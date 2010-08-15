@@ -52,7 +52,7 @@ class ArchiveDriverRegistry extends HashMap {
     private static final long serialVersionUID = 3445783613096128268L;
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/ArchiveDriverRegistry".replace('/', '.'); // support code obfuscation - NOI18N
+            = "de.schlichtherle.io.ArchiveDriverRegistry";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final Logger logger

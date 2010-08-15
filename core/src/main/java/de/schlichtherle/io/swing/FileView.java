@@ -42,7 +42,7 @@ import javax.swing.filechooser.*;
 final class FileView extends FilterFileView {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/swing/FileView".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.swing.FileView";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

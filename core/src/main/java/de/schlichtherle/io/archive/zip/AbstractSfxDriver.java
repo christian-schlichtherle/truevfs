@@ -33,7 +33,7 @@ abstract public class AbstractSfxDriver extends ZipDriver {
     private static final long serialVersionUID = -656184651651654635L;
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/archive/zip/AbstractSfxDriver".replace('/', '.'); // beware of code obfuscation!
+            = "de.schlichtherle.io.archive.zip.AbstractSfxDriver";
 
     /**
      * The character set used in SFX archives by default, which is determined

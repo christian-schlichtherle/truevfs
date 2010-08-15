@@ -47,7 +47,7 @@ public abstract class AbstractArchiveDriver
     private static final long serialVersionUID = 6546816846546846516L;
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/archive/spi/AbstractArchiveDriver".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.archive.spi.AbstractArchiveDriver";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private final String charset;

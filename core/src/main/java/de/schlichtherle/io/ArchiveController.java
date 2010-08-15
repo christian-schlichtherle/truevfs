@@ -93,7 +93,7 @@ abstract class ArchiveController implements Archive, Entry {
     //
 
     /*private static final String CLASS_NAME
-            = "de/schlichtherle/io/ArchiveController".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.ArchiveController";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);*/
 
     //

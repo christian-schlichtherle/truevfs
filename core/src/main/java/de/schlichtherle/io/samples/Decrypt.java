@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
 public class Decrypt extends CommandLineUtility {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/samples/Decrypt".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.samples.Decrypt";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

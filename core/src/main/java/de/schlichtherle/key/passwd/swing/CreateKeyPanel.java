@@ -42,7 +42,7 @@ import javax.swing.text.*;
 public class CreateKeyPanel extends EnhancedPanel {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/key/passwd/swing/CreateKeyPanel".replace('/', '.'); // beware of code obfuscation!
+            = "de.schlichtherle.key.passwd.swing.CreateKeyPanel";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

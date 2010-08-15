@@ -34,7 +34,7 @@ import javax.swing.DefaultComboBoxModel;
 public class AesKeyStrengthPanel extends EnhancedPanel {
     
     private static final String CLASS_NAME
-            = "de/schlichtherle/key/passwd/swing/AesKeyStrengthPanel".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.key.passwd.swing.AesKeyStrengthPanel";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

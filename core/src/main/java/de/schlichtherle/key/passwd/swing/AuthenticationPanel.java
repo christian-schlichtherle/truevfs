@@ -38,7 +38,7 @@ import javax.swing.text.*;
 public class AuthenticationPanel extends JPanel {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/key/passwd/swing/AuthenticationPanel".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.key.passwd.swing.AuthenticationPanel";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final File BASE_DIR = new File(".", ArchiveDetector.NULL);
