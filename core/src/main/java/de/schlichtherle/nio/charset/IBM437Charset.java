@@ -27,7 +27,7 @@ import java.util.logging.*;
 public final class IBM437Charset extends OctetCharset {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/nio/charset/IBM437Charset".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.nio.charset.IBM437Charset";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private static final String NAME = "IBM437";

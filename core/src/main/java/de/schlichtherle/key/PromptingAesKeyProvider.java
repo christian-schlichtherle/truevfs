@@ -50,7 +50,7 @@ public class PromptingAesKeyProvider
     }
 
     protected String getUIClassID() {
-        return "PromptingAesKeyProvider"; // support code obfuscation!
+        return "PromptingAesKeyProvider";
     }
 
     /**

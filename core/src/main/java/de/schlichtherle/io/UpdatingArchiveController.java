@@ -39,7 +39,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     //
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/UpdatingArchiveController".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.UpdatingArchiveController";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /** Prefix for temporary files created by this class. */

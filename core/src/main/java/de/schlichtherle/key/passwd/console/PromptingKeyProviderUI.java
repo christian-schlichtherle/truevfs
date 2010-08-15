@@ -33,7 +33,7 @@ public class PromptingKeyProviderUI
         implements de.schlichtherle.key.PromptingKeyProviderUI {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/key/passwd/console/PromptingKeyProviderUI".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.key.passwd.console.PromptingKeyProviderUI";
     protected static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

@@ -86,15 +86,15 @@ abstract class CommandLineUtility {
      */
     private static void configKeyManager() {
         String feedback;
-        feedback = "de/schlichtherle/key/passwd/swing/InvalidOpenKeyFeedback".replace('/', '.'); // support code obfuscation!
+        feedback = "de.schlichtherle.key.passwd.swing.InvalidOpenKeyFeedback";
         System.setProperty(feedback,
                 System.getProperty(feedback,
-                    "de/schlichtherle/key/passwd/swing/HurlingWindowFeedback".replace('/', '.'))); // support code obfuscation!
+                    "de.schlichtherle.key.passwd.swing.HurlingWindowFeedback"));
 
-        feedback = "de/schlichtherle/key/passwd/swing/InvalidCreateKeyFeedback".replace('/', '.'); // support code obfuscation!
+        feedback = "de.schlichtherle.key.passwd.swing.InvalidCreateKeyFeedback";
         System.setProperty(feedback,
                 System.getProperty(feedback,
-                    "de/schlichtherle/key/passwd/swing/HurlingWindowFeedback".replace('/', '.'))); // support code obfuscation!
+                    "de.schlichtherle.key.passwd.swing.HurlingWindowFeedback"));
     }
 
     /**

@@ -68,7 +68,7 @@ import java.util.ResourceBundle;
 public class NZip extends CommandLineUtility {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/samples/NZip".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.samples.NZip";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 

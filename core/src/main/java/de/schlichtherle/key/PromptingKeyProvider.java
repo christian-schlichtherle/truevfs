@@ -103,7 +103,7 @@ public class PromptingKeyProvider extends AbstractKeyProvider {
      * <code>PromptingKeyProviderUI</code> class for this identifier.
      */
     protected String getUIClassID() {
-        return "PromptingKeyProvider"; // support code obfuscation!
+        return "PromptingKeyProvider";
     }
 
     private synchronized final PromptingKeyProviderUI getUI() {

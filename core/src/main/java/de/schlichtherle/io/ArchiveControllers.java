@@ -34,7 +34,7 @@ import java.util.logging.*;
 final class ArchiveControllers {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/ArchiveControllers".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.ArchiveControllers";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**

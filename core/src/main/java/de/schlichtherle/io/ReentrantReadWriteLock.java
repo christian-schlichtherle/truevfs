@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 final class ReentrantReadWriteLock implements ReadWriteLock {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/ReentrantReadWriteLock".replace('/', '.'); // beware of code obfuscation!
+            = "de.schlichtherle.io.ReentrantReadWriteLock";
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 

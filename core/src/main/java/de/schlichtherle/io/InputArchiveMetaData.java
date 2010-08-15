@@ -43,7 +43,7 @@ import java.util.logging.*;
 public final class InputArchiveMetaData {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/InputArchiveMetaData".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.io.InputArchiveMetaData";
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**

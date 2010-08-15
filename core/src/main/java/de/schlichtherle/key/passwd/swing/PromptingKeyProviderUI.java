@@ -40,9 +40,9 @@ public class PromptingKeyProviderUI
         implements de.schlichtherle.key.PromptingKeyProviderUI {
 
     private static final String PACKAGE_NAME
-            = "de/schlichtherle/key/passwd/swing".replace('/', '.'); // support code obfuscation!
+            = "de.schlichtherle.key.passwd.swing";
     private static final String CLASS_NAME
-            = PACKAGE_NAME + "/PromptingKeyProviderUI".replace('/', '.'); // support code obfuscation!
+            = PACKAGE_NAME + ".PromptingKeyProviderUI";
     private static final ResourceBundle resources = ResourceBundle.getBundle(CLASS_NAME);
     private static final Logger logger = Logger.getLogger(CLASS_NAME);
 

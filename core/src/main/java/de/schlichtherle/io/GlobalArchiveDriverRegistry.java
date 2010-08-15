@@ -71,7 +71,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     private static final long serialVersionUID = 1579600190374703884L;
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/io/GlobalArchiveDriverRegistry".replace('/', '.'); // support code obfuscation - NOI18N
+            = "de.schlichtherle.io.GlobalArchiveDriverRegistry";
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
