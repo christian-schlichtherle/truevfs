@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle;
+package de.schlichtherle.io.samples;
 
 import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.DefaultArchiveDetector;
@@ -68,7 +68,7 @@ import java.util.ResourceBundle;
 public class NZip extends CommandLineUtility {
 
     private static final String CLASS_NAME
-            = "de/schlichtherle/NZip".replace('/', '.'); // support code obfuscation!
+            = "de/schlichtherle/io/samples/NZip".replace('/', '.'); // support code obfuscation!
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
