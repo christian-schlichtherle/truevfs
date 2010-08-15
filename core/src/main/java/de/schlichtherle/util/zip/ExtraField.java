@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) 2007-2010 Schlichtherle IT Services
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.schlichtherle.util.zip;
+
+import java.util.*;
+
+/**
+ * Abstract base class for an Extra Field in a Local or Central Header of a
+ * ZIP archive.
+ * It defines the common properties of all Extra Fields and how to
+ * serialize/deserialize them to/from byte arrays.
+ * <p>
+ * This class is <em>not</em> thread-safe.
+ * 
+ * @author Christian Schlichtherle
+ * @version $Revision$
+ * @since TrueZIP 6.7
+ */
+abstract class ExtraField {
+
+    /** The Header ID of a ZIP64 Extended Information Extra Field. */
+    public static final int ZIP64_HEADER_ID = 0x0001;
+
+    private static final Map registry = new HashMap();
+
+    /**
+     * Registers a concrete implementation of this abstract base class for
+     * use with the static factory method {@link #create}.
+     * 
+     * @param c The implementation class of this abstract base class.
+     * @throws IllegalArgumentException If <code>c</code> is <code>null</code>,
+     *         cannot get instantiated, is not a subclass of
+     *         <code>ExtraField</code> or its Header ID is out of range.
+     *         A more descriptive exception may be associated to it as its
+     *         cause.
+     * @see #create
+     */
+    public static void register(final Class c) {
+        final ExtraField ef;
+        try {
+            ef = (ExtraField) c.newInstance();
+        } catch (Exception ex) {
+            final IllegalArgumentException iae = new IllegalArgumentException();
+            iae.initCause(ex);
+            throw iae;
+        }
+        final int headerID = ef.getHeaderID();
+        UShort.check(headerID, "Header ID out of range", null);
+        // TODO: For JSE 5: registry.put(Integer.valueOf(headerID), c);
+        registry.put(new Integer(headerID), c);
+    }
+
+    /**
+     * A static factory method which creates a new Extra Field based on the
+     * given Header ID.
+     * The returned Extra Field still requires proper initialization, for
+     * example by calling {@link #readFrom}.
+     * 
+     * @param headerID An unsigned short integer (two bytes) which indicates
+     *        the type of the returned Extra Field.
+     * @return A new Extra Field - never <code>null</code>!
+     * @throws IllegalArgumentException If <code>headerID</code> is out of
+     *         range.
+     * @see #register
+     */
+    public static ExtraField create(final int headerID) {
+        UShort.check(headerID, "Header ID out of range", null);
+        // TODO: For JSE 5: final Class c = (Class) registry.get(Integer.valueOf(headerID));
+        final Class c = (Class) registry.get(new Integer(headerID));
+        final ExtraField ef;
+        try {
+            ef = c != null
+                    ? (ExtraField) c.newInstance()
+                    : new DefaultExtraField(headerID);
+        } catch (Exception cannotHappen) {
+            final AssertionError ae
+                    = new AssertionError("register(Class) should have checked the instantiatability of " + c);
+            ae.initCause(cannotHappen);
+            throw ae;
+        }
+        assert headerID == ef.getHeaderID();
+        return ef;
+    }
+
+    /**
+     * Returns the Header ID (type) of this Extra Field.
+     * The Header ID is an unsigned short integer (two bytes)
+     * which must be constant during the life cycle of this object.
+     */
+    public abstract int getHeaderID();
+
+    /**
+     * Returns the Data Size of this Extra Field.
+     * The Data Size is an unsigned short integer (two bytes)
+     * which indicates the length of the Data Block in bytes and does not
+     * include its own size in this Extra Field.
+     * This property may be initialized by calling {@link #readFrom}.
+     * 
+     * @return The size of the Data Block in bytes
+     *         or <code>0</code> if unknown.
+     * @see #getDataBlock
+     */
+    abstract int getDataSize();
+
+    /**
+     * Returns a protective copy of the Data Block.
+     * <code>null</code> is never returned.
+     * 
+     * @see #getDataSize
+     */
+    final byte[] getDataBlock() {
+        final int size = getDataSize();
+        UShort.check(size);
+        if (size == 0)
+            return ZIP.EMPTY;
+
+        final byte[] data = new byte[size];
+        writeTo(data, 0);
+        return data;
+    }
+
+    /**
+     * Initializes this Extra Field by deserializing a Data Block of
+     * <code>size</code> bytes from the
+     * byte array <code>data</code> at the zero based offset <code>off</code>.
+     * Upon return, this Extra Field shall not access <code>data</code>
+     * subsequently and {@link #getDataSize} must equal <code>size</code>.
+     *
+     * @param data The byte array to read the Data Block from.
+     * @param off The zero based offset in the byte array where the first byte
+     *        of the Data Block is read from.
+     * @param size The length of the Data Block in bytes.
+     * @throws IndexOutOfBoundsException If the byte array
+     *         <code>data</code> does not hold at least <code>size</code>
+     *         bytes at the zero based offset <code>off</code>.
+     * @throws RuntimeException If <code>size</code> is illegal or the
+     *         deserialized Data Block contains illegal data.
+     * @see #getDataSize
+     */
+    abstract void readFrom(byte[] data, int off, int size);
+
+    /**
+     * Serializes a Data Block of {@link #getDataSize} bytes to the
+     * byte array <code>data</code> at the zero based offset <code>off</code>.
+     * Upon return, this Extra Field shall not access <code>data</code>
+     * subsequently.
+     *
+     * @param data The byte array to write the Data Block to.
+     * @param off The zero based offset in the byte array where the first byte
+     *        of the Data Block is written to.
+     * @throws IndexOutOfBoundsException If the byte array
+     *         <code>data</code> does not hold at least {@link #getDataSize}
+     *         bytes at the zero based offset <code>off</code>.
+     * @see #getDataSize
+     */
+    abstract void writeTo(byte[] data, int off);
+}
