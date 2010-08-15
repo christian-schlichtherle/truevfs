@@ -1,0 +1,50 @@
+<!--
+  - Copyright (C) 2006-2010 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<html>
+    <head>
+        <meta http-equiv="Content-Language" content="en">
+        <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+    </head>
+    <body>
+        <p>The archive driver family for RAES encrypted ZIP files.
+            RAES encrypted ZIP files are no more than regular ZIP files
+            which use UTF-8 as their character set (like JARs) and have been
+            wrapped as a whole in the RAES file format.
+            RAES enables transparent random access to AES encrypted data in the file as
+            if the application were reading decrypted data from a
+            <code>RandomAccessFile</code>.
+            RAES is not at all specific to ZIP files - any kind of content can be
+            encrypted.
+            TrueZIP uses RAES to enable transparent access to encrypted ZIP files as if
+        they were (virtual) directories.</p>
+        
+        <p>To access RAES encrypted ZIP files, client applications need to</p>
+        <ol>
+            <li>configure TrueZIP to recognize the file suffixes
+                registered for this archive type with the
+                {@link de.schlichtherle.io.DefaultArchiveDetector} class
+                (which are <i>.tzp</i>, <i>.zip.rae</i> and <i>.zip.raes</i>
+                by default),
+            and</li>
+            <li>have the JAR for Bouncy Castle's Lightweight Crypto API for
+                JDK 1.4 Version 1.30 or higher (<i>lcrypto.jar</i>) on the
+                runtime class path.
+                You can download it by searching for "lcrypto-jdk14-130" at
+                <a href="http://www.bouncycastle.org/latest_releases.html">
+            http://www.bouncycastle.org/latest_releases.html</a>.</li>
+        </ol>
+    </body>
+</html>
