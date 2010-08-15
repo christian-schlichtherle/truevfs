@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle;
+package de.schlichtherle.io.samples;
 
 import de.schlichtherle.io.*;
 import de.schlichtherle.io.File;
@@ -86,15 +86,15 @@ abstract class CommandLineUtility {
      */
     private static void configKeyManager() {
         String feedback;
-        feedback = "de.schlichtherle.key.passwd.swing.InvalidOpenKeyFeedback";
+        feedback = "de/schlichtherle/key/passwd/swing/InvalidOpenKeyFeedback".replace('/', '.'); // support code obfuscation!
         System.setProperty(feedback,
                 System.getProperty(feedback,
-                    "de.schlichtherle.key.passwd.swing.HurlingWindowFeedback"));
+                    "de/schlichtherle/key/passwd/swing/HurlingWindowFeedback".replace('/', '.'))); // support code obfuscation!
 
-        feedback = "de.schlichtherle.key.passwd.swing.InvalidCreateKeyFeedback";
+        feedback = "de/schlichtherle/key/passwd/swing/InvalidCreateKeyFeedback".replace('/', '.'); // support code obfuscation!
         System.setProperty(feedback,
                 System.getProperty(feedback,
-                    "de.schlichtherle.key.passwd.swing.HurlingWindowFeedback"));
+                    "de/schlichtherle/key/passwd/swing/HurlingWindowFeedback".replace('/', '.'))); // support code obfuscation!
     }
 
     /**
