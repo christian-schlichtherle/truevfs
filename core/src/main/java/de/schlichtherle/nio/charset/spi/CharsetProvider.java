@@ -26,7 +26,7 @@ import java.util.*;
  * also known as <code>CP437</code>.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
     

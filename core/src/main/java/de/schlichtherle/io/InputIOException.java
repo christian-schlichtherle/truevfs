@@ -27,7 +27,7 @@ import java.io.IOException;
  * {@link Throwable#getCause} to an <code>IOException</code>.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 // TODO: Review: Rename this to IException?
 public class InputIOException extends IOException {

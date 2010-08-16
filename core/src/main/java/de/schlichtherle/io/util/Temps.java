@@ -26,7 +26,7 @@ import java.io.*;
  * the value of the system property <code>java.io.tmpdir</code> is used.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.6
  */
 public class Temps {

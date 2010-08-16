@@ -25,7 +25,7 @@ import junit.framework.*;
  * Tests archive type independent features of the {@link File} class.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class GeneralFileTest extends TestCase {
 

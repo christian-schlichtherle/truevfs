@@ -29,7 +29,7 @@ import java.util.zip.ZipException;
  * The exception's detail message is the name of the ZIP entry.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class CRC32Exception extends ZipException {

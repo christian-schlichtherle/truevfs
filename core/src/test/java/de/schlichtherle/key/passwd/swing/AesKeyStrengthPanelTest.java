@@ -31,7 +31,7 @@ import org.netbeans.jemmy.operators.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class AesKeyStrengthPanelTest extends TestCase {

@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
  * @see File#umount
  * @see File#update
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public class FileReader extends InputStreamReader {

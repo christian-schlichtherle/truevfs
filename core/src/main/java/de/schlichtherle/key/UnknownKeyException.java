@@ -25,7 +25,7 @@ import java.security.GeneralSecurityException;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.0
- * @version $Revision$
+ * @version $Id$
  */
 public class UnknownKeyException extends GeneralSecurityException {
 

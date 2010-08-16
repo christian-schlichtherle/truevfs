@@ -29,7 +29,7 @@ import java.util.logging.*;
  * by performing a full update of the target archive file.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 final class UpdatingArchiveController extends ArchiveFileSystemController {

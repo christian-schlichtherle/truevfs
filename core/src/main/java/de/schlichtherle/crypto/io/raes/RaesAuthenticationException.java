@@ -23,7 +23,7 @@ package de.schlichtherle.crypto.io.raes;
  * of a file.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class RaesAuthenticationException extends RaesException {

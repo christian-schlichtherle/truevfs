@@ -21,7 +21,7 @@ package de.schlichtherle.swing.event;
  * Provided for convenience.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0.1
  */
 public abstract class PanelAdapter implements PanelListener {

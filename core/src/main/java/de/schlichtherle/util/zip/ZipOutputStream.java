@@ -42,7 +42,7 @@ import java.util.*;
  * This class is thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @see ZipFile
  */
 public class ZipOutputStream extends BasicZipOutputStream {

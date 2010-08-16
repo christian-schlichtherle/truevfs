@@ -44,7 +44,7 @@ import java.util.Arrays;
  * @see KeyProvider
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4 (renamed from SharedKeyProvider)
  */
 public abstract class AbstractKeyProvider implements KeyProvider {

@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  * too, which is pretty inefficient for a single instance.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 class ArchiveDriverRegistry extends HashMap {

@@ -20,7 +20,7 @@ package de.schlichtherle.io;
  * Tests the TrueZIP API in de.schlichtherle.io with the TAR driver.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarFileTest extends FileTestCase {

@@ -22,7 +22,7 @@ package de.schlichtherle.io;
  * 
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 interface ReadWriteLock {

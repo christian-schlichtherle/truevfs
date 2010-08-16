@@ -23,7 +23,7 @@ package de.schlichtherle.io;
  * which enables to backport the functionality to J2SE 1.4 easily.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 interface Task {

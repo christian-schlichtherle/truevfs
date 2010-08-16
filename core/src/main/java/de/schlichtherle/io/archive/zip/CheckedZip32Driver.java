@@ -21,7 +21,7 @@ import javax.swing.Icon;
 /**
  * @deprecated Use {@link CheckedZipDriver} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  * @see CheckedZip32InputArchive
  */

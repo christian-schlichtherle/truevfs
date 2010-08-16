@@ -23,7 +23,7 @@ package de.schlichtherle.util.zip;
  * This class is safe for multithreading.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 final class LittleEndian {

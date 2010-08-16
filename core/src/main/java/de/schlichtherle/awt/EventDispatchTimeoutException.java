@@ -22,7 +22,7 @@ package de.schlichtherle.awt;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.4
- * @version $Revision$
+ * @version $Id$
  */
 public class EventDispatchTimeoutException extends Exception {
 

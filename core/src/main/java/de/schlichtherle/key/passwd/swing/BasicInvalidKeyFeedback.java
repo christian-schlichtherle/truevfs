@@ -46,7 +46,7 @@ import javax.swing.Timer;
  * This issue is fixed in JSE 1.5.0_07 (and probably earlier versions).
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public abstract class BasicInvalidKeyFeedback extends BasicFeedback {

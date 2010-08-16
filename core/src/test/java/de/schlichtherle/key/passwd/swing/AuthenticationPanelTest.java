@@ -30,7 +30,7 @@ import org.netbeans.jemmy.util.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class AuthenticationPanelTest extends TestCase {

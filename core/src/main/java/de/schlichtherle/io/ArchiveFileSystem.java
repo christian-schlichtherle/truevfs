@@ -33,7 +33,7 @@ import javax.swing.Icon;
  * respective <tt>ArchiveController</tt> object!
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0 (refactored from the former <code>ZipFileSystem</code>)
  */
 final class ArchiveFileSystem implements Entry {

@@ -21,7 +21,7 @@ package de.schlichtherle.crypto.io.raes;
  * an RAES file has been disabled or cancelled.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class RaesKeyException extends RaesParametersException {

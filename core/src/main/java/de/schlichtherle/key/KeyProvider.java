@@ -99,7 +99,7 @@ package de.schlichtherle.key;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.0
- * @version $Revision$
+ * @version $Id$
  */
 public interface KeyProvider {
 

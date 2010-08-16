@@ -59,7 +59,7 @@ import java.util.Locale;
  * Null suffixes are not permitted in this set.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public final class SuffixSet extends CanonicalStringSet {

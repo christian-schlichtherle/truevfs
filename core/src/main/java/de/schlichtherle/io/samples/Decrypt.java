@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
  * various flavours of ZIP compatible files.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public class Decrypt extends CommandLineUtility {

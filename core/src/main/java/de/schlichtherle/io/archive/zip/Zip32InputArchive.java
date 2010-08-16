@@ -25,7 +25,7 @@ import java.util.zip.ZipException;
 /**
  * @deprecated Use {@link ZipInputArchive} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class Zip32InputArchive extends ZipInputArchive {

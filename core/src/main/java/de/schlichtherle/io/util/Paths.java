@@ -23,7 +23,7 @@ import java.io.File;
  *
  * @deprecated This class will vanish in the next release.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class Paths {
 

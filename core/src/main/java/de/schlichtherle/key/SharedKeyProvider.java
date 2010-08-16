@@ -20,7 +20,7 @@ package de.schlichtherle.key;
  * @deprecated The class name is a misnomer: Use {@link AbstractKeyProvider}
  *             instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class SharedKeyProvider extends AbstractKeyProvider {

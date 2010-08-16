@@ -27,7 +27,7 @@ import de.schlichtherle.io.FileBusyException;
  * applies.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class OutputArchiveBusyException extends FileBusyException {

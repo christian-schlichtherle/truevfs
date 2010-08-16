@@ -57,7 +57,7 @@ import javax.swing.Icon;
  *
  * @see OdfOutputArchive
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public class OdfDriver extends JarDriver {

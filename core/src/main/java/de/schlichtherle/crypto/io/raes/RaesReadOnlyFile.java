@@ -59,7 +59,7 @@ import java.io.*;
  * @see RaesOutputStream
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {

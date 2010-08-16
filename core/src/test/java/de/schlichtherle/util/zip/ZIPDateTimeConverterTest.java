@@ -22,7 +22,7 @@ import junit.framework.TestSuite;
 /**
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class ZIPDateTimeConverterTest extends DateTimeConverterTestCase {

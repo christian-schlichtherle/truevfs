@@ -29,7 +29,7 @@ import java.io.*;
  * in {@link FilterReadOnlyFile}.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class BufferedReadOnlyFile extends FilterReadOnlyFile {
 

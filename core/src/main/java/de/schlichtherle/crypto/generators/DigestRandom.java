@@ -30,7 +30,7 @@ import org.bouncycastle.crypto.Digest;
  * Unlike its super class, this class does not support serialization.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class DigestRandom extends Random {
 

@@ -21,7 +21,7 @@ import javax.swing.Icon;
 /**
  * @deprecated Use {@link AbstractZipRaesDriver} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class AbstractZip32RaesDriver extends AbstractZipRaesDriver {

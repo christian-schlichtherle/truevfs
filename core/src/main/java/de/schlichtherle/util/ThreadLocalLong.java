@@ -21,7 +21,7 @@ package de.schlichtherle.util;
  * Its initial value is <code>0</code>.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 public class ThreadLocalLong extends ThreadLocal {

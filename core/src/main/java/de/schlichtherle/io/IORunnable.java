@@ -23,7 +23,7 @@ import java.io.IOException;
  * {@link ArchiveController#runWriteLocked}.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 interface IORunnable {

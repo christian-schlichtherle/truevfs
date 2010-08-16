@@ -30,7 +30,7 @@ import junit.framework.*;
  * Subclasses must override {@link #setUp}.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public abstract class ZipTestCase extends TestCase {
 

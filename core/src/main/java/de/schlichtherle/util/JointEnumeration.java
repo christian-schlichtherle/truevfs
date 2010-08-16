@@ -22,7 +22,7 @@ import java.util.*;
  * Concatenates two enumerations.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public final class JointEnumeration implements Enumeration {

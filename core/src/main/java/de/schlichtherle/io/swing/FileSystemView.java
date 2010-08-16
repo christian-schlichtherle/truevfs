@@ -34,7 +34,7 @@ import javax.swing.*;
  * {@link de.schlichtherle.io.swing.JFileTree}.
  *
  * @author  Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 //
 // Unfortunately this is a pretty ugly piece of code.

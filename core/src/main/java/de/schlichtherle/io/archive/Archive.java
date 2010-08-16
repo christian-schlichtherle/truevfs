@@ -25,7 +25,7 @@ package de.schlichtherle.io.archive;
  * features may be added in future.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface Archive {

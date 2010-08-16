@@ -48,7 +48,7 @@ import java.util.zip.ZipException;
  * @see ZipInputArchive
  * @see CheckedZipDriver
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class CheckedZipInputArchive extends ZipInputArchive {

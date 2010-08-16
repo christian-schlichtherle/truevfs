@@ -39,7 +39,7 @@ import de.schlichtherle.key.*;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.4
- * @version $Revision$
+ * @version $Id$
  */
 public class PromptingKeyManager extends de.schlichtherle.key.PromptingKeyManager {
 

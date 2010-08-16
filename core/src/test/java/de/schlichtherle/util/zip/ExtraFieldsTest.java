@@ -24,7 +24,7 @@ import junit.framework.TestCase;
  * Tests the collection of {@link ExtraFields Extra Fields}.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class ExtraFieldsTest extends TestCase {

@@ -24,7 +24,7 @@ package de.schlichtherle.key;
  * 256 bits.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public interface AesKeyProvider extends KeyProvider {

@@ -47,7 +47,7 @@ import javax.swing.Icon;
  * Instances of this base class are immutable.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class AbstractZipRaesDriver extends JarDriver {

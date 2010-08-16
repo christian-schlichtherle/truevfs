@@ -34,7 +34,7 @@ import java.util.*;
  * stub methods for the same purpose in {@link File}.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 final class Files {

@@ -33,7 +33,7 @@ package de.schlichtherle.crypto.io.raes;
  * </ol>
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface RaesParametersAgent extends RaesParameters {

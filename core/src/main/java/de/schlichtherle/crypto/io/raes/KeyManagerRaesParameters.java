@@ -45,7 +45,7 @@ import de.schlichtherle.key.KeyManager;
  * of these interfaces would put us at the mercy of {@link RaesOutputStream}!
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class KeyManagerRaesParameters implements RaesParametersAgent {

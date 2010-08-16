@@ -26,7 +26,7 @@ import java.text.*;
  * Abstract base class for command line utilities.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 abstract class CommandLineUtility {

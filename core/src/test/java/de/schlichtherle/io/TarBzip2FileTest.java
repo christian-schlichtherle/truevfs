@@ -22,7 +22,7 @@ import de.schlichtherle.io.archive.tar.TarBZip2Driver;
  * Tests the TrueZIP API in de.schlichtherle.io with the TAR.BZ2 driver.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarBzip2FileTest extends FileTestCase {

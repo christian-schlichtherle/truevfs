@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * for more information.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 final class ReentrantReadWriteLock implements ReadWriteLock {

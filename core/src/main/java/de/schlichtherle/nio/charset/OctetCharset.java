@@ -28,7 +28,7 @@ import java.util.Arrays;
  * A memory efficient base class for simple 8 bit (octet) character sets.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public abstract class OctetCharset extends Charset {
 

@@ -19,7 +19,7 @@ package de.schlichtherle.key.passwd.swing;
 /**
  * @deprecated Use super class instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 public class QuakingWindowFeedback extends HurlingWindowFeedback {

@@ -29,7 +29,7 @@ import org.bouncycastle.crypto.*;
  * @see RaesReadOnlyFile
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class RaesOutputStream extends CipherOutputStream {

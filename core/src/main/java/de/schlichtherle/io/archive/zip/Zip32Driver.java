@@ -22,7 +22,7 @@ import javax.swing.Icon;
 /**
  * @deprecated Use {@link ZipDriver} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class Zip32Driver extends ZipDriver {

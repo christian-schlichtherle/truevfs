@@ -35,7 +35,7 @@ import java.nio.channels.*;
  *             <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154">
  *             http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154</a>.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
 

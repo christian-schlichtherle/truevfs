@@ -26,7 +26,7 @@ import javax.swing.*;
  * A utility class for window management.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 final class WindowUtils {

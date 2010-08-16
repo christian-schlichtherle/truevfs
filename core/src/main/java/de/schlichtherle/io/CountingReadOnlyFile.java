@@ -22,7 +22,7 @@ import java.io.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 final class CountingReadOnlyFile extends FilterReadOnlyFile {

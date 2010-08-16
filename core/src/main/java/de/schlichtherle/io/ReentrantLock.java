@@ -25,7 +25,7 @@ package de.schlichtherle.io;
  * the particular needs of TrueZIP (see {@link ArchiveController}).
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 interface ReentrantLock {

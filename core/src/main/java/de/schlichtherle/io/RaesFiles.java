@@ -28,7 +28,7 @@ import java.io.*;
  * use the {@link File} class for this task instead.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class RaesFiles {
 

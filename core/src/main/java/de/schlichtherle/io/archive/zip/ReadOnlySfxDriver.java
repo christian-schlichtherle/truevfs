@@ -31,7 +31,7 @@ import javax.swing.Icon;
  * @see CheckedReadOnlySfxDriver
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  * @see ReadWriteSfxDriver
  */

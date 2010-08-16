@@ -32,7 +32,7 @@ import java.util.TimeZone;
  * This class is thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public abstract class DateTimeConverter {

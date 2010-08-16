@@ -24,7 +24,7 @@ import java.io.IOException;
  * is considered to be an issue when accessing the contents of a file.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class RaesException extends IOException {

@@ -46,7 +46,7 @@ import org.apache.tools.tar.*;
  * to overcome this limitation.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarOutputArchive

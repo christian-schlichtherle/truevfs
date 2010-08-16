@@ -37,7 +37,7 @@ import java.util.logging.*;
  * of the streams between multiple threads.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public final class OutputArchiveMetaData {

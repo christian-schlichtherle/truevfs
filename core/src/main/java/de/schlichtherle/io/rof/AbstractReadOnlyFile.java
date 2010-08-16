@@ -23,7 +23,7 @@ import java.io.*;
  * implements the common boilerplate.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {

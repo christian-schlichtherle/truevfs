@@ -25,7 +25,7 @@ import junit.framework.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public abstract class OctetCharsetTestCase extends TestCase {
 

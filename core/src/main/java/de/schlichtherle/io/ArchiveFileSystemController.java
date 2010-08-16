@@ -26,7 +26,7 @@ import java.io.*;
  * strategy.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 abstract class ArchiveFileSystemController extends ArchiveController {

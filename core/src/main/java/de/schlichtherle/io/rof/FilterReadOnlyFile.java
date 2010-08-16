@@ -58,7 +58,7 @@ import java.io.*;
  * </blockquote>
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class FilterReadOnlyFile extends AbstractReadOnlyFile {
 

@@ -47,7 +47,7 @@ import java.util.TreeMap;
  * Null elements are not permitted in this set.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public class CanonicalStringSet extends AbstractSet {

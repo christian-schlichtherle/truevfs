@@ -30,7 +30,7 @@ import org.bouncycastle.crypto.digests.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class RaesTest extends ReadOnlyFileTestCase {
 

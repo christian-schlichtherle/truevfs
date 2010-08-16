@@ -43,7 +43,7 @@ import javax.swing.*;
  * This class is thread safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class PromptingKeyManager

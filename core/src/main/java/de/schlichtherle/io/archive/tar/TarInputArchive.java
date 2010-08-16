@@ -40,7 +40,7 @@ import org.apache.tools.tar.*;
  * behaviour.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarInputArchive implements InputArchive, TarConstants {

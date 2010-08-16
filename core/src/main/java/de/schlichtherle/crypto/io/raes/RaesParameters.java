@@ -27,7 +27,7 @@ package de.schlichtherle.crypto.io.raes;
  * @see Type0RaesParameters
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface RaesParameters {

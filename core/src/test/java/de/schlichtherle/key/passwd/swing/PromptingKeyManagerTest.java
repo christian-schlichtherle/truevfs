@@ -30,7 +30,7 @@ import org.netbeans.jemmy.TestOut;
 /**
  * @author Christian Schlichtherle
  * @since TrueZIP 6.1
- * @version $Revision$
+ * @version $Id$
  */
 public class PromptingKeyManagerTest extends TestCase {
     static {

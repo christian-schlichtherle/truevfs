@@ -46,7 +46,7 @@ import javax.swing.Icon;
  * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5.5
  * @see CheckedZipInputArchive
  */

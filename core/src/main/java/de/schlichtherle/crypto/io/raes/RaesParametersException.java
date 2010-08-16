@@ -27,7 +27,7 @@ import java.io.FileNotFoundException;
  * but not a <code>FileNotFoundException</code>).
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class RaesParametersException extends FileNotFoundException {

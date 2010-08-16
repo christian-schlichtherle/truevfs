@@ -43,7 +43,7 @@ import java.io.*;
  * @see FileInputStream
  * @see FileOutputStream
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class FileBusyException extends FileNotFoundException {
 

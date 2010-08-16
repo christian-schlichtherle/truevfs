@@ -40,7 +40,7 @@ import java.io.IOException;
  * away this exception anyway and deal with the transient cause only.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public final class TransientIOException extends IOException {

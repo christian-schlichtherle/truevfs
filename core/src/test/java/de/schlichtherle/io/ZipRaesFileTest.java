@@ -26,7 +26,7 @@ import java.io.*;
  * constant password without prompting the user.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class ZipRaesFileTest extends FileTestCase {
 

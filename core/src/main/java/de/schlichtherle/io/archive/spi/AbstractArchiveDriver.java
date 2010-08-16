@@ -39,7 +39,7 @@ import javax.swing.Icon;
  * requirements of the {@link de.schlichtherle.io.File} class.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class AbstractArchiveDriver

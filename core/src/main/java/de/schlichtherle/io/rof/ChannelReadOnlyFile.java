@@ -24,7 +24,7 @@ import java.nio.channels.*;
  * A {@link ReadOnlyFile} implementation using file channels.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
 

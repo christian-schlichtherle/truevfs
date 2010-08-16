@@ -50,7 +50,7 @@ import java.util.Comparator;
  * </code></pre>
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0 (refactored from the predecessor class
  *        <code>ArchiveControllerException</code>)
  */

@@ -32,7 +32,7 @@ package de.schlichtherle.io.archive.zip.raes;
  * @see SafeZipRaesDriver
  * @see ParanoidZipRaesDriver
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class UnsafeZipRaesDriver extends AbstractZipRaesDriver {

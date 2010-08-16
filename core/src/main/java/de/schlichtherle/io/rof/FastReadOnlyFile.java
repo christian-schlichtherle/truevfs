@@ -28,7 +28,7 @@ import java.io.*;
  *             most likely does not provide any performance improvement.
  *             Use where necessary only!
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class FastReadOnlyFile
         extends RandomAccessFile

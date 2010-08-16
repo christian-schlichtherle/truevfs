@@ -47,7 +47,7 @@ import java.io.IOException;
  * </code></pre>
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ArchiveWarningException extends ArchiveException {

@@ -33,7 +33,7 @@ import javax.swing.tree.*;
  * current path expansions and selection.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public class JFileTree extends JTree {

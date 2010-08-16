@@ -29,7 +29,7 @@ import javax.swing.Icon;
  * interface.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarEntry

@@ -22,7 +22,7 @@ import junit.framework.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class MemoryMappedReadOnlyFileTest extends ReadOnlyFileTestCase {
     
