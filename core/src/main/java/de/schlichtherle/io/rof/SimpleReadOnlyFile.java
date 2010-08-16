@@ -24,7 +24,7 @@ import java.io.RandomAccessFile;
  * A {@link ReadOnlyFile} implementation using a {@link RandomAccessFile}.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class SimpleReadOnlyFile
         extends RandomAccessFile

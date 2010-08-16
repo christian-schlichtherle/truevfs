@@ -23,7 +23,7 @@ import java.io.CharConversionException;
  *
  * @deprecated Thie interface will vanish in TrueZIP 7.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public interface ArchiveEntryFactory {

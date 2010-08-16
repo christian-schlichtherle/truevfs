@@ -23,7 +23,7 @@ import org.bouncycastle.crypto.BlockCipher;
  * the blocks in a plain or cipher text.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 3.1
  */
 public interface SeekableBlockCipher extends BlockCipher {

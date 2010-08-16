@@ -22,7 +22,7 @@ import de.schlichtherle.io.archive.zip.CheckedZipDriver;
  * Tests the TrueZIP API in de.schlichtherle.io with the ZIP driver.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class CheckedZipFileTest extends FileTestCase {
     

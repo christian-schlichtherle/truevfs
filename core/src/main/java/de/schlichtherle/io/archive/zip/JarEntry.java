@@ -25,7 +25,7 @@ import de.schlichtherle.util.zip.DateTimeConverter;
  * @see ZipDriver
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class JarEntry extends ZipEntry {

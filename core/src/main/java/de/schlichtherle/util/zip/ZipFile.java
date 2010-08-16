@@ -46,7 +46,7 @@ import java.util.zip.*;
  * This class is thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @see ZipOutputStream
  */
 public class ZipFile extends BasicZipFile {

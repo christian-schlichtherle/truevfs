@@ -28,7 +28,7 @@ import java.util.logging.*;
  * Provides static utility methods for {@link ArchiveController}s.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 final class ArchiveControllers {

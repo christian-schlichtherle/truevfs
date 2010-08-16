@@ -70,7 +70,7 @@ import java.net.*;
  * @see File
  * @see ArchiveDriver
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface ArchiveDetector extends FileFactory {

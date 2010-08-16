@@ -23,7 +23,7 @@ package de.schlichtherle.key.passwd.swing;
  *
  * @deprecated
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 public interface InvalidOpenKeyFeedback extends OpenKeyFeedback {

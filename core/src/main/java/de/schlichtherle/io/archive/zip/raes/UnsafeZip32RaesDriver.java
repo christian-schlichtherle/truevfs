@@ -19,7 +19,7 @@ package de.schlichtherle.io.archive.zip.raes;
 /**
  * @deprecated Use {@link UnsafeZipRaesDriver} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class UnsafeZip32RaesDriver extends UnsafeZipRaesDriver {

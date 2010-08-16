@@ -53,7 +53,7 @@ import javax.swing.text.JTextComponent;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
- * @version $Revision$
+ * @version $Id$
  */
 public abstract class AbstractComboBoxBrowser implements Serializable {
 

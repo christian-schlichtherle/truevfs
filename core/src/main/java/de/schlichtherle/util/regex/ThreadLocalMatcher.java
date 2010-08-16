@@ -24,7 +24,7 @@ import java.util.regex.*;
  * performance pattern matching.
  *
  * @see #reset(CharSequence)
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5 (refactored from inner class in
  *        de.schlichtherle.io.DefaultArchiveDetector)
  */

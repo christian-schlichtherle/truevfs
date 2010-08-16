@@ -19,7 +19,7 @@ package de.schlichtherle.io;
 /**
  * @deprecated Use the base class instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class RaesFileUtils extends RaesFiles {
 

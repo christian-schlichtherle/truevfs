@@ -23,7 +23,7 @@ package de.schlichtherle.util.zip;
  * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 final class DefaultExtraField extends ExtraField {

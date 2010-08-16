@@ -30,7 +30,7 @@ import org.bouncycastle.crypto.params.*;
  * 
  * @author The Legion of the Bouncy Castle (majority of the code)
  * @author Christian Schlichtherle (optimizations and extension to support seeking)
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 3.1
  */
 public class SICSeekableBlockCipher implements SeekableBlockCipher {

@@ -23,7 +23,7 @@ package de.schlichtherle.crypto.io.raes;
  * constants become part of the public API.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 interface RAES {

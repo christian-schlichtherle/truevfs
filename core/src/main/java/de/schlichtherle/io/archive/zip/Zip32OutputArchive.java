@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * @deprecated Use {@link ZipOutputArchive} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class Zip32OutputArchive extends ZipOutputArchive {

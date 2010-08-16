@@ -24,7 +24,7 @@ import junit.runner.TestCollector;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public class TrueZIPTestCollector implements TestCollector {

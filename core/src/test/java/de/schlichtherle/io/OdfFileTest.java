@@ -20,7 +20,7 @@ package de.schlichtherle.io;
  * Tests the TrueZIP API in de.schlichtherle.io with the ODF driver.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class OdfFileTest extends FileTestCase {
     

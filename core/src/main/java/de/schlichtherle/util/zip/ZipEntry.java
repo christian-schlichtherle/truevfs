@@ -34,7 +34,7 @@ import java.io.UnsupportedEncodingException;
  * threads concurrently.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class ZipEntry implements Cloneable {
 

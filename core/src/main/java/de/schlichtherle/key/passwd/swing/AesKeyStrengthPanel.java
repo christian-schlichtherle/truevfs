@@ -29,7 +29,7 @@ import javax.swing.DefaultComboBoxModel;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.0 (refactored from package de.schlichtherle.crypto.io.swing)
- * @version $Revision$
+ * @version $Id$
  */
 public class AesKeyStrengthPanel extends EnhancedPanel {
     

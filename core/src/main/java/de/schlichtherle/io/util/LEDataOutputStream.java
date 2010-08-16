@@ -33,7 +33,7 @@ import java.io.OutputStream;
  * Note that this class is <em>not</em> thread safe.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class LEDataOutputStream
         extends FilterOutputStream

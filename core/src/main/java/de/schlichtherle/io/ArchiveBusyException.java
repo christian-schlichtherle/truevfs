@@ -36,7 +36,7 @@ package de.schlichtherle.io;
  * @see File#umount
  * @see File#update
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ArchiveBusyException extends ArchiveException {

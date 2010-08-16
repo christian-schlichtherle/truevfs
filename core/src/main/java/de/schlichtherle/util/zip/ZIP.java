@@ -22,7 +22,7 @@ package de.schlichtherle.util.zip;
  * constants become part of the public API.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 interface ZIP {
 

@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
  * Thrown to indicate that a password or key file is considered weak.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class WeakKeyException extends GeneralSecurityException {

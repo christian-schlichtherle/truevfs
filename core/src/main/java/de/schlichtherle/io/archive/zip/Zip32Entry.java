@@ -19,7 +19,7 @@ package de.schlichtherle.io.archive.zip;
 /**
  * @deprecated Use {@link ZipEntry} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class Zip32Entry extends ZipEntry {

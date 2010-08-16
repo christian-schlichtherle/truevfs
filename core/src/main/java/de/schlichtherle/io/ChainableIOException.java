@@ -52,7 +52,7 @@ import java.util.*;
  * @see File#umount
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0 (generalized from the former
  *        <code>ArchiveControllerException</code>).
  */

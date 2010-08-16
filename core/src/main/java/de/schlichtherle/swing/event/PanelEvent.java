@@ -37,7 +37,7 @@ import java.awt.Window;
  * cause. The super class is kept for backwards compatibility only.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public class PanelEvent extends AWTEvent {

@@ -34,7 +34,7 @@ import javax.swing.Timer;
  * in 2005.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {

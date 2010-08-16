@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
  * This exception is typically thrown from {@link File#cp}.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public class ContainsFileException extends FileNotFoundException {

@@ -24,7 +24,7 @@ import java.io.IOException;
  * read a ZIP compatible file which may or may not be encrypted.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public interface ReadOnlyFile {
 

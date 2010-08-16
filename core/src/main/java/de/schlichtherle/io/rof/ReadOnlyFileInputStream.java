@@ -27,7 +27,7 @@ import java.util.logging.*;
  * {@link NullPointerException} if {@link #rof} hasn't been initialized.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4 Support for marking.
  */
 public class ReadOnlyFileInputStream extends InputStream {

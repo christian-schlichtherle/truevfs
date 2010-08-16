@@ -21,7 +21,7 @@ import javax.swing.Icon;
 /**
  * @deprecated Use {@link ParanoidZipRaesDriver} instead.
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ParanoidZip32RaesDriver extends ParanoidZipRaesDriver {

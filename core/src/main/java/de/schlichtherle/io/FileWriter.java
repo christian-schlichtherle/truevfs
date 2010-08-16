@@ -33,7 +33,7 @@ import java.io.OutputStreamWriter;
  * @see File#update
  * @see File#setLenient
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 

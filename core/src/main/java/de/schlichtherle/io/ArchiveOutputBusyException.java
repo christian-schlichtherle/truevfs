@@ -23,7 +23,7 @@ package de.schlichtherle.io;
  * @see File#umount
  * @see File#update
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class ArchiveOutputBusyException extends ArchiveBusyException {
 

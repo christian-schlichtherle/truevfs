@@ -30,7 +30,7 @@ import java.util.zip.ZipException;
  * @see JarDriver
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class JarInputArchive extends ZipInputArchive {

@@ -43,7 +43,7 @@ import java.util.zip.CheckedOutputStream;
  * to overcome this limitation.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @see ZipDriver
  * @since TrueZIP 6.7
  */

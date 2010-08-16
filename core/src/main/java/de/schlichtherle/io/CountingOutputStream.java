@@ -22,7 +22,7 @@ import java.io.*;
  * An output stream which logs the number of bytes written.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 final class CountingOutputStream extends FilterOutputStream {

@@ -32,7 +32,7 @@ import javax.swing.filechooser.FileView;
  * - this should be done in subclasses.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 abstract class FilterFileView extends FileView {
 

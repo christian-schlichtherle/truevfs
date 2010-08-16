@@ -63,7 +63,7 @@ import java.util.logging.*;
  * should serialize path names instead, which are plain strings.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {

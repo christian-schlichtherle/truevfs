@@ -27,7 +27,7 @@ import javax.swing.WindowConstants;
 /**
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
- * @version $Revision$
+ * @version $Id$
  */
 public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
 

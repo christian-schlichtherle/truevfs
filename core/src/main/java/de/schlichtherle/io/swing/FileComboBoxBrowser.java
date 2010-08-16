@@ -42,7 +42,7 @@ import javax.swing.*;
  * 
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
- * @version $Revision$
+ * @version $Id$
  */
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
 

@@ -31,7 +31,7 @@ import org.apache.tools.bzip2.*;
  * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarBZip2Driver extends TarDriver {

@@ -30,7 +30,7 @@ import java.util.logging.*;
  * It does <em>not</em> throw any <code>AssertionError</code>s.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class KeyMgmtLifeCycle implements Runnable {

@@ -18,7 +18,7 @@ package de.schlichtherle.key.passwd.swing;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.1
  */
 public class RemoteControlThread extends Thread {

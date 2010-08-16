@@ -28,7 +28,7 @@ import javax.swing.*;
  * like (virtual) directories.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class JFileChooser extends javax.swing.JFileChooser {
 

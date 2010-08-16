@@ -62,7 +62,7 @@ import java.util.ResourceBundle;
  * This class is <em>not</em> thread safe.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public class NZip extends CommandLineUtility {

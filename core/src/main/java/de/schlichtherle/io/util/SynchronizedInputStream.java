@@ -23,7 +23,7 @@ import java.io.*;
  * via an object provided to its constructor.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 public class SynchronizedInputStream extends InputStream {

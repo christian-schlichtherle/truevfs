@@ -24,7 +24,7 @@ package de.schlichtherle.key;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.1
- * @version $Revision$
+ * @version $Id$
  */
 public class KeyPromptingCancelledException extends UnknownKeyException {
     

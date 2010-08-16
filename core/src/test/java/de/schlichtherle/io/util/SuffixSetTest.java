@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class SuffixSetTest extends TestCase {

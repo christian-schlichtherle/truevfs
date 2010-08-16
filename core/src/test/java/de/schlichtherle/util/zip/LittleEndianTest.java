@@ -23,7 +23,7 @@ import java.util.Arrays;
  * A simple round trip test of the little endian utility methods.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class LittleEndianTest extends TestCase {

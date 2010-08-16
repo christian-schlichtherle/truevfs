@@ -22,7 +22,7 @@ package de.schlichtherle.io.util;
  * @deprecated This class will vanish in the next release.
  * @author Christian Schlichtherle
  * @since TrueZIP 6.1
- * @version $Revision$
+ * @version $Id$
  */
 public class Path extends Paths {
     

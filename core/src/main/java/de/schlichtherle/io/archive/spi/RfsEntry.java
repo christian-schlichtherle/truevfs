@@ -27,7 +27,7 @@ import javax.swing.Icon;
  * {@link ArchiveEntry} (RFS means Real File System).
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public class RfsEntry implements ArchiveEntry {

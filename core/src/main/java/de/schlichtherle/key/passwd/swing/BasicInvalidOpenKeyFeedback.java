@@ -36,7 +36,7 @@ package de.schlichtherle.key.passwd.swing;
  * This issue is fixed in JSE 1.5.0_07 (and probably earlier versions).
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 public class BasicInvalidOpenKeyFeedback extends BasicInvalidKeyFeedback

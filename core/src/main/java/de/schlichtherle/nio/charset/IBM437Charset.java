@@ -22,7 +22,7 @@ import java.util.logging.*;
  * The <code>IBM437</code> character set, also known as <code>CP437</code>.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public final class IBM437Charset extends OctetCharset {
 

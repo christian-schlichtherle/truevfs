@@ -18,7 +18,7 @@ package de.schlichtherle.nio.charset;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class IBM437CharsetTest extends OctetCharsetTestCase {
     

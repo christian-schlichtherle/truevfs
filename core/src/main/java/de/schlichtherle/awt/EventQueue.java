@@ -25,7 +25,7 @@ import java.util.logging.*;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.1
- * @version $Revision$
+ * @version $Id$
  */
 public class EventQueue extends java.awt.EventQueue {
 

@@ -96,7 +96,7 @@ import java.util.regex.*;
  * too, which is pretty inefficient for a single instance.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @see ArchiveDetector#NULL
  * @see ArchiveDetector#DEFAULT
  * @see ArchiveDetector#ALL

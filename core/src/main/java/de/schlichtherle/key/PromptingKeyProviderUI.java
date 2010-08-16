@@ -31,7 +31,7 @@ package de.schlichtherle.key;
  * and should have no side effects!
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface PromptingKeyProviderUI {

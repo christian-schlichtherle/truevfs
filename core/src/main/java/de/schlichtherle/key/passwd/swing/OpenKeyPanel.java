@@ -40,7 +40,7 @@ import javax.swing.text.*;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.0
- * @version $Revision$
+ * @version $Id$
  */
 public class OpenKeyPanel extends EnhancedPanel {
 

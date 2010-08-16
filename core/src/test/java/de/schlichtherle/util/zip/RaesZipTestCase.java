@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * Subclasses must override {@link #setUp}.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public abstract class RaesZipTestCase extends ZipTestCase {
 

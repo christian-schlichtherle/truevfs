@@ -27,7 +27,7 @@ import java.util.*;
  * This class is <em>not</em> thread-safe.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 abstract class ExtraField {

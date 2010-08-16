@@ -32,7 +32,7 @@ import javax.swing.tree.*;
  * This allows you to traverse archive files just like directories.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public class FileTreeModel implements TreeModel {

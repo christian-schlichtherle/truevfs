@@ -49,7 +49,7 @@ import javax.swing.event.EventListenerList;
  * cause.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public class EnhancedPanel extends JPanel  {

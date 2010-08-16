@@ -304,7 +304,7 @@ import javax.swing.Icon;
  *      recognition
  * @since TrueZIP 1.0
  * @author  Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class File extends java.io.File {
 

@@ -69,7 +69,7 @@ import javax.swing.Icon;
  *      method to remove empty and dot and dot-dot elements from an archive
  *      entry name
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public interface ArchiveEntry {

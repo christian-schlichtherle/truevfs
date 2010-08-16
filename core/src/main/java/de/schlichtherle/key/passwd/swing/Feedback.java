@@ -28,7 +28,7 @@ import javax.swing.JPanel;
  * particular.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.2
  */
 public interface Feedback extends Runnable {

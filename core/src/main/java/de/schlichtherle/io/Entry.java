@@ -25,7 +25,7 @@ import de.schlichtherle.io.archive.spi.*;
  * constants become part of the public API.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 interface Entry {

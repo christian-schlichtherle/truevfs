@@ -36,7 +36,7 @@ import org.bouncycastle.crypto.*;
  * in the base class {@link FilterReadOnlyFile}.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 //

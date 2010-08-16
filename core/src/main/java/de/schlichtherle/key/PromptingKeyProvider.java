@@ -47,7 +47,7 @@ package de.schlichtherle.key;
  * @see KeyProvider
  * @see PromptingKeyManager
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class PromptingKeyProvider extends AbstractKeyProvider {

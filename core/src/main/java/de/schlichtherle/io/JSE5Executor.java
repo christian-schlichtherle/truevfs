@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 
 /**
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  */
 final class JSE5Executor implements Executor {

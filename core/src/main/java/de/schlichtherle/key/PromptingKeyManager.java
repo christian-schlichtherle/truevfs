@@ -46,7 +46,7 @@ import java.util.Map;
  * This class is thread safe.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public abstract class PromptingKeyManager extends KeyManager {

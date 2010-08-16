@@ -23,7 +23,7 @@ import java.util.EventListener;
  * that its ancestor window is shown or hidden.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public interface PanelListener extends EventListener {

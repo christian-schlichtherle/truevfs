@@ -32,7 +32,7 @@ package de.schlichtherle.key.passwd.swing;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
- * @version $Revision$
+ * @version $Id$
  */
 public class BasicUnknownOpenKeyFeedback extends BasicUnknownKeyFeedback
         implements OpenKeyFeedback {

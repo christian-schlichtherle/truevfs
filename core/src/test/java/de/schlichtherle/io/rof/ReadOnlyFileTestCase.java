@@ -29,7 +29,7 @@ import junit.framework.*;
  * Some tests use Las Vegas algorithms, so the run time may vary.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.5
  */
 public abstract class ReadOnlyFileTestCase extends TestCase {

@@ -33,7 +33,7 @@ import javax.swing.Icon;
  * implement the concept of a directory.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ArchiveEntryMetaData {

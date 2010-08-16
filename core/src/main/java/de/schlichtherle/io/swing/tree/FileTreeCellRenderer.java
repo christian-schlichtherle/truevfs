@@ -28,7 +28,7 @@ import javax.swing.tree.*;
  * {@link JFileTree} wherever possible.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 5.1
  */
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {

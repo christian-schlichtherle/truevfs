@@ -33,7 +33,7 @@ import java.util.zip.*;
  * performance.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.4
  * @see ZipFile
  */

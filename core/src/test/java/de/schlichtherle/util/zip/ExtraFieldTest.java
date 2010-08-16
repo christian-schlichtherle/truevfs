@@ -22,7 +22,7 @@ import junit.framework.TestCase;
  * A test case for the {@link ExtraField} class.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class ExtraFieldTest extends TestCase {

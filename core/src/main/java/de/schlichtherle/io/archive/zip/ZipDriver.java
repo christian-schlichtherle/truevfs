@@ -38,7 +38,7 @@ import javax.swing.Icon;
  *
  * @see CheckedZipDriver
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ZipDriver extends AbstractArchiveDriver {

@@ -37,7 +37,7 @@ import javax.swing.filechooser.*;
  * by JFileChooser.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 final class FileView extends FilterFileView {
 

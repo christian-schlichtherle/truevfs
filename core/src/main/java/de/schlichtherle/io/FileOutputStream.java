@@ -74,7 +74,7 @@ import java.io.*;
  * @see File#update
  * @see File#setLenient
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class FileOutputStream extends FilterOutputStream {
 

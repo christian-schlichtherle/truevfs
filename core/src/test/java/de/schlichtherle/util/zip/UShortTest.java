@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  * integers.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.7
  */
 public class UShortTest extends TestCase {

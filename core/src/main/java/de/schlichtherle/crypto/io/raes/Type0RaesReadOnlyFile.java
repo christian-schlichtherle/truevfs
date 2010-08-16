@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * Reads a type 0 RAES file.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 class Type0RaesReadOnlyFile extends RaesReadOnlyFile {

@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * OpenDocument Format (ODF) files.
  *
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  */
 public class OdfOutputArchive extends MultiplexedOutputArchive {
 

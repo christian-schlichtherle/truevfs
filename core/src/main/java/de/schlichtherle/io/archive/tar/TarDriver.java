@@ -31,7 +31,7 @@ import javax.swing.*;
  * Instances of this class are immutable.
  * 
  * @author Christian Schlichtherle
- * @version $Revision$
+ * @version $Id$
  * @since TrueZIP 6.0
  */
 public class TarDriver extends AbstractArchiveDriver {
