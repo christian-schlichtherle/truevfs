@@ -18,15 +18,22 @@ package de.schlichtherle.key.passwd.swing;
 
 import de.schlichtherle.awt.EventQueue;
 import de.schlichtherle.awt.EventDispatchTimeoutException;
-import de.schlichtherle.key.*;
-
-import java.awt.*;
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.*;
-
-import javax.swing.*;
+import de.schlichtherle.key.KeyPromptingInterruptedException;
+import de.schlichtherle.key.KeyPromptingTimeoutException;
+import de.schlichtherle.key.PromptingKeyProvider;
+import de.schlichtherle.util.ClassLoaderUtil;
+import java.awt.Window;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.
@@ -193,10 +200,7 @@ public class PromptingKeyProviderUI
             String n = System.getProperty(
                     PACKAGE_NAME + "." + type,
                     PACKAGE_NAME + ".Basic" + type);
-            ClassLoader l = Thread.currentThread().getContextClassLoader();
-            if (l == null)
-                l = ClassLoader.getSystemClassLoader();
-            Class c = l.loadClass(n);
+            Class c = ClassLoaderUtil.load(n, PromptingKeyProviderUI.class);
             Feedback f = (Feedback) c.newInstance();
             return f;
         } catch (ClassNotFoundException ex) {
