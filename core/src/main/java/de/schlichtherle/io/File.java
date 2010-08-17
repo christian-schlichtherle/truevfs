@@ -610,7 +610,7 @@ public class File extends java.io.File {
      * Converts a (jar:)*file: URI to a plain file: URI or returns the
      * provided URI again if it doesn't match this pattern.
      */
-    private static final URI unjarFileURI(final URI uri) {
+    private static URI unjarFileURI(final URI uri) {
         try {
             final String scheme = uri.getScheme();
             final String ssp = Paths.normalize(uri.getSchemeSpecificPart(), '/');
@@ -622,7 +622,7 @@ public class File extends java.io.File {
         throw new IllegalArgumentException(uri + ": Not a valid (possibly jared) file URI!");
     }
 
-    private static final URI unjarFileURI0(final URI uri)
+    private static URI unjarFileURI0(final URI uri)
     throws URISyntaxException {
         final String scheme = uri.getScheme();
         if ("jar".equalsIgnoreCase(scheme)) {
@@ -699,7 +699,7 @@ public class File extends java.io.File {
      * If assertions are disabled, the call to this method is thrown away by
      * the HotSpot compiler, so there is no performance penalty.
      */
-    private static final boolean parameters(
+    private static boolean parameters(
             final java.io.File delegate,
             final File innerArchive,
             final ArchiveDetector detector)
@@ -1090,7 +1090,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #umount(boolean, boolean, boolean, boolean)
      * umount(false, true, false, true)}.
      */
-    public static final void umount()
+    public static void umount()
     throws ArchiveException {
         ArchiveControllers.umount("", false, true, false, true, true);
     }
@@ -1099,7 +1099,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #umount(boolean, boolean, boolean, boolean)
      * umount(false, closeStreams, false, closeStreams)}.
      */
-    public static final void umount(boolean closeStreams)
+    public static void umount(boolean closeStreams)
     throws ArchiveException {
         ArchiveControllers.umount("",
                 false, closeStreams,
@@ -1185,7 +1185,7 @@ public class File extends java.io.File {
      * @see #umount(File)
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static final void umount(
+    public static void umount(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
@@ -1199,7 +1199,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #umount(File, boolean, boolean, boolean, boolean)
      * umount(archive, false, true, false, true)}.
      */
-    public static final void umount(File archive)
+    public static void umount(File archive)
     throws ArchiveException {
         umount(archive, false, true, false, true);
     }
@@ -1208,7 +1208,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #umount(File, boolean, boolean, boolean, boolean)
      * umount(archive, false, closeStreams, false, closeStreams)}.
      */
-    public static final void umount(File archive, boolean closeStreams)
+    public static void umount(File archive, boolean closeStreams)
     throws ArchiveException {
         umount(archive, false, closeStreams, false, closeStreams);
     }
@@ -1235,7 +1235,7 @@ public class File extends java.io.File {
      * @see #umount()
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static final void umount(
+    public static void umount(
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
@@ -1254,7 +1254,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #update(boolean, boolean, boolean, boolean)
      * update(false, true, false, true)}.
      */
-    public static final void update()
+    public static void update()
     throws ArchiveException {
         ArchiveControllers.umount("",
                 false, true,
@@ -1266,7 +1266,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #update(boolean, boolean, boolean, boolean)
      * update(false, closeStreams, false, closeStreams)}.
      */
-    public static final void update(boolean closeStreams)
+    public static void update(boolean closeStreams)
     throws ArchiveException {
         ArchiveControllers.umount("",
                 false, closeStreams,
@@ -1292,7 +1292,7 @@ public class File extends java.io.File {
      * @see #umount(boolean, boolean, boolean, boolean)
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static final void update(
+    public static void update(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
@@ -1306,7 +1306,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #update(File, boolean, boolean, boolean, boolean)
      * update(archive, false, true, false, true)}.
      */
-    public static final void update(File archive)
+    public static void update(File archive)
     throws ArchiveException {
         update(archive, false, true, false, true);
     }
@@ -1315,7 +1315,7 @@ public class File extends java.io.File {
      * Equivalent to {@link #update(File, boolean, boolean, boolean, boolean)
      * update(archive, false, closeStreams, false, closeStreams)}.
      */
-    public static final void update(File archive, boolean closeStreams)
+    public static void update(File archive, boolean closeStreams)
     throws ArchiveException {
         update(archive, false, closeStreams, false, closeStreams);
     }
@@ -1336,7 +1336,7 @@ public class File extends java.io.File {
      * @see #umount(File)
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static final void update(
+    public static void update(
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
@@ -1366,7 +1366,7 @@ public class File extends java.io.File {
      *
      * @see ArchiveStatistics
      */
-    public static final ArchiveStatistics getLiveArchiveStatistics() {
+    public static ArchiveStatistics getLiveArchiveStatistics() {
         return ArchiveControllers.getLiveArchiveStatistics();
     }
 
@@ -1380,7 +1380,7 @@ public class File extends java.io.File {
      *
      * @see #setLenient(boolean)
      */
-    public static final boolean isLenient() {
+    public static boolean isLenient() {
         return lenient;
     }
 
@@ -1476,7 +1476,7 @@ public class File extends java.io.File {
      * @see FileInputStream
      * @see FileOutputStream
      */
-    public static final void setLenient(final boolean lenient) {
+    public static void setLenient(final boolean lenient) {
         File.lenient = lenient;
     }
 
@@ -1491,7 +1491,7 @@ public class File extends java.io.File {
      * @see ArchiveDetector
      * @see #setDefaultArchiveDetector
      */
-    public static final ArchiveDetector getDefaultArchiveDetector() {
+    public static ArchiveDetector getDefaultArchiveDetector() {
         return defaultDetector;
     }
 
@@ -1516,7 +1516,7 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
-    public static final void setDefaultArchiveDetector(
+    public static void setDefaultArchiveDetector(
             final ArchiveDetector detector) {
         if (detector == null)
             throw new NullPointerException();
@@ -1913,7 +1913,7 @@ public class File extends java.io.File {
      * @throws NullPointerException If any parameter is <code>null</code>.
      * @since TrueZIP 5.1
      */
-    public static final boolean contains(java.io.File a, java.io.File b) {
+    public static boolean contains(java.io.File a, java.io.File b) {
         return Files.contains(a, b);
     }
 
@@ -1941,7 +1941,7 @@ public class File extends java.io.File {
      *
      * @deprecated This method will be made private in the next major version.
      */
-    protected static final boolean isUNC(final String path) {
+    protected static boolean isUNC(final String path) {
         return path.startsWith(uncPrefix) && path.indexOf(separatorChar, 2) > 2;
     }
 
@@ -4016,7 +4016,7 @@ public class File extends java.io.File {
      * @throws NullPointerException If any parameter is <code>null</code>.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
-    public static final void cp(final InputStream in, final OutputStream out)
+    public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
         Files.cp(in, out);
     }
@@ -4086,7 +4086,7 @@ public class File extends java.io.File {
      * @throws NullPointerException If any parameter is <code>null</code>.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
-    public static final void cp(java.io.File src, java.io.File dst)
+    public static void cp(java.io.File src, java.io.File dst)
     throws IOException {
         Files.cp(false, src, dst);
     }
@@ -4158,7 +4158,7 @@ public class File extends java.io.File {
      * @throws NullPointerException If any parameter is <code>null</code>.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
-    public static final void cp_p(java.io.File src, java.io.File dst)
+    public static void cp_p(java.io.File src, java.io.File dst)
     throws IOException {
         Files.cp(true, src, dst);
     }
@@ -4340,7 +4340,7 @@ public class File extends java.io.File {
      *         IOException in the output stream.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
-    public static final void cat(final InputStream in, final OutputStream out)
+    public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
         Streams.cat(in, out);
     }
