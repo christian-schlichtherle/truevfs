@@ -46,9 +46,7 @@ import java.util.Set;
  * Finally, an instance of the implementation must be installed either by
  * calling {@link #setInstance(KeyManager)} or by setting the system property
  * <code>de.schlichtherle.key.KeyManager</code> to the fully qualified class
- * name of the implementation before this class is ever used.
- * In the latter case, the class will be loaded using the context class loader
- * of the current thread.
+ * name of the implementation before this class is used.
  * <p>
  * Note that class loading and instantiation may happen in a JVM shutdown hook,
  * so class initializers and constructors must behave accordingly.
@@ -85,21 +83,18 @@ public class KeyManager {
      * <code>de.schlichtherle.key.KeyManager</code> is considered:
      * <p>
      * If this system property is set, it must denote the fully qualified
-     * class name of a subclass of this class. The class is loaded by name
-     * using the current thread's context class loader and instantiated using
-     * its public, no-arguments constructor.
+     * class name of a subclass of this class. The class is loaded and
+     * instantiated using its public, no-arguments constructor.
      * <p>
      * Otherwise, if the JVM is running in headless mode and the API conforms
      * to JSE 6 (where the class <code>java.io.Console</code> is available),
      * then the console I/O based implementation in the class
      * {@link de.schlichtherle.key.passwd.console.PromptingKeyManager}
-     * is loaded by name using the current thread's context class loader and
-     * instantiated using its public, no-arguments constructor.
+     * is loaded and instantiated using its public, no-arguments constructor.
      * <p>
      * Otherwise, the Swing based implementation in the class
      * {@link de.schlichtherle.key.passwd.swing.PromptingKeyManager}
-     * is loaded by name using the current thread's context class loader and
-     * instantiated using its public, no-arguments constructor.
+     * is loaded and instantiated using its public, no-arguments constructor.
      * <p>
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
@@ -117,7 +112,7 @@ public class KeyManager {
                 "de.schlichtherle.key.KeyManager",
                 getDefaultKeyManagerClassName());
         try {
-            Class c = ClassLoaderUtil.load(n, KeyManager.class);
+            Class c = ClassLoaderUtil.loadClass(n, KeyManager.class);
             keyManager = (KeyManager) c.newInstance();
         } catch (RuntimeException ex) {
             throw ex;

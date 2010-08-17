@@ -16,12 +16,18 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.io.util.SuffixSet;
+import de.schlichtherle.util.ClassLoaderUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A global registry for archive file suffixes and archive drivers which is
@@ -29,22 +35,20 @@ import java.util.logging.*;
  * This registry does not have a delegate, so it can only be used as the tail
  * in a {@link ArchiveDriverRegistry registry chain}.
  * <p>
- * When this class is instantiated, it uses the current thread's context
- * class loader to enumerate all instances of the relative path
- * <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
- * on the class path (this is to ensure that TrueZIP is compatible with JNLP
- * as used by Java Web Start and can be safely added to the Boot or Extension
- * Class Path).
+ * When this class is instantiated, it enumerate all instances of the relative
+ * path <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
+ * on the class path (this ensures that TrueZIP is compatible with JNLP as used
+ * by Java Web Start and can be safely added to the Extension Class Path).
  * <p>
  * The configuration files are processed in arbitrary order.
  * However, configuration files which contain the entry
- * <code>DRIVER=true</code> have lesser priority and will be overruled by
+ * {@code DRIVER=true} have lesser priority and will be overruled by
  * any other configuration files which do not contain this entry.
  * This is used by the default configuration file in TrueZIP's JAR:
  * It contains this entry in order to allow any client application provided
  * configuration file to overrule it.
  * <p>
- * Note that this class appears to be a singleton (there's not much point in
+ * This class may appear to be a singleton (there's not much point in
  * having multiple instances of this class, all with the same configuration).
  * However, it actually isn't a true singleton because it's
  * {@link Serializable} in order to support serialization of {@link File}
@@ -52,16 +56,16 @@ import java.util.logging.*;
  * This implies that a JVM can send an instance of this class to another JVM,
  * which's own global archive driver registry instance may be configured
  * completely different by its local configuration files.
- * Of course, this requires that the
+ * This requires that the
  * {@link de.schlichtherle.io.archive.spi.ArchiveDriver}s used by the global
  * archive driver registry are serializable, too.
  * <p>
  * Note that it's actually discouraged to serialize {@link File} instances.
  * It's only supported due to the implementation of this feature in its base
- * class <code>java.io.File</code>.
- * Instead of serializing <code>File</code> instances, a client application
+ * class {@code java.io.File}.
+ * Instead of serializing {@link File} instances, a client application
  * should serialize path names instead, which are plain strings.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.5
@@ -131,7 +135,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
      * Returns the ordered list of relative path names for configuration files.
      * Prior elements take precedence.
      */
-    private static final String[] getServices() {
+    private static String[] getServices() {
         return System.getProperty(PROP_KEY_REGISTRY,
                 "META-INF/services/de.schlichtherle.io.registry.properties" // since TrueZIP 6.5.2 - NOI18N
                 + File.pathSeparator
@@ -152,7 +156,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
 
     /**
      * Enumerates all resource URLs for <code>service</code> on the class
-     * path using the current thread's context class loader and calls
+     * path and calls
      * {@link #registerArchiveDrivers(URL, ArchiveDriverRegistry, ArchiveDriverRegistry)}
      * on each instance.
      * <p>
@@ -170,10 +174,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
 
         final Enumeration urls;
         try {
-            ClassLoader l = Thread.currentThread().getContextClassLoader();
-            if (l == null)
-                l = ClassLoader.getSystemClassLoader();
-            urls = l.getResources(service);
+            urls = ClassLoaderUtil.getResources(service, GlobalArchiveDriverRegistry.class);
         } catch (IOException ex) {
             logger.log(Level.WARNING, "lookup.ex", ex); // NOI18N
             return;
