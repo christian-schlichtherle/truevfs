@@ -29,12 +29,11 @@ import java.util.regex.*;
  * archive file suffixes in order to detect prospective archive files and
  * look up their corresponding {@link ArchiveDriver} in its <i>registry</i>.
  * <p>
- * When this class is loaded, it uses the current thread's context class
- * loader to enumerate all instances of the relative path
- * <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
- * on the class path (this is to ensure that TrueZIP is compatible with JNLP /
- * Java Web Start and can be safely added to the boot class path or extension
- * class path).
+ * When this class is initialized, it enumerates all instances of the relative
+ * path <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
+ * on the class path (this ensures that TrueZIP is compatible with JNLP as used
+ * by Java Web Start and can be safely added to the Extension Class Path).
+ * <p>
  * These <i>configuration files</i> are processed in arbitrary order
  * to configure the <i>global registry</i> of archive file suffixes and
  * archive drivers.
@@ -68,9 +67,6 @@ import java.util.regex.*;
  *     suffix in its registry determines the archive driver to be used.</li>
  * </ol>
  * <p>
- * Altogether, this enables to build arbitrary complex configurations with
- * very few lines of Java code or properties in the configuration file(s).
- * <p>
  * Where a constructor expects a suffix list as a parameter, this string must
  * have the form <code>&quot;suffix[|suffix]*&quot;</code>, where
  * <code>suffix</code> is a combination of case insensitive letters.
@@ -81,11 +77,6 @@ import java.util.regex.*;
  * The same would be true for <code>&quot;||.ZIP||.JAR||ZIP||JAR||&quot;</code>,
  * but this notation is discouraged because it's not in canonical form
  * (see {@link #getSuffixes}.
- * <p>
- * {@link ArchiveDriver} classes are loaded on demand by the
- * {@link #getArchiveDriver} method using the current thread's context class
- * loader. This usually happens when a client application instantiates the
- * {@link File} class.
  * <p>
  * This implementation is (virtually) immutable and thread safe.
  * <p>
@@ -299,8 +290,7 @@ public class DefaultArchiveDetector
      * <ol>
      * <li>If the registry holds a string, it's supposed to be the fully
      *     qualified class name of an <code>ArchiveDriver</code>
-     *     implementation. The class will be loaded using the context class
-     *     loader of the current thread and stored in the registry.
+     *     implementation. The class will be loaded and stored in the registry.
      * <li>If the registry then holds a class instance, it's instantiated
      *     with its no-arguments constructor, cast to the
      *     <code>ArchiveDriver</code> type and stored in the registry.

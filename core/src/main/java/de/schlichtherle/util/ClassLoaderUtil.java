@@ -15,13 +15,19 @@
  */
 package de.schlichtherle.util;
 
+import java.io.IOException;
+import java.util.Enumeration;
+
 /**
- * Provides a static utility method for convenient class loading which is
- * designed to work in both JEE and OSGi environments.
+ * Provides static utility methods for convenient class and resource loading
+ * which is designed to work in both JEE and OSGi environments.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.8
+ * @deprecated Though only introduced in TrueZIP 6.8, this class is just a
+ *             workaround until the introduction of a better, but probably
+ *             non-backwards-compatible solution in TrueZIP 7.
  */
 public class ClassLoaderUtil {
 
@@ -40,7 +46,7 @@ public class ClassLoaderUtil {
      * @throws ClassNotFoundException If loading the class failed for some
      *         reason.
      */
-    public static Class load(String classToLoad, Class loadingClass)
+    public static Class loadClass(String classToLoad, Class loadingClass)
     throws ClassNotFoundException {
         final ClassLoader l1 = loadingClass.getClassLoader();
         try {
@@ -53,5 +59,29 @@ public class ClassLoaderUtil {
                 throw cnfe; // optimization: there's no point in trying this twice.
             return l2.loadClass(classToLoad);
         }
+    }
+
+    /**
+     * Concatenates the enumeration of the resource {@code name} on the class
+     * path by using the class loader of the class {@code loadingClass} and the
+     * current thread's context class loader or, if not available, the system
+     * class loader.
+     *
+     * @param name The resource to enumerate.
+     * @param loadingClass The class which wants to enumerate {@code name}.
+     * @return A joint enumeration for the resource {@code name} on the class
+     *         path.
+     * @throws IOException If I/O errors occur.
+     */
+    public static Enumeration getResources(String name, Class loadingClass)
+    throws IOException {
+        final ClassLoader l1 = loadingClass.getClassLoader();
+        ClassLoader l2 = Thread.currentThread().getContextClassLoader();
+        if (l2 == null)
+            l2 = ClassLoader.getSystemClassLoader();
+        return l1 == l2
+                ? l1.getResources(name)
+                : new JointEnumeration( l1.getResources(name),
+                                        l2.getResources(name));
     }
 }

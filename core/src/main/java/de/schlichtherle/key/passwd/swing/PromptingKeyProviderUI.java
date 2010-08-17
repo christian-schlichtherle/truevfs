@@ -200,7 +200,7 @@ public class PromptingKeyProviderUI
             String n = System.getProperty(
                     PACKAGE_NAME + "." + type,
                     PACKAGE_NAME + ".Basic" + type);
-            Class c = ClassLoaderUtil.load(n, PromptingKeyProviderUI.class);
+            Class c = ClassLoaderUtil.loadClass(n, PromptingKeyProviderUI.class);
             Feedback f = (Feedback) c.newInstance();
             return f;
         } catch (ClassNotFoundException ex) {

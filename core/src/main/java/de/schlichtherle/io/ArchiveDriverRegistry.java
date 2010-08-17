@@ -205,8 +205,7 @@ class ArchiveDriverRegistry extends HashMap {
      * <ol>
      * <li>If the registry holds a string, it's supposed to be the fully
      *     qualified class name of an <code>ArchiveDriver</code>
-     *     implementation. The class will be loaded using the context class
-     *     loader of the current thread and stored in the registry.
+     *     implementation. The class will be loaded and stored in the registry.
      * <li>If the registry then holds a class instance, it's instantiated
      *     with its no-arguments constructor, cast to the
      *     <code>ArchiveDriver</code> type and stored in the registry.
@@ -259,7 +258,7 @@ class ArchiveDriverRegistry extends HashMap {
     private static final ArchiveDriver createArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
-                driver = ClassLoaderUtil.load((String) driver, ArchiveDriverRegistry.class);
+                driver = ClassLoaderUtil.loadClass((String) driver, ArchiveDriverRegistry.class);
             if (driver instanceof Class)
                 driver = ((Class) driver).newInstance();
             return (ArchiveDriver) driver; // may throw ClassCastException
