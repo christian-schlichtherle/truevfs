@@ -18,6 +18,7 @@ package de.schlichtherle.io;
 
 import de.schlichtherle.io.archive.spi.ArchiveDriver;
 import de.schlichtherle.io.util.SuffixSet;
+import de.schlichtherle.util.ClassLoaderUtil;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -257,12 +258,8 @@ class ArchiveDriverRegistry extends HashMap {
      */
     private static final ArchiveDriver createArchiveDriver(Object driver) {
         try {
-            if (driver instanceof String) {
-                ClassLoader l = Thread.currentThread().getContextClassLoader();
-                if (l == null)
-                    l = ClassLoader.getSystemClassLoader();
-                driver = l.loadClass((String) driver);
-            }
+            if (driver instanceof String)
+                driver = ClassLoaderUtil.load((String) driver, ArchiveDriverRegistry.class);
             if (driver instanceof Class)
                 driver = ((Class) driver).newInstance();
             return (ArchiveDriver) driver; // may throw ClassCastException

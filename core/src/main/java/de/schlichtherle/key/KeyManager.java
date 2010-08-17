@@ -16,9 +16,12 @@
 
 package de.schlichtherle.key;
 
+import de.schlichtherle.util.ClassLoaderUtil;
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An abstract class which maintains a static map of {@link KeyProvider}
@@ -110,14 +113,11 @@ public class KeyManager {
         if (keyManager != null)
             return keyManager;
 
-        final String cn = System.getProperty(
+        final String n = System.getProperty(
                 "de.schlichtherle.key.KeyManager",
                 getDefaultKeyManagerClassName());
         try {
-            ClassLoader l = Thread.currentThread().getContextClassLoader();
-            if (l == null)
-                l = ClassLoader.getSystemClassLoader();
-            Class c = l.loadClass(cn);
+            Class c = ClassLoaderUtil.load(n, KeyManager.class);
             keyManager = (KeyManager) c.newInstance();
         } catch (RuntimeException ex) {
             throw ex;
