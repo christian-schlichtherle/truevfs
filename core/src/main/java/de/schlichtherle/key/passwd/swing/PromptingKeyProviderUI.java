@@ -16,11 +16,13 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.awt.EventQueue;
 import de.schlichtherle.awt.EventDispatchTimeoutException;
+import de.schlichtherle.awt.EventQueue;
 import de.schlichtherle.key.KeyPromptingInterruptedException;
 import de.schlichtherle.key.KeyPromptingTimeoutException;
+import de.schlichtherle.key.KeyProvider;
 import de.schlichtherle.key.PromptingKeyProvider;
+import de.schlichtherle.key.UnknownKeyException;
 import de.schlichtherle.util.ClassLoaderUtil;
 import java.awt.Window;
 import java.io.IOException;
@@ -43,8 +45,8 @@ import javax.swing.JOptionPane;
  * @version $Id$
  * @since TrueZIP 6.0
  */
-public class PromptingKeyProviderUI
-        implements de.schlichtherle.key.PromptingKeyProviderUI {
+public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
+        implements de.schlichtherle.key.PromptingKeyProviderUI<P> {
 
     private static final String PACKAGE_NAME
             = "de.schlichtherle.key.passwd.swing";
@@ -69,7 +71,8 @@ public class PromptingKeyProviderUI
     // output.
     public static final int KEY_FILE_LEN = 512;
 
-    private static final Map openKeyPanels = new WeakHashMap();
+    private static final Map<KeyProvider, OpenKeyPanel> openKeyPanels
+            = new WeakHashMap<KeyProvider, OpenKeyPanel>();
 
     /**
      * The last resource ID used when prompting.
@@ -77,18 +80,6 @@ public class PromptingKeyProviderUI
      */
     static String lastResourceID = "";
 
-    /**
-     * @deprecated This field is not used anymore and will be removed for the
-     *             next major release number.
-     */
-    private CreateKeyPanel createKeyPanel;
-
-    /**
-     * @deprecated This field is not used anymore and will be removed for the
-     *             next major release number.
-     */
-    private OpenKeyPanel openKeyPanel;
-    
     private Feedback unknownCreateKeyFeedback;
     private Feedback invalidCreateKeyFeedback;
     private Feedback unknownOpenKeyFeedback;
@@ -118,34 +109,10 @@ public class PromptingKeyProviderUI
     }
 
     /**
-     * @deprecated This method is not used anymore and will be removed for the
-     *             next major release number.
-     *             It's use may dead lock the GUI.
-     *             Use {@link #createCreateKeyPanel} instead.
-     */
-    protected CreateKeyPanel getCreateKeyPanel() {
-        if (createKeyPanel == null)
-            createKeyPanel = createCreateKeyPanel();
-        return createKeyPanel;
-    }
-
-    /**
      * A factory method to create the Create Protected Resource Key Panel.
      */
     protected CreateKeyPanel createCreateKeyPanel() {
         return new CreateKeyPanel();
-    }
-
-    /**
-     * @deprecated This method is not used anymore and will be removed for the
-     *             next major release number.
-     *             It's use may dead lock the GUI.
-     *             Use {@link #createOpenKeyPanel} instead.
-     */
-    protected OpenKeyPanel getOpenKeyPanel() {
-        if (openKeyPanel == null)
-            openKeyPanel = createOpenKeyPanel();
-        return openKeyPanel;
     }
 
     /**
@@ -213,8 +180,8 @@ public class PromptingKeyProviderUI
         return null;
     }
 
-    public /*synchronized*/ final void promptCreateKey(
-            final PromptingKeyProvider provider) {
+    public void promptCreateKey(final P provider)
+    throws UnknownKeyException {
         final Runnable task = new Runnable() {
             public void run() {
                 promptCreateKey(provider, null);
@@ -223,8 +190,8 @@ public class PromptingKeyProviderUI
         multiplexOnEDT(task); // synchronized on class instance!
     }
 
-    public /*synchronized*/ final boolean promptUnknownOpenKey(
-            final PromptingKeyProvider provider) {
+    public boolean promptUnknownOpenKey(final P provider)
+    throws UnknownKeyException {
         final BooleanRunnable task = new BooleanRunnable() {
             public void run() {
                 result = promptOpenKey(provider, false, null);
@@ -234,8 +201,8 @@ public class PromptingKeyProviderUI
         return task.result;
     }
 
-    public /*synchronized*/ final boolean promptInvalidOpenKey(
-            final PromptingKeyProvider provider) {
+    public boolean promptInvalidOpenKey(final P provider)
+    throws UnknownKeyException {
         final BooleanRunnable task = new BooleanRunnable() {
             public void run() {
                 result = promptOpenKey(provider, true, null);
@@ -254,7 +221,7 @@ public class PromptingKeyProviderUI
      * so it doesn't need to be thread safe.
      */
     protected void promptCreateKey(
-            final PromptingKeyProvider provider,
+            final P provider,
             final JComponent extraDataUI) {
         assert EventQueue.isDispatchThread();
 
@@ -268,7 +235,9 @@ public class PromptingKeyProviderUI
                 // de-highlighting the resource ID in the panel if the
                 // loop iteration has to be repeated due to an invalid
                 // user input.
-                createKeyPanel.setResourceID(provider.getResourceID());
+                final String resourceID = provider.getResourceID();
+                assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
+                createKeyPanel.setResourceID(resourceID);
                 createKeyPanel.setFeedback(createKeyPanel.getError() != null
                         ? getInvalidCreateKeyFeedback()
                         : getUnknownCreateKeyFeedback());
@@ -294,7 +263,7 @@ public class PromptingKeyProviderUI
                 if (result != JOptionPane.OK_OPTION)
                     break; // reuse old key
 
-                final Object createKey = createKeyPanel.getCreateKey();
+                final Cloneable createKey = createKeyPanel.getCreateKey();
                 if (createKey != null) { // valid input?
                     provider.setKey(createKey);
                     break;
@@ -315,15 +284,20 @@ public class PromptingKeyProviderUI
      * so it doesn't need to be thread safe.
      */
     protected boolean promptOpenKey(
-            final PromptingKeyProvider provider,
+            final P provider,
             final boolean invalid,
             final JComponent extraDataUI) {
         assert EventQueue.isDispatchThread();
 
         final OpenKeyPanel openKeyPanel;
         if (invalid) {
-            OpenKeyPanel panel = (OpenKeyPanel) openKeyPanels.get(provider);
-            openKeyPanel = panel != null ? panel : createOpenKeyPanel();
+            final OpenKeyPanel panel = openKeyPanels.get(provider);
+            if (panel != null) {
+                openKeyPanel = panel;
+            } else {
+                openKeyPanel = createOpenKeyPanel();
+                openKeyPanel.setExtraDataUI(extraDataUI);
+            }
             openKeyPanel.setError(resources.getString("invalidKey"));
         } else {
             openKeyPanel = createOpenKeyPanel();
@@ -338,7 +312,9 @@ public class PromptingKeyProviderUI
                 // de-highlighting the resource ID in the panel if the
                 // loop iteration has to be repeated due to an invalid
                 // user input.
-                openKeyPanel.setResourceID(provider.getResourceID());
+                final String resourceID = provider.getResourceID();
+                assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
+                openKeyPanel.setResourceID(resourceID);
                 openKeyPanel.setFeedback(openKeyPanel.getError() != null
                         ? getInvalidOpenKeyFeedback()
                         : getUnknownOpenKeyFeedback());
@@ -366,7 +342,7 @@ public class PromptingKeyProviderUI
                     break;
                 }
 
-                final Object openKey = openKeyPanel.getOpenKey();
+                final Cloneable openKey = openKeyPanel.getOpenKey();
                 if (openKey != null) { // valid input?
                     provider.setKey(openKey);
                     break;
@@ -397,14 +373,12 @@ public class PromptingKeyProviderUI
      * Window's have been dispose()d or System.exit() has been called -
      * it is not sufficient just to hide() all Window's.
      * <p>
-     * The JOptionPane properly dispose()s its Dialog which displays our
-     * password panels.
-     * However, by default <code>JOptionPane</code> uses an internal
-     * <code>Frame</code> as its parent window if the application does not
-     * specify a parent window explicitly.
-     * This class also uses this frame unless the client application has
-     * called {@link PromptingKeyManager#setParentWindow(Window)}.
-     * <code>JOptionPane</code> never dispose()s the parent window, so the
+     * The {@code JOptionPane} properly dispose()s its Dialog which displays
+     * our password panels.
+     * However, by default {@code JOptionPane} uses an internal {@code Frame}
+     * as its parent window if the application does not specify a parent
+     * window explicitly.
+     * {@code JOptionPane} never dispose()s the parent window, so the
      * client application may eventually not terminate.
      * <p>
      * The workaround is to dispose the parent window if it's not showing.
@@ -432,7 +406,8 @@ public class PromptingKeyProviderUI
      * If a {@link Throwable} is thrown by the EDT, then it's wrapped in an
      * {@link UndeclaredThrowableException} and re-thrown by this thread.
      */
-    private static void multiplexOnEDT(final Runnable task) {
+    private static void multiplexOnEDT(final Runnable task)
+    throws UnknownKeyException {
         if (Thread.interrupted())
             throw new UndeclaredThrowableException(
                     new KeyPromptingInterruptedException());
@@ -444,24 +419,22 @@ public class PromptingKeyProviderUI
                 try {
                     EventQueue.invokeAndWaitUninterruptibly(
                             task, START_PROMPTING_TIMEOUT);
-                } catch (EventDispatchTimeoutException failure) {
+                } catch (EventDispatchTimeoutException ex) {
                     // Timeout while waiting for the EDT to start the task.
                     // Now wrap this in two exceptions: The outermost exception will
                     // be catched by the PromptingKeyProvider class and its cause
                     // will be unwrapped and passed on to the client application by
                     // the PromptingKeyProvider class.
-                    throw new UndeclaredThrowableException(
-                            new KeyPromptingTimeoutException(failure));
+                    throw new KeyPromptingTimeoutException(ex);
                 /*} catch (InterruptedException failure) {
                     // We've been interrupted while waiting for the EDT.
                     // Now wrap this in two exceptions: The outermost exception will
                     // be catched by the PromptingKeyProvider class and its cause
                     // will be unwrapped and passed on to the client application by
                     // the PromptingKeyProvider class.
-                    throw new UndeclaredThrowableException(
-                            new KeyPromptingInterruptedException(failure));
-                */} catch (InvocationTargetException failure) {
-                    throw new UndeclaredThrowableException(failure);
+                    throw new KeyPromptingInterruptedException(failure));
+                */} catch (InvocationTargetException ex) {
+                    throw new UndeclaredThrowableException(ex);
                 } finally {
                     Thread.interrupted();
                 }

@@ -16,9 +16,11 @@
 
 package de.schlichtherle.key.passwd.console;
 
-import de.schlichtherle.key.*;
+import de.schlichtherle.key.PromptingAesKeyProvider;
 
-import java.io.*;
+import static de.schlichtherle.key.AesKeyProvider.KEY_STRENGTH_128;
+import static de.schlichtherle.key.AesKeyProvider.KEY_STRENGTH_192;
+import static de.schlichtherle.key.AesKeyProvider.KEY_STRENGTH_256;
 
 /**
  * Extends its base class to enable the user to select the key strength
@@ -29,39 +31,35 @@ import java.io.*;
  * @since TrueZIP 6.4
  * @version $Id$
  */
-public class PromptingAesKeyProviderUI extends PromptingKeyProviderUI {
+public class PromptingAesKeyProviderUI
+        extends PromptingKeyProviderUI<PromptingAesKeyProvider<? super char[]>> {
 
-    protected void promptExtraData(PromptingKeyProvider provider) {
-        // We can safely cast the parameter to PromptingAesKeyProvider, because
-        // otherwise we would not have been called.
-        final PromptingAesKeyProvider aesKeyProvider = ((PromptingAesKeyProvider) provider);
-
-        printf(resources.getString("keyStrength.banner"));
-        printf(resources.getString("keyStrength.medium"));
-        printf(resources.getString("keyStrength.high"));
-        printf(resources.getString("keyStrength.ultra"));
+    @Override
+    protected void promptExtraData(
+            final PromptingAesKeyProvider<? super char[]> provider) {
+        con.printf(resources.getString("keyStrength.banner"));
+        con.printf(resources.getString("keyStrength.medium"));
+        con.printf(resources.getString("keyStrength.high"));
+        con.printf(resources.getString("keyStrength.ultra"));
 
         prompting: while (true) {
-            String keyStrength = readLine(
+            String keyStrength = con.readLine(
                     resources.getString("keyStrength.prompt"),
-                    aesKeyProvider);
+                    provider);
             if (keyStrength == null || keyStrength.length() <= 0)
                 return;
             try {
                 switch (Integer.parseInt(keyStrength)) {
                     case 128:
-                        aesKeyProvider.setKeyStrength(
-                                AesKeyProvider.KEY_STRENGTH_128);
+                        provider.setKeyStrength(KEY_STRENGTH_128);
                         break prompting;
 
                     case 192:
-                        aesKeyProvider.setKeyStrength(
-                                AesKeyProvider.KEY_STRENGTH_192);
+                        provider.setKeyStrength(KEY_STRENGTH_192);
                         break prompting;
 
                     case 256:
-                        aesKeyProvider.setKeyStrength(
-                                AesKeyProvider.KEY_STRENGTH_256);
+                        provider.setKeyStrength(KEY_STRENGTH_256);
                         break prompting;
                 }
             } catch (NumberFormatException syntaxError) {

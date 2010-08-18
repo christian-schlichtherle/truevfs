@@ -46,19 +46,4 @@ public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 	    total += read;
 	} while (total < len);
     }
-
-    /** @deprecated Use {@link #seek} instead. */
-    public int skipBytes(int n) throws IOException {
-        if (n <= 0)
-            return 0; // for compatibility to RandomAccessFile
-
-        final long fp = getFilePointer(); // should fail when closed
-        final long len = length(); // may succeed when closed
-        final long rem = len - fp;
-        if (n > rem)
-            n = (int) rem;
-        seek(fp + n);
-        assert getFilePointer() == fp + n;
-        return n;
-    }
 }

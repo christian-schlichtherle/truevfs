@@ -16,18 +16,17 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.key.*;
-
-import java.awt.*;
-import java.lang.reflect.*;
-
-import javax.swing.*;
-
-import junit.framework.*;
+import de.schlichtherle.key.AesKeyProvider;
+import java.awt.EventQueue;
+import java.lang.reflect.UndeclaredThrowableException;
+import javax.swing.JFrame;
 import junit.framework.Test;
-
-import org.netbeans.jemmy.*;
-import org.netbeans.jemmy.operators.*;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
+import org.netbeans.jemmy.operators.JComboBoxOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
 
 /**
  * @author Christian Schlichtherle
@@ -42,11 +41,12 @@ public class AesKeyStrengthPanelTest extends TestCase {
     private AesKeyStrengthPanel instance;
     private JFrame frame;
     private JFrameOperator frameOp;
-    
+
     public AesKeyStrengthPanelTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -62,6 +62,7 @@ public class AesKeyStrengthPanelTest extends TestCase {
         frameOp = new JFrameOperator(); // wait for JFrame
     }
 
+    @Override
     protected void tearDown() throws Exception {
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
@@ -82,7 +83,7 @@ public class AesKeyStrengthPanelTest extends TestCase {
         }*/
 
         TestSuite suite = new TestSuite(AesKeyStrengthPanelTest.class);
-        
+
         return suite;
     }
 
@@ -185,7 +186,7 @@ public class AesKeyStrengthPanelTest extends TestCase {
         assertEquals(expResult, selection);
         sleep();
     };
-    
+
     private static void sleep() {
         //new QueueTool().waitEmpty(500); // doesn't always update the screen!
         try {

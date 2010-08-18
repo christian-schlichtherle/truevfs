@@ -16,10 +16,11 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.key.*;
-
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.key.KeyManager;
+import de.schlichtherle.key.KeyProvider;
+import de.schlichtherle.key.UnknownKeyException;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * Simulates the typical life cycle of a protected resource and its
@@ -98,7 +99,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     }
 
     protected KeyProvider getKeyProvider(KeyManager manager, String id) {
-        return manager.getKeyProvider(id);
+        return manager.getKeyProvider(id, KeyProvider.class);
     }
 
     private void openResource() throws UnknownKeyException {
@@ -113,6 +114,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         openResourceHook(provider);
     }
 
+    @SuppressWarnings("CallToThreadDumpStack")
     private boolean authenticateKey(final KeyProvider provider) throws UnknownKeyException {
         final Object providedKey = provider.getOpenKey();
         final boolean correct = equals(refKey, providedKey);

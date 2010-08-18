@@ -17,10 +17,8 @@
 package de.schlichtherle.key.passwd.swing;
 
 import de.schlichtherle.key.KeyProvider;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -72,6 +70,7 @@ public abstract class BasicInvalidKeyFeedback extends BasicFeedback {
         this.delay = delay;
     }
 
+    @Override
     protected void startAnimation() {
         startAnimation(getPanel(), getDelay());
     }

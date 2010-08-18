@@ -78,6 +78,7 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
             setDelay(duration);
     }
 
+    @Override
     protected void startAnimation() {
         super.startAnimation(); // temporarily disable default button
         

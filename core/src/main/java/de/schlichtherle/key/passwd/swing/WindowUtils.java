@@ -32,16 +32,17 @@ import javax.swing.*;
 final class WindowUtils {
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";
 
-    private static Reference lastFocusManager = new WeakReference(null);
-    private static Reference lastFocusedWindow = lastFocusManager;
-    private static Reference parent;
+    private static Reference<KeyboardFocusManager> lastFocusManager
+            = new WeakReference<KeyboardFocusManager>(null);
+    private static Reference<Window> lastFocusedWindow
+            = new WeakReference<Window>(null);
 
     private static PropertyChangeListener focusListener
             = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             Window w = (Window) evt.getNewValue();
             if (w != null)
-                lastFocusedWindow = new WeakReference(w);
+                lastFocusedWindow = new WeakReference<Window>(w);
         }
     };
 
@@ -52,16 +53,11 @@ final class WindowUtils {
     private WindowUtils() {
     }
 
-    /**
-     * @see PromptingKeyManager#getParentWindow
-     */
+    /** @see PromptingKeyManager#getParentWindow */
     public static synchronized Window getParentWindow() {
-        Window w = parent != null ? (Window) parent.get() : null;
-        if (w == null) {
-            w = WindowUtils.getLastFocusedWindow();
-            if (w == null)
-                w = getAnyShowingWindow();
-        }
+        Window w = getLastFocusedWindow();
+        if (w == null)
+            w = getAnyShowingWindow();
 
         // Search the containment hierarchy updwards for the first showing
         // window.
@@ -71,13 +67,6 @@ final class WindowUtils {
 
         // No window is showing, use JOptionPane's default.
         return JOptionPane.getRootFrame();
-    }
-
-    /**
-     * @see PromptingKeyManager#setParentWindow
-     */
-    public static synchronized void setParentWindow(Window w) {
-        parent = w != null ? new WeakReference(w) : null;
     }
 
     /**
@@ -92,7 +81,7 @@ final class WindowUtils {
      */
     public static Window getLastFocusedWindow() {
         observeFocusedWindow();
-        return (Window) lastFocusedWindow.get();
+        return lastFocusedWindow.get();
     }
 
     /**
@@ -100,23 +89,22 @@ final class WindowUtils {
      * manager is observed.
      */
     private static synchronized void observeFocusedWindow() {
-        final KeyboardFocusManager lfm
-                = (KeyboardFocusManager) lastFocusManager.get();
+        final KeyboardFocusManager lfm = lastFocusManager.get();
         final KeyboardFocusManager fm
                 = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         if (fm == lfm)
             return;
 
         if (lfm != null)
-            lfm.removePropertyChangeListener(
-                    PROPERTY_FOCUSED_WINDOW, focusListener);
-        fm.addPropertyChangeListener(
-                PROPERTY_FOCUSED_WINDOW, focusListener);
-        lastFocusManager = new WeakReference(fm);
-        lastFocusedWindow = new WeakReference(fm.getFocusedWindow());
+            lfm.removePropertyChangeListener(PROPERTY_FOCUSED_WINDOW,
+                    focusListener);
+        fm.addPropertyChangeListener(PROPERTY_FOCUSED_WINDOW,
+                focusListener);
+        lastFocusManager = new WeakReference<KeyboardFocusManager>(fm);
+        lastFocusedWindow = new WeakReference<Window>(fm.getFocusedWindow());
     }
 
-    private static final Window getAnyShowingWindow() {
+    private static Window getAnyShowingWindow() {
         return getAnyShowingWindow(Frame.getFrames());
     }
 

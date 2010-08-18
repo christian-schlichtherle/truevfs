@@ -27,7 +27,6 @@ import java.util.zip.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 
 /**
  * This panel prompts the user for a key to create or overwrite a protected
@@ -48,6 +47,8 @@ public class CreateKeyPanel extends EnhancedPanel {
 
     /** The minimum acceptable length of a password. */
     private static final int MIN_PASSWD_LEN = 6;
+    
+    private static final long serialVersionUID = 6416529465492387235L;
 
     private final Color defaultForeground;
 
@@ -100,6 +101,7 @@ public class CreateKeyPanel extends EnhancedPanel {
      */
     public void setResourceID(final String resourceID) {
         final String lastResourceID = PromptingKeyProviderUI.lastResourceID;
+        assert lastResourceID != null : "violation of contract in PromptingKeyProvider";
         if (!lastResourceID.equals(resourceID) && !"".equals(lastResourceID)) {
             this.resourceID.setForeground(Color.RED);
         } else {
@@ -110,15 +112,15 @@ public class CreateKeyPanel extends EnhancedPanel {
     }
     
     /**
-     * Getter for property <code>createKey</code>.
+     * Getter for property {@code createKey}.
      *
-     * @return Value of property <code>createKey</code>.
-     *         This is <tt>null</tt> if the user hasn't entered two equal
+     * @return Value of property {@code createKey}.
+     *         This is {@code null} if the user hasn't entered two equal
      *         passwords or if the password is weak.
-     *         May also be <code>null</code> if a key file is selected and
+     *         May also be {@code null} if a key file is selected and
      *         accessing it results in an exception.
      */
-    public Object getCreateKey() {
+    public Cloneable getCreateKey() {
         try {
             switch (authenticationPanel.getAuthenticationMethod()) {
                 case AuthenticationPanel.AUTH_PASSWD:
@@ -168,27 +170,6 @@ public class CreateKeyPanel extends EnhancedPanel {
         }
     }
 
-    /**
-     * Clears the password fields and the error message (but doesn't touch
-     * the pathname in case a key file has been selected).
-     *
-     * @deprecated Create a new <code>CreateKeyPanel</code> instead.
-     */
-    public void resetCreateKey() {
-        resetPasswd();
-        setError(null);
-    }
-
-    /**
-     * Clears the password fields.
-     *
-     * @deprecated Create a new <code>CreateKeyPanel</code> instead.
-     */
-    public void resetPasswd() {
-        newPasswd1.setText(null);
-        newPasswd2.setText(null);
-    }
-
     /** Check the data entropy in the new key. */
     protected void checkKeyFileCreateKey(byte[] createKey)
     throws WeakKeyException {
@@ -207,12 +188,11 @@ public class CreateKeyPanel extends EnhancedPanel {
     protected void checkPasswdCreateKey(char[] createKey)
     throws WeakKeyException {
         if (createKey.length < MIN_PASSWD_LEN)
-            throw new WeakKeyException(
-                    localizedMessage(resources, "passwd.tooShort", new Integer(MIN_PASSWD_LEN)));
+            throw new WeakKeyException(localizedMessage(
+                    resources, "passwd.tooShort", MIN_PASSWD_LEN));
     }
 
-    // TODO: Make this private.
-    static final String localizedMessage(
+    private static String localizedMessage(
             final ResourceBundle resources,
             final String key,
             final Object param) {
@@ -236,7 +216,7 @@ public class CreateKeyPanel extends EnhancedPanel {
      */
     public void setError(final String error) {
         // Fix layout issue with GridBagLayout:
-        // If null is set, the layout seems to ignore the widthy = 1.0
+        // If null is set, the layout seems to ignore the width = 1.0
         // constraint for the component.
         this.error.setText(error != null ? error : " ");
     }
@@ -452,6 +432,7 @@ public class CreateKeyPanel extends EnhancedPanel {
         // This mess is insane (and I can hardly abstain from writing down
         // all the other insulting scatology which comes to my mind)!
         final Window window = evt.getAncestorWindow();
+        assert window != null : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
             public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);

@@ -21,9 +21,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
@@ -56,6 +53,7 @@ import javax.swing.text.JTextComponent;
  * @version $Id$
  */
 public abstract class AbstractComboBoxBrowser implements Serializable {
+    private static final long serialVersionUID = 1065103960246722893L;
 
     private final Listener listener = new Listener();
 
@@ -270,7 +268,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * 
      * @return Whether or not updating the combo box model was already locked.
      */
-    private final boolean lock() {
+    private boolean lock() {
         if (recursion)
             return true;
         recursion = true;
@@ -282,7 +280,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * <b>Warning:</b> This method works in a synchronized or single threaded
      * environment only!
      */
-    private final void unlock() {
+    private void unlock() {
         recursion = false;
     }
 
@@ -342,26 +340,32 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
             return comboBoxEditor;
         }
         
+        @Override
         public Component getEditorComponent() {
             return comboBoxEditor.getEditorComponent();
         }
 
+        @Override
         public void setItem(final Object item) {
             updateEditor(comboBoxEditor, item);
         }
 
+        @Override
         public Object getItem() {
             return comboBoxEditor.getItem();
         }
 
+        @Override
         public void selectAll() {
             comboBoxEditor.selectAll();
         }
 
+        @Override
         public void addActionListener(ActionListener actionListener) {
             comboBoxEditor.addActionListener(actionListener);
         }
 
+        @Override
         public void removeActionListener(ActionListener actionListener) {
             comboBoxEditor.removeActionListener(actionListener);
         }

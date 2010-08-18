@@ -25,9 +25,9 @@ import java.util.Enumeration;
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.8
- * @deprecated Though only introduced in TrueZIP 6.8, this class is just a
- *             workaround until the introduction of a better, but probably
- *             non-backwards-compatible solution in TrueZIP 7.
+ * @deprecated This class is just a workaround until the introduction of a
+ *             better, but probably non-backwards-compatible solution in
+ *             TrueZIP 7. Do <em>not</em> use!
  */
 public class ClassLoaderUtil {
 
@@ -48,7 +48,9 @@ public class ClassLoaderUtil {
      */
     public static Class loadClass(String classToLoad, Class loadingClass)
     throws ClassNotFoundException {
-        final ClassLoader l1 = loadingClass.getClassLoader();
+        ClassLoader l1 = loadingClass.getClassLoader();
+        if (l1 == null)
+            l1 = ClassLoader.getSystemClassLoader(); // just in case somebody adds TrueZIP to the Boot Class Path
         try {
             return l1.loadClass(classToLoad);
         } catch (ClassNotFoundException cnfe) {
@@ -75,7 +77,9 @@ public class ClassLoaderUtil {
      */
     public static Enumeration getResources(String name, Class loadingClass)
     throws IOException {
-        final ClassLoader l1 = loadingClass.getClassLoader();
+        ClassLoader l1 = loadingClass.getClassLoader();
+        if (l1 == null)
+            l1 = ClassLoader.getSystemClassLoader(); // just in case somebody adds TrueZIP to the Boot Class Path
         ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         if (l2 == null)
             l2 = ClassLoader.getSystemClassLoader();

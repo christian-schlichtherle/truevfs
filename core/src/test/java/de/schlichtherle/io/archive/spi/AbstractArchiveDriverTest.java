@@ -16,18 +16,24 @@
 
 package de.schlichtherle.io.archive.spi;
 
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.rof.*;
-
-import java.awt.*;
-import java.io.*;
-
-import javax.swing.*;
-
-import junit.framework.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharConversionException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class AbstractArchiveDriverTest extends TestCase {
 
@@ -37,13 +43,16 @@ public class AbstractArchiveDriverTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         driver = new DummyArchiveDriver();
     }
 
+    @Override
     protected void tearDown() throws Exception {
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructors() {
         try {
             new DummyArchiveDriver(null);
@@ -68,8 +77,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         assertSame(DummyArchiveDriver.ICON, driver.getClosedIcon(null));
     }
 
-    public void testEncoding() {
-        assertSame("US-ASCII", driver.getEncoding()); // string literals are interned
+    public void testCharset() {
+        assertSame("US-ASCII", driver.getCharset()); // string literals are interned
     }
 
     public void testEnsureEncodable() throws CharConversionException {
@@ -95,8 +104,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         in.close();
         
         assertNotSame(driver, driver2);
-        assertNotSame(driver.getEncoding(), driver2.getEncoding());
-        assertEquals(driver.getEncoding(), driver2.getEncoding());
+        assertNotSame(driver.getCharset(), driver2.getCharset());
+        assertEquals(driver.getCharset(), driver2.getCharset());
         assertNotSame(driver.getOpenIcon(null), driver2.getOpenIcon(null));
         //assertEquals(driver.getOpenIcon(null), driver2.getOpenIcon(null));
         assertNotSame(driver.getClosedIcon(null), driver2.getClosedIcon(null));
@@ -111,6 +120,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         class TestThread extends Thread {
             Throwable throwable; // = null;
 
+            @Override
             public void run() {
                 try {
                     synchronized (go) {
@@ -151,6 +161,8 @@ public class AbstractArchiveDriverTest extends TestCase {
     }
 
     private static class DummyArchiveDriver extends AbstractArchiveDriver {
+        private static final long serialVersionUID = 2382398676900721212L;
+
         private static final Icon ICON = new ImageIcon(
                 DummyArchiveDriver.class.getResource("empty.gif"));
 

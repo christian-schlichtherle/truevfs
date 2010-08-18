@@ -62,6 +62,7 @@ public class RemoteControl extends Assert implements Runnable {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void runIt() throws AssertionError {
         JDialogOperator dialog;
         JPasswordFieldOperator passwd1,  passwd2;
@@ -261,6 +262,7 @@ public class RemoteControl extends Assert implements Runnable {
         return error;
     }
 
+    @SuppressWarnings("SleepWhileHoldingLock")
     private void pushDefaultButton(JDialogOperator dialog) {
         final JButtonOperator ok = new JButtonOperator(
                 dialog.getRootPane().getDefaultButton());

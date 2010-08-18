@@ -16,10 +16,7 @@
 
 package de.schlichtherle.key;
 
-import de.schlichtherle.util.ThreadLocalLong;
-
 import java.lang.reflect.Array;
-import java.util.Arrays;
 
 /**
  * This abstract class implements the base functionality required to be a
@@ -47,36 +44,15 @@ import java.util.Arrays;
  * @version $Id$
  * @since TrueZIP 6.4 (renamed from SharedKeyProvider)
  */
-public abstract class AbstractKeyProvider implements KeyProvider {
+public abstract class AbstractKeyProvider<K extends Cloneable>
+        implements KeyProvider<K> {
 
-    private Object key;
-
-    private final ThreadLocalLong invalidated = new ThreadLocalLong();
-
-    /**
-     * Returns the single key maintained by this key provider.
-     * Client applications should not call this method directly,
-     * but rather call {@link #getOpenKey} or {@link #getCreateKey}.
-     * It is intended to be used by subclasses and user interface classes only.
-     *
-     * @deprecated You should not use this method from this class.
-     *             It will be moved to a subclass in the next major version release.
-     */
-    public synchronized Object getKey() {
-        return key;
-    }
-
-    /**
-     * Sets the single key maintained by this key provider.
-     * Client applications should not call this method directly.
-     * It is intended to be used by subclasses and user interface classes only.
-     *
-     * @deprecated You should not use this method from this class.
-     *             It will be moved to a subclass in the next major version release.
-     */
-    public synchronized void setKey(Object key) {
-        this.key = key;
-    }
+    private final ThreadLocal<Long> invalidated = new ThreadLocal<Long>() {
+        @Override
+        public Long initialValue() {
+            return 0L;
+        }
+    };
 
     /**
      * Forwards the call to {@link #getCreateKeyImpl}.
@@ -89,8 +65,8 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         exception.
      * @see KeyProvider#getCreateKey
      */
-    public Object getCreateKey() throws UnknownKeyException {
-        final Object key = getCreateKeyImpl();
+    public final K getCreateKey() throws UnknownKeyException {
+        final K key = getCreateKeyImpl();
         if (key == null)
             throw new UnknownKeyException();
         return clone(key);
@@ -107,8 +83,8 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         the key has been disabled or cancelled by the user.
      * @see KeyProvider#getCreateKey
      */
-    protected Object getCreateKeyImpl() throws UnknownKeyException {
-        return getKey();
+    protected K getCreateKeyImpl() throws UnknownKeyException {
+        return null;
     }
 
     /**
@@ -127,9 +103,9 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         exception.
      * @see KeyProvider#getOpenKey
      */
-    public final Object getOpenKey() throws UnknownKeyException {
+    public final K getOpenKey() throws UnknownKeyException {
         try {
-            final Object key = getOpenKeyImpl();
+            final K key = getOpenKeyImpl();
             if (key == null)
                 throw new UnknownKeyException();
             return clone(key);
@@ -148,8 +124,8 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         the key has been disabled or cancelled by the user.
      * @see KeyProvider#getCreateKey
      */
-    protected Object getOpenKeyImpl() throws UnknownKeyException {
-        return getKey();
+    protected K getOpenKeyImpl() throws UnknownKeyException {
+        return null;
     }
 
     /**
@@ -162,7 +138,7 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      * @see KeyProvider#invalidOpenKey
      */
     public final void invalidOpenKey() {
-        invalidated.setValue(System.currentTimeMillis());
+        invalidated.set(System.currentTimeMillis());
         invalidOpenKeyImpl();
     }
 
@@ -183,97 +159,43 @@ public abstract class AbstractKeyProvider implements KeyProvider {
     }
 
     /**
-     * Returns a clone of the key, which may be <code>null</code>.
-     * If the key is an array, a shallow copy of the array is
-     * returned.
-     * When overriding this method, please consider that the key
-     * may be <code>null</code>.
-     *
-     * @deprecated You should not use or override this method.
-     *             This method will vanish in the next major version release.
-     * @throws RuntimeException If cloning the key results in a runtime
-     *         exception.
-     */
-    protected Object cloneKey() {
-        final Object key = getKey();
-        if (key == null)
-            return null; // the clone of null is null, right? :-)
-        return clone(key);
-    }
-
-    /**
-     * Returns a clone of the key.
+     * Clones <code>key</code> reflectively.
      * If the key is an array, a shallow copy of the array is returned.
      *
-     * @throws RuntimeException If cloning the key results in a runtime
-     *         exception.
+     * @param key The key to get cloned - may be <code>null</code>.
+     * @return A clone of the <code>key</code> property, which may be
+     *         <code>null</code>.
+     * @throws RuntimeException If cloning the key results in an exception.
      */
-    static Object clone(final Object key) {
+    @SuppressWarnings("SuspiciousSystemArraycopy")
+    static <K> K clone(final K key) {
         // Could somebody please explain to me why the clone method is
         // declared "protected" in Object and Cloneable is just a marker
         // interface?
-        // And furthermore, why does clone() called via Reflection on an
+        // And furthermore, why does clone() called via reflection on an
         // array throw a NoSuchMethodException?
         // Somehow, this design doesn't speak to me...
-        final Class c = key.getClass();
+        final Class<?> c = key.getClass();
         if (c.isArray()) {
             final int l = Array.getLength(key);
-            final Object p = Array.newInstance(c.getComponentType(), l);
-            System.arraycopy(key, 0, p, 0, l);
-            return p;
+            final K clone = (K) Array.newInstance(c.getComponentType(), l);
+            System.arraycopy(key, 0, clone, 0, l);
+            return clone;
         } else {
             try {
-                return key.getClass().getMethod("clone", null).invoke(key, null);
+                return (K) c.getMethod("clone", (Class[]) null)
+                        .invoke(key, (Object[]) null);
             } catch (RuntimeException ex) {
-                throw ex; // pass on
+                throw ex;
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    /**
-     * Clears the data structure of the key itself and sets the
-     * reference to it to <code>null</code>.
-     * If the key is an array, the array is filled with zero values
-     * before setting the reference to <code>null</code>.
-     * When overwriting this method, please consider that the key
-     * may be <code>null</code>.
-     *
-     * @deprecated You should not use or override this method.
-     *             This method will vanish in the next major version release.
-     */
-    protected void resetKey() {
-        final Object key = getKey();
-        if (key == null)
-            return;
-        
-        setKey(null);
-
-        synchronized (key) {
-            if (key instanceof byte[])
-                Arrays.fill((byte[]) key, (byte) 0);
-            else if (key instanceof char[])
-                Arrays.fill((char[]) key, (char) 0);
-            else if (key instanceof short[])
-                Arrays.fill((short[]) key, (short) 0);
-            else if (key instanceof int[])
-                Arrays.fill((int[]) key, 0);
-            else if (key instanceof long[])
-                Arrays.fill((long[]) key, (long) 0);
-            else if (key instanceof float[])
-                Arrays.fill((float[]) key, (float) 0);
-            else if (key instanceof double[])
-                Arrays.fill((double[]) key, (double) 0);
-            else if (key instanceof boolean[])
-                Arrays.fill((boolean[]) key, false);
-            else if (key instanceof Object[])
-                Arrays.fill((Object[]) key, null);
-        }
-    }
-
+    @SuppressWarnings("SleepWhileHoldingLock")
     private void enforceSuspensionPenalty() {
-        final long last = invalidated.getValue();
+        final long last = invalidated.get();
         long delay;
         InterruptedException interrupted = null;
         while ((delay = System.currentTimeMillis() - last) < MIN_KEY_RETRY_DELAY) {
@@ -297,10 +219,8 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      * whenever an instance is mapped in the <code>KeyManager</code>.
      *
      * @param resourceID The resource identifier to map this instance for.
-     *
      * @return The key provider previously mapped for the given resource
      *         identifier or <code>null</code> if no key provider was mapped.
-     *
      * @throws NullPointerException If <code>resourceID</code> is
      *         <code>null</code>.
      * @throws IllegalStateException If mapping this instance is prohibited
@@ -308,8 +228,7 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    protected KeyProvider addToKeyManager(String resourceID)
-    throws NullPointerException, IllegalStateException {
+    protected KeyProvider<?> addToKeyManager(String resourceID) {
         return KeyManager.mapKeyProvider(resourceID, this);
     }
 
@@ -332,8 +251,7 @@ public abstract class AbstractKeyProvider implements KeyProvider {
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    protected KeyProvider removeFromKeyManager(String resourceID)
-    throws NullPointerException, IllegalStateException {
+    protected KeyProvider<?> removeFromKeyManager(String resourceID) {
         return KeyManager.unmapKeyProvider(resourceID);
     }
 }

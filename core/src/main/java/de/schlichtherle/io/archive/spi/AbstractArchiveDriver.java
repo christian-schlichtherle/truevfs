@@ -103,6 +103,7 @@ public abstract class AbstractArchiveDriver
         assert invariants();
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private static UnsupportedEncodingException testJSE11Support(
             final String charset) {
         try {
@@ -204,11 +205,6 @@ public abstract class AbstractArchiveDriver
         return charset;
     }
 
-    /** @deprecated Use {@link #getCharset} instead. */
-    public final String getEncoding() {
-        return charset;
-    }
-
     /**
      * Returns the value of the property <code>openIcon</code> which was 
      * provided to the constructor.
@@ -230,6 +226,7 @@ public abstract class AbstractArchiveDriver
     }
 
     private final class ThreadLocalEncoder extends ThreadLocal {
+        @Override
         protected Object initialValue() {
             return Charset.forName(charset).newEncoder();
         }
@@ -287,6 +284,8 @@ public abstract class AbstractArchiveDriver
      * is final and its constructor is private.
      */
     protected static final class InconsistentCharsetSupportError extends Error {
+        private static final long serialVersionUID = 5976345821010992606L;
+
         private InconsistentCharsetSupportError(String charset, Exception cause) {
             super(message(charset, cause), cause);
         }

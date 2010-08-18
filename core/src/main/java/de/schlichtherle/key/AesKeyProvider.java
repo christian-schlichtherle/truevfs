@@ -22,12 +22,16 @@ package de.schlichtherle.key;
  * contents of an already existing AES encrypted resource.
  * The cipher key strength for the AES encryption may be either 128, 192 or
  * 256 bits.
+ * <p>
+ * Note that provider implementations must be thread safe.
+ * This allows clients to use the same provider by multiple threads
+ * concurrently.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.1
  */
-public interface AesKeyProvider extends KeyProvider {
+public interface AesKeyProvider<K extends Cloneable> extends KeyProvider<K> {
 
     /** Identifier for a 128 bit ciphering key. */
     int KEY_STRENGTH_128 = 0;
@@ -40,7 +44,7 @@ public interface AesKeyProvider extends KeyProvider {
 
     /**
      * Returns the cipher key strength for the AES encryption.
-     * 
+     *
      * @return One of <code>KEY_STRENGTH_128</code>,
      *        <code>KEY_STRENGTH_192</code> or <code>KEY_STRENGTH_256</code>.
      */
@@ -48,7 +52,7 @@ public interface AesKeyProvider extends KeyProvider {
 
     /**
      * Sets the cipher key strength for the AES encryption.
-     * 
+     *
      * @param keyStrength One of <code>KEY_STRENGTH_128</code>,
      *        <code>KEY_STRENGTH_192</code> or <code>KEY_STRENGTH_256</code>.
      * @throws IllegalArgumentException If the preconditions for the parameter

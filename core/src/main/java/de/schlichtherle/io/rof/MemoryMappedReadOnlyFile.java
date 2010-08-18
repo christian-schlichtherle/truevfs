@@ -16,24 +16,34 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * A {@link ReadOnlyFile} implementation using channels to map the underlying
  * file into memory.
  * This class supports files larger than Integer.MAX_VALUE.
+ * <p>
+ * <b>Warning:</b> The {@link #close} method in this class cannot reliably
+ * release the underlying file on the Windows platform and hence this class
+ * is not used in other parts of this library.
+ * <p>
+ * The reason is that the mapped file remains allocated until the garbage
+ * collector frees it even if the file channel and/or the
+ * <code>RandomAccessFile</code> has been closed.
+ * Subsequent delete/write operations on the file will then fail.
+ * For more information, please refer to
+ * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154">
+ * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154</a>.
+ * Applications may safely use this class if subsequent access to the file
+ * is not required during the life time of the application however.
+ * <p>
+ * This class is <em>not</em> thread-safe.
  *
- * @deprecated This class does not reliably work on the Windows platform,
- *             and hence its not used in TrueZIP.
- *             The reason is that the mapped file remains allocated until the
- *             garbage collector frees it even if the file channel and/or the
- *             RandomAccessFile has been closed. Subsequent delete/write
- *             operations on the file will then fail. For more information,
- *             please refer to
- *             <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154">
- *             http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154</a>.
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -67,7 +77,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      * @return The number of bytes available in the floating window.
      *         If zero, the end of the file has been reached.
      */
-    private final int available() throws IOException {
+    private int available() throws IOException {
         ensureOpen();
         if (window.remaining() <= 0)
             window(windowOff + WINDOW_LEN);
@@ -115,7 +125,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     public int read() throws IOException {
         return available() > 0 ? window.get() & 0xff : -1;
     }
-    
+
     public int read(final byte[] buf, final int off, int len)
     throws IOException {
         if (len == 0)
@@ -152,7 +162,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
             // Workaround for garbage collection issue with memory mapped files.
             // Note that there's no guarantee that this works: Sometimes it
             // does, sometimes not!
-            System.gc(); 
+            System.gc();
             System.runFinalization();
             // Thread.interrupted(); // cancel pending interrupt
             try {
@@ -167,7 +177,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private final void ensureOpen() throws IOException {
+    private void ensureOpen() throws IOException {
         if (channel == null)
             throw new IOException("file is closed");
     }

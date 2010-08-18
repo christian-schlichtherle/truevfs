@@ -17,7 +17,6 @@
 package de.schlichtherle.key.passwd.swing;
 
 import java.awt.Toolkit;
-
 import javax.swing.JPanel;
 
 /**

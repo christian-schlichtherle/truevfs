@@ -17,7 +17,6 @@
 package de.schlichtherle.swing.event;
 
 import de.schlichtherle.swing.EnhancedPanel;
-
 import java.awt.AWTEvent;
 import java.awt.Window;
 
@@ -50,8 +49,6 @@ public class PanelEvent extends AWTEvent {
     /** The id for Ancestor Window Hidden Event. */
     public static final int ANCESTOR_WINDOW_HIDDEN = RESERVED_ID_MAX + 2;
 
-    /**
-     */
     public PanelEvent(EnhancedPanel source, int id) {
         super(source, id);
 
@@ -66,11 +63,31 @@ public class PanelEvent extends AWTEvent {
     }
 
     /**
-     * Returns the source of this event as an <code>EnhancedPanel</code>
-     * or <code>null</code> if it's not an instance of this class.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in <code>PanelEvent</code> always returns a valid
+     * instance of <code>EnhancedPanel</code>.
      */
-    public EnhancedPanel getSourcePanel() {
-        return source instanceof EnhancedPanel ? (EnhancedPanel) source : null;
+    @Override
+    public EnhancedPanel getSource() {
+        return (EnhancedPanel) source;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in <code>PanelEvent</code> enforces that the
+     * parameter is a valid instance of <code>EnhancedPanel</code>.
+     *
+     * @throws NullPointerException If <code>source</code> is <code>null</code>.
+     * @throws ClassCastException If <code>source</code> is not an instance of
+     *         <code>EnhancedPanel</code>.
+     */
+    @Override
+    public void setSource(Object source) {
+        if (source == null)
+            throw new NullPointerException();
+        super.setSource((EnhancedPanel) source);
     }
 
     /**
@@ -78,10 +95,10 @@ public class PanelEvent extends AWTEvent {
      * source of this event is not an <code>EnhancedPanel</code>.
      */
     public Window getAncestorWindow() {
-        EnhancedPanel panel = getSourcePanel();
-        return panel != null ? panel.getAncestorWindow() : null;
+        return getSource().getAncestorWindow();
     }
 
+    @Override
     public String paramString() {
         switch (id) {
             case ANCESTOR_WINDOW_SHOWN:

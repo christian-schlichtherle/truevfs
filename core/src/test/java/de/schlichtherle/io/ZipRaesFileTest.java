@@ -16,15 +16,19 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.key.*;
-
-import java.io.*;
+import de.schlichtherle.key.AesKeyProvider;
+import de.schlichtherle.key.KeyManager;
+import de.schlichtherle.key.KeyPromptingCancelledException;
+import de.schlichtherle.key.UnknownKeyException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * Tests the TrueZIP API in de.schlichtherle.io with the ZIP.RAES (TZP) driver.
+ * Tests the TrueZIP API in the package {@code de.schlichtherle.io} with the
+ * ZIP.RAES (TZP) driver.
  * This test uses a custom key manager in order to automatically provide a
  * constant password without prompting the user.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -39,6 +43,7 @@ public class ZipRaesFileTest extends FileTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".tzp";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("tzp"));
@@ -49,6 +54,7 @@ public class ZipRaesFileTest extends FileTestCase {
         super.setUp();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
 
@@ -101,19 +107,19 @@ public class ZipRaesFileTest extends FileTestCase {
         }
     }
 
-    public static class SimpleAesKeyProvider implements AesKeyProvider {
-        public Object getCreateKey() throws UnknownKeyException {
+    public static class SimpleAesKeyProvider implements AesKeyProvider<char[]> {
+        public char[] getCreateKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
             else
-                return "secret".toCharArray();
+                return "secret".toCharArray(); // return clone!
         }
 
-        public Object getOpenKey() throws UnknownKeyException {
+        public char[] getOpenKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
             else
-                return "secret".toCharArray();
+                return "secret".toCharArray(); // return clone!
         }
 
         public void invalidOpenKey() {

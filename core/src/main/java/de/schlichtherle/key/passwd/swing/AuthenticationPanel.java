@@ -16,16 +16,21 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.ref.*;
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.text.*;
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.File;
+import de.schlichtherle.io.swing.FileComboBoxBrowser;
+import java.awt.EventQueue;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.lang.ref.SoftReference;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
 /**
  * A panel displaying a password panel or a key file panel in order to let
@@ -50,6 +55,7 @@ public class AuthenticationPanel extends JPanel {
     
     /** The key file authentication method. */
     public static final int AUTH_KEY_FILE = 1;
+    private static final long serialVersionUID = 3876515923659236921L;
 
     /**
      * Creates a new authentication panel.
@@ -287,6 +293,7 @@ public class AuthenticationPanel extends JPanel {
 
     private static class CustomFileChooser extends javax.swing.JFileChooser {
         private static java.io.File lastCurrentDir = BASE_DIR;
+        private static final long serialVersionUID = 2361832976537648223L;
         
         public CustomFileChooser() {
             super(lastCurrentDir);
@@ -295,11 +302,13 @@ public class AuthenticationPanel extends JPanel {
             setFileHidingEnabled(false);
         }
 
+        @Override
         public void setCurrentDirectory(java.io.File dir) {
             super.setCurrentDirectory(dir);
             lastCurrentDir = dir;
         }
 
+        @Override
         public java.io.File getCurrentDirectory() {
             return lastCurrentDir = super.getCurrentDirectory();
         }

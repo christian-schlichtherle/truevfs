@@ -100,27 +100,6 @@ public class DefaultArchiveDetector
     private static final long serialVersionUID = 848158760183179884L;
 
     /**
-     * The canonical list of archive file suffixes in the global registry
-     * which have been configured to be recognized by default.
-     * 
-     * @deprecated This field is not for public use and will vanish
-     *             private access in the next major release.
-     *             Use <code>ArchiveDetector.DEFAULT.getSuffixes()</code> instead.
-     */
-    public static final String DEFAULT_SUFFIXES
-            = GlobalArchiveDriverRegistry.INSTANCE.defaultSuffixes;
-
-    /**
-     * The canonical list of all archive file suffixes in the global registry.
-     * 
-     * @deprecated This field is not for public use and will vanish
-     *             private access in the next major release.
-     *             Use <code>ArchiveDetector.ALL.getSuffixes()</code> instead.
-     */
-    public static final String ALL_SUFFIXES
-            = GlobalArchiveDriverRegistry.INSTANCE.allSuffixes;
-
-    /**
      * The local registry for archive file suffixes and archive drivers.
      * This could actually be the global registry
      * ({@link GlobalArchiveDriverRegistry#INSTANCE}), filtered by a custom

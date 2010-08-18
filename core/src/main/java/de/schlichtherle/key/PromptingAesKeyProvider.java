@@ -28,9 +28,9 @@ package de.schlichtherle.key;
  * @version $Id$
  * @since TrueZIP 6.0
  */
-public class PromptingAesKeyProvider
-        extends PromptingKeyProvider
-        implements AesKeyProvider {
+public class PromptingAesKeyProvider<K extends Cloneable>
+        extends PromptingKeyProvider<K>
+        implements AesKeyProvider<K> {
 
     private int keyStrength = KEY_STRENGTH_256;
 
@@ -49,20 +49,19 @@ public class PromptingAesKeyProvider
         this.keyStrength = keyStrength;
     }
 
+    @Override
     protected String getUIClassID() {
-        return "PromptingAesKeyProvider";
+        return "PromptingAesKeyProvider"; // support code obfuscation!
     }
 
-    /**
-     * Resets the key strength to 256 bits.
-     */
+    /** Resets the key strength to 256 bits. */
+    @Override
     protected void onReset() {
         keyStrength = KEY_STRENGTH_256;
     }
 
-    /**
-     * Returns the current key strength.
-     */
+    /** Returns the current key strength. */
+    @Override
     public String toString() {
         return "" + (128 + keyStrength * 64);
     }

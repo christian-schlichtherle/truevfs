@@ -16,12 +16,11 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.key.*;
-
-import java.awt.*;
-import java.lang.ref.*;
-
-import javax.swing.*;
+import de.schlichtherle.key.KeyPromptingDisabledException;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Window;
+import javax.swing.JOptionPane;
 
 /**
  * A key manager which enables users to enter passwords or select key files
@@ -90,34 +89,16 @@ public class PromptingKeyManager
      * <p>
      * As a last resort, if no window is showing, then {@link JOptionPane}'s
      * root frame is used.
-     *
-     * @see #setParentWindow(Window)
      */
     public static Window getParentWindow() {
         return WindowUtils.getParentWindow();
-    }
-
-    /**
-     * Sets the parent window of the dialog used for prompting the user for
-     * a key.
-     * The window is stored in a weak reference in order to allow it to get
-     * garbage collected if no thread is holding a strong reference to it
-     * from a root object.
-     *
-     * @param w The parent window to use for key prompting or
-     *        <code>null</code> if a default window shall be used.
-     * @see #getParentWindow()
-     * @deprecated You shouldn't use this method any more, but rely on the
-     *             implementation in <code>getParentWindow()</code>.
-     */
-    public static void setParentWindow(final Window w) {
-        WindowUtils.setParentWindow(w);
     }
 
     //
     // Instance stuff:
     //
 
+    @Override
     protected boolean isPromptingImpl() {
         return super.isPromptingImpl() && !GraphicsEnvironment.isHeadless();
     }
@@ -127,6 +108,7 @@ public class PromptingKeyManager
      * a {@link KeyPromptingDisabledException} with a {@link HeadlessException}
      * as its cause.
      */
+    @Override
     protected void ensurePromptingImpl()
     throws KeyPromptingDisabledException {
         if (GraphicsEnvironment.isHeadless())

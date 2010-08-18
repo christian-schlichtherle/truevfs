@@ -16,7 +16,7 @@
 
 package de.schlichtherle.key.passwd.console;
 
-import de.schlichtherle.key.*;
+import de.schlichtherle.key.KeyPromptingDisabledException;
 
 /**
  * A simple key manager which enables users to enter passwords as keys using
@@ -25,8 +25,8 @@ import de.schlichtherle.key.*;
  * and the API complies to JSE6 (i.e. the class <code>java.io.Console</code>
  * is available)!
  * To request it explicitly, set the system property
- * <code>de.schlichtherle.key.KeyManager</code> to
- * <code>de.schlichtherle.key.passwd.console.PromptingKeyManager</code>.
+ * {@code de.schlichtherle.key.KeyManager} to
+ * [@code de.schlichtherle.key.passwd.console.PromptingKeyManager}.
  * <p>
  * This key manager does not support key files and disables prompting if no
  * console is attached to the JVM.
@@ -75,6 +75,7 @@ public class PromptingKeyManager extends de.schlichtherle.key.PromptingKeyManage
     // Instance stuff:
     //
 
+    @Override
     protected boolean isPromptingImpl() {
         return super.isPromptingImpl() && System.console() != null;
     }
@@ -83,6 +84,7 @@ public class PromptingKeyManager extends de.schlichtherle.key.PromptingKeyManage
      * If no console is attached to this JVM, then this method throws a
      * {@link KeyPromptingDisabledException}.
      */
+    @Override
     protected void ensurePromptingImpl()
     throws KeyPromptingDisabledException {
         if (System.console() == null)

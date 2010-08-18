@@ -74,8 +74,5 @@ public interface ReadOnlyFile {
 
     void readFully(byte[] b, int off, int len) throws IOException;
 
-    /** @deprecated Use {@link #seek} instead. */
-    int skipBytes(int n) throws IOException;
-
     void close() throws IOException;
 }

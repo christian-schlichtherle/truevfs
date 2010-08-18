@@ -157,29 +157,6 @@ public class Paths {
     }
 
     /**
-     * Cuts off a trailing separator character of the pathname, unless the
-     * pathname contains of only the separator character (i.e. denotes the
-     * root directory).
-     *
-     * @deprecated This method chops off a single trailing separator only.
-     *             Use {@link #cutTrailingSeparators} to chop off multiple
-     *             trailing separators.
-     * @return <code>path</code> if it's a path without a trailing separator
-     *         or contains the separator only.
-     *         Otherwise, the substring up to the last character is returned.
-     * @throws NullPointerException If path is <code>null</code>.
-     */
-    public final static String cutTrailingSeparator(
-            final String path,
-            final char separatorChar) {
-        final int pathEnd = path.length() - 1;
-        if (pathEnd > 0 && path.charAt(pathEnd) == separatorChar)
-            return path.substring(0, pathEnd);
-        else
-            return path;
-    }
-
-    /**
      * Equivalent to {@link #split(String, char)
      * split(path, File.separatorChar)}.
      */

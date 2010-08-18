@@ -18,9 +18,7 @@ package de.schlichtherle.key.passwd.swing;
 
 import de.schlichtherle.key.PromptingAesKeyProvider;
 import de.schlichtherle.swing.EnhancedPanel;
-
 import java.util.ResourceBundle;
-
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 

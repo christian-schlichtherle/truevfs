@@ -39,6 +39,5 @@ package de.schlichtherle.key.passwd.swing;
  * @version $Id$
  * @since TrueZIP 6.2
  */
-public class BasicInvalidOpenKeyFeedback extends BasicInvalidKeyFeedback
-        implements OpenKeyFeedback {
+public class BasicInvalidOpenKeyFeedback extends BasicInvalidKeyFeedback {
 }

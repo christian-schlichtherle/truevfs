@@ -32,6 +32,7 @@ import javax.swing.tree.*;
  * @since TrueZIP 5.1
  */
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
+    private static final long serialVersionUID = 923743852664723915L;
 
     private final JFileTree fileTree;
     
@@ -39,6 +40,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         this.fileTree = fileTree;
     }
 
+    @Override
     public Icon getOpenIcon() {
         // This is a hack: When editing a node, the edited node is the ONLY
         // one for which the BasicTreeUI somehow BYPASSES the call to
@@ -53,6 +55,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
                 : super.getOpenIcon();
     }
 
+    @Override
     public Icon getClosedIcon() {
         // This is a hack: When editing a node, the edited node is the ONLY
         // one for which the BasicTreeUI somehow BYPASSES the call to
@@ -67,6 +70,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
                 : super.getClosedIcon();
     }
 
+    @Override
     public Icon getLeafIcon() {
         // This is a hack: When editing a node, the edited node is the ONLY
         // one for which the BasicTreeUI somehow BYPASSES the call to
@@ -81,6 +85,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
                 : super.getLeafIcon();
     }
 
+    @Override
     public Component getTreeCellRendererComponent(
             final JTree tree,
             final Object value,

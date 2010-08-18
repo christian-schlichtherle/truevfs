@@ -56,32 +56,7 @@ public class FileBusyException extends FileNotFoundException {
         super(msg);
     }
 
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     *             It will vanish in the next major version.
-     */
-    public FileBusyException(InputArchiveBusyException cause) {
-        super(cause != null ? cause.toString() : null);
-        initCause(cause);
-    }
-
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     *             It will vanish in the next major version.
-     */
-    public FileBusyException(OutputArchiveBusyException cause) {
-        super(cause != null ? cause.toString() : null);
-        initCause(cause);
-    }
-
-    // TODO: Make this package private.
-    /**
-     * @deprecated You should not use this constructor.
-     *             It will have package private access in the next major version.
-     */
-    public FileBusyException(ArchiveBusyException cause) {
+    FileBusyException(ArchiveBusyException cause) {
         super(cause != null ? cause.toString() : null);
         initCause(cause);
     }

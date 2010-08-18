@@ -16,9 +16,10 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.key.*;
-
-import java.util.logging.*;
+import de.schlichtherle.key.AesKeyProvider;
+import de.schlichtherle.key.KeyManager;
+import de.schlichtherle.key.KeyProvider;
+import java.util.logging.Logger;
 
 /**
  * @author Christian Schlichtherle
@@ -39,10 +40,12 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
         super(id);
     }
 
+    @Override
     protected KeyProvider getKeyProvider(KeyManager manager, String id) {
         return manager.getKeyProvider(id, AesKeyProvider.class);
     }
 
+    @Override
     protected void createResourceHook(KeyProvider provider) {
         // In a real world application, you should never blindly cast
         // a key provider.
@@ -51,6 +54,7 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
         printKeyStrength(provider);
     }
 
+    @Override
     protected void openResourceHook(KeyProvider provider) {
         // In a real world application, you should never blindly cast
         // a key provider.
