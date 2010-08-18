@@ -47,12 +47,14 @@ public class OpenKeyPanelTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         instance = new OpenKeyPanel();
         frame = showInstanceInFrame();
         errorLabel = findErrorLabel(frame);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         frame.setVisible(false);
     }
@@ -66,6 +68,7 @@ public class OpenKeyPanelTest extends TestCase {
         return new JFrameOperator();
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testResourceID() {
         final String resourceID = "Hello world!";
         instance.setResourceID(resourceID);
@@ -188,6 +191,7 @@ public class OpenKeyPanelTest extends TestCase {
     /**
      * Test of get/setExtraDataUI method, of class de.schlichtherle.key.passwd.swing.OpenKeyPanel.
      */
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testExtraDataUI() {
         final JComponent ui = new AesKeyStrengthPanel();
         instance.setExtraDataUI(ui);
