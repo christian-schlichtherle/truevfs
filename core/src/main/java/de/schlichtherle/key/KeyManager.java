@@ -155,7 +155,7 @@ public class KeyManager {
      * @throws NullPointerException If <code>resourceID</code> or
      *         <code>provider</code> is <code>null</code>.
      */
-    static final synchronized KeyProvider mapKeyProvider(
+    static synchronized KeyProvider mapKeyProvider(
             String resourceID,
             KeyProvider provider)
     throws NullPointerException {
@@ -172,7 +172,7 @@ public class KeyManager {
      * @throws NullPointerException If <code>resourceID</code> is
      *         <code>null</code>.
      */
-    static synchronized final KeyProvider unmapKeyProvider(String resourceID)
+    static synchronized KeyProvider unmapKeyProvider(String resourceID)
     throws NullPointerException {
         if (resourceID == null)
             throw new NullPointerException();
@@ -246,7 +246,7 @@ public class KeyManager {
     /**
      * @deprecated Use {@link #resetAndRemoveKeyProviders} instead.
      */
-    public static final void resetAndClearKeyProviders() {
+    public static void resetAndClearKeyProviders() {
         resetAndRemoveKeyProviders();
     }
 
@@ -423,7 +423,7 @@ public class KeyManager {
                     + " must be a subclass or implementation of "
                     + forKeyProviderType.getName() + "!");
         try {
-            useKeyProviderType.getConstructor(null);
+            useKeyProviderType.getConstructor((Class[]) null);
         } catch (NoSuchMethodException noPublicNullaryConstructor) {
             final IllegalArgumentException iae = new IllegalArgumentException(
                     useKeyProviderType.getName() + " (no public nullary constructor)");
@@ -431,17 +431,6 @@ public class KeyManager {
             throw iae;
         }
         providerTypes.put(forKeyProviderType, useKeyProviderType);
-    }
-
-    /**
-     * Equivalent to <code>return {@link #getKeyProvider(String, Class)
-     * getKeyProvider(resourceID, KeyProvider.class)};</code> - provided for
-     * convenience.
-     *
-     * @deprecated Use #getKeyProvider(String, Class) instead.
-     */
-    public KeyProvider getKeyProvider(String resourceID) {
-        return getKeyProvider(resourceID, KeyProvider.class);
     }
 
     /**
