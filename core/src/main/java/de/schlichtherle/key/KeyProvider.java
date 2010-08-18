@@ -101,7 +101,7 @@ package de.schlichtherle.key;
  * @since TrueZIP 6.0
  * @version $Id$
  */
-public interface KeyProvider {
+public interface KeyProvider<K extends Cloneable> {
 
     /**
      * The minimum delay between subsequent attempts to authenticate a key
@@ -111,31 +111,31 @@ public interface KeyProvider {
      * same thread.
      */
     int MIN_KEY_RETRY_DELAY = 3 * 1000;
-    
+
     /**
-     * Returns the key which may be used to create a new protected resource or
-     * entirely replace the contents of an already existing protected resource.
-     * Hence, the key does not need to be authenticated.
+     * Returns the key which should be used to create a new protected
+     * resource or entirely replace the contents of an already existing
+     * protected resource.
+     * Hence, this key does not need to be authenticated.
      * <p>
      * For each call to this method an object is returned which compares
      * {@link Object#equals equal} to the previously returned object, but is
      * not necessarily the same.
-     * 
+     *
      * @return A clone of the key object.
      *         If the key does not support cloning or cloning fails for some
      *         reason, the key object itself is returned.
      *         <code>null</code> is never returned.
-     *
      * @throws UnknownKeyException If the required key is unknown.
      *         At the provider implementation's discretion, this may mean that
      *         prompting for the key has been disabled or cancelled by the user.
      */
-    Object getCreateKey() throws UnknownKeyException;
+    K getCreateKey() throws UnknownKeyException;
 
     /**
-     * Returns the key which may be used to open an existing protected resource
-     * in order to access its contents.
-     * Hence, the key needs to be authenticated.
+     * Returns the key which should be used to open an existing protected
+     * resource in order to access its contents.
+     * Hence, this key needs to be authenticated.
      * If the authentication fails, {@link #invalidOpenKey} must be called
      * immediately to indicate this situation.
      * <p>
@@ -161,7 +161,7 @@ public interface KeyProvider {
      * negatively affected by the suspension penalty.
      * For the same reason, "friendly" implementations should enforce the
      * suspension penalty for the local thread only.
-     * 
+     *
      * @return A clone of the key object.
      *         If the key does not support cloning or cloning fails for some
      *         reason, the key object itself is returned.
@@ -171,7 +171,7 @@ public interface KeyProvider {
      *         prompting for the key has been disabled or cancelled by the user.
      * @see #MIN_KEY_RETRY_DELAY
      */
-    Object getOpenKey() throws UnknownKeyException;
+    K getOpenKey() throws UnknownKeyException;
 
     /**
      * Called to indicate that authentication of the key returned by

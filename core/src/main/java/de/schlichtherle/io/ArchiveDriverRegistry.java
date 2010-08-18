@@ -152,10 +152,7 @@ class ArchiveDriverRegistry extends HashMap {
         } catch (IllegalArgumentException iae) {
             throw iae;
         } catch (RuntimeException rte) {
-            final IllegalArgumentException iae
-                    = new IllegalArgumentException(rte.toString());
-            iae.initCause(rte);
-            throw iae;
+            throw new IllegalArgumentException(rte);
         }
     }
 
@@ -255,7 +252,7 @@ class ArchiveDriverRegistry extends HashMap {
      *         returned.
      *         The cause is wrapped in the exception.
      */
-    private static final ArchiveDriver createArchiveDriver(Object driver) {
+    private static ArchiveDriver createArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
                 driver = ClassLoaderUtil.loadClass((String) driver, ArchiveDriverRegistry.class);
@@ -300,13 +297,13 @@ class ArchiveDriverRegistry extends HashMap {
         return set;
     }
 
-    private static final String getString(String key) {
+    private static String getString(String key) {
         return resources.getString(key);
     }
 
-    private static final String getString(String key, String arg) {
+    private static String getString(String key, String arg) {
         return MessageFormat.format(resources.getString(key),
-                                    new String[] { arg });
+                                    (Object[]) new String[] { arg });
     }
 
     static class IllegalArchiveDriverException

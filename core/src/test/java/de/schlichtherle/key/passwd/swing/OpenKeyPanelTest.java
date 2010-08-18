@@ -42,7 +42,7 @@ public class OpenKeyPanelTest extends TestCase {
     private JLabelOperator errorLabel;
     private final ComponentChooser keyFileChooser
                 = new NameComponentChooser("keyFileChooser");
-    
+
     public OpenKeyPanelTest(String testName) {
         super(testName);
     }
@@ -73,7 +73,7 @@ public class OpenKeyPanelTest extends TestCase {
         final String resourceID = "Hello world!";
         instance.setResourceID(resourceID);
         assertEquals(resourceID, instance.getResourceID());
-        
+
         new JTextComponentOperator(frame, resourceID);
     }
 
@@ -113,7 +113,7 @@ public class OpenKeyPanelTest extends TestCase {
     public void testPasswd() {
         String passwd;
         Object result;
-        
+
         final JLabelOperator errorLabel = findErrorLabel(frame);
 
         // Check default.
@@ -197,7 +197,7 @@ public class OpenKeyPanelTest extends TestCase {
         instance.setExtraDataUI(ui);
         frame.pack();
         assertSame(ui, instance.getExtraDataUI());
-        
+
         new JComboBoxOperator(frame); // find combo box
     }
 }

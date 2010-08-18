@@ -16,12 +16,11 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.swing.tree.*;
-
+import de.schlichtherle.io.swing.tree.FileTreeCellRenderer;
+import de.schlichtherle.io.swing.tree.FileTreeModel;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
@@ -46,6 +45,7 @@ public class JFileTree extends JTree {
 
     /** The name of the property <code>defaultSuffix</code>. */
     private static final String PROPERTY_DEFAULT_SUFFIX = "defaultSuffix"; // NOI18N
+    private static final long serialVersionUID = 1064787562479927601L;
 
     private final Controller controller = new Controller();
 
@@ -75,7 +75,7 @@ public class JFileTree extends JTree {
      * root <code>File</code>.
      * The ZipDetector of the given file is used to detect and configure any
      * ZIP compatible files in this directory tree.
-     * 
+     *
      * @see de.schlichtherle.io.File#getDefaultArchiveDetector()
      * @see de.schlichtherle.io.File#setDefaultArchiveDetector(ArchiveDetector)
      */
@@ -89,18 +89,8 @@ public class JFileTree extends JTree {
      */
     public JFileTree(FileTreeModel model) {
         super(model);
-        super.setCellRenderer(createTreeCellRenderer());
         super.addTreeExpansionListener(controller);
-    }
-
-    /**
-     * Returns a new tree cell renderer.
-     * This method may be overridden by subclasses.
-     * <p>
-     * This implementation simply returns a new {@link FileTreeCellRenderer}.
-     */
-    protected TreeCellRenderer createTreeCellRenderer() {
-        return new FileTreeCellRenderer(this);
+        super.setCellRenderer(new FileTreeCellRenderer(this));
     }
 
     //
@@ -111,10 +101,12 @@ public class JFileTree extends JTree {
      * @throws ClassCastException If <code>model</code> is not an instance
      *         of {@link FileTreeModel}.
      */
+    @Override
     public void setModel(TreeModel model) {
         super.setModel((FileTreeModel) model);
     }
 
+    @Override
     public void setEditable(final boolean editable) {
         if (editable) {
             super.setEditable(true);
@@ -129,7 +121,7 @@ public class JFileTree extends JTree {
 
     /**
      * Getter for bound property displayingSuffixes.
-     * 
+     *
      * @return Value of property displayingSuffixes.
      */
     public boolean isDisplayingSuffixes() {
@@ -141,7 +133,7 @@ public class JFileTree extends JTree {
      * If this is <code>false</code>, the suffix of files will not be displayed
      * in this tree.
      * Defaults to <code>true</code>.
-     * 
+     *
      * @param displayingSuffixes New value of property displayingSuffixes.
      */
     public void setDisplayingSuffixes(boolean displayingSuffixes) {
@@ -165,7 +157,7 @@ public class JFileTree extends JTree {
      * If this is <code>false</code>, the suffix of a file will be truncated
      * before editing its name starts.
      * Defaults to <code>true</code>.
-     * 
+     *
      * @param editingSuffixes New value of property editingSuffixes.
      */
     public void setEditingSuffixes(boolean editingSuffixes) {
@@ -215,27 +207,31 @@ public class JFileTree extends JTree {
     //
 
     /**
-     * Returns the node that is currently edited, if any. 
+     * Returns the node that is currently edited, if any.
      * This method is not intended for public use - do not use it!
      */
     public java.io.File getEditedNode() {
         return editedNode;
     }
 
+    @Override
     public boolean isEditing() {
         return editedNode != null;
     }
 
+    @Override
     public void startEditingAtPath(TreePath path) {
         editedNode = (java.io.File) path.getLastPathComponent();
         super.startEditingAtPath(path);
     }
 
+    @Override
     public void cancelEditing() {
         editedNode = null;
         super.cancelEditing();
     }
 
+    @Override
     public boolean stopEditing() {
         final boolean stop = super.stopEditing();
         if (stop)
@@ -288,6 +284,7 @@ public class JFileTree extends JTree {
     // Rendering:
     //
 
+    @Override
     public String convertValueToText(
             final Object value,
             final boolean selected,
@@ -368,7 +365,7 @@ public class JFileTree extends JTree {
         final TreePath lead = getLeadSelectionPath();
         final TreePath anchor = getAnchorSelectionPath();
         final TreePath[] selections = getSelectionPaths();
-        
+
         for (int i = 0, l = paths.length; i < l; i++) {
             final TreePath path = paths[i];
             final Enumeration expansions = getExpandedDescendants(path);
@@ -656,7 +653,7 @@ public class JFileTree extends JTree {
     public void setSelectionNodes(final java.io.File[] nodes) {
         final FileTreeModel ftm = (FileTreeModel) getModel();
 
-        final java.util.List list = new LinkedList();
+        final java.util.List<TreePath> list = new LinkedList<TreePath>();
         TreePath lastPath = null;
         for (int i = 0, l = nodes.length; i < l; i++) {
             lastPath = ftm.createTreePath(nodes[i]);
@@ -685,7 +682,9 @@ public class JFileTree extends JTree {
 
     private class Controller
             implements TreeExpansionListener, CellEditorListener, Serializable {
+        private static final long serialVersionUID = 6027634928673290123L;
 
+        @java.lang.SuppressWarnings("deprecation")
         public void treeCollapsed(TreeExpansionEvent evt) {
             ((FileTreeModel) getModel()).forget(
                     (java.io.File) evt.getPath().getLastPathComponent());

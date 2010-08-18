@@ -22,8 +22,10 @@ import java.util.ResourceBundle;
 /**
  * Convenience class to look up the bundle in a {@link ResourceBundle}.
  * Provided for comfort.
- * 
+ *
  * @author Christian Schlichtherle
+ * @version $Id$
+ * @since TrueZIP 6.4
  */
 class Resources {
 
@@ -50,22 +52,22 @@ class Resources {
     public final String getString(String key, Object[] arguments) {
         return MessageFormat.format(getString(key), arguments);
     }
-    
+
     /**
      * Looks up a string resource identified by <code>key</code> in
      * <code>bundle</code> and formats it as a message using
      * <code>MessageFormat.format</code> with the given singular <code>argument</code>.
      */
     public final String getString(String key, Object argument) {
-        return MessageFormat.format(getString(key), new Object[] { argument });
+        return MessageFormat.format(getString(key), argument);
     }
-    
+
     /**
      * Looks up a string resource identified by <code>key</code> in
      * <code>bundle</code> and formats it as a message using
      * <code>MessageFormat.format</code> with the given singular <code>argument</code>.
      */
     public final String getString(String key, int argument) {
-        return MessageFormat.format(getString(key), new Object[] { new Integer(argument) });
+        return MessageFormat.format(getString(key), argument);
     }
 }

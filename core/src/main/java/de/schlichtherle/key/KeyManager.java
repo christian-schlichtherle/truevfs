@@ -45,15 +45,17 @@ import java.util.Set;
  * no-arguments constructor.
  * Finally, an instance of the implementation must be installed either by
  * calling {@link #setInstance(KeyManager)} or by setting the system property
- * <code>de.schlichtherle.key.KeyManager</code> to the fully qualified class
- * name of the implementation before this class is used.
+ * {@code de.schlichtherle.key.KeyManager} to the fully qualified class
+ * name of the implementation before this class is ever used.
+ * In the latter case, the class will be loaded using the context class loader
+ * of the current thread.
  * <p>
  * Note that class loading and instantiation may happen in a JVM shutdown hook,
  * so class initializers and constructors must behave accordingly.
  * In particular, it's not permitted to construct or use a Swing GUI there.
  * <p>
  * This class is thread safe.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
@@ -62,12 +64,17 @@ public class KeyManager {
 
     private static volatile KeyManager keyManager;
 
-    /**
-     * Maps resource IDs [String] -> providers [KeyProvider]
-     */
-    private static final Map providers = new HashMap();
+    /** Maps resource IDs to providers. */
+    private static final Map<String, KeyProvider<?>> providers
+            = new HashMap<String, KeyProvider<?>>();
 
-    private final Map providerTypes = new HashMap();
+    /**
+     * Maps key provider types (should be interfaces) to key provider types
+     * (their implementing classes).
+     */
+    private final Map<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>
+            types = new HashMap<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>();
+    //private final Map types = new HashMap(); // look at the beauty of this instead!
 
     //
     // Static Methods.
@@ -80,7 +87,7 @@ public class KeyManager {
      * {@link #setInstance}, then this instance is returned.
      * <p>
      * Otherwise, the value of the system property
-     * <code>de.schlichtherle.key.KeyManager</code> is considered:
+     * {@code de.schlichtherle.key.KeyManager} is considered:
      * <p>
      * If this system property is set, it must denote the fully qualified
      * class name of a subclass of this class. The class is loaded and
@@ -98,7 +105,7 @@ public class KeyManager {
      * <p>
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
-     * 
+     *
      * @throws ClassCastException If the class name in the system property
      *         does not denote a subclass of this class.
      * @throws UndeclaredThrowableException If any other precondition on the
@@ -155,13 +162,12 @@ public class KeyManager {
      * @throws NullPointerException If <code>resourceID</code> or
      *         <code>provider</code> is <code>null</code>.
      */
-    static synchronized KeyProvider mapKeyProvider(
+    static synchronized KeyProvider<?> mapKeyProvider(
             String resourceID,
-            KeyProvider provider)
-    throws NullPointerException {
+            KeyProvider<?> provider) {
         if (resourceID == null || provider == null)
             throw new NullPointerException();
-        return (KeyProvider) providers.put(resourceID, provider);
+        return providers.put(resourceID, provider);
     }
 
     /**
@@ -172,11 +178,11 @@ public class KeyManager {
      * @throws NullPointerException If <code>resourceID</code> is
      *         <code>null</code>.
      */
-    static synchronized KeyProvider unmapKeyProvider(String resourceID)
-    throws NullPointerException {
+    static synchronized KeyProvider<?> unmapKeyProvider(
+            String resourceID) {
         if (resourceID == null)
             throw new NullPointerException();
-        return (KeyProvider) providers.remove(resourceID);
+        return providers.remove(resourceID);
     }
 
     /**
@@ -185,16 +191,16 @@ public class KeyManager {
      * This works only if the key provider associated with the given resource
      * identifier is an instance of {@link AbstractKeyProvider}.
      * Otherwise, nothing happens.
-     * 
+     *
      * @param resourceID The resource identifier.
      * @return Whether or not an instance of {@link AbstractKeyProvider}
      *         is mapped for the resource identifier and has been reset.
      */
     public static synchronized boolean resetKeyProvider(final String resourceID) {
-        final KeyProvider provider = (KeyProvider) providers.get(resourceID);
+        final KeyProvider<?> provider = providers.get(resourceID);
         if (provider instanceof AbstractKeyProvider) {
-            final AbstractKeyProvider skp = (AbstractKeyProvider) provider;
-            skp.reset();
+            final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
+            akp.reset();
             return true;
         }
         return false;
@@ -206,17 +212,18 @@ public class KeyManager {
      * If the key provider associated with the given resource identifier is
      * not an instance of {@link AbstractKeyProvider}, it is just removed from
      * the map.
-     * 
+     *
      * @param resourceID The resource identifier.
      * @return Whether or not a key provider was mapped for the resource
      *         identifier and has been removed.
      */
-    public static synchronized boolean resetAndRemoveKeyProvider(final String resourceID) {
-        final KeyProvider provider = (KeyProvider) providers.get(resourceID);
+    public static synchronized boolean resetAndRemoveKeyProvider(
+            final String resourceID) {
+        final KeyProvider<?> provider = providers.get(resourceID);
         if (provider instanceof AbstractKeyProvider) {
-            final AbstractKeyProvider skp = (AbstractKeyProvider) provider;
-            skp.reset();
-            final KeyProvider result = skp.removeFromKeyManager(resourceID);
+            final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
+            akp.reset();
+            final KeyProvider result = akp.removeFromKeyManager(resourceID);
             assert provider == result;
             return true;
         } else if (provider != null) {
@@ -226,7 +233,7 @@ public class KeyManager {
         }
         return false;
     }
-    
+
     /**
      * Resets all key providers, causing them to forget their respective
      * common key.
@@ -237,17 +244,10 @@ public class KeyManager {
         forEachKeyProvider(new KeyProviderCommand() {
             public void run(String resourceID, KeyProvider provider) {
                 if (provider instanceof AbstractKeyProvider) {
-                    ((AbstractKeyProvider) provider).reset();
+                    ((AbstractKeyProvider<?>) provider).reset();
                 }
             }
         });
-    }
-
-    /**
-     * @deprecated Use {@link #resetAndRemoveKeyProviders} instead.
-     */
-    public static void resetAndClearKeyProviders() {
-        resetAndRemoveKeyProviders();
     }
 
     /**
@@ -256,7 +256,7 @@ public class KeyManager {
      * If the key provider associated with the given resource identifier is
      * not an instance of {@link AbstractKeyProvider}, it is just removed from
      * the map.
-     * 
+     *
      * @since TrueZIP 6.1
      * @throws IllegalStateException If resetting or unmapping one or more
      *         key providers is prohibited by a constraint in a subclass of
@@ -272,10 +272,11 @@ public class KeyManager {
 
             public void run(String resourceID, KeyProvider provider) {
                 if (provider instanceof AbstractKeyProvider) {
-                    final AbstractKeyProvider skp = (AbstractKeyProvider) provider;
-                    skp.reset();
+                    final AbstractKeyProvider<?> akp
+                            = (AbstractKeyProvider<?>) provider;
+                    akp.reset();
                     try {
-                        skp.removeFromKeyManager(resourceID); // support proper clean up!
+                        akp.removeFromKeyManager(resourceID); // support proper clean up!
                     } catch (IllegalStateException exc) {
                         ise = exc; // mark and forget any previous exception
                     }
@@ -285,7 +286,7 @@ public class KeyManager {
                 }
             }
         }
-        
+
         final ResetAndRemoveKeyProvider cmd = new ResetAndRemoveKeyProvider();
         forEachKeyProvider(cmd);
         if (cmd.ise != null)
@@ -302,14 +303,15 @@ public class KeyManager {
         // We can't use an iterator because the command may modify the map.
         // Otherwise, resetAndClearKeyProviders() would fail with a
         // ConcurrentModificationException.
-        final Set entrySet = providers.entrySet();
+        final Set<Map.Entry<String, KeyProvider<?>>> entrySet = providers.entrySet();
         final int n = entrySet.size();
-        final Map.Entry[] entries
-                = (Map.Entry[]) entrySet.toArray(new Map.Entry[n]);
+        //@SuppressWarnings("unchecked")
+        final Map.Entry<String, KeyProvider<?>>[] entries
+                = entrySet.toArray(new Map.Entry[n]);
         for (int i = 0; i < n; i++) {
-            final Map.Entry entry = entries[i];
-            final String resourceID = (String) entry.getKey();
-            final KeyProvider provider = (KeyProvider) entry.getValue();
+            final Map.Entry<String, KeyProvider<?>> entry = entries[i];
+            final String resourceID = entry.getKey();
+            final KeyProvider provider = entry.getValue();
             command.run(resourceID, provider);
         }
     }
@@ -319,7 +321,7 @@ public class KeyManager {
      * on key providers with the {@link #forEachKeyProvider} method.
      */
     protected interface KeyProviderCommand {
-        void run(String resourceID, KeyProvider provider);
+        void run(String resourceID, KeyProvider<?> provider);
     }
 
     /**
@@ -330,7 +332,7 @@ public class KeyManager {
      * Calling this method then allows you to rename a file without the need
      * to retrieve its keys again, thereby possibly prompting (and confusing)
      * the user.
-     * 
+     *
      * @return <code>true</code> if and only if the operation succeeded,
      *         which means that there was an instance of
      *         {@link KeyProvider} associated with
@@ -351,18 +353,18 @@ public class KeyManager {
         if (oldResourceID == null || newResourceID == null)
             throw new NullPointerException();
 
-        final KeyProvider provider = (KeyProvider) providers.get(oldResourceID);
+        final KeyProvider<?> provider = providers.get(oldResourceID);
         if (provider == null)
             return false;
 
         if (provider instanceof AbstractKeyProvider) {
-            final AbstractKeyProvider skp = (AbstractKeyProvider) provider;
+            final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
             // Implement transactional behaviour.
-            skp.removeFromKeyManager(oldResourceID);
+            akp.removeFromKeyManager(oldResourceID);
             try {
-                skp.addToKeyManager(newResourceID);
+                akp.addToKeyManager(newResourceID);
             } catch (RuntimeException failure) {
-                skp.addToKeyManager(oldResourceID);
+                akp.addToKeyManager(oldResourceID);
                 throw failure;
             }
         } else {
@@ -384,65 +386,56 @@ public class KeyManager {
      */
     public KeyManager() {
     }
-    
+
     /**
      * Subclasses must use this method to register default implementation
      * classes for the interfaces {@link KeyProvider} and {@link AesKeyProvider}
      * and optionally other subinterfaces or subclasses of
      * <code>KeyProvider</code>.
-     * This is best done in the constructor of the subclass.
+     * This is best done in the constructor of the subclass
+     * (this method is final).
      *
-     * @param forKeyProviderType The type which shall be substituted with
-     *        <code>useKeyProviderType</code> when determining a suitable
-     *        run time type in <code>getKeyProvider(String, Class)</code>.
-     * @param useKeyProviderType The type which shall be substituted for
-     *        <code>forKeyProviderType</code> when determining a suitable
-     *        run time type in <code>getKeyProvider(String, Class)</code>.
+     * @param forType The type which shall be substituted with
+     *        {@code useType} when determining a suitable
+     *        run time type in {@link #getKeyProvider(String, Class)}.
+     * @param useType The type which shall be substituted for
+     *        {@code forType} when determining a suitable
+     *        run time type in {@link #getKeyProvider(String, Class)}.
      * @throws NullPointerException If any of the parameters is
-     *         <code>null</code>.
-     * @throws IllegalArgumentException If <code>forKeyProviderType</code>
-     *         is not assignment compatible to the <code>KeyProvider</code>
-     *         interface,
-     *         or if <code>useKeyProviderType</code> is the same as
-     *         <code>forKeyProviderType</code>,
-     *         or if <code>useKeyProviderType</code> is not assignment
-     *         compatible to <code>forKeyProviderType</code>,
-     *         or if <code>useKeyProviderType</code> does not provide a
-     *         public constructor with no parameters.
-     * @see #getKeyProvider(String, Class)
+     *         [@code null}.
+     * @throws IllegalArgumentException If {@code useType} is the same as
+     *         {@code forType}, or if {@code useType} does not
+     *         provide a public constructor with no parameters.
      * @since TrueZIP 6.1
      */
-    protected final synchronized void mapKeyProviderType(
-            final Class forKeyProviderType,
-            final Class useKeyProviderType) {
-        if (!KeyProvider.class.isAssignableFrom(forKeyProviderType)
-                || !forKeyProviderType.isAssignableFrom(useKeyProviderType)
-                || forKeyProviderType == useKeyProviderType)
+    protected final synchronized <P extends KeyProvider<?>> void mapKeyProviderType(
+            final Class<P> forType,
+            final Class<? extends P> useType) {
+        if (useType == forType)
             throw new IllegalArgumentException(
-                    useKeyProviderType.getName()
+                    useType.getName()
                     + " must be a subclass or implementation of "
-                    + forKeyProviderType.getName() + "!");
+                    + forType.getName() + "!");
         try {
-            useKeyProviderType.getConstructor((Class[]) null);
+            useType.getConstructor((Class[]) null);
         } catch (NoSuchMethodException noPublicNullaryConstructor) {
-            final IllegalArgumentException iae = new IllegalArgumentException(
-                    useKeyProviderType.getName() + " (no public nullary constructor)");
-            iae.initCause(noPublicNullaryConstructor);
-            throw iae;
+            throw new IllegalArgumentException(useType.getName()
+            + " (no public nullary constructor)",
+                    noPublicNullaryConstructor);
         }
-        providerTypes.put(forKeyProviderType, useKeyProviderType);
+        types.put(forType, useType);
     }
 
     /**
      * Returns the {@link KeyProvider} for the given resource identifier.
      * If no key provider is mapped, this key manager will determine an
      * appropriate class which is assignment compatible to
-     * <code>keyProviderType</code> (but is not necessarily the same),
+     * {@code type} (but is not necessarily the same),
      * instantiate it, map the instance for the protected resource and return
      * it.
      * <p>
      * Client applications should specify an interface rather than an
-     * implementation as the <code>keyProviderType</code> in order to allow
+     * implementation as the {@code type} in order to allow
      * the key manager to instantiate a useful default implementation of this
      * interface unless another key provider was already mapped for the
      * protected resource.
@@ -471,7 +464,7 @@ public class KeyManager {
      * </pre>.
      *
      * @param resourceID The identifier of the protected resource.
-     * @param keyProviderType Unless another key provider is already mapped
+     * @param type Unless another key provider is already mapped
      *        for the protected resource, this denotes the root of the class
      *        hierarchy to which the run time type of the returned instance
      *        may belong.
@@ -482,46 +475,40 @@ public class KeyManager {
      * @return The {@link KeyProvider} mapped for the protected resource.
      *         If no key provider has been previously mapped for the protected
      *         resource, the run time type of this instance is guaranteed to be
-     *         assignment compatible to the given <code>keyProviderType</code>.
+     *         assignment compatible to the given {@code type}.
      * @throws NullPointerException If <code>resourceID</code> or
-     *         <code>keyProviderType</code> is <code>null</code>.
+     *         {@code type} is {@code null}.
      * @throws ClassCastException If no other key provider is mapped for the
      *         protected resource and the given class is not an implementation
      *         of the <code>KeyProvider</code> interface.
      * @throws IllegalArgumentException If any other precondition on the
-     *         parameter <code>keyProviderType</code> does not hold.
+     *         parameter {@code type} does not hold.
      * @see #getInstance
      */
-    public synchronized KeyProvider getKeyProvider(
+    public synchronized KeyProvider<?> getKeyProvider(
             final String resourceID,
-            Class keyProviderType)
+            Class<? extends KeyProvider> type)
     throws NullPointerException, ClassCastException, IllegalArgumentException {
         if (resourceID == null)
             throw new NullPointerException();
 
         synchronized (KeyManager.class) {
-            KeyProvider provider = (KeyProvider) providers.get(resourceID);
-            if (provider == null) {
-                final Class subst = (Class) providerTypes.get(keyProviderType);
+            KeyProvider<?> kp = providers.get(resourceID);
+            if (kp == null) {
+                final Class<? extends KeyProvider<?>> subst = types.get(type);
                 if (subst != null)
-                    keyProviderType = subst;
+                    type = subst;
                 try {
-                    provider = (KeyProvider) keyProviderType.newInstance();
-                } catch (InstantiationException failure) {
-                    IllegalArgumentException iae = new IllegalArgumentException(
-                            keyProviderType.getName());
-                    iae.initCause(failure);
-                    throw iae;
-                } catch (IllegalAccessException failure) {
-                    IllegalArgumentException iae = new IllegalArgumentException(
-                            keyProviderType.getName());
-                    iae.initCause(failure);
-                    throw iae;
+                    kp = type.newInstance();
+                } catch (InstantiationException ex) {
+                    throw new IllegalArgumentException(type.getName(), ex);
+                } catch (IllegalAccessException ex) {
+                    throw new IllegalArgumentException(type.getName(), ex);
                 }
-                setKeyProvider(resourceID, provider);
+                setKeyProvider(resourceID, kp);
             }
 
-            return provider;
+            return kp;
         }
     }
 
@@ -536,12 +523,7 @@ public class KeyManager {
      * previous provider before and may negatively affect the security if the
      * provider is not properly guarded by the application.
      * Use with caution only!
-     * <p>
-     * If you are using this method in order to set the key provider for a
-     * RAES encrypted ZIP file, then the resource ID must be the canonical
-     * or at least absolute path of this file -
-     * see {@link de.schlichtherle.io.File#getCanOrAbsPath}.
-     * 
+     *
      * @param resourceID The resource identifier to associate the key
      *        provider with.
      *        For an RAES encrypted ZIP file, this must be the canonical
@@ -549,8 +531,8 @@ public class KeyManager {
      * @param provider The key provider for <code>resourceID</code>.
      *        For an RAES encrypted ZIP file, this must be an instance of
      *        the {@link AesKeyProvider} interface.
-     * @throws NullPointerException If <code>resourceID</code> or
-     *         <code>provider</code> is <code>null</code>.
+     * @throws NullPointerException If {@code resourceID} or
+     *         {@code provider} is {@code null}.
      * @throws IllegalStateException If mapping this instance is prohibited
      *         by a constraint in a subclass of {@link AbstractKeyProvider}.
      *         Please refer to the respective subclass documentation for
@@ -558,13 +540,13 @@ public class KeyManager {
      */
     public void setKeyProvider(
             final String resourceID,
-            final KeyProvider provider)
+            final KeyProvider<?> provider)
     throws NullPointerException, IllegalStateException {
         /*if (resourceID == null || provider == null)
             throw new NullPointerException();*/
 
         if (provider instanceof AbstractKeyProvider) {
-            ((AbstractKeyProvider) provider).addToKeyManager(resourceID);
+            ((AbstractKeyProvider<?>) provider).addToKeyManager(resourceID);
         } else {
             mapKeyProvider(resourceID, provider);
         }

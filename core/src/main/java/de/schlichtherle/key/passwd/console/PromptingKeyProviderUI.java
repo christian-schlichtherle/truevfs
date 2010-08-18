@@ -16,21 +16,21 @@
 
 package de.schlichtherle.key.passwd.console;
 
-import de.schlichtherle.key.*;
-
-import java.io.*;
-import java.util.*;
+import de.schlichtherle.key.PromptingKeyProvider;
+import java.io.Console;
+import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * A out I/O based user interface to prompt for passwords.
  * This class is thread safe.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.4
  */
-public class PromptingKeyProviderUI
-        implements de.schlichtherle.key.PromptingKeyProviderUI {
+public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[]>>
+        implements de.schlichtherle.key.PromptingKeyProviderUI<P> {
 
     private static final String CLASS_NAME
             = "de.schlichtherle.key.passwd.console.PromptingKeyProviderUI";
@@ -49,7 +49,7 @@ public class PromptingKeyProviderUI
      */
     private static final PromptingLock lock = new PromptingLock();
 
-    /** The minimum acceptable length of a password. */
+    /** The minimum acceptable lenght of a password. */
     private static final int MIN_PASSWD_LEN = 6;
 
     /**
@@ -58,32 +58,33 @@ public class PromptingKeyProviderUI
      */
     private static String lastResourceID = "";
 
-    public final void promptCreateKey(final PromptingKeyProvider provider) {
+    public final void promptCreateKey(final P provider) {
         synchronized (lock) {
             final String resourceID = provider.getResourceID();
+            assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
             if (!resourceID.equals(lastResourceID))
-                printf(resources.getString("createKey.banner"),
+                con.printf(resources.getString("createKey.banner"),
                         provider.getResourceID());
             lastResourceID = resourceID;
 
             while (true) {
-                char[] newPasswd1 = readPassword(
+                char[] newPasswd1 = con.readPassword(
                         resources.getString("createKey.newPasswd1"));
                 if (newPasswd1 == null || newPasswd1.length <= 0)
                     return;
 
-                char[] newPasswd2 = readPassword(
+                char[] newPasswd2 = con.readPassword(
                         resources.getString("createKey.newPasswd2"));
                 if (newPasswd2 == null)
                     return;
 
                 if (!Arrays.equals(newPasswd1, newPasswd2)) {
-                    printf(resources.getString("createKey.passwd.noMatch"));
+                    con.printf(resources.getString("createKey.passwd.noMatch"));
                     continue;
                 }
 
                 if (newPasswd1.length < MIN_PASSWD_LEN) {
-                    printf(resources.getString("createKey.passwd.tooShort"));
+                    con.printf(resources.getString("createKey.passwd.tooShort"));
                     continue;
                 }
 
@@ -95,33 +96,33 @@ public class PromptingKeyProviderUI
         }
     }
 
-    protected void promptExtraData(PromptingKeyProvider provider)
-    {
+    protected void promptExtraData(P provider) {
     }
 
-    public final boolean promptUnknownOpenKey(PromptingKeyProvider provider) {
+    public final boolean promptUnknownOpenKey(P provider) {
         synchronized (lock) {
             return promptOpenKey(provider, false);
         }
     }
 
-    public final boolean promptInvalidOpenKey(PromptingKeyProvider provider) {
+    public final boolean promptInvalidOpenKey(P provider) {
         synchronized (lock) {
             return promptOpenKey(provider, true);
         }
     }
 
-    private boolean promptOpenKey(final PromptingKeyProvider provider, final boolean invalid) {
+    private boolean promptOpenKey(final P provider, final boolean invalid) {
         if (invalid)
-            printf(resources.getString("openKey.invalid"));
+            con.printf(resources.getString("openKey.invalid"));
 
         final String resourceID = provider.getResourceID();
+        assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
         if (!resourceID.equals(lastResourceID))
-            printf(resources.getString("openKey.banner"),
+            con.printf(resources.getString("openKey.banner"),
                     provider.getResourceID());
         lastResourceID = resourceID;
 
-        char[] passwd = readPassword(resources.getString("openKey.passwd"));
+        char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
         if (passwd == null || passwd.length <= 0) {
             provider.setKey(null);
             return false;
@@ -130,7 +131,7 @@ public class PromptingKeyProviderUI
         provider.setKey(passwd);
 
         while (true) {
-            String changeKey = readLine(resources.getString("openKey.change"));
+            String changeKey = con.readLine(resources.getString("openKey.change"));
             if (changeKey == null)
                 return false;
             changeKey = changeKey.toLowerCase();
@@ -139,31 +140,6 @@ public class PromptingKeyProviderUI
             else if (changeKey.equals(resources.getString("yes")))
                 return true;
         }
-    }
-
-    //
-    // TrueZIP 6.4 is still Java source level 1.4, so we need these helpers
-    // as a substitute for the varargs calls.
-    //
-
-    protected final Console printf(String format) {
-        return con.printf(format, null);
-    }
-
-    protected final Console printf(String format, Object arg) {
-        return con.printf(format, new Object[] { arg });
-    }
-
-    protected final String readLine(String format) {
-        return con.readLine(format, null);
-    }
-
-    protected final String readLine(String format, Object arg) {
-        return con.readLine(format, new Object[] { arg });
-    }
-
-    protected final char[] readPassword(String format) {
-        return con.readPassword(format, null);
     }
 
     //

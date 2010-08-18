@@ -15,18 +15,28 @@
  */
 package de.schlichtherle.key.passwd.swing;
 
-import java.awt.*;
-import java.lang.ref.*;
-import java.io.*;
-import java.util.logging.*;
-
-import javax.swing.*;
-
-import junit.framework.*;
-
-import org.netbeans.jemmy.*;
-import org.netbeans.jemmy.operators.*;
-import org.netbeans.jemmy.util.*;
+import java.awt.EventQueue;
+import java.io.File;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+import junit.framework.TestCase;
+import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JFileChooserOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
+import org.netbeans.jemmy.operators.JLabelOperator;
+import org.netbeans.jemmy.operators.JTabbedPaneOperator;
+import org.netbeans.jemmy.operators.JTextFieldOperator;
+import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
  * @author Christian Schlichtherle
@@ -34,22 +44,23 @@ import org.netbeans.jemmy.util.*;
  * @since TrueZIP 6.1
  */
 public class AuthenticationPanelTest extends TestCase {
-
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
-    private static final Logger logger = Logger.getLogger(AuthenticationPanelTest.class.getName());
+
+    private static final Logger logger
+            = Logger.getLogger(AuthenticationPanelTest.class.getName());
+
     static final File rootDir;
-
-
     static {
-        if (File.separatorChar == '\\') {
+        if (File.separatorChar == '\\')
             rootDir = new File("C:\\");
-        } else {
+        else
             rootDir = new File("/");
-        }
     }
-    private final ComponentChooser keyFileChooser = new NameComponentChooser("keyFileChooser");
+
+    private final ComponentChooser keyFileChooser
+                = new NameComponentChooser("keyFileChooser");
 
     public AuthenticationPanelTest(String testName) {
         super(testName);
@@ -59,49 +70,77 @@ public class AuthenticationPanelTest extends TestCase {
      * Test of getFileChooser method, of class de.schlichtherle.key.passwd.swing.AuthenticationPanel.
      */
     public void testGetFileChooser() throws InterruptedException {
-        JFileChooser fc = AuthenticationPanel.getFileChooser();
-        fc.setCurrentDirectory(rootDir);
+        final ReferenceQueue<JFileChooser> queue = new ReferenceQueue<JFileChooser>();
+        final PhantomReference<JFileChooser> ref = initQueue(queue, rootDir);
 
-        assertSame("JFileChooser instance should not yet have been garbage collected!",
-                fc, AuthenticationPanel.getFileChooser());
-
-        final Reference ref = new SoftReference(fc);
-        fc = null;
-
+        byte[] bfo;
         int i = 1;
-        try {
-            while (true) {
-                assertNotNull("JFileChooser should not yet have been garbage collected!",
-                        ref.get());
-                // Allocate big fat object in order to cause the internal
-                // cache for the file chooser to be cleared.
-                // If the chunk is finally big enough, an OOME will be thrown.
-                final byte[] bfo = new byte[i * 1024 * 1024];
-                i <<= 1; // is not reached on OOME!
+        while (null == queue.poll()) {
+            // Allocate big fat object in order to cause the internal
+            // cache for the file chooser to be cleared.
+            try {
+                bfo = new byte[i * 1024 * 1024];
+                i++; // is not reached on OOME!
+            } catch (OutOfMemoryError oome) {
+                //oome.printStackTrace();
+                // SoftReferences (which are used by getFileChooser) are
+                // guaranteed to be cleared BEFORE an OOME is thrown.
+                // However, the additional chunk of memory we are requesting
+                // may be too big, in which case the reference is first cleared
+                // and then immediately an OOME is thrown.
+                // When the SoftReference has been cleared, the referent is
+                // made eligible for finalization.
+                // Run the finalization now and assert this:
+                System.runFinalization();
+                assertNotNull(queue.poll()); // JFileChooser has been finalized
+                break;
             }
-        } catch (OutOfMemoryError stopCondition) {
+
+            // Release memory again in order to allow the JVM to operate
+            // normally.
+            bfo = null;
+
+            System.gc();
         }
-
-        i >>= 1;
-        logger.fine("Successfully allocated " + i + " Megabytes heap memory before OOME.");
-
-        // As a side effect of the OOME, the internal SoftReference to the
-        // JFileChooser should have been cleared and hence our reference
-        // should have been enqueued.
-        assertNull("JFileChooser should have been garbage collected",
-                ref.get());
+        assert null == queue.poll(); // previous poll() has removed the reference
+        logger.log(Level.FINE, "Successfully allocated {0} megabytes before JFileChooser was discarded.", i);
 
         // Now ask for a file chooser again.
-        fc = AuthenticationPanel.getFileChooser();
+        JFileChooser fc = AuthenticationPanel.getFileChooser();
         assertEquals(
-                "New JFileChooser needs to have same current directory!",
+                "Newly instantiated JFileChooser needs to have same current directory as previous instance!",
                 rootDir, fc.getCurrentDirectory());
     }
 
+    private PhantomReference<JFileChooser> initQueue(
+            final ReferenceQueue<JFileChooser> queue,
+            final File dir) {
+        JFileChooser fc = AuthenticationPanel.getFileChooser();
+        fc.setCurrentDirectory(dir);
+
+        final PhantomReference<JFileChooser> ref
+                = new PhantomReference<JFileChooser>(fc, queue);
+
+        fc = null;
+        System.gc();
+
+        fc = AuthenticationPanel.getFileChooser();
+        fc.setCurrentDirectory(dir);
+
+        fc = null;
+        System.gc();
+
+        assertNull(
+                "Initial JFileChooser instance should not yet have been thrown away!",
+                queue.poll());
+
+        return ref;
+    }
+
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testTabbedPane() {
         final String text = "Hello world!";
         EventQueue.invokeLater(new Runnable() {
-
             public void run() {
                 final AuthenticationPanel instance = new AuthenticationPanel();
 
@@ -149,6 +188,6 @@ public class AuthenticationPanelTest extends TestCase {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
         new JLabelOperator(frame, text);
 
-    //frame.close();
+        //frame.close();
     }
 }

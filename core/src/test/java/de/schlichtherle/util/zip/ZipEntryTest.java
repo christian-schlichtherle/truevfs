@@ -32,12 +32,14 @@ public class ZipEntryTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp()
             throws Exception {
         super.setUp();
         entry = new ZipEntry("test");
     }
 
+    @Override
     protected void tearDown() throws Exception {
         entry = null;
         super.tearDown();
@@ -195,10 +197,10 @@ public class ZipEntryTest extends TestCase {
     public void testRoundTripTimeConversion() {
         // Must start with DOS time due to lesser time granularity.
         long dosTime = ZipEntry.MIN_DOS_TIME;
-        assertEquals(dosTime, ZipEntry.java2dosTime(ZipEntry.dos2javaTime(dosTime)));
+        assertEquals(dosTime, DateTimeConverter.JAR.toDosTime(DateTimeConverter.JAR.toJavaTime(dosTime)));
 
-        dosTime = ZipEntry.java2dosTime(System.currentTimeMillis());
-        assertEquals(dosTime, ZipEntry.java2dosTime(ZipEntry.dos2javaTime(dosTime)));
+        dosTime = DateTimeConverter.JAR.toDosTime(System.currentTimeMillis());
+        assertEquals(dosTime, DateTimeConverter.JAR.toDosTime(DateTimeConverter.JAR.toJavaTime(dosTime)));
     }
 
     public void testDosTime() {
@@ -239,7 +241,7 @@ public class ZipEntryTest extends TestCase {
         assertEquals(ZipEntry.UNKNOWN, entry.getTime());
         entry.setTime(0);
         long time = entry.getTime();
-        assertEquals(time, ZipEntry.dos2javaTime(ZipEntry.MIN_DOS_TIME));
+        assertEquals(time, DateTimeConverter.JAR.toJavaTime(ZipEntry.MIN_DOS_TIME));
         entry.setTime(ZipEntry.UNKNOWN);
         assertEquals(ZipEntry.UNKNOWN, entry.getTime());
     }

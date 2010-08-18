@@ -43,6 +43,8 @@ public class RemoteControlThread extends Thread {
         return rc.throwable;
     }
 
+    @Override
+    @SuppressWarnings({"CallToThreadRun", "CallToThreadDumpStack"})
     public void run() {
         super.run();
         final Throwable t = getThrowable();

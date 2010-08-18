@@ -18,22 +18,18 @@ package de.schlichtherle.swing;
 
 import de.schlichtherle.swing.event.PanelEvent;
 import de.schlichtherle.swing.event.PanelListener;
-
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventListener;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
-import junit.framework.*;
+import junit.framework.TestCase;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
-
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
 
@@ -53,20 +49,14 @@ public class EnhancedPanelTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         instance = new EnhancedPanel();
         instance.add(new JLabel("Hello world!"));
     }
 
+    @Override
     protected void tearDown() throws Exception {
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite(EnhancedPanelTest.class);
-        /*TestSuite suite = new TestSuite();
-        suite.addTest(new EnhancedPanelTest("testEvents4JOptionPane"));*/
-        
-        return suite;
     }
 
     /**
@@ -229,6 +219,7 @@ public class EnhancedPanelTest extends TestCase {
     /**
      * Test of fireAncestorWindowShown method, of class de.schlichtherle.swing.EnhancedPanel.
      */
+    @SuppressWarnings("deprecation")
     public void testFireAncestorWindowShown() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
@@ -243,6 +234,7 @@ public class EnhancedPanelTest extends TestCase {
     /**
      * Test of fireAncestorWindowHidden method, of class de.schlichtherle.swing.EnhancedPanel.
      */
+    @SuppressWarnings("deprecation")
     public void testFireAncestorWindowHidden() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
@@ -287,6 +279,7 @@ public class EnhancedPanelTest extends TestCase {
                 super(frame);
             }
 
+            @SuppressWarnings("deprecation")
             public void run() {
                 // Use multiple ways to make the frame visible.
                 // Depending on the version of the Swing implementation, this may
@@ -302,6 +295,7 @@ public class EnhancedPanelTest extends TestCase {
                 super(frame);
             }
 
+            @SuppressWarnings("deprecation")
             public void run() {
                 // Use multiple ways to make the frame visible.
                 // Depending on the version of the Swing implementation, this may
@@ -356,6 +350,7 @@ public class EnhancedPanelTest extends TestCase {
         waitEmptyQueue();
     }
 
+    @SuppressWarnings("CallToThreadDumpStack")
     private static void waitEmptyQueue() throws AssertionError {
         //new QueueTool().waitEmpty();
         final EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();

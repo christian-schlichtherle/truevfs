@@ -34,7 +34,7 @@ package de.schlichtherle.key;
  * @version $Id$
  * @since TrueZIP 6.0
  */
-public interface PromptingKeyProviderUI {
+public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
 
     /**
      * Prompts the user for the key which may be used to create a new
@@ -59,28 +59,29 @@ public interface PromptingKeyProviderUI {
      * continue its operation as if the user would not have requested to
      * change the key.
      * <p>
-     * Since TrueZIP 6.4, an implementation may also throw a
-     * {@link RuntimeException} with any kind of {@link UnknownKeyException}
-     * as its cause.
+     * Since TrueZIP 7, an implementation may also throw an
+     * {@link UnknownKeyException}.
      * This will trigger the calling method in the
-     * <code>PromptingKeyProvider</code> class to unwrap and pass on the
-     * cause without changing its state.
+     * {@code PromptingKeyProvider} class to pass on this exception
+     * without changing its state.
      * This may be useful if prompting was interrupted by a call to
      * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
      * In this case, another try to prompt the user should have the chance to
      * succeed instead of being cancelled without actually prompting the user
      * again.
-     * To trigger this behaviour, the implementation should simply throw any
-     * kind of <code>RuntimeException</code> with a
-     * {@link KeyPromptingInterruptedException} as its cause.
-     * 
-     * @param provider The default key provider to store the result in.
-     * @throws RuntimeException with an {@link UnknownKeyException} as its
-     *         cause if the implementation does not want the key provider's
-     *         state to be changed.
+     * To trigger this behaviour, the implementation should simply throw a
+     * {@link KeyPromptingInterruptedException}.
+     *
+     * @param provider The key provider to store the result in.
+     *        The property {@code resourceID} must be
+     *        non-{@code null}.
+     * @throws UnknownKeyException if the implementation does not want the
+     *         key provider's state to be changed.
+     * @throws RuntimeException An instance of a subclass if
+     *         {@code provider} or its property {@code resourceID}
+     *         is {@code null}.
      */
-    // TODO: Add UnknownKeyException to the signature of this method in TrueZIP 7.
-    void promptCreateKey(PromptingKeyProvider provider);
+    void promptCreateKey(P provider) throws UnknownKeyException;
 
     /**
      * Prompts the user for the key which may be used to open an existing
@@ -98,30 +99,31 @@ public interface PromptingKeyProviderUI {
      * Otherwise, the key is used as the common key, a clone of which is
      * provided to the client upon request.
      * <p>
-     * Since TrueZIP 6.4, an implementation may also throw a
-     * {@link RuntimeException} with any kind of {@link UnknownKeyException}
-     * as its cause.
+     * Since TrueZIP 7, an implementation may also throw an
+     * {@link UnknownKeyException}.
      * This will trigger the calling method in the
-     * <code>PromptingKeyProvider</code> class to unwrap and pass on the
-     * cause without changing its state.
+     * {@code PromptingKeyProvider} class to pass on this exception
+     * without changing its state.
      * This may be useful if prompting was interrupted by a call to
      * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
      * In this case, another try to prompt the user should have the chance to
      * succeed instead of being cancelled without actually prompting the user
      * again.
-     * To trigger this behaviour, the implementation should simply throw any
-     * kind of <code>RuntimeException</code> with a
-     * {@link KeyPromptingInterruptedException} as its cause.
-     * 
-     * @param provider The key provider to store the result in.
-     * @return <code>true</code> if the user has requested to change the
+     * To trigger this behaviour, the implementation should simply throw a
+     * {@link KeyPromptingInterruptedException}.
+     *
+     * @return {@code true} if the user has requested to change the
      *         provided key.
-     * @throws RuntimeException with an {@link UnknownKeyException} as its
-     *         cause if the implementation does not want the key provider's
-     *         state to be changed.
+     * @param provider The key provider to store the result in.
+     *        The property {@code resourceID} must be
+     *        non-{@code null}.
+     * @throws UnknownKeyException if the implementation does not want the
+     *         key provider's state to be changed.
+     * @throws RuntimeException An instance of a subclass if
+     *         {@code provider} or its property {@code resourceID}
+     *         is {@code null}.
      */
-    // TODO: Add UnknownKeyException to the signature of this method in TrueZIP 7.
-    boolean promptUnknownOpenKey(PromptingKeyProvider provider);
+    boolean promptUnknownOpenKey(P provider) throws UnknownKeyException;
 
     /**
      * Prompts the user for the key which may be used to open an existing
@@ -141,28 +143,29 @@ public interface PromptingKeyProviderUI {
      * Otherwise, the key is used as the common key, a clone of which is
      * provided to the client upon request.
      * <p>
-     * Since TrueZIP 6.4, an implementation may also throw a
-     * {@link RuntimeException} with any kind of {@link UnknownKeyException}
-     * as its cause.
+     * Since TrueZIP 7, an implementation may also throw an
+     * {@link UnknownKeyException}.
      * This will trigger the calling method in the
-     * <code>PromptingKeyProvider</code> class to unwrap and pass on the
-     * cause without changing its state.
+     * {@code PromptingKeyProvider} class to pass on this exception
+     * without changing its state.
      * This may be useful if prompting was interrupted by a call to
      * {@link Thread#interrupt} while waiting on the Event Dispatch Thread.
      * In this case, another try to prompt the user should have the chance to
      * succeed instead of being cancelled without actually prompting the user
      * again.
-     * To trigger this behaviour, the implementation should simply throw any
-     * kind of <code>RuntimeException</code> with a
-     * {@link KeyPromptingInterruptedException} as its cause.
-     * 
-     * @param provider The key provider to store the result in.
-     * @return <code>true</code> if the user has requested to change the
+     * To trigger this behaviour, the implementation should simply throw a
+     * {@link KeyPromptingInterruptedException}.
+     *
+     * @return {@code true} if the user has requested to change the
      *         provided key.
-     * @throws RuntimeException with an {@link UnknownKeyException} as its
-     *         cause if the implementation does not want the key provider's
-     *         state to be changed.
+     * @param provider The key provider to store the result in.
+     *        The property {@code resourceID} must be
+     *        non-{@code null}.
+     * @throws UnknownKeyException if the implementation does not want the
+     *         key provider's state to be changed.
+     * @throws RuntimeException An instance of a subclass if
+     *         {@code provider} or its property {@code resourceID}
+     *         is {@code null}.
      */
-    // TODO: Add UnknownKeyException to the signature of this method in TrueZIP 7.
-    boolean promptInvalidOpenKey(PromptingKeyProvider provider);
+    boolean promptInvalidOpenKey(P provider) throws UnknownKeyException;
 }

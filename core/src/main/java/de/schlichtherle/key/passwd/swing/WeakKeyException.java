@@ -17,7 +17,6 @@
 package de.schlichtherle.key.passwd.swing;
 
 import java.security.GeneralSecurityException;
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -28,32 +27,10 @@ import java.util.ResourceBundle;
  * @since TrueZIP 6.1
  */
 public class WeakKeyException extends GeneralSecurityException {
-
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     *             It will vanish in the next major version.
-     * @param key The resource bundle key for the localized message.
-     * @see #getLocalizedMessage()
-     */
-    public WeakKeyException(ResourceBundle resources, String key) {
-        super(CreateKeyPanel.localizedMessage(resources, key, null));
-    }
-
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     *             It will vanish in the next major version.
-     * @param key The resource bundle key for the localized message.
-     * @see #getLocalizedMessage()
-     */
-    public WeakKeyException(ResourceBundle resources, String key, Object param) {
-        super(CreateKeyPanel.localizedMessage(resources, key, param));
-    }
+    private static final long serialVersionUID = 2946387652018652745L;
 
     /**
-     * Creates a new <code>WeakKeyException</code> with the given localized
-     * message.
+     * Creates a new {@code WeakKeyException} with the given localized message.
      */
     public WeakKeyException(String localizedMessage) {
         super(localizedMessage);

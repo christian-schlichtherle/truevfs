@@ -18,7 +18,6 @@ package de.schlichtherle.key.passwd.swing;
 
 import de.schlichtherle.awt.*;
 import de.schlichtherle.key.*;
-
 import javax.swing.*;
 
 /**
@@ -28,52 +27,33 @@ import javax.swing.*;
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.0
- * @version $Id$
+ * @version @version@
  */
-public class PromptingAesKeyProviderUI extends PromptingKeyProviderUI {
-
-    /**
-     * @deprecated This field is not used anymore and will be removed for the
-     *             next major release number.
-     */
-    private AesKeyStrengthPanel aesKeyStrengthPanel;
-
-    /**
-     * @deprecated This method is not used anymore and will be removed for the
-     *             next major release number.
-     *             It's use may dead lock the GUI.
-     *             Use {@link #createAesKeyStrengthPanel} instead.
-     */
-    protected AesKeyStrengthPanel getAesKeyStrengthPanel() {
-        if (aesKeyStrengthPanel == null)
-            aesKeyStrengthPanel = createAesKeyStrengthPanel();
-        return aesKeyStrengthPanel;
-    }
+public class PromptingAesKeyProviderUI
+        extends PromptingKeyProviderUI<PromptingAesKeyProvider<Cloneable>> {
 
     /**
      * A factory method to create the AES Key Strength Panel.
      */
-    protected AesKeyStrengthPanel createAesKeyStrengthPanel() {
+    protected AesKeyStrengthPanel newAesKeyStrengthPanel() {
         return new AesKeyStrengthPanel();
     }
 
-    protected void promptCreateKey(final PromptingKeyProvider provider, JComponent extraDataUI) {
+    protected void promptCreateKey(
+            final PromptingAesKeyProvider<Cloneable> provider,
+            final JComponent extraDataUI) {
         assert null == extraDataUI;
         assert EventQueue.isDispatchThread();
 
-        // We can safely cast the parameter to PromptingAesKeyProvider, because
-        // otherwise we would not have been called.
-        final PromptingAesKeyProvider aesKeyProvider = ((PromptingAesKeyProvider) provider);
-
-        final Object oldKey = aesKeyProvider.getKey();
+        final Cloneable oldKey = provider.getKey();
 
         // Init panel with current key strength and prompt user.
-        final AesKeyStrengthPanel aesKeyStrengthPanel = createAesKeyStrengthPanel();
-        aesKeyStrengthPanel.setKeyStrength(aesKeyProvider.getKeyStrength());
-        super.promptCreateKey(aesKeyProvider, aesKeyStrengthPanel);
+        final AesKeyStrengthPanel keyStrengthPanel = newAesKeyStrengthPanel();
+        keyStrengthPanel.setKeyStrength(provider.getKeyStrength());
+        super.promptCreateKey(provider, keyStrengthPanel);
 
         // Update key strength only on valid input.
-        if (oldKey != aesKeyProvider.getKey())
-            aesKeyProvider.setKeyStrength(aesKeyStrengthPanel.getKeyStrength());
+        if (oldKey != provider.getKey())
+            provider.setKeyStrength(keyStrengthPanel.getKeyStrength());
     }
 }

@@ -16,7 +16,8 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simulates the typical life cycle of a protected resource and its
@@ -56,11 +57,14 @@ public class KeyMgmtLifeCycleThread extends Thread {
         return rlc.throwable;
     }
 
+    @Override
     public void start() {
-        logger.fine(rlc.id + ": Starting Key Management Life Cycle Thread...");
+        logger.log(Level.FINE, "{0}: Starting Key Management Life Cycle Thread...", rlc.id);
         super.start();
     }
 
+    @Override
+    @SuppressWarnings({"CallToThreadDumpStack", "CallToThreadRun"})
     public void run() {
         super.run();
         final Throwable t = getThrowable();

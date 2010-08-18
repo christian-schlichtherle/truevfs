@@ -16,9 +16,7 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
-
-import junit.framework.*;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
@@ -30,6 +28,7 @@ public class MemoryMappedReadOnlyFileTest extends ReadOnlyFileTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp()
     throws IOException {
         super.setUp();

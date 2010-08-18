@@ -18,12 +18,11 @@ package de.schlichtherle.key.passwd.swing;
 
 import java.awt.Window;
 import java.util.Random;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-
-import junit.framework.*;
-
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 
@@ -38,10 +37,6 @@ public class PromptingKeyManagerTest extends TestCase {
     }
 
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite(PromptingKeyManagerTest.class);
-        /*TestSuite suite = new TestSuite();
-        suite.addTest(new PromptingKeyManagerTest("testParentWindow"));*/
-
         // Who says you can't have fun with automated GUI testing? :-)
         {
             String feedback;
@@ -55,10 +50,14 @@ public class PromptingKeyManagerTest extends TestCase {
                     System.getProperty(feedback,
                         "de.schlichtherle.key.passwd.swing.HurlingWindowFeedback"));
         }
-        
+
+        //TestSuite suite = new TestSuite(PromptingKeyManagerTest.class);
+        TestSuite suite = new TestSuite();
+        suite.addTest(new PromptingKeyManagerTest("testParentWindow"));
+
         return suite;
     }
-    
+
     public PromptingKeyManagerTest(String testName) {
         super(testName);
     }
@@ -84,14 +83,15 @@ public class PromptingKeyManagerTest extends TestCase {
         final JFrame frame = new JFrame();
         frame.setVisible(true);
         final JDialog dialog = new JDialog(frame);
-
         assertFalse(dialog.isVisible());
+
         result = PromptingKeyManager.getParentWindow();
         assertSame(frame, result);
 
         dialog.setVisible(true);
+        assertTrue(dialog.isVisible());
         result = PromptingKeyManager.getParentWindow();
-        assertSame(dialog, result);
+        assertSame(frame, result); // dialog is not a frame!
 
         dialog.setVisible(false);
         frame.setVisible(false);
@@ -199,10 +199,10 @@ public class PromptingKeyManagerTest extends TestCase {
                 kmlcThreadStillAlive = true;
             else if (kmlcThread.getThrowable() != null)
                 threadDiedWithException = true;
-            
+
             i++;
         }
-        
+
         if (threadDiedWithException)
             fail("Some threads terminated with an exception!");
         if (kmlcThreadStillAlive)

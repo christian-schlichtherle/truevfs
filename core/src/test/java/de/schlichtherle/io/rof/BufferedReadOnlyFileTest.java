@@ -16,11 +16,7 @@
 
 package de.schlichtherle.io.rof;
 
-import de.schlichtherle.io.rof.*;
-
 import java.io.*;
-
-import junit.framework.*;
 
 /**
  * @author Christian Schlichtherle
@@ -32,6 +28,7 @@ public class BufferedReadOnlyFileTest extends ReadOnlyFileTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp()
     throws IOException {
         super.setUp();

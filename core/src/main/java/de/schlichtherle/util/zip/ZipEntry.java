@@ -589,28 +589,4 @@ public class ZipEntry implements Cloneable {
     public String toString() {
         return getName();
     }
-
-    //
-    // Time conversion.
-    //
-
-    /**
-     * Refactored to
-     * <code>{@link DateTimeConverter#JAR}.{@link DateTimeConverter#toDosTime(long) toDosTime(jTime)}</code>.
-     *
-     * @deprecated Use {@link DateTimeConverter#toDosTime(long)} instead.
-     */
-    protected static long java2dosTime(final long jTime) {
-        return DateTimeConverter.JAR.toDosTime(jTime);
-    }
-
-    /**
-     * Refactored to
-     * <code>{@link DateTimeConverter#JAR}.{@link DateTimeConverter#toJavaTime(long) toJavaTime(dTime)}</code>.
-     *
-     * @deprecated Use {@link DateTimeConverter#toJavaTime(long)} instead.
-     */
-    protected static long dos2javaTime(final long dTime) {
-        return DateTimeConverter.JAR.toJavaTime(dTime);
-    }
 }

@@ -18,22 +18,16 @@ package de.schlichtherle.swing;
 
 import de.schlichtherle.swing.event.PanelEvent;
 import de.schlichtherle.swing.event.PanelListener;
-
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.Window;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.EventListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.JPanel;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.EventListenerList;
 
 /**
@@ -54,6 +48,7 @@ import javax.swing.event.EventListenerList;
  */
 public class EnhancedPanel extends JPanel  {
 
+    private static final long serialVersionUID = 6984576810262891640L;
     private static final Logger logger
             = Logger.getLogger(EnhancedPanel.class.getName());
     
@@ -126,63 +121,6 @@ public class EnhancedPanel extends JPanel  {
                             : PanelEvent.ANCESTOR_WINDOW_HIDDEN));
             }
         });
-
-        /*final ComponentListener cl = new ComponentAdapter() {
-            public void componentShown(ComponentEvent evt) {
-                // Depending on which method the ancestor window uses to show
-                // itself, multiple ComponentEvents may occur for the same event.
-                // By posting the subsequent PanelEvents to the AWT Event Queue,
-                // they can be coalesced into one event again.
-                final PanelEvent event = new PanelEvent(EnhancedPanel.this,
-                        PanelEvent.ANCESTOR_WINDOW_SHOWN);
-                logger.finer("Posting " + event);
-                getToolkit().getSystemEventQueue().postEvent(event);
-                //processPanelEvent(event);
-            }
-
-            public void componentHidden(ComponentEvent evt) {
-                // Depending on which method the ancestor window uses to hide
-                // itself, multiple ComponentEvents may occur for the same event.
-                // By posting the subsequent PanelEvents to the AWT Event Queue,
-                // they can be coalesced into one event again.
-                final PanelEvent event = new PanelEvent(EnhancedPanel.this,
-                        PanelEvent.ANCESTOR_WINDOW_HIDDEN);
-                logger.finer("Posting " + event);
-                getToolkit().getSystemEventQueue().postEvent(event);
-                //processPanelEvent(event);
-            }
-        };
-
-        addAncestorListener(new AncestorListener() {
-            public void ancestorAdded(final AncestorEvent evt) {
-                // Note that with J2SE 1.4.2_10 this event happens BEFORE
-                // the ancestor window is made visible, while with
-                // J2SE 1.5.0_06 this event happens AFTER the ancestor is
-                // made visible.
-                final Window window = getAncestorWindow(evt.getAncestor());
-                window.addComponentListener(cl);
-                final boolean windowShown = window.isShowing();
-                //assert windowShown == isShowing();
-                if (windowShown)
-                    cl.componentShown(null);
-            }
-
-            public void ancestorRemoved(final AncestorEvent evt) {
-                // Note that with J2SE 1.4.2_10 this event happens BEFORE
-                // the ancestor window is made visible, while with
-                // J2SE 1.5.0_06 this event happens AFTER the ancestor is
-                // made visible.
-                final Window window = getAncestorWindow(evt.getAncestor());
-                window.removeComponentListener(cl);
-                final boolean windowShown = window.isShowing();
-                //assert windowShown == isShowing();
-                if (!windowShown)
-                    cl.componentHidden(null);
-            }
-
-            public void ancestorMoved(AncestorEvent evt) {
-            }
-        });*/
     }
 
     /**
@@ -191,6 +129,8 @@ public class EnhancedPanel extends JPanel  {
      *
      * @deprecated See {@link EnhancedPanel}.
      */
+    @Override
+    @Deprecated
     protected AWTEvent coalesceEvents(
             final AWTEvent existingEvent,
             final AWTEvent newEvent) {
@@ -217,6 +157,8 @@ public class EnhancedPanel extends JPanel  {
      *
      * @deprecated See {@link EnhancedPanel}.
      */
+    @Override
+    @Deprecated
     protected void processEvent(final AWTEvent event) {
         if (event instanceof PanelEvent) {
             //assert false : "This is dead code since the refactoring for TrueZIP 6.4!";
@@ -232,7 +174,7 @@ public class EnhancedPanel extends JPanel  {
      * <code>event</code>.
      */
     protected void processPanelEvent(final PanelEvent event) {
-        logger.fine("Processing " + event);
+        logger.log(Level.FINE, "Processing {0}", event);
         switch (event.getID()) {
             case PanelEvent.ANCESTOR_WINDOW_SHOWN:
                 fireAncestorWindowShown(event);
@@ -256,7 +198,7 @@ public class EnhancedPanel extends JPanel  {
         return getAncestorWindow(this);
     }
 
-    private static final Window getAncestorWindow(Component c) {
+    private static Window getAncestorWindow(Component c) {
         while (c != null && !(c instanceof Window))
             c = c.getParent();
 
@@ -327,11 +269,15 @@ public class EnhancedPanel extends JPanel  {
             return new PanelListener[0];
     }
 
-    public EventListener[] getListeners(Class listenerType) {
-        if (listenerType == PanelListener.class)
-            return getPanelListeners();
-        else
+    @Override
+    public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
+        if (listenerType == PanelListener.class) {
+            @java.lang.SuppressWarnings("unchecked")
+            final T[] listeners = (T[]) getPanelListeners();
+            return listeners;
+        } else {
             return super.getListeners(listenerType);
+        }
     }
 
     /**
@@ -342,6 +288,7 @@ public class EnhancedPanel extends JPanel  {
      *
      * @deprecated You should not call this method directly.
      */
+    @Deprecated
     protected void fireAncestorWindowShown(final PanelEvent event) {
         if (listenerList == null)
             return;
@@ -360,6 +307,7 @@ public class EnhancedPanel extends JPanel  {
      *
      * @deprecated You should not call this method directly.
      */
+    @Deprecated
     protected void fireAncestorWindowHidden(final PanelEvent event) {
         if (listenerList == null)
             return;

@@ -66,8 +66,6 @@ import java.net.*;
  * too, so that {@link de.schlichtherle.io.File} instances which use it can
  * be serialized.
  * 
- * @see DefaultArchiveDetector
- * @see File
  * @see ArchiveDriver
  * @author Christian Schlichtherle
  * @version $Id$

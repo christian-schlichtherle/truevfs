@@ -28,6 +28,7 @@ import java.security.GeneralSecurityException;
  * @version $Id$
  */
 public class UnknownKeyException extends GeneralSecurityException {
+    private static final long serialVersionUID = 6092786348232837265L;
 
     UnknownKeyException() {
     }

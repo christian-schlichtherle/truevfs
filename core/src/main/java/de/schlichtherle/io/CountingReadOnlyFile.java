@@ -78,11 +78,4 @@ final class CountingReadOnlyFile extends FilterReadOnlyFile {
             total += ret;
         return ret;
     }
-
-    /** @deprecated */
-    public int skipBytes(int n) throws IOException {
-        int ret = rof.skipBytes(n);
-        total += ret;
-        return ret;
-    }
 }

@@ -159,11 +159,14 @@ abstract class CommandLineUtility {
             setDaemon(true);
         }
 
+        @Override
         public void start() {
             if (err == System.err || err == System.out)
                 super.start();
         }
 
+        @Override
+        @SuppressWarnings("SleepWhileHoldingLock")
         public void run() {
             boolean run = false;
             for (long sleep = 2000; ; sleep = 200, run = true) {
@@ -191,10 +194,11 @@ abstract class CommandLineUtility {
             args[1] = new Long(
                     (liveStats.getUpdateTotalByteCountWritten() + 1023) / 1024);
             err.print(MessageFormat.format(
-                    "Top level archive I/O: {0} / {1} KB        \r", args));
+                    "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
             err.flush();
         }
 
+        @SuppressWarnings("CallToThreadDumpStack")
         private void shutdown() {
             /*if (err != System.err && err != System.out)
                 return;*/
