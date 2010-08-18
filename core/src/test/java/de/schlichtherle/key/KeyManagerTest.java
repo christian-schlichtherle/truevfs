@@ -16,38 +16,33 @@
 
 package de.schlichtherle.key;
 
-import java.util.logging.Logger;
-import junit.framework.*;
-
-import de.schlichtherle.key.passwd.swing.PromptingKeyManager;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class KeyManagerTest extends TestCase {
-
-    private static final Logger logger = Logger.getLogger(
-            KeyManagerTest.class.getName());
-
     private KeyManager instance;
 
     public KeyManagerTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
+        KeyManager.setInstance(null); // request new instance
         instance = KeyManager.getInstance();
     }
 
+    @Override
     protected void tearDown() throws Exception {
     }
 
     /**
      * Test of get/setInstance method, of class de.schlichtherle.key.KeyManager.
      */
-    public void testGetSetInstance() {
-        logger.fine("getSetInstance");
-        
+    public void testInstance() {
         final KeyManager inst1 = KeyManager.getInstance();
         assertNotNull(inst1);
 
@@ -68,21 +63,19 @@ public class KeyManagerTest extends TestCase {
     /**
      * Test of get/setKeyProvider method, of class de.schlichtherle.key.KeyManager.
      */
-    public void testGetSetKeyProvider() {
-        logger.fine("getSetKeyProvider");
+    public void testKeyProvider() {
+        final String idA = "keyProvider A";
 
-        final String idA = "getSetKeyProvider A";
-        
-        final KeyProvider resA1 = instance.getKeyProvider(idA);
+        final KeyProvider resA1 = instance.getKeyProvider(idA, KeyProvider.class);
         assertNotNull(resA1);
-        
-        final KeyProvider resA2 = instance.getKeyProvider(idA);
+
+        final KeyProvider resA2 = instance.getKeyProvider(idA, KeyProvider.class);
         assertSame(resA1, resA2);
-        
+
         final KeyProvider resA3 = instance.getKeyProvider(
                 idA, SucceedingKeyProvider.class);
         assertSame(resA1, resA3);
-        
+
         final KeyProvider resA4 = new SucceedingKeyProvider();
         try {
             instance.setKeyProvider(null, resA4);
@@ -101,19 +94,19 @@ public class KeyManagerTest extends TestCase {
         }
         instance.setKeyProvider(idA, resA4);
 
-        final KeyProvider resA5 = instance.getKeyProvider(idA);
+        final KeyProvider resA5 = instance.getKeyProvider(idA, KeyProvider.class);
         assertSame(resA4, resA5);
 
-        final String idB = "getSetKeyProvider B";
-        
+        final String idB = "keyProvider B";
+
         final KeyProvider resB1 = instance.getKeyProvider(
                 idB, SucceedingKeyProvider.class);
         assertNotNull(resB1);
         assertNotSame(resA5, resB1);
         assertTrue(resB1 instanceof SucceedingKeyProvider);
 
-        final String idC = "getSetKeyProvider C";
-        
+        final String idC = "keyProvider C";
+
         try {
             final KeyProvider resC1 = instance.getKeyProvider(
                     idC, FailingKeyProvider.class);
@@ -121,7 +114,7 @@ public class KeyManagerTest extends TestCase {
         } catch (IllegalArgumentException exc) {
         }
     }
-    
+
     static class SucceedingKeyProvider extends PromptingKeyProvider {
     }
 
@@ -133,49 +126,35 @@ public class KeyManagerTest extends TestCase {
      * Test of resetKeyProvider method, of class de.schlichtherle.key.KeyManager.
      */
     public void testResetKeyProvider() {
-        String resourceID = "resetKeyProvider";
-        logger.fine(resourceID);
+        final String resourceID = "resetKeyProvider";
 
-        final SimpleSharedKeyProvider provider
-                = (SimpleSharedKeyProvider) instance.getKeyProvider(
-                    resourceID, SimpleSharedKeyProvider.class);
+        final SmartKeyProvider provider
+                = (SmartKeyProvider) instance.getKeyProvider(
+                    resourceID, SmartKeyProvider.class);
         provider.reset = false;
         boolean result = KeyManager.resetKeyProvider(resourceID);
         assertTrue(result);
         assertTrue(provider.reset);
-        
-        assertSame(provider, instance.getKeyProvider(resourceID));
-    }
 
-    static class SimpleSharedKeyProvider extends AbstractKeyProvider {
-        public boolean reset;
-
-        public void invalidOpenKeyImpl() {
-        }
-
-        public void reset() {
-            reset = true;
-        }
+        assertSame(provider, instance.getKeyProvider(resourceID, KeyProvider.class));
     }
 
     /**
      * Test of resetAndRemoveKeyProvider method, of class de.schlichtherle.key.KeyManager.
      */
     public void testResetAndRemoveKeyProvider() {
-        logger.fine("resetAndRemoveKeyProvider");
-
         final String resA = "resetAndRemoveKeyProvider A";
         final String resB = "resetAndRemoveKeyProvider B";
 
-        final SimpleSharedKeyProvider provA1
-                = (SimpleSharedKeyProvider) instance.getKeyProvider(
-                    resA, SimpleSharedKeyProvider.class);
+        final SmartKeyProvider provA1
+                = (SmartKeyProvider) instance.getKeyProvider(
+                    resA, SmartKeyProvider.class);
         provA1.reset = false;
         boolean okA = KeyManager.resetAndRemoveKeyProvider(resA);
         assertTrue(okA);
         assertTrue(provA1.reset);
-        
-        final KeyProvider provA2 = instance.getKeyProvider(resA);
+
+        final KeyProvider provA2 = instance.getKeyProvider(resA, KeyProvider.class);
         assertNotNull(provA2);
         assertNotSame(provA1, provA2);
 
@@ -184,42 +163,27 @@ public class KeyManagerTest extends TestCase {
                     resB, SimpleKeyProvider.class);
         boolean okB = KeyManager.resetAndRemoveKeyProvider(resB);
         assertTrue(okB);
-        
-        final KeyProvider provB2 = instance.getKeyProvider(resB);
+
+        final KeyProvider provB2 = instance.getKeyProvider(resB, KeyProvider.class);
         assertNotNull(provB2);
         assertNotSame(provB1, provB2);
-    }
-
-    static class SimpleKeyProvider implements KeyProvider {
-        public Object getCreateKey() {
-            return this;
-        }
-
-        public Object getOpenKey() {
-            return this;
-        }
-        
-        public void invalidOpenKey() {
-        }
     }
 
     /**
      * Test of resetKeyProviders method, of class de.schlichtherle.key.KeyManager.
      */
     public void testResetKeyProviders() {
-        logger.fine("resetKeyProviders");
-
         final String resA = "resetKeyProviders A";
         final String resB = "resetKeyProviders B";
 
-        final SimpleSharedKeyProvider provA
-                = (SimpleSharedKeyProvider) instance.getKeyProvider(
-                    resA, SimpleSharedKeyProvider.class);
+        final SmartKeyProvider provA
+                = (SmartKeyProvider) instance.getKeyProvider(
+                    resA, SmartKeyProvider.class);
         provA.reset = false;
 
-        final SimpleSharedKeyProvider provB
-                = (SimpleSharedKeyProvider) instance.getKeyProvider(
-                    resB, SimpleSharedKeyProvider.class);
+        final SmartKeyProvider provB
+                = (SmartKeyProvider) instance.getKeyProvider(
+                    resB, SmartKeyProvider.class);
         provB.reset = false;
 
         KeyManager.resetKeyProviders();
@@ -232,14 +196,12 @@ public class KeyManagerTest extends TestCase {
      * Test of resetAndClearKeyProviders method, of class de.schlichtherle.key.KeyManager.
      */
     public void testResetAndRemoveKeyProviders() {
-        logger.fine("resetAndRemoveKeyProviders");
-
         final String resA = "resetAndRemoveKeyProviders A";
         final String resB = "resetAndRemoveKeyProviders B";
 
-        final SimpleSharedKeyProvider provA1
-                = (SimpleSharedKeyProvider) instance.getKeyProvider(
-                    resA, SimpleSharedKeyProvider.class);
+        final SmartKeyProvider provA1
+                = (SmartKeyProvider) instance.getKeyProvider(
+                    resA, SmartKeyProvider.class);
         provA1.reset = false;
 
         final SimpleKeyProvider provB1
@@ -248,12 +210,12 @@ public class KeyManagerTest extends TestCase {
 
         KeyManager.resetAndRemoveKeyProviders();
         assertTrue(provA1.reset);
-        
-        final KeyProvider provA2 = instance.getKeyProvider(resA);
+
+        final KeyProvider provA2 = instance.getKeyProvider(resA, KeyProvider.class);
         assertNotNull(provA2);
         assertNotSame(provA1, provA2);
-        
-        final KeyProvider provB2 = instance.getKeyProvider(resB);
+
+        final KeyProvider provB2 = instance.getKeyProvider(resB, KeyProvider.class);
         assertNotNull(provB2);
         assertNotSame(provB1, provB2);
     }
@@ -262,8 +224,6 @@ public class KeyManagerTest extends TestCase {
      * Test of moveKeyProvider method, of class de.schlichtherle.key.KeyManager.
      */
     public void testMoveKeyProvider() {
-        logger.fine("moveKeyProvider");
-        
         String oldResourceID = "moveKeyProvider A";
         String newResourceID = "moveKeyProvider B";
 
@@ -286,20 +246,48 @@ public class KeyManagerTest extends TestCase {
         assertEquals(false, result); // no provider mapped yet
 
         final PromptingKeyProvider provA1
-                = (PromptingKeyProvider) instance.getKeyProvider(oldResourceID);
+                = (PromptingKeyProvider) instance.getKeyProvider(oldResourceID, KeyProvider.class);
         assertNotNull(provA1);
         assertSame(oldResourceID, provA1.getResourceID());
 
         result = KeyManager.moveKeyProvider(oldResourceID, newResourceID);
         assertEquals(true, result);
 
-        final KeyProvider provA2 = instance.getKeyProvider(oldResourceID);
+        final KeyProvider provA2 = instance.getKeyProvider(oldResourceID, KeyProvider.class);
         assertNotNull(provA2);
 
         final PromptingKeyProvider provB1
-                = (PromptingKeyProvider) instance.getKeyProvider(newResourceID);
+                = (PromptingKeyProvider) instance.getKeyProvider(newResourceID, KeyProvider.class);
         assertNotNull(provB1);
         assertSame(provA1, provB1);
         assertSame(newResourceID, provB1.getResourceID());
+    }
+
+    //
+    // Inner classes.
+    //
+
+    static class SimpleKeyProvider implements KeyProvider<char[]> {
+        public char[] getCreateKey() {
+            return "secret".toCharArray();
+        }
+
+        public char[] getOpenKey() {
+            return "secret".toCharArray();
+        }
+
+        public void invalidOpenKey() {
+        }
+    }
+
+    static class SmartKeyProvider extends AbstractKeyProvider<char[]> {
+        public boolean reset;
+
+        public void invalidOpenKeyImpl() {
+        }
+
+        public void reset() {
+            reset = true;
+        }
     }
 }
