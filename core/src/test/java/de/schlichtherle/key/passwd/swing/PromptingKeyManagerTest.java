@@ -63,11 +63,12 @@ public class PromptingKeyManagerTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         JemmyProperties.setCurrentDispatchingModel(JemmyProperties.getDefaultDispatchingModel());
-        PromptingKeyManager.setParentWindow(null);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         PromptingKeyManager.resetAndRemoveKeyProviders();
     }
@@ -76,7 +77,6 @@ public class PromptingKeyManagerTest extends TestCase {
      * Test of getParentWindow method, of class de.schlichtherle.key.passwd.swing.PromptingKeyManager.
      */
     public void testParentWindow() {
-        PromptingKeyManager.setParentWindow(null);
         Window result = PromptingKeyManager.getParentWindow();
         assertNotNull(result);
         assertFalse(result.isVisible());
@@ -84,7 +84,6 @@ public class PromptingKeyManagerTest extends TestCase {
         final JFrame frame = new JFrame();
         frame.setVisible(true);
         final JDialog dialog = new JDialog(frame);
-        PromptingKeyManager.setParentWindow(dialog);
 
         assertFalse(dialog.isVisible());
         result = PromptingKeyManager.getParentWindow();
