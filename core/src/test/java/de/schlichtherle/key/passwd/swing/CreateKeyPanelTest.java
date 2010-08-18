@@ -47,6 +47,7 @@ public class CreateKeyPanelTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         instance = new CreateKeyPanel();
         frame = showInstanceInFrame();
@@ -54,6 +55,7 @@ public class CreateKeyPanelTest extends TestCase {
 
     }
 
+    @Override
     protected void tearDown() throws Exception {
         frame.setVisible(false);
     }
@@ -67,6 +69,7 @@ public class CreateKeyPanelTest extends TestCase {
         return new JFrameOperator();
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testResourceID() {
         final String resourceID = "Hello world!";
         instance.setResourceID(resourceID);
@@ -103,20 +106,6 @@ public class CreateKeyPanelTest extends TestCase {
 
     private static boolean isBlank(String s) {
         return s == null || s.trim().length() <= 0;
-    }
-
-    /**
-     * Test of resetPasswd method, of class de.schlichtherle.key.passwd.swing.CreateKeyPanel.
-     */
-    public void testResetPasswd() {
-        // Enter mismatching passwords.
-        new JPasswordFieldOperator(frame, 0).setText("foofoo");
-        new JPasswordFieldOperator(frame, 1).setText("barbar");
-        
-        // Reset and check state.
-        instance.resetPasswd();
-        assertTrue("".equals(new JPasswordFieldOperator(frame, 0).getText()));
-        assertTrue("".equals(new JPasswordFieldOperator(frame, 1).getText()));
     }
 
     /**
@@ -195,6 +184,7 @@ public class CreateKeyPanelTest extends TestCase {
     /**
      * Test of get/setExtraDataUI method, of class de.schlichtherle.key.passwd.swing.CreateKeyPanel.
      */
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testExtraDataUI() {
         final JComponent ui = new AesKeyStrengthPanel();
         instance.setExtraDataUI(ui);
