@@ -16,7 +16,8 @@
 
 package de.schlichtherle.io.util;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A decorator which synchronizes all access to an {@link InputStream}
@@ -27,14 +28,10 @@ import java.io.*;
  * @since TrueZIP 6.4
  */
 public class SynchronizedInputStream extends InputStream {
-    /**
-     * The object to synchronize on - never <code>null</code>.
-     */
+    /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
-    
-    /**
-     * The decorated input stream.
-     */
+
+    /** The decorated input stream. */
     protected InputStream in;
 
     /**
@@ -44,7 +41,7 @@ public class SynchronizedInputStream extends InputStream {
      * @param in The input stream to wrap in this decorator.
      */
     public SynchronizedInputStream(final InputStream in) {
-	this(in, null);
+        this(in, null);
     }
 
     /**
@@ -52,70 +49,81 @@ public class SynchronizedInputStream extends InputStream {
      *
      * @param in The input stream to wrap in this decorator.
      * @param lock The object to synchronize on.
-     *        If <code>null</code>, then this object is used, not the stream.
+     *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedInputStream(final InputStream in, final Object lock) {
-	this.in = in;
-	this.lock = lock != null ? lock : this;
+        this.in = in;
+        this.lock = lock != null ? lock : this;
     }
 
     public int read() throws IOException {
-	synchronized (lock) {
-	    return in.read();
-	}
+        synchronized (lock) {
+            return in.read();
+        }
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
-	synchronized (lock) {
-	    return read(b, 0, b.length);
-	}
+        synchronized (lock) {
+            return read(b, 0, b.length);
+        }
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
-	synchronized (lock) {
-	    return in.read(b, off, len);
-	}
+        synchronized (lock) {
+            return in.read(b, off, len);
+        }
     }
 
+    @Override
     public long skip(long n) throws IOException {
-	synchronized (lock) {
-	    return in.skip(n);
-	}
+        synchronized (lock) {
+            return in.skip(n);
+        }
     }
 
+    @Override
     public int available() throws IOException {
-	synchronized (lock) {
-	    return in.available();
-	}
+        synchronized (lock) {
+            return in.available();
+        }
     }
 
     /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
+    @Override
     public void close() throws IOException {
-	synchronized (lock) {
-	    doClose();
-	}
+        synchronized (lock) {
+            doClose();
+        }
     }
 
-    /** Closes the underlying stream. This method is not synchronized! */
+    /**
+     * Closes the underlying input stream.
+     * This method is <em>not</em> synchronized!
+     */
     protected void doClose() throws IOException {
         in.close();
     }
 
+    @Override
     public void mark(int readlimit) {
-	synchronized (lock) {
-	    in.mark(readlimit);
-	}
+        synchronized (lock) {
+            in.mark(readlimit);
+        }
     }
 
+    @Override
     public void reset() throws IOException {
-	synchronized (lock) {
-	    in.reset();
-	}
+        synchronized (lock) {
+            in.reset();
+        }
     }
 
+    @Override
     public boolean markSupported() {
-	synchronized (lock) {
-	    return in.markSupported();
-	}
+        synchronized (lock) {
+            return in.markSupported();
+        }
     }
 }

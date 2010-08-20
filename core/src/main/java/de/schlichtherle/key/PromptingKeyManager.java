@@ -24,7 +24,7 @@ import java.util.Map;
  * An abstract {@link KeyManager} which prompts the user for a key if required.
  * <p>
  * This class maintains a map of user interface classes for the
- * <code>PromptingKeyProvider</code> class and each of its subclasses which
+ * {@code PromptingKeyProvider} class and each of its subclasses which
  * require an individual user interface.
  * The particular user interface classes are determined by a subclass of this
  * key manager. This enables the subclass to determine which user interface
@@ -60,7 +60,7 @@ public class PromptingKeyManager extends KeyManager {
     private final Map<String, Object> uis = new HashMap<String, Object>();
 
     /**
-     * Constructs a new <code>PromptingKeyManager</code>.
+     * Constructs a new {@code PromptingKeyManager}.
      * This instance maps the following key provider types using
      * {@link KeyManager#mapKeyProviderType}:
      * <table border="2" cellpadding="4">
@@ -88,16 +88,16 @@ public class PromptingKeyManager extends KeyManager {
     //
 
     /**
-     * Returns <code>true</code> if and only if prompting mode is enabled.
+     * Returns {@code true} if and only if prompting mode is enabled.
      * This is a class property.
      * <p>
      * Note that subclasses might add additional behaviour to both
      * {@link #isPrompting} and {@link #setPrompting} through the default
      * key manager instance (see {@link #getInstance}).
      * Regardless, an application may safely assume that
-     * <code>isPrompting()</code> reflects the actual behaviour of the API
+     * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
-     * the last call to <code>setPrompting(boolean)</code>.
+     * the last call to {@code setPrompting(boolean)}.
      *
      * @return Whether or not the user will be prompted for a key if required.
      *
@@ -139,11 +139,11 @@ public class PromptingKeyManager extends KeyManager {
      * {@link #isPrompting} and {@link #setPrompting} through the default
      * key manager instance (see {@link #getInstance}).
      * Regardless, an application may safely assume that
-     * <code>isPrompting()</code> reflects the actual behaviour of the API
+     * {@code isPrompting()} reflects the actual behaviour of the API
      * in this package although it may not reflect the parameter value of
-     * the last call to <code>setPrompting(boolean)</code>.
+     * the last call to {@code setPrompting(boolean)}.
      *
-     * @param prompting The value of the property <code>prompting</code>.
+     * @param prompting The value of the property {@code prompting}.
      *
      * @see #isPrompting
      */

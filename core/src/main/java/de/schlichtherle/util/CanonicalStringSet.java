@@ -50,13 +50,13 @@ import java.util.TreeMap;
  * @version $Id$
  * @since TrueZIP 6.5
  */
-public class CanonicalStringSet extends AbstractSet {
+public class CanonicalStringSet extends AbstractSet<String> {
 
     /** The separator for string lists. */
     private final char separator;
 
     /** The sorted map which implements the behaviour of this class. */
-    private final SortedMap map = new TreeMap();
+    private final SortedMap<String, String> map = new TreeMap<String, String>();
 
     /**
      * Constructs a new, empty set of canonical strings.
@@ -82,32 +82,11 @@ public class CanonicalStringSet extends AbstractSet {
     }
 
     /**
-     * Constructs a new set of canonical strings from the given string list.
-     *
-     * @deprecated This constructor is dangerous: It may call
-     *             {@link #canonicalize}, which may result in a call from a
-     *             superclass if this constructor is called from a subclass.
-     * @param separator The separator character to use in string lists.
-     * @param list A string list - may be {@code null} to
-     *        construct an empty set.
-     */
-    public CanonicalStringSet(final char separator, final String list) {
-        this.separator = separator;
-        if (list != null)
-            addAll(list);
-    }
-
-    /** @deprecated Override and use {@link #canonicalize} instead. */
-    protected String canonical(final String s) {
-        return canonicalize(s);
-    }
-
-    /**
      * A template method which returns the canonical form of {@code s} or
      * {@code null} if the given string does not have a canonical form.
      * <p>
-     * The implementation in {@link CanonicalStringSet} simply returns the
-     * parameter.
+     * The implementation in the class {@link CanonicalStringSet} simply
+     * returns the method parameter.
      *
      * @param s The string to get canonicalized.
      *        Never {@code null} and never contains the separator.
@@ -120,10 +99,12 @@ public class CanonicalStringSet extends AbstractSet {
         return s;
     }
 
+    @Override
     public final boolean isEmpty() {
         return super.isEmpty();
     }
 
+    @Override
     public final int size() {
         return map.size();
     }
@@ -143,6 +124,7 @@ public class CanonicalStringSet extends AbstractSet {
      * @throws NullPointerException If {@code list} is {@code null}.
      * @throws ClassCastException If {@code list} is not a {@code String}.
      */
+    @Override
     public final boolean contains(Object list) {
         return containsAll((String) list);
     }
@@ -152,7 +134,8 @@ public class CanonicalStringSet extends AbstractSet {
      *
      * @return A new iterator for all canonical string elements.
      */
-    public final Iterator iterator() {
+    @Override
+    public final Iterator<String> iterator() {
         return map.keySet().iterator();
     }
 
@@ -163,15 +146,17 @@ public class CanonicalStringSet extends AbstractSet {
      *
      * @return A new iterator for all original string elements.
      */
-    public final Iterator originalIterator() {
+    public final Iterator<String> originalIterator() {
         return map.values().iterator();
     }
 
+    @Override
     public final Object[] toArray() {
         return map.keySet().toArray();
     }
 
-    public final Object[] toArray(Object[] array) {
+    @Override
+    public final <T> T[] toArray(T[] array) {
         return map.keySet().toArray(array);
     }
 
@@ -189,8 +174,9 @@ public class CanonicalStringSet extends AbstractSet {
      * @throws NullPointerException If {@code list} is {@code null}.
      * @throws ClassCastException If {@code list} is not a {@code String}.
      */
-    public final boolean add(Object list) {
-        return addAll((String) list);
+    @Override
+    public final boolean add(String list) {
+        return addAll(list);
     }
 
     /**
@@ -202,6 +188,7 @@ public class CanonicalStringSet extends AbstractSet {
      * @throws NullPointerException If {@code list} is {@code null}.
      * @throws ClassCastException If {@code list} is not a {@code String}.
      */
+    @Override
     public final boolean remove(Object list) {
         return removeAll((String) list);
     }
@@ -239,7 +226,7 @@ public class CanonicalStringSet extends AbstractSet {
      * @throws NullPointerException If {@code list} is {@code null}.
      */
     public final boolean containsAll(final String list) {
-        final Iterator i = new CanonicalStringIterator(list);
+        final Iterator<String> i = new CanonicalStringIterator(list);
         while (i.hasNext())
             if (!map.containsKey(i.next()))
                 return false;
@@ -257,9 +244,8 @@ public class CanonicalStringSet extends AbstractSet {
      */
     public final boolean addAll(final CanonicalStringSet set) {
         boolean changed = false;
-        final Iterator e = set.map.values().iterator();
-        while (e.hasNext())
-            changed |= add(e.next());
+        for (String s : set.map.values())
+            changed |= add(s);
         return changed;
     }
 
@@ -274,14 +260,11 @@ public class CanonicalStringSet extends AbstractSet {
      */
     public final boolean addAll(final String list) {
         boolean changed = false;
-        final Iterator i = new StringIterator(list);
-        while (i.hasNext()) {
-            final String element = (String) i.next();
+        for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
+            final String element = i.next();
             final String canonical = canonicalize(element);
-            if (canonical != null) {
-                final String previous = (String) map.put(canonical, element);
-                changed |= previous == null; //!element.equals(previous);
-            }
+            if (canonical != null)
+                changed |= map.put(canonical, element) == null;
         }
         return changed;
     }
@@ -290,8 +273,7 @@ public class CanonicalStringSet extends AbstractSet {
      * Retains all canonical strings in the given set in this set.
      *
      * @param set A non-null set of canonical strings.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
+     * @return {@code true} Iff this set changed as a result of the call.
      * @throws NullPointerException If {@code set} is {@code null}.
      */
     public final boolean retainAll(CanonicalStringSet set) {
@@ -303,8 +285,7 @@ public class CanonicalStringSet extends AbstractSet {
      * If a string in the list does not have a canonical form, it's skipped.
      *
      * @param list A non-null string list.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
+     * @return {@code true} Iff this set changed as a result of the call.
      * @throws NullPointerException If {@code list} is {@code null}.
      */
     public final boolean retainAll(final String list) {
@@ -314,6 +295,7 @@ public class CanonicalStringSet extends AbstractSet {
                 super.addAll(list);
             }
 
+            @Override
             protected String canonicalize(String s) {
                 return CanonicalStringSet.this.canonicalize(s);
             }
@@ -325,8 +307,7 @@ public class CanonicalStringSet extends AbstractSet {
      * Removes all canonical strings in the given set from this set.
      *
      * @param set A non-null set of strings.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
+     * @return {@code true} Iff this set changed as a result of the call.
      * @throws NullPointerException If {@code set} is {@code null}.
      */
     public final boolean removeAll(CanonicalStringSet set) {
@@ -338,18 +319,17 @@ public class CanonicalStringSet extends AbstractSet {
      * If a string in the list does not have a canonical form, it's skipped.
      *
      * @param list A non-null string list.
-     * @return {@code true} Iff this set of canonicalized strings has
-     *         changed as a result of the call.
+     * @return {@code true} Iff this set changed as a result of the call.
      * @throws NullPointerException If {@code list} is {@code null}.
      */
     public final boolean removeAll(final String list) {
         boolean changed = false;
-        final Iterator i = new CanonicalStringIterator(list);
-        while (i.hasNext())
-            changed |= (map.remove(i.next()) != null);
+        for (final Iterator<String> i = new CanonicalStringIterator(list); i.hasNext(); )
+            changed |= map.remove(i.next()) != null;
         return changed;
     }
 
+    @Override
     public final void clear() {
         map.clear();
     }
@@ -362,14 +342,14 @@ public class CanonicalStringSet extends AbstractSet {
      * Returns the canonical string list representation of this set.
      * If this string set is empty, an empty string is returned.
      */
+    @Override
     public final String toString() {
-        final Iterator i = iterator();
+        final Iterator<String> i = iterator();
         if (i.hasNext()) {
-            // TODO: JSE 5: Use StringBuilder
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             int c = 0;
             do {
-                final String string = (String) i.next();
+                final String string = i.next();
                 if (c++ > 0)
                     sb.append(separator);
                 sb.append(string);
@@ -384,8 +364,8 @@ public class CanonicalStringSet extends AbstractSet {
     // Inner classes.
     //
 
-    private class CanonicalStringIterator implements Iterator {
-        private final Iterator i;
+    private class CanonicalStringIterator implements Iterator<String> {
+        private final Iterator<String> i;
         private String canonical;
 
         private CanonicalStringIterator(final String list) {
@@ -397,7 +377,7 @@ public class CanonicalStringSet extends AbstractSet {
             return canonical != null;
         }
 
-        public Object next() {
+        public String next() {
             if (canonical == null)
                 throw new NoSuchElementException();
             final String c = canonical;
@@ -407,7 +387,7 @@ public class CanonicalStringSet extends AbstractSet {
 
         private void advance() {
             while (i.hasNext()) {
-                canonical = canonicalize((String) i.next());
+                canonical = canonicalize(i.next());
                 if (canonical != null)
                     return;
             }
@@ -419,7 +399,7 @@ public class CanonicalStringSet extends AbstractSet {
         }
     } // class CanonicalSuffixIterator
 
-    private class StringIterator implements Iterator {
+    private class StringIterator implements Iterator<String> {
         private final String[] split;
         private int i = 0;
 
@@ -431,7 +411,7 @@ public class CanonicalStringSet extends AbstractSet {
             return i < split.length;
         }
 
-        public Object next() {
+        public String next() {
             try {
                 return split[i++];
             } catch (IndexOutOfBoundsException ex) {

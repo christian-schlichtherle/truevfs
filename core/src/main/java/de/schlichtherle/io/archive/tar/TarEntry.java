@@ -16,16 +16,13 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.archive.spi.*;
-
-import java.io.*;
+import de.schlichtherle.io.ArchiveEntryMetaData;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
 import java.io.File;
-
 import javax.swing.Icon;
 
 /**
- * An entry in a TAR archive which implements the <code>ArchiveEntry</code>
+ * An entry in a TAR archive which implements the {@code ArchiveEntry}
  * interface.
  *
  * @author Christian Schlichtherle

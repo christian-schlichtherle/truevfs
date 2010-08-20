@@ -17,7 +17,6 @@
 package de.schlichtherle.key.passwd.swing;
 
 import java.security.GeneralSecurityException;
-import java.util.ResourceBundle;
 
 /**
  * Thrown to indicate that a password or key file is considered weak.

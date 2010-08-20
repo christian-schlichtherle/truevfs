@@ -27,7 +27,8 @@ package de.schlichtherle.key;
  * @version $Id$
  */
 public class KeyPromptingDisabledException extends UnknownKeyException  {
-    
+    private static final long serialVersionUID = 7656348649239172586L;
+
     public KeyPromptingDisabledException() {
         super("Key prompting has been disabled!");
     }

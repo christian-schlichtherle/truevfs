@@ -30,7 +30,8 @@ import javax.swing.DefaultComboBoxModel;
  * @version $Id$
  */
 public class AesKeyStrengthPanel extends EnhancedPanel {
-    
+    private static final long serialVersionUID = 5629581723148235643L;
+
     private static final String CLASS_NAME
             = "de.schlichtherle.key.passwd.swing.AesKeyStrengthPanel";
     private static final ResourceBundle resources
@@ -121,9 +122,9 @@ public class AesKeyStrengthPanel extends EnhancedPanel {
      * Setter for property keyStrength.
      *
      * @param keyStrength One of
-     *        <code>PromptingAesKeyProvider.KEY_STRENGTH_128</code>,
-     *        <code>PromptingAesKeyProvider.KEY_STRENGTH_192</code> or
-     *        <code>PromptingAesKeyProvider.KEY_STRENGTH_256</code>.
+     *        {@code PromptingAesKeyProvider.KEY_STRENGTH_128},
+     *        {@code PromptingAesKeyProvider.KEY_STRENGTH_192} or
+     *        {@code PromptingAesKeyProvider.KEY_STRENGTH_256}.
      *
      * @throws IllegalArgumentException If the preconditions for the parameter
      *         do not hold.

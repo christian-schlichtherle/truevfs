@@ -16,19 +16,18 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.*;
+import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.File;
-import de.schlichtherle.key.*;
-import de.schlichtherle.swing.*;
-
-import java.io.*;
-import java.text.*;
-import java.util.*;
-
-import javax.swing.*;
+import de.schlichtherle.key.PromptingKeyManager;
+import de.schlichtherle.swing.AbstractComboBoxBrowser;
+import java.io.FilenameFilter;
+import java.text.Collator;
+import java.util.Arrays;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 
 /**
- * Subclasses <code>AbstractComboBoxBrowser</code> to complete relative and
+ * Subclasses {@code AbstractComboBoxBrowser} to complete relative and
  * absolute path names of files and directories.
  * This class uses instances of TrueZIP's custom {@link File} class in
  * order to support the browsing of archive files for auto completion.
@@ -39,7 +38,7 @@ import javax.swing.*;
     new FileComboBoxBrowser(box);
     box.setEditable(true);
  * </pre>
- * 
+ *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
  * @version $Id$
@@ -61,7 +60,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
      * Creates a new combo box auto completion browser.
      *
      * @param comboBox The combo box to enable browsing for auto completions.
-     *        May be <code>null</code>.
+     *        May be {@code null}.
      */
     public FileComboBoxBrowser(final JComboBox comboBox) {
         super(comboBox);
@@ -75,7 +74,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
 
     /**
      * Returns the directory which is used to complete relative path names.
-     * This defaults to the current directory; <code>null</code> is never
+     * This defaults to the current directory; {@code null} is never
      * returned.
      */
     public java.io.File getDirectory() {
@@ -86,7 +85,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
      * Returns the directory which is used to complete relative path names.
      *
      * @param directory The directory to use for completion.
-     *        If this is <code>null</code>, the directory is reset to the
+     *        If this is {@code null}, the directory is reset to the
      *        current directory.
      */
     public void setDirectory(final java.io.File directory) {
@@ -94,23 +93,25 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
     }
 
     /**
-     * Interpretes the specified <code>initials</code> as the initial
+     * Interpretes the specified {@code initials} as the initial
      * characters of an absolute or relative path name of a node in the file
      * system and updates the contents of the combo box model with possible
      * completions.
      * The elements in the combo box model are sorted according to their
      * natural comparison order.
-     * 
+     *
      * @param initials The initial characters of a file or directory path name.
-     *        May be <code>null</code>.
-     * @return <code>true</code> if and only if the file system contains a
-     *         node with <code>initials</code> as its initial characters and
+     *        May be {@code null}.
+     * @return {@code true} if and only if the file system contains a
+     *         node with {@code initials} as its initial characters and
      *         hence the popup window with the completions should be shown.
-     * @throws NullPointerException If the <code>comboBox</code> property is
-     *         <code>null</code>.
+     * @throws NullPointerException If the {@code comboBox} property is
+     *         {@code null}.
      */
+    @Override
     protected boolean update(final String initials) {
-        return update(  (DefaultComboBoxModel) getComboBox().getModel(),
+        final JComboBox cb = getComboBox();
+        return update(  (DefaultComboBoxModel) cb.getModel(),
                         getDirectory(), initials);
     }
 
@@ -150,7 +151,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
                     dir = node;
                     prefix = "";
                 } else {
-                    dir = (File) node.getParentFile();
+                    dir = node.getParentFile();
                     if (dir == null) {
                         dir = node;
                         prefix = "";
@@ -178,7 +179,8 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
                     dir = node;
                     prefix = "";
                 } else {
-                    dir = (File) node.getParentFile();
+                    dir = node.getParentFile();
+                    assert dir != null : "node is child of directory";
                     prefix = node.getName();
                 }
                 // Keep the user provided file separator.

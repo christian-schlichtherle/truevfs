@@ -23,38 +23,39 @@ import java.io.FileNotFoundException;
  * something is wrong with the parameters.
  * This is a subclass of {@link FileNotFoundException} to indicate that this
  * is considered to be an issue when opening an RAES file rather than accessing
- * it contents (which would usually throw an <code>IOException</code>,
- * but not a <code>FileNotFoundException</code>).
+ * it contents (which would usually throw an {@code IOException},
+ * but not a {@code FileNotFoundException}).
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
  */
 public class RaesParametersException extends FileNotFoundException {
-    
+    private static final long serialVersionUID = 1605398165986459281L;
+
     /**
-     * Creates a new instance of <code>RaesParametersException</code> with a
+     * Creates a new instance of {@code RaesParametersException} with a
      * detail message indicating that no suitable {@link RaesParameters} have
      * been found.
      */
     public RaesParametersException() {
         super("No suitable RaesParameters provided!");
     }
-    
+
     /**
-     * Constructs an instance of <code>RaesParametersException</code> with the
+     * Constructs an instance of {@code RaesParametersException} with the
      * specified detail message.
-     * 
+     *
      * @param msg The detail message.
      */
     public RaesParametersException(String msg) {
         super(msg);
     }
-    
+
     /**
-     * Constructs an instance of <code>RaesParametersException</code> with the
+     * Constructs an instance of {@code RaesParametersException} with the
      * specified cause.
-     * 
+     *
      * @param cause The cause.
      */
     public RaesParametersException(Throwable cause) {

@@ -32,6 +32,7 @@ public class TarGZipFileTest extends FileTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".tar.gz";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("tar.gz"));

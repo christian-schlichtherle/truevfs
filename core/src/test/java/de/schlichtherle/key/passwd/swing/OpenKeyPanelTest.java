@@ -16,16 +16,25 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import java.io.*;
-import java.util.*;
-
-import javax.swing.*;
-
-import junit.framework.*;
-
-import org.netbeans.jemmy.*;
-import org.netbeans.jemmy.operators.*;
-import org.netbeans.jemmy.util.*;
+import java.io.File;
+import java.util.Arrays;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import junit.framework.TestCase;
+import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JCheckBoxOperator;
+import org.netbeans.jemmy.operators.JComboBoxOperator;
+import org.netbeans.jemmy.operators.JFileChooserOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
+import org.netbeans.jemmy.operators.JLabelOperator;
+import org.netbeans.jemmy.operators.JPasswordFieldOperator;
+import org.netbeans.jemmy.operators.JTabbedPaneOperator;
+import org.netbeans.jemmy.operators.JTextComponentOperator;
+import org.netbeans.jemmy.operators.JTextFieldOperator;
+import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
  * @author Christian Schlichtherle

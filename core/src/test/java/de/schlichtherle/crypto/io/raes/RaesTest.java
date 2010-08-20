@@ -16,17 +16,15 @@
 
 package de.schlichtherle.crypto.io.raes;
 
-import de.schlichtherle.crypto.generators.*;
-import de.schlichtherle.crypto.modes.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
-
-import junit.framework.*;
-
-import org.bouncycastle.crypto.digests.*;
+import de.schlichtherle.crypto.generators.DigestRandom;
+import de.schlichtherle.io.rof.ReadOnlyFileTestCase;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 /**
  * @author Christian Schlichtherle
@@ -38,19 +36,19 @@ public class RaesTest extends ReadOnlyFileTestCase {
             RaesTest.class.getName());
 
     private static final String PASSWD = "secret";
-    
+
     private static final Random rnd = new DigestRandom(new SHA256Digest());
-    
+
     private static final int[] keyStrengths = {
         Type0RaesParameters.KEY_STRENGTH_128,
         Type0RaesParameters.KEY_STRENGTH_192,
         Type0RaesParameters.KEY_STRENGTH_256
     };
-    
+
     private static RaesParameters createRaesParameters() {
         return new Type0RaesParameters() {
             boolean secondTry;
-            
+
             public char[] getOpenPasswd() {
                 if (secondTry) {
                     logger.finer("First returned password was wrong, providing the right one now!");
@@ -62,31 +60,32 @@ public class RaesTest extends ReadOnlyFileTestCase {
                             : "wrong".toCharArray();
                 }
             }
-            
+
             public void invalidOpenPasswd() {
                 logger.finer("Password wrong!");
             }
-            
+
             public char[] getCreatePasswd() {
                 return PASSWD.toCharArray();
             }
-            
+
             public int getKeyStrength() {
                 return keyStrengths[rnd.nextInt(keyStrengths.length)];
             }
-            
+
             public void setKeyStrength(int keyStrength) {
-                logger.finer("Key strength: " + keyStrength);
+                logger.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };
     }
-    
+
     private File cipherFile;
-    
+
     public RaesTest(String testName) {
         super(testName);
     }
-    
+
+    @Override
     protected void setUp()
     throws IOException {
         super.setUp();
@@ -116,9 +115,9 @@ public class RaesTest extends ReadOnlyFileTestCase {
             } finally {
                 out.close();
             }
-            logger.fine("Encrypted "
-            + data.length + " bytes of random data using AES-"
-            + out.getKeySizeBits() + "/CTR/Hmac-SHA-256/PBKDFv2.");
+            logger.log(Level.FINE,
+                    "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
+                    new Object[]{ data.length, out.getKeySizeBits() });
             // Open cipherFile for random access decryption.
             trof = RaesReadOnlyFile.getInstance(cipherFile, createRaesParameters());
         } catch (IOException ex) {
@@ -127,7 +126,8 @@ public class RaesTest extends ReadOnlyFileTestCase {
             throw ex;
         }
     }
-    
+
+    @Override
     protected void tearDown()
     throws IOException {
         try {

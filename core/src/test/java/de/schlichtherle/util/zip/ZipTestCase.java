@@ -16,14 +16,26 @@
 
 package de.schlichtherle.util.zip;
 
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-import java.security.*;
-import java.util.*;
-import java.util.logging.*;
-
-import junit.framework.*;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import de.schlichtherle.io.rof.SimpleReadOnlyFile;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import junit.framework.TestCase;
 
 /**
  * Tests compression of data.
@@ -56,6 +68,7 @@ public abstract class ZipTestCase extends TestCase {
      * It must also finally call this superclass implementation to create
      * the temporary file to be used as a ZIP file.
      */
+    @Override
     protected void setUp() throws Exception {
         if (data == null)
             throw new IllegalStateException("'data' hasn't been initialized!");
@@ -64,10 +77,11 @@ public abstract class ZipTestCase extends TestCase {
         assertTrue(zip.delete());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         final boolean deleted = zip.delete();
         if (!deleted && zip.exists())
-            logger.warning(zip + " (could not delete)");
+            logger.log(Level.WARNING, "{0} (could not delete)", zip);
         zip = null;
 
         data = null;
@@ -128,21 +142,21 @@ public abstract class ZipTestCase extends TestCase {
 
         try {
             createZipOutputStream(null, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipOutputStream(new ByteArrayOutputStream(), null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipOutputStream(null, "UTF-8");
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
@@ -157,28 +171,28 @@ public abstract class ZipTestCase extends TestCase {
 
         try {
             createZipFile((String) null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((String) null, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((String) null, "UTF-8");
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile(zip.getName(), null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
@@ -186,28 +200,28 @@ public abstract class ZipTestCase extends TestCase {
 
         try {
             createZipFile((File) null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((File) null, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((File) null, "UTF-8");
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile(zip, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
@@ -215,28 +229,28 @@ public abstract class ZipTestCase extends TestCase {
 
         try {
             createZipFile((ReadOnlyFile) null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((ReadOnlyFile) null, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile((ReadOnlyFile) null, "UTF-8");
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
         }
         try {
             createZipFile(rof, null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            fail("Use of null arguments must throw a NullPointerException!");
         }
         catch (NullPointerException npe) {
             // This is the expected result!
@@ -349,6 +363,7 @@ public abstract class ZipTestCase extends TestCase {
         class CheckAllEntriesThread extends Thread {
             Throwable failure;
 
+            @Override
             public void run() {
                 try {
                     // Retrieve list of entries and randomize their order.
@@ -419,9 +434,9 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     /**
-     * Creates test ZIP file with <code>nEntries</code> and returns the
+     * Creates test ZIP file with {@code nEntries} and returns the
      * entry names in a set.
-     * The field <code>zip</code> is used to determine the ZIP file.
+     * The field {@code zip} is used to determine the ZIP file.
      */
     private void createTestZipFile(final int nEntries) throws IOException {
         final HashSet set = new HashSet();
@@ -454,6 +469,7 @@ public abstract class ZipTestCase extends TestCase {
         }
     }
 
+    @SuppressWarnings("empty-statement")
     public void testGoodGetCheckedInputStream() throws IOException {
         // Create test ZIP file.
         final String name = "entry";
@@ -482,6 +498,7 @@ public abstract class ZipTestCase extends TestCase {
         zipIn.close();
     }
 
+    @SuppressWarnings("empty-statement")
     public void testBadGetCheckedInputStream() throws IOException {
         if (ZIP.ZIP64_EXT)
             fail("TODO: Adapt this test so that it works when ZIP64 extensions have been forced to use!");

@@ -19,10 +19,8 @@ package de.schlichtherle.crypto.io.raes;
 import de.schlichtherle.crypto.generators.DigestRandom;
 import de.schlichtherle.crypto.modes.SICSeekableBlockCipher;
 import de.schlichtherle.io.util.LEDataOutputStream;
-
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
@@ -38,7 +36,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Writes a type 0 RAES file.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
@@ -70,7 +68,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
     /** Whether this stream has been closed or not. */
     private boolean closed;
-    
+
     Type0RaesOutputStream(
             final OutputStream out,
             final Type0RaesParameters parameters)
@@ -140,7 +138,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         final byte[] cipherKey
                 = ((KeyParameter) cipherParam.getParameters()).getKey();
         klac.update(cipherKey, 0, cipherKey.length);
-        
+
         // Init stream chain.
         dos = new LEDataOutputStream(out);
         this.out = new MacOutputStream(dos, mac);
@@ -155,7 +153,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         // Init start.
         start = dos.size();
         assert start == RAES.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length;
-        
+
         // Now that everything went OK, finally init the super class cipher.
         this.cipher = cipher;
     }
@@ -164,6 +162,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         return keyStrengthBits;
     }
 
+    @Override
     public void close() throws IOException {
         // Order is important here!
         if (!closed) {

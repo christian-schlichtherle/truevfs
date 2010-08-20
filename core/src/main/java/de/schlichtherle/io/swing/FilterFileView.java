@@ -16,16 +16,15 @@
 
 package de.schlichtherle.io.swing;
 
-import java.io.*;
-
-import javax.swing.*;
+import java.io.File;
 import javax.swing.filechooser.FileView;
+import javax.swing.Icon;
 
 /**
  * An abstract decorator which simply delegates to another instance of
  * {@link FileView}.
- * If the delegate is <code>null</code>, all methods in this class return
- * <code>null</code>.
+ * If the delegate is {@code null}, all methods in this class return
+ * {@code null}.
  * Subclasses should override individual methods to implement some specific
  * behaviour.
  * Note that this class does not override any methods in {@link Object}
@@ -36,27 +35,27 @@ import javax.swing.filechooser.FileView;
  */
 abstract class FilterFileView extends FileView {
 
-    /** The file view to be decorated - may be <code>null</code>. */
+    /** The file view to be decorated - may be {@code null}. */
     private FileView delegate;
 
     /**
      * Constructs a new decorating file view.
      *
-     * @param delegate The file view to be decorated - may be <code>null</code>.
+     * @param delegate The file view to be decorated - may be {@code null}.
      */
     protected FilterFileView(final FileView delegate) {
         this.delegate = delegate;
     }
 
-    /** Returns the file view to be decorated - may be <code>null</code>. */
+    /** Returns the file view to be decorated - may be {@code null}. */
     public FileView getDelegate() {
         return delegate;
     }
 
     /**
-     * Sets the file view to be decorated - may be <code>null</code>.
+     * Sets the file view to be decorated - may be {@code null}.
      *
-     * @throws IllegalArgumentException If <code>delegate</code> is this
+     * @throws IllegalArgumentException If {@code delegate} is this
      *         instance.
      */
     public void setDelegate(final FileView delegate) {
@@ -65,22 +64,27 @@ abstract class FilterFileView extends FileView {
         this.delegate = delegate;
     }
 
+    @Override
     public String getDescription(File f) {
         return delegate != null ? delegate.getDescription(f) : null;
     }
 
+    @Override
     public Icon getIcon(File f) {
         return delegate != null ? delegate.getIcon(f) : null;
     }
 
+    @Override
     public String getName(File f) {
         return delegate != null ? delegate.getName(f) : null;
     }
 
+    @Override
     public String getTypeDescription(File f) {
         return delegate != null ? delegate.getTypeDescription(f) : null;
     }
 
+    @Override
     public Boolean isTraversable(File f) {
         return delegate != null ? delegate.isTraversable(f) : null;
     }

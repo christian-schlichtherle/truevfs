@@ -37,11 +37,12 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
     /** Whether we have started to write the <i>mimetype</i> entry or not. */
     private boolean mimetype;
 
-    /** Creates a new <code>OdfOutputArchive</code>. */
+    /** Creates a new {@code OdfOutputArchive}. */
     public OdfOutputArchive(OutputArchive target) {
         super(target);
     }
 
+    @Override
     public OutputStream getOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
@@ -56,10 +57,12 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
         return super.getOutputStream(zipEntry, srcEntry);
     }
 
+    @Override
     public boolean isTargetBusy() {
         return !mimetype || super.isTargetBusy();
     }
 
+    @Override
     public void close() throws IOException {
         mimetype = true; // trigger writing temps
         super.close();

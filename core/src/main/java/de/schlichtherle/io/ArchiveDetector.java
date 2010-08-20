@@ -16,10 +16,9 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-
-import java.io.*;
-import java.net.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import java.io.FileNotFoundException;
+import java.net.URI;
 
 /**
  * Detects archive files solely by scanning file paths -
@@ -29,12 +28,12 @@ import java.net.*;
  * {@link #getArchiveDriver(String)} method returns an instance of the
  * {@link ArchiveDriver} interface which allows to access it.
  * <p>
- * <code>ArchiveDetector</code> instances are assigned to <code>File</code>
+ * {@code ArchiveDetector} instances are assigned to {@code File}
  * instances in the following way:
  * <ol>
  * <li>If an archive detector is explicitly provided as a parameter to the
- *     constructor of the <code>File</code> class or any other method which
- *     creates <code>File</code> instances (e.g. <code>listFiles(*)</code>),
+ *     constructor of the {@code File} class or any other method which
+ *     creates {@code File} instances (e.g. {@code listFiles(*)}),
  *     then this archive detector is used.
  * <li>Otherwise, the archive detector returned by
  *     {@link File#getDefaultArchiveDetector} is used.
@@ -56,7 +55,7 @@ import java.net.*;
  * <p>
  * Implementations must be (virtually) immutable and hence thread safe.
  * <p>
- * Rather than implementing <code>ArchiveDetector</code> directly, it's easier
+ * Rather than implementing {@code ArchiveDetector} directly, it's easier
  * to instantiate or subclass the {@link DefaultArchiveDetector} class.
  * This class provides a registry for archive file suffixes and archive drivers
  * which can be easily customized via configuration files or Java code.
@@ -80,7 +79,7 @@ public interface ArchiveDetector extends FileFactory {
     /**
      * Never recognizes archive files in a path.
      * This can be used as the end of a chain of
-     * <code>DefaultArchiveDetector</code> instances or if archive files
+     * {@code DefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
      *
      * @see DefaultArchiveDetector
@@ -89,7 +88,7 @@ public interface ArchiveDetector extends FileFactory {
     
     /**
      * Recognizes the archive file suffixes defined by the key
-     * <code>DEFAULT</code> in the configuration file(s).
+     * {@code DEFAULT} in the configuration file(s).
      * If only TrueZIP's default configuration file is used, then this is set
      * so that no additional JARs are required on the runtime class path.
      * <p>
@@ -125,15 +124,15 @@ public interface ArchiveDetector extends FileFactory {
     //
     
     /**
-     * Detects whether the given <code>path</code> identifies a prospective
+     * Detects whether the given {@code path} identifies a prospective
      * archive file or not by applying heuristics to it and returns an
-     * appropriate <code>ArchiveDriver</code> to use or <code>null</code>
+     * appropriate {@code ArchiveDriver} to use or {@code null}
      * if the path does not denote a prospective archive file or an
-     * appropriate <code>ArchiveDriver</code> is not available for some
+     * appropriate {@code ArchiveDriver} is not available for some
      * reason.
      * <p>
      * Please note that implementations <em>must not</em> check the actual
-     * contents of the file identified by <code>path</code>!
+     * contents of the file identified by {@code path}!
      * This is because this method may be used to detect archive files
      * by their names before they are actually created or to detect archive
      * files which are enclosed in other archive files, in which case there
@@ -143,12 +142,12 @@ public interface ArchiveDetector extends FileFactory {
      *        archive file.
      *        This does not actually need to be accessible in the real file
      *        system!
-     * @return An <code>ArchiveDriver</code> instance for this archive file
-     *         or <code>null</code> if the path does not denote an archive
+     * @return An {@code ArchiveDriver} instance for this archive file
+     *         or {@code null} if the path does not denote an archive
      *         file (i.e. the path does not have a known suffix)
-     *         or an appropriate <code>ArchiveDriver</code> is not available
+     *         or an appropriate {@code ArchiveDriver} is not available
      *         for some reason.
-     * @throws NullPointerException If <code>path</code> is <code>null</code>.
+     * @throws NullPointerException If {@code path} is {@code null}.
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
@@ -160,7 +159,7 @@ public interface ArchiveDetector extends FileFactory {
 
     /**
      * Constructs a new {@link File} instance from the given
-     * <code>blueprint</code>.
+     * {@code blueprint}.
      * 
      * @param blueprint The file to use as a blueprint. If this is an instance
      *        of the {@link File} class, its fields are simply copied.
@@ -170,26 +169,26 @@ public interface ArchiveDetector extends FileFactory {
     File createFile(java.io.File blueprint);
 
     /**
-     * This factory method is <em>not</em> for public use - do not use it!
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
      */
     // This is used by {@link File#getParentFile()} for fast file construction
     // without rescanning the entire path for archive files, which could even
     // lead to wrong results.
     // 
     // Calling this constructor with illegal arguments may result in
-    // <code>IllegalArgumentException</code>, <code>AssertionError</code> or
+    // {@code IllegalArgumentException}, {@code AssertionError} or
     // may even silently fail!
     File createFile(java.io.File delegate, File innerArchive);
 
     /**
-     * This factory method is <em>not</em> for public use - do not use it!
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
      */
     // This is used by some methods for fast file
     // construction without rescanning the pathname for archive files
-    // when rewriting the pathname of an existing <code>File</code> instance.
+    // when rewriting the pathname of an existing {@code File} instance.
     // <p>
     // Calling this method with illegal arguments may result in
-    // <code>IllegalArgumentException</code>, <code>AssertionError</code> or
+    // {@code IllegalArgumentException}, {@code AssertionError} or
     // may even silently fail!
     File createFile(File blueprint, java.io.File delegate, File enclArchive);
 
@@ -217,7 +216,7 @@ public interface ArchiveDetector extends FileFactory {
      * Constructs a new {@link File} instance which uses this
      * {@link ArchiveDetector} to detect any archive files in its pathname.
      * 
-     * @param parent The parent pathname as a <code>File</code>.
+     * @param parent The parent pathname as a {@code File}.
      * @param child The child pathname as a {@link String}.
      *
      * @return A newly created instance of the class {@link File}.
@@ -226,7 +225,7 @@ public interface ArchiveDetector extends FileFactory {
 
     /**
      * Constructs a new {@link File} instance from the given
-     * <code>uri</code>. This method behaves similar to
+     * {@code uri}. This method behaves similar to
      * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
      * amendment:
      * If the URI matches the pattern
@@ -237,14 +236,14 @@ public interface ArchiveDetector extends FileFactory {
      * {@link ArchiveDetector} to detect any archive files in its pathname.
      * 
      * @param uri an absolute, hierarchical URI with a scheme equal to
-     *        <code>file</code> or <code>jar</code>, a non-empty path component,
+     *        {@code file} or {@code jar}, a non-empty path component,
      *        and undefined authority, query, and fragment components.
      *
      * @return A newly created instance of the class {@link File}.
      *
-     * @throws NullPointerException if <code>uri</code> is <code>null</code>.
+     * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if the preconditions on the
-     *         parameter <code>uri</code> do not hold.
+     *         parameter {@code uri} do not hold.
      */
     File createFile(URI uri);
 
@@ -266,7 +265,7 @@ public interface ArchiveDetector extends FileFactory {
      * given file.
      * 
      * @param file The file to write.
-     * @param append If <code>true</code> the new content should be appended
+     * @param append If {@code true} the new content should be appended
      *        to the old content rather than overwriting it.
      *
      * @return A newly created instance of the class {@link FileOutputStream}.

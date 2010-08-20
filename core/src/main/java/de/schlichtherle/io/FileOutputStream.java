@@ -16,9 +16,12 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.ArchiveController.*;
-
-import java.io.*;
+import de.schlichtherle.io.ArchiveController.RfsEntryFalsePositiveException;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -29,23 +32,23 @@ import java.io.*;
  * <p>
  * To prevent exceptions to be thrown subsequently, client applications
  * should always close their streams using the following idiom:
- * <pre><code>
+ * <pre>{@code 
  * FileOutputStream fos = new FileOutputStream(file);
  * try {
  *     // access fos here
  * } finally {
  *     fos.close();
  * }
- * </code></pre>
+ * }</pre>
  * <p>
  * Note that for various (mostly archive driver specific) reasons, the
- * <code>close()</code> method may throw an <code>IOException</code>, too.
+ * {@code close()} method may throw an {@code IOException}, too.
  * Client applications need to deal with this appropriately, for example
- * by enclosing the entire block with another <code>try-catch</code>-block.
+ * by enclosing the entire block with another {@code try-catch}-block.
  * <p>
  * Client applications cannot write to an entry in an archive file if an
  * automatic update is required but cannot get performed because other
- * <code>FileInputStream</code> or <code>FileOutputStream</code> instances
+ * {@code FileInputStream} or {@code FileOutputStream} instances
  * haven't been closed or garbage collected yet.
  * A {@link FileBusyException} is thrown by the constructors of this class
  * in this case.
@@ -62,7 +65,7 @@ import java.io.*;
  * {@link FileBusyException} is thrown by the constructors of this class.
  * <p>
  * If you would like to use this class in order to copy files,
- * please consider using the <code>*copy*</code> methods in the {@link File}
+ * please consider using the {@code *copy*} methods in the {@link File}
  * class instead.
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.
@@ -164,6 +167,7 @@ public class FileOutputStream extends FilterOutputStream {
         return new java.io.FileOutputStream(file, append);
     }
 
+    @Override
     public void write(byte[] buf, int off, int len) throws IOException {
         out.write(buf, off, len);
     }

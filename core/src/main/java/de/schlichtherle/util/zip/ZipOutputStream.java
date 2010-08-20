@@ -16,8 +16,11 @@
 
 package de.schlichtherle.util.zip;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Enumeration;
 
 /**
  * Drop-in replacement for
@@ -29,8 +32,8 @@ import java.util.*;
  * This implies that the class may produce ZIP archive files which cannot
  * be read by older ZIP implementations.
  * <p>
- * If the system property <code>de.schlichtherle.util.zip.zip64ext</code>
- * is set to <code>true</code> (case is ignored),
+ * If the system property {@code de.schlichtherle.util.zip.zip64ext}
+ * is set to {@code true} (case is ignored),
  * then ZIP64 extensions are always added when writing a ZIP archive file,
  * regardless of its size.
  * This system property is primarily intended for unit testing purposes.
@@ -49,9 +52,9 @@ public class ZipOutputStream extends BasicZipOutputStream {
     
     /**
      * Creates a new ZIP output stream decorating the given output stream,
-     * using the UTF-8 charset.
+     * using the {@value de.schlichtherle.util.zip.BasicZipOutputStream#DEFAULT_CHARSET} charset.
      *
-     * @throws NullPointerException If <code>out</code> is <code>null</code>.
+     * @throws NullPointerException If {@code out} is {@code null}.
      */
     public ZipOutputStream(
             final OutputStream out)
@@ -62,8 +65,8 @@ public class ZipOutputStream extends BasicZipOutputStream {
     /**
      * Creates a new ZIP output stream decorating the given output stream.
      *
-     * @throws NullPointerException If <code>out</code> or <code>charset</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code out} or {@code charset} is
+     *         {@code null}.
      * @throws UnsupportedEncodingException If charset is not supported by
      *         this JVM.
      */
@@ -75,6 +78,7 @@ public class ZipOutputStream extends BasicZipOutputStream {
         super(out, charset);
     }
 
+    @Override
     public synchronized int size() {
         return super.size();
     }
@@ -86,6 +90,7 @@ public class ZipOutputStream extends BasicZipOutputStream {
      * do not affect this instance, the returned enumeration or the
      * enumerated ZIP entries.
      */
+    @Override
     public synchronized Enumeration entries() {
 	return new Enumeration() {
 	    Enumeration e = Collections.enumeration(Collections.list(
@@ -103,47 +108,57 @@ public class ZipOutputStream extends BasicZipOutputStream {
 
     /**
      * Returns a clone of the {@link ZipEntry} for the given name or
-     * <code>null</code> if no entry with that name exists.
+     * {@code null} if no entry with that name exists.
      *
      * @param name Name of the ZIP entry.
      */
+    @Override
     public synchronized ZipEntry getEntry(String name) {
         ZipEntry entry = super.getEntry(name);
         return entry != null ? (ZipEntry) entry.clone() : null;
     }
 
+    @Override
     public synchronized void setComment(String comment) {
         super.setComment(comment);
     }
 
+    @Override
     public synchronized String getComment() {
         return super.getComment();
     }
     
+    @Override
     public synchronized void setLevel(int level) {
 	super.setLevel(level);
     }
 
+    @Override
     public synchronized int getLevel() {
         return super.getLevel();
     }
 
+    @Override
     public synchronized int getMethod() {
         return super.getMethod();
     }
 
+    @Override
     public synchronized void setMethod(int method) {
         super.setMethod(method);
     }
 
+    @Override
     public synchronized long length() {
         return super.length();
     }
 
+    @Override
     public synchronized final boolean isBusy() {
         return super.isBusy();
     }
 
+    @Override
     public synchronized void putNextEntry(
             final ZipEntry entry,
             final boolean deflate)
@@ -151,24 +166,29 @@ public class ZipOutputStream extends BasicZipOutputStream {
         super.putNextEntry(entry, deflate);
     }
 
+    @Override
     public synchronized void write(int b)
     throws IOException {
         super.write(b);
     }
 
+    @Override
     public synchronized void write(final byte[] b, final int off, final int len)
     throws IOException {
         super.write(b, off, len);
     }
 
+    @Override
     public synchronized void closeEntry() throws IOException {
         super.closeEntry();
     }
 
+    @Override
     public synchronized void finish() throws IOException {
         super.finish();
     }
 
+    @Override
     public synchronized void close() throws IOException {
         super.close();
     }

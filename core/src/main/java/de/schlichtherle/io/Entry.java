@@ -38,8 +38,8 @@ interface Entry {
 
     /**
      * Denotes the entry name of the virtual root directory.
-     * This name is used as the value of the <code>innerEntryName</code>
-     * property if a <code>File</code> instance denotes an archive file.
+     * This name is used as the value of the {@code innerEntryName}
+     * property if a {@code File} instance denotes an archive file.
      * <p>
      * This constant may be safely used for identity comparison.
      */

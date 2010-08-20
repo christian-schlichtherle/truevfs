@@ -28,14 +28,14 @@ import java.io.IOException;
  * and store them in an exception chain until all archive files have been
  * updated.
  * Finally, if the exception chain is not empty, it's reordered and thrown
- * so that if its head is an instance of <code>ArchiveWarningException</code>,
+ * so that if its head is an instance of {@code ArchiveWarningException},
  * only instances of this class or its subclasses are in the chain, but no
- * instances of <code>ArchiveException</code> or its subclasses (except
- * <code>ArchiveWarningException</code>, of course).
+ * instances of {@code ArchiveException} or its subclasses (except
+ * {@code ArchiveWarningException}, of course).
  *
  * <p>This enables client applications to do a simple case distinction with a
  * try-catch-block like this to react selectively:</p>
- * <pre><code>
+ * <pre>{@code 
  * try {
  *     File.umount();
  * } catch (ArchiveWarningException warning) {
@@ -44,13 +44,14 @@ import java.io.IOException;
  *     // Some data has been lost - panic!
  *     error.printStackTrace();
  * }
- * </code></pre>
+ * }</pre>
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
  */
 public class ArchiveWarningException extends ArchiveException {
+    private static final long serialVersionUID = 2302357394858347366L;
     
     // TODO: Make this constructor package private!
     public ArchiveWarningException(
@@ -74,6 +75,7 @@ public class ArchiveWarningException extends ArchiveException {
         super(priorZipException, cause);
     }
     
+    @Override
     public int getPriority() {
         return -1;
     }

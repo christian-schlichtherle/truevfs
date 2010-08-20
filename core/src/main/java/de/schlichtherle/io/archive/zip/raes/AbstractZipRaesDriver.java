@@ -97,9 +97,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * Next, if the gross file length of the archive is smaller than or equal
      * to the authentication trigger, the MAC authentication on the cipher
      * text is performed.
-     * Finally, the <code>RaesReadOnlyFile</code> is passed on to the super
+     * Finally, the {@code RaesReadOnlyFile} is passed on to the super
      * class implementation.
      */
+    @Override
     public InputArchive createInputArchive(
             final Archive archive,
             final ReadOnlyFile rof)
@@ -124,9 +125,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
 
     /**
      * Creates a new ZipEntry, enforcing that the data gets
-     * <code>DEFLATED</code> when written, even if copying data from a
-     * <code>STORED</code> source entry.
+     * {@code DEFLATED} when written, even if copying data from a
+     * {@code STORED} source entry.
      */
+    @Override
     public ArchiveEntry createArchiveEntry(
             final Archive archive,
             final String entryName,
@@ -147,6 +149,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * initializes a new {@link RaesOutputStream}, and finally passes the
      * resulting stream to the super class implementation.
      */
+    @Override
     public OutputArchive createOutputArchive(
             final Archive archive,
             final OutputStream out,
@@ -166,8 +169,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * Returns the {@link RaesParameters} for the given canonical path name.
      * 
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
      *
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.

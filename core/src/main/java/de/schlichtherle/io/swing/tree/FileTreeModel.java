@@ -16,12 +16,20 @@
 
 package de.schlichtherle.io.swing.tree;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  * A {@link TreeModel} which traverses {@link java.io.File java.io.File}
@@ -51,11 +59,8 @@ public class FileTreeModel implements TreeModel {
     }
 
     /** A comparator which sorts directory entries to the beginning. */
-    public static final Comparator FILE_NAME_COMPARATOR = new Comparator() {
-        public final int compare(Object o1, Object o2) {
-            return compare((java.io.File) o1, (java.io.File) o2);
-        }
-
+    public static final Comparator<java.io.File> FILE_NAME_COMPARATOR
+            = new Comparator<java.io.File>() {
         public int compare(java.io.File f1, java.io.File f2) {
             if (f1.isDirectory())
                 return f2.isDirectory()
@@ -73,14 +78,15 @@ public class FileTreeModel implements TreeModel {
      * Maps {@link java.io.File} -&gt; {@link java.io.File}[] instances.
      */
     // Tactical note: Working with a WeakHashMap shows strange results.
-    private final Map cache = new HashMap();
+    private final Map<java.io.File, java.io.File[]> cache
+            = new HashMap<java.io.File, java.io.File[]>();
 
     private final java.io.File root;
 
     private final FileFilter filter;
 
-    /** A comparator for <code>java.io.File</code> or super classes. */
-    private final Comparator comparator;
+    /** A comparator for {@code java.io.File} or super classes. */
+    private final Comparator<? super java.io.File> comparator;
 
     private final EventListenerList listeners = new EventListenerList();
 
@@ -93,7 +99,7 @@ public class FileTreeModel implements TreeModel {
     public FileTreeModel() {
         this(null, null, FILE_NAME_COMPARATOR);
     }
-    
+
     /**
      * Equivalent to {@link #FileTreeModel(java.io.File, FileFilter, Comparator)
      * FileTreeModel(root, null, FILE_NAME_COMPARATOR)}.
@@ -101,7 +107,7 @@ public class FileTreeModel implements TreeModel {
     public FileTreeModel(final java.io.File root) {
         this(root, null, FILE_NAME_COMPARATOR);
     }
-    
+
     /**
      * Equivalent to {@link #FileTreeModel(java.io.File, FileFilter, Comparator)
      * FileTreeModel(root, filter, FILE_NAME_COMPARATOR)}.
@@ -111,36 +117,36 @@ public class FileTreeModel implements TreeModel {
             final FileFilter filter) {
         this(root, filter, FILE_NAME_COMPARATOR);
     }
-    
+
     /**
-     * Creates a new <code>FileTreeModel</code> which browses the specified
-     * <code>root</code> file.
-     * If <code>file</code> is an instance of {@link de.schlichtherle.io.File},
+     * Creates a new {@code FileTreeModel} which browses the specified
+     * {@code root} file.
+     * If {@code file} is an instance of {@link de.schlichtherle.io.File},
      * its archive detector is used to detect any archive files in the
      * directory tree.
      *
-     * @param root The root of this <code>FileTreeModel</code>.
-     *        If this is <code>null</code>, an empty tree is created.
+     * @param root The root of this {@code FileTreeModel}.
+     *        If this is {@code null}, an empty tree is created.
      * @param filter Used to filter the files and directories which are
-     *        present in this <code>TreeModel</code>.
-     *        If this is <code>null</code>, all files are accepted.
-     * @param comparator A comparator for <code>java.io.File</code> instances
+     *        present in this {@code TreeModel}.
+     *        If this is {@code null}, all files are accepted.
+     * @param comparator A comparator for {@code java.io.File} instances
      *        or super classes.
-     *        This must not be <code>null</code>.
-     * @throws NullPointerException If <code>comparator</code> is <code>null</code>.
-     * @throws IllegalArgumentException If <code>root</code> isn't
-     *         <code>null</code> and comparing it to itself didn't result in
-     *         <code>0</code>.
-     * @throws ClassCastException If <code>root</code> isn't
-     *         <code>null</code> and <code>comparator</code> isn't a
-     *         <code>Comparator</code> for <code>java.io.File</code> or super
+     *        This must not be {@code null}.
+     * @throws NullPointerException If {@code comparator} is {@code null}.
+     * @throws IllegalArgumentException If {@code root} isn't
+     *         {@code null} and comparing it to itself didn't result in
+     *         {@code 0}.
+     * @throws ClassCastException If {@code root} isn't
+     *         {@code null} and {@code comparator} isn't a
+     *         {@code Comparator} for {@code java.io.File} or super
      *         class instances.
      * @since TrueZIP 6.5.4 (this constructor)
      */
     public FileTreeModel(
             final java.io.File root,
             final FileFilter filter,
-            final Comparator comparator) {
+            final Comparator<? super java.io.File> comparator) {
         if (comparator == null)
             throw new NullPointerException();
         if (root != null && comparator.compare(root, root) != 0)
@@ -159,9 +165,9 @@ public class FileTreeModel implements TreeModel {
      * This is actually an instance of {@link java.io.File java.io.File} or
      * a subclass, like
      * {@link de.schlichtherle.io.File de.schlichtherle.io.File}.
-     * 
-     * @return A <code>File</code> object or <code>null</code> if this tree
-     *         model has not been created with a <code>File</code> object.
+     *
+     * @return A {@code File} object or {@code null} if this tree
+     *         model has not been created with a {@code File} object.
      */
     public Object getRoot() {
         return root;
@@ -198,7 +204,7 @@ public class FileTreeModel implements TreeModel {
 
     private java.io.File[] getChildren(final java.io.File parent) {
         assert parent != null;
-        java.io.File[] children = (java.io.File[]) cache.get(parent);
+        java.io.File[] children = cache.get(parent);
         if (children == null) {
             if (cache.containsKey(parent))
                 return null; // parent is file or inaccessible directory
@@ -213,7 +219,7 @@ public class FileTreeModel implements TreeModel {
             // recursion, which is then used for repainting.
             cache.put(parent, children);
             if (children != null)
-                Arrays.sort(children, FILE_NAME_COMPARATOR);
+                Arrays.sort(children, comparator);
         }
         return children;
     }
@@ -223,19 +229,11 @@ public class FileTreeModel implements TreeModel {
     //
 
     /**
-     * Forwards the call to {@link #createTreePath}.
-     *
-     * @deprecated Use {@link #createTreePath} instead.
+     * Returns a new {@link TreePath} for the given {@code node} or
+     * {@code null} if {@code node} is not part of this file tree or
+     * is {@code null}.
      */
-    public TreePath getTreePath(java.io.File node) {
-        return createTreePath(node);
-    }
-
-    /**
-     * Returns a {@link TreePath} for the given <code>node</code> or
-     * <code>null</code> if the node is not part of this file tree.
-     */
-    public TreePath createTreePath(java.io.File node) {
+    public TreePath createTreePath(final java.io.File node) {
         java.io.File[] elements = createPath(node);
         return elements != null ? new TreePath(elements) : null;
     }
@@ -243,13 +241,14 @@ public class FileTreeModel implements TreeModel {
     /**
      * Returns an array of {@link java.io.File} objects indicating the path
      * from the root to the given node.
-     * 
-     * @param node The <code>File</code> object to get the path for.
-     * @return An array of <code>File</code> objects, suitable as a constructor
-     *         argument for {@link TreePath} or <code>null</code> if
-     *         <code>node</code> is not part of this file tree.
+     *
+     * @param node The {@code File} object to get the path for.
+     * @return An array of {@code File} objects, suitable as a constructor
+     *         argument for {@link TreePath} or {@code null} if
+     *         {@code node} is not part of this file tree or is
+     *         {@code null}.
      */
-    private java.io.File[] createPath(java.io.File node) {
+    private java.io.File[] createPath(final java.io.File node) {
         if (root == null /*|| !de.schlichtherle.io.File.contains(root, node)*/)
             return null;
         // Do not apply the filter here! The filter could depend on the file's
@@ -263,7 +262,7 @@ public class FileTreeModel implements TreeModel {
     private java.io.File[] createPath(final java.io.File node, int level) {
         assert root != null; // FindBugs
         final java.io.File[] path;
-        if (/*node == null ||*/ root.equals(node)) {
+        if (root.equals(node)) {
             path = new java.io.File[level];
             path[0] = root;
         } else if (node != null) {
@@ -281,7 +280,7 @@ public class FileTreeModel implements TreeModel {
     //
 
     /**
-     * Creates <code>node</code> as a new file in the file system
+     * Creates {@code node} as a new file in the file system
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      * If you would like to create a new file with initial content, please
@@ -299,7 +298,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Creates <code>node</code> as a new directory
+     * Creates {@code node} as a new directory
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -314,7 +313,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Creates <code>node</code> as a new directory, including all parents,
+     * Creates {@code node} as a new directory, including all parents,
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -329,8 +328,8 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Creates <code>node</code> as a new file with the contents read from
-     * <code>in</code> and updates the tree accordingly.
+     * Creates {@code node} as a new file with the contents read from
+     * {@code in} and updates the tree accordingly.
      * However, the current selection may get lost.
      * Note that the given stream is <em>always</em> closed.
      *
@@ -345,7 +344,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Copies <code>oldNode</code> to <code>node</code>
+     * Copies {@code oldNode} to {@code node}
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -359,7 +358,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Copies <code>oldNode</code> to <code>node</code> recursively
+     * Copies {@code oldNode} to {@code node} recursively
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -372,7 +371,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Copies <code>oldNode</code> to <code>node</code>, preserving
+     * Copies {@code oldNode} to {@code node}, preserving
      * its last modification time
      * and updates the tree accordingly.
      * However, the current selection may get lost.
@@ -387,7 +386,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Copies <code>oldNode</code> to <code>node</code> recursively, preserving
+     * Copies {@code oldNode} to {@code node} recursively, preserving
      * its last modification time
      * and updates the tree accordingly.
      * However, the current selection may get lost.
@@ -401,7 +400,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Renames <code>oldNode</code> to <code>newNode</code>
+     * Renames {@code oldNode} to {@code newNode}
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -418,7 +417,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Deletes the file or empty directory <code>node</code>
+     * Deletes the file or empty directory {@code node}
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -433,7 +432,7 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Deletes the file or (probably not empty) directory <code>node</code>
+     * Deletes the file or (probably not empty) directory {@code node}
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      *
@@ -455,7 +454,7 @@ public class FileTreeModel implements TreeModel {
      * Inserts the given node in the tree or reloads the tree structure for
      * the given node if it already exists.
      * This method calls {@link TreeModelListener#treeNodesInserted(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void nodeInsertedOrStructureChanged(final java.io.File node) {
         if (node == null)
@@ -468,9 +467,9 @@ public class FileTreeModel implements TreeModel {
 
     /**
      * Inserts the given node in the tree.
-     * If <code>node</code> already exists, nothing happens.
+     * If {@code node} already exists, nothing happens.
      * This method calls {@link TreeModelListener#treeNodesInserted(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void nodeInserted(final java.io.File node) {
         if (cache.containsKey(node))
@@ -488,7 +487,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Updates the given node in the tree.
      * This method calls {@link TreeModelListener#treeNodesChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void nodeChanged(final java.io.File node) {
         final java.io.File parent = node.getParentFile();
@@ -503,7 +502,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Removes the given node from the tree.
      * This method calls {@link TreeModelListener#treeNodesRemoved(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void nodeRemoved(final java.io.File node) {
         final java.io.File parent = node.getParentFile();
@@ -523,7 +522,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Refreshes the tree structure for the entire tree.
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void refresh() {
         cache.clear();
@@ -540,7 +539,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Reloads the tree structure for the given node.
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      */
     public void structureChanged(final java.io.File node) {
         if (node == null)
@@ -551,29 +550,30 @@ public class FileTreeModel implements TreeModel {
     }
 
     /**
-     * Clears the internal cache associated with <code>node</code> and all
+     * Clears the internal cache associated with {@code node} and all
      * of its children.
      *
      * @deprecated This method is only public in order to make it available to
      *             {@link de.schlichtherle.io.swing.JFileTree}
-     *             - it is <em>not</em> intended for public use.
+     *             - it is <em>not</em> intended for public use!
      *             In particular, this method does <em>not</em> notify the
      *             tree of any structural changes in the file system.
      */
+    @Deprecated
     public final void forget(final java.io.File node) {
         forget(node, true);
     }
 
     /**
-     * Clears the internal cache associated with <code>node</code>.
+     * Clears the internal cache associated with {@code node}.
      *
-     * @param childrenToo If and only if <code>true</code>, the internal
+     * @param childrenToo If and only if {@code true}, the internal
      *        cache for all children is cleared, too.
      */
     private void forget(
             final java.io.File node,
             final boolean childrenToo) {
-        final java.io.File[] children = (java.io.File[]) cache.remove(node);
+        final java.io.File[] children = cache.remove(node);
         if (children != null && childrenToo)
             for (int i = 0, l = children.length; i < l; i++)
                 forget(children[i], childrenToo);
@@ -603,7 +603,7 @@ public class FileTreeModel implements TreeModel {
 
     /**
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
     protected void fireTreeNodesChanged(final TreeModelEvent evt) {
@@ -614,7 +614,7 @@ public class FileTreeModel implements TreeModel {
 
     /**
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
     protected void fireTreeNodesInserted(final TreeModelEvent evt) {
@@ -625,7 +625,7 @@ public class FileTreeModel implements TreeModel {
 
     /**
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
     protected void fireTreeNodesRemoved(final TreeModelEvent evt) {
@@ -636,7 +636,7 @@ public class FileTreeModel implements TreeModel {
 
     /**
      * This method calls {@link TreeModelListener#treeStructureChanged(TreeModelEvent)}
-     * on all listeners of this <code>TreeModel</code>.
+     * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
     protected void fireTreeStructureChanged(final TreeModelEvent evt) {

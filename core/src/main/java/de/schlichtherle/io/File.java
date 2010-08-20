@@ -16,13 +16,27 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.ArchiveController.*;
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
+import de.schlichtherle.io.ArchiveController.ArchiveFileNotFoundException;
+import de.schlichtherle.io.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.io.util.Paths;
+import de.schlichtherle.io.util.Streams;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.Icon;
 
 /**
@@ -49,7 +63,7 @@ import javax.swing.Icon;
  *     simply return a boolean value indicating success or failure.
  *     Though this is suboptimal, this is consistent with most methods in
  *     the super class.
- * <li>The cp(_p)? methods return void and throw an <code>IOException</code>
+ * <li>The cp(_p)? methods return void and throw an {@code IOException}
  *     on failure.
  *     The exception hierarchy is fine grained enough to let a client
  *     application differentiate between access restrictions, input exceptions
@@ -65,7 +79,7 @@ import javax.swing.Icon;
  *     It performs the asynchronous data transfer from an input stream to an
  *     output stream. When used with properly crafted input and output stream
  *     implementations, it delivers the same performance as the transfer
- *     method in the package <code>java.nio</code>.
+ *     method in the package {@code java.nio}.
  * </ol>
  * All copy methods use asynchronous I/O, pooled large buffers and pooled
  * threads (if run on JSE 1.5) to achieve best performance.
@@ -109,56 +123,56 @@ import javax.swing.Icon;
  * <tr>
  *   <th>Path</th>
  *   <th>True State</th>
- *   <th><code>isArchive()</code><sup>1</sup></th>
- *   <th><code>isDirectory()</code></th>
- *   <th><code>isFile()</code></th>
- *   <th><code>exists()</code></th>
- *   <th><code>length()</code><sup>2</sup></th>
+ *   <th>{@code isArchive()}<sup>1</sup></th>
+ *   <th>{@code isDirectory()}</th>
+ *   <th>{@code isFile()}</th>
+ *   <th>{@code exists()}</th>
+ *   <th>{@code length()}<sup>2</sup></th>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i><sup>3</sup></td>
  *   <td>Valid ZIP file</td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>0</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code 0}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
  *   <td>False positive: Regular directory</td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
  *   <td>False positive: Regular file</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
  *   <td>False positive: Regular special file</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
  *   <td>File or directory does not exist</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>0</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code 0}</td>
  * </tr>
  * <tr>
  *   <td colspan="7">&nbsp;</td>
@@ -166,56 +180,56 @@ import javax.swing.Icon;
  * <tr>
  *   <td><i>archive.tzp</i><sup>4</sup></td>
  *   <td>Valid RAES encrypted ZIP file with valid key (e.g. password)</td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>0</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code 0}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
  *   <td>Valid RAES encrypted ZIP file with unknown key<sup>5</sup></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
  *  <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
  *   <td>False positive: Regular directory</td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
  *   <td>False positive: Regular file</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
  *   <td>False positive: Regular special file</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
  *   <td><code><i>?</i></code></td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
  *   <td>File or directory does not exist</td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>0</code></td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code 0}</td>
  * </tr>
  * <tr>
  *   <td colspan="7">&nbsp;</td>
@@ -223,50 +237,50 @@ import javax.swing.Icon;
  * <tr>
  *   <td><i>other</i></td>
  *   <td>Regular directory</td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><i><code>?</code></i></td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
  *   <td>Regular file</td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><code>true</code></td>
- *   <td><i><code>?</code></i></td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code true}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
  *   <td>Regular special file</td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>true</code></td>
- *   <td><i><code>?</code></i></td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code true}</td>
+ *   <td><i>{@code ?}</i></td>
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
  *   <td>File or directory does not exist</td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>false</code></td>
- *   <td><code>0</code></td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code 0}</td>
  * </tr>
  * </table>
  * <ol>
  * <li>{@link #isArchive} doesn't check the true state of the file - it just
  *     looks at its path: If the path ends with a configured archive file
- *     suffix, <code>isArchive()</code> always returns <code>true</code>.
- * <li>{@link #length} always returns <code>0</code> if the path denotes a
+ *     suffix, {@code isArchive()} always returns {@code true}.
+ * <li>{@link #length} always returns {@code 0} if the path denotes a
  *     valid archive file.
- *     Otherwise, the return value of <code>length()</code> depends on the
- *     platform and file system, which is indicated by <i><code>?</code></i>.
+ *     Otherwise, the return value of {@code length()} depends on the
+ *     platform and file system, which is indicated by <i>{@code ?}</i>.
  *     For regular directories on Windows/NTFS for example, the return value
- *     would be <code>0</code>.
+ *     would be {@code 0}.
  * <li><i>archive.zip</i> is just an example: If TrueZIP is configured to
  *     recognize TAR.GZ files, the same behavior applies to
  *     <i>archive.tar.gz</i>.</li>
@@ -278,8 +292,8 @@ import javax.swing.Icon;
  *    ZIP file remains unknown (e.g. because the user cancelled password
  *    prompting), then these methods behave as if the true state of the path
  *    were a special file: Both {@link #isDirectory} and {@link #isFile}
- *    return <code>false</code>, while {@link #exists} returns
- *    <code>true</code>.</li>
+ *    return {@code false}, while {@link #exists} returns
+ *    {@code true}.</li>
  * </ol>
  *
  * <h3><a name="miscellaneous">Miscellaneous</a></h3>
@@ -337,12 +351,12 @@ public class File extends java.io.File {
      * The delegate is used to implement the behaviour of the file system
      * operations in case this instance represents neither an archive file
      * nor an entry in an archive file.
-     * If this instance is constructed from another <code>java.io.File</code>
+     * If this instance is constructed from another {@code java.io.File}
      * instance, then this field is initialized with that instance.
      * <p>
      * This enables "stacking" of virtual file system implementations and is
      * essential to enable the broken implementation in
-     * <code>javax.swing.JFileChooser</code> to browse archive files.
+     * {@code javax.swing.JFileChooser} to browse archive files.
      */
     private final java.io.File delegate;
 
@@ -382,8 +396,8 @@ public class File extends java.io.File {
 
     /**
      * This refers to the archive controller if and only if this file refers
-     * to an archive file, otherwise it's <code>null</code>.
-     * This field should be considered to be <code>final</code>!
+     * to an archive file, otherwise it's {@code null}.
+     * This field should be considered to be {@code final}!
      *
      * @see #readObject
      */
@@ -403,19 +417,19 @@ public class File extends java.io.File {
     }
 
     /**
-     * Constructs a new <code>File</code> instance which may use the given
+     * Constructs a new {@code File} instance which may use the given
      * {@link ArchiveDetector} to detect any archive files in its path.
      * 
      * @param template The file to use as a template. If this is an instance
      *        of this class, its fields are copied and the
-     *        <code>detector</code> parameter is ignored.
+     *        {@code detector} parameter is ignored.
      * @param detector The object used to detect any archive files in the path.
-     *        This parameter is ignored if <code>template</code> is an
+     *        This parameter is ignored if {@code template} is an
      *        instance of this class.
-     *        Otherwise, it must not be <code>null</code>.
+     *        Otherwise, it must not be {@code null}.
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
-     * @throws NullPointerException If a required parameter is <code>null</code>.
+     * @throws NullPointerException If a required parameter is {@code null}.
      */
     public File(
             final java.io.File template,
@@ -449,7 +463,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Constructs a new <code>File</code> instance which uses the given
+     * Constructs a new {@code File} instance which uses the given
      * {@link ArchiveDetector} to detect any archive files in its path.
      *
      * @param path The path of the file.
@@ -478,7 +492,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Constructs a new <code>File</code> instance which uses the given
+     * Constructs a new {@code File} instance which uses the given
      * {@link ArchiveDetector} to detect any archive files in its path.
      *
      * @param parent The parent path as a {@link String}.
@@ -504,14 +518,14 @@ public class File extends java.io.File {
      * Equivalent to {@link #File(java.io.File, String, ArchiveDetector)
      * File(parent, child, null)}.
      *
-     * @param parent The parent directory as a <code>File</code> instance.
+     * @param parent The parent directory as a {@code File} instance.
      *        If this parameter is an instance of this class, its
-     *        <code>ArchiveDetector</code> is used to detect any archive files
-     *        in the path of this <code>File</code> instance.
+     *        {@code ArchiveDetector} is used to detect any archive files
+     *        in the path of this {@code File} instance.
      *        Otherwise, the {@link #getDefaultArchiveDetector()} is used.
-     *        This is used in order to make this <code>File</code> instance
+     *        This is used in order to make this {@code File} instance
      *        behave as if it had been created by one of the {@link #listFiles}
-     *        methods called on <code>parent</code> instead.
+     *        methods called on {@code parent} instead.
      * @param child The child path as a {@link String}.
      */
     public File(java.io.File parent, String child) {
@@ -519,20 +533,20 @@ public class File extends java.io.File {
     }
 
     /**
-     * Constructs a new <code>File</code> instance which uses the given
+     * Constructs a new {@code File} instance which uses the given
      * {@link ArchiveDetector} to detect any archive files in its path
      * and configure their parameters.
      *
-     * @param parent The parent directory as a <code>File</code> instance.
+     * @param parent The parent directory as a {@code File} instance.
      * @param child The child path as a {@link String}.
      * @param detector The object used to detect any archive files in the path.
-     *        If this is <code>null</code> and <code>parent</code> is an
+     *        If this is {@code null} and {@code parent} is an
      *        instance of this class, the archive detector is inherited from
      *        this instance.
-     *        If this is <code>null</code> and <code>parent</code> is
+     *        If this is {@code null} and {@code parent} is
      *        <em>not</em> an instance of this class, the archive detector
      *        returned by {@link #getDefaultArchiveDetector()} is used.
-     * @throws NullPointerException If <code>child</code> is <code>null</code>.
+     * @throws NullPointerException If {@code child} is {@code null}.
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
@@ -556,8 +570,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Constructs a new <code>File</code> instance from the given
-     * <code>uri</code>. This method behaves similar to
+     * Constructs a new {@code File} instance from the given
+     * {@code uri}. This method behaves similar to
      * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
      * amendment:
      * If the URI matches the pattern
@@ -578,15 +592,15 @@ public class File extends java.io.File {
      *   }
      * }
      * </pre>
-     * The newly created <code>File</code> instance uses
-     * {@link ArchiveDetector#ALL} as its <code>ArchiveDetector</code>.
+     * The newly created {@code File} instance uses
+     * {@link ArchiveDetector#ALL} as its {@code ArchiveDetector}.
      *
      * @param uri an absolute, hierarchical URI with a scheme equal to
-     *        <code>file</code> or <code>jar</code>, a non-empty path component,
+     *        {@code file} or {@code jar}, a non-empty path component,
      *        and undefined authority, query, and fragment components.
-     * @throws NullPointerException if <code>uri</code> is <code>null</code>.
+     * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if the preconditions on the
-     *         parameter <code>uri</code> do not hold.
+     *         parameter {@code uri} do not hold.
      */
     public File(URI uri) {
         this(uri, ArchiveDetector.ALL);
@@ -654,7 +668,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * This constructor is <em>not</em> for public use - do not use it!
+     * <b>Warning:</b> This constructor is <em>not</em> intended for public use!
      *
      * @see FileFactory
      */
@@ -716,7 +730,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * This constructor is <em>not</em> for public use - do not use it!
+     * <b>Warning:</b> This constructor is <em>not</em> intended for public use!
      *
      * @see FileFactory
      */
@@ -790,9 +804,9 @@ public class File extends java.io.File {
 
     /**
      * Initialize this file object by scanning its path for archive
-     * files, using the given <code>ancestor</code> file (i.e. a direct or
+     * files, using the given {@code ancestor} file (i.e. a direct or
      * indirect parent file) if any.
-     * <code>entry</code> and <code>detector</code> must already be
+     * {@code entry} and {@code detector} must already be
      * initialized!
      * Must not be called to re-initialize this object!
      */
@@ -908,7 +922,7 @@ public class File extends java.io.File {
     /**
      * Uses the given (jar:)*file: URI to initialize this file object.
      * Note that we already know that the provided URI matches this pattern!
-     * <code>entry</code> and <code>detector</code> must already be
+     * {@code entry} and {@code detector} must already be
      * initialized!
      * Must not be called to re-initialize this object!
      */
@@ -931,7 +945,7 @@ public class File extends java.io.File {
 
     /**
      * TODO: Provide a means to detect other archive schemes, not only
-     * <code>&quot;jar:&quot;</code>.
+     * {@code &quot;jar:&quot;}.
      */
     private void init(
             URI uri,
@@ -999,9 +1013,7 @@ public class File extends java.io.File {
         try {
             return new URI(scheme, ssp, null);
         } catch (URISyntaxException syntaxError) {
-	    IllegalArgumentException iae = new IllegalArgumentException(syntaxError.toString());
-	    iae.initCause(syntaxError);
-	    throw iae;
+            throw new IllegalArgumentException(syntaxError);
         }
     }
 
@@ -1047,7 +1059,7 @@ public class File extends java.io.File {
      *
      * @throws AssertionError If any invariant is violated even if assertions
      *         are disabled.
-     * @return <code>true</code>
+     * @return {@code true}
      */
     private boolean invariants() {
         if (delegate == null)
@@ -1120,14 +1132,14 @@ public class File extends java.io.File {
      * 
      * @param waitInputStreams Suppose any other thread has still one or more
      *        archive entry input streams open.
-     *        Then if and only if this parameter is <code>true</code>, this
+     *        Then if and only if this parameter is {@code true}, this
      *        method will wait until all other threads have closed their
      *        archive entry input streams.
      *        Archive entry input streams opened (and not yet closed) by the
      *        current thread are always ignored.
      *        If the current thread gets interrupted while waiting, it will
      *        stop waiting and proceed normally as if this parameter were
-     *        <code>false</code>.
+     *        {@code false}.
      *        Be careful with this parameter value: If a stream has not been
      *        closed because the client application does not always properly
      *        close its streams, even on an {@link IOException} (which is a
@@ -1137,7 +1149,7 @@ public class File extends java.io.File {
      *        for any archive entries because the application has forgot to
      *        close all {@link FileInputStream} objects or another thread is
      *        still busy doing I/O on an archive.
-     *        Then if this parameter is <code>true</code>, an update is forced
+     *        Then if this parameter is {@code true}, an update is forced
      *        and an {@link ArchiveBusyWarningException} is finally thrown to
      *        indicate that any subsequent operations on these streams
      *        will fail with an {@link ArchiveEntryStreamClosedException}
@@ -1145,17 +1157,17 @@ public class File extends java.io.File {
      *        This may also be used to recover an application from a
      *        {@link FileBusyException} thrown by a constructor of
      *        {@link FileInputStream} or {@link FileOutputStream}.
-     *        If this parameter is <code>false</code>, the respective archive
+     *        If this parameter is {@code false}, the respective archive
      *        file is <em>not</em> updated and an {@link ArchiveBusyException}
      *        is thrown to indicate that the application must close all entry
      *        input streams first.
-     * @param waitOutputStreams Similar to <code>waitInputStreams</code>,
+     * @param waitOutputStreams Similar to {@code waitInputStreams},
      *        but applies to archive entry output streams instead.
-     * @param closeOutputStreams Similar to <code>closeInputStreams</code>,
+     * @param closeOutputStreams Similar to {@code closeInputStreams},
      *        but applies to archive entry output streams instead.
-     *        If this parameter is <code>true</code>, then
-     *        <code>closeInputStreams</code> must be <code>true</code>, too.
-     *        Otherwise, an <code>IllegalArgumentException</code> is thrown.
+     *        If this parameter is {@code true}, then
+     *        {@code closeInputStreams} must be {@code true}, too.
+     *        Otherwise, an {@code IllegalArgumentException} is thrown.
      * @throws ArchiveBusyWarningExcepion If an archive file has been updated
      *         while the application is using any open streams to access it
      *         concurrently.
@@ -1177,9 +1189,9 @@ public class File extends java.io.File {
      *         has been created externally and was corrupted or it cannot
      *         get updated because the file system of the temp file or target
      *         file folder is full.
-     * @throws IllegalArgumentException If <code>closeInputStreams</code> is
-     *         <code>false</code> and <code>closeOutputStreams</code> is
-     *         <code>true</code>.
+     * @throws IllegalArgumentException If {@code closeInputStreams} is
+     *         {@code false} and {@code closeOutputStreams} is
+     *         {@code true}.
      * @see #update(File)
      * @see #update()
      * @see #umount(File)
@@ -1217,18 +1229,18 @@ public class File extends java.io.File {
      * Similar to
      * {@link #umount(boolean, boolean, boolean, boolean)
      * umount(waitInputStreams, closeInputStreams, waitOutputStreams, closeOutputStreams)},
-     * but will only update the given <code>archive</code> and all its enclosed
+     * but will only update the given {@code archive} and all its enclosed
      * (nested) archives.
      * <p>
      * If a client application needs to unmount an individual archive file,
      * the following idiom can be used:
      * <pre><code>if (file.{@link #isArchive()} && file.{@link #getEnclArchive()} == null) // filter top level archive<br>    if (file.{@link #isDirectory()}) // ignore false positives<br>        File.{@link #umount(File)}; // update archive and all enclosed archives</code></pre>
      * Again, this will also unmount all archive files which are located
-     * within the archive file referred to by the <code>file</code> instance.
+     * within the archive file referred to by the {@code file} instance.
      * 
      * @param archive A top level archive file.
-     * @throws NullPointerException If <code>archive</code> is <code>null</code>.
-     * @throws IllegalArgumentException If <code>archive</code> is not an
+     * @throws NullPointerException If {@code archive} is {@code null}.
+     * @throws IllegalArgumentException If {@code archive} is not an
      *         archive or is enclosed in another archive (is not top level).
      * @see #update()
      * @see #update(File)
@@ -1285,7 +1297,7 @@ public class File extends java.io.File {
      * In particular, if the client application does not seem to recognize
      * changes made to archive files by
      * <a href="package_summary.html#third_parties">third parties</code>,
-     * replace the calls to this method with <code>umount(*)</code>.
+     * replace the calls to this method with {@code umount(*)}.
      * 
      * @see #update()
      * @see #umount()
@@ -1324,12 +1336,12 @@ public class File extends java.io.File {
      * Similar to
      * {@link #update(boolean, boolean, boolean, boolean)
      * update(waitInputStreams, closeInputStreams, waitOutputStreams, closeOutputStreams)},
-     * but will only update the given <code>archive</code> and all its enclosed
+     * but will only update the given {@code archive} and all its enclosed
      * (nested) archives.
      * 
      * @param archive A top level archive file.
-     * @throws NullPointerException If <code>archive</code> is <code>null</code>.
-     * @throws IllegalArgumentException If <code>archive</code> is not an
+     * @throws NullPointerException If {@code archive} is {@code null}.
+     * @throws IllegalArgumentException If {@code archive} is not an
      *         archive or is enclosed in another archive (is not top level).
      * @see #update()
      * @see #umount()
@@ -1371,12 +1383,12 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns the value of the class property <code>lenient</code>.
+     * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * <code>de.schlichtherle.io.strict</code>.
-     * In other words, this returns <code>true</code> unless you set the
-     * system property <code>de.schlichtherle.io.strict</code> to
-     * <code>true</code> or call {@link #setLenient(boolean) setLenient(false)}.
+     * {@code de.schlichtherle.io.strict}.
+     * In other words, this returns {@code true} unless you set the
+     * system property {@code de.schlichtherle.io.strict} to
+     * {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
      */
@@ -1389,7 +1401,7 @@ public class File extends java.io.File {
      * directories shall be created on the fly if they don't exist and (2)
      * open archive entry streams should automatically be closed if they are
      * only weakly reachable.
-     * By default, this class property is <code>true</code>.
+     * By default, this class property is {@code true}.
      * <ol>
      * <li>
      * Consider the following path: &quot;a/outer.zip/b/inner.zip/c&quot;.
@@ -1398,9 +1410,9 @@ public class File extends java.io.File {
      * default configuration is used which would recognize &quot;outer.zip&quot; and
      * &quot;inner.zip&quot; as ZIP files.
      * <p>
-     * If this class property is set to <code>false</code>, then
+     * If this class property is set to {@code false}, then
      * the client application would have to call
-     * <code>new File(&quot;a/outer.zip/b/inner.zip&quot;).mkdirs()</code>
+     * {@code new File(&quot;a/outer.zip/b/inner.zip&quot;).mkdirs()}
      * before it could actually create the innermost &quot;c&quot; entry as a file
      * or directory.
      * <p>
@@ -1408,15 +1420,15 @@ public class File extends java.io.File {
      * system, all its parent directories must exist, including archive
      * files. This emulates the behaviour of real file systems.
      * <p>
-     * If this class property is set to <code>true</code> however, then
+     * If this class property is set to {@code true} however, then
      * any missing parent directories (including archive files) up to the
      * outermost archive file (&quot;outer.zip&quot;) are created on the fly when using
      * operations to create the innermost element of the path (&quot;c&quot;).
      * <p>
      * This allows applications to succeed when doing this:
-     * <code>new File(&quot;a/outer.zip/b/inner.zip/c&quot;).createNewFile()</code>,
+     * {@code new File(&quot;a/outer.zip/b/inner.zip/c&quot;).createNewFile()},
      * or that:
-     * <code>new FileOutputStream(&quot;a/outer.zip/b/inner.zip/c&quot;)</code>.
+     * {@code new FileOutputStream(&quot;a/outer.zip/b/inner.zip/c&quot;)}.
      * <p>
      * Note that in any case the parent directory of the outermost archive
      * file (&quot;a&quot;), must exist - TrueZIP does not create regular directories
@@ -1424,7 +1436,7 @@ public class File extends java.io.File {
      * </li>
      * <li>
      * Many Java applications unfortunately fail to close their streams in all
-     * cases, in particular if an <code>IOException</code> occured while
+     * cases, in particular if an {@code IOException} occured while
      * accessing it.
      * However, open streams are a limited resource in any operating system
      * and may interfere with other services of the OS (on Windows, you can't
@@ -1432,29 +1444,29 @@ public class File extends java.io.File {
      * This is called the &quot;unclosed streams issue&quot;.
      * <p>
      * Likewise, in TrueZIP an unclosed archive entry stream may result in an
-     * <code>ArchiveBusy(Warning)?Exception</code> to be thrown when
+     * {@code ArchiveBusy(Warning)?Exception} to be thrown when
      * {@link #umount} or {@link #update} is called.
      * In order to prevent this, TrueZIP's archive entry streams have a
      * {@link Object#finalize()} method which closes an archive entry stream
      * if its garbage collected.
      * <p>
-     * Now if this class property is set to <code>false</code>, then
+     * Now if this class property is set to {@code false}, then
      * TrueZIP maintains a hard reference to all archive entry streams
      * until {@link #umount} or {@link #update} is called, which will deal
      * with them: If they are not closed, an
-     * <code>ArchiveBusy(Warning)?Exception</code> is thrown, depending on
+     * {@code ArchiveBusy(Warning)?Exception} is thrown, depending on
      * the boolean parameters to these methods.
      * <p>
      * This setting is useful if you do not want to tolerate the
      * &quot;unclosed streams issue&quot; in a client application.
      * <p>
-     * If this class property is set to <code>true</code> however, then
+     * If this class property is set to {@code true} however, then
      * TrueZIP maintains only a weak reference to all archive entry streams.
      * This allows the garbage collector to finalize them before
      * {@link #umount} or {@link #update} is called.
      * The finalize() method will then close these archive entry streams,
      * which exempts them, from triggering an
-     * <code>ArchiveBusy(Warning)?Exception</code> on the next call to
+     * {@code ArchiveBusy(Warning)?Exception} on the next call to
      * {@link #umount} or {@link #update}.
      * However, closing an archive entry output stream this way may result
      * in loss of buffered data, so it's only a workaround for this issue.
@@ -1483,10 +1495,10 @@ public class File extends java.io.File {
     /**
      * Returns the default {@link ArchiveDetector} to be used if no
      * archive detector is passed explicitly to the constructor of a
-     * <code>File</code> instance.
+     * {@code File} instance.
      * <p>
      * This class property is initially set to
-     * <code>ArchiveDetector.DEFAULT</code>
+     * {@code ArchiveDetector.DEFAULT}
      *
      * @see ArchiveDetector
      * @see #setDefaultArchiveDetector
@@ -1497,20 +1509,20 @@ public class File extends java.io.File {
 
     /**
      * This class property controls how archive files are recognized.
-     * When a new <code>File</code> instance is created and no
+     * When a new {@code File} instance is created and no
      * {@link ArchiveDetector} is provided to the constructor,
      * or when some method of this class are called which accept an
-     * <code>ArchiveDetector</code> parameter,
+     * {@code ArchiveDetector} parameter,
      * then this class property is used.
-     * Changing this value affects all newly created <code>File</code>
+     * Changing this value affects all newly created {@code File}
      * instances, but not any existing ones.
      *
      * @param detector The default {@link ArchiveDetector} to use
-     *        for newly created <code>File</code> instances which have not
-     *        been constructed with an explicit <code>ArchiveDetector</code>
+     *        for newly created {@code File} instances which have not
+     *        been constructed with an explicit {@code ArchiveDetector}
      *        parameter
-     * @throws NullPointerException If <code>detector</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code detector} is
+     *         {@code null}.
      * @see ArchiveDetector
      * @see #getDefaultArchiveDetector()
      * @see <a href="package-summary.html#third_parties">Third Party
@@ -1525,9 +1537,10 @@ public class File extends java.io.File {
 
     /**
      * Behaves like the superclass implementation, but actually either
-     * returns <code>null</code> or a new instance of this class, so you can
+     * returns {@code null} or a new instance of this class, so you can
      * safely cast it.
      */
+    @Override
     public java.io.File getParentFile() {
         final java.io.File parent = delegate.getParentFile();
         if (parent == null)
@@ -1563,6 +1576,7 @@ public class File extends java.io.File {
      * Behaves like the superclass implementation, but returns a new instance
      * of this class, so you can safely cast it.
      */
+    @Override
     public java.io.File getAbsoluteFile() {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
@@ -1572,11 +1586,11 @@ public class File extends java.io.File {
 
     /**
      * Similar to {@link #getAbsoluteFile()}, but removes any
-     * <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> directories
+     * {@code &quot;.&quot;} and {@code &quot;..&quot;} directories
      * from the path wherever possible.
      * The result is similar to {@link #getCanonicalFile()}, but symbolic
      * links are not resolved.
-     * This may be useful if <code>getCanonicalFile()</code> throws an
+     * This may be useful if {@code getCanonicalFile()} throws an
      * IOException.
      *
      * @see #getCanonicalFile()
@@ -1593,11 +1607,11 @@ public class File extends java.io.File {
 
     /**
      * Similar to {@link #getAbsolutePath()}, but removes any
-     * <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> directories
+     * {@code &quot;.&quot;} and {@code &quot;..&quot;} directories
      * from the path wherever possible.
      * The result is similar to {@link #getCanonicalPath()}, but symbolic
      * links are not resolved.
-     * This may be useful if <code>getCanonicalPath()</code> throws an
+     * This may be useful if {@code getCanonicalPath()} throws an
      * IOException.
      *
      * @see #getCanonicalPath()
@@ -1609,7 +1623,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Removes any <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code>
+     * Removes any {@code &quot;.&quot;} and {@code &quot;..&quot;}
      * directories from the path wherever possible.
      *
      * @return If this file is already normalized, it is returned.
@@ -1626,7 +1640,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Removes any <code>&quot;.&quot;</code>, <code>&quot;..&quot;</code> and empty directories
+     * Removes any {@code &quot;.&quot;}, {@code &quot;..&quot;} and empty directories
      * from the path wherever possible.
      *
      * @return The normalized path of this file as a {@link String}.
@@ -1641,6 +1655,7 @@ public class File extends java.io.File {
      * Behaves like the superclass implementation, but returns a new instance
      * of this class, so you can safely cast it.
      */
+    @Override
     public java.io.File getCanonicalFile() throws IOException {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
@@ -1671,7 +1686,7 @@ public class File extends java.io.File {
      * prior fails.
      *
      * @return The canonical or absolute path of this file as a
-     *         <code>String</code> instance.
+     *         {@code String} instance.
      * @since TrueZIP 6.0
      */
     public String getCanOrAbsPath() {
@@ -1679,11 +1694,11 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if the path represented by this
+     * Returns {@code true} if and only if the path represented by this
      * instance denotes an archive file.
      * Whether or not this is true solely depends on the
      * {@link ArchiveDetector} which was used to construct this
-     * <code>File</code> instance: If no <code>ArchiveDetector</code> is
+     * {@code File} instance: If no {@code ArchiveDetector} is
      * explicitly passed to the constructor,
      * {@link #getDefaultArchiveDetector()} is used.
      * <p>
@@ -1693,7 +1708,7 @@ public class File extends java.io.File {
      * been entered in case it's a RAES encrypted ZIP file), it should
      * subsequently call {@link #isDirectory}, too.
      * This will automount the virtual file system from the archive file and
-     * return <code>true</code> if and only if it's a valid archive file.
+     * return {@code true} if and only if it's a valid archive file.
      *
      * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
      * @see #isDirectory
@@ -1704,12 +1719,12 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if the path represented by this
+     * Returns {@code true} if and only if the path represented by this
      * instance names an archive file as an ancestor.
      * <p>
      * Whether or not this is true depends solely on the {@link ArchiveDetector}
      * used to construct this instance.
-     * If no <code>ArchiveDetector</code> was explicitly passed to the
+     * If no {@code ArchiveDetector} was explicitly passed to the
      * constructor, {@link #getDefaultArchiveDetector()} is used.
      * <p>
      * Please note that no tests on the file's true state are performed!
@@ -1718,7 +1733,7 @@ public class File extends java.io.File {
      * encrypted ZIP file), you should call
      * {@link #getParentFile getParentFile()}.{@link #isDirectory isDirectory()}, too.
      * This will automount the virtual file system from the archive file and
-     * return <code>true</code> if and only if it's a valid archive file.
+     * return {@code true} if and only if it's a valid archive file.
      *
      * @see #isArchive
      */
@@ -1732,14 +1747,14 @@ public class File extends java.io.File {
      * this object.
      * If this object is a file or directory located within a
      * archive file, then this methods returns the file representing the
-     * enclosing archive file, or <code>null</code> otherwise.
+     * enclosing archive file, or {@code null} otherwise.
      * <p>
      * This method always returns an undotified path, i.e. all
-     * occurences of <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> in the path are
+     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
      * removed according to their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
-     * a <code>File</code> instance which again could be an entry within
+     * a {@code File} instance which again could be an entry within
      * another archive file.
      */
     public final File getInnerArchive() {
@@ -1749,15 +1764,15 @@ public class File extends java.io.File {
     /**
      * Returns the entry name in the innermost archive file.
      * I.e. if this object is a archive file, then this method returns
-     * the empty string <code>&quot;&quot;</code>.
+     * the empty string {@code &quot;&quot;}.
      * If this object is a file or directory located within an
      * archive file, then this method returns the relative path of
      * the entry in the enclosing archive file separated by the entry
-     * separator character <code>'/'</code>, or <code>null</code>
+     * separator character {@code '/'}, or {@code null}
      * otherwise.
      * <p>
      * This method always returns an undotified path, i.e. all
-     * occurences of <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> in the path are
+     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
      * removed according to their meaning wherever possible.
      */
     public final String getInnerEntryName() {
@@ -1768,14 +1783,14 @@ public class File extends java.io.File {
      * Returns the enclosing archive file in this path.
      * I.e. if this object is an entry located within an archive file,
      * then this method returns the file representing the enclosing archive
-     * file, or <code>null</code> otherwise.
+     * file, or {@code null} otherwise.
      * <p>
      * This method always returns an undotified path, i.e. all
-     * occurences of <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> in the path are
+     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
      * removed according to their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
-     * a <code>File</code> instance which again could be an entry within
+     * a {@code File} instance which again could be an entry within
      * another archive file.
      */
     public final File getEnclArchive() {
@@ -1787,10 +1802,10 @@ public class File extends java.io.File {
      * I.e. if this object is an entry located within a archive file,
      * then this method returns the relative path of the entry in the
      * enclosing archive file separated by the entry separator character
-     * <code>'/'</code>, or <code>null</code> otherwise.
+     * {@code '/'}, or {@code null} otherwise.
      * <p>
      * This method always returns an undotified path, i.e. all
-     * occurences of <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code> in the path are
+     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
      * removed according to their meaning wherever possible.
      */
     public final String getEnclEntryName() {
@@ -1799,34 +1814,37 @@ public class File extends java.io.File {
 
     /**
      * Returns the {@link ArchiveDetector} that was used to construct this
-     * object - never <code>null</code>.
+     * object - never {@code null}.
      */
     public final ArchiveDetector getArchiveDetector() {
         return detector;
     }
 
     /**
-     * <em>This method is <b>not</b> intended for public use!</em>
-     * Returns the legacy <code>java.io.File</code> object to which some
-     * methods of this class delegate if this object does not represent an
+     * Returns the legacy {@link java.io.File java.io.File} object to which
+     * some methods of this class delegate if this object does not represent an
      * archive file or an entry in an archive file.
-     * This is required to support the stacking of file system implementations.
-     * For example, <code>javax.swing.JFileChooser</code> creates instances of
-     * <code>sun.awt.shell.ShellFolder</code>, which is a subclass of
-     * <code>java.io.File</code>, too.
+     * <p>
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
+     * It's required to support the federation of file system implementations.
+     * For example, {@link javax.swing.JFileChooser javax.swing.JFileChooser}
+     * creates instances of
+     * {@link sun.awt.shell.ShellFolder sun.awt.shell.ShellFolder},
+     * which is a subclass of {@link java.io.File java.io.File}, too.
      * These instances are <i>wrapped</i> as the delegate in instances of this
-     * class when using <code>de.schlichtherle.swing.JFileChooser</code> in
-     * order to stack the functionality of these different file system
+     * class when using
+     * {@link de.schlichtherle.io.swing.JFileChooser de.schlichtherle.io.swing.JFileChooser}
+     * in order to federate the functionality of these different file system
      * implementations.
      * <p>
      * In case you want to convert an instance of this class which recognized
-     * the leaf of its path as an archive file to a file instance which
+     * the base name of its path as an archive file to a file instance which
      * doesn't recognize this archive file, use the following code instead:
-     * <code>ArchiveDetector.NULL.createFile((File) file.getParentFile(), file.getName())</code>
+     * {@code ArchiveDetector.NULL.createFile((File) file.getParentFile(), file.getName())}
      *
      * @return An instance of the {@link java.io.File java.io.File} class or
      *         one of its subclasses, but never an instance of this class or
-     *         its subclasses and never <code>null</code>.
+     *         its subclasses and never {@code null}.
      */
     public final java.io.File getDelegate() {
         return delegate;
@@ -1834,7 +1852,7 @@ public class File extends java.io.File {
 
     /**
      * Returns an archive controller if and only if the path denotes an
-     * archive file, or <code>null</code> otherwise.
+     * archive file, or {@code null} otherwise.
      */
     final ArchiveController getArchiveController() {
         assert (controller != null) == isArchive();
@@ -1842,9 +1860,9 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if the path represented
+     * Returns {@code true} if and only if the path represented
      * by this instance is a direct or indirect parent of the path
-     * represented by the specified <code>file</code>.
+     * represented by the specified {@code file}.
      * <p>
      * <b>Note:</b>
      * <ul>
@@ -1857,7 +1875,7 @@ public class File extends java.io.File {
      * </ul>
      *
      * @param file The path to test for being a child of this path.
-     * @throws NullPointerException If the parameter is <code>null</code>.
+     * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final java.io.File file) {
         final String a = Files.getCanOrAbsFile(this).getPath();
@@ -1866,9 +1884,9 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if the path represented
+     * Returns {@code true} if and only if the path represented
      * by this instance contains the path represented by the specified
-     * <code>file</code>,
+     * {@code file},
      * where a path is said to contain another path if and only
      * if it is equal or a parent of the other path.
      * <p>
@@ -1884,7 +1902,7 @@ public class File extends java.io.File {
      *
      * @param file The path to test for being contained by this path.
      *
-     * @throws NullPointerException If the parameter is <code>null</code>.
+     * @throws NullPointerException If the parameter is {@code null}.
      *
      * @since TrueZIP 5.1
      */
@@ -1893,8 +1911,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if the path represented
-     * by <code>a</code> contains the path represented by <code>b</code>,
+     * Returns {@code true} if and only if the path represented
+     * by {@code a} contains the path represented by {@code b},
      * where a path is said to contain another path if and only
      * if it is equal or a parent of the other path.
      * <p>
@@ -1908,9 +1926,9 @@ public class File extends java.io.File {
      *     It just tests the paths.
      * </ul>
      *
-     * @param a The path to test for containing <code>b</code>.
-     * @param b The path to test for being contained by <code>a</code>.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @param a The path to test for containing {@code b}.
+     * @param b The path to test for being contained by {@code a}.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @since TrueZIP 5.1
      */
     public static boolean contains(java.io.File a, java.io.File b) {
@@ -1918,7 +1936,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if this file denotes a file system
+     * Returns {@code true} if and only if this file denotes a file system
      * root or a UNC (if running on the Windows platform).
      */
     public boolean isFileSystemRoot() {
@@ -1927,24 +1945,22 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns <code>true</code> if and only if this file denotes a UNC.
+     * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this may be only relevant on the Windows platform.
      */
     public boolean isUNC() {
         return isUNC(getCanOrAbsFile().getPath());
     }
 
-    // TODO: Make this private!
     /**
-     * Returns <code>true</code> if and only if the given path is a UNC.
+     * Returns {@code true} if and only if the given path is a UNC.
      * Note that this may be only relevant on the Windows platform.
-     *
-     * @deprecated This method will be made private in the next major version.
      */
-    protected static boolean isUNC(final String path) {
+    private static boolean isUNC(final String path) {
         return path.startsWith(uncPrefix) && path.indexOf(separatorChar, 2) > 2;
     }
 
+    @Override
     public int hashCode() {
         // Note that we cannot just return the paths' hash code:
         // Some platforms consider the case of files when comparing file
@@ -1967,8 +1983,8 @@ public class File extends java.io.File {
 
     /**
      * Tests this abstract path for equality with the given object.
-     * Returns <code>true</code> if and only if the argument is not
-     * <code>null</code> and is an abstract path that denotes the same
+     * Returns {@code true} if and only if the argument is not
+     * {@code null} and is an abstract path that denotes the same
      * abstract path for a file or directory as this abstract path.
      * <p>
      * If the given file is not an instance of this class, the call is
@@ -2034,12 +2050,13 @@ public class File extends java.io.File {
      *
      * @param other The object to be compared with this abstract path.
      *
-     * @return <code>true</code> if and only if the objects are equal,
-     *         <code>false</code> otherwise
+     * @return {@code true} if and only if the objects are equal,
+     *         {@code false} otherwise
      *
      * @see #compareTo(Object)
      * @see Object#equals(Object)
      */
+    @Override
     public boolean equals(final Object other) {
         if (other instanceof File)
             return compareTo((File) other) == 0;
@@ -2064,7 +2081,7 @@ public class File extends java.io.File {
      * This case distinction allows an application on the Windows platform to
      * deal with archive files generated on other platforms which may contain
      * different entries with names that just differ in case
-     * (like e.g. <code>&quot;hello.txt&quot;</code> and <code>&quot;HELLO.txt&quot;</code>).
+     * (like e.g. {@code &quot;hello.txt&quot;} and {@code &quot;HELLO.txt&quot;}).
      *
      * @param other The file to be compared with this abstract path.
      *
@@ -2074,6 +2091,7 @@ public class File extends java.io.File {
      * @see #equals(Object)
      * @see Comparable#compareTo(Object)
      */
+    @Override
     public int compareTo(java.io.File other) {
         if (this == other)
             return 0;
@@ -2115,10 +2133,10 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns The top level archive file in the path or <code>null</code>
+     * Returns The top level archive file in the path or {@code null}
      * if this path does not denote an archive.
      * A top level archive is not enclosed in another archive.
-     * If this does not return <code>null</code>, this denotes the longest
+     * If this does not return {@code null}, this denotes the longest
      * part of the path which actually may (but does not need to) exist
      * as a regular file in the real file system.
      */
@@ -2129,38 +2147,47 @@ public class File extends java.io.File {
                 : innerArchive;
     }
 
+    @Override
     public String getAbsolutePath() {
         return delegate.getAbsolutePath();
     }
 
+    @Override
     public String getCanonicalPath() throws IOException {
         return delegate.getCanonicalPath();
     }
 
+    @Override
     public String getName() {
         return delegate.getName();
     }
 
+    @Override
     public String getParent() {
         return delegate.getParent();
     }
 
+    @Override
     public String getPath() {
         return delegate.getPath();
     }
 
+    @Override
     public boolean isAbsolute() {
         return delegate.isAbsolute();
     }
 
+    @Override
     public boolean isHidden() {
         return delegate.isHidden();
     }
 
+    @Override
     public String toString() {
         return delegate.toString();
     }
 
+    @Override
     public java.net.URI toURI() {
         return delegate.toURI();
     }
@@ -2169,12 +2196,13 @@ public class File extends java.io.File {
      * @deprecated This method has been deprecated in JSE 6.
      * @see java.io.File#toURL
      */
+    @Override
     public URL toURL() throws MalformedURLException {
         return delegate.toURL();
     }
 
     /**
-     * Throws an <code>ArchiveFileNotFoundException</code> if and only if this
+     * Throws an {@code ArchiveFileNotFoundException} if and only if this
      * file is a true archive file, not just a false positive, including
      * RAES encrypted ZIP files for which key prompting has been cancelled
      * or disabled.
@@ -2198,6 +2226,7 @@ public class File extends java.io.File {
      *
      * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
      */
+    @Override
     public boolean exists() {
         try {
             if (enclArchive != null)
@@ -2209,12 +2238,13 @@ public class File extends java.io.File {
 
     /**
      * Similar to its super class implementation, but returns
-     * <code>false</code> for a valid archive file.
+     * {@code false} for a valid archive file.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
      */
+    @Override
     public boolean isFile() {
         try {
             if (innerArchive != null)
@@ -2230,20 +2260,21 @@ public class File extends java.io.File {
 
     /**
      * Similar to its super class implementation, but returns
-     * <code>true</code> for a valid archive file.
+     * {@code true} for a valid archive file.
      * <p>
      * In case a RAES encrypted ZIP file is tested which is accessed for the
      * first time, the user is prompted for the password (if password based
      * encryption is used).
      * Note that this is not the only method which would prompt the user for
      * a password: For example, {@link #length} would prompt the user and
-     * return <code>0</code> unless the user cancels the prompting or the
+     * return {@code 0} unless the user cancels the prompting or the
      * file is a false positive archive file.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
      */
+    @Override
     public boolean isDirectory() {
         try {
             if (innerArchive != null)
@@ -2256,7 +2287,7 @@ public class File extends java.io.File {
     /**
      * Returns an icon for this file or directory if it is in <i>open</i>
      * state for {@link de.schlichtherle.io.swing.JFileTree}
-     * or <code>null</code> if the default should be used.
+     * or {@code null} if the default should be used.
      */
     public Icon getOpenIcon() {
         try {
@@ -2270,7 +2301,7 @@ public class File extends java.io.File {
     /**
      * Returns an icon for this file or directory if it is in <i>closed</i>
      * state for {@link de.schlichtherle.io.swing.JFileTree}
-     * or <code>null</code> if the default should be used.
+     * or {@code null} if the default should be used.
      */
     public Icon getClosedIcon() {
         try {
@@ -2281,6 +2312,7 @@ public class File extends java.io.File {
         return null;
     }
 
+    @Override
     public boolean canRead() {
         // More thorough test than exists
         try {
@@ -2291,6 +2323,7 @@ public class File extends java.io.File {
         return delegate.canRead();
     }
 
+    @Override
     public boolean canWrite() {
         try {
             if (innerArchive != null)
@@ -2304,11 +2337,12 @@ public class File extends java.io.File {
      * Like the super class implementation, but is aware of archive
      * files in its path.
      * For entries in a archive file, this is effectively a no-op:
-     * The method will only return <code>true</code> if the entry exists and the
+     * The method will only return {@code true} if the entry exists and the
      * archive file was mounted read only.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
+    @Override
     public boolean setReadOnly() {
         try {
             if (innerArchive != null)
@@ -2320,7 +2354,7 @@ public class File extends java.io.File {
 
     /**
      * Returns the (uncompressed) length of the file.
-     * The length returned of a valid archive file is <code>0</code> in order
+     * The length returned of a valid archive file is {@code 0} in order
      * to correctly emulate virtual directories across all platforms.
      * <p>
      * In case a RAES encrypted ZIP file is tested which is accessed for the
@@ -2328,13 +2362,14 @@ public class File extends java.io.File {
      * encryption is used).
      * Note that this is not the only method which would prompt the user for
      * a password: For example, {@link #isDirectory} would prompt the user and
-     * return <code>true</code> unless the user cancels the prompting or the
+     * return {@code true} unless the user cancels the prompting or the
      * file is a false positive archive file.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
      */
+    @Override
     public long length() {
         try {
             if (innerArchive != null)
@@ -2345,9 +2380,9 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns a <code>long</code> value representing the time this file was
+     * Returns a {@code long} value representing the time this file was
      * last modified, measured in milliseconds since the epoch (00:00:00 GMT,
-     * January 1, 1970), or <code>0L</code> if the file does not exist or if an
+     * January 1, 1970), or {@code 0L} if the file does not exist or if an
      * I/O error occurs or if this is a ghost directory in an archive file.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
@@ -2355,6 +2390,7 @@ public class File extends java.io.File {
      * @see <a href="package.html">Package description for more information
      *      about ghost directories</a>
      */
+    @Override
     public long lastModified() {
         try {
             if (innerArchive != null)
@@ -2383,6 +2419,7 @@ public class File extends java.io.File {
      * @see <a href="package.html">Package description for more information
      *      about ghost directories</a>
      */
+    @Override
     public boolean setLastModified(final long time) {
         try {
             if (innerArchive != null)
@@ -2404,6 +2441,7 @@ public class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
+    @Override
     public String[] list() {
         try {
             if (innerArchive != null)
@@ -2415,7 +2453,7 @@ public class File extends java.io.File {
 
     /**
      * Returns the names of the members in this directory which are
-     * accepted by <code>filenameFilter</code> in a newly created array.
+     * accepted by {@code filenameFilter} in a newly created array.
      * The returned array is <em>not</em> sorted.
      * <p>
      * <b>Note:</b> Archive entries with absolute paths are ignored by
@@ -2423,9 +2461,10 @@ public class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @return <code>null</code> if this is not a directory or an archive file,
+     * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
+    @Override
     public String[] list(final FilenameFilter filenameFilter) {
         try {
             if (innerArchive != null)
@@ -2440,17 +2479,18 @@ public class File extends java.io.File {
      * Equivalent to {@link #listFiles(FilenameFilter, FileFactory)
      * listFiles((FilenameFilter) null, getArchiveDetector())}.
      */
+    @Override
     public java.io.File[] listFiles() {
         return listFiles((FilenameFilter) null, detector);
     }
 
     /**
-     * Returns <code>File</code> objects for the members in this directory
+     * Returns {@code File} objects for the members in this directory
      * in a newly created array.
      * The returned array is <em>not</em> sorted.
      * <p>
      * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of <code>java.io.File</code>
+     * Previously, the returned array was an array of {@code java.io.File}
      * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
@@ -2462,7 +2502,7 @@ public class File extends java.io.File {
      *        directory.
      *        This could be an {@link ArchiveDetector} in order to detect any
      *        archives by the member file names.
-     * @return <code>null</code> if this is not a directory or an archive file,
+     * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      */
     public File[] listFiles(final FileFactory factory) {
@@ -2473,18 +2513,19 @@ public class File extends java.io.File {
      * Equivalent to {@link #listFiles(FilenameFilter, FileFactory)
      * listFiles(filenameFilter, getArchiveDetector())}.
      */
+    @Override
     public java.io.File[] listFiles(final FilenameFilter filenameFilter) {
         return listFiles(filenameFilter, detector);
     }
 
     /**
-     * Returns <code>File</code> objects for the members in this directory
-     * which are accepted by <code>filenameFilter</code> in a newly created
+     * Returns {@code File} objects for the members in this directory
+     * which are accepted by {@code filenameFilter} in a newly created
      * array.
      * The returned array is <em>not</em> sorted.
      * <p>
      * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of <code>java.io.File</code>
+     * Previously, the returned array was an array of {@code java.io.File}
      * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
@@ -2496,7 +2537,7 @@ public class File extends java.io.File {
      *        directory.
      *        This could be an {@link ArchiveDetector} in order to detect any
      *        archives by the member file names.
-     * @return <code>null</code> if this is not a directory or an archive file,
+     * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -2530,17 +2571,18 @@ public class File extends java.io.File {
      * Equivalent to {@link #listFiles(FileFilter, FileFactory)
      * listFiles(fileFilter, getArchiveDetector())}.
      */
+    @Override
     public final java.io.File[] listFiles(final FileFilter fileFilter) {
         return listFiles(fileFilter, detector);
     }
 
     /**
-     * Returns <code>File</code> objects for the members in this directory
-     * which are accepted by <code>fileFilter</code> in a newly created array.
+     * Returns {@code File} objects for the members in this directory
+     * which are accepted by {@code fileFilter} in a newly created array.
      * The returned array is <em>not</em> sorted.
      * <p>
      * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of <code>java.io.File</code>
+     * Previously, the returned array was an array of {@code java.io.File}
      * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
@@ -2552,7 +2594,7 @@ public class File extends java.io.File {
      *        directory.
      *        This could be an {@link ArchiveDetector} in order to detect any
      *        archives by the member file names.
-     * @return <code>null</code> if this is not a directory or an archive file,
+     * @return {@code null} if this is not a directory or an archive file,
      *         a valid (but maybe empty) array otherwise.
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -2572,11 +2614,11 @@ public class File extends java.io.File {
     private File[] delegateListFiles(
             final FileFilter fileFilter,
             final FileFactory factory) {
-        // When filtering, we want to pass in <code>de.schlichtherle.io.File</code>
-        // objects rather than <code>java.io.File</code> objects, so we cannot
-        // just call <code>entry.listFiles(FileFilter)</code>.
+        // When filtering, we want to pass in {@code de.schlichtherle.io.File}
+        // objects rather than {@code java.io.File} objects, so we cannot
+        // just call {@code entry.listFiles(FileFilter)}.
         // Instead, we will query the entry for the children names (i.e.
-        // Strings) only, construct <code>de.schlichtherle.io.File</code>
+        // Strings) only, construct {@code de.schlichtherle.io.File}
         // instances from this and then apply the filter to construct the
         // result list.
 
@@ -2606,6 +2648,7 @@ public class File extends java.io.File {
      *
      * @see #mkdir
      */
+    @Override
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null)
@@ -2618,6 +2661,7 @@ public class File extends java.io.File {
         return delegate.createNewFile();
     }
 
+    @Override
     public boolean mkdirs() {
         if (innerArchive == null)
             return delegate.mkdirs();
@@ -2636,20 +2680,21 @@ public class File extends java.io.File {
      * Creates a new, empty (virtual) directory similar to its superclass
      * implementation.
      * This method creates an archive file if {@link #isArchive} returns
-     * <code>true</code>.
+     * {@code true}.
      * Example:
-     * <code>new File(&quot;archive.zip&quot;).mkdir();</code>
+     * {@code new File(&quot;archive.zip&quot;).mkdir();}
      * <p>
      * Alternatively, archive files can be created on the fly by simply
      * creating their entries.
      * Example:
-     * <code>new FileOutputStream(&quot;archive.zip/README&quot;);</code>
+     * {@code new FileOutputStream(&quot;archive.zip/README&quot;);}
      * <p>
      * These examples assume TrueZIP's default configuration where ZIP file
-     * recognition is enabled and {@link #isLenient} returns <code>true</code>.
+     * recognition is enabled and {@link #isLenient} returns {@code true}.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
+    @Override
     public boolean mkdir() {
         try {
             if (innerArchive != null)
@@ -2678,6 +2723,7 @@ public class File extends java.io.File {
      *
      * @see #deleteAll
      */
+    @Override
     public boolean delete() {
         try {
             if (innerArchive != null)
@@ -2709,6 +2755,7 @@ public class File extends java.io.File {
         return Files.rm_r(this);
     }
 
+    @Override
     public void deleteOnExit() {
         if (innerArchive == null) {
             delegate.deleteOnExit();
@@ -2729,13 +2776,14 @@ public class File extends java.io.File {
      * Equivalent to {@link #renameTo(java.io.File, ArchiveDetector)
      * renameTo(dst, getArchiveDetector())}.
      */
+    @Override
     public final boolean renameTo(final java.io.File dst) {
         return renameTo(dst, detector);
     }
 
     /**
      * Behaves similar to the super class, but renames this file or directory
-     * by recursively copying its data if this object or the <code>dst</code>
+     * by recursively copying its data if this object or the {@code dst}
      * object is either an archive file or an entry located in an archive file.
      * Hence, in these cases only this file system operation is <em>not</em>
      * atomic.
@@ -2769,7 +2817,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies the input stream <code>in</code> to this file and closes it.
+     * Copies the input stream {@code in} to this file and closes it.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -2810,8 +2858,8 @@ public class File extends java.io.File {
      * </tr>
      * </table>
      *
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyFrom(final InputStream in) {
@@ -2829,7 +2877,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies the file <code>src</code> to this file.
+     * Copies the file {@code src} to this file.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -2871,10 +2919,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyFrom(final java.io.File src) {
@@ -2887,7 +2935,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code>
+     * Recursively copies the file or directory {@code src}
      * to this file or directory.
      * This version uses the {@link ArchiveDetector} which was used to
      * construct this object to detect any archive files in the source
@@ -2933,10 +2981,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyAllFrom(final java.io.File src) {
@@ -2949,7 +2997,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code>
+     * Recursively copies the file or directory {@code src}
      * to this file or directory.
      * This version uses the given archive detector to detect any archive
      * files in the source and destination directory trees.
@@ -2994,11 +3042,11 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3015,13 +3063,13 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code>
+     * Recursively copies the file or directory {@code src}
      * to this file or directory.
      * By using different {@link ArchiveDetector}s for the source and
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
-     * in the destination tree (where <code>srcDetector</code> could be
-     * {@link ArchiveDetector#DEFAULT} and <code>dstDetector</code> must be
+     * in the destination tree (where {@code srcDetector} could be
+     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3065,14 +3113,14 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param srcDetector The object used to detect any archive files
      *        in the source directory tree.
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3090,7 +3138,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies this file to the output stream <code>out</code> and closes it.
+     * Copies this file to the output stream {@code out} and closes it.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -3131,8 +3179,8 @@ public class File extends java.io.File {
      * </tr>
      * </table>
      *
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyTo(final OutputStream out) {
@@ -3146,7 +3194,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies this file to the file <code>dst</code>.
+     * Copies this file to the file {@code dst}.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -3188,10 +3236,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @return <code>true</code> if the file has been successfully copied.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if the file has been successfully copied.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyTo(final java.io.File dst) {
@@ -3205,7 +3253,7 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code>.
+     * {@code dst}.
      * This version uses the {@link ArchiveDetector} which was used to
      * construct this object to detect any archive files in the source
      * and destination directory trees.
@@ -3250,10 +3298,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean copyAllTo(final java.io.File dst) {
@@ -3267,7 +3315,7 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code>.
+     * {@code dst}.
      * This version uses the given archive detector to detect any archive
      * files in the source and destination directory trees.
      * <p>
@@ -3311,12 +3359,12 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3334,12 +3382,12 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code>.
+     * {@code dst}.
      * By using different {@link ArchiveDetector}s for the source and
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
-     * in the destination tree (where <code>srcDetector</code> could be
-     * {@link ArchiveDetector#DEFAULT} and <code>dstDetector</code> must be
+     * in the destination tree (where {@code srcDetector} could be
+     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3383,14 +3431,14 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param srcDetector The object used to detect any archive files
      *        in the source directory tree.
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3408,7 +3456,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies the file <code>src</code> to this file and tries to preserve
+     * Copies the file {@code src} to this file and tries to preserve
      * all attributes of the source file to the destination file, too.
      * Note that the current implementation only preserves the last
      * modification time.
@@ -3453,10 +3501,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean archiveCopyFrom(final java.io.File src) {
@@ -3469,7 +3517,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code> to this file
+     * Recursively copies the file or directory {@code src} to this file
      * or directory and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
@@ -3519,10 +3567,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean archiveCopyAllFrom(final java.io.File src) {
@@ -3535,7 +3583,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code> to this file
+     * Recursively copies the file or directory {@code src} to this file
      * or directory and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
@@ -3584,12 +3632,12 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3606,7 +3654,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Recursively copies the file or directory <code>src</code> to this file
+     * Recursively copies the file or directory {@code src} to this file
      * or directory and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
@@ -3615,8 +3663,8 @@ public class File extends java.io.File {
      * By using different {@link ArchiveDetector}s for the source and
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
-     * in the destination tree (where <code>srcDetector</code> could be
-     * {@link ArchiveDetector#DEFAULT} and <code>dstDetector</code> must be
+     * in the destination tree (where {@code srcDetector} could be
+     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3660,14 +3708,14 @@ public class File extends java.io.File {
      * </table>
      *
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param srcDetector The object used to detect any archive files
      *        in the source directory tree.
      * @param dstDetector The object used to detect archive files
      *        in the destination directory tree.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3685,7 +3733,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies this file to the file <code>dst</code> and tries to preserve
+     * Copies this file to the file {@code dst} and tries to preserve
      * all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
@@ -3731,10 +3779,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean archiveCopyTo(java.io.File dst) {
@@ -3748,7 +3796,7 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code> and tries to preserve all attributes of the source
+     * {@code dst} and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
      * modification time.
@@ -3797,10 +3845,10 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean archiveCopyAllTo(final java.io.File dst) {
@@ -3814,7 +3862,7 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code> and tries to preserve all attributes of the source
+     * {@code dst} and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
      * modification time.
@@ -3864,12 +3912,12 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param detector The object used to detect any archive files
      *        in the source and destination directory trees.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3887,7 +3935,7 @@ public class File extends java.io.File {
 
     /**
      * Recursively copies this file or directory to the file or directory
-     * <code>dst</code> and tries to preserve all attributes of the source
+     * {@code dst} and tries to preserve all attributes of the source
      * file to the destination file, too.
      * Note that the current implementation only preserves the last
      * modification time.
@@ -3895,8 +3943,8 @@ public class File extends java.io.File {
      * By using different {@link ArchiveDetector}s for the source and
      * destination, this method can be used to do advanced stuff like
      * unzipping any archive file in the source tree to a plain directory
-     * in the destination tree (where <code>srcDetector</code> could be
-     * {@link ArchiveDetector#DEFAULT} and <code>dstDetector</code> must be
+     * in the destination tree (where {@code srcDetector} could be
+     * {@link ArchiveDetector#DEFAULT} and {@code dstDetector} must be
      * {@link ArchiveDetector#NULL}) or changing the charset by configuring
      * a custom {@link DefaultArchiveDetector}.
      * <p>
@@ -3940,14 +3988,14 @@ public class File extends java.io.File {
      * </table>
      *
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive files and entries
+     *        be a plain {@code java.io.File}, archive files and entries
      *        are only supported for instances of this class.
      * @param srcDetector The object used to detect any archive files
      *        in the source directory tree.
      * @param dstDetector The object used to detect any archive files
      *        in the destination directory tree.
-     * @return <code>true</code> if and only if the operation succeeded.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @return {@code true} if and only if the operation succeeded.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
@@ -3965,8 +4013,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies the input stream <code>in</code> to the output stream
-     * <code>out</code>.
+     * Copies the input stream {@code in} to the output stream
+     * {@code out}.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -4013,7 +4061,7 @@ public class File extends java.io.File {
      *         IOException in the input stream.
      * @throws IOException If copying the data fails because of an
      *         IOException in the output stream.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final OutputStream out)
@@ -4022,7 +4070,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies <code>src</code> to <code>dst</code>.
+     * Copies {@code src} to {@code dst}.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -4064,10 +4112,10 @@ public class File extends java.io.File {
      * </table>
      * 
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
      * @throws FileBusyException If an archive entry cannot get accessed
      *         because the client application is trying to input or output
@@ -4083,7 +4131,7 @@ public class File extends java.io.File {
      *         IOException in the source.
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp(java.io.File src, java.io.File dst)
@@ -4092,7 +4140,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies <code>src</code> to <code>dst</code> and tries to preserve
+     * Copies {@code src} to {@code dst} and tries to preserve
      * all attributes of the source file to the destination file, too.
      * Currently, only the last modification time is preserved.
      * <p>
@@ -4136,10 +4184,10 @@ public class File extends java.io.File {
      * </table>
      * 
      * @param src The source file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
      * @param dst The destination file. Note that although this just needs to
-     *        be a plain <code>java.io.File</code>, archive entries are only
+     *        be a plain {@code java.io.File}, archive entries are only
      *        supported for instances of this class.
      * @throws FileBusyException If an archive entry cannot get accessed
      *         because the client application is trying to input or output
@@ -4155,7 +4203,7 @@ public class File extends java.io.File {
      *         IOException in the source.
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp_p(java.io.File src, java.io.File dst)
@@ -4164,7 +4212,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Copies the input stream <code>in</code> to this file or
+     * Copies the input stream {@code in} to this file or
      * entry in an archive file without closing the input stream.
      * <p>
      * <table border="2" cellpadding="4">
@@ -4207,7 +4255,7 @@ public class File extends java.io.File {
      * </table>
      *
      * @param in The input stream.
-     * @return <code>true</code> if and only if the operation succeeded.
+     * @return {@code true} if and only if the operation succeeded.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean catFrom(final InputStream in) {
@@ -4231,7 +4279,7 @@ public class File extends java.io.File {
 
     /**
      * Copies this file or entry in an archive file to the output stream
-     * <code>out</code> without closing it.
+     * {@code out} without closing it.
      * <p>
      * <table border="2" cellpadding="4">
      * <tr>
@@ -4273,7 +4321,7 @@ public class File extends java.io.File {
      * </table>
      *
      * @param out The output stream.
-     * @return <code>true</code> if and only if the operation succeeded.
+     * @return {@code true} if and only if the operation succeeded.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public boolean catTo(final OutputStream out) {

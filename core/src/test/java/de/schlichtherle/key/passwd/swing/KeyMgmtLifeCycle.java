@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * <p>
  * Note that this Runnable simulates the regular operation of a client
  * application of the key manager package.
- * It does <em>not</em> throw any <code>AssertionError</code>s.
+ * It does <em>not</em> throw any {@code AssertionError}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -46,7 +46,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     private Object refKey;
 
     /**
-     * Contains non-<code>null</code> if and only if <code>run()</code> has
+     * Contains non-{@code null} if and only if {@code run()} has
      * terminated because the user cancelled the key prompting.
      */
     public Throwable throwable;

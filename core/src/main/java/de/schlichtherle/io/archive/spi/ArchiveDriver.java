@@ -60,7 +60,7 @@ import javax.swing.Icon;
 public interface ArchiveDriver {
 
     /**
-     * Creates a new input archive for <code>archive</code>
+     * Creates a new input archive for {@code archive}
      * from the given read only file.
      * <p>
      * Note that if an exception is thrown, the method must be reentrant!
@@ -77,40 +77,40 @@ public interface ArchiveDriver {
      * </tr>
      * <tr>
      *   <td>{@link FileNotFoundException}</td>
-     *   <td><b><code>false</code></b></td>
-     *   <td><code>false</code></td>
-     *   <td><code>true</code></td>
-     *   <td><code>true</code> (unless prohibited by the real file system)</td>
+     *   <td><b>{@code false}</b></td>
+     *   <td>{@code false}</td>
+     *   <td>{@code true}</td>
+     *   <td>{@code true} (unless prohibited by the real file system)</td>
      * </tr>
      * <tr>
      *   <td>{@link IOException}</td>
-     *   <td><b><code>true</code></b></td>
-     *   <td><code>false</code></td>
-     *   <td><code>true</code></td>
-     *   <td><code>true</code> (unless prohibited by the real file system)</td>
+     *   <td><b>{@code true}</b></td>
+     *   <td>{@code false}</td>
+     *   <td>{@code true}</td>
+     *   <td>{@code true} (unless prohibited by the real file system)</td>
      * </tr>
      * </table>
      * 
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
      * @param rof The {@link de.schlichtherle.io.rof.ReadOnlyFile} to read the
-     *        actual archive contents from - never <code>null</code>.
-     *        Hint: If you'ld prefer to have an <code>InputStream</code>,
+     *        actual archive contents from - never {@code null}.
+     *        Hint: If you'ld prefer to have an {@code InputStream},
      *        you could decorate this parameter with a
      *        {@link de.schlichtherle.io.rof.ReadOnlyFileInputStream}.
      * @return A new input archive instance.
      * @throws TransientIOException If calling this method for the same
      *         archive file again may finally succeed.
-     *         This exception is associated with another <code>IOException</code>
+     *         This exception is associated with another {@code IOException}
      *         as its cause which is unwrapped and interpreted as below.
      * @throws FileNotFoundException If the input archive is inaccessible
      *         for any reason and you would like the package
-     *         <code>de.schlichtherle.io</code> to mask the archive as a
+     *         {@code de.schlichtherle.io} to mask the archive as a
      *         special file which cannot get read, written or deleted.
      * @throws IOException On any other I/O or data format related issue
      *         when reading the input archive and you would like the package
-     *         <code>de.schlichtherle.io</code> to treat the archive like a
+     *         {@code de.schlichtherle.io} to treat the archive like a
      *         regular file which may be read, written or deleted.
      * @see InputArchive
      */
@@ -120,23 +120,23 @@ public interface ArchiveDriver {
     throws IOException;
 
     /**
-     * Creates a new archive entry for <code>entryName</code>
+     * Creates a new archive entry for {@code entryName}
      * for use with an {@link OutputArchive}.
      * 
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
-     * @param entryName A valid archive entry name  - never <code>null</code>.
-     * @param template If not <code>null</code>, then the newly created entry
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
+     * @param entryName A valid archive entry name  - never {@code null}.
+     * @param template If not {@code null}, then the newly created entry
      *        shall inherit as much attributes from this object as possible
      *        (with the exception of the name).
      *        This is typically used for archive copy operations.
      *        Note that there is no guarantee on the runtime type of this
      *        object; it may have been created by other drivers.
-     *        It is safe to ignore the <code>metaData</code> property when
+     *        It is safe to ignore the {@code metaData} property when
      *        copying entries.
      * @return A new archive entry instance.
-     * @throws CharConversionException If <code>name</code> contains
+     * @throws CharConversionException If {@code name} contains
      *         illegal characters.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
      */
@@ -147,17 +147,17 @@ public interface ArchiveDriver {
     throws CharConversionException;
 
     /**
-     * Creates a new output archive for <code>archive</code>
+     * Creates a new output archive for {@code archive}
      * from the given output stream.
      * 
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
      * @param out The {@link OutputStream} to write the archive entries to
-     *        - never <code>null</code>.
+     *        - never {@code null}.
      * @param source The source {@link InputArchive} if
-     *        <code>archive</code> is going to get updated.
-     *        If not <code>null</code>, this is guaranteed to be a product
+     *        {@code archive} is going to get updated.
+     *        If not {@code null}, this is guaranteed to be a product
      *        of this driver's {@link #createInputArchive} method.
      *        This may be used to copy some meta data which is specific to
      *        the type of archive this driver supports.
@@ -166,7 +166,7 @@ public interface ArchiveDriver {
      * @return A new output archive instance.
      * @throws TransientIOException If calling this method for the same
      *         archive file again may finally succeed.
-     *         This exception is associated with another <code>IOException</code>
+     *         This exception is associated with another {@code IOException}
      *         as its cause which is unwrapped and interpreted as below.
      * @throws FileNotFoundException If the output archive is inaccessible
      *         for any reason.
@@ -185,11 +185,11 @@ public interface ArchiveDriver {
      * should display for the given archive.
      *
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
      * @return The icon that should be displayed for the given archive if is
      *         is open/expanded in the view.
-     *         If <code>null</code> is returned, a default icon should be used.
+     *         If {@code null} is returned, a default icon should be used.
      */
     Icon getOpenIcon(Archive archive);
 
@@ -199,11 +199,11 @@ public interface ArchiveDriver {
      * display for the given archive.
      *
      * @param archive The abstract archive representation which TrueZIP's
-     *        internal <code>ArchiveController</code> is processing
-     *        - never <code>null</code>.
+     *        internal {@code ArchiveController} is processing
+     *        - never {@code null}.
      * @return The icon that should be displayed for the given archive if is
      *         is closed/collapsed in the view.
-     *         If <code>null</code> is returned, a default icon should be used.
+     *         If {@code null} is returned, a default icon should be used.
      */
     Icon getClosedIcon(Archive archive);
 
@@ -212,11 +212,12 @@ public interface ArchiveDriver {
      * so be sure to implement this properly.
      * Note that this is just a reinforcement of the general contract for
      * {@link Object#equals} and the best possible implementation is the
-     * default implementation in <code>Object</code> which is most
+     * default implementation in {@code Object} which is most
      * discriminating.
      *
      * @since TrueZIP 6.4
      */
+    @Override
     boolean equals(Object o);
 
     /**
@@ -224,10 +225,11 @@ public interface ArchiveDriver {
      * so be sure to implement this properly.
      * Note that this is just a reinforcement of the general contract for
      * {@link Object#hashCode} and the best possible implementation is the
-     * default implementation in <code>Object</code> which is most
+     * default implementation in {@code Object} which is most
      * discriminating.
      *
      * @since TrueZIP 6.4
      */
+    @Override
     int hashCode();
 }

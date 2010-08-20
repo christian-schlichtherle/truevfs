@@ -16,7 +16,9 @@
 
 package de.schlichtherle.util.zip;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may
@@ -33,12 +35,13 @@ final class ExtraFields implements Cloneable {
     /**
      * The map of Extra Fields.
      * Maps from Header ID [{@link Integer}] to Extra Field [{@link ExtraField}].
-     * Must not be <code>null</code>, but may be empty if no Extra Fields are used.
+     * Must not be {@code null}, but may be empty if no Extra Fields are used.
      * The map is sorted by Header IDs in ascending order.
      */
     private Map extra = new TreeMap();
 
     /** Returns a shallow clone of this collection. */
+    @Override
     public Object clone() {
         try {
             final ExtraFields clone = (ExtraFields) super.clone();
@@ -55,14 +58,14 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Returns the Extra Field with the given Header ID or <code>null</code>
+     * Returns the Extra Field with the given Header ID or {@code null}
      * if no such Extra Field exists.
      * 
      * @param headerID The requested Header ID.
-     * @return The Extra Field with the given Header ID or <code>null</code>
+     * @return The Extra Field with the given Header ID or {@code null}
      *         if no such Extra Field exists.
-     * @throws IllegalArgumentException If <code>headerID</code> is not in
-     *         the range of <code>0</code> to {@link UShort#MAX_VALUE}
+     * @throws IllegalArgumentException If {@code headerID} is not in
+     *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.util.zip.UShort#MAX_VALUE}).
      */
     public ExtraField get(final int headerID) {
@@ -78,11 +81,11 @@ final class ExtraFields implements Cloneable {
      * 
      * @param ef The Extra Field to store in this collection.
      * @return The Extra Field previously associated with the Header ID of
-     *         of the given Extra Field or <code>null</code> if no such
+     *         of the given Extra Field or {@code null} if no such
      *         Extra Field existed.
-     * @throws NullPointerException If <code>ef</code> is <code>null</code>.
+     * @throws NullPointerException If {@code ef} is {@code null}.
      * @throws IllegalArgumentException If the Header ID of the given Extra
-     *         Field is not in the range of <code>0</code> to
+     *         Field is not in the range of {@code 0} to
      *         {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.util.zip.UShort#MAX_VALUE}).
      */
@@ -99,10 +102,10 @@ final class ExtraFields implements Cloneable {
      * Removes the Extra Field with the given Header ID.
      * 
      * @param headerID The requested Header ID.
-     * @return The Extra Field with the given Header ID or <code>null</code>
+     * @return The Extra Field with the given Header ID or {@code null}
      *         if no such Extra Field exists.
-     * @throws IllegalArgumentException If <code>headerID</code> is not in
-     *         the range of <code>0</code> to {@link UShort#MAX_VALUE}
+     * @throws IllegalArgumentException If {@code headerID} is not in
+     *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value de.schlichtherle.util.zip.UShort#MAX_VALUE}).
      */
     public ExtraField remove(final int headerID) {
@@ -117,7 +120,7 @@ final class ExtraFields implements Cloneable {
      * Returns the number of bytes required to hold the Extra Fields.
      * 
      * @return The length of the Extra Fields in bytes.
-     *         May be <code>0</code>.
+     *         May be {@code 0}.
      * @see #getExtra
      */
     int getExtraLength() {
@@ -134,7 +137,7 @@ final class ExtraFields implements Cloneable {
 
     /**
      * Returns a protective copy of the Extra Fields.
-     * <code>null</code> is never returned.
+     * {@code null} is never returned.
      * 
      * @see #getExtraLength
      */
@@ -151,19 +154,19 @@ final class ExtraFields implements Cloneable {
 
     /**
      * Initializes this collection by deserializing a list of Extra Fields
-     * of <code>size</code> bytes from the
-     * byte array <code>data</code> at the zero based offset <code>off</code>.
-     * Upon return, this collection shall not access <code>data</code>
-     * subsequently and {@link #getExtraLength} must equal <code>size</code>.
+     * of {@code size} bytes from the
+     * byte array {@code data} at the zero based offset {@code off}.
+     * Upon return, this collection shall not access {@code data}
+     * subsequently and {@link #getExtraLength} must equal {@code size}.
      *
      * @param data The byte array to read the list of Extra Fields from.
      * @param off The zero based offset in the byte array where the first byte
      *        of the list of Extra Fields is read from.
      * @param size The length of the list of Extra Fields in bytes.
      * @throws IndexOutOfBoundsException If the byte array
-     *         <code>data</code> does not hold at least <code>size</code>
-     *         bytes at the zero based offset <code>off</code>.
-     * @throws RuntimeException If <code>size</code> is illegal or the
+     *         {@code data} does not hold at least {@code size}
+     *         bytes at the zero based offset {@code off}.
+     * @throws RuntimeException If {@code size} is illegal or the
      *         deserialized list of Extra Fields contains illegal data.
      * @see #getExtraLength
      */
@@ -190,16 +193,16 @@ final class ExtraFields implements Cloneable {
 
     /**
      * Serializes a list of Extra Fields of {@link #getExtraLength} bytes to the
-     * byte array <code>data</code> at the zero based offset <code>off</code>.
-     * Upon return, this collection shall not access <code>data</code>
+     * byte array {@code data} at the zero based offset {@code off}.
+     * Upon return, this collection shall not access {@code data}
      * subsequently.
      *
      * @param data The byte array to write the list of Extra Fields to.
      * @param off The zero based offset in the byte array where the first byte
      *        of the list of Extra Fields is written to.
      * @throws IndexOutOfBoundsException If the byte array
-     *         <code>data</code> does not hold at least {@link #getExtraLength}
-     *         bytes at the zero based offset <code>off</code>.
+     *         {@code data} does not hold at least {@link #getExtraLength}
+     *         bytes at the zero based offset {@code off}.
      * @see #getExtraLength
      */
     void writeTo(final byte[] data, int off) {

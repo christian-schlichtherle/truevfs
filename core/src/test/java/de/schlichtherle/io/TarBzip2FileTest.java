@@ -34,6 +34,7 @@ public class TarBzip2FileTest extends FileTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".tar.bz2";
         // We want to test TrueZIP with this driver, not the memory

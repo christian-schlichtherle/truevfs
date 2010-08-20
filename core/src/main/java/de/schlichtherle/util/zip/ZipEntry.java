@@ -21,12 +21,12 @@ import java.io.UnsupportedEncodingException;
 /**
  * Drop-in replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
  * For every numeric property of this class, the default value is
- * <code>UNKNOWN</code> in order to indicate an unknown state and it's
+ * {@code UNKNOWN} in order to indicate an unknown state and it's
  * permitted to set this value explicitly in order to reset the property.
  * <p>
- * Note that a <code>ZipEntry</code> object can be used with only one
+ * Note that a {@code ZipEntry} object can be used with only one
  * {@link ZipFile} or {@link ZipOutputStream} instance.
- * Reusing the same <code>ZipEntry</code> object with a second object of these
+ * Reusing the same {@code ZipEntry} object with a second object of these
  * classes is an error and may result in unpredictable behaviour.
  * <p>
  * In general, this class is <em>not</em> thread-safe.
@@ -79,11 +79,11 @@ public class ZipEntry implements Cloneable {
     /**
      * The map of Extra Fields.
      * Maps from Header ID [Integer] to Extra Field [ExtraField].
-     * Should be <code>null</code> or may be empty if no Extra Fields are used.
+     * Should be {@code null} or may be empty if no Extra Fields are used.
      */
     private ExtraFields fields;
 
-    /** <code>null</code> if no comment field. */
+    /** {@code null} if no comment field. */
     private String comment;
 
     /**
@@ -108,11 +108,12 @@ public class ZipEntry implements Cloneable {
         csize = blueprint.csize;
         size = blueprint.size;
         offset = blueprint.offset;
-        setExtra(blueprint.getExtra());
+        setExtra0(blueprint.getExtra());
         comment = blueprint.comment;
         setInit(NAME, false); // unlock name
     }
 
+    @Override
     public Object clone() {
         try {
             final ZipEntry entry = (ZipEntry) super.clone();
@@ -124,12 +125,12 @@ public class ZipEntry implements Cloneable {
         }
     }
 
-    private final boolean isInit(final int index) {
+    private boolean isInit(final int index) {
         assert 0 <= index && index < 8 : "Bit index out of range: " + index;
         return (init & (1 << index)) != 0;
     }
 
-    private final void setInit(final int index, final boolean init) {
+    private void setInit(final int index, final boolean init) {
         assert 0 <= index && index < 8 : "Bit index out of range: " + index;
         if (init)
             this.init |=   1 << index;
@@ -171,7 +172,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Returns true if and only if this ZIP entry represents a directory entry
-     * (i.e. end with <code>'/'</code>).
+     * (i.e. end with {@code '/'}).
      */
     public boolean isDirectory() {
         return name.endsWith("/");
@@ -237,7 +238,7 @@ public class ZipEntry implements Cloneable {
      *
      * @see #getMethod
      * @see ZipOutputStream#setMethod
-     * @throws RuntimeException If <code>method</code> is not
+     * @throws RuntimeException If {@code method} is not
      *         {@link #STORED}, {@link #DEFLATED} or {@link #UNKNOWN}.
      */
     public void setMethod(final int method) {
@@ -280,7 +281,7 @@ public class ZipEntry implements Cloneable {
      * The implementation in the class {@link ZipEntry} returns
      * {@link DateTimeConverter#JAR}.
      *
-     * @return A {@link DateTimeConverter} - never <code>null</code>.
+     * @return A {@link DateTimeConverter} - never {@code null}.
      * @see DateTimeConverter
      */
     protected DateTimeConverter getDateTimeConverter() {
@@ -324,8 +325,8 @@ public class ZipEntry implements Cloneable {
      * Sets the Compressed Size of this entry.
      *
      * @param csize The Compressed Size.
-     * @throws RuntimeException If <code>csize</code> is not in the
-     *         range from <code>0</code> to {@link ULong#MAX_VALUE}
+     * @throws RuntimeException If {@code csize} is not in the
+     *         range from {@code 0} to {@link ULong#MAX_VALUE}
      *         ({@value de.schlichtherle.util.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
@@ -333,7 +334,7 @@ public class ZipEntry implements Cloneable {
         setCompressedSize64(csize);
     }
 
-    private final void setCompressedSize64(final long csize) {
+    private void setCompressedSize64(final long csize) {
         if (csize != UNKNOWN)
             ULong.check(csize, name, "Compressed Size out of range");
         this.csize = csize;
@@ -364,8 +365,8 @@ public class ZipEntry implements Cloneable {
      * Sets the (Uncompressed) Size of this entry.
      *
      * @param size The (Uncompressed) Size.
-     * @throws RuntimeException If <code>size</code> is not in the
-     *         range from <code>0</code> to {@link ULong#MAX_VALUE}
+     * @throws RuntimeException If {@code size} is not in the
+     *         range from {@code 0} to {@link ULong#MAX_VALUE}
      *         ({@value de.schlichtherle.util.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
@@ -373,7 +374,7 @@ public class ZipEntry implements Cloneable {
         setSize64(size);
     }
 
-    private final void setSize64(final long size) {
+    private void setSize64(final long size) {
         if (size != UNKNOWN)
             ULong.check(size, name, "Uncompressed Size out of range");
         this.size = size;
@@ -399,7 +400,7 @@ public class ZipEntry implements Cloneable {
         setOffset64(offset);
     }
 
-    private final void setOffset64(final long offset) {
+    private void setOffset64(final long offset) {
         if (offset != UNKNOWN)
             ULong.check(offset, name, "Relative Header Offset out of range");
         this.offset = offset;
@@ -408,10 +409,10 @@ public class ZipEntry implements Cloneable {
     /**
      * Returns a protective copy of the serialized Extra Fields.
      * Note that unlike its blueprint {@link java.util.zip.ZipEntry#getExtra},
-     * this method never returns <code>null</code>.
+     * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized Extra Fields.
-     *         <code>null</code> is never returned.
+     *         {@code null} is never returned.
      */
     public byte[] getExtra() {
         return getExtra(true);
@@ -423,7 +424,7 @@ public class ZipEntry implements Cloneable {
      * @param zip64 Whether or not a ZIP64 Extended Information Extra Field,
      *        if present, shall be included in the return data or not.
      * @return A new byte array holding the serialized Extra Fields.
-     *         <code>null</code> is never returned.
+     *         {@code null} is never returned.
      * @see #getExtra()
      */
     byte[] getExtra(final boolean zip64) {
@@ -468,9 +469,13 @@ public class ZipEntry implements Cloneable {
      * Sets the serialized Extra Fields by making a protective copy.
      *
      * @param data The byte array holding the serialized Extra Fields.
-     *        May be <code>null</code>.
+     *        May be {@code null}.
      */
-    public void setExtra(final byte[] data) {
+    public void setExtra(byte[] data) {
+        setExtra0(data);
+    }
+
+    private void setExtra0(final byte[] data) {
         if (data == null || data.length <= 0) {
             fields = null;
         } else {
@@ -586,6 +591,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /** Returns the ZIP entry name. */
+    @Override
     public String toString() {
         return getName();
     }

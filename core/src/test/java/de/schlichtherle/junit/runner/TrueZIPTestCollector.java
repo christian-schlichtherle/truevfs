@@ -16,10 +16,12 @@
 
 package de.schlichtherle.junit.runner;
 
-import de.schlichtherle.io.*;
-
-import java.util.*;
-
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.File;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import junit.runner.TestCollector;
 
 /**

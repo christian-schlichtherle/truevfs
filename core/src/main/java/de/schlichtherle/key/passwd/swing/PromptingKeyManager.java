@@ -49,7 +49,7 @@ public class PromptingKeyManager
         extends de.schlichtherle.key.PromptingKeyManager {
 
     /**
-     * Constructs a new <code>PromptingKeyManager</code>.
+     * Constructs a new {@code PromptingKeyManager}.
      * This instance maps the following key provider UI types using
      * {@link de.schlichtherle.key.PromptingKeyManager#mapPromptingKeyProviderUIType}:
      * <table border="2" cellpadding="4">

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.*;
@@ -52,10 +53,12 @@ public class ManySmallEntriesTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws IOException {
         zip = File.createTempFile("zip", null);
     }
 
+    @Override
     protected void tearDown() {
         assertTrue(zip.delete());
     }
@@ -64,7 +67,7 @@ public class ManySmallEntriesTest extends TestCase {
         logger.fine("testManySmallEntries");
         
         final int n = 70000; // 0xffff;
-        logger.finer("Compressing " + n + " ZIP file entries to: " + zip.getPath());
+        logger.log(Level.FINER, "Compressing {0} ZIP file entries to: {1}", new Object[]{n, zip.getPath()});
         logger.finer("Note that the max. number of entries supported by the ZIP File Format Spec. is 65535!");
 
         final HashSet set = new HashSet();
@@ -78,7 +81,7 @@ public class ManySmallEntriesTest extends TestCase {
             assertTrue(set.add(name));
         }
         zipOut.close();
-        logger.finer("Compressed " + n + " ZIP file entries into " + zip.length() / 1024 + " KB ZIP file length.");
+        logger.log(Level.FINER, "Compressed {0} ZIP file entries into {1} KB ZIP file length.", new Object[]{n, zip.length() / 1024});
 
         final ZipFile zipIn = new ZipFile(zip);
         try {

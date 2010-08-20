@@ -18,12 +18,21 @@ package de.schlichtherle.io.swing;
 
 import de.schlichtherle.io.swing.tree.FileTreeCellRenderer;
 import de.schlichtherle.io.swing.tree.FileTreeModel;
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import javax.swing.CellEditor;
+import javax.swing.JTree;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.tree.TreeCellEditor;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  * A custom {@link JTree} to browse files and directories.
@@ -37,13 +46,13 @@ import javax.swing.tree.*;
  */
 public class JFileTree extends JTree {
 
-    /** The name of the property <code>displayingSuffixes</code>. */
+    /** The name of the property {@code displayingSuffixes}. */
     private static final String PROPERTY_DISPLAYING_SUFFIXES = "displayingSuffixes"; // NOI18N
 
-    /** The name of the property <code>editingSuffixes</code>. */
+    /** The name of the property {@code editingSuffixes}. */
     private static final String PROPERTY_EDITING_SUFFIXES = "editingSuffixes"; // NOI18N
 
-    /** The name of the property <code>defaultSuffix</code>. */
+    /** The name of the property {@code defaultSuffix}. */
     private static final String PROPERTY_DEFAULT_SUFFIX = "defaultSuffix"; // NOI18N
     private static final long serialVersionUID = 1064787562479927601L;
 
@@ -62,7 +71,7 @@ public class JFileTree extends JTree {
     private java.io.File editedNode;
 
     /**
-     * Creates an empty <code>JFileTree</code> with no root.
+     * Creates an empty {@code JFileTree} with no root.
      * You shouldn't use this constructor.
      * It's only provided to implement the JavaBean pattern.
      */
@@ -71,8 +80,8 @@ public class JFileTree extends JTree {
     }
 
     /**
-     * Creates a new <code>JFileTree</code> which traverses the given
-     * root <code>File</code>.
+     * Creates a new {@code JFileTree} which traverses the given
+     * root {@code File}.
      * The ZipDetector of the given file is used to detect and configure any
      * ZIP compatible files in this directory tree.
      *
@@ -84,7 +93,7 @@ public class JFileTree extends JTree {
     }
 
     /**
-     * Creates a new <code>JFileTree</code> which traverses the given
+     * Creates a new {@code JFileTree} which traverses the given
      * {@link FileTreeModel}.
      */
     public JFileTree(FileTreeModel model) {
@@ -98,7 +107,7 @@ public class JFileTree extends JTree {
     //
 
     /**
-     * @throws ClassCastException If <code>model</code> is not an instance
+     * @throws ClassCastException If {@code model} is not an instance
      *         of {@link FileTreeModel}.
      */
     @Override
@@ -130,9 +139,9 @@ public class JFileTree extends JTree {
 
     /**
      * Setter for bound property displayingSuffixes.
-     * If this is <code>false</code>, the suffix of files will not be displayed
+     * If this is {@code false}, the suffix of files will not be displayed
      * in this tree.
-     * Defaults to <code>true</code>.
+     * Defaults to {@code true}.
      *
      * @param displayingSuffixes New value of property displayingSuffixes.
      */
@@ -154,9 +163,9 @@ public class JFileTree extends JTree {
 
     /**
      * Setter for bound property editingSuffixes.
-     * If this is <code>false</code>, the suffix of a file will be truncated
+     * If this is {@code false}, the suffix of a file will be truncated
      * before editing its name starts.
-     * Defaults to <code>true</code>.
+     * Defaults to {@code true}.
      *
      * @param editingSuffixes New value of property editingSuffixes.
      */
@@ -181,12 +190,12 @@ public class JFileTree extends JTree {
      * Sets the default suffix to use when suffixes are shown and allowed to
      * be edited, but the user did not provide a suffix when editing a file
      * name.
-     * This property defaults to <code>null</code> and is ignored for
+     * This property defaults to {@code null} and is ignored for
      * directories.
      *
      * @param defaultSuffix The new default suffix.
-     *        If not <code>null</code>, this parameter is fixed to always
-     *        start with a <code>'.'</code>.
+     *        If not {@code null}, this parameter is fixed to always
+     *        start with a {@code '.'}.
      */
     public void setDefaultSuffix(String defaultSuffix) {
         final String oldDefaultSuffix = this.defaultSuffix;
@@ -208,7 +217,8 @@ public class JFileTree extends JTree {
 
     /**
      * Returns the node that is currently edited, if any.
-     * This method is not intended for public use - do not use it!
+     * <p>
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
      */
     public java.io.File getEditedNode() {
         return editedNode;
@@ -335,7 +345,7 @@ public class JFileTree extends JTree {
      * selection path if necessary.
      *
      * @param node The file or directory to refresh.
-     *        This may <em>not</em> be <code>null</code>.
+     *        This may <em>not</em> be {@code null}.
      *
      */
     public void refresh(final java.io.File node) {
@@ -353,8 +363,8 @@ public class JFileTree extends JTree {
      * restores the expanded and selected paths and scrolls to the lead
      * selection path if necessary.
      *
-     * @param paths The array of <code>TreePath</code>s to refresh.
-     *        This may be <code>null</code>.
+     * @param paths The array of {@code TreePath}s to refresh.
+     *        This may be {@code null}.
      */
     public void refresh(final TreePath paths[]) {
         if (paths == null || paths.length <= 0)
@@ -554,7 +564,7 @@ public class JFileTree extends JTree {
 
     /**
      * Forwards the call to the {@link FileTreeModel},
-     * restores the expanded paths, selects <code>node</code> and scrolls to
+     * restores the expanded paths, selects {@code node} and scrolls to
      * it if necessary.
      */
     public boolean renameTo(final java.io.File oldNode, final java.io.File node) {

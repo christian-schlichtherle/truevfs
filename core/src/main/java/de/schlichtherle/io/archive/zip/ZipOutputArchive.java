@@ -58,23 +58,12 @@ public class ZipOutputArchive
     private OutputArchiveMetaData metaData;
     private ZipEntry tempEntry;
 
-    /** @deprecated */
-    public ZipOutputArchive(
-            final OutputStream out,
-            final String charset,
-            final ZipInputArchive source)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            IOException {
-        this(out, charset, ZipDriver.DEFAULT_LEVEL, source);
-    }
-
     /**
      * Creates a new instance which uses the output stream, character set and
      * compression level.
      *
      * @param level The compression level to use.
-     * @throws IllegalArgumentException If <code>level</code> is not in the
+     * @throws IllegalArgumentException If {@code level} is not in the
      *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
@@ -203,6 +192,7 @@ public class ZipOutputArchive
      * Returns whether this output archive is busy writing an archive entry
      * or not.
      */
+    @Override
     public final boolean isBusy() {
         return super.isBusy() || tempEntry != null;
     }
@@ -225,14 +215,17 @@ public class ZipOutputArchive
             putNextEntry(entry, deflate);
         }
 
+        @Override
         public void write(byte[] b) throws IOException {
             out.write(b, 0, b.length);
         }
 
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             out.write(b, off, len);
         }
 
+        @Override
         public void close() throws IOException {
             closeEntry();
         }
@@ -257,6 +250,7 @@ public class ZipOutputArchive
             tempEntry = entry;
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -315,27 +309,16 @@ public class ZipOutputArchive
             crc.update(b);
         }
 
+        @Override
         public void write(byte[] b, int off, int len) {
             crc.update(b, off, len);
         }
     } // class Crc32OutputStream
 
     /**
-     * @deprecated This method will be removed in the next major version number
-     *             release and should be implemented as
-     *             <code>getOutputStream(entry, null).close()</code>.
-     */
-    public final void storeDirectory(ArchiveEntry entry)
-    throws IOException {
-        assert false : "Since TrueZIP 6.5, this is not used anymore!";
-        if (!entry.isDirectory())
-            throw new IllegalArgumentException();
-        getOutputStream(entry, null).close();
-    }
-
-    /**
      * Retain the postamble of the source ZIP archive, if any.
      */
+    @Override
     public void finish() throws IOException {
         super.finish();
 

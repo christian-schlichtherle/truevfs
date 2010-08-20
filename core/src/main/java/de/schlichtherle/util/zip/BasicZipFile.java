@@ -16,28 +16,48 @@
 
 package de.schlichtherle.util.zip;
 
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-import java.lang.ref.*;
-import java.util.*;
-import java.util.zip.*;
+import de.schlichtherle.io.rof.BufferedReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.Closeable;
+import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipException;
 
 /**
- * <em>This class is <b>not</b> intended for public use!</em>
- * The methods in this class are unsynchronized and
- * {@link #entries}/{@link #getEntry} enumerate/return {@link ZipEntry}
- * instances which are shared with this class rather than clones
- * of them.
- * This may be used by subclasses in order to benefit from the slightly better
- * performance.
+ * Provides unsafe access to a ZIP file using unsynchronized methods and shared
+ * {@link ZipEntry} instances.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * This class is used within other parts of the TrueZIP API in order to benefit
+ * from the slightly better performance.
+ * <p>
+ * Where the constructors of this class accept a {@code charset}
+ * parameter, this is used to decode comments and entry names in the ZIP file.
+ * However, if an entry has bit 11 set in its General Purpose Bit Flag,
+ * then this parameter is ignored and "UTF-8" is used for this entry.
+ * This is in accordance to Appendix D of PKWARE's ZIP File Format
+ * Specification, version 6.3.0 and later.
+ * <p>
+ * This class is able to skip a preamble like the one found in self extracting
+ * archives.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.4
- * @see ZipFile
  */
-public class BasicZipFile {
+public class BasicZipFile implements Closeable {
 
     private static final long LONG_MSB = 0x8000000000000000L;
 
@@ -52,9 +72,6 @@ public class BasicZipFile {
             /* compressed size                 */ 4 +
             /* uncompressed size               */ 4;
 
-    private static final Set allocatedInflaters = new HashSet();
-    private static final List releasedInflaters = new LinkedList();
-
     /**
      * The default character set used for entry names and comments in ZIP
      * compatible files.
@@ -65,7 +82,7 @@ public class BasicZipFile {
     public static final String DEFAULT_CHARSET = ZIP.DEFAULT_CHARSET;
 
     /** The charset to use for entry names and comments. */
-    private final String charset;
+    private String charset;
 
     /** The comment of this ZIP compatible file. */
     private String comment;
@@ -89,289 +106,40 @@ public class BasicZipFile {
     private OffsetMapper mapper;
 
     /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming {@value #DEFAULT_CHARSET} charset for file names.
-     * 
-     * @param name name of the file.
-     * @throws NullPointerException If <code>name</code> is <code>null</code>.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(String name)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = DEFAULT_CHARSET;
-        try {
-            init(null, new File(name), true, false);
-        } catch (UnsupportedEncodingException cannotHappen) {
-            throw new AssertionError(cannotHappen);
-        }
-    }
-
-    /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param name name of the file.
-     * @param charset the charset to use for file names
-     * @throws NullPointerException If <code>name</code> or <code>charset</code> is
-     *         <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(String name, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = charset;
-        init(null, new File(name), true, false);
-    }
-
-    /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param name name of the file.
-     * @param charset the charset to use for file names
-     * @param preambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a preamble.
-     *        Otherwise, the ZIP compatible file must start with either a
-     *        Local File Header (LFH) signature or an End Of Central Directory
-     *        (EOCD) Header, causing this constructor to fail fast if the file
-     *        is actually a false positive ZIP compatible file, i.e. not
-     *        compatible to the ZIP File Format Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX), which
+     * Opens the given {@link ReadOnlyFile} for reading its entries.
+     *
+     * @param rof The random access read only file.
+     * @param charset The charset to use for decoding entry names and ZIP file
+     *        comment.
+     * @param preambled If this is {@code true}, then the ZIP file may have a
+     *        preamble.
+     *        Otherwise, the ZIP file must start with either a Local File
+     *        Header (LFH) signature or an End Of Central Directory (EOCD)
+     *        Header, causing this constructor to fail if the file is actually
+     *        a false positive ZIP file, i.e. not compatible to the ZIP File
+     *        Format Specification.
+     *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
-     *        a preamble.
-     *        This parameter is <code>true</code> by default.
-     * @param postambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a postamble of arbitrary length.
-     *        Otherwise, the ZIP compatible file must not have a postamble
-     *        which exceeds 64KB size, including the End Of Central Directory
-     *        record (i.e. including the ZIP file comment), causing this
-     *        constructor to fail fast if the file is actually a false positive
-     *        ZIP compatible file, i.e. not compatible to the ZIP File Format
-     *        Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX) with
+     *        the preamble.
+     * @param postambled If this is {@code true}, then the ZIP file may have a
+     *        postamble of arbitrary length.
+     *        Otherwise, the ZIP file must not have a postamble which exceeds
+     *        64KB size, including the End Of Central Directory record
+     *        (i.e. including the ZIP file comment), causing this constructor
+     *        to fail if the file is actually a false positive ZIP file, i.e.
+     *        not compatible to the ZIP File Format Specification.
+     *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     *        This parameter is <code>false</code> by default.
-     * @throws NullPointerException If <code>name</code> or <code>charset</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code rof} or {@code charset} is
+     *         {@code null}.
      * @throws UnsupportedEncodingException If charset is not supported by
      *         this JVM.
      * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
+     * @throws ZipException If the file is not compatible with the ZIP File
+     *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
-    public BasicZipFile(
-            String name,
-            String charset,
-            boolean preambled,
-            boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = charset;
-        init(null, new File(name), preambled, postambled);
-    }
-
-    /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming {@value #DEFAULT_CHARSET} charset for file names.
-     * 
-     * @param file The file.
-     * @throws NullPointerException If <code>file</code> is <code>null</code>.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(File file)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = DEFAULT_CHARSET;
-        try {
-            init(null, file, true, false);
-        } catch (UnsupportedEncodingException cannotHappen) {
-            throw new AssertionError(cannotHappen);
-        }
-    }
-
-    /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param file The file.
-     * @param charset The charset to use for entry names and comments
-     *        - must <em>not</em> be <code>null</code>!
-     * @throws NullPointerException If <code>file</code> or <code>charset</code>
-     *         is <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(File file, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = charset;
-        init(null, file, true, false);
-    }
-
-    /**
-     * Opens the given file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param file The file.
-     * @param charset The charset to use for entry names and comments
-     *        - must <em>not</em> be <code>null</code>!
-     * @param preambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a preamble.
-     *        Otherwise, the ZIP compatible file must start with either a
-     *        Local File Header (LFH) signature or an End Of Central Directory
-     *        (EOCD) Header, causing this constructor to fail fast if the file
-     *        is actually a false positive ZIP compatible file, i.e. not
-     *        compatible to the ZIP File Format Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        a preamble.
-     *        This parameter is <code>true</code> by default.
-     * @param postambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a postamble of arbitrary length.
-     *        Otherwise, the ZIP compatible file must not have a postamble
-     *        which exceeds 64KB size, including the End Of Central Directory
-     *        record (i.e. including the ZIP file comment), causing this
-     *        constructor to fail fast if the file is actually a false positive
-     *        ZIP compatible file, i.e. not compatible to the ZIP File Format
-     *        Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     *        This parameter is <code>false</code> by default.
-     * @throws NullPointerException If <code>file</code> or <code>charset</code> is
-     *         <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(
-            File file,
-            String charset,
-            boolean preambled,
-            boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = charset;
-        init(null, file, preambled, postambled);
-    }
-
-    /**
-     * Opens the given read only file for reading its ZIP contents,
-     * assuming {@value #DEFAULT_CHARSET} charset for file names.
-     * 
-     * @param rof The read only file.
-     *        Note that this constructor <em>never</em> closes this file.
-     * @throws NullPointerException If <code>rof</code> is <code>null</code>.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(ReadOnlyFile rof)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = DEFAULT_CHARSET;
-        try {
-            init(rof, null, true, false);
-        } catch (UnsupportedEncodingException cannotHappen) {
-            throw new AssertionError(cannotHappen);
-        }
-    }
-
-    /**
-     * Opens the given read only file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param rof The read only file.
-     *        Note that this constructor <em>never</em> closes this file.
-     * @param charset The charset to use for entry names and comments
-     *        - must <em>not</em> be <code>null</code>!
-     * @throws NullPointerException If <code>rof</code> or <code>charset</code>
-     *         is <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
-    public BasicZipFile(ReadOnlyFile rof, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this.charset = charset;
-        init(rof, null, true, false);
-    }
-
-    /**
-     * Opens the given read only file for reading its ZIP contents,
-     * assuming the specified charset for file names.
-     * 
-     * @param rof The read only file.
-     *        Note that this constructor <em>never</em> closes this file.
-     * @param charset The charset to use for entry names and comments
-     *        - must <em>not</em> be <code>null</code>!
-     * @param preambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a preamble.
-     *        Otherwise, the ZIP compatible file must start with either a
-     *        Local File Header (LFH) signature or an End Of Central Directory
-     *        (EOCD) Header, causing this constructor to fail fast if the file
-     *        is actually a false positive ZIP compatible file, i.e. not
-     *        compatible to the ZIP File Format Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        a preamble.
-     *        This parameter is <code>true</code> by default.
-     * @param postambled If this is <code>true</code>, then the ZIP compatible
-     *        file may have a postamble of arbitrary length.
-     *        Otherwise, the ZIP compatible file must not have a postamble
-     *        which exceeds 64KB size, including the End Of Central Directory
-     *        record (i.e. including the ZIP file comment), causing this
-     *        constructor to fail fast if the file is actually a false positive
-     *        ZIP compatible file, i.e. not compatible to the ZIP File Format
-     *        Specification.
-     *        This may be used to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     *        This parameter is <code>false</code> by default.
-     * @throws NullPointerException If <code>rof</code> or <code>charset</code>
-     *         is <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not ZIP compatible.
-     * @throws IOException On any other I/O related issue.
-     */
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public BasicZipFile(
             ReadOnlyFile rof,
             String charset,
@@ -382,62 +150,23 @@ public class BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        this.charset = charset;
-        init(rof, null, preambled, postambled);
-    }
-
-    private void init(
-            ReadOnlyFile rof,
-            final File file,
-            final boolean preambled,
-            final boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        // Check parameters (fail fast).
-        if (charset == null)
-            throw new NullPointerException("charset");
+        if (rof == null || charset == null)
+            throw new NullPointerException();
         new String(new byte[0], charset); // may throw UnsupportedEncodingException!
-        if (rof == null) {
-            if (file == null)
-                throw new NullPointerException();
-            rof = createReadOnlyFile(file);
-        } else { // rof != null
-            assert file == null;
-        }
+        this.charset = charset;
         archive = rof;
 
-        try {
-            final BufferedReadOnlyFile brof;
-            if (archive instanceof BufferedReadOnlyFile)
-                brof = (BufferedReadOnlyFile) archive;
-            else
-                brof = new BufferedReadOnlyFile(archive);
-            mountCentralDirectory(brof, preambled, postambled);
-            // Do NOT close brof - would close rof as well!
-        } catch (IOException failure) {
-            if (file != null)
-                rof.close();
-            throw failure;
-        }
-        
-        assert mapper != null;
-    }
+        final BufferedReadOnlyFile brof;
+        if (archive instanceof BufferedReadOnlyFile)
+            brof = (BufferedReadOnlyFile) archive;
+        else
+            brof = new BufferedReadOnlyFile(archive);
+        mountCentralDirectory(brof, preambled, postambled);
+        // Do NOT close brof - would close rof as well!
 
-    /**
-     * A factory method called by the constructor to get a read only file
-     * to access the contents of the ZIP file.
-     * This method is only used if the constructor isn't called with a read
-     * only file as its parameter.
-     * 
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
-     */
-    protected ReadOnlyFile createReadOnlyFile(File file)
-    throws FileNotFoundException, IOException {
-        return new SimpleReadOnlyFile(file);
+        assert archive != null;
+        assert charset != null;
+        assert mapper != null;
     }
 
     /**
@@ -456,7 +185,7 @@ public class BasicZipFile {
             final boolean preambled,
             final boolean postambled)
     throws ZipException, IOException {
-        int numEntries = locateCentralDirectory(rof, preambled, postambled);
+        int numEntries = findCentralDirectory(rof, preambled, postambled);
         assert mapper != null;
 
         preamble = Long.MAX_VALUE;
@@ -588,13 +317,13 @@ public class BasicZipFile {
      * Performs some means to check that this is really a ZIP compatible
      * file.
      * <p>
-     * As a side effect, both <code>mapper</code> and </code>postamble</code>
+     * As a side effect, both {@code mapper} and </code>postamble</code>
      * will be set.
      * 
      * @throws ZipException If the file is not ZIP compatible.
      * @throws IOException On any other I/O related issue.
      */
-    private int locateCentralDirectory(
+    private int findCentralDirectory(
             final ReadOnlyFile rof,
             boolean preambled,
             final boolean postambled)
@@ -779,7 +508,7 @@ public class BasicZipFile {
     }
 
     /**
-     * Returns the comment of this ZIP compatible file or <code>null</code>
+     * Returns the comment of this ZIP compatible file or {@code null}
      * if no comment exists.
      */
     public String getComment() {
@@ -791,7 +520,7 @@ public class BasicZipFile {
     }
 
     /**
-     * Returns <code>true</code> if and only if some input streams are open to
+     * Returns {@code true} if and only if some input streams are open to
      * read from this ZIP compatible file.
      */
     public boolean busy() {
@@ -801,11 +530,6 @@ public class BasicZipFile {
     /** Returns the charset to use for entry names and comments. */
     public String getCharset() {
         return charset;
-    }
-
-    /** @deprecated Use {@link #getCharset} instead. */
-    public String getEncoding() {
-        return getCharset();
     }
 
     /**
@@ -819,7 +543,7 @@ public class BasicZipFile {
 
     /**
      * Returns the {@link ZipEntry} for the given name or
-     * <code>null</code> if no entry with that name exists.
+     * {@code null} if no entry with that name exists.
      * Note that the returned entry is shared with this class.
      * It is illegal to change its state!
      *
@@ -863,9 +587,9 @@ public class BasicZipFile {
      * Note that the returned stream is a <i>lightweight</i> stream,
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
      * allocated for it. Instead, all streams returned by this method share
-     * the underlying <code>ReadOnlyFile</code> of this <code>ZipFile</code>.
+     * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
-     * <code>ReadOnlyFile</code>) without cooperation of the returned
+     * {@code ReadOnlyFile}) without cooperation of the returned
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
      *
@@ -896,9 +620,9 @@ public class BasicZipFile {
      * Note that the returned stream is a <i>lightweight</i> stream,
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
      * allocated for it. Instead, all streams returned by this method share
-     * the underlying <code>ReadOnlyFile</code> of this <code>ZipFile</code>.
+     * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
-     * <code>ReadOnlyFile</code>) without cooperation of the returned
+     * {@code ReadOnlyFile}) without cooperation of the returned
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
      *
@@ -911,7 +635,7 @@ public class BasicZipFile {
     }
 
     /**
-     * Returns <code>true</code> if and only if the offsets in this ZIP file
+     * Returns {@code true} if and only if the offsets in this ZIP file
      * are relative to the start of the file, rather than the first Local
      * File Header.
      * <p>
@@ -958,27 +682,15 @@ public class BasicZipFile {
         return getInputStream(entry.getName(), true, true);
     }
 
-    /** @deprecated */
-    public InputStream getInputStream(String name, boolean inflate)
-    throws  IOException {
-        return getInputStream(name, false, inflate);
-    }
-
-    /** @deprecated */
-    public final InputStream getInputStream(ZipEntry entry, boolean inflate)
-    throws IOException {
-        return getInputStream(entry.getName(), false, inflate);
-    }
-
     /**
-     * Returns an <code>InputStream</code> for reading the inflated or
+     * Returns an {@code InputStream} for reading the inflated or
      * deflated data of the given entry.
      * <p>
      * If the {@link #close} method is called on this instance, all input
      * streams returned by this method are closed, too.
      *
      * @param name The name of the entry to get the stream for
-     *        - may <em>not</em> be <code>null</code>!
+     *        - may <em>not</em> be {@code null}!
      * @param check Whether or not the entry's CRC-32 value is checked.
      *        If and only if this parameter is true, two additional checks are
      *        performed for the ZIP entry:
@@ -988,20 +700,20 @@ public class BasicZipFile {
      *        <li>When calling {@link InputStream#close} on the returned entry
      *            stream, the CRC-32 value computed from the inflated entry
      *            data is checked against the declared CRC-32 values.
-     *            This is independent from the <code>inflate</code> parameter.
+     *            This is independent from the {@code inflate} parameter.
      *        </ol>
      *        If any of these checks fail, a {@link CRC32Exception} is thrown.
      *        <p>
-     *        This parameter should be <code>false</code> for most
+     *        This parameter should be {@code false} for most
      *        applications, and is the default for the sibling of this class
      *        in {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
      * @param inflate Whether or not the entry data should be inflated.
-     *        If <code>false</code>, the entry data is not inflated,
+     *        If {@code false}, the entry data is not inflated,
      *        even if the entry data is deflated.
-     *        This parameter should be <code>true</code> for most applications.
-     * @return A stream to read the entry data from or <code>null</code> if the
+     *        This parameter should be {@code true} for most applications.
+     * @return A stream to read the entry data from or {@code null} if the
      *         entry does not exist.
-     * @throws NullPointerException If <code>name</code> is <code>null</code>.
+     * @throws NullPointerException If {@code name} is {@code null}.
      * @throws CRC32Exception If the declared CRC-32 values of the inflated
      *         entry data are inconsistent across the entry headers.
      * @throws ZipException If this file is not compatible to the ZIP File
@@ -1092,7 +804,7 @@ public class BasicZipFile {
         return in;
     }
 
-    private static final int getBufferSize(final ZipEntry entry) {
+    private static int getBufferSize(final ZipEntry entry) {
         long size = entry.getSize();
         if (size > ZIP.FLATER_BUF_LENGTH)
             size = ZIP.FLATER_BUF_LENGTH;
@@ -1104,7 +816,7 @@ public class BasicZipFile {
     /**
      * Ensures that this archive is still open.
      */
-    private final void ensureOpen() throws ZipException {
+    private void ensureOpen() throws ZipException {
         if (archive == null)
             throw new ZipException("ZIP file has been closed!");
     }
@@ -1114,9 +826,10 @@ public class BasicZipFile {
         private boolean closed;
 
         public PooledInflaterInputStream(InputStream in, int size) {
-            super(in, allocateInflater(), size);
+            super(in, InflaterPool.allocate(), size);
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -1125,47 +838,10 @@ public class BasicZipFile {
             try {
                 super.close();
             } finally {
-                releaseInflater(inf);
+                InflaterPool.release(inf);
             }
         }
     } // class PooledInflaterInputStream
-
-    private static Inflater allocateInflater() {
-        Inflater inflater = null;
-
-        synchronized (releasedInflaters) {
-            for (Iterator i = releasedInflaters.iterator(); i.hasNext(); ) {
-                inflater = (Inflater) ((Reference) i.next()).get();
-                i.remove();
-                if (inflater != null) {
-                    //inflater.reset();
-                    break;
-                }
-            }
-            if (inflater == null)
-                inflater = new Inflater(true);
-
-            // We MUST make sure that we keep a strong reference to the
-            // inflater in order to retain it from being released again and
-            // then finalized when the close() method of the InputStream
-            // returned by getInputStream(...) is called from within another
-            // finalizer.
-            // The finalizer of the inflater calls end() and leaves the object
-            // in a state so that the subsequent call to reset() throws an NPE.
-            // The ZipFile class in Sun's J2SE 1.4.2 shows this bug.
-            allocatedInflaters.add(inflater);
-        }
-        
-        return inflater;
-    }
-
-    private static void releaseInflater(Inflater inflater) {
-        inflater.reset();
-        synchronized (releasedInflaters) {
-            releasedInflaters.add(new SoftReference(inflater));
-            allocatedInflaters.remove(inflater);
-        }
-    }
 
     private static final class CheckedInputStream
             extends java.util.zip.CheckedInputStream {
@@ -1181,10 +857,13 @@ public class BasicZipFile {
             this.size = size;
         }
 
+        @Override
         public long skip(long toSkip) throws IOException {
             return skipWithBuffer(this, toSkip, new byte[size]);
         }
 
+        @Override
+        @SuppressWarnings("empty-statement")
         public void close() throws IOException {
             try {
                 while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
@@ -1201,7 +880,7 @@ public class BasicZipFile {
     } // class CheckedInputStream
 
     /**
-     * This method skips <code>toSkip</code> bytes in the given input stream
+     * This method skips {@code toSkip} bytes in the given input stream
      * using the given buffer unless EOF or IOException.
      */
     private static long skipWithBuffer(
@@ -1219,9 +898,9 @@ public class BasicZipFile {
     }
 
     /**
-     * An stream which reads and returns deflated data from its input
+     * A stream which reads and returns deflated data from its input
      * while a CRC-32 checksum is computed over the inflated data and
-     * checked in the close() method.
+     * checked in the method {@code close}.
      */
     private static final class RawCheckedInputStream extends FilterInputStream {
 
@@ -1237,7 +916,7 @@ public class BasicZipFile {
                 final ZipEntry entry,
                 final int size) {
             super(in);
-            this.inf = allocateInflater();
+            this.inf = InflaterPool.allocate();
             this.infBuf = new byte[size];
             this.entry = entry;
         }
@@ -1248,6 +927,8 @@ public class BasicZipFile {
                 throw new IOException("input stream has been closed");
         }
 
+        @Override
+        @SuppressWarnings("empty-statement")
         public int read()
         throws IOException {
             int read;
@@ -1256,6 +937,7 @@ public class BasicZipFile {
             return read > 0 ? singleByteBuf[0] & 0xff : -1;
         }
 
+        @Override
         public int read(final byte[] buf, final int off, final int len)
         throws IOException {
             if (len == 0)
@@ -1288,9 +970,7 @@ public class BasicZipFile {
                 while ((inflated = inf.inflate(infBuf, 0, infBuf.length)) > 0)
                     crc.update(infBuf, 0, inflated);
             } catch (DataFormatException dfe) {
-                IOException ioe = new IOException(dfe.toString());
-                ioe.initCause(dfe);
-                throw ioe;
+                throw new IOException(dfe);
             }
 
             // Check inflater invariants.
@@ -1301,10 +981,13 @@ public class BasicZipFile {
             return read;
         }
 
+        @Override
         public long skip(long toSkip) throws IOException {
             return skipWithBuffer(this, toSkip, new byte[infBuf.length]);
         }
 
+        @Override
+        @SuppressWarnings("empty-statement")
         public void close() throws IOException {
             if (closed)
                 return;
@@ -1315,7 +998,7 @@ public class BasicZipFile {
                     ; 
             } finally {
                 closed = true;
-                releaseInflater(inf);
+                InflaterPool.release(inf);
                 super.close();
             }
 
@@ -1326,14 +1009,17 @@ public class BasicZipFile {
                         entry.getName(), expectedCrc, actualCrc);
         }
 
+        @Override
         public void mark(int readlimit) {
         }
 
+        @Override
         public void reset()
         throws IOException {
             throw new IOException("mark()/reset() not supported");
         }
 
+        @Override
         public boolean markSupported() {
             return false;
         }
@@ -1368,9 +1054,9 @@ public class BasicZipFile {
         private boolean addDummyByte;
 
         /**
-         * @param start The start address (not offset) in <code>archive</code>.
+         * @param start The start address (not offset) in {@code archive}.
          * @param remaining The remaining bytes allowed to be read in
-         *        <code>archive</code>.
+         *        {@code archive}.
          */
         IntervalInputStream(long start, long remaining) {
             assert start >= 0;
@@ -1402,6 +1088,7 @@ public class BasicZipFile {
             return ret;
         }
 
+        @Override
         public int read(final byte[] b, final int off, int len)
         throws IOException {
             if (len <= 0) {
@@ -1445,14 +1132,15 @@ public class BasicZipFile {
 
         /**
          * @return The number of bytes remaining in this entry, yet maximum
-         *         <code>Integer.MAX_VALUE</code>.
+         *         {@code Integer.MAX_VALUE}.
          *         Note that this is only relevant for entries which have been
-         *         stored with the <code>STORED</code> method.
-         *         For entries stored according to the <code>DEFLATED</code>
+         *         stored with the {@code STORED} method.
+         *         For entries stored according to the {@code DEFLATED}
          *         method, the value returned by this method on the
-         *         <code>InputStream</code> returned by {@link #getInputStream}
+         *         {@code InputStream} returned by {@link #getInputStream}
          *         is actually determined by an {@link InflaterInputStream}.
          */
+        @Override
         public int available()
         throws IOException {
             ensureOpen();
@@ -1473,6 +1161,7 @@ public class BasicZipFile {
             openStreams++;
         }
 
+        @Override
         public void close() throws IOException {
             // Order is important here!
             if (!closed) {
@@ -1482,6 +1171,8 @@ public class BasicZipFile {
             }
         }
 
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
                 close();
@@ -1504,6 +1195,7 @@ public class BasicZipFile {
             this.start = start;
         }
 
+        @Override
         long location(long offset) {
             return start + offset;
         }

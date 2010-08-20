@@ -86,6 +86,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * to one in order to inhibit writing unencrypted temporary files for
      * buffering the written entries.
      */
+    @Override
     public OutputArchive createOutputArchive(
             final Archive archive,
             final OutputStream out,

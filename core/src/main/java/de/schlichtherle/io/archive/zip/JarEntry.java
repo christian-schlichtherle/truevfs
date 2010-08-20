@@ -38,6 +38,7 @@ public class JarEntry extends ZipEntry {
         super(blueprint);
     }
 
+    @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.JAR;
     }

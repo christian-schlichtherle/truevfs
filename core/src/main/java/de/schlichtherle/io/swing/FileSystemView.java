@@ -16,14 +16,13 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.*;
+import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.File;
-
-import java.io.*;
-import java.text.*;
-import java.util.*;
-
-import javax.swing.*;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.text.MessageFormat;
+import javax.swing.Icon;
+import javax.swing.UIManager;
 
 /**
  * A custom file system view required to browse archive files like (virtual)
@@ -69,19 +68,6 @@ public class FileSystemView extends FilterFileSystemView {
             javax.swing.filechooser.FileSystemView.getFileSystemView(),
             null);
 
-    public final static javax.swing.filechooser.FileSystemView getFileSystemView() {
-        return getFileSystemView(null);
-    }
-
-    public final static javax.swing.filechooser.FileSystemView getFileSystemView(
-            ArchiveDetector archiveDetector) {
-        return archiveDetector != null
-            ? new FileSystemView(
-                javax.swing.filechooser.FileSystemView.getFileSystemView(),
-                archiveDetector)
-            : defaultView;
-    }
-
     /** Maybe null - uses default then. **/
     private ArchiveDetector archiveDetector;
 
@@ -92,10 +78,23 @@ public class FileSystemView extends FilterFileSystemView {
         this.archiveDetector = archiveDetector;
     }
 
+    public static javax.swing.filechooser.FileSystemView getFileSystemView() {
+        return getFileSystemView(null);
+    }
+
+    public static javax.swing.filechooser.FileSystemView getFileSystemView(
+            ArchiveDetector archiveDetector) {
+        return archiveDetector != null
+            ? new FileSystemView(
+                javax.swing.filechooser.FileSystemView.getFileSystemView(),
+                archiveDetector)
+            : defaultView;
+    }
+
     /**
      * Returns a valid archive detector to use with this class.
      * If no archive detector has been explicitly set for this file system
-     * view or the archive detector has been set to <code>null</code>,
+     * view or the archive detector has been set to {@code null},
      * then {@link de.schlichtherle.io.File#getDefaultArchiveDetector} is
      * returned.
      */
@@ -109,7 +108,7 @@ public class FileSystemView extends FilterFileSystemView {
      * Sets the archive detector to use within this class.
      *
      * @param archiveDetector The archive detector to use.
-     *        May be <code>null</code> to indicate that
+     *        May be {@code null} to indicate that
      *        {@link de.schlichtherle.io.File#getDefaultArchiveDetector}
      *        should be used.
      */
@@ -150,10 +149,12 @@ public class FileSystemView extends FilterFileSystemView {
     // Overridden methods:
     //
 
+    @Override
     public boolean isRoot(java.io.File file) {
         return super.isRoot(unwrap(file));
     }
 
+    @Override
     public Boolean isTraversable(java.io.File file) {
         final File wFile = wrap(file);
         final Boolean traversable = FileView.traversable(wFile);
@@ -162,6 +163,7 @@ public class FileSystemView extends FilterFileSystemView {
         return super.isTraversable(unwrap(file));
     }
 
+    @Override
     public String getSystemDisplayName(java.io.File file) {
         final File wFile = wrap(file);
         if (wFile.isArchive() || wFile.isEntry())
@@ -169,6 +171,7 @@ public class FileSystemView extends FilterFileSystemView {
         return super.getSystemDisplayName(unwrap(file));
     }
 
+    @Override
     public String getSystemTypeDescription(java.io.File file) {
         final File wFile = wrap(file);
         final String typeDescription = FileView.typeDescription(wFile);
@@ -177,6 +180,7 @@ public class FileSystemView extends FilterFileSystemView {
         return super.getSystemTypeDescription(unwrap(file));
     }
 
+    @Override
     public Icon getSystemIcon(java.io.File file) {
         final File wFile = wrap(file);
         final Icon icon = FileView.closedIcon(wFile);
@@ -188,11 +192,13 @@ public class FileSystemView extends FilterFileSystemView {
             : null;
     }
 
+    @Override
     public boolean isParent(java.io.File folder, java.io.File file) {
         return super.isParent(wrap(folder), wrap(file))
             || super.isParent(unwrap(folder), unwrap(file));
     }
 
+    @Override
     public java.io.File getChild(java.io.File parent, String child) {
         final File wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry())
@@ -200,10 +206,12 @@ public class FileSystemView extends FilterFileSystemView {
         return createFileObject(super.getChild(unwrap(parent), child));
     }
 
+    @Override
     public boolean isFileSystem(java.io.File file) {
         return super.isFileSystem(unwrap(file));
     }
 
+    @Override
     public java.io.File createNewFolder(final java.io.File parent)
     throws IOException {
         final File wParent = wrap(parent);
@@ -223,30 +231,35 @@ public class FileSystemView extends FilterFileSystemView {
                             UIManager.getString(File.separatorChar == '\\'
                                 ? "FileChooser.win32.newFolder.subsequent"
                                 : "FileChooser.other.newFolder.subsequent"),
-                            new Object[] { new Integer(i) }));
+                            new Object[] { Integer.valueOf(i) }));
             }
-            
+
             return folder;
         }
         return createFileObject(super.createNewFolder(unwrap(parent)));
     }
 
+    @Override
     public boolean isHiddenFile(java.io.File file) {
         return super.isHiddenFile(unwrap(file));
     }
 
+    @Override
     public boolean isFileSystemRoot(java.io.File file) {
         return super.isFileSystemRoot(unwrap(file));
     }
 
+    @Override
     public boolean isDrive(java.io.File file) {
         return super.isDrive(unwrap(file));
     }
 
+    @Override
     public boolean isFloppyDrive(java.io.File file) {
         return super.isFloppyDrive(unwrap(file));
     }
 
+    @Override
     public boolean isComputerNode(java.io.File file) {
         return super.isComputerNode(unwrap(file));
     }
@@ -255,18 +268,21 @@ public class FileSystemView extends FilterFileSystemView {
      * Creates a ZIP enabled file where necessary only,
      * otherwise the file system view delegate is used to create the file.
      */
+    @Override
     public java.io.File createFileObject(java.io.File dir, String str) {
         return createFileObject(super.createFileObject(dir, str));
     }
-    
+
     /**
      * Creates a ZIP enabled file where necessary only,
      * otherwise the file system view delegate is used to create the file.
      */
+    @Override
     public java.io.File createFileObject(String str) {
         return createFileObject(super.createFileObject(str));
     }
 
+    @Override
     public java.io.File[] getFiles(
             final java.io.File dir,
             final boolean useFileHiding) {
@@ -288,6 +304,7 @@ public class FileSystemView extends FilterFileSystemView {
         }
     }
 
+    @Override
     public java.io.File getParentDirectory(java.io.File file) {
         final File wFile = wrap(file);
         if (wFile.isEntry())

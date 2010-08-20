@@ -17,16 +17,25 @@
 package de.schlichtherle.key.passwd.swing;
 
 import de.schlichtherle.swing.EnhancedPanel;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.zip.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.ResourceBundle;
+import java.util.zip.Deflater;
+import javax.swing.JComponent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * This panel prompts the user for a key to create or overwrite a protected
@@ -86,18 +95,18 @@ public class CreateKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Getter for property <code>resourceID</code>.
+     * Getter for property {@code resourceID}.
      *
-     * @return Value of property <code>resourceID</code>.
+     * @return Value of property {@code resourceID}.
      */
     public String getResourceID() {
         return resourceID.getText();
     }
     
     /**
-     * Setter for property <code>resourceID</code>.
+     * Setter for property {@code resourceID}.
      *
-     * @param resourceID New value of property <code>resourceID</code>.
+     * @param resourceID New value of property {@code resourceID}.
      */
     public void setResourceID(final String resourceID) {
         final String lastResourceID = PromptingKeyProviderUI.lastResourceID;
@@ -202,7 +211,7 @@ public class CreateKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Getter for property <code>error</code>.
+     * Getter for property {@code error}.
      */
     public String getError() {
         final String error = this.error.getText();
@@ -222,23 +231,23 @@ public class CreateKeyPanel extends EnhancedPanel {
     }
     
     /**
-     * Getter for property <code>extraDataUI</code>.
+     * Getter for property {@code extraDataUI}.
      * 
-     * @return Value of property <code>extraDataUI</code>.
+     * @return Value of property {@code extraDataUI}.
      */
     public JComponent getExtraDataUI() {
         return extraDataUI;
     }
     
     /**
-     * Setter for property <code>extraDataUI</code>.
+     * Setter for property {@code extraDataUI}.
      * This component is placed below the two password fields and above the
      * error label.
      * It may be used to prompt the user for additional data which may form
      * part of the key or is separately stored in the key provider.
      * The panel is automatically revalidated.
      * 
-     * @param extraDataUI New value of property <code>extraDataUI</code>.
+     * @param extraDataUI New value of property {@code extraDataUI}.
      */
     public void setExtraDataUI(final JComponent extraDataUI) {
         if (this.extraDataUI == extraDataUI)

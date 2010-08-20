@@ -16,11 +16,15 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import java.awt.*;
-import java.beans.*;
-import java.lang.ref.*;
-
-import javax.swing.*;
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.KeyboardFocusManager;
+import java.awt.Window;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import javax.swing.JOptionPane;
 
 /**
  * A utility class for window management.
@@ -72,10 +76,10 @@ final class WindowUtils {
     /**
      * Returns the last window which received the focus.
      * If no window received the focus yet or is already made eligible for
-     * finalization, <code>null</code> is returned instead.
+     * finalization, {@code null} is returned instead.
      * Note that this is <em>not</em> the same as
-     * <code>WindowUtils.getCurrentKeyboardFocusManager().getFocusedWindow()</code>:
-     * The latter may return <code>null</code> if no window in this JVM has
+     * {@code WindowUtils.getCurrentKeyboardFocusManager().getFocusedWindow()}:
+     * The latter may return {@code null} if no window in this JVM has
      * the focus, while this method will return the last window in this JVM
      * which had the focus (unless this is also the first call to this method).
      */

@@ -88,9 +88,9 @@ public class OpenKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Setter for property <code>resourceID</code>.
+     * Setter for property {@code resourceID}.
      *
-     * @param resourceID New value of property <code>resourceID</code>.
+     * @param resourceID New value of property {@code resourceID}.
      */
     public void setResourceID(final String resourceID) {
         final String lastResourceID = PromptingKeyProviderUI.lastResourceID;
@@ -104,16 +104,16 @@ public class OpenKeyPanel extends EnhancedPanel {
     }
 
     /**
-     * Getter for property <code>resourceID</code>.
+     * Getter for property {@code resourceID}.
      *
-     * @return Value of property <code>resourceID</code>.
+     * @return Value of property {@code resourceID}.
      */
     public String getResourceID() {
         return resourceID.getText();
     }
 
     /**
-     * Getter for property <code>error</code>.
+     * Getter for property {@code error}.
      */
     public String getError() {
         final String error = this.error.getText();
@@ -186,23 +186,23 @@ public class OpenKeyPanel extends EnhancedPanel {
     }
     
     /**
-     * Getter for property <code>extraDataUI</code>.
+     * Getter for property {@code extraDataUI}.
      * 
-     * @return Value of property <code>extraDataUI</code>.
+     * @return Value of property {@code extraDataUI}.
      */
     public JComponent getExtraDataUI() {
         return extraDataUI;
     }
     
     /**
-     * Setter for property <code>extraDataUI</code>.
+     * Setter for property {@code extraDataUI}.
      * This component is placed below the password field and above the
      * "change password / key file" check box.
      * It may be used to prompt the user for additional data which may form
      * part of the key or is separately stored in the key provider.
      * The panel is automatically revalidated.
      * 
-     * @param extraDataUI New value of property <code>extraDataUI</code>.
+     * @param extraDataUI New value of property {@code extraDataUI}.
      */
     public void setExtraDataUI(final JComponent extraDataUI) {
         if (this.extraDataUI == extraDataUI)

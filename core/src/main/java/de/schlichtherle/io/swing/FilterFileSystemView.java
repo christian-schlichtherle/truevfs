@@ -16,10 +16,10 @@
 
 package de.schlichtherle.io.swing;
 
-import java.io.*;
-import javax.swing.*;
-
+import java.io.File;
+import java.io.IOException;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.Icon;
 
 /**
  * An abstract decorator which simply delegates to another instance of
@@ -34,13 +34,13 @@ import javax.swing.filechooser.FileSystemView;
  */
 abstract class FilterFileSystemView extends FileSystemView {
 
-    /** The file system view to be decorated - never <code>null</code>. */
+    /** The file system view to be decorated - never {@code null}. */
     private FileSystemView delegate;
-    
+
     /**
      * Creates a new decorating file system view.
      *
-     * @param delegate The file view to be decorated - may be <code>null</code>.
+     * @param delegate The file view to be decorated - may be {@code null}.
      */
     protected FilterFileSystemView(final FileSystemView delegate) {
         if (delegate == null)
@@ -49,7 +49,7 @@ abstract class FilterFileSystemView extends FileSystemView {
     }
 
     /**
-     * Returns the file system view to be decorated - never <code>null</code>.
+     * Returns the file system view to be decorated - never {@code null}.
      */
     public FileSystemView getDelegate() {
         return delegate;
@@ -58,8 +58,8 @@ abstract class FilterFileSystemView extends FileSystemView {
     /**
      * Sets the file system view to be decorated.
      *
-     * @throws NullPointerException If <code>delegate</code> is <code>null</code>.
-     * @throws IllegalArgumentException If <code>delegate</code> is this
+     * @throws NullPointerException If {@code delegate} is {@code null}.
+     * @throws IllegalArgumentException If {@code delegate} is this
      *         instance.
      */
     public void setDelegate(final FileSystemView delegate) {
@@ -74,34 +74,42 @@ abstract class FilterFileSystemView extends FileSystemView {
     // Overridden methods:
     //
 
+    @Override
     public boolean isRoot(File f) {
         return delegate.isRoot(f);
     }
 
+    @Override
     public Boolean isTraversable(File f) {
         return delegate.isTraversable(f);
     }
 
+    @Override
     public String getSystemDisplayName(File f) {
         return delegate.getSystemDisplayName(f);
     }
 
+    @Override
     public String getSystemTypeDescription(File f) {
         return delegate.getSystemTypeDescription(f);
     }
 
+    @Override
     public Icon getSystemIcon(File f) {
         return delegate.getSystemIcon(f);
     }
 
+    @Override
     public boolean isParent(File folder, File file) {
         return delegate.isParent(folder, file);
     }
 
+    @Override
     public File getChild(File parent, String fileName) {
         return delegate.getChild(parent, fileName);
     }
 
+    @Override
     public boolean isFileSystem(File f) {
         return delegate.isFileSystem(f);
     }
@@ -110,61 +118,74 @@ abstract class FilterFileSystemView extends FileSystemView {
         return delegate.createNewFolder(containingDir);
     }
 
+    @Override
     public boolean isHiddenFile(File f) {
         return delegate.isHiddenFile(f);
     }
 
+    @Override
     public boolean isFileSystemRoot(File dir) {
         return delegate.isFileSystemRoot(dir);
     }
 
+    @Override
     public boolean isDrive(File dir) {
         return delegate.isDrive(dir);
     }
 
+    @Override
     public boolean isFloppyDrive(File dir) {
         return delegate.isFloppyDrive(dir);
     }
 
+    @Override
     public boolean isComputerNode(File dir) {
         return delegate.isComputerNode(dir);
     }
 
+    @Override
     public File[] getRoots() {
         return delegate.getRoots();
     }
-    
+
+    @Override
     public File getHomeDirectory() {
         return delegate.getHomeDirectory();
     }
 
+    @Override
     public File getDefaultDirectory() {
         return delegate.getDefaultDirectory();
     }
-    
+
+    @Override
     public File createFileObject(File dir, String filename) {
         return delegate.createFileObject(dir, filename);
     }
 
+    @Override
     public File createFileObject(String path) {
         return delegate.createFileObject(path);
     }
 
+    @Override
     public File[] getFiles(File dir, boolean useFileHiding) {
         return delegate.getFiles(dir, useFileHiding);
     }
 
+    @Override
     public File getParentDirectory(File dir) {
         return delegate.getParentDirectory(dir);
     }
 
     /** Forwards the call to {@link #createFileSystemRootImpl}. */
+    @Override
     protected final File createFileSystemRoot(File f) {
         return createFileSystemRootImpl(f);
     }
 
     /**
-     * Creates a new <code>File</code> object for <code>f</code> with correct
+     * Creates a new {@code File} object for {@code f} with correct
      * behavior for a file system root directory.
      * If the delegate is an instance of this class, then this method
      * forwards the call to the delegate like all other methods in this class.
@@ -174,7 +195,7 @@ abstract class FilterFileSystemView extends FileSystemView {
      */
     public File createFileSystemRootImpl(File f) {
         return (delegate instanceof FilterFileSystemView)
-                ? ((FilterFileSystemView) delegate).createFileSystemRootImpl(f)  
+                ? ((FilterFileSystemView) delegate).createFileSystemRootImpl(f)
                 : super.createFileSystemRoot(f);
     }
 }

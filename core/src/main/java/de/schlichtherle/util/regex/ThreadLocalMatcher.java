@@ -16,7 +16,9 @@
 
 package de.schlichtherle.util.regex;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * A thread local {@link Matcher}.
@@ -26,9 +28,9 @@ import java.util.regex.*;
  * @see #reset(CharSequence)
  * @version $Id$
  * @since TrueZIP 6.5 (refactored from inner class in
- *        de.schlichtherle.io.DefaultArchiveDetector)
+ *        {@link de.schlichtherle.io.DefaultArchiveDetector})
  */
-public class ThreadLocalMatcher extends ThreadLocal {
+public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
     private final Pattern pattern;
 
     /**
@@ -46,7 +48,7 @@ public class ThreadLocalMatcher extends ThreadLocal {
      * Creates a new thread local matcher by using the given pattern.
      *
      * @param pattern The pattern to be used.
-     * @throws NullPointerException If the parameter is <code>null</code>.
+     * @throws NullPointerException If the parameter is {@code null}.
      */
     public ThreadLocalMatcher(final Pattern pattern) {
         if (pattern == null)
@@ -54,7 +56,8 @@ public class ThreadLocalMatcher extends ThreadLocal {
         this.pattern = pattern;
     }
 
-    protected Object initialValue() {
+    @Override
+    protected Matcher initialValue() {
         return pattern.matcher(""); // NOI18N
     }
 
@@ -65,12 +68,4 @@ public class ThreadLocalMatcher extends ThreadLocal {
     public Matcher reset(CharSequence input) {
         return ((Matcher) get()).reset(input);
     }
-
-    /*public boolean matches() {
-        return ((Matcher) tl.get()).matches();
-    }
-
-    public String group(int i) {
-        return ((Matcher) tl.get()).group(i);
-    }*/
 }

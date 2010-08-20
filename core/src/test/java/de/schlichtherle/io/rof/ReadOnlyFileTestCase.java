@@ -48,21 +48,20 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
         logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
             logger.warning("Please enable assertions for additional white box testing.");
-
     }
-    
+
     /** The test data. */
     protected byte[] data;
-    
+
     /** The temporary file with the test data. */
     protected File file;
-    
-    /** The <code>ReadOnlyFile</code> implementation to use as a reference. */
+
+    /** The {@code ReadOnlyFile} implementation to use as a reference. */
     private ReadOnlyFile rrof;
 
-    /** The <code>ReadOnlyFile</code> implementation to test. */
+    /** The {@code ReadOnlyFile} implementation to test. */
     protected ReadOnlyFile trof;
-    
+
     protected ReadOnlyFileTestCase(String testName) {
         super(testName);
     }
@@ -93,7 +92,7 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
             throw ex;
         }
     }
-    
+
     @Override
     protected void tearDown()
     throws IOException {
@@ -130,75 +129,75 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     public static void testClose(final ReadOnlyFile rof)
     throws IOException {
         rof.close();
-        
+
         try {
             rof.length();
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             rof.getFilePointer();
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             rof.seek(0);
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             rof.read();
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             assertEquals(0, rof.read(new byte[0]));
         } catch (IOException mayHappen) {
         }
-        
+
         try {
             rof.read(new byte[1]);
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             assertEquals(0, rof.read(new byte[0], 0, 0));
         } catch (IOException mayHappen) {
         }
-        
+
         try {
             rof.read(new byte[1], 0, 1);
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             rof.readFully(new byte[0]);
         } catch (IOException mayHappen) {
         }
-        
+
         try {
             rof.readFully(new byte[1]);
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         try {
             rof.readFully(new byte[0], 0, 0);
         } catch (IOException mayHappen) {
         }
-        
+
         try {
             rof.readFully(new byte[1], 0, 1);
             fail("Expected IOException!");
         } catch (IOException expected) {
         }
-        
+
         rof.close();
     }
 
@@ -213,7 +212,7 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
         testForwardReadBytes(rrof);
         testForwardReadBytes(trof);
     }
-    
+
     public void testForwardReadBytes(final ReadOnlyFile rof)
     throws IOException {
         final long length = rof.length();
@@ -231,9 +230,9 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     public void testRandomReadBytes(final ReadOnlyFile rof)
     throws IOException {
         assertEquals(0, rof.getFilePointer());
-        
+
         testRandomReadByte(rof, 0);
-        
+
         final int length = (int) rof.length();
         for (int i = length; --i >= 0; ) {
             final int tooSmall = rnd.nextInt() | Integer.MIN_VALUE;
@@ -272,20 +271,20 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
             assertEquals(off, rof.getFilePointer());
         }
     }
-    
+
     public void testBackwardReadBytes()
     throws IOException {
         testBackwardReadBytes(rrof);
         testBackwardReadBytes(trof);
     }
-    
+
     public void testBackwardReadBytes(final ReadOnlyFile rof)
     throws IOException {
         final int length = (int) rof.length();
         for (int off = length; --off >= 0; )
             testRandomReadByte(rof, off);
     }
-    
+
     /** Las Vegas algorithm. */
     public void testForwardReadChunks()
     throws IOException {
@@ -316,7 +315,7 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
         assertEquals( 0, rrof.read(new byte[0]));
         assertEquals( 0, trof.read(new byte[0]));
     }
-    
+
     public void testRandomReadChunks()
     throws IOException {
         final int length = (int) rrof.length();

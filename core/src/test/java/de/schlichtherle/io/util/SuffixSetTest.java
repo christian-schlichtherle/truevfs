@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 
 /**
+ * Tests {@link SuffixSet}.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.7
@@ -36,6 +38,7 @@ public class SuffixSetTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() {
         empty = new SuffixSet("");
 

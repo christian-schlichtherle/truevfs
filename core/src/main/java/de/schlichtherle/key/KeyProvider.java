@@ -125,7 +125,7 @@ public interface KeyProvider<K extends Cloneable> {
      * @return A clone of the key object.
      *         If the key does not support cloning or cloning fails for some
      *         reason, the key object itself is returned.
-     *         <code>null</code> is never returned.
+     *         {@code null} is never returned.
      * @throws UnknownKeyException If the required key is unknown.
      *         At the provider implementation's discretion, this may mean that
      *         prompting for the key has been disabled or cancelled by the user.
@@ -144,7 +144,7 @@ public interface KeyProvider<K extends Cloneable> {
      * the previously returned object, but is not necessarily the same.
      * <p>
      * <b>Important:</b> From a client application's perspective, a
-     * <code>KeyProvider</code> is not trustworthy!
+     * {@code KeyProvider} is not trustworthy!
      * Hence, the key returned by this method must not only get authenticated,
      * but the client application should also throttle the pace for the
      * return from a subsequent call to this method if the key is invalid
@@ -156,7 +156,7 @@ public interface KeyProvider<K extends Cloneable> {
      * "Friendly" implementations of this interface should duplicate this
      * behaviour in order to protect client applications which do not obeye
      * these considerations against abuses of the key provider implementation.
-     * Note that <code>invalidOpenKey()</code> must still be called
+     * Note that {@code invalidOpenKey()} must still be called
      * immediately by the client application, so that other threads are not
      * negatively affected by the suspension penalty.
      * For the same reason, "friendly" implementations should enforce the
@@ -165,7 +165,7 @@ public interface KeyProvider<K extends Cloneable> {
      * @return A clone of the key object.
      *         If the key does not support cloning or cloning fails for some
      *         reason, the key object itself is returned.
-     *         <code>null</code> is never returned.
+     *         {@code null} is never returned.
      * @throws UnknownKeyException If the required key is unknown.
      *         At the provider implementation's discretion, this may mean that
      *         prompting for the key has been disabled or cancelled by the user.

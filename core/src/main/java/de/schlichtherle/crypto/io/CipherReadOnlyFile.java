@@ -16,12 +16,11 @@
 
 package de.schlichtherle.crypto.io;
 
-import de.schlichtherle.crypto.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-
-import org.bouncycastle.crypto.*;
+import de.schlichtherle.crypto.SeekableBlockCipher;
+import de.schlichtherle.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.IOException;
+import org.bouncycastle.crypto.Mac;
 
 /**
  * A read only file for transparent random read access to an encrypted file.
@@ -30,17 +29,17 @@ import org.bouncycastle.crypto.*;
  * before it can actually read anything!
  * <p>
  * Note that this class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying <code>ReadOnlyFile</code>
+ * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link FilterReadOnlyFile}.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
  */
 //
-// Tactical notes:
+// Implementation notes:
 //
 // In order to provide optimum performance, this class implements a read ahead
 // strategy with lazy decryption.
@@ -59,7 +58,7 @@ import org.bouncycastle.crypto.*;
 // actually decrypt it, which is redundant.
 //
 public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
-    
+
     /**
      * The maximum buffer length of the window to the encrypted file.
      * This value has been adjusted to provide optimum performance at minimal
@@ -70,7 +69,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
     private static final int MAX_WINDOW_LEN = 1024;
 
     /** Returns the smaller parameter. */
-    private static final long min(long a, long b) {
+    private static long min(long a, long b) {
         return a < b ? a : b;
     }
 
@@ -131,11 +130,22 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      * before it can actually read anything!
      *
      * @param rof A read-only file.
-     *        This may be <code>null</code>, but must be properly init before
-     *        the call to <code>init()</code>.
+     *        This may be {@code null}, but must be properly init before
+     *        the call to {@code init()}.
      */
     public CipherReadOnlyFile(ReadOnlyFile rof) {
         super(rof);
+    }
+
+    /**
+     * Ensures that this cipher output stream is in open state, which requires
+     * that {@link #cipher} is not {@code null}.
+     *
+     * @throws IOException If the preconditions do not hold.
+     */
+    private void ensureOpen() throws IOException {
+        if (cipher == null)
+            throw new IOException("cipher read only file is not in open state");
     }
 
     /**
@@ -144,17 +154,16 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      *
      * @param start The start offset of the encrypted data in this file.
      * @param length The length of the encrypted data in this file.
-     *
      * @throws IOException If this read only file has already been closed.
      *         This exception is <em>not</em> recoverable.
      * @throws IllegalStateException If this object has already been
      *         initialized.
      *         This exception is <em>not</em> recoverable.
-     * @throws NullPointerException If {@link #rof} is <tt>null</tt>
-     *         or <tt>cipher</tt> is <tt>null</tt>.
+     * @throws NullPointerException If {@link #rof} or {@code cipher} is
+     *         {@code null}.
      *         This exception <em>is</em> recoverable.
      */
-    public void init(
+    protected final void init(
             final SeekableBlockCipher cipher,
             final long start,
             final long length)
@@ -184,7 +193,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         block = new byte[blockLen];
         windowOff = Long.MIN_VALUE; // invalidate window
         window = new byte[(MAX_WINDOW_LEN / blockLen) * blockLen]; // round down to multiple of block size
-        
+
         assert fp == 0;
         assert block.length > 0;
         assert window.length > 0;
@@ -196,7 +205,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      * read only file using the given Message Authentication Code (MAC) object.
      * It is safe to call this method multiple times to detect if the file
      * has been tampered with meanwhile.
-     * 
+     *
      * @param mac A properly initialized MAC object.
      *
      * @throws IOException On any I/O related issue.
@@ -215,24 +224,27 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             final int bufLen = mac.doFinal(buf, 0);
             assert bufLen == buf.length;
         } finally {
-            fp = safedFp;
+            seek(safedFp);
         }
 
         return buf;
     }
 
+    @Override
     public long length() throws IOException {
-        ensureInit();
+        ensureOpen();
         return length;
     }
 
+    @Override
     public long getFilePointer() throws IOException {
-        ensureInit();
+        ensureOpen();
         return fp;
     }
 
+    @Override
     public void seek(final long fp) throws IOException {
-        ensureInit();
+        ensureOpen();
 
         if (fp < 0)
             throw new IOException("file pointer must not be negative");
@@ -243,9 +255,10 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         this.fp = fp;
     }
 
+    @Override
     public int read() throws IOException {
         // Check state.
-        ensureInit();
+        ensureOpen();
         if (fp >= length)
             return -1;
 
@@ -254,13 +267,14 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         return block[(int) (fp++ % block.length)] & 0xff;
     }
 
+    @Override
     public int read(final byte[] buf, final int off, final int len)
     throws IOException {
         if (len == 0)
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
         // Check state.
-        ensureInit();
+        ensureOpen();
         if (fp >= length)
             return -1;
 
@@ -274,7 +288,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         // Setup.
         final int blockLen = block.length;
         int read = 0; // amount of decrypted data copied to buf
-        
+
         {
             // Partial read of decrypted data block at the start.
             final int o = (int) (fp % blockLen);
@@ -300,7 +314,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
                 fp += blockLen;
             }
         }
-        
+
         // Partial read of decrypted data block at the end.
         if (read < len && fp < length) {
             // The file pointer is not on a block boundary.
@@ -310,21 +324,11 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             read += n;
             fp += n;
         }
-        
+
         // Assert that at least one byte has been read if len isn't zero.
         // Note that EOF has been tested before.
         assert read > 0;
         return read;
-    }
-
-    /**
-     * Ensures that this file is open and has been initialized.
-     *
-     * @throws IOException If the preconditions do not hold.
-     */
-    private final void ensureInit() throws IOException {
-        if (cipher == null)
-            throw new IOException("file is closed or not initialized");
     }
 
     /**
@@ -334,6 +338,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      *
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         if (closed)
             return;
@@ -348,7 +353,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      * Ensures that the block with the decrypted data for partial reading is
      * positioned so that it contains the current virtual file pointer
      * in the encrypted file.
-     * 
+     *
      * @throws IOException On any I/O related issue.
      *         The block is not moved in this case.
      */
@@ -366,7 +371,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         positionWindow();
         final long blockCounter = fp / blockLen;
         blockOff = blockCounter * blockLen;
-        
+
         // Decrypt block from window.
         cipher.setBlockCounter(blockCounter);
         cipher.processBlock(window, (int) (blockOff - windowOff), block, 0);
@@ -376,7 +381,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      * Ensures that the window is positioned so that the block containing
      * the current virtual file pointer in the encrypted file is entirely
      * contained in it.
-     * 
+     *
      * @throws IOException On any I/O related issue.
      *         The window is invalidated in this case.
      */
@@ -387,7 +392,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         final long nextWindowOff = windowOff + windowLen;
         if (windowOff <= fp && fp < nextWindowOff)
             return;
-    
+
         try {
             // Move window in the encrypted file.
             final int blockLen = block.length;

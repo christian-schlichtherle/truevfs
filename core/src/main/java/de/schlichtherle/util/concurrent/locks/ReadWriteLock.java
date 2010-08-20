@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Schlichtherle IT Services
+ * Copyright (C) 2006-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.key.passwd.swing;
+package de.schlichtherle.util.concurrent.locks;
 
 /**
- * Provides visual and/or audible feedback to the user when prompting
- * for a key to open an existing protected resource.
+ * Similar to {@link java.util.concurrent.locks.ReadWriteLock},
+ * but uses the simplified {@link ReentrantLock} interface.
  *
- * @deprecated
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.2
  */
-public interface OpenKeyFeedback extends Feedback {
+public interface ReadWriteLock {
+
+    /** Returns the lock for reading. */
+    ReentrantLock readLock();
+
+    /** Returns the lock for writing. */
+    ReentrantLock writeLock();
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   - Copyright (C) 2005-2010 Schlichtherle IT Services
   -
@@ -12,21 +13,22 @@
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   - See the License for the specific language governing permissions and
   - limitations under the License.
-  -->
-<html>
-<head>
-<meta http-equiv="Content-Language" content="en">
-<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-</head>
-<body>
-A custom implementation of the &quot;IBM437&quot; character set.
-This is the original IBM PC character set for the USA, also known as
-&quot;CP437&quot;, and is used as the default charset by TrueZIP's archive
-driver for the ZIP file format.
-<p>
-This implementation is required because this character set may not be
-installed in the JRE.
-In Sun's JRE, if installed, it's contained in <code>lib/charsets.jar</code>
-in the JRE home directory.
-</body>
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head/>
+    <body>
+        <p>
+            Provides an implementation of the {@code IBM437} character set.
+            This is the original IBM PC character set for the USA, also known
+            as {@code CP437}, and is the original character set used in ZIP
+            files.
+        </p>
+        <p>
+            This implementation is provided because this character set does not
+            need to be present in a JRE.
+            In Sun's JRE, if installed, it's contained in
+            {@code lib/charsets.jar} in the JRE home directory.
+        </p>
+    </body>
 </html>

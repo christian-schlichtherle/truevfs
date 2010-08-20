@@ -37,8 +37,8 @@ interface ZIP {
 
     /**
      * This boolean field is set by the system property
-     * <code>de.schlichtherle.util.zip.zip64ext</code>.
-     * If this property is set to <code>true</code> (case is ignored),
+     * {@code de.schlichtherle.util.zip.zip64ext}.
+     * If this property is set to {@code true} (case is ignored),
      * then ZIP64 extensions are always added when writing a ZIP archive file,
      * regardless of its size.
      * This system property is intended for testing purposes only.

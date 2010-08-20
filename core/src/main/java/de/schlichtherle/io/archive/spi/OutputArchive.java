@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * Defines the interface used to write entries to an archive file.
  * <p>
  * Implementations do <em>not</em> need to be thread safe:
- * Multithreading is addressed in the package <code>de.schlichtherle.io</code>.
+ * Multithreading is addressed in the package {@code de.schlichtherle.io}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -53,19 +53,19 @@ public interface OutputArchive {
 
     /**
      * Returns the {@link ArchiveEntry} for the given entry name or
-     * <code>null</code> if no entry with this name has been written
+     * {@code null} if no entry with this name has been written
      * or started to be written.
      * <p>
      * This method may be called before the archive is closed and must also
      * reflect entries which have not yet been closed.
      * 
-     * @param entryName A valid archive entry name - never <code>null</code>.
+     * @param entryName A valid archive entry name - never {@code null}.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
      */
     ArchiveEntry getArchiveEntry(String entryName);
 
     /**
-     * Returns a new <code>OutputStream</code> for writing the contents of the
+     * Returns a new {@code OutputStream} for writing the contents of the
      * given archive entry.
      * <p>
      * The returned stream should preferrably be unbuffered, as buffering is
@@ -80,7 +80,7 @@ public interface OutputArchive {
      *        The runtime class of this entry is the same as the runtime class
      *        of the entries returned by
      *        {@link ArchiveDriver#createArchiveEntry}.
-     * @param srcEntry If not <code>null</code>, this identifies the entry
+     * @param srcEntry If not {@code null}, this identifies the entry
      *        from which TrueZIP is actually copying data from and should be
      *        used to implement the Direct Data Copying (DDC) feature.
      *        Note that there is no guarantee on the runtime type of this
@@ -99,7 +99,7 @@ public interface OutputArchive {
      *        removing the need to create (yet another) temporary file.
      * @return A (preferrably unbuffered) {@link OutputStream} to write the
      *         archive entry data to.
-     *         <code>null</code> is not allowed!
+     *         {@code null} is not allowed!
      * @throws OutputArchiveBusyException If the archive is currently busy
      *         on output for another entry.
      *         This exception is guaranteed to be recoverable, meaning it
@@ -111,21 +111,6 @@ public interface OutputArchive {
      */
     OutputStream getOutputStream(ArchiveEntry entry, ArchiveEntry srcEntry)
     throws OutputArchiveBusyException, FileNotFoundException, IOException;
-
-    /**
-     * Writes the given <code>entry</code> as a directory enry.
-     *
-     * @deprecated This method will be removed in the next major version number
-     *             release and should be implemented as
-     *             <code>getOutputStream(entry, null).close()</code>.
-     * @param entry The archive entry to write. This is <em>never</em>
-     *        <code>null</code> and safe to be casted to the archive entry
-     *        type actually created by the
-     *        {@link ArchiveDriver#createArchiveEntry} method.
-     * @throws IOException On any exceptional condition.
-     */
-    void storeDirectory(ArchiveEntry entry)
-    throws IOException;
     
     /**
      * Closes this output archive and releases any system resources
@@ -138,14 +123,14 @@ public interface OutputArchive {
 
     /**
      * Returns the meta data for this input archive.
-     * The default value is <code>null</code>.
+     * The default value is {@code null}.
      */
     OutputArchiveMetaData getMetaData();
 
     /**
      * Sets the meta data for this input archive.
      *
-     * @param metaData The meta data - may not be <code>null</code>.
+     * @param metaData The meta data - may not be {@code null}.
      */
     void setMetaData(OutputArchiveMetaData metaData);
 }

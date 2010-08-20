@@ -27,12 +27,13 @@ import de.schlichtherle.io.archive.zip.CheckedZipDriver;
 public class CheckedZipFileTest extends FileTestCase {
     
     /**
-     * Creates a new instance of <code>CheckedZipFileTest</code>.
+     * Creates a new instance of {@code CheckedZipFileTest}.
      */
     public CheckedZipFileTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".zip";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector(

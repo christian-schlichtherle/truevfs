@@ -16,7 +16,7 @@
 
 package de.schlichtherle.io;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Thrown if an input or output stream for an archive entry has been forced to
@@ -30,6 +30,7 @@ import java.io.*;
  * @since TrueZIP 6.0
  */
 public class ArchiveEntryStreamClosedException extends IOException {
+    private static final long serialVersionUID = 4563928734723923649L;
     
     // TODO: Make this package private!
     public ArchiveEntryStreamClosedException() {

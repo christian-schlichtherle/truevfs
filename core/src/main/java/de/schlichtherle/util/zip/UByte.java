@@ -56,15 +56,15 @@ final class UByte {
      * @param i The integer to check to be in the range of an unsigned byte
      *        integer ({@value SIZE} bits).
      * @param subject The subject of the exception message
-     *        - may be <code>null</code>.
+     *        - may be {@code null}.
      *        This should not end with a punctuation character.
      * @param error First sentence of the exception message
-     *        - may be <code>null</code>.
+     *        - may be {@code null}.
      *        This should not end with a punctuation character.
-     * @throws IllegalArgumentException If <code>i</code> is less than
+     * @throws IllegalArgumentException If {@code i} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static final void check(
+    public static void check(
             final int i,
             final String subject,
             final String error)
@@ -95,10 +95,10 @@ final class UByte {
      * 
      * @param i The integer to check to be in the range of an unsigned byte
      *        integer ({@value SIZE} bits).
-     * @throws IllegalArgumentException If <code>i</code> is less than
+     * @throws IllegalArgumentException If {@code i} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static final void check(final int i)
+    public static void check(final int i)
     throws IllegalArgumentException {
         check(i, "Integer out of range", null);
     }

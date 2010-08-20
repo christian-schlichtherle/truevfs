@@ -30,7 +30,7 @@ package de.schlichtherle.io;
  * unless other exceptional conditions apply.
  * However, if the client application is still using a disconnected stream,
  * it will receive an {@link ArchiveEntryStreamClosedException} on the next
- * call to any other method than <code>close()</code>.
+ * call to any other method than {@code close()}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see File#umount
@@ -40,23 +40,13 @@ package de.schlichtherle.io;
  * @since TrueZIP 6.0
  */
 public class ArchiveBusyException extends ArchiveException {
+    private static final long serialVersionUID = 1937861953461235716L;
 
     ArchiveBusyException(ArchiveException priorException, String cPath) {
         super(priorException, cPath);
     }
 
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     * It will vanish in the next major version.
-     */
-    public ArchiveBusyException(
-            ArchiveException priorException, java.io.File target) {
-        super(priorException, target.getPath());
-
-        assert target.isAbsolute();
-    }
-
+    @Override
     public int getPriority() {
         return -2;
     }

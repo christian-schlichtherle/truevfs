@@ -41,12 +41,12 @@ import javax.swing.text.JTextComponent;
  * the combo box model with the actual auto completion data.
  * <p>
  * This class is designed to be minimal intrusive: It works with any subclass
- * of <code>JComboBox</code> and doesn't require a special
+ * of {@code JComboBox} and doesn't require a special
  * {@link ComboBoxModel}, although its specific behaviour will only show
- * if the <code>JComboBox</code> is <code>editable</code> and uses an
+ * if the {@code JComboBox} is {@code editable} and uses an
  * instance of a {@link MutableComboBoxModel} (which, apart from the
- * <code>editable</code> property being set to <code>true</code>, is the
- * default for a plain <code>JComboBox</code>).
+ * {@code editable} property being set to {@code true}, is the
+ * default for a plain {@code JComboBox}).
  *
  * @author Christian Schlichtherle
  * @since TrueZIP 6.2
@@ -77,7 +77,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * and hence the drop down list of the combo box is left unchanged.
      *
      * @param comboBox The combo box to enable browsing for auto completions.
-     *        May be <code>null</code>.
+     *        May be {@code null}.
      */
     public AbstractComboBoxBrowser(final JComboBox comboBox) {
         changeComboBox(null, comboBox, false);
@@ -85,7 +85,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
 
     /**
      * Returns the combo box which this object is auto completing.
-     * The default is <code>null</code>.
+     * The default is {@code null}.
      */
     public JComboBox getComboBox() {
         return comboBox;
@@ -97,7 +97,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * item.
      *
      * @param comboBox The combo box to enable browsing for auto completions.
-     *        May be <code>null</code>.
+     *        May be {@code null}.
      */
     public void setComboBox(final JComboBox comboBox) {
         changeComboBox(getComboBox(), comboBox, true);
@@ -118,7 +118,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
         }
 
         this.comboBox = newCB;
-        
+
         ComboBoxEditor newCBE = null;
         if (newCB != null) {
             newCB.updateUI(); // ensure comboBoxEditor is initialized
@@ -247,15 +247,15 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
 
     /**
      * Subclasses are expected to update the auto completion elements in the
-     * model of this combo box based on the specified <code>initials</code>.
+     * model of this combo box based on the specified {@code initials}.
      * They should not do any other work within this method.
      * In particular, they should not update the visual appearance of this
      * component.
      * <p>
-     * {@link #getComboBox} is guaranteed to return non-<code>null</code> if
+     * {@link #getComboBox} is guaranteed to return non-{@code null} if
      * this method is called from this abstract base class.
      *
-     * @param initials The text to auto complete. May be <code>null</code>.
+     * @param initials The text to auto complete. May be {@code null}.
      * @return Whether or not the combo box should pop up to show the updated
      *         contents of its model.
      */
@@ -265,7 +265,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
      * Locks out mutual recursive event notification.
      * <b>Warning:</b> This method works in a synchronized or single threaded
      * environment only!
-     * 
+     *
      * @return Whether or not updating the combo box model was already locked.
      */
     private boolean lock() {
@@ -316,13 +316,13 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
     }
 
     /**
-     * This proxy controls access to the real <code>ComboBoxEditor</code>
+     * This proxy controls access to the real {@code ComboBoxEditor}
      * installed by the client application or the pluggable look and feel.
      * It is used to lock out mutual recursion caused by modifications to
-     * the list model in the <code>JComboBox</code>.
+     * the list model in the {@code JComboBox}.
      * <p>
      * Note that there is a slight chance that the introduction of this proxy
-     * breaks the look and feel if it does <code>instanceof</code> tests for
+     * breaks the look and feel if it does {@code instanceof} tests for
      * a particular class, but I'm not aware of any look and feel which is
      * actually affected.
      * In order to reduce this risk, this class is extended from
@@ -339,7 +339,7 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
         public ComboBoxEditor getEditor() {
             return comboBoxEditor;
         }
-        
+
         @Override
         public Component getEditorComponent() {
             return comboBoxEditor.getEditorComponent();

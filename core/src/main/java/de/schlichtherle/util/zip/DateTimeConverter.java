@@ -50,9 +50,9 @@ public abstract class DateTimeConverter {
      * <p>
      * This behaviour provides best interoperability with:
      * <ul>
-     * <li>Java SE: <code>jar</code> utility
-     *     and <code>java.util.zip</code> package</li>
-     * <li>Info-ZIP: <code>unzip</code></li>
+     * <li>Java SE: {@code jar} utility
+     *     and {@code java.util.zip} package</li>
+     * <li>Info-ZIP: {@code unzip}</li>
      * </ul>
      */
     public static final DateTimeConverter JAR = new DateTimeConverter() {
@@ -109,7 +109,7 @@ public abstract class DateTimeConverter {
      * @return A DOS date/time value reflecting the local time zone and
      *         rounded down to even seconds which is minimum
      *         January 1<sup>st</sup>, 1980 AD 00:00:00.
-     * @throws RuntimeException If <code>jTime</code> is negative
+     * @throws RuntimeException If {@code jTime} is negative
      *         or later than 2107 AD.
      * @see #toJavaTime(long)
      * @see #createTimeZone()
@@ -163,15 +163,15 @@ public abstract class DateTimeConverter {
      * However, the returned Java time may differ from its intended value at
      * the time of the creation of the ZIP archive file and when converting
      * it back again, the resulting DOS date/time will not be the same as
-     * <code>dTime</code>.
+     * {@code dTime}.
      * Hence, interoperability is negatively affected in this case.
      *
      * @param dTime The DOS date/time value.
      * @return The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>the epoch</i> alias Java time).
-     * @throws RuntimeException If <code>dTime</code> is earlier
+     * @throws RuntimeException If {@code dTime} is earlier
      *         than 1980 AD
-     *         or greater than <code>0xffffffffL</code>
+     *         or greater than {@code 0xffffffffL}
      *         or holds an illegal DOS date/time field combination
      *         and assertions are enabled.
      * @see #toDosTime(long)
@@ -224,6 +224,7 @@ public abstract class DateTimeConverter {
 
     /** @see #getCalendar() */
     private final ThreadLocal calendar = new ThreadLocal() {
+        @Override
         protected Object initialValue() {
             final Calendar cal = new GregorianCalendar(createTimeZone());
             boolean ea = false;
@@ -238,7 +239,7 @@ public abstract class DateTimeConverter {
      * All returned instances must have the same
      * {@link TimeZone#hasSameRules(TimeZone) rules}.
      *
-     * @return A new timezone for date/time conversion - never <code>null</code>.
+     * @return A new timezone for date/time conversion - never {@code null}.
      */
     protected abstract TimeZone createTimeZone();
 
@@ -248,7 +249,7 @@ public abstract class DateTimeConverter {
      *
      * @param jTime The number of milliseconds since midnight, January 1st,
      *        1970 AD UTC (called <i>the epoch</i> alias Java time).
-     * @return <code>yes</code> for round-up, <code>no</code> for round-down.
+     * @return {@code yes} for round-up, {@code no} for round-down.
      */
     protected abstract boolean roundUp(long jTime);
 

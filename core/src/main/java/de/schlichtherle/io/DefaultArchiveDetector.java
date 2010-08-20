@@ -16,13 +16,16 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-import de.schlichtherle.util.regex.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.io.util.SuffixSet;
+import de.schlichtherle.util.regex.ThreadLocalMatcher;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * An {@link ArchiveDetector} which matches file paths against a pattern of
@@ -68,13 +71,13 @@ import java.util.regex.*;
  * </ol>
  * <p>
  * Where a constructor expects a suffix list as a parameter, this string must
- * have the form <code>&quot;suffix[|suffix]*&quot;</code>, where
- * <code>suffix</code> is a combination of case insensitive letters.
+ * have the form {@code &quot;suffix[|suffix]*&quot;}, where
+ * {@code suffix} is a combination of case insensitive letters.
  * Empty or duplicated suffixes and leading dots are silently ignored
- * and <code>null</code> is interpreted as an empty list.
- * As an example, the parameter <code>&quot;zip|jar&quot;</code> would cause
+ * and {@code null} is interpreted as an empty list.
+ * As an example, the parameter {@code &quot;zip|jar&quot;} would cause
  * the archive detector to recognize ZIP and JAR files in a path.
- * The same would be true for <code>&quot;||.ZIP||.JAR||ZIP||JAR||&quot;</code>,
+ * The same would be true for {@code &quot;||.ZIP||.JAR||ZIP||JAR||&quot;},
  * but this notation is discouraged because it's not in canonical form
  * (see {@link #getSuffixes}.
  * <p>
@@ -121,11 +124,11 @@ public class DefaultArchiveDetector
     private transient ThreadLocalMatcher matcher; // never transmit this over the wire!
 
     /**
-     * Creates a new <code>DefaultArchiveDetector</code> by filtering the
-     * global registry for all canonicalized suffixes in <code>list</code>.
+     * Creates a new {@code DefaultArchiveDetector} by filtering the
+     * global registry for all canonicalized suffixes in {@code list}.
      * 
      * @param list A list of suffixes which shall identify prospective
-     *        archive files. May be <code>null</code> or empty, but must
+     *        archive files. May be {@code null} or empty, but must
      *        obeye the usual syntax.
      * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
      * @throws IllegalArgumentException If any of the suffixes in the suffix
@@ -155,24 +158,24 @@ public class DefaultArchiveDetector
     }
 
     /**
-     * Creates a new <code>DefaultArchiveDetector</code> by
-     * decorating the configuration of <code>delegate</code> with
-     * mappings for all canonicalized suffixes in <code>list</code> to
-     * <code>driver</code>.
+     * Creates a new {@code DefaultArchiveDetector} by
+     * decorating the configuration of {@code delegate} with
+     * mappings for all canonicalized suffixes in {@code list} to
+     * {@code driver}.
      * 
-     * @param delegate The <code>DefaultArchiveDetector</code> which's
+     * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
      * @param list A non-null, non-empty archive file suffix list, obeying
      *        the usual syntax.
      * @param driver The archive driver to map for the suffix list.
      *        This must either be an archive driver instance or
-     *        <code>null</code>.
-     *        A <code>null</code> archive driver may be used to shadow a
-     *        mapping for the same archive driver in <code>delegate</code>,
+     *        {@code null}.
+     *        A {@code null} archive driver may be used to shadow a
+     *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
      * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
-     * @throws NullPointerException If <code>delegate</code> or
-     *         <code>list</code> is <code>null</code>.
+     * @throws NullPointerException If {@code delegate} or
+     *         {@code list} is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         suffix list.
@@ -185,23 +188,23 @@ public class DefaultArchiveDetector
     }
 
     /**
-     * Creates a new <code>DefaultArchiveDetector</code> by
-     * decorating the configuration of <code>delegate</code> with
-     * mappings for all entries in <code>config</code>.
+     * Creates a new {@code DefaultArchiveDetector} by
+     * decorating the configuration of {@code delegate} with
+     * mappings for all entries in {@code config}.
      * 
-     * @param delegate The <code>DefaultArchiveDetector</code> which's
+     * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
      * @param config An array of suffix lists and archive driver IDs.
      *        Each key in this map must be a non-null, non-empty archive file
      *        suffix list, obeying the usual syntax.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or <code>null</code>.
-     *        A <code>null</code> archive driver may be used to shadow a
-     *        mapping for the same archive driver in <code>delegate</code>,
+     *        an archive driver class, or {@code null}.
+     *        A {@code null} archive driver may be used to shadow a
+     *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
      * @throws NullPointerException If any parameter or configuration element
-     *         other than an archive driver is <code>null</code>.
+     *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
@@ -214,23 +217,23 @@ public class DefaultArchiveDetector
     }
 
     /**
-     * Creates a new <code>DefaultArchiveDetector</code> by
-     * decorating the configuration of <code>delegate</code> with
-     * mappings for all entries in <code>config</code>.
+     * Creates a new {@code DefaultArchiveDetector} by
+     * decorating the configuration of {@code delegate} with
+     * mappings for all entries in {@code config}.
      * 
-     * @param delegate The <code>DefaultArchiveDetector</code> which's
+     * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
      * @param config A map of suffix lists and archive drivers.
      *        Each key in this map must be a non-null, non-empty archive file
      *        suffix list, obeying the usual syntax.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or <code>null</code>.
-     *        A <code>null</code> archive driver may be used to shadow a
-     *        mapping for the same archive driver in <code>delegate</code>,
+     *        an archive driver class, or {@code null}.
+     *        A {@code null} archive driver may be used to shadow a
+     *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
      * @throws NullPointerException If any parameter or configuration element
-     *         other than an archive driver is <code>null</code>.
+     *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
@@ -268,14 +271,14 @@ public class DefaultArchiveDetector
      * An archive driver is looked up in the registry as follows:
      * <ol>
      * <li>If the registry holds a string, it's supposed to be the fully
-     *     qualified class name of an <code>ArchiveDriver</code>
+     *     qualified class name of an {@code ArchiveDriver}
      *     implementation. The class will be loaded and stored in the registry.
      * <li>If the registry then holds a class instance, it's instantiated
      *     with its no-arguments constructor, cast to the
-     *     <code>ArchiveDriver</code> type and stored in the registry.
+     *     {@code ArchiveDriver} type and stored in the registry.
      * <li>If the registry then holds an instance of an
-     *     <code>ArchiveDriver</code> implementation, it's returned.
-     * <li>Otherwise, <code>null</code> is returned.
+     *     {@code ArchiveDriver} implementation, it's returned.
+     * <li>Otherwise, {@code null} is returned.
      * </ol>
      *
      * @throws RuntimeException A subclass is thrown if loading or
@@ -295,9 +298,9 @@ public class DefaultArchiveDetector
      * Returns the set of archive file suffixes recognized by this archive
      * detector in canonical form.
      * 
-     * @return Either <code>&quot;&quot;</code> to indicate an empty set or
-     *         a string of the form <code>&quot;suffix[|suffix]*&quot;</code>,
-     *         where <code>suffix</code> is a combination of lower case
+     * @return Either {@code &quot;&quot;} to indicate an empty set or
+     *         a string of the form {@code &quot;suffix[|suffix]*&quot;},
+     *         where {@code suffix} is a combination of lower case
      *         letters which does <em>not</em> start with a dot.
      *         The string never contains empty or duplicated suffixes and the
      *         suffixes are sorted in natural order.

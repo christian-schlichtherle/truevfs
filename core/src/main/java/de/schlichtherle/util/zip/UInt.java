@@ -56,15 +56,15 @@ final class UInt {
      * @param l The long integer to check to be in the range of an unsigned
      *        integer ({@value SIZE} bits).
      * @param subject The subject of the exception message
-     *        - may be <code>null</code>.
+     *        - may be {@code null}.
      *        This should not end with a punctuation character.
      * @param error First sentence of the exception message
-     *        - may be <code>null</code>.
+     *        - may be {@code null}.
      *        This should not end with a punctuation character.
-     * @throws IllegalArgumentException If <code>l</code> is less than
+     * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static final void check(
+    public static void check(
             final long l,
             final String subject,
             final String error)
@@ -95,10 +95,10 @@ final class UInt {
      * 
      * @param l The long integer to check to be in the range of an unsigned
      *        integer ({@value SIZE} bits).
-     * @throws IllegalArgumentException If <code>l</code> is less than
+     * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static final void check(final long l)
+    public static void check(final long l)
     throws IllegalArgumentException {
         check(l, "Long integer out of range", null);
     }

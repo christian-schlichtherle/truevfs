@@ -16,14 +16,14 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class ChannelReadOnlyFileTest extends ReadOnlyFileTestCase {
-    
+
     public ChannelReadOnlyFileTest(String testName) {
         super(testName);
     }

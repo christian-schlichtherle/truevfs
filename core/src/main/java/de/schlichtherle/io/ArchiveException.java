@@ -17,10 +17,6 @@
 package de.schlichtherle.io;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Comparator;
 
 /**
  * Represents a chain of exceptions thrown by the {@link File#umount} and
@@ -31,14 +27,14 @@ import java.util.Comparator;
  * and store them in an exception chain until all archive files have been
  * updated.
  * Finally, if the exception chain is not empty, it's reordered and thrown
- * so that if its head is an instance of <code>ArchiveWarningException</code>,
+ * so that if its head is an instance of {@code ArchiveWarningException},
  * only instances of this class or its subclasses are in the chain, but no
- * instances of <code>ArchiveException</code> or its subclasses (except
- * <code>ArchiveWarningException</code>, of course).
+ * instances of {@code ArchiveException} or its subclasses (except
+ * {@code ArchiveWarningException}, of course).
  *
  * <p>This enables client applications to do a simple case distinction with a
  * try-catch-block like this to react selectively:</p>
- * <pre><code>
+ * <pre>{@code 
  * try {
  *     File.umount();
  * } catch (ArchiveWarningException warning) {
@@ -47,14 +43,15 @@ import java.util.Comparator;
  *     // Some data has been lost - panic!
  *     error.printStackTrace();
  * }
- * </code></pre>
+ * }</pre>
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0 (refactored from the predecessor class
- *        <code>ArchiveControllerException</code>)
+ *        {@code ArchiveControllerException})
  */
 public class ArchiveException extends ChainableIOException {
+    private static final long serialVersionUID = 4893204620357369739L;
 
     // TODO: Make this constructor package private!
     /**
@@ -65,7 +62,7 @@ public class ArchiveException extends ChainableIOException {
      * before.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be <tt>null</tt>.
+     *         caught. This is <b>not</b> a cause! May be {@code null}.
      */
     public ArchiveException(ArchiveException priorException) {
         super(priorException);
@@ -81,7 +78,7 @@ public class ArchiveException extends ChainableIOException {
      * before.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be <tt>null</tt>.
+     *         caught. This is <b>not</b> a cause! May be {@code null}.
      * @param  message The message for this exception.
      */
     public ArchiveException(
@@ -100,9 +97,9 @@ public class ArchiveException extends ChainableIOException {
      * before.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be <tt>null</tt>.
+     *         caught. This is <b>not</b> a cause! May be {@code null}.
      * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         {@link #getCause()} method).  (A {@code null} value is
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      */
@@ -122,10 +119,10 @@ public class ArchiveException extends ChainableIOException {
      * before.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be <tt>null</tt>.
+     *         caught. This is <b>not</b> a cause! May be {@code null}.
      * @param  message The message for this exception.
      * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         {@link #getCause()} method).  (A {@code null} value is
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      */

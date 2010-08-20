@@ -25,7 +25,7 @@ package de.schlichtherle.io;
 public class OdfFileTest extends FileTestCase {
     
     /**
-     * Creates a new instance of <code>ZipFileTest</code>.
+     * Creates a new instance of {@code ZipFileTest}.
      */
     public OdfFileTest(String testName) {
         super(testName);

@@ -39,8 +39,8 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[
 
     /**
      * The console to use for I/O.
-     * If <code>null</code>, the prompt methods are never called, so it's
-     * safe to assume that it's not <code>null</code> in these methods.
+     * If {@code null}, the prompt methods are never called, so it's
+     * safe to assume that it's not {@code null} in these methods.
      */
     protected static final Console con = System.console();
 

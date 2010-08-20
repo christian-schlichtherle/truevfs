@@ -38,7 +38,7 @@ public class ZipRaesFileTest extends FileTestCase {
 
     private String oldKeyManager;
 
-    /** Creates a new instance of <code>ZipRaesFileTest</code>. */
+    /** Creates a new instance of {@code ZipRaesFileTest}. */
     public ZipRaesFileTest(String testName) {
         super(testName);
     }

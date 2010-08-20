@@ -57,6 +57,7 @@ public class ZipInputArchive
         super(rof, charset, preambled, postambled);
     }
 
+    @Override
     protected de.schlichtherle.util.zip.ZipEntry createZipEntry(String entryName) {
         return new ZipEntry(Paths.normalize(entryName, '/'));
     }

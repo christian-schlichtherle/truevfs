@@ -39,6 +39,7 @@ public abstract class DateTimeConverterTestCase extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp()
     throws Exception {
         super.setUp();
@@ -47,6 +48,7 @@ public abstract class DateTimeConverterTestCase extends TestCase {
         cal.set(Calendar.MILLISECOND, 0);
     }
 
+    @Override
     protected void tearDown()
     throws Exception {
         super.tearDown();

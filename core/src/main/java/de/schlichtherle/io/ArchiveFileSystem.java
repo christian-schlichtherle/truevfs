@@ -16,12 +16,16 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.util.*;
-
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.InputArchive;
+import java.io.CharConversionException;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.swing.Icon;
 
 /**
@@ -30,11 +34,11 @@ import javax.swing.Icon;
  * <p>
  * <b>WARNING:</b>This class is <em>not</em> thread safe!
  * All calls to non-static methods <em>must</em> be synchronized on the
- * respective <tt>ArchiveController</tt> object!
+ * respective {@code ArchiveController} object!
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0 (refactored from the former <code>ZipFileSystem</code>)
+ * @since TrueZIP 6.0 (refactored from the former {@code ZipFileSystem})
  */
 final class ArchiveFileSystem implements Entry {
 
@@ -101,7 +105,7 @@ final class ArchiveFileSystem implements Entry {
     }
 
     /**
-     * Mounts the archive file system from <tt>archive</tt> and ensures its
+     * Mounts the archive file system from {@code archive} and ensures its
      * integrity.
      * First, a root directory with the given last modification time is
      * created - it's never loaded from the archive!
@@ -112,7 +116,7 @@ final class ArchiveFileSystem implements Entry {
      * be replaced.
      * <p>
      * Note that the entries in this file system are shared with
-     * <code>archive</code>.
+     * {@code archive}.
      * 
      * @param controller The controller which will use this file system.
      *        This constructor will solely use the controller as a factory
@@ -121,7 +125,7 @@ final class ArchiveFileSystem implements Entry {
      * @param archive The archive to mount the file system from.
      * @param rootTime The last modification time of the root of the mounted
      *        file system in milliseconds since the epoch.
-     * @param readOnly If and only if <code>true</code>, any subsequent
+     * @param readOnly If and only if {@code true}, any subsequent
      *        modifying operation will result in a
      *        {@link ArchiveReadOnlyException}.
      */
@@ -173,8 +177,8 @@ final class ArchiveFileSystem implements Entry {
     /**
      * Checks whether the given entry entryName is a legal entry name.
      * A legal entry name does not denote the virtual root directory, the dot
-     * directory (<code>&quot;.&quot;</code>) or the dot-dot directory
-     * (<code>&quot;..&quot;</code>) or any of their descendants.
+     * directory ({@code &quot;.&quot;}) or the dot-dot directory
+     * ({@code &quot;..&quot;}) or any of their descendants.
      */
     private static boolean isLegalEntryName(final String entryName) {
         final int l = entryName.length();
@@ -224,7 +228,7 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * Called from a constructor to fix the parent directories of
-     * <tt>entry</tt>, ensuring that all parent directories of the entry
+     * {@code entry}, ensuring that all parent directories of the entry
      * exist and that they contain the respective child.
      * If a parent directory does not exist, it is created using an
      * unkown time as the last modification time - this is defined to be a
@@ -262,20 +266,20 @@ final class ArchiveFileSystem implements Entry {
      * @return The {@link #split} array, which will hold at least two strings:
      *         <ul>
      *         <li>Index 0 holds the parent entry name.
-     *             If <code>entryName</code> is empty or equals
-     *             <code>SEPARATOR</code>, this is <code>null</code>.
+     *             If {@code entryName} is empty or equals
+     *             {@code SEPARATOR}, this is {@code null}.
      *             Otherwise, this contains the parent name of the entry and
-     *             <em>always</em> ends with an <code>SEPARATOR</code>.
+     *             <em>always</em> ends with an {@code SEPARATOR}.
      *         <li>Index 1 holds the base name.
-     *             If <code>entryName</code> is empty or equals
-     *             <code>SEPARATOR</code>, this is an empty string.
+     *             If {@code entryName} is empty or equals
+     *             {@code SEPARATOR}, this is an empty string.
      *             Otherwise, this contains the base name of the entry and
-     *             <em>never</em> contains an <code>SEPARATOR</code>.
+     *             <em>never</em> contains an {@code SEPARATOR}.
      *         </ul>
-     * @throws NullPointerException If <code>entryName</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code entryName} is
+     *         {@code null}.
      */
-    private final String[] split(final String entryName) {
+    private String[] split(final String entryName) {
         //return Paths.split(entryName, SEPARATOR_CHAR, split);
         return split(entryName, split);
     }
@@ -315,7 +319,7 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * Indicates whether this file system is read only or not.
-     * The default is <tt>false</tt>.
+     * The default is {@code false}.
      */
     boolean isReadOnly() {
         return readOnly;
@@ -323,7 +327,7 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * Indicates whether this file system has been modified since
-     * its time of creation or the last call to <tt>resetTouched()</tt>.
+     * its time of creation or the last call to {@code resetTouched()}.
      */
     boolean isTouched() {
         assert controller.getFileSystem() == this;
@@ -351,7 +355,7 @@ final class ArchiveFileSystem implements Entry {
     }
 
     /**
-     * Returns an enumeration of all <code>ArchiveEntry</code> instances
+     * Returns an enumeration of all {@code ArchiveEntry} instances
      * in this file system.
      */
     Enumeration getArchiveEntries() {
@@ -372,16 +376,16 @@ final class ArchiveFileSystem implements Entry {
     }
 
     /**
-     * Returns <code>true</code> iff the given entry name refers to the
+     * Returns {@code true} iff the given entry name refers to the
      * virtual root directory within this controller.
      */
-    static final boolean isRoot(String entryName) {
+    static boolean isRoot(String entryName) {
         return ROOT_NAME == entryName; // possibly assigned by File.init(...)
     }
 
     /**
      * Looks up the specified entry in the file system and returns it or
-     * <tt>null</tt> if not existent.
+     * {@code null} if not existent.
      */
     ArchiveEntry get(String entryName) {
         assert entryName != null;
@@ -400,7 +404,7 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * Begins a &quot;create and link entry&quot; transaction to ensure that either a
-     * new entry for the given <tt>entryName</tt> will be created or an
+     * new entry for the given {@code entryName} will be created or an
      * existing entry is replaced within this virtual archive file system.
      * <p>
      * This is the first step of a two-step process to create an archive entry
@@ -409,7 +413,7 @@ final class ArchiveFileSystem implements Entry {
      * after you have successfully conducted the operations which compose the
      * transaction.
      * <p>
-     * Upon a <code>commit</code> operation, the last modification time of
+     * Upon a {@code commit} operation, the last modification time of
      * the newly created and linked entries will be set to the system's
      * current time at the moment the transaction has begun and the file
      * system will be marked as touched at the moment the transaction has
@@ -422,10 +426,10 @@ final class ArchiveFileSystem implements Entry {
      * returned object may be safely collected by the garbage collector,
      * 
      * @param entryName The relative path name of the entry to create or replace.
-     * @param createParents If <tt>true</tt>, any non-existing parent
+     * @param createParents If {@code true}, any non-existing parent
      *        directory will be created in this file system with its last
      *        modification time set to the system's current time.
-     * @param template If not <code>null</code>, then the newly created or
+     * @param template If not {@code null}, then the newly created or
      *        replaced entry shall inherit as much properties from this
      *        instance as possible (with the exception of the name).
      *        This is typically used for archive copy operations and requires
@@ -438,14 +442,14 @@ final class ArchiveFileSystem implements Entry {
      *         is read only.
      * @throws ArchiveFileSystemException If one of the following is true:
      *         <ul>
-     *         <li><code>entryName</code> contains characters which are not
+     *         <li>{@code entryName} contains characters which are not
      *             supported by the archive file.
-     *         <li>The entry name indicates a directory (trailing <tt>/</tt>)
+     *         <li>The entry name indicates a directory (trailing {@code /})
      *             and its entry does already exist within this file system.
      *         <li>The entry is a file or directory and does already exist as
      *             the respective other type within this file system.
      *         <li>The parent directory does not exist and
-     *             <tt>createParents</tt> is <tt>false</tt>.
+     *             {@code createParents} is {@code false}.
      *         <li>One of the entry's parents denotes a file.
      *         </ul>
      */
@@ -599,11 +603,11 @@ final class ArchiveFileSystem implements Entry {
      * This interface encapsulates the methods required to begin and commit
      * a simplified transaction (a delta) on this virtual archive file system.
      * <p>
-     * Note that there is no <code>begin</code> or <code>rollback</code>
+     * Note that there is no {@code begin} or {@code rollback}
      * method in this class.
-     * Instead, <code>begin</code> is expected to be implemented by the
+     * Instead, {@code begin} is expected to be implemented by the
      * constructor of the implementation and must not modify the file system,
-     * so that an explicit <code>rollback</code> is not required.
+     * so that an explicit {@code rollback} is not required.
      */
     interface Delta {
 
@@ -630,14 +634,14 @@ final class ArchiveFileSystem implements Entry {
      * 
      * @param entryName The path name of the entry to create or replace.
      *        This must be a relative path name.
-     * @param blueprint If not <code>null</code>, then the newly created entry
+     * @param blueprint If not {@code null}, then the newly created entry
      *        shall inherit as much attributes from this object as possible
      *        (with the exception of the name).
      *        This is typically used for archive copy operations and requires
      *        some support by the archive driver.
      * @return An {@link ArchiveEntry} created by the archive driver and
      *         properly initialized with meta data.
-     * @throws CharConversionException If <code>entryName</code> contains
+     * @throws CharConversionException If {@code entryName} contains
      *         characters which are not supported by the archive file.
      */
     private ArchiveEntry createArchiveEntry(
@@ -652,8 +656,8 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * Like {@link #createArchiveEntry}, but throws an
-     * <code>AssertionError</code> instead of
-     * <code>CharConversionException</code>.
+     * {@code AssertionError} instead of
+     * {@code CharConversionException}.
      *
      * @throws AssertionError If a {@link CharConversionException} occurs.
      */
@@ -667,7 +671,7 @@ final class ArchiveFileSystem implements Entry {
 
     /**
      * If this method returns, the entry identified by the given
-     * <tt>entryName</tt> has been successfully deleted from the virtual
+     * {@code entryName} has been successfully deleted from the virtual
      * archive file system.
      * If the entry is a directory, it must be empty for successful deletion.
      * 
@@ -689,7 +693,7 @@ final class ArchiveFileSystem implements Entry {
                         "entry does not exist");
             if (entry == root
                     || entry.isDirectory()
-                        && entry.getMetaData().children.size() != 0) {
+                        && !entry.getMetaData().children.isEmpty()) {
                 master.put(entryName, entry); // Restore file system
                 throw new ArchiveFileSystemException(entryName,
                         "directory is not empty");
@@ -850,7 +854,7 @@ final class ArchiveFileSystem implements Entry {
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir,
-            final FileFactory factory) { // deprecated warning is OK!
+            final FileFactory factory) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(entryName + SEPARATOR);
         if (entry != null)
@@ -863,7 +867,7 @@ final class ArchiveFileSystem implements Entry {
             final String entryName,
             final FileFilter fileFilter,
             final File dir,
-            final FileFactory factory) { // deprecated warning is OK!
+            final FileFactory factory) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(entryName + SEPARATOR);
         if (entry != null)
@@ -908,6 +912,8 @@ final class ArchiveFileSystem implements Entry {
      * even know about the existence of virtual archive file systems.
      */
     static class ArchiveFileSystemException extends IOException {
+        private static final long serialVersionUID = 4652084652223428651L;
+
         /** The entry's path name. */
         private final String entryName;
 
@@ -921,6 +927,7 @@ final class ArchiveFileSystem implements Entry {
             this.entryName = entryName;
         }
 
+        @Override
         public String getMessage() {
             // For performance reasons, this string is constructed on demand
             // only!
@@ -935,6 +942,8 @@ final class ArchiveFileSystem implements Entry {
      * virtual archive file system.
      */
     static class ArchiveReadOnlyException extends ArchiveFileSystemException {
+        private static final long serialVersionUID = 987645923519873262L;
+
         private ArchiveReadOnlyException() {
             super("Archive file is read-only!");
         }

@@ -27,6 +27,7 @@ package de.schlichtherle.io;
  */
 public class ArchiveOutputBusyWarningException
         extends ArchiveBusyWarningException {
+    private static final long serialVersionUID = 8465202307683484734L;
 
     private final int numStreams;
 
@@ -39,7 +40,7 @@ public class ArchiveOutputBusyWarningException
 
     /**
      * Returns the number of open entry output streams, whereby an open stream
-     * is a stream which's <code>close()</code> method hasn't been called.
+     * is a stream which's {@code close()} method hasn't been called.
      */
     public int getNumStreams() {
         return numStreams;

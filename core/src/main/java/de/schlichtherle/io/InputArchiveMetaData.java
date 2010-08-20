@@ -16,25 +16,28 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-import de.schlichtherle.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.InputArchive;
+import de.schlichtherle.io.util.SynchronizedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * <em>This class is <b>not</b> intended for public use!</em>
- * It's only public in order to implement
- * {@link de.schlichtherle.io.archive.spi.ArchiveDriver}s.
- * <p>
  * Annotates an {@link InputArchive} with the methods required for safe
  * reading of archive entries.
  * As an implication of this, it's also responsible for the synchronization
  * of the streams between multiple threads.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * It's only public for technical reasons and may get renamed or entirely
+ * disappear without notice.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -70,7 +73,7 @@ public final class InputArchiveMetaData {
      * The pool of all open entry streams.
      * This is implemented as a map where the keys are the streams and the
      * value is the current thread.
-     * If <code>File.isLenient()</code> is true, then the map is actually
+     * If {@code File.isLenient()} is true, then the map is actually
      * instantiated as a {@link WeakHashMap}. Otherwise, it's a {@link HashMap}.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
@@ -85,7 +88,7 @@ public final class InputArchiveMetaData {
     private volatile boolean stopped;
 
     /**
-     * Creates a new instance of <code>InputArchiveMetaData</code>
+     * Creates a new instance of {@code InputArchiveMetaData}
      * and sets itself as the meta data for the given input archive.
      */
     InputArchiveMetaData(final Archive archive, final InputArchive inArchive) {
@@ -110,7 +113,7 @@ public final class InputArchiveMetaData {
      * Waits until all entry streams which have been opened (and not yet closed)
      * by all <em>other threads</em> are closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
-     * a warning message is logged using <code>java.util.logging</code> and
+     * a warning message is logged using {@code java.util.logging} and
      * this method returns.
      * <p>
      * Unless otherwise prevented, another thread could immediately open
@@ -167,8 +170,8 @@ public final class InputArchiveMetaData {
      * Closes and disconnects <em>all</em> entry streams for the archive
      * containing this metadata object.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
-     * streams will throw an <code>IOException</code>, with the exception of
-     * their <code>close()</code> method.
+     * streams will throw an {@code IOException}, with the exception of
+     * their {@code close()} method.
      */
     synchronized ArchiveException closeAllInputStreams(
             ArchiveException exceptionChain) {
@@ -200,6 +203,7 @@ public final class InputArchiveMetaData {
     private final class EntryInputStream extends SynchronizedInputStream {
         private /*volatile*/ boolean closed;
 
+        @SuppressWarnings("NotifyWhileNotSynced")
         private EntryInputStream(final InputStream in) {
             super(in, InputArchiveMetaData.this);
             assert in != null;
@@ -207,31 +211,36 @@ public final class InputArchiveMetaData {
             InputArchiveMetaData.this.notify(); // there can be only one waiting thread!
         }
 
-        private final void ensureNotStopped() throws IOException {
+        private void ensureNotStopped() throws IOException {
             if (stopped)
                 throw new ArchiveEntryStreamClosedException();
         }
 
+        @Override
         public int read() throws IOException {
             ensureNotStopped();
             return super.read();
         }
 
+        @Override
         public int read(byte[] b) throws IOException {
             ensureNotStopped();
             return super.read(b);
         }
 
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
             ensureNotStopped();
             return super.read(b, off, len);
         }
 
+        @Override
         public long skip(long n) throws IOException {
             ensureNotStopped();
             return super.skip(n);
         }
 
+        @Override
         public int available() throws IOException {
             ensureNotStopped();
             return super.available();
@@ -245,6 +254,7 @@ public final class InputArchiveMetaData {
          *
          * @throws IOException If an I/O exception occurs.
          */
+        @Override
         public final void close() throws IOException {
             assert InputArchiveMetaData.this == lock;
             synchronized (InputArchiveMetaData.this) {
@@ -269,6 +279,7 @@ public final class InputArchiveMetaData {
          *
          * @throws IOException If an I/O exception occurs.
          */
+        @Override
         protected void doClose() throws IOException {
             assert !closed;
             /*if (closed)
@@ -279,16 +290,19 @@ public final class InputArchiveMetaData {
             super.doClose();
         }
 
+        @Override
         public void mark(int readlimit) {
             if (!stopped)
                 super.mark(readlimit);
         }
 
+        @Override
         public void reset() throws IOException {
             ensureNotStopped();
             super.reset();
         }
 
+        @Override
         public boolean markSupported() {
             return !stopped && super.markSupported();
         }
@@ -299,6 +313,8 @@ public final class InputArchiveMetaData {
          * This is used to ensure that an archive can be updated although
          * the client may have "forgot" to close this input stream before.
          */
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
                 if (closed)

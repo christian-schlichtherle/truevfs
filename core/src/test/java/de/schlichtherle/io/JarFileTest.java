@@ -25,12 +25,13 @@ package de.schlichtherle.io;
 public class JarFileTest extends FileTestCase {
     
     /**
-     * Creates a new instance of <code>JarFileTest</code>.
+     * Creates a new instance of {@code JarFileTest}.
      */
     public JarFileTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".jar";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("jar"));

@@ -16,10 +16,14 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.crypto.io.raes.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
+import de.schlichtherle.crypto.io.raes.KeyManagerRaesParameters;
+import de.schlichtherle.crypto.io.raes.RaesOutputStream;
+import de.schlichtherle.crypto.io.raes.RaesParameters;
+import de.schlichtherle.crypto.io.raes.RaesReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -98,7 +102,7 @@ public class RaesFiles {
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      * 
-     * @param strongAuthentication If this is <tt>true</tt>, the whole
+     * @param strongAuthentication If this is {@code true}, the whole
      *        contents of encrypted file get authenticated, which can be a
      *        time consuming operation.
      *        Otherwise, only the key/password and the file length get
@@ -136,7 +140,7 @@ public class RaesFiles {
      * Please note that this method just creates a file object,
      * and does not actually operate on the file system.
      */
-    private static final File getNonArchiveFile(
+    private static File getNonArchiveFile(
             final String path,
             final ArchiveDetector detector) {
         final File file = detector.createFile(path);

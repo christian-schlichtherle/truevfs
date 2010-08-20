@@ -42,6 +42,7 @@ public class JarDriver extends ZipDriver {
     /**
      * The default character set for entry names and comments, which is {@value}.
      */
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final String DEFAULT_CHARSET = "UTF-8";
 
     /**
@@ -70,14 +71,17 @@ public class JarDriver extends ZipDriver {
         super(DEFAULT_CHARSET, openIcon, closedIcon, preambled, postambled, level);
     }
 
+    @Override
     protected ZipEntry createZipEntry(ZipEntry template) {
         return new JarEntry(template);
     }
 
+    @Override
     protected ZipEntry createZipEntry(String entryName) {
         return new JarEntry(entryName);
     }
 
+    @Override
     protected ZipInputArchive createZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)

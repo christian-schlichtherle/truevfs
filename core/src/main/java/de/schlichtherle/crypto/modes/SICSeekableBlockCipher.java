@@ -16,18 +16,19 @@
 
 package de.schlichtherle.crypto.modes;
 
-import de.schlichtherle.crypto.*;
-
-import org.bouncycastle.crypto.*;
-import org.bouncycastle.crypto.params.*;
+import de.schlichtherle.crypto.SeekableBlockCipher;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.modes.SICBlockCipher;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
- * Implements the Segmented Integer Counter (SIC) alias Counter (CTR) mode
+ * Implements Counter (CTR) mode (alias Segmented Integer Counter - SIC).
  * on top of a simple block cipher.
- * This code is based on the <tt>SICBlockCipher</tt> class
- * (as of version 1.30 of Bouncy Castle's Lightweight API for JDK 1.4),
+ * This code is based on bouncy castle's {@link SICBlockCipher} class,
  * but also allows random access to a block.
- * 
+ *
  * @author The Legion of the Bouncy Castle (majority of the code)
  * @author Christian Schlichtherle (optimizations and extension to support seeking)
  * @version $Id$
@@ -38,27 +39,27 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
     private final BlockCipher cipher;
     private final int blockSize;
     private final byte[] IV;
-    private final byte[] counter;
+    private final byte[] counterIn;
     private long blockCounter; // the blockCounter counter
     private final byte[] counterOut;
 
     /**
      * Basic constructor.
-     * 
-     * @param c the blockCounter cipher to be used.
+     *
+     * @param cipher The block cipher to be used.
      */
-    public SICSeekableBlockCipher(BlockCipher c) {
-        this.cipher = c;
+    public SICSeekableBlockCipher(final BlockCipher cipher) {
+        this.cipher = cipher;
         this.blockSize = cipher.getBlockSize();
         this.IV = new byte[blockSize];
-        this.counter = new byte[blockSize];
+        this.counterIn = new byte[blockSize];
         this.counterOut = new byte[blockSize];
     }
 
     /**
-     * return the underlying blockCounter cipher that we are wrapping.
-     * 
-     * @return the underlying blockCounter cipher that we are wrapping.
+     * Returns the underlying block cipher which we are decorating.
+     *
+     * @return The underlying block cipher which we are decorating.
      */
     public BlockCipher getUnderlyingCipher() {
         return cipher;
@@ -93,23 +94,22 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
             final int outOff)
     throws DataLengthException, IllegalStateException {
         updateCounter();
-        cipher.processBlock(counter, 0, counterOut, 0);
+        cipher.processBlock(counterIn, 0, counterOut, 0);
 
         // XOR the counterOut with the plaintext producing the cipher text.
-        for (int i = blockSize; --i >= 0; ) {
-          out[outOff + i] = (byte)(counterOut[i] ^ in[inOff + i]);
-        }
+        for (int i = blockSize; --i >= 0; )
+          out[outOff + i] = (byte) (counterOut[i] ^ in[inOff + i]);
 
         blockCounter++;
 
         return blockSize;
     }
 
-    private final void updateCounter() {
+    private void updateCounter() {
         long block = this.blockCounter;
         for (int i = blockSize; --i >= 0; ) {
             block += IV[i] & 0xff;
-            counter[i] = (byte) block;
+            counterIn[i] = (byte) block;
             block >>>= 8;
         }
     }
@@ -124,9 +124,9 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
 
     public void reset() {
         // Effectively the same as setBlockCounter(0).
-        //System.arraycopy(IV, 0, counter, 0, blockSize);
+        //System.arraycopy(IV, 0, counterIn, 0, blockSize);
         blockCounter = 0;
-        
+
         cipher.reset();
     }
 }

@@ -16,21 +16,19 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.*;
-
-import java.awt.*;
-import java.io.*;
-
-import javax.swing.*;
+import de.schlichtherle.io.ArchiveDetector;
+import java.awt.Graphics;
+import javax.swing.Icon;
 
 /**
- * A custom <code>JFileChooser</code> which supports browsing archive files
+ * A custom {@code JFileChooser} which supports browsing archive files
  * like (virtual) directories.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class JFileChooser extends javax.swing.JFileChooser {
+    private static final long serialVersionUID = 936528972682036204L;
 
     private transient volatile short paintingDisabled; // = false;
 
@@ -52,6 +50,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
      *
      * @see javax.swing.JFileChooser#getSelectedFile()
      */
+    @Override
     public java.io.File getSelectedFile() {
         java.io.File file = super.getSelectedFile();
         return ((FileSystemView) getFileSystemView()).wrap(file);
@@ -64,6 +63,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
      *
      * @see javax.swing.JFileChooser#getSelectedFiles()
      */
+    @Override
     public java.io.File[] getSelectedFiles() {
         java.io.File files[] = super.getSelectedFiles();
         if (files != null) {
@@ -76,6 +76,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
         return files;
     }
 
+    @Override
     public Icon getIcon(final java.io.File file) {
         beginPaintingDisabled();
         try {
@@ -85,6 +86,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
         }
     }
 
+    @Override
     public String getTypeDescription(final java.io.File file) {
         beginPaintingDisabled();
         try {
@@ -94,6 +96,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
         }
     }
 
+    @Override
     public boolean isTraversable(final java.io.File file) {
         beginPaintingDisabled();
         try {
@@ -103,6 +106,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
         }
     }
 
+    @Override
     public void paint(final Graphics g) {
         if (paintingDisabled > 0) {
             /*EventQueue.invokeLater(new Runnable() {

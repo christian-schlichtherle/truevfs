@@ -125,12 +125,14 @@ public class PromptingKeyProvider<K extends Cloneable>
      * Returns the identifier which is used by the {@link PromptingKeyManager}
      * to look up an instance of the {@link PromptingKeyProviderUI} user
      * interface class which is then used to prompt the user for a key.
-     * The implementation in this class returns the name of this class.
      * <p>
      * Subclasses which want to use a custom user interface should overwrite
      * this method to return the name of their respective class as the
      * identifier and provide a custom {@code PromptingKeyManager} which has
      * registered a {@code PromptingKeyProviderUI} class for this identifier.
+     * <p>
+     * The implementation in this class returns the simple name of this class,
+     * {@code PromptingKeyProvider}.
      */
     protected String getUIClassID() {
         return "PromptingKeyProvider";
@@ -311,7 +313,7 @@ public class PromptingKeyProvider<K extends Cloneable>
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in <code>PromptingKeyProider</code> throws an
+     * The implementation in {@code PromptingKeyProider} throws an
      * {@link IllegalStateException} if this instance is already mapped for
      * another resource identifier.
      *
@@ -336,7 +338,7 @@ public class PromptingKeyProvider<K extends Cloneable>
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in <code>PromptingKeyProider</code> throws an
+     * The implementation in {@code PromptingKeyProider} throws an
      * {@link IllegalStateException} if this instance is already mapped for
      * another resource identifier.
      *

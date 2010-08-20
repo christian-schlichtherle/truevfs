@@ -40,6 +40,7 @@ public class LittleEndianTest extends TestCase {
         super(testName);
     }            
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         read = (byte[]) DATA.clone();

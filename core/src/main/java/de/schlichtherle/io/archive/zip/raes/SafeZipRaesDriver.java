@@ -18,7 +18,6 @@ package de.schlichtherle.io.archive.zip.raes;
 
 import de.schlichtherle.io.archive.Archive;
 import de.schlichtherle.io.archive.zip.CheckedJarInputArchive;
-import de.schlichtherle.io.archive.zip.JarInputArchive;
 import de.schlichtherle.io.archive.zip.ZipInputArchive;
 import de.schlichtherle.io.rof.ReadOnlyFile;
 import java.io.IOException;
@@ -106,6 +105,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * {@link #getAuthenticationTrigger} bytes where the archive is both MAC
      * and CRC-32 authenticated.
      */
+    @Override
     protected ZipInputArchive createZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)

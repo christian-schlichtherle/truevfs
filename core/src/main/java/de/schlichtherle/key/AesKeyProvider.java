@@ -45,16 +45,16 @@ public interface AesKeyProvider<K extends Cloneable> extends KeyProvider<K> {
     /**
      * Returns the cipher key strength for the AES encryption.
      *
-     * @return One of <code>KEY_STRENGTH_128</code>,
-     *        <code>KEY_STRENGTH_192</code> or <code>KEY_STRENGTH_256</code>.
+     * @return One of {@code KEY_STRENGTH_128},
+     *        {@code KEY_STRENGTH_192} or {@code KEY_STRENGTH_256}.
      */
     int getKeyStrength();
 
     /**
      * Sets the cipher key strength for the AES encryption.
      *
-     * @param keyStrength One of <code>KEY_STRENGTH_128</code>,
-     *        <code>KEY_STRENGTH_192</code> or <code>KEY_STRENGTH_256</code>.
+     * @param keyStrength One of {@code KEY_STRENGTH_128},
+     *        {@code KEY_STRENGTH_192} or {@code KEY_STRENGTH_256}.
      * @throws IllegalArgumentException If the preconditions for the parameter
      *         do not hold.
      */

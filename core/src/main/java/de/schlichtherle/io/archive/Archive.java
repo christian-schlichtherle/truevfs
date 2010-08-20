@@ -21,6 +21,7 @@ package de.schlichtherle.io.archive;
  * A single instance of this interface is created for every
  * canonical path name representation of an archive file.
  * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
  * Client applications should never implement this interface because more
  * features may be added in future.
  *
@@ -42,13 +43,13 @@ public interface Archive {
      * path actually exists as a file in the native file system!
      *
      * @return A valid reference to a {@link String} object
-     *         - never <code>null</code>.
+     *         - never {@code null}.
      * @see #getEnclArchive
      */
     String getPath();
 
     /**
-     * @return The enclosing archive or <code>null</code> if this archive is
+     * @return The enclosing archive or {@code null} if this archive is
      *         not enclosed in another archive
      */
     Archive getEnclArchive();

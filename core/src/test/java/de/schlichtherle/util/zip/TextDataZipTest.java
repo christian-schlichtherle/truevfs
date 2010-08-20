@@ -16,9 +16,8 @@
 
 package de.schlichtherle.util.zip;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.*;
 
 /**
  * Tests compression of a data with about 1MB of highly compressible text.
@@ -30,27 +29,22 @@ public class TextDataZipTest extends ZipTestCase {
     private static final Logger logger
             = Logger.getLogger(TextDataZipTest.class.getName());
 
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     private static final byte[] data;
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.config("Java assertions enabled: " + ea);
+        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         final String text = "This is a truly compressible text!\n";
         final int count = 1024 * 1024 / text.length();
         final int length = count * text.length(); // rounded down
-        StringBuffer buf = new StringBuffer(length);
+        StringBuilder buf = new StringBuilder(length);
         for (int i = 0; i < count; i++) {
             buf.append(text);
         }
         data = buf.toString().getBytes();
-        logger.config("Created " + data.length + " bytes of highly compressible text as the data.");
-    }
-
-    public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite(TextDataZipTest.class);
-        
-        return suite;
+        logger.log(Level.CONFIG, "Created {0} bytes of highly compressible text as the data.", data.length);
     }
     
     /** Creates a new instance of RandomMessageZipTest */
@@ -58,6 +52,7 @@ public class TextDataZipTest extends ZipTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.data = TextDataZipTest.data;
         

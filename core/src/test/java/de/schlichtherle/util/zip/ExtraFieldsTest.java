@@ -16,8 +16,7 @@
 
 package de.schlichtherle.util.zip;
 
-import java.util.*;
-
+import java.util.Arrays;
 import junit.framework.TestCase;
 
 /**
@@ -53,6 +52,7 @@ public class ExtraFieldsTest extends TestCase {
         super(testName);
     }            
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         fields = new ExtraFields();

@@ -16,16 +16,16 @@
 
 package de.schlichtherle.crypto.io.raes;
 
-import de.schlichtherle.crypto.io.*;
-
-import java.io.*;
-
-import org.bouncycastle.crypto.*;
+import de.schlichtherle.crypto.io.CipherOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.Mac;
 
 /**
  * An {@link OutputStream} to produce a file with data ecnrypted according
  * to the Random Access Encryption Specification (RAES).
- * 
+ *
  * @see RaesReadOnlyFile
  *
  * @author Christian Schlichtherle
@@ -35,11 +35,11 @@ import org.bouncycastle.crypto.*;
 public abstract class RaesOutputStream extends CipherOutputStream {
 
     /**
-     * Update the given KLAC with the given file <tt>length</tt> in
-     * little endian order and finalize it, writing the result to <tt>buf</tt>.
+     * Update the given KLAC with the given file {@code length} in
+     * little endian order and finalize it, writing the result to {@code buf}.
      * The KLAC must already have been initialized and updated with the
      * password bytes as retrieved according to PKCS #12.
-     * The result is stored in <tt>buf</tt>, which must match the given
+     * The result is stored in {@code buf}, which must match the given
      * KLAC's output size.
      */
     static void klac(final Mac klac, long length, final byte[] buf) {
@@ -52,8 +52,8 @@ public abstract class RaesOutputStream extends CipherOutputStream {
     }
 
     /**
-     * Creates a new instance of <code>RaesOutputStream</code>.
-     * 
+     * Creates a new instance of {@code RaesOutputStream}.
+     *
      * @param out The underlying output stream to use for the encrypted data.
      * @param parameters The {@link RaesParameters} used to determine and
      *        configure the type of RAES file created.
@@ -66,8 +66,8 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *        {@link RaesParametersAgent} interface.
      *        Instances of this interface are recursively used to find RAES
      *        parameters which match a known RAES type.
-     * @throws NullPointerException If {@link #out} is <tt>null</tt>
-     *         or <tt>parameters</tt> is <tt>null</tt>.
+     * @throws NullPointerException If {@link #out} is {@code null}
+     *         or {@code parameters} is {@code null}.
      * @throws IllegalArgumentException If an illegal keyStrength is provided
      *         in the parameters.
      * @throws RaesParametersException If no suitable RAES parameters have been

@@ -49,6 +49,12 @@ public class PromptingAesKeyProvider<K extends Cloneable>
         this.keyStrength = keyStrength;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in this class returns the simple name of this class,
+     * {@code PromptingAesKeyProvider}.
+     */
     @Override
     protected String getUIClassID() {
         return "PromptingAesKeyProvider"; // support code obfuscation!

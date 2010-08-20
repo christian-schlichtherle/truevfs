@@ -26,7 +26,7 @@ import javax.swing.Icon;
  * read and write entries for the supported archive types.
  * <p>
  * Implementations do <em>not</em> need to be thread safe:
- * Multithreading is addressed in the package <code>de.schlichtherle.io</code>.
+ * Multithreading is addressed in the package {@code de.schlichtherle.io}.
  *
  * <h3><a name="entryName">Requirements for Archive Entry Names</a></h3>
  * <p>
@@ -34,8 +34,8 @@ import javax.swing.Icon;
  * <ol>
  * <li>An entry name is a list of directory or file names whichs elements
  *     are separated by single separators ({@link #SEPARATOR}).
- * <li>An empty string (<code>&quot;&quot;</code>), a dot
- *     (<code>&quot;.&quot;</code>), or a dot-dot (<code>&quot;..&quot;</code>)
+ * <li>An empty string ({@code &quot;&quot;}), a dot
+ *     ({@code &quot;.&quot;}), or a dot-dot ({@code &quot;..&quot;})
  *     is not permissible as a directory or file name.
  * <li>If an entry name starts with a separator, it's said to be
  *     <i>absolute</i>.
@@ -44,12 +44,12 @@ import javax.swing.Icon;
  * <li>If an entry name ends with a separator, it denotes a directory
  *     and vice versa.
  * </ol>
- * For example, <code>&quot;foo/bar&quot;</code> denotes a valid entry
- * name for a file, but <code>&quot;./abc/../foo/./def/./../bar/.&quot;</code>
+ * For example, {@code &quot;foo/bar&quot;} denotes a valid entry
+ * name for a file, but {@code &quot;./abc/../foo/./def/./../bar/.&quot;}
  * would not, although both refer to the same entry.
  * <p>
- * As another example, <code>&quot;dir/&quot;</code> denotes a valid entry
- * name for a directory, but <code>&quot;dir&quot;</code> would not.
+ * As another example, {@code &quot;dir/&quot;} denotes a valid entry
+ * name for a directory, but {@code &quot;dir&quot;} would not.
  * <p>
  * If an archive driver is to be written for an archive type which does not
  * support these requirements, an adapter for the entry name must be
@@ -102,14 +102,14 @@ public interface ArchiveEntry {
     String getName();
 
     /**
-     * Returns <code>true</code> if and only if this entry represents a
+     * Returns {@code true} if and only if this entry represents a
      * directory.
      */
     boolean isDirectory();
 
     /**
      * Returns the (uncompressed) size of the archive entry in bytes,
-     * or <code>UNKNOWN</code> if not specified.
+     * or {@code UNKNOWN} if not specified.
      * This method is not meaningful for directory entries.
      */
     long getSize();
@@ -125,7 +125,7 @@ public interface ArchiveEntry {
 
     /**
      * Returns the last modification time of this archive entry since the
-     * epoch, or <code>UNKNOWN</code> if not specified.
+     * epoch, or {@code UNKNOWN} if not specified.
      *
      * @see #setTime
      */
@@ -143,7 +143,7 @@ public interface ArchiveEntry {
     /**
      * Returns the icon that {@link de.schlichtherle.io.swing.tree.FileTreeCellRenderer}
      * should display for this entry if it is open/expanded in the view.
-     * If <code>null</code> is returned, a default icon will be used,
+     * If {@code null} is returned, a default icon will be used,
      * depending on the type of this entry and its state in the view.
      */
     Icon getOpenIcon();
@@ -152,21 +152,21 @@ public interface ArchiveEntry {
      * Returns the icon that {@link de.schlichtherle.io.swing.FileSystemView}
      * and {@link de.schlichtherle.io.swing.tree.FileTreeCellRenderer} should
      * display for this entry if it is closed/collapsed in the view.
-     * If <code>null</code> is returned, a default icon will be used,
+     * If {@code null} is returned, a default icon will be used,
      * depending on the type of this entry and its state in the view.
      */
     Icon getClosedIcon();
 
     /**
      * Returns the meta data for this archive entry.
-     * The default value is <code>null</code>.
+     * The default value is {@code null}.
      */
     ArchiveEntryMetaData getMetaData();
 
     /**
      * Sets the meta data for this archive entry.
      *
-     * @param metaData The meta data - may not be <code>null</code>.
+     * @param metaData The meta data - may not be {@code null}.
      */
     void setMetaData(ArchiveEntryMetaData metaData);
 }

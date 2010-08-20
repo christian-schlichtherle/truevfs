@@ -96,7 +96,7 @@ public final class SuffixSet extends CanonicalStringSet {
      * @throws ClassCastException If the collection does not only contain
      *         {@code String}s.
      */
-    public SuffixSet(final Collection c) {
+    public SuffixSet(final Collection<String> c) {
         super(SEPARATOR);
         if (c != null)
             super.addAll(c);
@@ -107,6 +107,7 @@ public final class SuffixSet extends CanonicalStringSet {
      * if the given suffix does not have a canonical form.
      * An example of the latter case is the empty string.
      */
+    @Override
     protected String canonicalize(String suffix) {
         assert suffix != null;
         assert suffix.indexOf(SEPARATOR) < 0 : "separator in suffix is illegal";
@@ -125,22 +126,18 @@ public final class SuffixSet extends CanonicalStringSet {
      * If this suffix set is empty, an unmatchable expression is returned.
      */
     public String toRegex() {
-        final Iterator i = iterator();
+        final Iterator<String> i = iterator();
         if (i.hasNext()) {
-            // TODO: JSE 5: Use StringBuilder
-            final StringBuffer sb = new StringBuffer(".*\\.(?i)("); // NOI18N
+            final StringBuilder sb = new StringBuilder(".*\\.(?i)("); // NOI18N
             int c = 0;
             do {
-                final String suffix = (String) i.next();
+                final String suffix = i.next();
                 if (c++ > 0)
                     sb.append('|'); // not SEPARATOR !!!
-                sb.append("\\Q"); // NOI18N
-                sb.append(suffix);
-                sb.append("\\E"); // NOI18N
+                sb.append("\\Q").append(suffix).append("\\E"); // NOI18N
             } while (i.hasNext());
             assert c > 0;
-            sb.append(")[\\" + File.separatorChar + "/]*");
-            return sb.toString();
+            return sb.append(")[\\").append(File.separatorChar).append("/]*").toString();
         } else {
             return "\\00"; // NOT "\00"! Effectively never matches anything. // NOI18N
         }

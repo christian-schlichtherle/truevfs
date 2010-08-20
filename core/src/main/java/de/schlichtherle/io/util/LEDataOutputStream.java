@@ -26,9 +26,9 @@ import java.io.OutputStream;
  * <p>
  * This class is similar to {@link java.io.DataOutputStream},
  * but writes data in Little Endian format to its underlying stream.
- * A noteable difference to <code>DataOutputStream</code> is that the
+ * A noteable difference to {@code DataOutputStream} is that the
  * {@link #size()} method and the {@link #written} field are respectively
- * return <code>long</code> values and wrap to <code>Long.MAX_VALUE</code>.
+ * return {@code long} values and wrap to {@link Long#MAX_VALUE}.
  * <p>
  * Note that this class is <em>not</em> thread safe.
  *
@@ -43,17 +43,17 @@ public class LEDataOutputStream
     private final byte[] buf = new byte[8];
 
     /**
-     * The number of bytes written to the data output stream so far. 
+     * The number of bytes written to the data output stream so far.
      * If this counter overflows, it will be wrapped to Long.MAX_VALUE.
      */
     protected volatile long written;
-    
+
     /**
-     * Creates a new data output stream to write data to the specified 
-     * underlying output stream. The counter <code>written</code> is 
+     * Creates a new data output stream to write data to the specified
+     * underlying output stream. The counter {@code written} is
      * set to zero.
      *
-     * @param   out   The underlying output stream, to be saved for later use.
+     * @param out The underlying output stream which is saved for subsequent use.
      */
     public LEDataOutputStream(OutputStream out) {
         super(out);
@@ -61,40 +61,42 @@ public class LEDataOutputStream
 
     /**
      * Increases the written counter by the specified value
-     * until it reaches Long.MAX_VALUE.
+     * until it reaches {@link Long#MAX_VALUE}.
      */
-    private final void incCount(int inc) {
+    private void incCount(int inc) {
         final long temp = written + inc;
         written = temp >= 0 ? temp : Long.MAX_VALUE;
     }
 
     /**
-     * Writes the specified byte (the low eight bits of the argument 
-     * <code>b</code>) to the underlying output stream.
-     * If no exception is thrown, the counter <code>written</code> is
+     * Writes the specified byte (the low eight bits of the argument
+     * {@code b}) to the underlying output stream.
+     * If no exception is thrown, the counter {@code written} is
      * incremented by one.
      * <p>
-     * Implements the <code>write</code> method of <code>OutputStream</code>.
+     * Implements the {@code write} method of {@code OutputStream}.
      *
-     * @param b The <code>byte</code> value to be written.
+     * @param b The {@code byte} to be written.
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(int b) throws IOException {
 	out.write(b);
         incCount(1);
     }
 
     /**
-     * Writes <code>len</code> bytes from the specified byte array 
-     * starting at offset <code>off</code> to the underlying output stream. 
-     * If no exception is thrown, the counter <code>written</code> is 
-     * incremented by <code>len</code>.
+     * Writes {@code len} bytes from the specified byte array
+     * starting at offset {@code off} to the underlying output stream.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by {@code len}.
      *
      * @param b The data.
      * @param off The start offset in the data.
      * @param len The number of bytes to write.
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(byte b[], int off, int len)
     throws IOException {
 	out.write(b, off, len);
@@ -102,14 +104,14 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes a <code>boolean</code> value to the underlying output stream
-     * as a 1-byte value. The value <code>true</code> is written out as the 
-     * value <code>(byte)1</code>; the value <code>false</code> is 
-     * written out as the value <code>(byte)0</code>.
-     * If no exception is thrown, the counter <code>written</code> is
+     * Writes a {@code boolean} value to the underlying output stream
+     * as a 1-byte value. The value {@code true} is written out as the
+     * value {@code (byte)1}; the value {@code false} is
+     * written out as the value {@code (byte)0}.
+     * If no exception is thrown, the counter {@code written} is
      * incremented by one.
-     * 
-     * @param b The <code>boolean</code> value to be written.
+     *
+     * @param b The {@code boolean} value to be written.
      * @throws IOException If an I/O error occurs.
      */
     public final void writeBoolean(boolean b) throws IOException {
@@ -118,12 +120,12 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes a <code>byte</code> value to the underlying output stream
+     * Writes a {@code byte} value to the underlying output stream
      * as a 1-byte value.
-     * If no exception is thrown, the counter <code>written</code> is
+     * If no exception is thrown, the counter {@code written} is
      * incremented by one.
-     * 
-     * @param b The <code>byte</code> value to be written.
+     *
+     * @param b The {@code byte} value to be written.
      * @throws IOException If an I/O error occurs.
      */
     public final void writeByte(int b) throws IOException {
@@ -132,12 +134,12 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes a <code>char</code> value to the underlying output stream
+     * Writes a {@code char} value to the underlying output stream
      * as a 2-byte value, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
+     * If no exception is thrown, the counter {@code written} is
      * incremented by two.
-     * 
-     * @param c The <code>char</code> value to be written.
+     *
+     * @param c The {@code char} value to be written.
      * @throws IOException If an I/O error occurs.
      */
     public final void writeChar(int c) throws IOException {
@@ -145,9 +147,9 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes the integer value <code>s</code> to the underlying output stream
+     * Writes the integer value {@code s} to the underlying output stream
      * as two bytes, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
+     * If no exception is thrown, the counter {@code written} is
      * incremented by two.
      *
      * @param s The short integer value to be written.
@@ -162,9 +164,9 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes the integer value <code>i</code> to the underlying output stream
+     * Writes the integer value {@code i} to the underlying output stream
      * as four bytes, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
+     * If no exception is thrown, the counter {@code written} is
      * incremented by four.
      *
      * @param i The integer value to be written.
@@ -183,9 +185,9 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes the integer value <code>l</code> to the underlying output stream
+     * Writes the integer value {@code l} to the underlying output stream
      * as eight bytes, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
+     * If no exception is thrown, the counter {@code written} is
      * incremented by eight.
      *
      * @param l The long integer value to be written.
@@ -212,14 +214,14 @@ public class LEDataOutputStream
     }
 
     /**
-     * Converts the float value <code>f</code> to an <code>int</code> using
-     * the <code>floatToIntBits</code> method in class <code>Float</code>, 
-     * and then writes that <code>int</code> value to the underlying 
+     * Converts the float value {@code f} to an {@code int} using
+     * the {@code floatToIntBits} method in class {@code Float},
+     * and then writes that {@code int} value to the underlying
      * output stream as a 4-byte quantity, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
-     * incremented by <code>4</code>.
-     * 
-     * @param f The <code>float</code> value to be written.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by {@code 4}.
+     *
+     * @param f The {@code float} value to be written.
      * @throws IOException If an I/O error occurs.
      * @see java.lang.Float#floatToIntBits(float)
      */
@@ -228,14 +230,14 @@ public class LEDataOutputStream
     }
 
     /**
-     * Converts the double value <code>d</code> to a <code>long</code> using
-     * the <code>doubleToLongBits</code> method in class <code>Double</code>, 
-     * and then writes that <code>long</code> value to the underlying 
+     * Converts the double value {@code d} to a {@code long} using
+     * the {@code doubleToLongBits} method in class {@code Double},
+     * and then writes that {@code long} value to the underlying
      * output stream as an 8-byte quantity, low byte first.
-     * If no exception is thrown, the counter <code>written</code> is
-     * incremented by <code>8</code>.
-     * 
-     * @param d The <code>double</code> value to be written.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by {@code 8}.
+     *
+     * @param d The {@code double} value to be written.
      * @throws IOException If an I/O error occurs.
      * @see java.lang.Double#doubleToLongBits(double)
      */
@@ -244,11 +246,11 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes the string <code>s</code> to the underlying output stream as a
-     * sequence of bytes. Each character in the string is written out, in 
+     * Writes the string {@code s} to the underlying output stream as a
+     * sequence of bytes. Each character in the string is written out, in
      * sequence, by discarding its high eight bits.
-     * If no exception is thrown, the counter <code>written</code> is
-     * incremented by the length of <code>s</code>.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by the length of {@code s}.
      *
      * @param s The string of bytes to be written.
      * @throws IOException If an I/O error occurs.
@@ -260,13 +262,13 @@ public class LEDataOutputStream
     }
 
     /**
-     * Writes the string <code>s</code> to the underlying output stream as a
-     * sequence of characters. Each character is written out as 
-     * if by the <code>writeChar</code> method.
-     * If no exception is thrown, the counter <code>written</code> is
-     * incremented by twice the length of <code>s</code>.
-     * 
-     * @param s The <code>String</code> value to be written.
+     * Writes the string {@code s} to the underlying output stream as a
+     * sequence of characters. Each character is written out as
+     * if by the {@code writeChar} method.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by twice the length of {@code s}.
+     *
+     * @param s The {@code String} value to be written.
      * @throws IOException If an I/O error occurs.
      * @see java.io.DataOutputStream#writeChar(int)
      */
@@ -286,14 +288,14 @@ public class LEDataOutputStream
     }
 
     /**
-     * Returns the current value of the counter <code>written</code>, 
+     * Returns the current value of the counter {@code written},
      * the number of bytes written to this data output stream so far.
-     * If the counter overflows, it will be wrapped to Long.MAX_VALUE.
-     * 
-     * @return The value of the <code>written</code> field.
+     * If the counter overflows, it will be wrapped to {@link Long#MAX_VALUE}.
+     *
+     * @return The value of the {@code written} field.
      * @see java.io.DataOutputStream#written
      */
     public final long size() {
-	return written;
+        return written;
     }
 }

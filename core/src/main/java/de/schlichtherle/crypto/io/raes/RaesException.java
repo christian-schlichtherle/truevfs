@@ -28,9 +28,10 @@ import java.io.IOException;
  * @since TrueZIP 6.0
  */
 public class RaesException extends IOException {
+    private static final long serialVersionUID = 8564203786508562247L;
 
     /**
-     * Constructs an instance of <tt>RaesException</tt> with the specified
+     * Constructs an instance of {@code RaesException} with the specified
      * detail message.
      *
      * @param msg The detail message.
@@ -40,7 +41,7 @@ public class RaesException extends IOException {
     }
 
     /**
-     * Constructs an instance of <tt>RaesException</tt> with the specified
+     * Constructs an instance of {@code RaesException} with the specified
      * detail message and cause.
      *
      * @param msg The detail message.

@@ -16,11 +16,12 @@
 
 package de.schlichtherle.io.samples;
 
-import de.schlichtherle.io.*;
+import de.schlichtherle.io.ArchiveStatistics;
 import de.schlichtherle.io.File;
-
-import java.io.*;
-import java.text.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.text.MessageFormat;
 
 /**
  * Abstract base class for command line utilities.
@@ -60,7 +61,7 @@ abstract class CommandLineUtility {
      * @param out The standard output stream.
      * @param err The error output stream.
      * @param autoFlush If the output streams are not {@link PrintStream}s,
-     *        then they are wrapped in a new <code>PrintStream</code> with
+     *        then they are wrapped in a new {@code PrintStream} with
      *        this as the additional constructor parameter.
      * @see de.schlichtherle.key.passwd.swing.PromptingKeyManager
      */
@@ -104,8 +105,8 @@ abstract class CommandLineUtility {
      *
      * @param args A non-empty array of Unix-like commands and optional
      *        parameters.
-     * @return <code>1</code> iff the command fails,
-     *         <code>0</code> otherwise.
+     * @return {@code 1} iff the command fails,
+     *         {@code 0} otherwise.
      */
     public final int run(final String[] args) {
         try {
@@ -133,9 +134,9 @@ abstract class CommandLineUtility {
      *
      * @param args A non-empty array of Unix-like commands and optional
      *        parameters.
-     * @return <code>false</code> iff the command is a test which fails,
-     *         <code>true</code> otherwise.
-     * @throws IllegalUsageException If <code>args</code> does not contain
+     * @return {@code false} iff the command is a test which fails,
+     *         {@code true} otherwise.
+     * @throws IllegalUsageException If {@code args} does not contain
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
@@ -143,6 +144,8 @@ abstract class CommandLineUtility {
     throws IllegalUsageException, IOException;
 
     protected static abstract class IllegalUsageException extends IllegalArgumentException {
+        private static final long serialVersionUID = 1985623981423542464L;
+
         IllegalUsageException(String msg) {
             super(msg);
         }

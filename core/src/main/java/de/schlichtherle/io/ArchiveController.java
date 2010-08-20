@@ -21,7 +21,12 @@ import de.schlichtherle.io.archive.Archive;
 import de.schlichtherle.io.archive.spi.ArchiveDriver;
 import de.schlichtherle.io.archive.spi.ArchiveEntry;
 import de.schlichtherle.io.archive.spi.TransientIOException;
+import de.schlichtherle.io.util.Streams;
 import de.schlichtherle.key.PromptingKeyManager;
+import de.schlichtherle.util.Action;
+import de.schlichtherle.util.concurrent.locks.ReadWriteLock;
+import de.schlichtherle.util.concurrent.locks.ReentrantLock;
+import de.schlichtherle.util.concurrent.locks.ReentrantReadWriteLock;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -182,7 +187,7 @@ abstract class ArchiveController implements Archive, Entry {
     }
 
     /**
-     * Runs the given {@link IORunnable} while this controller has
+     * Runs the given {@link Action} while this controller has
      * acquired its write lock regardless of the state of its read lock.
      * You must use this method if this controller may have acquired a
      * read lock in order to prevent a dead lock.
@@ -192,11 +197,11 @@ abstract class ArchiveController implements Archive, Entry {
      * Hence, the runnable should recheck the state of the controller
      * before it proceeds with any write operations.
      *
-     * @param runnable The {@link IORunnable} to run while the write
-     *        lock is acquired.
+     * @param runnable The {@link Action} to run while the write lock is
+     *        acquired.
      *        No read lock is acquired while it's running.
      */
-    final void runWriteLocked(IORunnable runnable)
+    final void runWriteLocked(Action<IOException> runnable)
     throws IOException {
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.
@@ -204,7 +209,7 @@ abstract class ArchiveController implements Archive, Entry {
         // implementation in JSE 5: If automatic upgrading were implemented,
         // two threads holding a read lock try to upgrade concurrently,
         // they would dead lock each other!
-        final int lockCount = readLock().lockCount();
+        final int lockCount = readLock().getLockCount();
         for (int c = lockCount; c > 0; c--)
             readLock().unlock();
 
@@ -243,7 +248,7 @@ abstract class ArchiveController implements Archive, Entry {
      * Returns {@code true} iff the given entry name refers to the
      * virtual root directory within this controller.
      */
-    static final boolean isRoot(String entryName) {
+    static boolean isRoot(String entryName) {
         return ROOT_NAME == entryName; // possibly assigned by File.init(...), so using == is OK!
     }
 
@@ -269,7 +274,7 @@ abstract class ArchiveController implements Archive, Entry {
                 : enclEntryName + SEPARATOR + entryName;
     }
 
-    private final boolean isEnclosedBy(ArchiveController wannabe) {
+    private boolean isEnclosedBy(ArchiveController wannabe) {
         assert wannabe != null;
         if (enclController == wannabe)
             return true;
@@ -299,7 +304,7 @@ abstract class ArchiveController implements Archive, Entry {
      *        - never {@code null}.
      */
     final void setDriver(ArchiveDriver driver) {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
 
         // This affects all subsequent creations of the driver's products
         // (In/OutputArchive and ArchiveEntry) and hence ArchiveFileSystem.
@@ -411,7 +416,7 @@ abstract class ArchiveController implements Archive, Entry {
      */
     final void autoUmount(final String entryName)
     throws ArchiveException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
 
         if (hasNewData(entryName))
             umount(null, true, false, true, false, false, false);
@@ -539,6 +544,7 @@ abstract class ArchiveController implements Archive, Entry {
     abstract void reset()
     throws IOException;
 
+    @Override
     public String toString() {
         return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getPath() + ")";
     }
@@ -597,7 +603,7 @@ abstract class ArchiveController implements Archive, Entry {
                         "cannot read (potential) virtual root directory");
             } else {
                 if (hasNewData(entryName)) {
-                    runWriteLocked(new IORunnable() {
+                    runWriteLocked(new Action<IOException>() {
                         public void run() throws IOException {
                             autoUmount(entryName);
                         }
@@ -750,7 +756,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean exists0(final String entryName)
+    private boolean exists0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -780,7 +786,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean isFile0(final String entryName)
+    private boolean isFile0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -806,7 +812,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean isDirectory0(final String entryName)
+    private boolean isDirectory0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -830,7 +836,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final Icon getOpenIcon0(final String entryName)
+    private Icon getOpenIcon0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -856,7 +862,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final Icon getClosedIcon0(final String entryName)
+    private Icon getClosedIcon0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -882,7 +888,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean canRead0(final String entryName)
+    private boolean canRead0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -906,7 +912,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean canWrite0(final String entryName)
+    private boolean canWrite0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -930,7 +936,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final long length0(final String entryName)
+    private long length0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -954,7 +960,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final long lastModified0(final String entryName)
+    private long lastModified0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -978,7 +984,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final String[] list0(final String entryName)
+    private String[] list0(final String entryName)
     throws IOException {
         readLock().lock();
         try {
@@ -1006,7 +1012,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final String[] list0(
+    private String[] list0(
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir)
@@ -1038,7 +1044,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final File[] listFiles0(
+    private File[] listFiles0(
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir,
@@ -1071,7 +1077,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final File[] listFiles0(
+    private File[] listFiles0(
             final String entryName,
             final FileFilter fileFilter,
             final File dir,
@@ -1104,7 +1110,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean setReadOnly0(final String entryName)
+    private boolean setReadOnly0(final String entryName)
     throws IOException {
         writeLock().lock();
         try {
@@ -1131,7 +1137,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean setLastModified0(
+    private boolean setLastModified0(
             final String entryName,
             final long time)
     throws IOException {
@@ -1157,7 +1163,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final boolean createNewFile0(
+    private boolean createNewFile0(
             final String entryName,
             final boolean autoCreate)
     throws IOException {
@@ -1195,7 +1201,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final void mkdir0(final String entryName, final boolean autoCreate)
+    private void mkdir0(final String entryName, final boolean autoCreate)
     throws IOException {
         writeLock().lock();
         try {
@@ -1242,7 +1248,7 @@ abstract class ArchiveController implements Archive, Entry {
         }
     }
 
-    private final void delete0(final String entryName)
+    private void delete0(final String entryName)
     throws IOException {
         writeLock().lock();
         try {
@@ -1346,6 +1352,8 @@ abstract class ArchiveController implements Archive, Entry {
      * {@code IOException} as their cause.
      */
     abstract class FalsePositiveException extends FileNotFoundException {
+        private static final long serialVersionUID = 947139561381472363L;
+
         private final boolean cacheable;
 
         /**
@@ -1399,6 +1407,7 @@ abstract class ArchiveController implements Archive, Entry {
      * {@code IOException} as their cause.
      */
     final class RfsEntryFalsePositiveException extends FalsePositiveException {
+        private static final long serialVersionUID = 5234672956837622323L;
 
         /**
          * Creates a new {@code RfsEntryFalsePositiveException}.
@@ -1424,6 +1433,8 @@ abstract class ArchiveController implements Archive, Entry {
      * {@code IOException} as their cause.
      */
     abstract class ArchiveEntryFalsePositiveException extends FalsePositiveException {
+        private static final long serialVersionUID = 1234562841928746533L;
+
         private final ArchiveController enclController;
         private final String enclEntryName;
 
@@ -1484,6 +1495,7 @@ abstract class ArchiveController implements Archive, Entry {
      */
     final class FileArchiveEntryFalsePositiveException
             extends ArchiveEntryFalsePositiveException {
+        private static final long serialVersionUID = 2846364592164215345L;
 
         /**
          * Creates a new {@code FileArchiveEntryFalsePositiveException}.
@@ -1518,6 +1530,7 @@ abstract class ArchiveController implements Archive, Entry {
      */
     final class DirectoryArchiveEntryFalsePositiveException
             extends ArchiveEntryFalsePositiveException {
+        private static final long serialVersionUID = 5672345295269335783L;
 
         /**
          * Creates a new {@code DirectoryArchiveEntryFalsePositiveException}.
@@ -1550,11 +1563,13 @@ abstract class ArchiveController implements Archive, Entry {
      * the target file is not allowed.
      */
     final class ArchiveFileNotFoundException extends FileNotFoundException {
+        private static final long serialVersionUID = 2654293654126325623L;
 
         ArchiveFileNotFoundException(String msg) {
             super(msg);
         }
 
+        @Override
         public String getMessage() {
             String msg = super.getMessage();
             if (msg != null)
@@ -1571,6 +1586,8 @@ abstract class ArchiveController implements Archive, Entry {
      * {@link #createOutputStream}.
      */
     final class ArchiveEntryNotFoundException extends FileNotFoundException {
+        private static final long serialVersionUID = 2972350932856838564L;
+
         private final String entryName;
 
         ArchiveEntryNotFoundException(final String entryName, final String msg) {
@@ -1580,6 +1597,7 @@ abstract class ArchiveController implements Archive, Entry {
             this.entryName = entryName;
         }
 
+        @Override
         public String getMessage() {
             String path = getPath();
             if (!isRoot(entryName))

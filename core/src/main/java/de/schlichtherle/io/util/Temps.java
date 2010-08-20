@@ -16,15 +16,16 @@
 
 package de.schlichtherle.io.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * A utility class for creating temporary files.
  * This class allows to change the directory for temporary files via the class
- * property <code>directory</code>.
- * If the value of this property is <code>null</code> (which is the default),
- * the value of the system property <code>java.io.tmpdir</code> is used.
- * 
+ * property {@code directory}.
+ * If the value of this property is {@code null} (which is the default),
+ * the value of the system property {@code java.io.tmpdir} is used.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.6
@@ -39,9 +40,9 @@ public class Temps {
 
     /**
      * Returns the directory for temporary files.
-     * By default, this method returns <code>null</code>, which means that
+     * By default, this method returns {@code null}, which means that
      * the directory used for {@link #createTempFile} is determined by the
-     * system property <code>java.io.tmpdir</code>. 
+     * system property {@code java.io.tmpdir}.
      */
     public static File getDirectory() {
         return directory;
@@ -49,8 +50,8 @@ public class Temps {
 
     /**
      * Sets the directory for temporary files.
-     * If this is <code>null</code>, the value of the system property
-     * <code>java.io.tmpdir</code> is used by {@link #createTempFile}.
+     * If this is {@code null}, the value of the system property
+     * {@code java.io.tmpdir} is used by {@link #createTempFile}.
      */
     public static void setDirectory(final File directory) {
         Temps.directory = directory;
@@ -58,18 +59,16 @@ public class Temps {
 
     /**
      * Like {@link java.io.File#createTempFile}, but uses the value of the
-     * class property <code>directory</code> as the directory for temporary
+     * class property {@code directory} as the directory for temporary
      * files.
-     * If the value of this property is <code>null</code>, the directory is
+     * If the value of this property is {@code null}, the directory is
      * determined by the value of the system property
-     * <code>java.io.tmpdir</code>.
-     * 
+     * {@code java.io.tmpdir}.
+     *
      * @see #getDirectory
      * @see #setDirectory
      */
-    public static final File createTempFile(
-            final String prefix,
-            final String suffix)
+    public static File createTempFile(final String prefix, final String suffix)
     throws IOException {
         return File.createTempFile(prefix, suffix, directory);
     }
@@ -77,11 +76,11 @@ public class Temps {
     /**
      * Like {@link #createTempFile(String, String)}, but uses the default
      * suffix {@code ".tmp"}.
-     * 
+     *
      * @see #getDirectory
      * @see #setDirectory
      */
-    public static final File createTempFile(final String prefix)
+    public static File createTempFile(final String prefix)
     throws IOException {
         return File.createTempFile(prefix, null, directory);
     }

@@ -16,14 +16,28 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
-import java.util.regex.*;
-
-import junit.framework.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
 /**
  * Tests the VFS implementation for a particular archive type.
@@ -53,20 +67,20 @@ public abstract class FileTestCase extends TestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.config("Java assertions " + (ea ? "enabled." : "disabled!"));
+        logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
             logger.warning("Please enable assertions for additional white box testing.");
 
         new Random().nextBytes(_data);
-        logger.config("Created " + _data.length + " bytes of random data.");
-        logger.config("Temp dir for TrueZIP API: " + _tempDir.getPath());
-        logger.config("Default temp dir for unit tests: " + _baseDir.getPath());
-        logger.config("Free memory: " + mb(Runtime.getRuntime().freeMemory()));
-        logger.config("Total memory: " + mb(Runtime.getRuntime().totalMemory()));
-        logger.config("Max memory: " + mb(Runtime.getRuntime().maxMemory()));
+        logger.log(Level.CONFIG, "Created {0} bytes of random data.", _data.length);
+        logger.log(Level.CONFIG, "Temp dir for TrueZIP API: {0}", _tempDir.getPath());
+        logger.log(Level.CONFIG, "Default temp dir for unit tests: {0}", _baseDir.getPath());
+        logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
+        logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
+        logger.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
     }
 
-    private static final String mb(long value) {
+    private static String mb(long value) {
         return ((value - 1 + 1024 * 1024) / (1024 * 1024)) + " MB"; // round up
     }
     
@@ -97,6 +111,7 @@ public abstract class FileTestCase extends TestCase {
      * It must also finally call this superclass implementation to create
      * the temporary file to be used as an archive file.
      */
+    @Override
     protected void setUp() throws Exception {
         if (data == null)
             data = _data; // (byte[]) _data.clone();
@@ -114,6 +129,7 @@ public abstract class FileTestCase extends TestCase {
         File.setLenient(true); // Restore default
     }
     
+    @Override
     protected void tearDown() throws Exception {
         data = null;
         baseDir = null;
@@ -122,7 +138,7 @@ public abstract class FileTestCase extends TestCase {
         
         final boolean deleted = archive.delete();
         if (!deleted && archive.exists())
-            logger.warning(archive + " (could not delete)");
+            logger.log(Level.WARNING, "{0} (could not delete)", archive);
         archive = null;
         
         // umount now to delete temps and free memory.
@@ -149,17 +165,18 @@ public abstract class FileTestCase extends TestCase {
             if (totalTemps.add(temps[i])) {
                 // If the TrueZIP API itself (rather than this test code)
                 // leaves a temporary file, then that's considered a bug!
-                logger.warning("Bug in TrueZIP API: Temp file found: " + temps[i]);
+                logger.log(Level.WARNING, "Bug in TrueZIP API: Temp file found: {0}", temps[i]);
             }
         }
         
     }
 
-    private static final File createNonArchiveFile(File file) {
+    private static File createNonArchiveFile(File file) {
         return ArchiveDetector.NULL.createFile(
                 file.getParentFile(), file.getName());
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testParentConstructor() throws Exception {
         // Test normalization and parent+child constructors.
         // This is not yet a comprehensive test.
@@ -503,6 +520,7 @@ public abstract class FileTestCase extends TestCase {
         assertTrue(archive.deleteAll());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void testIllegalDirectoryOperations(final File dir) throws IOException {
         assert dir.isDirectory();
         try {
@@ -1053,21 +1071,21 @@ public abstract class FileTestCase extends TestCase {
             assertTrue(file.createNewFile());
         }
         time = System.currentTimeMillis() - time;
-        logger.finer("Time required to create " + i + " archive file entries: " + time + "ms");
+        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FilenameFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.finer("Time required to list these entries " + j + " times using a nullary FilenameFilter: " + time + "ms");
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FileFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.finer("Time required to list these entries " + j + " times using a nullary FileFilter: " + time + "ms");
+        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
         
         assertFalse(archive.delete()); // directory not empty!
         File.umount(); // allow external modifications!
@@ -1352,6 +1370,7 @@ public abstract class FileTestCase extends TestCase {
         class CheckAllEntriesThread extends Thread {
             Throwable failure;
             
+            @Override
             public void run() {
                 try {
                     checkArchiveEntries(archive, nEntries);
@@ -1443,6 +1462,7 @@ public abstract class FileTestCase extends TestCase {
                 this.i = i;
             }
             
+            @Override
             public void run() {
                 try {
                     final File file = new File(archive, i + "");
@@ -1514,6 +1534,7 @@ public abstract class FileTestCase extends TestCase {
         class WritingThread extends Thread {
             Throwable failure;
             
+            @Override
             public void run() {
                 try {
                     final File archive = new File(createTempFile(prefix, suffix));

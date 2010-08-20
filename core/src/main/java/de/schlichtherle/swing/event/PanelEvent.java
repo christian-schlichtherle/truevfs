@@ -26,7 +26,7 @@ import java.awt.Window;
  * <p>
  * Note that since TrueZIP 6.1, this class has been refactored to subclass
  * {@link AWTEvent} (which subclasses {@link java.util.EventObject}) instead
- * of <code>EventObject</code> directly.
+ * of {@code EventObject} directly.
  * This has been done in order to allow coalescing multiple events for the
  * same cause by posting them to the AWT's Event Queue, from which the
  * coalesced event would then be dispatched by AWT's Event Dispatching Thread.
@@ -65,8 +65,8 @@ public class PanelEvent extends AWTEvent {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in <code>PanelEvent</code> always returns a valid
-     * instance of <code>EnhancedPanel</code>.
+     * The implementation in {@code PanelEvent} always returns a valid
+     * instance of {@code EnhancedPanel}.
      */
     @Override
     public EnhancedPanel getSource() {
@@ -76,12 +76,12 @@ public class PanelEvent extends AWTEvent {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in <code>PanelEvent</code> enforces that the
-     * parameter is a valid instance of <code>EnhancedPanel</code>.
+     * The implementation in {@code PanelEvent} enforces that the
+     * parameter is a valid instance of {@code EnhancedPanel}.
      *
-     * @throws NullPointerException If <code>source</code> is <code>null</code>.
-     * @throws ClassCastException If <code>source</code> is not an instance of
-     *         <code>EnhancedPanel</code>.
+     * @throws NullPointerException If {@code source} is {@code null}.
+     * @throws ClassCastException If {@code source} is not an instance of
+     *         {@code EnhancedPanel}.
      */
     @Override
     public void setSource(Object source) {
@@ -91,8 +91,8 @@ public class PanelEvent extends AWTEvent {
     }
 
     /**
-     * Returns the ancestor window for this event or <code>null</code> if the
-     * source of this event is not an <code>EnhancedPanel</code>.
+     * Returns the ancestor window for this event or {@code null} if the
+     * source of this event is not an {@code EnhancedPanel}.
      */
     public Window getAncestorWindow() {
         return getSource().getAncestorWindow();

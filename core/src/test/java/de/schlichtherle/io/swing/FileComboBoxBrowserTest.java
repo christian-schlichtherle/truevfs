@@ -23,20 +23,12 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Logger;
-
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
-
-import junit.framework.*;
-
+import junit.framework.TestCase;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -57,13 +49,6 @@ public class FileComboBoxBrowserTest extends TestCase {
 
     public FileComboBoxBrowserTest(String testName) {
         super(testName);
-    }
-
-    protected void setUp() throws Exception {
-        
-    }
-
-    protected void tearDown() throws Exception {
     }
 
     /**
@@ -157,8 +142,8 @@ public class FileComboBoxBrowserTest extends TestCase {
         return Arrays.asList(entries);
     }
 
-    private static List asList(final JComboBox combo) {
-        final List list = new LinkedList();
+    private static List<Object> asList(final JComboBox combo) {
+        final List<Object> list = new LinkedList<Object>();
         final ComboBoxModel model = combo.getModel();
         for (int i = 0, l = model.getSize(); i < l; i++)
             list.add(model.getElementAt(i));
@@ -177,11 +162,11 @@ public class FileComboBoxBrowserTest extends TestCase {
         // Type a character in tc0, then check that it's appearing in tc1.
         tc0.typeText("?");
         assertEquals("?", tc1.getText());
-        
+
         // Clear character in tc1, ensure that its cleared in tc0
         tc1.clearText();
         assertEquals("", tc0.getText());
-        
+
         // Select first element in list of tc0 (entry in current directory),
         // if any, and check its appearance in tc1.
         tc0.pressKey(KeyEvent.VK_DOWN);

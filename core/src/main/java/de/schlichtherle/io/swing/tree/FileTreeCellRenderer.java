@@ -16,11 +16,12 @@
 
 package de.schlichtherle.io.swing.tree;
 
-import de.schlichtherle.io.swing.*;
-
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.tree.*;
+import de.schlichtherle.io.swing.FileSystemView;
+import de.schlichtherle.io.swing.JFileTree;
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * A {@link javax.swing.tree.TreeCellRenderer} which uses an instance of
@@ -32,10 +33,10 @@ import javax.swing.tree.*;
  * @since TrueZIP 5.1
  */
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
-    private static final long serialVersionUID = 923743852664723915L;
+    private static final long serialVersionUID = 1045639746091876245L;
 
     private final JFileTree fileTree;
-    
+
     public FileTreeCellRenderer(final JFileTree fileTree) {
         this.fileTree = fileTree;
     }

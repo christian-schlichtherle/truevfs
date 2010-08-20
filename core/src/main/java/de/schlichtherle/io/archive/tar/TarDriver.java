@@ -16,14 +16,19 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-import java.util.logging.*;
-
-import javax.swing.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.archive.spi.AbstractArchiveDriver;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.InputArchive;
+import de.schlichtherle.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.io.archive.spi.OutputArchive;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFileInputStream;
+import java.io.CharConversionException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.swing.Icon;
 
 /**
  * An archive driver which builds TAR files.
@@ -129,8 +134,8 @@ public class TarDriver extends AbstractArchiveDriver {
     }
 
     /**
-     * Returns a new <code>InputStream</code> to read the contents from the
-     * given <code>ReadOnlyFile</code> from.
+     * Returns a new {@code InputStream} to read the contents from the
+     * given {@code ReadOnlyFile} from.
      * Override this method in order to decorate the stream returned by the
      * implementation in this class in order to have the driver read the TAR
      * file from wrapper file formats such as GZIP or BZIP2.
@@ -147,10 +152,10 @@ public class TarDriver extends AbstractArchiveDriver {
     }
 
     /**
-     * Returns a new <code>TarInputArchive</code> to read the contents from
-     * the given <code>InputStream</code>.
+     * Returns a new {@code TarInputArchive} to read the contents from
+     * the given {@code InputStream}.
      * The implementation in this class simply returns
-     * <code>new TarInputArchive(in)</code>.
+     * {@code new TarInputArchive(in)}.
      */
     protected TarInputArchive createTarInputArchive(
             Archive archive,

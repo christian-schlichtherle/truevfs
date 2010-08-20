@@ -26,12 +26,13 @@ package de.schlichtherle.io;
 public class TarFileTest extends FileTestCase {
     
     /**
-     * Creates a new instance of <code>TarFileTest</code>
+     * Creates a new instance of {@code TarFileTest}
      */
     public TarFileTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".tar";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("tar"));

@@ -41,7 +41,7 @@ public interface Feedback extends Runnable {
     /**
      * Sets the panel which is used to provide feedback.
      *
-     * @param panel The <code>CreateKeyPanel</code> to provide feedback.
+     * @param panel The {@code CreateKeyPanel} to provide feedback.
      */
     void setPanel(JPanel panel);
 

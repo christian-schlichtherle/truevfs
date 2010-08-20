@@ -16,9 +16,11 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-
-import java.io.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.util.Action;
+import java.io.CharConversionException;
+import java.io.IOException;
 
 /**
  * This archive controller implements the automounting functionality.
@@ -60,13 +62,13 @@ abstract class ArchiveFileSystemController extends ArchiveController {
      * be acquired while this method is called!
      */
     void touch() throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         setScheduled(true);
     }
 
     final ArchiveFileSystem autoMount(final boolean create)
     throws IOException {
-        assert readLock().isLocked() || writeLock().isLocked();
+        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         return autoMounter.autoMount(create);
     }
 
@@ -97,7 +99,7 @@ abstract class ArchiveFileSystemController extends ArchiveController {
         ArchiveFileSystem autoMount(final boolean create)
         throws IOException {
             try {
-                class Mounter implements IORunnable {
+                class Mounter implements Action<IOException> {
                     public void run() throws IOException {
                         // Check state again: Another thread may have changed
                         // it while we released all read locks in order to
@@ -158,6 +160,7 @@ abstract class ArchiveFileSystemController extends ArchiveController {
             return fileSystem;
         }
 
+        @Override
         ArchiveFileSystem getFileSystem() {
             return fileSystem;
         }
@@ -200,7 +203,7 @@ abstract class ArchiveFileSystemController extends ArchiveController {
      * It may, however, have side effects on the state of the sub class.
      *
      * @param create If the archive file does not exist and this is
-     *        <code>true</code>, a new file system with only a virtual root
+     *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @throws FalsePositiveException

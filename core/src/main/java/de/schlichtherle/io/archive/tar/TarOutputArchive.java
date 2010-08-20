@@ -16,14 +16,22 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.util.*;
-
-import org.apache.tools.tar.*;
+import de.schlichtherle.io.OutputArchiveMetaData;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.io.archive.spi.OutputArchive;
+import de.schlichtherle.io.archive.spi.OutputArchiveBusyException;
+import de.schlichtherle.io.util.Temps;
+import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.apache.tools.tar.TarOutputStream;
 
 /**
  * An implementation of {@link OutputArchive} to write TAR archives.
@@ -31,15 +39,13 @@ import org.apache.tools.tar.*;
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source (such as entries created with
  * {@link FileOutputStream}) are actually written to temp files and copied
- * to the underlying <code>TarOutputStream</code> upon a call to their
+ * to the underlying {@code TarOutputStream} upon a call to their
  * {@link OutputStream#close} method.
- * Note that this implies that the <code>close()</code> method may fail with
+ * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  * <p>
- * Entries which's size is known in advance (such as entries copied with one
- * of the <code>(archiveC|c)opy(All)?(From|To)</code> methods in the
- * {@link File} class) are directly written to the underlying
- * <code>TarOutputStream</code> instead.
+ * Entries which's size is known in advance are directly written to the
+ * underlying {@link TarOutputStream} instead.
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a {@link MultiplexedOutputArchive}
@@ -49,9 +55,7 @@ import org.apache.tools.tar.*;
  * @version $Id$
  * @since TrueZIP 6.0
  */
-public class TarOutputArchive
-        extends TarOutputStream
-        implements OutputArchive {
+public class TarOutputArchive extends TarOutputStream implements OutputArchive {
 
     /** Prefix for temporary files created by the multiplexer. */
     private static final String TEMP_FILE_PREFIX = TarDriver.TEMP_FILE_PREFIX;
@@ -110,7 +114,7 @@ public class TarOutputArchive
      * Returns whether this output archive is busy writing an archive entry
      * or not.
      */
-    private final boolean isBusy() {
+    private boolean isBusy() {
         return busy;
     }
 
@@ -132,14 +136,17 @@ public class TarOutputArchive
             busy = true;
         }
 
+        @Override
         public void write(byte[] b) throws IOException {
             out.write(b, 0, b.length);
         }
 
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             out.write(b, off, len);
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -172,6 +179,7 @@ public class TarOutputArchive
             busy = true;
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -208,19 +216,6 @@ public class TarOutputArchive
             if (!temp.delete()) // may fail on Windoze if in.close() failed!
                 temp.deleteOnExit(); // we're bullish never to leavy any temps!
         }
-    }
-
-    /**
-     * @deprecated This method will be removed in the next major version number
-     *             release and should be implemented as
-     *             <code>getOutputStream(entry, null).close()</code>.
-     */
-    public final void storeDirectory(ArchiveEntry entry)
-    throws IOException {
-        assert false : "Since TrueZIP 6.5, this is not used anymore!";
-        if (!entry.isDirectory())
-            throw new IllegalArgumentException();
-        getOutputStream(entry, null).close();
     }
 
     //

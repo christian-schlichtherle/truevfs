@@ -34,7 +34,7 @@ final class LittleEndian {
 
     /**
      * Reads a signed short integer value from the byte array
-     * <code>buf</code> at the offset <code>off</code>
+     * {@code buf} at the offset {@code off}
      * as two bytes, low byte first.
      *
      * @param buf The byte array to read the signed short integer value from.
@@ -42,13 +42,13 @@ final class LittleEndian {
      *        of the signed short integer value is read from.
      * @return The signed short integer value read from the byte array.
      */
-    public static final short readShort(final byte[] buf, final int off) {
+    public static short readShort(final byte[] buf, final int off) {
         return (short) ((buf[off + 1] << 8) | (buf[off] & 0xff));
     }
 
     /**
      * Reads an unsigned short integer value from the byte array
-     * <code>buf</code> at the offset <code>off</code>
+     * {@code buf} at the offset {@code off}
      * as two bytes, low byte first.
      * Note that it is <em>not</em> necessary to check the return value with
      * {@link UShort#check}.
@@ -57,17 +57,17 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the unsigned short integer value is read from.
      * @return The unsigned short integer value read from the byte array.
-     *         Java does not provide <code>unsigned short</code> as a primitive
-     *         type, hence an <code>int</code> is returned which's two most
+     *         Java does not provide {@code unsigned short} as a primitive
+     *         type, hence an {@code int} is returned which's two most
      *         significant bytes are zero.
      */
-    public static final int readUShort(final byte[] buf, final int off) {
+    public static int readUShort(final byte[] buf, final int off) {
         return ((buf[off + 1] & 0xff) << 8) | (buf[off] & 0xff);
     }
 
     /**
      * Reads a signed integer value from the byte array
-     * <code>buf</code> at the offset <code>off</code>
+     * {@code buf} at the offset {@code off}
      * as four bytes, low byte first.
      *
      * @param buf The byte array to read the signed integer value from.
@@ -75,7 +75,7 @@ final class LittleEndian {
      *        of the signed integer value is read from.
      * @return The signed integer value read from the byte array.
      */
-    public static final int readInt(final byte[] buf, int off) {
+    public static int readInt(final byte[] buf, int off) {
         off += 3;
         int i = buf[off--]; // expands sign
         i <<= 8;
@@ -89,7 +89,7 @@ final class LittleEndian {
 
     /**
      * Reads an unsigned integer value from the byte array
-     * <code>buf</code> at the offset <code>off</code>
+     * {@code buf} at the offset {@code off}
      * as four bytes, low byte first.
      * Note that it is <em>not</em> necessary to check the return value with
      * {@link UInt#check}.
@@ -98,17 +98,17 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the unsigned integer value is read from.
      * @return The unsigned integer value read from the byte array.
-     *         Java does not provide <code>unsigned int</code> as a primitive
-     *         type, hence a <code>long</code> is returned which's four most
+     *         Java does not provide {@code unsigned int} as a primitive
+     *         type, hence a {@code long} is returned which's four most
      *         significant bytes are zero.
      */
-    public static final long readUInt(final byte[] buf, int off) {
+    public static long readUInt(final byte[] buf, int off) {
         return readInt(buf, off) & UInt.MAX_VALUE;
     }
 
     /**
      * Reads a (signed) long integer value from the byte array
-     * <code>buf</code> at the offset <code>off</code>
+     * {@code buf} at the offset {@code off}
      * as eight bytes, low byte first.
      *
      * @param buf The byte array to read the signed long integer value from.
@@ -116,7 +116,7 @@ final class LittleEndian {
      *        of the (signed) long integer value is read from.
      * @return The (signed) long integer value read from the byte array.
      */
-    public static final long readLong(final byte[] buf, int off) {
+    public static long readLong(final byte[] buf, int off) {
         off += 7;
         long l = buf[off--]; // expands sign
         l <<= 8;
@@ -137,8 +137,8 @@ final class LittleEndian {
     }
 
     /**
-     * Writes the integer value <code>s</code> to the byte array
-     * <code>buf</code> at the zero based offset <code>off</code>
+     * Writes the integer value {@code s} to the byte array
+     * {@code buf} at the zero based offset {@code off}
      * as two bytes, low byte first.
      * The most significant two bytes of the integer value are ignored.
      *
@@ -147,15 +147,15 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the short integer value is written to.
      */
-    public static final void writeShort(int s, final byte[] buf, final int off) {
+    public static void writeShort(int s, final byte[] buf, final int off) {
         buf[off] = (byte) s;
         s >>= 8;
         buf[off + 1] = (byte) s;
     }
 
     /**
-     * Writes the integer value <code>i</code> to the byte array
-     * <code>buf</code> at the zero based offset <code>off</code>
+     * Writes the integer value {@code i} to the byte array
+     * {@code buf} at the zero based offset {@code off}
      * as four bytes, low byte first.
      *
      * @param i The integer value to be written.
@@ -163,7 +163,7 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the integer value is written to.
      */
-    public static final void writeInt(int i, final byte[] buf, final int off) {
+    public static void writeInt(int i, final byte[] buf, final int off) {
         buf[off] = (byte) i;
         i >>= 8;
         buf[off + 1] = (byte) i;
@@ -174,8 +174,8 @@ final class LittleEndian {
     }
 
     /**
-     * Writes the long integer value <code>l</code> to the byte array
-     * <code>buf</code> at the zero based offset <code>off</code>
+     * Writes the long integer value {@code l} to the byte array
+     * {@code buf} at the zero based offset {@code off}
      * as eight bytes, low byte first.
      *
      * @param l The long integer value to be written.
@@ -183,7 +183,7 @@ final class LittleEndian {
      * @param off The zero based offset in the byte array where the first byte
      *        of the long integer value is written to.
      */
-    public static final void writeLong(long l, final byte[] buf, final int off) {
+    public static void writeLong(long l, final byte[] buf, final int off) {
         buf[off] = (byte) l;
         l >>= 8;
         buf[off + 1] = (byte) l;

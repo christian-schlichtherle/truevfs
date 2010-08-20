@@ -16,14 +16,16 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-
-import javax.swing.*;
-
-import org.apache.tools.bzip2.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.swing.Icon;
+import org.apache.tools.bzip2.CBZip2InputStream;
+import org.apache.tools.bzip2.CBZip2OutputStream;
 
 /**
  * An archive driver which builds TAR files compressed with BZIP2.
@@ -57,11 +59,6 @@ public class TarBZip2Driver extends TarDriver {
      * which is {@value}.
      */
     public static final int DEFAULT_BLOCKSIZE = MAX_BLOCKSIZE;
-
-    /**
-     * @deprecated Use {@link #DEFAULT_BLOCKSIZE} instead.
-     */
-    public static final int DEFAULT_LEVEL = MAX_BLOCKSIZE;
 
     private final int inBlockSize;
 
@@ -102,7 +99,7 @@ public class TarBZip2Driver extends TarDriver {
      *
      * @param inBlockSize The compression block size to use when writing
      *        a BZIP2 output stream.
-     * @throws IllegalArgumentException If <code>inBlockSize</code> is not
+     * @throws IllegalArgumentException If {@code inBlockSize} is not
      *         in the range [1..9].
      */
     public TarBZip2Driver(
@@ -117,7 +114,7 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     /**
-     * Returns the value of the property <code>inBlockSize</code> which was
+     * Returns the value of the property {@code inBlockSize} which was
      * provided to the constructor.
      */
     public final int getLevel() {
@@ -132,9 +129,10 @@ public class TarBZip2Driver extends TarDriver {
      * Returns a newly created and verified {@link CBZip2InputStream}.
      * This method performs a simple verification by computing the checksum
      * for the first record only.
-     * This method is required because the <code>CBZip2InputStream</code>
+     * This method is required because the {@code CBZip2InputStream}
      * unfortunately does not do sufficient verification!
      */
+    @Override
     protected InputStream createInputStream(Archive archive, ReadOnlyFile rof)
     throws IOException {
         final InputStream in = super.createInputStream(archive, rof);
@@ -149,6 +147,7 @@ public class TarBZip2Driver extends TarDriver {
         return new CBZip2InputStream(new BufferedInputStream(vin, BUFSIZE));
     }
 
+    @Override
     protected TarOutputArchive createTarOutputArchive(
             final Archive archive,
             final OutputStream out,

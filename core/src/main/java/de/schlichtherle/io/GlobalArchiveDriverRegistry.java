@@ -107,12 +107,12 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     }
 
     /**
-     * Creates a new <code>GlobalArchiveDriverRegistry</code>.
+     * Creates a new {@code GlobalArchiveDriverRegistry}.
      * This constructor logs some configuration messages at
-     * <code>Level.CONFIG</code>.
+     * {@code Level.CONFIG}.
      * If an exception occurs during processing of the configuration resource
      * files or no archive drivers are registered, then one or more warnings
-     * messages are logged at <code>Level.WARNING</code>, but otherwise the
+     * messages are logged at {@code Level.WARNING}, but otherwise the
      * constructor terminates normally.
      * This is to ensure that TrueZIP can be used without throwing exceptions
      * in static initializers just because of a bug in a configuration
@@ -137,12 +137,8 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
      */
     private static String[] getServices() {
         return System.getProperty(PROP_KEY_REGISTRY,
-                "META-INF/services/de.schlichtherle.io.registry.properties" // since TrueZIP 6.5.2 - NOI18N
-                + File.pathSeparator
-                + "META-INF/services/" + CLASS_NAME + ".properties" // deprecated - NOI18N
-                + File.pathSeparator
-                + "META-INF/services/de.schlichtherle.io.archive.spi.ArchiveDriver.properties")
-                .split("\\" + File.pathSeparator); // deprecated - NOI18N
+                "META-INF/services/de.schlichtherle.io.registry.properties") // since TrueZIP 6.5.2 - NOI18N
+                .split("\\" + File.pathSeparator); // NOI18N
     }
 
     private void registerArchiveDrivers() {
@@ -155,7 +151,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     }
 
     /**
-     * Enumerates all resource URLs for <code>service</code> on the class
+     * Enumerates all resource URLs for {@code service} on the class
      * path and calls
      * {@link #registerArchiveDrivers(URL, ArchiveDriverRegistry, ArchiveDriverRegistry)}
      * on each instance.
@@ -187,7 +183,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     }
 
     /**
-     * Loads and processes the given <code>url</code> in order to register
+     * Loads and processes the given {@code url} in order to register
      * the archive drivers in its config resource file.
      */
     private static void registerArchiveDrivers(
@@ -216,11 +212,11 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     }
 
     /**
-     * Processes the given <code>config</code> in order to register
+     * Processes the given {@code config} in order to register
      * its archive drivers.
      * 
      * @throws NullPointerException If any archive driver ID in the
-     *         configuration is <code>null</code>.
+     *         configuration is {@code null}.
      */
     private static void registerArchiveDrivers(
             final Map config,
@@ -240,14 +236,14 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     }
 
     /**
-     * Consumes and processes the entry for the keyword <code>DEFAULT</code>
+     * Consumes and processes the entry for the keyword {@code DEFAULT}
      * in the map.
      * If a suffix is specified for which no driver is registered, then a
      * warning is logged and the suffix is removed from the return value.
      *
      * @return The set of suffixes processed by evaluating the value of the
-     *         entry with the key <code>DEFAULT</code> in the map of drivers.
-     *         May be empty, but never <code>null</code>.
+     *         entry with the key {@code DEFAULT} in the map of drivers.
+     *         May be empty, but never {@code null}.
      */
     private SuffixSet defaultSuffixes() {
         final SuffixSet set;

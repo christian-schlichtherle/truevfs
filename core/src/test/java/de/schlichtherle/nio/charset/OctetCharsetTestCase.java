@@ -16,12 +16,14 @@
 
 package de.schlichtherle.nio.charset;
 
-import java.nio.*;
-import java.nio.charset.*;
-import java.util.*;
-import java.util.logging.*;
-
-import junit.framework.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.util.Arrays;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
@@ -36,8 +38,10 @@ public abstract class OctetCharsetTestCase extends TestCase {
     }
 
     /** Must set charset. */
+    @Override
     protected abstract void setUp() throws Exception;
 
+    @Override
     protected void tearDown() throws Exception {
         charset = null;
     }
