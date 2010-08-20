@@ -222,7 +222,8 @@ public class ZipDriver extends AbstractArchiveDriver {
             ReadOnlyFile rof)
     throws IOException {
         return new ZipInputArchive(
-                rof, getCharset(), getPreambled(), getPostambled());
+                rof, getCharset(), ZipEntryFactory.INSTANCE,
+                getPreambled(), getPostambled());
     }
 
     /**

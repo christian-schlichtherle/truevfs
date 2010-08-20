@@ -86,7 +86,8 @@ public class JarDriver extends ZipDriver {
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new JarInputArchive(
-                rof, getCharset(), getPreambled(), getPostambled());
+        return new ZipInputArchive(
+                rof, getCharset(), JarEntryFactory.INSTANCE,
+                getPreambled(), getPostambled());
     }
 }

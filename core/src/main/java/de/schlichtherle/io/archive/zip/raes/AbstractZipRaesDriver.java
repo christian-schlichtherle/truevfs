@@ -124,9 +124,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Creates a new ZipEntry, enforcing that the data gets
+     * Creates a new {@link JarEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
+     * This feature strengthens the security of the authentication process.
      */
     @Override
     public ArchiveEntry createArchiveEntry(
@@ -145,9 +146,16 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     /**
-     * This implementation calls {@link #getRaesParameters}, with which it
-     * initializes a new {@link RaesOutputStream}, and finally passes the
-     * resulting stream to the super class implementation.
+     * The implementation in this class calls {@link #getRaesParameters}
+     * and decorates the given {@link OutputStream} with a new
+     * {@link RaesOutputStream} before passing the result to the super class
+     * implementation.
+     *
+     * @param archive The archive to write.
+     * @param out The {@link OutputStream} to decorate with a
+     *        {@link RaesOutputStream}.
+     * @param source The source from which archive entries will be copied to
+     *        the destination.
      */
     @Override
     public OutputArchive createOutputArchive(

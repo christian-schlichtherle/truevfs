@@ -20,7 +20,6 @@ import de.schlichtherle.io.InputArchiveMetaData;
 import de.schlichtherle.io.archive.spi.ArchiveEntry;
 import de.schlichtherle.io.archive.spi.InputArchive;
 import de.schlichtherle.io.rof.ReadOnlyFile;
-import de.schlichtherle.io.util.Paths;
 import de.schlichtherle.util.zip.BasicZipFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,6 +46,7 @@ public class ZipInputArchive
     public ZipInputArchive(
             ReadOnlyFile rof,
             String charset,
+            de.schlichtherle.util.zip.ZipEntryFactory factory,
             boolean preambled,
             boolean postambled)
     throws  NullPointerException,
@@ -54,12 +54,7 @@ public class ZipInputArchive
             FileNotFoundException,
             ZipException,
             IOException {
-        super(rof, charset, preambled, postambled);
-    }
-
-    @Override
-    protected de.schlichtherle.util.zip.ZipEntry createZipEntry(String entryName) {
-        return new ZipEntry(Paths.normalize(entryName, '/'));
+        super(rof, charset, factory, preambled, postambled);
     }
 
     public int getNumArchiveEntries() {

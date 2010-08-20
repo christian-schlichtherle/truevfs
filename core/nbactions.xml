@@ -44,4 +44,19 @@
                 <goal>package</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-Generate Javadoc JAR</actionName>
+            <displayName>Generate Javadoc JAR</displayName>
+            <goals>
+                <goal>generate-sources</goal>
+                <goal>javadoc:jar</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-site</actionName>
+            <displayName>site</displayName>
+            <goals>
+                <goal>site</goal>
+            </goals>
+        </action>
     </actions>

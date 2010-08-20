@@ -124,7 +124,9 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(new SimpleReadOnlyFile(new File(name)), charset, preambled, postambled);
+        super(  new SimpleReadOnlyFile(new File(name)),
+                charset, DefaultZipEntryFactory.SINGLETON,
+                preambled, postambled);
         this.name = name;
     }
 
@@ -197,7 +199,9 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(new SimpleReadOnlyFile(file), charset, preambled, postambled);
+        super(  new SimpleReadOnlyFile(file),
+                charset, DefaultZipEntryFactory.SINGLETON,
+                preambled, postambled);
         this.name = file.getPath();
     }
 
@@ -270,7 +274,9 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(rof, charset, preambled, postambled);
+        super(  rof,
+                charset, DefaultZipEntryFactory.SINGLETON,
+                preambled, postambled);
         this.name = null;
     }
 

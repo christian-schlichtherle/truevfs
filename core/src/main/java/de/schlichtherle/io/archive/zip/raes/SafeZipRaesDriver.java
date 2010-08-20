@@ -17,7 +17,8 @@
 package de.schlichtherle.io.archive.zip.raes;
 
 import de.schlichtherle.io.archive.Archive;
-import de.schlichtherle.io.archive.zip.CheckedJarInputArchive;
+import de.schlichtherle.io.archive.zip.CheckedZipInputArchive;
+import de.schlichtherle.io.archive.zip.JarEntryFactory;
 import de.schlichtherle.io.archive.zip.ZipInputArchive;
 import de.schlichtherle.io.rof.ReadOnlyFile;
 import java.io.IOException;
@@ -117,8 +118,9 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedJarInputArchive(
-                    rof, getCharset(), getPreambled(), getPostambled())
+                ? new CheckedZipInputArchive(
+                    rof, getCharset(), JarEntryFactory.INSTANCE,
+                    getPreambled(), getPostambled())
                 : super.createZipInputArchive(archive, rof);
     }
 }

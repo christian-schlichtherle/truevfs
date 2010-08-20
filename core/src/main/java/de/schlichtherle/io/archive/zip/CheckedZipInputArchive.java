@@ -56,6 +56,7 @@ public class CheckedZipInputArchive extends ZipInputArchive {
     public CheckedZipInputArchive(
             ReadOnlyFile rof,
             String charset,
+            de.schlichtherle.util.zip.ZipEntryFactory factory,
             boolean preambled,
             boolean postambled)
     throws  NullPointerException,
@@ -63,7 +64,7 @@ public class CheckedZipInputArchive extends ZipInputArchive {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(rof, charset, preambled, postambled);
+        super(rof, charset, factory, preambled, postambled);
     }
 
     /**

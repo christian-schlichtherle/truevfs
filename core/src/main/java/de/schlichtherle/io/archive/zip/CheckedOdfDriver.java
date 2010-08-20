@@ -85,6 +85,7 @@ public class CheckedOdfDriver extends OdfDriver {
             ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputArchive(
-                rof, getCharset(), getPreambled(), getPostambled());
+                rof, getCharset(), ZipEntryFactory.INSTANCE,
+                getPreambled(), getPostambled());
     }
 }

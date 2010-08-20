@@ -52,7 +52,7 @@ import java.util.zip.ZipException;
  * <p>
  * This class is able to skip a preamble like the one found in self extracting
  * archives.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.4
@@ -105,10 +105,13 @@ public class BasicZipFile implements Closeable {
     /** Maps offsets specified in the ZIP file to real offsets in the file. */
     private OffsetMapper mapper;
 
+    private final ZipEntryFactory factory;
+
     /**
      * Opens the given {@link ReadOnlyFile} for reading its entries.
      *
-     * @param rof The random access read only file.
+     * @param archive The {@link ReadOnlyFile} instance for random access to
+     *        the ZIP file.
      * @param charset The charset to use for decoding entry names and ZIP file
      *        comment.
      * @param preambled If this is {@code true}, then the ZIP file may have a
@@ -130,8 +133,8 @@ public class BasicZipFile implements Closeable {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException If {@code rof} or {@code charset} is
-     *         {@code null}.
+     * @param factory A factory for {@link ZipEntry}s.
+     * @throws NullPointerException If any reference parameter is {@code null}.
      * @throws UnsupportedEncodingException If charset is not supported by
      *         this JVM.
      * @throws FileNotFoundException If the file cannot get opened for reading.
@@ -141,8 +144,9 @@ public class BasicZipFile implements Closeable {
      */
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public BasicZipFile(
-            ReadOnlyFile rof,
-            String charset,
+            final ReadOnlyFile archive,
+            final String charset,
+            final ZipEntryFactory factory,
             boolean preambled,
             boolean postambled)
     throws  NullPointerException,
@@ -150,18 +154,20 @@ public class BasicZipFile implements Closeable {
             FileNotFoundException,
             ZipException,
             IOException {
-        if (rof == null || charset == null)
+        if (archive == null || charset == null || factory == null)
             throw new NullPointerException();
-        new String(new byte[0], charset); // may throw UnsupportedEncodingException!
-        this.charset = charset;
-        archive = rof;
+        //new String(new byte[0], charset); // may throw UnsupportedEncodingException!
 
-        final BufferedReadOnlyFile brof;
+        this.archive = archive;
+        this.charset = charset;
+        this.factory = factory;
+
+        final BufferedReadOnlyFile bzip;
         if (archive instanceof BufferedReadOnlyFile)
-            brof = (BufferedReadOnlyFile) archive;
+            bzip = (BufferedReadOnlyFile) archive;
         else
-            brof = new BufferedReadOnlyFile(archive);
-        mountCentralDirectory(brof, preambled, postambled);
+            bzip = new BufferedReadOnlyFile(archive);
+        mountCentralDirectory(bzip, preambled, postambled);
         // Do NOT close brof - would close rof as well!
 
         assert archive != null;
@@ -176,7 +182,7 @@ public class BasicZipFile implements Closeable {
      * The ZipEntrys will know all data that can be obtained from
      * the central directory alone, but not the data that requires the
      * local file header or additional data to be read.
-     * 
+     *
      * @throws ZipException If the file is not ZIP compatible.
      * @throws IOException On any other I/O related issue.
      */
@@ -206,7 +212,7 @@ public class BasicZipFile implements Closeable {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
             final String charset = utf8 ? ZIP.UTF8 : this.charset;
-            final ZipEntry entry = createZipEntry(new String(name, charset));
+            final ZipEntry entry = factory.newZipEntry(new String(name, charset));
             try {
                 int off = 0;
 
@@ -319,7 +325,7 @@ public class BasicZipFile implements Closeable {
      * <p>
      * As a side effect, both {@code mapper} and </code>postamble</code>
      * will be set.
-     * 
+     *
      * @throws ZipException If the file is not ZIP compatible.
      * @throws IOException On any other I/O related issue.
      */
@@ -356,9 +362,9 @@ public class BasicZipFile implements Closeable {
                 long cdSize;        // size of the central directory
                 long cdOffset;      // offset of start of central directory with respect to the starting disk number
                 int commentLen;     // .ZIP file comment length
-                
+
                 int off = 0;
-                
+
                 // Process EOCDR.
                 final byte[] eocdr = new byte[ZIP.EOCDR_MIN_LEN - sig.length];
                 rof.readFully(eocdr);
@@ -492,19 +498,12 @@ public class BasicZipFile implements Closeable {
                         mapper = new OffsetMapper();
                     }
                 }
-                
+
                 return (int) cdEntries;
             }
         }
         throw new ZipException(
                 "Expected End Of Central Directory Record signature!");
-    }
-
-    /**
-     * A factory method returning a newly created ZipEntry for the given name.
-     */
-    protected ZipEntry createZipEntry(String name) {
-        return new ZipEntry(name);
     }
 
     /**
@@ -514,7 +513,7 @@ public class BasicZipFile implements Closeable {
     public String getComment() {
         return comment;
     }
-    
+
     private void setComment(String comment) {
         this.comment = comment;
     }
@@ -579,7 +578,7 @@ public class BasicZipFile implements Closeable {
     public long getPreambleLength() {
         return preamble;
     }
-    
+
     /**
      * Returns an {@link InputStream} to read the preamble of this ZIP
      * compatible file.
@@ -612,7 +611,7 @@ public class BasicZipFile implements Closeable {
     public long getPostambleLength() {
         return postamble;
     }
-    
+
     /**
      * Returns an {@link InputStream} to read the postamble of this ZIP
      * compatible file.
@@ -645,7 +644,7 @@ public class BasicZipFile implements Closeable {
         assert mapper != null;
         return mapper.location(0) == 0;
     }
-    
+
     /**
      * Equivalent to {@link #getInputStream(String, boolean, boolean)
      * getInputStream(name, false, true)}.
@@ -867,7 +866,7 @@ public class BasicZipFile implements Closeable {
         public void close() throws IOException {
             try {
                 while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
-                    ; 
+                    ;
             } finally {
                 super.close();
             }
@@ -955,7 +954,7 @@ public class BasicZipFile implements Closeable {
 
             // Read data.
             final int read = in.read(buf, off, len);
-            
+
             // Feed inflater.
             if (read >= 0) {
                 inf.setInput(buf, off, read);
@@ -995,7 +994,7 @@ public class BasicZipFile implements Closeable {
             // Order is important!
             try {
                 while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
-                    ; 
+                    ;
             } finally {
                 closed = true;
                 InflaterPool.release(inf);
@@ -1028,7 +1027,7 @@ public class BasicZipFile implements Closeable {
     /**
      * Closes the file.
      * This closes any open input streams reading from this ZIP file.
-     * 
+     *
      * @throws IOException if an error occurs closing the file.
      */
     public void close() throws IOException {
@@ -1098,7 +1097,7 @@ public class BasicZipFile implements Closeable {
             }
 
             ensureOpen();
-            
+
             if (remaining <= 0) {
                 if (addDummyByte) {
                     addDummyByte = false;
@@ -1187,7 +1186,7 @@ public class BasicZipFile implements Closeable {
             return offset;
         }
     } // class OffsetMapper
-    
+
     private static class IrregularOffsetMapper extends OffsetMapper {
         final long start;
 

@@ -84,7 +84,8 @@ public class CheckedJarDriver extends JarDriver {
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new CheckedJarInputArchive(
-                rof, getCharset(), getPreambled(), getPostambled());
+        return new CheckedZipInputArchive(
+                rof, getCharset(), JarEntryFactory.INSTANCE,
+                getPreambled(), getPostambled());
     }
 }

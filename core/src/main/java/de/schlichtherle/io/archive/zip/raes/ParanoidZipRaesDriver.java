@@ -22,7 +22,7 @@ import de.schlichtherle.io.archive.Archive;
 import de.schlichtherle.io.archive.spi.InputArchive;
 import de.schlichtherle.io.archive.spi.OutputArchive;
 import de.schlichtherle.io.archive.spi.TransientIOException;
-import de.schlichtherle.io.archive.zip.JarInputArchive;
+import de.schlichtherle.io.archive.zip.ZipInputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.swing.Icon;
@@ -99,6 +99,6 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
             throw new TransientIOException(failure);
         }
 
-        return createZipOutputArchive(archive, ros, (JarInputArchive) source);
+        return createZipOutputArchive(archive, ros, (ZipInputArchive) source);
     }
 }
