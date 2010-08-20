@@ -134,27 +134,27 @@ limitations under the License.
                     <groups>
                         <group>
                             <title>High Level API For Accessing Archive Files Of Any Supported Type</title>
-                            <packages>de.schlichtherle.io:de.schlichtherle.io.samples</packages>
+                            <packages>de.schlichtherle.truezip.io:de.schlichtherle.truezip.io.samples</packages>
                         </group>
                         <group>
                             <title>Low Level API For Accessing ZIP Files</title>
-                            <packages>de.schlichtherle.util.zip</packages>
+                            <packages>de.schlichtherle.truezip.util.zip</packages>
                         </group>
                         <group>
                             <title>Low Level API For Accessing RAES Files</title>
-                            <packages>de.schlichtherle.crypto.io.raes:de.schlichtherle.key*</packages>
+                            <packages>de.schlichtherle.truezip.crypto.io.raes:de.schlichtherle.truezip.key*</packages>
                         </group>
                         <group>
                             <title>GUI For Accessing Archive Files Of Any Supported Type</title>
-                            <packages>de.schlichtherle.awt:de.schlichtherle.io.swing*:de.schlichtherle.swing*</packages>
+                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
                         </group>
                         <group>
                             <title>SPI With Implementations For Pluggable Archive Drivers</title>
-                            <packages>de.schlichtherle.io.archive.*</packages>
+                            <packages>de.schlichtherle.truezip.io.archive.*</packages>
                         </group>
                         <group>
                             <title>Packages &lt;em&gt;NOT&lt;/em&gt; Intended For Public Use!</title>
-                            <packages>de.schlichtherle.io.archive</packages>
+                            <packages>de.schlichtherle.truezip.io.archive</packages>
                         </group>
                     </groups>
                     <links>

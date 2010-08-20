@@ -26,7 +26,7 @@
         <p>TrueZIP&#39;s design strategy is to &quot;make simple things easy and
             complex things possible&quot;.
             For example, when using the default configuration, the instance
-            {@link de.schlichtherle.io.File#File(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
+            {@link de.schlichtherle.truezip.io.File#File(java.lang.String) new File("app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")}
             would refer to the text file entry <i>META-INF/MANIFEST.MF</i> within the JAR file
             entry <i>WEB-INF/lib/lib.jar</i> within the WAR file entry <i>web.war</i> within
             the EAR file <i>app.ear</i>. The same applies for any other supported and configured
@@ -49,7 +49,7 @@
         <p>TrueZIP is covered under the Apache License, Version 2.0.</p>
         <h3><a name="defaults"></a>Default Configuration</h3>
         <p>The following archive types and access parameters are defined by the
-            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.io.registry.properties</i>.
+            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.truezip.io.registry.properties</i>.
             Note that only the archive file suffixes {@code "ear|jar|war|zip"}
             are recognized in file paths by default.</p>
         <table border="2" cellpadding="0" cellspacing="2">
@@ -150,9 +150,7 @@
                     <p><i>lcrypto.jar</i><sup>6</sup></p>
                 </td>
                 <td>
-                    <p>
-                        <a href="de/schlichtherle/io/archive/zip/raes/package-summary.html#package_description">
-		RAES encrypted ZIP file</a>.</p>
+                    <p>{@linkplain de.schlichtherle.truezip.io.archive.zip.raes RAES encrypted ZIP file}.</p>
                 </td>
             </tr>
             <tr>
@@ -249,11 +247,11 @@
                 </td>
             </tr>
         </table>
-        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.io.DefaultArchiveDetector}
+        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.DefaultArchiveDetector}
             class.<br/>
-            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.io.ArchiveDetector#DEFAULT}?
+            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.ArchiveDetector#DEFAULT}?
             Note that this may be extended (but not restricted) in future releases.<br/>
-            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.io.ArchiveDetector#ALL}?
+            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.ArchiveDetector#ALL}?
             Note that this may be extended (but not restricted) in future releases.<br/>
             <sup>3</sup> The code page to use for entry names and other entry meta data. This
             access parameter is determined by the archive driver (not the archive detector)
