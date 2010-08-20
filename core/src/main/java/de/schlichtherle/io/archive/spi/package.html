@@ -19,16 +19,18 @@
     <head/>
     <body>
         <p>
-            The Service Provider Interface (SPI) for pluggable archive drivers.
+            The Service Provider Interface (SPI) for pluggable
+            {@code ArchiveDriver}s.
             The interfaces and classes in this package are used by some package
-            private classes in the package {@code de.schlichtherle.io} in order to
-            access archive files without requiring to know the archive type.
+            private classes in the package {@code de.schlichtherle.io} in order
+            to access archive files without requiring to know the archive type.
         </p>
         <p>
             To implement support for a custom archive type, developers must
-            implement the interfaces in this package and either provide a custom
-            implementation of the {@link de.schlichtherle.io.ArchiveDetector}
-            interface or register the driver class with the
+            implement the interfaces in this package and either provide a
+            custom implementation of the
+            {@link de.schlichtherle.io.ArchiveDetector} interface or register
+            the driver class with the
             {@link de.schlichtherle.io.DefaultArchiveDetector} class.
         </p>
         <p>
