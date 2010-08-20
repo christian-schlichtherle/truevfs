@@ -16,13 +16,23 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.key.*;
-
-import java.io.*;
-import java.lang.ref.*;
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.key.PromptingKeyManager;
+import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.
@@ -40,8 +50,8 @@ final class ArchiveControllers {
     /**
      * The map of all archive controllers.
      * The keys are plain {@link java.io.File} instances and the values
-     * are either <code>ArchiveController</code>s or {@link WeakReference}s
-     * to <code>ArchiveController</code>s.
+     * are either {@code ArchiveController}s or {@link WeakReference}s
+     * to {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
     private static final Map controllers = new WeakHashMap();
@@ -71,9 +81,9 @@ final class ArchiveControllers {
      * <p>
      * <b>Note:</b>
      * <ul>
-     * <li>Neither <code>file</code> nor the enclosing archive file(s)
-     *     need to actually exist for this to return a valid <code>ArchiveController</code>.
-     *     Just the parent directories of <code>file</code> need to look like either
+     * <li>Neither {@code file} nor the enclosing archive file(s)
+     *     need to actually exist for this to return a valid {@code ArchiveController}.
+     *     Just the parent directories of {@code file} need to look like either
      *     an ordinary directory or an archive file, e.g. their lowercase
      *     representation needs to have a .zip or .jar ending.</li>
      * <li>It is an error to call this method on a target file which is
@@ -155,12 +165,12 @@ final class ArchiveControllers {
     /**
      * Associates the given archive controller to the target file.
      *
-     * @param target The target file. This must not be <code>null</code> or
-     *        an instance of the <code>File</code> class in this package!
+     * @param target The target file. This must not be {@code null} or
+     *        an instance of the {@code File} class in this package!
      * @param controller An {@link ArchiveController} or a
      *        {@link WeakReference} to an archive controller.
      */
-    static final void set(final java.io.File target, final Object controller) {
+    static void set(final java.io.File target, final Object controller) {
         assert target != null;
         assert !(target instanceof File);
         assert controller instanceof ArchiveController
@@ -173,25 +183,25 @@ final class ArchiveControllers {
 
     /**
      * Updates all archive files in the real file system which's canonical
-     * path name start with <code>prefix</code> with the contents of their
+     * path name start with {@code prefix} with the contents of their
      * virtual file system, resets all cached state and deletes all temporary
      * files.
      * This method is thread safe.
      * 
      * @param prefix The prefix of the canonical path name of the archive files
-     *        which shall get updated - <code>null</code> is not allowed!
+     *        which shall get updated - {@code null} is not allowed!
      *        If the canonical pathname of an archive file does not start with
      *        this string, then it is not updated.
      * @param waitInputStreams Suppose any other thread has still one or more
      *        archive entry input streams open.
-     *        Then if and only if this parameter is <code>true</code>, this
+     *        Then if and only if this parameter is {@code true}, this
      *        method will wait until all other threads have closed their
      *        archive entry input streams.
      *        Archive entry input streams opened (and not yet closed) by the
      *        current thread are always ignored.
      *        If the current thread gets interrupted while waiting, it will
      *        stop waiting and proceed normally as if this parameter were
-     *        <code>false</code>.
+     *        {@code false}.
      *        Be careful with this parameter value: If a stream has not been
      *        closed because the client application does not always properly
      *        close its streams, even on an {@link IOException} (which is a
@@ -201,7 +211,7 @@ final class ArchiveControllers {
      *        for any archive entries because the application has forgot to
      *        close all {@link FileInputStream} objects or another thread is
      *        still busy doing I/O on an archive.
-     *        Then if this parameter is <code>true</code>, an update is forced
+     *        Then if this parameter is {@code true}, an update is forced
      *        and an {@link ArchiveBusyWarningException} is finally thrown to
      *        indicate that any subsequent operations on these streams
      *        will fail with an {@link ArchiveEntryStreamClosedException}
@@ -209,23 +219,23 @@ final class ArchiveControllers {
      *        This may also be used to recover an application from a
      *        {@link FileBusyException} thrown by a constructor of
      *        {@link FileInputStream} or {@link FileOutputStream}.
-     *        If this parameter is <code>false</code>, the respective archive
+     *        If this parameter is {@code false}, the respective archive
      *        file is <em>not</em> updated and an {@link ArchiveBusyException}
      *        is thrown to indicate that the application must close all entry
      *        input streams first.
-     * @param waitOutputStreams Similar to <code>waitInputStreams</code>,
+     * @param waitOutputStreams Similar to {@code waitInputStreams},
      *        but applies to archive entry output streams instead.
-     * @param closeOutputStreams Similar to <code>closeInputStreams</code>,
+     * @param closeOutputStreams Similar to {@code closeInputStreams},
      *        but applies to archive entry output streams instead.
-     *        If this parameter is <code>true</code>, then
-     *        <code>closeInputStreams</code> must be <code>true</code>, too.
-     *        Otherwise, an <code>IllegalArgumentException</code> is thrown.
-     * @param umount If <code>true</code>, all temporary files get deleted, too.
+     *        If this parameter is {@code true}, then
+     *        {@code closeInputStreams} must be {@code true}, too.
+     *        Otherwise, an {@code IllegalArgumentException} is thrown.
+     * @param umount If {@code true}, all temporary files get deleted, too.
      *        Thereafter, the archive controller will behave as if it has just
      *        been created and any subsequent operations on its entries will
      *        remount the virtual file system from the archive file again.
      *        Use this to allow subsequent changes to the archive files
-     *        by other processes or via the <code>java.io.File*</code> classes
+     *        by other processes or via the {@code java.io.File*} classes
      *        <em>before</em> this package is used for read or write access to
      *        these archive files again.
      * @throws ArchiveBusyWarningExcepion If a archive file has been updated
@@ -249,10 +259,10 @@ final class ArchiveControllers {
      *         has been created externally and was corrupted or it cannot
      *         get updated because the file system of the temp file or target
      *         file folder is full.
-     * @throws NullPointerException If <code>prefix</code> is <code>null</code>.
-     * @throws IllegalArgumentException If <code>closeInputStreams</code> is
-     *         <code>false</code> and <code>closeOutputStreams</code> is
-     *         <code>true</code>.
+     * @throws NullPointerException If {@code prefix} is {@code null}.
+     * @throws IllegalArgumentException If {@code closeInputStreams} is
+     *         {@code false} and {@code closeOutputStreams} is
+     *         {@code true}.
      */
     static void umount(
             final String prefix,
@@ -341,7 +351,7 @@ final class ArchiveControllers {
         });
     }
 
-    static final ArchiveStatistics getLiveArchiveStatistics() {
+    static ArchiveStatistics getLiveArchiveStatistics() {
         return LiveArchiveStatistics.SINGLETON;
     }
 
@@ -393,6 +403,8 @@ final class ArchiveControllers {
          * directly called except for unit testing (you couldn't do a unit test
          * on a shutdown hook otherwise, could you?).
          */
+        @Override
+        @SuppressWarnings("CallToThreadDumpStack")
         public void run() {
             synchronized (PromptingKeyManager.class) {
                 try { // paranoid, but safe.

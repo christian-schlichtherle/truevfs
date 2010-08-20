@@ -34,7 +34,7 @@ import java.nio.channels.FileChannel;
  * <p>
  * The reason is that the mapped file remains allocated until the garbage
  * collector frees it even if the file channel and/or the
- * <code>RandomAccessFile</code> has been closed.
+ * {@code RandomAccessFile} has been closed.
  * Subsequent delete/write operations on the file will then fail.
  * For more information, please refer to
  * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154">

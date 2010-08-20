@@ -15,20 +15,28 @@
  */
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.ArchiveController.*;
-import de.schlichtherle.io.ArchiveFileSystem.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.util.*;
+import de.schlichtherle.io.ArchiveController.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.io.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.io.ArchiveFileSystem.ArchiveFileSystemException;
+import de.schlichtherle.io.ArchiveFileSystem.Delta;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.RfsEntry;
+import de.schlichtherle.io.util.Paths;
+import de.schlichtherle.io.util.Streams;
+import de.schlichtherle.util.Action;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 /**
  * Provides static utility methods for {@link File}s.
  * Note that in contrast to the {@link File} class, the methods in this
- * class accept and return plain <code>java.io.File</code> instances.
+ * class accept and return plain {@code java.io.File} instances.
  * Full advantage is taken if a parameter is actually an instance of the
- * <code>File</code> class in this package, however.
+ * {@code File} class in this package, however.
  * <p>
  * <b>TODO:</b> Consider making this class public in TrueZIP 7 and remove the
  * stub methods for the same purpose in {@link File}.
@@ -60,12 +68,12 @@ final class Files {
   }
 
   /**
-   * Returns true if and only if the <code>pathA</code> contains
-   * <code>pathB</code>.
+   * Returns true if and only if the {@code pathA} contains
+   * {@code pathB}.
    *
    * @param pathA A valid file path.
    * @param pathB A valid file path.
-   * @throws NullPointerException If any parameter is <code>null</code>.
+   * @throws NullPointerException If any parameter is {@code null}.
    */
   static boolean contains(String pathA, String pathB) {
     // Windows is just case preserving, all others are case sensitive.
@@ -89,8 +97,8 @@ final class Files {
    * form if resolving the prior fails.
    *
    * @return The canonical or absolute path of this file as a
-   *         <code>java.io.File</code> instance.
-   * @throws NullPointerException If <code>file</code> is <code>null</code>.
+   *         {@code java.io.File} instance.
+   * @throws NullPointerException If {@code file} is {@code null}.
    */
   public static java.io.File getCanOrAbsFile(java.io.File file) {
     try {
@@ -115,13 +123,13 @@ final class Files {
   }
 
   /**
-   * Removes any <code>&quot;.&quot;</code> and <code>&quot;..&quot;</code>
+   * Removes any {@code &quot;.&quot;} and {@code &quot;..&quot;}
    * directories from the path wherever possible.
    *
    * @param file The file instance which's path is to be normalized.
-   * @return <code>file</code> if it was already in normalized form.
+   * @return {@code file} if it was already in normalized form.
    *         Otherwise, an object which's runtime class is guaranteed to
-   *         be <code>java.io.File</code>.
+   *         be {@code java.io.File}.
    */
   public static java.io.File normalize(final java.io.File file) {
     final String path = file.getPath();
@@ -132,7 +140,7 @@ final class Files {
   }
 
   /**
-   * Returns <code>true</code> if the given file exists or can be created
+   * Returns {@code true} if the given file exists or can be created
    * and at least one byte can be successfully written to it - the file is
    * restored to its previous state afterwards.
    * This is a much stronger test than {@link File#canWrite()}.
@@ -235,7 +243,7 @@ final class Files {
    * entries within archive files, but is <em>not</em> atomic.
    * <p>
    * The name of this method is inspired by the Unix command line utility
-   * <code>mv</code> although in most cases it performs a plain rename
+   * {@code mv} although in most cases it performs a plain rename
    * operation rather than a copy-and-delete operation.
    *
    * @param src The source file or directory.
@@ -253,7 +261,7 @@ final class Files {
    * @see <a href="package-summary.html#third_parties">Third Party
    *      Access using different Archive Detectors</a>
    */
-  public static final boolean mv(
+  public static boolean mv(
           final java.io.File src,
           final java.io.File dst,
           final ArchiveDetector detector) {
@@ -303,14 +311,14 @@ final class Files {
 
   /**
    * The name of this method is inspired by the Unix command line utility
-   * <code>cp</code> with the <code>-r</code> option to operate recursively.
+   * {@code cp} with the {@code -r} option to operate recursively.
    *
    * @see File#copyAllTo(java.io.File, ArchiveDetector, ArchiveDetector)
    * @see File#archiveCopyAllTo(java.io.File, ArchiveDetector, ArchiveDetector)
    * @see <a href="package-summary.html#third_parties">Third Party
    *      Access using different Archive Detectors</a>
    */
-  public static final void cp_r(
+  public static void cp_r(
           final boolean preserve,
           final java.io.File src,
           final java.io.File dst,
@@ -368,14 +376,14 @@ final class Files {
 
   /**
    * The name of this method is inspired by the Unix command line utility
-   * <code>cp</code>.
+   * {@code cp}.
    *
    * @see File#cp(java.io.File, java.io.File)
    * @see File#cp_p(java.io.File, java.io.File)
    * @see <a href="package-summary.html#third_parties">Third Party
    *      Access using different Archive Detectors</a>
    */
-  public static final void cp(
+  public static void cp(
           final boolean preserve,
           final java.io.File src,
           final java.io.File dst)
@@ -600,7 +608,7 @@ final class Files {
     //assert !dstController.writeLock().isLocked();
 
     try {
-      class IOStreamCreator implements IORunnable {
+      class IOStreamCreator implements Action<IOException> {
         InputStream in;
         OutputStream out;
 
@@ -609,7 +617,7 @@ final class Files {
           // This may invalidate the file system object, so it must be
           // done first in case srcController and dstController are the
           // same!
-          class SrcControllerUpdater implements IORunnable {
+          class SrcControllerUpdater implements Action<IOException> {
             public void run() throws IOException {
               srcController.autoUmount(srcEntryName);
               srcController.readLock().lock(); // downgrade to read lock upon return
@@ -702,7 +710,7 @@ final class Files {
    * @throws IOException If copying the data fails because of an
    *         IOException in the destination.
    */
-  static final void cp0(
+  static void cp0(
           final boolean preserve,
           final java.io.File src,
           final InputStream in,
@@ -715,7 +723,7 @@ final class Files {
     //assert !dstController.writeLock().isLocked();
 
     try {
-      class OStreamCreator implements IORunnable {
+      class OStreamCreator implements Action<IOException> {
         OutputStream out; // = null;
 
         public void run() throws IOException {
@@ -796,7 +804,7 @@ final class Files {
    * archive file at all.
    * <p>
    * The name of this method is inspired by the Unix command line utility
-   * <code>rm</code> with the <code>-r</code> option to operate recursively.
+   * {@code rm} with the {@code -r} option to operate recursively.
    * <p>
    * This file system operation is <em>not</em> atomic.
    *

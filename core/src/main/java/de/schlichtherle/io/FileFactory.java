@@ -20,14 +20,14 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 
 /**
- * <em>This interface is <b>not</b> intended for public use!</em>
- * It's only used to hide the existence of {@link ArchiveDetector}s from
- * some methods in the {@link File} class.
- * <p>
  * A factory interface which creates {@link File}s, {@link FileInputStream}s
  * and {@link FileOutputStream}s.
  * You should not implement this interface directly - implement
  * {@link ArchiveDetector} instead.
+ * <p>
+ * <b>Warning:</b> This interface is <em>not</em> intended for public use!
+ * It's only used to hide the existence of {@link ArchiveDetector}s from
+ * some methods in the {@link File} class.
  * <p>
  * Implementations must be virtually immutable and thread safe!
  *

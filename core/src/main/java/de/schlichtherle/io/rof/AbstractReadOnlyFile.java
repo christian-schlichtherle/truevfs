@@ -16,11 +16,14 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
 
 /**
- * A base class for <code>ReadOnlyFile</code> implementations which
+ * A base class for {@code ReadOnlyFile} implementations which
  * implements the common boilerplate.
+ * <p>
+ * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

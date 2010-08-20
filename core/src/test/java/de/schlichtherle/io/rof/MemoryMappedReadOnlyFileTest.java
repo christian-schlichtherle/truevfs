@@ -23,7 +23,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public class MemoryMappedReadOnlyFileTest extends ReadOnlyFileTestCase {
-    
+
     public MemoryMappedReadOnlyFileTest(String testName) {
         super(testName);
     }

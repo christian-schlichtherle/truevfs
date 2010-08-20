@@ -16,25 +16,28 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
-import de.schlichtherle.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.OutputArchive;
+import de.schlichtherle.io.util.SynchronizedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * <em>This class is <b>not</b> intended for public use!</em>
- * It's only public in order to implement
- * {@link de.schlichtherle.io.archive.spi.ArchiveDriver}s.
- * <p>
  * Annotates an {@link OutputArchive} with the methods required for safe
  * writing of archive entries.
  * As an implication of this, it's also responsible for the synchronization
  * of the streams between multiple threads.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * It's only public for technical reasons and may get renamed or entirely
+ * disappear without notice.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -70,7 +73,7 @@ public final class OutputArchiveMetaData {
      * The pool of all open entry streams.
      * This is implemented as a map where the keys are the streams and the
      * value is the current thread.
-     * If <code>File.isLenient()</code> is true, then the map is actually
+     * If {@code File.isLenient()} is true, then the map is actually
      * instantiated as a {@link WeakHashMap}. Otherwise, it's a {@link HashMap}.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
@@ -85,7 +88,7 @@ public final class OutputArchiveMetaData {
     private volatile boolean stopped;
 
     /**
-     * Creates a new instance of <code>OutputArchiveMetaData</code>
+     * Creates a new instance of {@code OutputArchiveMetaData}
      * and sets itself as the meta data for the given output archive.
      */
     OutputArchiveMetaData(final Archive archive, final OutputArchive outArchive) {
@@ -110,7 +113,7 @@ public final class OutputArchiveMetaData {
      * Waits until all entry streams which have been opened (and not yet closed)
      * by all <em>other threads</em> are closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
-     * a warning message is logged using <code>java.util.logging</code> and
+     * a warning message is logged using {@code java.util.logging} and
      * this method returns.
      * <p>
      * Unless otherwise prevented, another thread could immediately open
@@ -167,8 +170,8 @@ public final class OutputArchiveMetaData {
      * Closes and disconnects <em>all</em> entry streams for the archive
      * containing this metadata object.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
-     * streams will throw an <code>IOException</code>, with the exception of
-     * their <code>close()</code> method.
+     * streams will throw an {@code IOException}, with the exception of
+     * their {@code close()} method.
      */
     synchronized ArchiveException closeAllOutputStreams(
             ArchiveException exceptionChain) {
@@ -200,6 +203,7 @@ public final class OutputArchiveMetaData {
     private final class EntryOutputStream extends SynchronizedOutputStream {
         private /*volatile*/ boolean closed;
 
+        @SuppressWarnings("NotifyWhileNotSynced")
         private EntryOutputStream(final OutputStream out) {
             super(out, OutputArchiveMetaData.this);
             assert out != null;
@@ -207,26 +211,30 @@ public final class OutputArchiveMetaData {
             OutputArchiveMetaData.this.notify(); // there can be only one waiting thread!
         }
 
-        private final void ensureNotStopped() throws IOException {
+        private void ensureNotStopped() throws IOException {
             if (stopped)
                 throw new ArchiveEntryStreamClosedException();
         }
 
+        @Override
         public void write(int b) throws IOException {
             ensureNotStopped();
             super.write(b);
         }
 
+        @Override
         public void write(byte[] b) throws IOException {
             ensureNotStopped();
             super.write(b);
         }
 
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             ensureNotStopped();
             super.write(b, off, len);
         }
 
+        @Override
         public void flush() throws IOException {
             ensureNotStopped();
             super.flush();
@@ -240,6 +248,7 @@ public final class OutputArchiveMetaData {
          *
          * @throws IOException If an I/O exception occurs.
          */
+        @Override
         public final void close() throws IOException {
             assert OutputArchiveMetaData.this == lock;
             synchronized (OutputArchiveMetaData.this) {
@@ -264,6 +273,7 @@ public final class OutputArchiveMetaData {
          *
          * @throws IOException If an I/O exception occurs.
          */
+        @Override
         protected void doClose() throws IOException {
             assert !closed;
             /*if (closed)
@@ -280,6 +290,8 @@ public final class OutputArchiveMetaData {
          * This is used to ensure that an archive can be updated although
          * the client may have "forgot" to close this output stream before.
          */
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
                 if (closed)

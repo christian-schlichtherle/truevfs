@@ -111,6 +111,7 @@ public class DefaultArchiveDetectorTest extends TestCase {
         });
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void testIllegalConstructors(
             final Class expected,
             final Object[][] list) {

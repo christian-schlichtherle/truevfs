@@ -16,26 +16,37 @@
 
 package de.schlichtherle.util.zip;
 
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
+import de.schlichtherle.io.util.LEDataOutputStream;
+import java.io.Closeable;
+import java.io.FilterOutputStream;
+import java.io.Flushable;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.zip.CRC32;
+import java.util.zip.Deflater;
+import java.util.zip.ZipException;
 
 /**
- * <em>This class is <b>not</b> intended for public use!</em>
- * The methods in this class are unsynchronized and
- * {@link #entries}/{@link #getEntry} enumerate/return {@link ZipEntry}
- * instances which are shared with this class rather than clones of them.
- * This may be used by subclasses in order to benefit from the slightly better
- * performance.
+ * Provides unsafe access to a ZIP file using unsynchronized methods and shared
+ * {@link ZipEntry} instances.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * This class is used within other parts of the TrueZIP API in order to benefit
+ * from the slightly better performance.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.4
- * @see ZipOutputStream
  */
-public class BasicZipOutputStream extends FilterOutputStream {
+public class BasicZipOutputStream
+        extends FilterOutputStream
+        implements Closeable, Flushable {
 
     /**
      * The default character set used for entry names and comments in ZIP
@@ -87,7 +98,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
 
     /**
      * Whether or not we need to deflate the current entry.
-     * This can be used together with the <code>DEFLATED</code> method to
+     * This can be used together with the {@code DEFLATED} method to
      * write already compressed entry data into the ZIP file.
      */
     private boolean deflate;
@@ -96,7 +107,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
      * Creates a new ZIP output stream decorating the given output stream,
      * using the {@value #DEFAULT_CHARSET} charset.
      *
-     * @throws NullPointerException If <code>out</code> is <code>null</code>.
+     * @throws NullPointerException If {@code out} is {@code null}.
      */
     public BasicZipOutputStream(final OutputStream out)
     throws NullPointerException {
@@ -112,10 +123,10 @@ public class BasicZipOutputStream extends FilterOutputStream {
     /**
      * Creates a new ZIP output stream decorating the given output stream.
      *
-     * @throws NullPointerException If <code>out</code> or <code>charset</code> is
-     *         <code>null</code>.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
+     * @throws NullPointerException If {@code out} or {@code charset} is
+     *         {@code null}.
+     * @throws UnsupportedEncodingException If {@code charset} is not supported
+     *         by this JVM.
      */
     public BasicZipOutputStream(
             final OutputStream out,
@@ -164,7 +175,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
 
     /**
      * Returns the {@link ZipEntry} for the given name or
-     * <code>null</code> if no entry with that name exists.
+     * {@code null} if no entry with that name exists.
      * Note that the returned entry is shared with this class.
      * It is illegal to change its state!
      *
@@ -242,8 +253,8 @@ public class BasicZipOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Returns <code>true</code> if and only if this
-     * <code>BasicZipOutputStream</code> is currently writing a ZIP entry.
+     * Returns {@code true} if and only if this
+     * {@code BasicZipOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
         return entry != null;
@@ -428,6 +439,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
     /**
      * @throws IOException On any I/O related issue.
      */
+    @Override
     public void write(int b) throws IOException {
         byte[] buf = sbuf;
         buf[0] = (byte) b;
@@ -437,6 +449,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
     /**
      * @throws IOException On any I/O related issue.
      */
+    @Override
     public void write(final byte[] b, final int off, final int len)
     throws IOException {
         if (entry != null) {
@@ -459,7 +472,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
         }
     }
 
-    private final void deflate() throws IOException {
+    private void deflate() throws IOException {
         final int dlen = def.deflate(dbuf, 0, dbuf.length);
         if (dlen > 0)
             out.write(dbuf, 0, dlen);
@@ -784,6 +797,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
      *
      * @throws IOException On any I/O related issue.
      */
+    @Override
     public void close() throws IOException {
         if (closed)
             return;
@@ -810,6 +824,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
             super(Deflater.DEFAULT_COMPRESSION, true);
         }
 
+        @Override
         public void setInput(byte[] b, int off, int len) {
             super.setInput(b, off, len);
             read += len;
@@ -819,11 +834,13 @@ public class BasicZipOutputStream extends FilterOutputStream {
             return level;
         }
 
+        @Override
         public void setLevel(int level) {
             super.setLevel(level);
             this.level = level;
         }
 
+        @Override
         public int deflate(byte[] b, int off, int len) {
             int dlen = super.deflate(b, off, len);
             written += dlen;
@@ -833,6 +850,7 @@ public class BasicZipOutputStream extends FilterOutputStream {
         /**
          * Returns the total number of uncompressed bytes input so far.
          */
+        @Override
         public long getBytesRead() {
             return read;
         }
@@ -840,10 +858,12 @@ public class BasicZipOutputStream extends FilterOutputStream {
         /**
          * Returns the total number of compressed bytes output so far.
          */
+        @Override
         public long getBytesWritten() {
             return written;
         }
 
+        @Override
         public void reset() {
             super.reset();
             read = written = 0;

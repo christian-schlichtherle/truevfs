@@ -21,14 +21,16 @@ import java.util.Enumeration;
 /**
  * Provides static utility methods for convenient class and resource loading
  * which is designed to work in both JEE and OSGi environments.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * It's just a workaround which will exist until the introduction of a better,
+ * but probably non-backwards-compatible solution in TrueZIP 7.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.8
- * @deprecated This class is just a workaround until the introduction of a
- *             better, but probably non-backwards-compatible solution in
- *             TrueZIP 7. Do <em>not</em> use!
  */
+// TODO: Exchange this class for a more general solution, e.g. OSGi.
 public class ClassLoaderUtil {
 
     private ClassLoaderUtil() {

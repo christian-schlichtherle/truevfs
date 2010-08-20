@@ -16,21 +16,22 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-
-import java.io.*;
-import java.util.*;
-
-import javax.swing.Icon;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * <em>This class is <b>not</b> intended for public use!</em>
- * It's only public for technical reasons and may get renamed or entirely
- * disappear without notice.
- * <p>
  * Annotates an {@link ArchiveEntry} with the fields and methods required to
  * implement the concept of a directory.
+ * <p>
+ * <b>Warning:</b> This class is <em>not</em> intended for public use!
+ * It's only public for technical reasons and may get renamed or entirely
+ * disappear without notice.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -43,6 +44,7 @@ public class ArchiveEntryMetaData {
      * as a temporary buffer to implement filtered list methods.
      */
     private static final ThreadLocal threadLocal = new ThreadLocal() {
+        @Override
         protected Object initialValue() {
             return new ArrayList(64);
         }
@@ -52,7 +54,7 @@ public class ArchiveEntryMetaData {
      * If the entry from which this object has been created represents a
      * directory, then this is a valid reference to a set of Strings,
      * representing the children names.
-     * Otherwise this field is initialized with <code>null</code>.
+     * Otherwise this field is initialized with {@code null}.
      */
     final Set children;
 
@@ -81,11 +83,11 @@ public class ArchiveEntryMetaData {
 
     /**
      * Returns the names of the members in this directory which are
-     * accepted by <code>filenameFilter</code> in a newly created array.
-     * <code>dir</code> is used as the directory argument for the
-     * <code>filenameFilter</code>. The returned array is <em>not</em> sorted.
+     * accepted by {@code filenameFilter} in a newly created array.
+     * {@code dir} is used as the directory argument for the
+     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
      *
-     * @param filenameFilter a valid object - must not be <code>null</code>.
+     * @param filenameFilter a valid object - must not be {@code null}.
      * @param dir the directory represented as a File object.
      *
      * @throws NullPointerException If the entry from which this object has
@@ -112,13 +114,13 @@ public class ArchiveEntryMetaData {
     }
 
     /**
-     * Returns <code>File</code> objects for the members in this directory
-     * which are accepted by <code>filenameFilter</code> in a newly created
+     * Returns {@code File} objects for the members in this directory
+     * which are accepted by {@code filenameFilter} in a newly created
      * array.
-     * <code>dir</code> is used as the directory argument for the
-     * <code>filenameFilter</code>. The returned array is <em>not</em> sorted.
+     * {@code dir} is used as the directory argument for the
+     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
      *
-     * @param filenameFilter may be <code>null</code> to accept all members.
+     * @param filenameFilter may be {@code null} to accept all members.
      * @param dir the directory represented as a File object.
      *
      * @throws NullPointerException If the entry from which this object has
@@ -147,13 +149,13 @@ public class ArchiveEntryMetaData {
     }
 
     /**
-     * Returns <code>File</code> objects for the members in this directory
-     * which are accepted by <code>filenameFilter</code> in a newly created
+     * Returns {@code File} objects for the members in this directory
+     * which are accepted by {@code filenameFilter} in a newly created
      * array.
-     * <code>dir</code> is used as the directory argument for the
-     * <code>filenameFilter</code>. The returned array is <em>not</em> sorted.
+     * {@code dir} is used as the directory argument for the
+     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
      *
-     * @param fileFilter may be <code>null</code> to accept all members.
+     * @param fileFilter may be {@code null} to accept all members.
      * @param dir the directory represented as a File object.
      *
      * @throws NullPointerException If the entry from which this object has

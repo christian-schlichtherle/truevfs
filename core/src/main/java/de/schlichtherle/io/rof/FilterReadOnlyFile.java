@@ -16,16 +16,16 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * A base class for any class which wants to decorate a {@link ReadOnlyFile}.
  * <p>
  * Note that subclasses of this class often implement their own virtual file
  * pointer.
- * Thus, if you would like to access the underlying <code>ReadOnlyFile</code>
+ * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with the
- * <code>FilteredReadOnlyFile</code>, you should synchronize their file
+ * {@code FilteredReadOnlyFile}, you should synchronize their file
  * pointers a'la:
  * <pre>
  *     ReadOnlyFile rof = new SimpleReadOnlyFile(new File("HelloWorld.java"));
@@ -51,11 +51,13 @@ import java.io.*;
  * referring to this classes Javadoc like this:
  * <blockquote>
  * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying <code>ReadOnlyFile</code>
+ * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
  * in {@link FilterReadOnlyFile}.
  * </blockquote>
+ * <p>
+ * This class <em>is</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -64,9 +66,9 @@ public class FilterReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The read only file to be filtered. */
     protected ReadOnlyFile rof;
-    
+
     /**
-     * Creates a new instance of <tt>FilterReadOnlyFile</tt>,
+     * Creates a new instance of {@code FilterReadOnlyFile},
      * which filters the given read only file.
      */
     public FilterReadOnlyFile(ReadOnlyFile rof) {

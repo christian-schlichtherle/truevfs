@@ -113,7 +113,7 @@ public class EnhancedPanelTest extends TestCase {
         assertEquals(0, listeners.length);
 
         listener = null;
-        
+
         try {
             instance.addPanelListener(listener);
             fail("Previous method call should throw an NPE!");
@@ -121,7 +121,7 @@ public class EnhancedPanelTest extends TestCase {
         }
         listeners = instance.getPanelListeners();
         assertEquals(0, listeners.length);
-        
+
         try {
             instance.removePanelListener(listener);
             fail("Previous method call should throw an NPE!");
@@ -129,7 +129,7 @@ public class EnhancedPanelTest extends TestCase {
         }
         listeners = instance.getPanelListeners();
         assertEquals(0, listeners.length);
-        
+
         listener = new CountingPanelListener();
 
         instance.addPanelListener(listener);
@@ -164,7 +164,7 @@ public class EnhancedPanelTest extends TestCase {
             hidden++;
         }
     }
-            
+
     /**
      * Test of getListeners method, of class de.schlichtherle.swing.EnhancedPanel.
      */
@@ -176,7 +176,7 @@ public class EnhancedPanelTest extends TestCase {
         assertEquals(0, listeners.length);
 
         listener = null;
-        
+
         try {
             instance.addPanelListener(listener);
             fail("Previous method call should throw an NPE!");
@@ -184,7 +184,7 @@ public class EnhancedPanelTest extends TestCase {
         }
         listeners = instance.getListeners(PanelListener.class);
         assertEquals(0, listeners.length);
-        
+
         try {
             instance.removePanelListener(listener);
             fail("Previous method call should throw an NPE!");
@@ -192,9 +192,9 @@ public class EnhancedPanelTest extends TestCase {
         }
         listeners = instance.getListeners(PanelListener.class);
         assertEquals(0, listeners.length);
-        
+
         listener = new CountingPanelListener();
-        
+
         instance.addPanelListener(listener);
         listeners = instance.getListeners(PanelListener.class);
         assertEquals(1, listeners.length);
@@ -219,13 +219,12 @@ public class EnhancedPanelTest extends TestCase {
     /**
      * Test of fireAncestorWindowShown method, of class de.schlichtherle.swing.EnhancedPanel.
      */
-    @SuppressWarnings("deprecation")
     public void testFireAncestorWindowShown() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
         instance.addPanelListener(l); // add again to receive same event twice!
         assertEquals(0, l.shown);
-        
+
         PanelEvent event = null;
         instance.fireAncestorWindowShown(event);
         assertEquals(2, l.shown);
@@ -234,13 +233,12 @@ public class EnhancedPanelTest extends TestCase {
     /**
      * Test of fireAncestorWindowHidden method, of class de.schlichtherle.swing.EnhancedPanel.
      */
-    @SuppressWarnings("deprecation")
     public void testFireAncestorWindowHidden() {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
         instance.addPanelListener(l); // add again to receive same event twice!
         assertEquals(0, l.hidden);
-        
+
         PanelEvent event = null;
         instance.fireAncestorWindowHidden(event);
         assertEquals(2, l.hidden);
@@ -258,11 +256,12 @@ public class EnhancedPanelTest extends TestCase {
 
         class FrameHolder {
             protected final JFrame frame;
-            
+
             protected FrameHolder(JFrame frame) {
                 this.frame = frame;
             }
         }
+
         class SetupFrame extends FrameHolder implements Runnable {
             SetupFrame(JFrame frame) {
                 super(frame);
@@ -274,6 +273,7 @@ public class EnhancedPanelTest extends TestCase {
                 frame.setLocationRelativeTo(null);
             }
         }
+
         class MakeFrameVisible extends FrameHolder implements Runnable {
             MakeFrameVisible(JFrame frame) {
                 super(frame);
@@ -290,6 +290,7 @@ public class EnhancedPanelTest extends TestCase {
                 frame.setVisible(true);
             }
         }
+
         class MakeFrameInvisible extends FrameHolder implements Runnable {
             MakeFrameInvisible(JFrame frame) {
                 super(frame);
@@ -338,7 +339,7 @@ public class EnhancedPanelTest extends TestCase {
     }
 
     /**
-     * Invokes the given <code>runnable</code> from the AWT Event Dispatch
+     * Invokes the given {@code runnable} from the AWT Event Dispatch
      * Thread and waits for the AWT Event Queue to drain.
      *
      * @throws Error If this method is called from the AWT Event Dispatch Thread.

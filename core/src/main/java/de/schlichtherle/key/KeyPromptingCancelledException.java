@@ -27,6 +27,7 @@ package de.schlichtherle.key;
  * @version $Id$
  */
 public class KeyPromptingCancelledException extends UnknownKeyException {
+    private static final long serialVersionUID = 7645927619378423566L;
     
     public KeyPromptingCancelledException() {
         super("Key prompting has been cancelled!");

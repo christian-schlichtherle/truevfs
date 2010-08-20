@@ -16,27 +16,29 @@
 
 package de.schlichtherle.io;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Comparator;
 
 /**
  * Represents a chain of {@link IOException}s.
  * This class supports chaining exceptions for reasons other than causes
  * (which is a functionality already provided by J2SE 1.4 and later).
- * A <code>ChainableIOException</code> can be used to implement an algorithm
+ * A {@code ChainableIOException} can be used to implement an algorithm
  * which must be able to continue with some work although one or more
- * <code>IOException</code>s have occured.
+ * {@code IOException}s have occured.
  * <p>
  * For example, when looping through a list of files, an algorithm might
- * encounter an <code>IOException</code> when processing a file element in the list.
+ * encounter an {@code IOException} when processing a file element in the list.
  * However, it may still be required to process the remaining files in the list
- * before actually throwing the corresponding <code>IOException</code>.
- * Hence, whenever this algorithm encounters an <code>IOException</code>,
- * it would catch the <code>IOException</code>, create a
- * <code>ChainableIOException</code> for it and continue processing the
+ * before actually throwing the corresponding {@code IOException}.
+ * Hence, whenever this algorithm encounters an {@code IOException},
+ * it would catch the {@code IOException}, create a
+ * {@code ChainableIOException} for it and continue processing the
  * remainder of the list.
- * Finally, at the end of the algorithm, if any <code>IOException</code>s
- * have occured, the <code>ChainableIOException</code> chain would get sorted
+ * Finally, at the end of the algorithm, if any {@code IOException}s
+ * have occured, the {@code ChainableIOException} chain would get sorted
  * according to priority (see {@link #getPriority()} and
  * {@link #sortPriority()}) and finally thrown.
  * This would allow a client application to filter the exceptions by priority
@@ -54,7 +56,7 @@ import java.util.*;
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0 (generalized from the former
- *        <code>ArchiveControllerException</code>).
+ *        {@code ArchiveControllerException}).
  */
 public class ChainableIOException extends IOException implements Cloneable {
 
@@ -86,12 +88,13 @@ public class ChainableIOException extends IOException implements Cloneable {
     };
 
     private static int maxPrintExceptions = 3;
+    private static final long serialVersionUID = 2305749434187324928L;
     
     /**
      * The tail chain of this exception chain.
-     * Maybe <tt>null</tt> if there are no more exceptions.
+     * Maybe {@code null} if there are no more exceptions.
      * If this exception chain has not been reordered,
-     * the head of the tail is either <tt>null</tt> or an exception which
+     * the head of the tail is either {@code null} or an exception which
      * occured before this exception was created.
      * <p>
      * Please note that this is totally unrelated to a possible cause for
@@ -107,7 +110,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Constructs a new exception with the specified prior exception.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught - may be <tt>null</tt>.
+     *         caught - may be {@code null}.
      * 
      * @see ChainableIOException
      */
@@ -120,7 +123,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * and a message.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught - may be <tt>null</tt>.
+     *         caught - may be {@code null}.
      * @param  message The message for this exception.
      * 
      * @see ChainableIOException
@@ -136,9 +139,9 @@ public class ChainableIOException extends IOException implements Cloneable {
      * cause.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught - may be <tt>null</tt>.
+     *         caught - may be {@code null}.
      * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         {@link #getCause()} method).  (A {@code null} value is
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      * 
@@ -155,10 +158,10 @@ public class ChainableIOException extends IOException implements Cloneable {
      * a message and a cause.
      *
      * @param  priorException An exception that happened before and that was
-     *         caught - may be <tt>null</tt>.
+     *         caught - may be {@code null}.
      * @param  message The message for this exception.
      * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         {@link #getCause()} method).  (A {@code null} value is
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      * 
@@ -171,7 +174,7 @@ public class ChainableIOException extends IOException implements Cloneable {
         super(message);
         this.prior = priorException;
         if (cause != null)
-            initCause(cause);
+            super.initCause(cause);
         if (priorException != null)
             maxAppearance = priorException.maxAppearance + 1;
         else
@@ -182,6 +185,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     /**
      * Returns a <em>shallow</em> clone of this exception.
      */
+    @Override
     public Object clone() {
         try {
             return super.clone();
@@ -210,7 +214,7 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     /**
      * @return The exception chain represented by the prior exception,
-     *         or <code>null</code> if no prior exception exists.
+     *         or {@code null} if no prior exception exists.
      */
     public ChainableIOException getPrior() {
         return prior;
@@ -285,17 +289,15 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     /**
-     * Calls {@link #initCause(IOException) initCause((IOException) cause)}.
+     * Calls {@link IOException#initCause(Throwable) super.initCause((IOException) cause)}.
      *
-     * @throws ClassCastException If <code>cause</code> is not an instance
+     * @throws ClassCastException If {@code cause} is not an instance
      *         of {@link IOException}.
      */
-    public final Throwable initCause(final Throwable cause) {
-        return initCause((IOException) cause);
-    }
-
-    public Throwable initCause(final IOException cause) {
-        return super.initCause(cause);
+    @Override
+    public final ChainableIOException initCause(final Throwable cause) {
+        super.initCause((IOException) cause);
+        return this;
     }
 
     /**
@@ -312,12 +314,13 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Thus, this exception is always printed as the last exception in the
      * list.
      */
+    @Override
     public void printStackTrace(PrintStream s) {
         printStackTrace(s, getMaxPrintExceptions());
     }
 
     /**
-     * Prints up to <code>maxExceptions()</code> exceptions in this
+     * Prints up to {@code maxExceptions()} exceptions in this
      * chain to the provided {@link PrintStream}.
      * <p>
      * Exceptions are printed in ascending order of this chain.
@@ -363,12 +366,13 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Thus, this exception is always printed as the last exception in the
      * list.
      */
+    @Override
     public void printStackTrace(PrintWriter s) {
         printStackTrace(s, getMaxPrintExceptions());
     }
 
     /**
-     * Prints up to <code>maxExceptions()</code> exceptions in this
+     * Prints up to {@code maxExceptions()} exceptions in this
      * chain to the provided {@link PrintStream}.
      * <p>
      * Exceptions are printed in ascending order of this chain.

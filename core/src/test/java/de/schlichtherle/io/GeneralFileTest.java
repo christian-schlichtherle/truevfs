@@ -16,10 +16,9 @@
 
 package de.schlichtherle.io;
 
-import java.io.*;
-import java.net.*;
-
-import junit.framework.*;
+import java.io.IOException;
+import java.net.URI;
+import junit.framework.TestCase;
 
 /**
  * Tests archive type independent features of the {@link File} class.
@@ -35,11 +34,9 @@ public class GeneralFileTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".zip";
-    }
-
-    protected void tearDown() throws Exception {
     }
 
     public void testURIConstructor() throws Exception {

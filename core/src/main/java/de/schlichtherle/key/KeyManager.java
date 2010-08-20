@@ -94,7 +94,7 @@ public class KeyManager {
      * instantiated using its public, no-arguments constructor.
      * <p>
      * Otherwise, if the JVM is running in headless mode and the API conforms
-     * to JSE 6 (where the class <code>java.io.Console</code> is available),
+     * to JSE 6 (where the class {@code java.io.Console} is available),
      * then the console I/O based implementation in the class
      * {@link de.schlichtherle.key.passwd.console.PromptingKeyManager}
      * is loaded and instantiated using its public, no-arguments constructor.
@@ -147,7 +147,7 @@ public class KeyManager {
      * Sets the default instance of the key manager explicitly.
      *
      * @param keyManager The key manager to use as the default instance.
-     *        If this is set to <code>null</code>, on the next call to
+     *        If this is set to {@code null}, on the next call to
      *        {@link #getInstance} the default instance will be recreated.
      */
     public static void setInstance(final KeyManager keyManager) {
@@ -158,9 +158,9 @@ public class KeyManager {
      * Maps the given key provider for the given resource identifier.
      *
      * @return The key provider previously mapped for the given resource
-     *         identifier or <code>null</code> if no key provider was mapped.
-     * @throws NullPointerException If <code>resourceID</code> or
-     *         <code>provider</code> is <code>null</code>.
+     *         identifier or {@code null} if no key provider was mapped.
+     * @throws NullPointerException If {@code resourceID} or
+     *         {@code provider} is {@code null}.
      */
     static synchronized KeyProvider<?> mapKeyProvider(
             String resourceID,
@@ -174,9 +174,9 @@ public class KeyManager {
      * Removes the key provider for the given resource identifier from the map.
      *
      * @return The key provider previously mapped for the given resource
-     *         identifier or <code>null</code> if no key provider was mapped.
-     * @throws NullPointerException If <code>resourceID</code> is
-     *         <code>null</code>.
+     *         identifier or {@code null} if no key provider was mapped.
+     * @throws NullPointerException If {@code resourceID} is
+     *         {@code null}.
      */
     static synchronized KeyProvider<?> unmapKeyProvider(
             String resourceID) {
@@ -333,12 +333,12 @@ public class KeyManager {
      * to retrieve its keys again, thereby possibly prompting (and confusing)
      * the user.
      *
-     * @return <code>true</code> if and only if the operation succeeded,
+     * @return {@code true} if and only if the operation succeeded,
      *         which means that there was an instance of
      *         {@link KeyProvider} associated with
-     *         <code>oldResourceID</code>.
-     * @throws NullPointerException If <code>oldResourceID</code> or
-     *         <code>newResourceID</code> is <code>null</code>.
+     *         {@code oldResourceID}.
+     * @throws NullPointerException If {@code oldResourceID} or
+     *         {@code newResourceID} is {@code null}.
      * @throws IllegalStateException If unmapping or mapping the key provider
      *         is prohibited by a constraint in a subclass of
      *         {@link AbstractKeyProvider}, in which case the transaction is
@@ -380,7 +380,7 @@ public class KeyManager {
     //
 
     /**
-     * Creates a new <code>KeyManager</code>.
+     * Creates a new {@code KeyManager}.
      * This class does <em>not</em> map any key provider types.
      * This must be done in the subclass using {@link #mapKeyProviderType}.
      */
@@ -391,7 +391,7 @@ public class KeyManager {
      * Subclasses must use this method to register default implementation
      * classes for the interfaces {@link KeyProvider} and {@link AesKeyProvider}
      * and optionally other subinterfaces or subclasses of
-     * <code>KeyProvider</code>.
+     * {@code KeyProvider}.
      * This is best done in the constructor of the subclass
      * (this method is final).
      *
@@ -476,11 +476,11 @@ public class KeyManager {
      *         If no key provider has been previously mapped for the protected
      *         resource, the run time type of this instance is guaranteed to be
      *         assignment compatible to the given {@code type}.
-     * @throws NullPointerException If <code>resourceID</code> or
+     * @throws NullPointerException If {@code resourceID} or
      *         {@code type} is {@code null}.
      * @throws ClassCastException If no other key provider is mapped for the
      *         protected resource and the given class is not an implementation
-     *         of the <code>KeyProvider</code> interface.
+     *         of the {@code KeyProvider} interface.
      * @throws IllegalArgumentException If any other precondition on the
      *         parameter {@code type} does not hold.
      * @see #getInstance
@@ -528,7 +528,7 @@ public class KeyManager {
      *        provider with.
      *        For an RAES encrypted ZIP file, this must be the canonical
      *        path name of the archive file.
-     * @param provider The key provider for <code>resourceID</code>.
+     * @param provider The key provider for {@code resourceID}.
      *        For an RAES encrypted ZIP file, this must be an instance of
      *        the {@link AesKeyProvider} interface.
      * @throws NullPointerException If {@code resourceID} or

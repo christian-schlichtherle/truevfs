@@ -17,8 +17,7 @@
 package de.schlichtherle.io.util;
 
 import java.io.File;
-
-import junit.framework.*;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
@@ -31,18 +30,7 @@ public class PathsTest extends TestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
-    }
-
-    protected void tearDown() throws Exception {
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite(PathsTest.class);
-
-        return suite;
-    }
-
+    @SuppressWarnings("RedundantStringConstructorCall")
     public void testCutTrailingSeparators() {
         String path;
 
@@ -86,7 +74,7 @@ public class PathsTest extends TestCase {
 
         testSplit(".");
         testSplit("..");
-        testSplit(fs);
+        //testSplit(fs);
 
         testSplit("dir");
         testSplit("dir" + fs);
@@ -100,11 +88,11 @@ public class PathsTest extends TestCase {
 
         testSplit("dir" + fs + fs + "file");
         testSplit("dir" + fs + fs + fs + "file");
-        
+
         testSplit("dir" + fs + fs + fs + "file" + fs);
         testSplit("dir" + fs + fs + fs + "file" + fs + fs);
         testSplit("dir" + fs + fs + fs + "file" + fs + fs + fs);
-        
+
         if (File.separatorChar == '\\') { // Windoze?
             testSplit("\\\\\\host");
             testSplit("\\\\\\\\host");
@@ -145,7 +133,6 @@ public class PathsTest extends TestCase {
         final java.io.File file = new java.io.File(path);
         final String parent = file.getParent();
         final String base = file.getName();
-        //System.err.println(path + " -> (" + parent + ", " + base + ")");
 
         final String[] split = Paths.split(path, File.separatorChar);
         assertEquals(2, split.length);
@@ -190,7 +177,7 @@ public class PathsTest extends TestCase {
         testNormalize("..",  "a/b/./.././.././..");
         testNormalize("..",  "a/b/././../././../././..");
         testNormalize("..",  "a/b/./././.././././.././././..");
-        
+
         testNormalize("a/b/c", "a/b/c");
         testNormalize("a/b",   "a/b/c/..");
         testNormalize("a",     "a/b/c/../..");
@@ -305,21 +292,20 @@ public class PathsTest extends TestCase {
         testNormalize("../b", "..//a//..//b");
         testNormalize("../b/", "..//a//..//b//");
     }
-    
+
     private void testNormalize(String result, final String path) {
         testNormalize(result, path, '/');
     }
-    
-    private void testNormalize(String result, final String path, final char separatorChar) {
-        if (result == path)
-            assertSame(result, Paths.normalize(path, separatorChar));
-        else
-            assertEquals(result, Paths.normalize(path, separatorChar));
+
+    private void testNormalize(String expected, final String path, final char separatorChar) {
+        final String result = Paths.normalize(path, separatorChar);
+        assertEquals(expected, result);
+        assertTrue(!result.equals(path) || result == path);
         if (path.length() > 0 && !path.endsWith(separatorChar + "")) {
             String appended = path;
             for (int i = 0; i < 3; i++) {
                 appended += separatorChar + ".";
-                assertEquals(result, Paths.normalize(appended, separatorChar));
+                assertEquals(expected, Paths.normalize(appended, separatorChar));
             }
         }
     }

@@ -50,7 +50,7 @@ public class KeyMgmtLifeCycleThread extends Thread {
     }
 
     /**
-     * Returns non-<code>null</code> if and only if this thread has
+     * Returns non-{@code null} if and only if this thread has
      * terminated because the user cancelled the key prompting.
      */
     public Throwable getThrowable() {

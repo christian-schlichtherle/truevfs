@@ -16,35 +16,37 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * A {@link ReadOnlyFile} implementation which provides buffered random read
- * only access to another <code>ReadOnlyFile</code>.
+ * only access to another {@code ReadOnlyFile}.
  * <p>
  * <b>Note:</b> This class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying <code>ReadOnlyFile</code>
+ * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
  * in {@link FilterReadOnlyFile}.
- * 
+ * <p>
+ * This class is <em>not</em> thread-safe.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class BufferedReadOnlyFile extends FilterReadOnlyFile {
 
-    /**
-     * The default buffer length of the window to the file.
-     */
+    /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = 4096;
 
     /** Returns the smaller parameter. */
-    protected static final long min(long a, long b) {
+    protected static long min(long a, long b) {
         return a < b ? a : b;
     }
 
     /** Returns the greater parameter. */
-    protected static final long max(long a, long b) {
+    protected static long max(long a, long b) {
         return a < b ? b : a;
     }
 
@@ -62,18 +64,16 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
      */
     private long windowOff;
 
-    /**
-     * The buffer window to the file data.
-     */
+    /** The buffer window to the file data. */
     private final byte[] window;
 
     private boolean closed;
 
     /**
-     * Creates a new instance of <tt>BufferedReadOnlyFile</tt>.
-     * 
+     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     *
      * @param file The file to read.
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
@@ -86,11 +86,11 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of <tt>BufferedReadOnlyFile</tt>.
-     * 
+     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     *
      * @param file The file to read.
      * @param windowLen The size of the buffer window in bytes.
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
@@ -104,10 +104,10 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of <tt>BufferedReadOnlyFile</tt>.
-     * 
+     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     *
      * @param rof The read only file to read.
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
@@ -120,11 +120,11 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of <tt>BufferedReadOnlyFile</tt>.
-     * 
+     * Creates a new instance of {@code BufferedReadOnlyFile}.
+     *
      * @param rof The read only file to read.
      * @param windowLen The size of the buffer window in bytes.
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
@@ -148,9 +148,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
 
         // Check parameters (fail fast).
         if (rof == null) {
-            if (file == null)
-                throw new NullPointerException();
-            rof = createReadOnlyFile(file);
+            rof = new SimpleReadOnlyFile(file);
         } else { // rof != null
             assert file == null;
         }
@@ -162,26 +160,11 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         fp = rof.getFilePointer();
         window = new byte[windowLen];
         invalidateWindow();
-        
+
         assert window.length > 0;
     }
 
-    /**
-     * A factory method called by the constructor to get a read only file
-     * to access the contents of the read only file.
-     * This method is only used if the constructor isn't called with a read
-     * only file as its parameter.
-     * 
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
-     */
-    protected ReadOnlyFile createReadOnlyFile(File file)
-    throws IOException {
-        return new SimpleReadOnlyFile(file);
-        //return new FastReadOnlyFile(file);
-        //return new ChannelReadOnlyFile(file);
-    }
-
+    @Override
     public long length()
     throws IOException {
         final long newLength = rof.length();
@@ -193,12 +176,14 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         return length;
     }
 
+    @Override
     public long getFilePointer()
     throws IOException {
         ensureOpen();
         return fp;
     }
 
+    @Override
     public void seek(final long fp)
     throws IOException {
         ensureOpen();
@@ -213,6 +198,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         this.fp = fp;
     }
 
+    @Override
     public int read()
     throws IOException {
         // Check state.
@@ -225,6 +211,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         return window[(int) (fp++ % window.length)] & 0xff;
     }
 
+    @Override
     public int read(final byte[] buf, final int off, final int len)
     throws IOException {
         if (len == 0)
@@ -246,7 +233,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         // Setup.
         final int windowLen = window.length;
         int read = 0; // amount of decrypted data copied to buf
-        
+
         {
             // Partial read of window data at the start.
             final int o = (int) (fp % windowLen);
@@ -270,7 +257,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
                 fp += windowLen;
             }
         }
-        
+
         // Partial read of window data at the end.
         if (read < len && fp < length) {
             // The file pointer is not on a window boundary.
@@ -280,7 +267,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
             read += n;
             fp += n;
         }
-        
+
         // Assert that at least one byte has been read if len isn't zero.
         // Note that EOF has been tested before.
         assert read > 0;
@@ -290,8 +277,9 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     /**
      * Closes this read only file.
      * As a side effect, this will set the reference to the underlying read
-     * only file ({@link #rof} to <tt>null</tt>.
+     * only file ({@link #rof} to {@code null}.
      */
+    @Override
     public void close()
     throws IOException {
         if (closed)
@@ -307,7 +295,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private final void ensureOpen() throws IOException {
+    private void ensureOpen() throws IOException {
         if (closed)
             throw new IOException("file is closed");
     }
@@ -320,7 +308,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
      * Ensures that the window is positioned so that the block containing
      * the current virtual file pointer in the encrypted file is entirely
      * contained in it.
-     * 
+     *
      * @throws IOException On any I/O related issue.
      *         The window is invalidated in this case.
      */
@@ -332,7 +320,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         final long nextWindowOff = windowOff + windowLen;
         if (windowOff <= fp && fp < nextWindowOff)
             return;
-    
+
         try {
             // Move window in the buffered file.
             windowOff = (fp / windowLen) * windowLen; // round down to multiple of window size
@@ -360,7 +348,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
      * Forces the window to be reloaded on the next call to
      * {@link #positionWindow()}.
      */
-    private final void invalidateWindow() {
+    private void invalidateWindow() {
         windowOff = Long.MIN_VALUE;
     }
 }

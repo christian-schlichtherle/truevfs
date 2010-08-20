@@ -16,17 +16,36 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.*;
-import de.schlichtherle.io.File;
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.util.*;
+import de.schlichtherle.io.InputArchiveMetaData;
+import de.schlichtherle.io.InputIOException;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.InputArchive;
+import de.schlichtherle.io.archive.spi.TransientIOException;
+import de.schlichtherle.io.util.Paths;
+import de.schlichtherle.io.util.Streams;
+import de.schlichtherle.io.util.Temps;
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.apache.tools.tar.TarBuffer;
+import org.apache.tools.tar.TarInputStream;
+import org.apache.tools.tar.TarUtils;
 
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
-
-import org.apache.tools.tar.*;
+import static org.apache.tools.tar.TarConstants.GIDLEN;
+import static org.apache.tools.tar.TarConstants.MODELEN;
+import static org.apache.tools.tar.TarConstants.MODTIMELEN;
+import static org.apache.tools.tar.TarConstants.NAMELEN;
+import static org.apache.tools.tar.TarConstants.SIZELEN;
+import static org.apache.tools.tar.TarConstants.UIDLEN;
 
 /**
  * Presents a {@link TarInputStream} as a randomly accessible archive.
@@ -43,7 +62,7 @@ import org.apache.tools.tar.*;
  * @version $Id$
  * @since TrueZIP 6.0
  */
-public class TarInputArchive implements InputArchive, TarConstants {
+public class TarInputArchive implements InputArchive {
 
     private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
 
@@ -92,7 +111,7 @@ public class TarInputArchive implements InputArchive, TarConstants {
                             final java.io.FileOutputStream out
                                     = new java.io.FileOutputStream(tmp);
                             try {
-                                File.cat(tin, out); // use high performance pump (async I/O)
+                                Streams.cat(tin, out); // use high performance pump (async I/O)
                             } finally {
                                 out.close();
                             }
@@ -122,7 +141,7 @@ public class TarInputArchive implements InputArchive, TarConstants {
      * Returns a newly created and validated {@link TarInputStream}.
      * This method performs a simple validation by computing the checksum
      * for the first record only.
-     * This method is required because the <code>TarInputStream</code>
+     * This method is required because the {@code TarInputStream}
      * unfortunately does not do any validation!
      */
     private static TarInputStream createValidatedTarInputStream(
@@ -146,22 +165,18 @@ public class TarInputArchive implements InputArchive, TarConstants {
     }
 
     /**
-     * Fills <code>buf</code> with data from the given input stream and
+     * Fills {@code buf} with data from the given input stream and
      * returns an input stream from which you can still read all data,
      * including the data in buf.
      *
-     * @param in The stream to read from. May <em>not</em> be <code>null</code>.
+     * @param in The stream to read from. May <em>not</em> be {@code null}.
      * @param buf The buffer to fill entirely with data.
-     * @return A stream which holds all the data <code>in</code> did.
-     * @throws IOException If <code>buf</code> couldn't get filled entirely.
+     * @return A stream which holds all the data {@code in} did.
+     * @throws IOException If {@code buf} couldn't get filled entirely.
      */
     static InputStream readAhead(final InputStream in, final byte[] buf)
     throws IOException {
-        // Unfortunately, in Sun's J2SE 1.4.2_12 implementation,
-        // InflaterInputStream pretends to support marking, but actually it
-        // doesn't - hence we need to filter this special case.
-        // This issue has been fixed in Sun's J2SE 1.5.0-b64 implementation.
-        if (!(in instanceof InflaterInputStream) && in.markSupported()) {
+        if (in.markSupported()) {
             in.mark(buf.length);
             readFully(in, buf);
             in.reset();
@@ -249,6 +264,8 @@ public class TarInputArchive implements InputArchive, TarConstants {
      * the TAR is simply not accessible and not necessarily a false positive.
      */
     private static final class TempFileException extends FileNotFoundException {
+        private static final long serialVersionUID = 1923814625681036853L;
+
         private TempFileException(
                 final org.apache.tools.tar.TarEntry entry,
                 final IOException cause) {

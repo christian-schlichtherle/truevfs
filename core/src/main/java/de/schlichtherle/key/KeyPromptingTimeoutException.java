@@ -25,6 +25,7 @@ package de.schlichtherle.key;
  * @version $Id$
  */
 public class KeyPromptingTimeoutException extends UnknownKeyException {
+    private static final long serialVersionUID = 7656348612765052586L;
 
     public KeyPromptingTimeoutException() {
         super("Key prompting has timed out!");

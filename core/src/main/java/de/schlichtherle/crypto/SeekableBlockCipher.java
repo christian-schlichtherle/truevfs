@@ -19,7 +19,7 @@ package de.schlichtherle.crypto;
 import org.bouncycastle.crypto.BlockCipher;
 
 /**
- * Extends a <code>BlockCipher</code> in order to support random access to
+ * Extends a {@code BlockCipher} in order to support random access to
  * the blocks in a plain or cipher text.
  *
  * @author Christian Schlichtherle
@@ -37,7 +37,7 @@ public interface SeekableBlockCipher extends BlockCipher {
      *        {@link #processBlock(byte[], int, byte[], int)} is called.
      */
     void setBlockCounter(long block);
-    
+
     /**
      * Returns the index of the block, starting at 0, which will be processed
      * next when {@link #processBlock(byte[], int, byte[], int)} is called.

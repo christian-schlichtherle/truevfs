@@ -16,7 +16,8 @@
 
 package de.schlichtherle.util.zip;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract base class for an Extra Field in a Local or Central Header of a
@@ -42,9 +43,9 @@ abstract class ExtraField {
      * use with the static factory method {@link #create}.
      * 
      * @param c The implementation class of this abstract base class.
-     * @throws IllegalArgumentException If <code>c</code> is <code>null</code>,
+     * @throws IllegalArgumentException If {@code c} is {@code null},
      *         cannot get instantiated, is not a subclass of
-     *         <code>ExtraField</code> or its Header ID is out of range.
+     *         {@code ExtraField} or its Header ID is out of range.
      *         A more descriptive exception may be associated to it as its
      *         cause.
      * @see #create
@@ -54,9 +55,7 @@ abstract class ExtraField {
         try {
             ef = (ExtraField) c.newInstance();
         } catch (Exception ex) {
-            final IllegalArgumentException iae = new IllegalArgumentException();
-            iae.initCause(ex);
-            throw iae;
+            throw new IllegalArgumentException(ex);
         }
         final int headerID = ef.getHeaderID();
         UShort.check(headerID, "Header ID out of range", null);
@@ -72,8 +71,8 @@ abstract class ExtraField {
      * 
      * @param headerID An unsigned short integer (two bytes) which indicates
      *        the type of the returned Extra Field.
-     * @return A new Extra Field - never <code>null</code>!
-     * @throws IllegalArgumentException If <code>headerID</code> is out of
+     * @return A new Extra Field - never {@code null}!
+     * @throws IllegalArgumentException If {@code headerID} is out of
      *         range.
      * @see #register
      */
@@ -87,10 +86,9 @@ abstract class ExtraField {
                     ? (ExtraField) c.newInstance()
                     : new DefaultExtraField(headerID);
         } catch (Exception cannotHappen) {
-            final AssertionError ae
-                    = new AssertionError("register(Class) should have checked the instantiatability of " + c);
-            ae.initCause(cannotHappen);
-            throw ae;
+            throw new AssertionError(
+                    "register(Class) should have checked the instantiatability of " + c,
+                    cannotHappen);
         }
         assert headerID == ef.getHeaderID();
         return ef;
@@ -111,14 +109,14 @@ abstract class ExtraField {
      * This property may be initialized by calling {@link #readFrom}.
      * 
      * @return The size of the Data Block in bytes
-     *         or <code>0</code> if unknown.
+     *         or {@code 0} if unknown.
      * @see #getDataBlock
      */
     abstract int getDataSize();
 
     /**
      * Returns a protective copy of the Data Block.
-     * <code>null</code> is never returned.
+     * {@code null} is never returned.
      * 
      * @see #getDataSize
      */
@@ -135,19 +133,19 @@ abstract class ExtraField {
 
     /**
      * Initializes this Extra Field by deserializing a Data Block of
-     * <code>size</code> bytes from the
-     * byte array <code>data</code> at the zero based offset <code>off</code>.
-     * Upon return, this Extra Field shall not access <code>data</code>
-     * subsequently and {@link #getDataSize} must equal <code>size</code>.
+     * {@code size} bytes from the
+     * byte array {@code data} at the zero based offset {@code off}.
+     * Upon return, this Extra Field shall not access {@code data}
+     * subsequently and {@link #getDataSize} must equal {@code size}.
      *
      * @param data The byte array to read the Data Block from.
      * @param off The zero based offset in the byte array where the first byte
      *        of the Data Block is read from.
      * @param size The length of the Data Block in bytes.
      * @throws IndexOutOfBoundsException If the byte array
-     *         <code>data</code> does not hold at least <code>size</code>
-     *         bytes at the zero based offset <code>off</code>.
-     * @throws RuntimeException If <code>size</code> is illegal or the
+     *         {@code data} does not hold at least {@code size}
+     *         bytes at the zero based offset {@code off}.
+     * @throws RuntimeException If {@code size} is illegal or the
      *         deserialized Data Block contains illegal data.
      * @see #getDataSize
      */
@@ -155,16 +153,16 @@ abstract class ExtraField {
 
     /**
      * Serializes a Data Block of {@link #getDataSize} bytes to the
-     * byte array <code>data</code> at the zero based offset <code>off</code>.
-     * Upon return, this Extra Field shall not access <code>data</code>
+     * byte array {@code data} at the zero based offset {@code off}.
+     * Upon return, this Extra Field shall not access {@code data}
      * subsequently.
      *
      * @param data The byte array to write the Data Block to.
      * @param off The zero based offset in the byte array where the first byte
      *        of the Data Block is written to.
      * @throws IndexOutOfBoundsException If the byte array
-     *         <code>data</code> does not hold at least {@link #getDataSize}
-     *         bytes at the zero based offset <code>off</code>.
+     *         {@code data} does not hold at least {@link #getDataSize}
+     *         bytes at the zero based offset {@code off}.
      * @see #getDataSize
      */
     abstract void writeTo(byte[] data, int off);

@@ -14,32 +14,35 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.io;
+package de.schlichtherle.util.concurrent.locks;
 
-import junit.framework.*;
+import de.schlichtherle.util.Action;
+import junit.framework.TestCase;
 
 /**
- *
  * @author Christian Schlichtherle
+ * @version $Id$
  */
 public class ReentrantReadWriteLockTest extends TestCase {
-    
+
     public ReentrantReadWriteLockTest(String testName) {
         super(testName);
     }
 
     private ReentrantReadWriteLock instance;
 
+    @Override
     protected void setUp() throws Exception {
         instance = new ReentrantReadWriteLock();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         instance = null;
     }
 
     /**
-     * Test of readLock method, of class de.schlichtherle.io.ReentrantReadWriteLock.
+     * Test of readLock method, of class de.schlichtherle.util.concurrent.locks.ReentrantReadWriteLock.
      */
     public void testReadLock() {
         ReentrantLock rl = instance.readLock();
@@ -47,7 +50,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
 
         rl.lock();
         try {
-            runWithTimeout(1000, new InterruptibleRunnable() {
+            runWithTimeout(1000, new Action<InterruptedException>() {
                 public void run() throws InterruptedException {
                     ReentrantLock wl = instance.writeLock();
                     // Upgrading a read lock blocks until interrupted.
@@ -60,14 +63,14 @@ public class ReentrantReadWriteLockTest extends TestCase {
     }
 
     /**
-     * Test of writeLock method, of class de.schlichtherle.io.ReentrantReadWriteLock.
+     * Test of writeLock method, of class de.schlichtherle.util.concurrent.locks.ReentrantReadWriteLock.
      */
     public void testWriteLock() throws InterruptedException {
         ReentrantLock wl = instance.writeLock();
         assertNotNull(wl);
 
         wl.lock();
-        runWithTimeout(1000, new InterruptibleRunnable() {
+        runWithTimeout(1000, new Action<InterruptedException>() {
             public void run() throws InterruptedException {
                 ReentrantLock rl = instance.readLock();
                 // Downgrading a write lock returns immediately.
@@ -76,12 +79,13 @@ public class ReentrantReadWriteLockTest extends TestCase {
         });
     }
 
-    private void runWithTimeout(
+    private <T extends Throwable> void runWithTimeout(
             final long timeout,
-            final InterruptibleRunnable runnable)
-    throws InterruptedException {
+            final Action<T> action)
+    throws T {
         final Thread target = Thread.currentThread();
         final Thread observer = new Thread(new Runnable() {
+            @SuppressWarnings("CallToThreadDumpStack")
             public void run() {
                 try {
                     Thread.sleep(timeout);
@@ -93,10 +97,6 @@ public class ReentrantReadWriteLockTest extends TestCase {
         }, "Timeout thread");
         observer.setDaemon(true);
         observer.start();
-        runnable.run();
-    }
-    
-    private interface InterruptibleRunnable {
-        void run() throws InterruptedException;
+        action.run();
     }
 }

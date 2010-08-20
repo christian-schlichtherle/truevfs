@@ -16,9 +16,10 @@
 
 package de.schlichtherle.io.samples;
 
-import de.schlichtherle.io.*;
 import de.schlichtherle.io.File;
-import java.io.*;
+import de.schlichtherle.io.RaesFiles;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ResourceBundle;
 
 /**
@@ -26,13 +27,13 @@ import java.util.ResourceBundle;
  * into the file provided as the second argument for the main method.
  * <p>
  * Please note that you should not use this utility to decrypt an RAES
- * encrypted ZIP file (usually a file with a <code>".tzp"</code> or
- * <code>".zip.rae"</code> suffix) back to a plain ZIP file.
+ * encrypted ZIP file (usually a file with a {@code ".tzp"} or
+ * {@code ".zip.rae"} suffix) back to a plain ZIP file.
  * This is because RAES encrypted ZIP files use the &quot;UTF-8&quot;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.
  * To decrypt an RAES encrypted ZIP file to a plain ZIP file, use the
- * <code>"cp"</code> command of the {@link NZip} class instead.
+ * {@code "cp"} command of the {@link NZip} class instead.
  * This class knows about the correct character set charsets for the
  * various flavours of ZIP compatible files.
  *
@@ -54,7 +55,7 @@ public class Decrypt extends CommandLineUtility {
         super(out, err, autoFlush);
     }
 
-    /** Equivalent to <code>System.exit(new Decrypt().run(args));</code>. */
+    /** Equivalent to {@code System.exit(new Decrypt().run(args));}. */
     public static void main(final String[] args) {
         System.exit(new Decrypt().run(args));
     }
@@ -73,6 +74,8 @@ public class Decrypt extends CommandLineUtility {
 
     public class IllegalUsageException
             extends CommandLineUtility.IllegalUsageException {
+        private static final long serialVersionUID = 1425694834623864343L;
+
         private IllegalUsageException() {
             super(resources.getString("usage"));
         }

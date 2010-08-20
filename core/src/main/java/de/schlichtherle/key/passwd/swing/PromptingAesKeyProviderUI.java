@@ -16,9 +16,9 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.awt.*;
-import de.schlichtherle.key.*;
-import javax.swing.*;
+import de.schlichtherle.key.PromptingAesKeyProvider;
+import java.awt.EventQueue;
+import javax.swing.JComponent;
 
 /**
  * Extends its base class to enable the user to select the key strength
@@ -39,6 +39,7 @@ public class PromptingAesKeyProviderUI
         return new AesKeyStrengthPanel();
     }
 
+    @Override
     protected void promptCreateKey(
             final PromptingAesKeyProvider<Cloneable> provider,
             final JComponent extraDataUI) {

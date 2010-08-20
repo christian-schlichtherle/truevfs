@@ -43,12 +43,12 @@ import javax.swing.Icon;
  * An ODF file is either a plain XML file or a JAR file (called <i>package</i>).
  * <p>
  * If it's an XML file, the method {@link de.schlichtherle.io.File#isFile}
- * returns <code>true</code> and this driver is actually never used.
+ * returns {@code true} and this driver is actually never used.
  * It's up to the client application to recognize this and deal with the
  * ODF file appropriately.
  * <p>
  * If it's a JAR file however, the method
- * {@link de.schlichtherle.io.File#isDirectory} returns <code>true</code> and
+ * {@link de.schlichtherle.io.File#isDirectory} returns {@code true} and
  * this driver is used to access the file.
  * The client application can then access the ODF file transparently as if it
  * were a directory in a path.
@@ -89,6 +89,7 @@ public class OdfDriver extends JarDriver {
         super(openIcon, closedIcon, preambled, postambled, level);
     }
 
+    @Override
     public OutputArchive createOutputArchive(
             Archive archive,
             OutputStream out,

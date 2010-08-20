@@ -37,12 +37,12 @@ package de.schlichtherle.crypto.io.raes;
  * @since TrueZIP 6.0
  */
 public interface RaesParametersAgent extends RaesParameters {
-    
+
     /**
      * Requests an {@link RaesParameters} instance of the given
-     * <code>type</code>.
+     * {@code type}.
      * It is permissible to return an instance of any other implementation
-     * of the <code>RaesParameters</code> interface.
+     * of the {@code RaesParameters} interface.
      * If the returned object is an instance of an implementation of this
      * interface, it will be used to continue the search for RAES parameters
      * recursively.
@@ -50,9 +50,8 @@ public interface RaesParametersAgent extends RaesParameters {
      *
      * @param type The {@link RaesParameters} interface class which's
      *        implementation is searched.
-     *
-     * @return An instance of <code>RaesParameters</code> or <code>null</code>
+     * @return An instance of {@code RaesParameters} or {@code null}
      *         if no RAES parameters are available.
      */
-    RaesParameters getParameters(Class type);
+    RaesParameters getParameters(Class<? extends RaesParameters> type);
 }

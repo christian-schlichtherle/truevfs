@@ -42,8 +42,8 @@ public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
      * existing protected resource.
      * <p>
      * Upon return, the implementation is expected to update the common key
-     * in <code>provider</code>.
-     * Upon return, if <code>provider.getKey()</code> returns <code>null</code>,
+     * in {@code provider}.
+     * Upon return, if {@code provider.getKey()} returns {@code null},
      * prompting for the key is assumed to have been cancelled by the user.
      * In this case, the current and each subsequent call to
      * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}
@@ -54,7 +54,7 @@ public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
      * provided to the client upon request.
      * <p>
      * <b>Hint:</b> If the user cancels the dialog, it is recommended to
-     * leave the provider's <code>key</code> property simply unmodified.
+     * leave the provider's {@code key} property simply unmodified.
      * This causes the old key to be reused and allows the client to
      * continue its operation as if the user would not have requested to
      * change the key.
@@ -88,8 +88,8 @@ public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
      * protected resource in order to access its contents.
      * <p>
      * Upon return, the implementation is expected to update the common key
-     * in <code>provider</code>.
-     * Upon return, if <code>provider.getKey()</code> returns <code>null</code>,
+     * in {@code provider}.
+     * Upon return, if {@code provider.getKey()} returns {@code null},
      * prompting for the key is assumed to have been cancelled by the user.
      * In this case, the current and each subsequent call to
      * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}
@@ -132,8 +132,8 @@ public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
      * {@link #promptUnknownOpenKey} is invalid.
      * <p>
      * Upon return, the implementation is expected to update the common key
-     * in <code>provider</code>.
-     * Upon return, if <code>provider.getKey()</code> returns <code>null</code>,
+     * in {@code provider}.
+     * Upon return, if {@code provider.getKey()} returns {@code null},
      * prompting for the key is assumed to have been cancelled by the user.
      * In this case, the current and each subsequent call to
      * {@link KeyProvider#getOpenKey} or {@link KeyProvider#getCreateKey}

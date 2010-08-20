@@ -87,9 +87,9 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
 
     /**
      * Reads the encryption key as a byte sequence from the given pathname
-     * into a buffer of exactly <code>KEY_FILE_LEN</code> bytes and returns it.
+     * into a buffer of exactly {@code KEY_FILE_LEN} bytes and returns it.
      *
-     * @throws EOFException If the file is not at least <code>KEY_FILE_LEN</code>
+     * @throws EOFException If the file is not at least {@code KEY_FILE_LEN}
      *         bytes long.
      * @throws IOException If an IOException occurs when opening, reading or
      *         closing the file.
@@ -389,7 +389,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
     }
 
     /**
-     * Invokes the given <code>task</code> on the AWT Event Dispatching Thread
+     * Invokes the given {@code task} on the AWT Event Dispatching Thread
      * (EDT) and waits until it's finished.
      * <p>
      * In multithreaded environments, although technically possible,

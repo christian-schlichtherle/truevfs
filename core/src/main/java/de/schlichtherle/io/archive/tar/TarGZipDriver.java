@@ -16,14 +16,14 @@
 
 package de.schlichtherle.io.archive.tar;
 
-import de.schlichtherle.io.archive.*;
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
-import java.util.zip.*;
-
-import javax.swing.*;
+import de.schlichtherle.io.archive.Archive;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPInputStream;
+import javax.swing.Icon;
 
 /**
  * An archive driver which builds TAR files compressed with GZIP.
@@ -76,7 +76,7 @@ public class TarGZipDriver extends TarDriver {
      *
      * @param level The compression level to use when writing a GZIP output
      *        stream.
-     * @throws IllegalArgumentException If <code>level</code> is not in the
+     * @throws IllegalArgumentException If {@code level} is not in the
      *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
@@ -94,7 +94,7 @@ public class TarGZipDriver extends TarDriver {
     }
 
     /**
-     * Returns the value of the property <code>preambled</code> which was 
+     * Returns the value of the property {@code preambled} which was 
      * provided to the constructor.
      */
     public final int getLevel() {
@@ -105,6 +105,7 @@ public class TarGZipDriver extends TarDriver {
     // Driver implementation:
     //
 
+    @Override
     protected InputStream createInputStream(Archive archive, ReadOnlyFile rof)
     throws IOException {
         return new GZIPInputStream(
@@ -112,6 +113,7 @@ public class TarGZipDriver extends TarDriver {
                 BUFSIZE);
     }
 
+    @Override
     protected TarOutputArchive createTarOutputArchive(
             final Archive archive,
             final OutputStream out,
@@ -126,14 +128,14 @@ public class TarGZipDriver extends TarDriver {
     public static class GZIPOutputStream
             extends java.util.zip.GZIPOutputStream {
         /**
-         * Constructs a new <code>GZIPOutputStream</code> with the specified
+         * Constructs a new {@code GZIPOutputStream} with the specified
          * output stream, buffer size and compression level.
          *
          * @param level The compression level for the {@link Deflater}
          *        ({@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}).
          * @throws IOException If an I/O error occurs.
-         * @throws IllegalArgumentException if <code>size</code> is <= 0.
-         * @throws IllegalArgumentException If <code>level</code> is not in the
+         * @throws IllegalArgumentException if {@code size} is <= 0.
+         * @throws IllegalArgumentException If {@code level} is not in the
          *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
          *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
          */

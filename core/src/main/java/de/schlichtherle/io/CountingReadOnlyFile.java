@@ -16,9 +16,9 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
+import de.schlichtherle.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
@@ -58,6 +58,7 @@ final class CountingReadOnlyFile extends FilterReadOnlyFile {
         reset = true;
     }
 
+    @Override
     public int read() throws IOException {
         int ret = rof.read();
         if (ret != -1)
@@ -65,6 +66,7 @@ final class CountingReadOnlyFile extends FilterReadOnlyFile {
         return ret;
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
         int ret = rof.read(b);
         if (ret != -1)
@@ -72,6 +74,7 @@ final class CountingReadOnlyFile extends FilterReadOnlyFile {
         return ret;
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int ret = rof.read(b, off, len);
         if (ret != -1)

@@ -17,12 +17,11 @@
 package de.schlichtherle.crypto.generators;
 
 import de.schlichtherle.util.Arrays;
-
-import junit.framework.*;
-
-import java.util.*;
-
-import org.bouncycastle.crypto.digests.*;
+import java.util.Random;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 /**
  * @author Christian Schlichtherle
@@ -32,17 +31,18 @@ public class DigestRandomTest extends TestCase {
 
     private Random rnd1;
     private Random rnd2;
-    
+
     public static Test suite() {
         TestSuite suite = new TestSuite(DigestRandomTest.class);
-        
+
         return suite;
     }
-    
+
     public DigestRandomTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         rnd1 = new DigestRandom(new SHA256Digest());
         rnd2 = new DigestRandom(new SHA256Digest());
@@ -50,6 +50,7 @@ public class DigestRandomTest extends TestCase {
         //rnd2 = new SecureRandom();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         rnd1 = null;
         rnd2 = null;

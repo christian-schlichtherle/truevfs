@@ -40,6 +40,7 @@ public class ZipEntry
     }
 
     /** The unknown value for numeric properties. */
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final byte UNKNOWN = de.schlichtherle.util.zip.ZipEntry.UNKNOWN;
 
     private ArchiveEntryMetaData metaData;
@@ -61,10 +62,12 @@ public class ZipEntry
      *         Cloning doesn't work with ArchiveEntryMetaData and is not
      *         required for ArchiveDriver's anyway.
      */
+    @Override
     public Object clone() {
         throw new UnsupportedOperationException("Cloning doesn't work with ArchiveEntryMetaData and is not required for an ArchiveDriver anyway.");
     }
 
+    @Override
     protected void setName(String name) {
         super.setName(name);
     }
@@ -77,6 +80,7 @@ public class ZipEntry
         return null;
     }
 
+    @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.ZIP;
     }

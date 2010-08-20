@@ -16,12 +16,11 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.*;
-
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.File;
+import java.util.ResourceBundle;
+import javax.swing.Icon;
+import javax.swing.UIManager;
 
 /**
  * An archive enabled file view.
@@ -49,12 +48,13 @@ final class FileView extends FilterFileView {
     /**
      * Creates a new archive enabled file view.
      *
-     * @param delegate The file view to be decorated - may be <code>null</code>.
+     * @param delegate The file view to be decorated - may be {@code null}.
      */
     public FileView(javax.swing.filechooser.FileView delegate) {
         super(delegate);
     }
 
+    @Override
     public Icon getIcon(java.io.File file) {
         Icon icon = closedIcon(file);
         return icon != null
@@ -62,6 +62,7 @@ final class FileView extends FilterFileView {
                 : super.getIcon(file);
     }
 
+    @Override
     public String getTypeDescription(java.io.File file) {
         String typeDescription = typeDescription(file);
         return typeDescription != null
@@ -69,6 +70,7 @@ final class FileView extends FilterFileView {
                 : super.getTypeDescription(file);
     }
 
+    @Override
     public Boolean isTraversable(java.io.File file) {
         Boolean traversable = traversable(file);
         return traversable != null

@@ -14,38 +14,42 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.io;
+package de.schlichtherle.io.util;
 
-import java.io.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import java.util.*;
+import de.schlichtherle.io.InputIOException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Provides static utility methods for {@link InputStream}s and
  * {@link OutputStream}s.
- * <p>
- * <b>TODO:</b> Consider making this class public in TrueZIP 7 and remove the
- * stub methods for the same purpose in {@link File}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.5
  */
-final class Streams {
+public class Streams {
 
-    private static final Executor readerExecutor
-            = getExecutor("TrueZIP InputStream Reader");
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     /** This class cannot get instantiated. */
-    protected Streams() {
+    private Streams() {
     }
 
     /**
      * The name of this method is inspired by the Unix command line utility
-     * <code>cat</code>.
-     *
-     * @see File#cat(InputStream, OutputStream)
+     * {@code cat}.
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
@@ -139,7 +143,7 @@ final class Streams {
 
         try {
             final Reader reader = new Reader();
-            final Task task = readerExecutor.submit(reader);
+            final Future<?> task = executor.submit(reader);
 
             // Cache some data for better performance.
             final int buffersLen = buffers.length;
@@ -176,7 +180,18 @@ final class Streams {
                     // thread cannot not reuse the same shared buffers that
                     // an unfinished reader thread of a previous call is
                     // still using.
-                    task.cancel();
+                    task.cancel(true);
+                    while (true) {
+                        try {
+                            task.get();
+                            break;
+                        } catch (CancellationException cancelled) {
+                            break;
+                        } catch (ExecutionException readerFailure) {
+                            throw new AssertionError(readerFailure);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
                     throw ex;
                 }
 
@@ -195,18 +210,7 @@ final class Streams {
         }
     }
 
-    private static Executor getExecutor(final String threadName) {
-        try {
-            // Take advantage of Java 5 cached thread pools.
-            final Class cl = Class.forName("de.schlichtherle.io.JSE5Executor");
-            final Constructor co = cl.getConstructor(new Class[] { String.class });
-            return (Executor) co.newInstance(new Object[] { threadName });
-        } catch (Throwable ex) {
-            return new LegacyExecutor(threadName);
-        }
-    }
-
-    private static final Buffer[] allocateBuffers() {
+    private static Buffer[] allocateBuffers() {
         synchronized (Buffer.list) {
             Buffer[] buffers;
             for (Iterator i = Buffer.list.iterator(); i.hasNext(); ) {
@@ -226,7 +230,7 @@ final class Streams {
         return buffers;
     }
 
-    private static final void releaseBuffers(Buffer[] buffers) {
+    private static void releaseBuffers(Buffer[] buffers) {
         synchronized (Buffer.list) {
             Buffer.list.add(new SoftReference(buffers));
         }

@@ -25,11 +25,12 @@ package de.schlichtherle.awt;
  * @version $Id$
  */
 public class EventDispatchTimeoutException extends Exception {
+    private static final long serialVersionUID = 1286457456293876327L;
 
     private final long timeout;
 
     /**
-     * Creates a new instance of <code>EventDispatchTimeoutException</code> without detail message.
+     * Creates a new instance of {@code EventDispatchTimeoutException} without detail message.
      */
     EventDispatchTimeoutException(final long timeout) {
         super("Waiting for the EDT timed out after milliseconds: " + timeout);

@@ -25,12 +25,13 @@ package de.schlichtherle.io;
 public class ZipFileTest extends FileTestCase {
 
     /**
-     * Creates a new instance of <code>ZipFileTest</code>.
+     * Creates a new instance of {@code ZipFileTest}.
      */
     public ZipFileTest(String testName) {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         suffix = ".zip";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("zip"));

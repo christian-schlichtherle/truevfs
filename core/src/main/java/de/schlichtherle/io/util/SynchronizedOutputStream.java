@@ -16,7 +16,8 @@
 
 package de.schlichtherle.io.util;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A decorator which synchronizes all access to an {@link OutputStream}
@@ -27,14 +28,10 @@ import java.io.*;
  * @since TrueZIP 6.4
  */
 public class SynchronizedOutputStream extends OutputStream {
-    /**
-     * The object to synchronize on - never <code>null</code>.
-     */
+    /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
 
-    /**
-     * The decorated output stream.
-     */
+    /** The decorated output stream. */
     protected OutputStream out;
 
     /**
@@ -44,7 +41,7 @@ public class SynchronizedOutputStream extends OutputStream {
      * @param out The output stream to wrap in this decorator.
      */
     public SynchronizedOutputStream(final OutputStream out) {
-	this(out, null);
+    	this(out, null);
     }
 
     /**
@@ -52,48 +49,55 @@ public class SynchronizedOutputStream extends OutputStream {
      *
      * @param out The output stream to wrap in this decorator.
      * @param lock The object to synchronize on.
-     *        If <code>null</code>, then this object is used, not the stream.
+     *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedOutputStream(final OutputStream out, final Object lock) {
-	this.out = out;
-	this.lock = lock != null ? lock : this;
+        this.out = out;
+        this.lock = lock != null ? lock : this;
     }
 
     public void write(int b) throws IOException {
-	synchronized (lock) {
-	    out.write(b);
-	}
+        synchronized (lock) {
+            out.write(b);
+        }
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
-	synchronized (lock) {
-	    write(b, 0, b.length);
-	}
+        synchronized (lock) {
+            write(b, 0, b.length);
+        }
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
-	synchronized (lock) {
-	    out.write(b, off, len);
-	}
+        synchronized (lock) {
+            out.write(b, off, len);
+        }
     }
 
     /** Synchronizes on the {@link #lock} and calls {@link #doFlush}. */
+    @Override
     public void flush() throws IOException {
-	synchronized (lock) {
-	    doFlush();
-	}
+        synchronized (lock) {
+            doFlush();
+        }
     }
 
-    /** Flushes the underlying stream. This method is not synchronized! */
+    /**
+     * Flushes the underlying stream.
+     * This method is <em>not</em> synchronized!
+     */
     protected void doFlush() throws IOException {
         out.flush();
     }
 
     /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
+    @Override
     public void close() throws IOException {
-	synchronized (lock) {
-            doClose();
-	}
+        synchronized (lock) {
+                doClose();
+        }
     }
 
     /**

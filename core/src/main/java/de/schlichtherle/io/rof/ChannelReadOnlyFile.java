@@ -16,12 +16,17 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * A {@link ReadOnlyFile} implementation using file channels.
+ * <p>
+ * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -49,9 +54,7 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
         try {
             channel.position(fp);
         } catch (IllegalArgumentException iae) {
-            final IOException ioe = new IOException(iae.toString());
-            ioe.initCause(iae);
-            throw ioe;
+            throw new IOException(iae);
         }
     }
 

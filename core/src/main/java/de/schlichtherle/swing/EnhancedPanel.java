@@ -49,11 +49,12 @@ import javax.swing.event.EventListenerList;
 public class EnhancedPanel extends JPanel  {
 
     private static final long serialVersionUID = 6984576810262891640L;
+
     private static final Logger logger
             = Logger.getLogger(EnhancedPanel.class.getName());
     
     /**
-     * Creates a new <code>EnhancedPanel</code> with the specified layout
+     * Creates a new {@code EnhancedPanel} with the specified layout
      * manager and buffering strategy.
      *
      * @param layout The {@link LayoutManager} to use.
@@ -67,7 +68,7 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Create a new buffered <code>EnhancedPanel</code> with the specified
+     * Create a new buffered {@code EnhancedPanel} with the specified
      * layout manager.
      *
      * @param layout The {@link LayoutManager} to use.
@@ -78,9 +79,9 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Creates a new <code>EnhancedPanel</code> with <code>FlowLayout</code>
+     * Creates a new {@code EnhancedPanel} with {@code FlowLayout}
      * and the specified buffering strategy.
-     * If <code>isDoubleBuffered</code> is true, the <code>EnhancedPanel</code>
+     * If {@code isDoubleBuffered} is true, the {@code EnhancedPanel}
      * will use a double buffer.
      *
      * @param isDoubleBuffered A boolean, true for double-buffering, which
@@ -93,7 +94,7 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Creates a new <code>EnhancedPanel</code> with a double buffer
+     * Creates a new {@code EnhancedPanel} with a double buffer
      * and a flow layout.
      */
     public EnhancedPanel() {
@@ -107,10 +108,8 @@ public class EnhancedPanel extends JPanel  {
                         != HierarchyEvent.SHOWING_CHANGED)
                     return;
 
-                /*if (!isVisible())
-                    return;*/
-
                 final Window window = getAncestorWindow();
+                assert window != null : "a showing panel must have a containing window";
                 final boolean windowShown = window.isShowing();
                 if (windowShown != isShowing())
                     return;
@@ -171,7 +170,7 @@ public class EnhancedPanel extends JPanel  {
     /**
      * Calls {@link #fireAncestorWindowShown} or
      * {@link #fireAncestorWindowHidden}, depending on the ID of the given
-     * <code>event</code>.
+     * {@code event}.
      */
     protected void processPanelEvent(final PanelEvent event) {
         logger.log(Level.FINE, "Processing {0}", event);
@@ -190,9 +189,9 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Returns the ancestor {@link Window} of this <code>Panel</code> or
-     * <code>null</code> if the component is not (yet) placed in a
-     * <code>Window</code>.
+     * Returns the ancestor {@link Window} of this {@code Panel} or
+     * {@code null} if the component is not (yet) placed in a
+     * {@code Window}.
      */
     public Window getAncestorWindow() {
         return getAncestorWindow(this);
@@ -212,18 +211,18 @@ public class EnhancedPanel extends JPanel  {
     private transient EventListenerList listenerList;
 
     /**
-     * Adds the <code>listener</code> to the list of receivers for
+     * Adds the {@code listener} to the list of receivers for
      * {@link PanelEvent}s.
      * <p>
      * Note that the listener doesn't get serialized with this component!
      *
      * @param listener The listener to add.
-     *        If this method is called <code>n</code> times with the same
+     *        If this method is called {@code n} times with the same
      *        listener, any events generated will be delivered to this
-     *        listener <code>n</code> times.
+     *        listener {@code n} times.
      *
-     * @throws NullPointerException If <code>listener</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code listener} is
+     *         {@code null}.
      */
     public void addPanelListener(final PanelListener listener) {
         if (listener == null)
@@ -234,15 +233,15 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Removes the <code>listener</code> from the list of receivers for
+     * Removes the {@code listener} from the list of receivers for
      * {@link PanelEvent}s.
      *
      * @param listener The listener to remove.
      *        If this listener has been {@link #addPanelListener added}
      *        multiple times, it is removed from the list only once.
      *
-     * @throws NullPointerException If <code>listener</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code listener} is
+     *         {@code null}.
      */
     public void removePanelListener(final PanelListener listener) {
         if (listener == null)
@@ -256,7 +255,7 @@ public class EnhancedPanel extends JPanel  {
      * Returns an array of all the panel listeners
      * registered on this component.
      *
-     * @return All of this panel's <code>PanelListener</code>s or an empty
+     * @return All of this panel's {@code PanelListener}s or an empty
      *         array if no panel listeners are currently registered.
      *
      * @see #addPanelListener
@@ -264,7 +263,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public PanelListener[] getPanelListeners() {
         if (listenerList != null)
-            return (PanelListener[]) listenerList.getListeners(PanelListener.class);
+            return listenerList.getListeners(PanelListener.class);
         else
             return new PanelListener[0];
     }
@@ -285,11 +284,8 @@ public class EnhancedPanel extends JPanel  {
      * This is a synchronous operation.
      * 
      * @param event The event to be fired.
-     *
-     * @deprecated You should not call this method directly.
      */
-    @Deprecated
-    protected void fireAncestorWindowShown(final PanelEvent event) {
+    void fireAncestorWindowShown(final PanelEvent event) {
         if (listenerList == null)
             return;
         final Object[] listeners = listenerList.getListenerList();
@@ -304,11 +300,8 @@ public class EnhancedPanel extends JPanel  {
      * This is a synchronous operation.
      * 
      * @param event The event to be fired.
-     *
-     * @deprecated You should not call this method directly.
      */
-    @Deprecated
-    protected void fireAncestorWindowHidden(final PanelEvent event) {
+    void fireAncestorWindowHidden(final PanelEvent event) {
         if (listenerList == null)
             return;
         final Object[] listeners = listenerList.getListenerList();

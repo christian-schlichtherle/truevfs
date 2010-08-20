@@ -41,8 +41,8 @@ import java.util.ResourceBundle;
 /**
  * A comprehensive command line utility which allows you to work
  * with entries in all supported archive files using Unix like commands
- * (<code>cat</code>, <code>cp</code>, <code>rm</code>, <code>mkdir</code>,
- * <code>rmdir</code>, <code>ls</code> etc.).
+ * ({@code cat}, {@code cp}, {@code rm}, {@code mkdir},
+ * {@code rmdir}, {@code ls} etc.).
  * <p>
  * Please note that TrueZIP is designed for optimum performance.
  * However, this utility features some optional archive drivers which
@@ -53,7 +53,7 @@ import java.util.ResourceBundle;
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.
  * In addition, the SFX driver is used which allows you to browse
- * <code>.exe</code> files if they happen to be SelF eXtracting archives (SFX).
+ * {@code .exe} files if they happen to be SelF eXtracting archives (SFX).
  * If they are not however, TrueZIP may spend some considerable amount of
  * time searching for the Central Directory required to be present in ZIP
  * (and hence SFX) files.
@@ -127,7 +127,7 @@ public class NZip extends CommandLineUtility {
                 });
     }
 
-    /** Equivalent to <code>System.exit(new NZip().run(args));</code>. */
+    /** Equivalent to {@code System.exit(new NZip().run(args));}. */
     public static void main(final String[] args) {
         System.exit(new NZip().run(args));
     }
@@ -138,9 +138,9 @@ public class NZip extends CommandLineUtility {
      *
      * @param args A non-empty array of Unix-like commands and optional
      *        parameters.
-     * @return <code>false</code> iff the command is a test which fails,
-     *         <code>true</code> otherwise.
-     * @throws IllegalUsageException If <code>args</code> does not contain
+     * @return {@code false} iff the command is a test which fails,
+     *         {@code true} otherwise.
+     * @throws IllegalUsageException If {@code args} does not contain
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
@@ -212,7 +212,7 @@ public class NZip extends CommandLineUtility {
         return true;
     }
 
-    private static final String[] lshift(final String[] args) {
+    private static String[] lshift(final String[] args) {
         return lshift(args, 1);
     }
 
@@ -523,6 +523,7 @@ public class NZip extends CommandLineUtility {
 
     public class IllegalUsageException
             extends CommandLineUtility.IllegalUsageException {
+        private static final long serialVersionUID = 2660653252314854276L;
 
         private IllegalUsageException() {
             super(resources.getString("usage")); // use Resource Bundle

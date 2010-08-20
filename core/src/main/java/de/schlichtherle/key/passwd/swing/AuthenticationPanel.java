@@ -73,8 +73,8 @@ public class AuthenticationPanel extends JPanel {
     /**
      * Sets the panel which should be used to enter the password.
      *
-     * @throws NullPointerException If <code>passwdPanel</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code passwdPanel} is
+     *         {@code null}.
      */
     public void setPasswdPanel(JPanel passwdPanel) {
         if (passwdPanel == null)
@@ -95,8 +95,8 @@ public class AuthenticationPanel extends JPanel {
 
     /**
      * Returns the path of the key file.
-     * If the parameter <code>rememberPath</code> of the constructor was
-     * <code>true</code>, then the returned path is remembered in a static
+     * If the parameter {@code rememberPath} of the constructor was
+     * {@code true}, then the returned path is remembered in a static
      * field for the next instance of this class.
      */
     public String getKeyFilePath() {
@@ -117,7 +117,7 @@ public class AuthenticationPanel extends JPanel {
     /**
      * Returns the authentication method selected by the user.
      *
-     * @return <code>AUTH_PASSWD</code> or <code>AUTH_KEY_FILE</code>.
+     * @return {@code AUTH_PASSWD} or {@code AUTH_KEY_FILE}.
      */
     public int getAuthenticationMethod() {
         final int method = tabs.getSelectedIndex();
@@ -137,7 +137,7 @@ public class AuthenticationPanel extends JPanel {
     }
 
     /**
-     * Return a <code>JFileChooser</code> to use within this panel.
+     * Return a {@code JFileChooser} to use within this panel.
      * The file chooser is stored in a cache for subsequent use.
      * If the JVM gets short of storage, the cache is emptied and a new
      * file chooser is instantiated on the next call to this method again.

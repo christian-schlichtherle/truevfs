@@ -19,7 +19,7 @@ package de.schlichtherle.util.zip;
 import java.util.zip.ZipException;
 
 /**
- * Thrown to indicate a CRC-32 mismatch between the declared value in the 
+ * Thrown to indicate a CRC-32 mismatch between the declared value in the
  * Central File Header and the Data Descriptor or between the declared value
  * and the computed value from the decompressed data.
  * The prior case is detected on the call to {@link ZipFile#getCheckedInputStream},
@@ -33,11 +33,12 @@ import java.util.zip.ZipException;
  * @since TrueZIP 6.1
  */
 public class CRC32Exception extends ZipException {
-    
+    private static final long serialVersionUID = 1656298435298526391L;
+
     final long expectedCrc, actualCrc;
 
     /**
-     * Creates a new instance of <code>CRC32Exception</code> where the
+     * Creates a new instance of {@code CRC32Exception} where the
      * given entry name is the detail message of the base class.
      *
      * @see #getMessage

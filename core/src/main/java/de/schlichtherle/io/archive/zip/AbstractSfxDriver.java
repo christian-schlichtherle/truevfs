@@ -39,6 +39,7 @@ abstract public class AbstractSfxDriver extends ZipDriver {
      * The character set used in SFX archives by default, which is determined
      * by calling {@code System.getProperty("file.encoding")}.
      */
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final String DEFAULT_CHARSET
             = System.getProperty("file.encoding");
 

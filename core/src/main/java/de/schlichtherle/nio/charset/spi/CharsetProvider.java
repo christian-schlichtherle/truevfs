@@ -16,45 +16,49 @@
 
 package de.schlichtherle.nio.charset.spi;
 
-import de.schlichtherle.nio.charset.*;
-
-import java.nio.charset.*;
-import java.util.*;
+import de.schlichtherle.nio.charset.IBM437Charset;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 
 /**
- * A charset provider that only provides the <code>IBM437</code> character set,
- * also known as <code>CP437</code>.
+ * A charset provider that only provides the {@code IBM437} character set,
+ * also known as {@code CP437}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
-    
-    private static final Map name2charset;
-    private static final Collection charsets;
-    
+
+    private static final Collection<Charset> charsets;
+    private static final Map<String, Charset> name2charset;
+
     static {
         charsets = Collections.unmodifiableCollection(
                 Arrays.asList(new Charset[] { new IBM437Charset() }));
-        
-        name2charset = new HashMap();
-        for (Iterator i = charsets.iterator(); i.hasNext(); ) {
-            final Charset cs = (Charset) i.next();
-            name2charset.put(lowerCase(cs.name()), cs);
-            for (Iterator j = cs.aliases().iterator(); j.hasNext(); )
-                name2charset.put(lowerCase((String) j.next()), cs);
+
+        name2charset = new HashMap<String, Charset>();
+        for (final Charset charset : charsets) {
+            name2charset.put(lowerCase(charset.name()), charset);
+            for (final String alias : charset.aliases())
+                name2charset.put(lowerCase(alias), charset);
         }
     }
 
-    public Charset charsetForName(String charset) {
-        return (Charset) name2charset.get(lowerCase(charset));
-    }
-
-    private static final String lowerCase(String s) {
+    private static String lowerCase(String s) {
         return s.toLowerCase(Locale.ENGLISH);
     }
-    
-    public Iterator charsets() {
+
+    public Iterator<Charset> charsets() {
         return charsets.iterator();
+    }
+
+    public Charset charsetForName(String charset) {
+        return name2charset.get(lowerCase(charset));
     }
 }

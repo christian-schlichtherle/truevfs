@@ -57,7 +57,7 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
     }
 
     /**
-     * Constructs a new <code>HurlingWindowFeedback</code>.
+     * Constructs a new {@code HurlingWindowFeedback}.
      * 
      * @param distance The maximum distance for quaking the window.
      * @param cycle Milliseconds required for one cycle.

@@ -16,13 +16,24 @@
 
 package de.schlichtherle.io;
 
-import de.schlichtherle.io.archive.spi.*;
-import de.schlichtherle.io.rof.*;
-import de.schlichtherle.io.util.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
+import de.schlichtherle.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.io.archive.spi.InputArchive;
+import de.schlichtherle.io.archive.spi.OutputArchive;
+import de.schlichtherle.io.archive.spi.TransientIOException;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import de.schlichtherle.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.io.util.Streams;
+import de.schlichtherle.io.util.Temps;
+import de.schlichtherle.util.Action;
+import de.schlichtherle.util.concurrent.locks.ReentrantLock;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -47,7 +58,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
 
     /**
      * Suffix for temporary files created by this class
-     * - should <em>not</em> be <code>null</code> for enhanced unit tests.
+     * - should <em>not</em> be {@code null} for enhanced unit tests.
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
 
@@ -56,7 +67,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     //
 
     /**
-     * The actual archive file as a plain <code>java.io.File</code> object
+     * The actual archive file as a plain {@code java.io.File} object
      * which serves as the input file for the virtual file system managed
      * by this {@link ArchiveController} object.
      * Note that this will be set to a tempory file if the archive file is
@@ -71,8 +82,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     private InputArchive inArchive;
 
     /**
-     * Plain <code>java.io.File</code> object used for temporary output.
-     * Maybe identical to <code>inFile</code>.
+     * Plain {@code java.io.File} object used for temporary output.
+     * Maybe identical to {@code inFile}.
      */
     private java.io.File outFile;
 
@@ -106,7 +117,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
 
     void mount(final boolean autoCreate)
     throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert inArchive == null;
         assert outFile == null;
         assert outArchive == null;
@@ -121,7 +132,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         try {
             mount0(autoCreate);
         } catch (IOException ioe) {
-            assert writeLock().isLocked();
+            assert writeLock().isLockedByCurrentThread();
             assert inArchive == null;
             assert outFile == null;
             assert outArchive == null;
@@ -133,7 +144,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         }
         logger.log(Level.FINER, "mount.exiting"); // NOI18N
 
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert autoCreate || inArchive != null;
         assert autoCreate || outFile == null;
         assert autoCreate || outArchive == null;
@@ -248,7 +259,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             controller.readLock().lock();
             if (controller.hasNewData(entryName) || autoCreate) {
                 controller.readLock().unlock();
-                class Locker implements IORunnable {
+                class Locker implements Action<IOException> {
                     public void run() throws IOException {
                         // Update controller if the entry already has new data.
                         // This needs to be done first before we can access the
@@ -301,7 +312,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             final boolean autoCreate)
     throws IOException {
         assert controller != null;
-        assert controller.readLock().isLocked() || controller.writeLock().isLocked();
+        assert controller.readLock().isLockedByCurrentThread() || controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
         assert !ROOT_NAME.equals(entryName);
         assert inFile == null;
@@ -352,14 +363,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // to make sure that we always delete the newly
                 // created temp file.
                 // Finally, we pass on the catched exception.
-                if (!tmp.delete()) {
-                    // This should normally never happen...
-                    final IOException ioe = new IOException(
-                            tmp.getPath()
-                            + " (couldn't delete corrupted input file)");
-                    ioe.initCause(ex);
-                    throw ioe;
-                }
+                if (!tmp.delete())
+                    throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)", ex);
                 if (ex instanceof IOException)
                     throw (IOException) ex;
                 else if (ex instanceof RuntimeException)
@@ -377,7 +382,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             throw new ArchiveFileNotFoundException("may not create");
         } else {
             assert autoCreate;
-            assert controller.writeLock().isLocked();
+            assert controller.writeLock().isLockedByCurrentThread();
 
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
@@ -418,22 +423,22 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     }
 
     /**
-     * Initializes <code>inArchive</code> with a newly created
-     * {@link InputArchive} for reading <code>inFile</code>.
+     * Initializes {@code inArchive} with a newly created
+     * {@link InputArchive} for reading {@code inFile}.
      *
-     * @throws IOException On any I/O related issue with <code>inFile</code>.
+     * @throws IOException On any I/O related issue with {@code inFile}.
      */
     private void initInArchive(final java.io.File inFile)
     throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert inArchive == null;
 
         logger.log(Level.FINEST, "initInArchive.entering", inFile); // NOI18N
         try {
             ReadOnlyFile rof = new SimpleReadOnlyFile(inFile);
-            if (isRfsEntryTarget())
-                rof = new CountingReadOnlyFile(rof);
             try {
+                if (isRfsEntryTarget())
+                    rof = new CountingReadOnlyFile(rof);
                 inArchive = getDriver().createInputArchive(this, rof);
             } catch (Throwable ex) {
                 // ex could be a NoClassDefFoundError if target is an RAES
@@ -469,7 +474,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             final ArchiveEntry dstEntry)
     throws IOException {
         assert entry != null;
-        assert readLock().isLocked() || writeLock().isLocked();
+        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         assert !hasNewData(entry.getName());
         assert !entry.isDirectory();
 
@@ -486,7 +491,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             final ArchiveEntry srcEntry)
     throws IOException {
         assert entry != null;
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert !hasNewData(entry.getName());
         assert !entry.isDirectory();
 
@@ -499,15 +504,16 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         return out;
     }
 
+    @Override
     void touch() throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         ensureOutArchive();
         super.touch();
     }
 
     private void ensureOutArchive()
     throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
 
         if (outArchive != null)
             return;
@@ -539,26 +545,26 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     }
 
     /**
-     * Initializes <code>outArchive</code> with a newly created
-     * {@link OutputArchive} for writing <code>outFile</code>.
-     * This method will delete <code>outFile</code> if it has successfully
+     * Initializes {@code outArchive} with a newly created
+     * {@link OutputArchive} for writing {@code outFile}.
+     * This method will delete {@code outFile} if it has successfully
      * opened it for overwriting, but failed to write the archive file header.
      *
-     * @throws IOException On any I/O related issue with <code>outFile</code>.
+     * @throws IOException On any I/O related issue with {@code outFile}.
      */
     private void initOutArchive(final java.io.File outFile)
     throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert outArchive == null;
 
         logger.log(Level.FINEST, "initOutArchive.entering", outFile); // NOI18N
         try {
             OutputStream out = new java.io.FileOutputStream(outFile);
-            // If we are actually writing to the target file,
-            // we want to log the byte count.
-            if (outFile == getTarget())
-                out = new CountingOutputStream(out);
             try {
+                // If we are actually writing to the target file,
+                // we want to log the byte count.
+                if (outFile == getTarget())
+                    out = new CountingOutputStream(out);
                 outArchive = getDriver().createOutputArchive(this, out, inArchive);
             } catch (Throwable ex) {
                 // ex could be a NoClassDefFoundError if target is an RAES
@@ -568,18 +574,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // that we delete the newly created temp file.
                 // Finally, we will pass on the catched exception.
                 out.close();
-                if (!outFile.delete()) {
-                    // This could happen in situations where the file system
-                    // allows us to open the file for overwriting, then
-                    // overwriting failed (e.g. because of a cancelled password
-                    // for an RAES encrypted ZIP file) and finally the file
-                    // system also denied deleting the corrupted file.
-                    // Shit happens!
-                    final IOException ioe = new IOException(outFile.getPath()
-                            + " (couldn't delete corrupted output file)");
-                    ioe.initCause(ex);
-                    throw ioe;
-                }
+                if (!outFile.delete())
+                    throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)", ex);
                 if (ex instanceof IOException)
                     throw (IOException) ex;
                 else if (ex instanceof RuntimeException)
@@ -601,7 +597,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     }
 
     boolean hasNewData(String entryName) {
-        assert readLock().isLocked() || writeLock().isLocked();
+        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         return outArchive != null && outArchive.getArchiveEntry(entryName) != null;
     }
 
@@ -616,7 +612,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     throws ArchiveException {
         assert closeInputStreams || !closeOutputStreams; // closeOutputStreams => closeInputStreams
         assert !umount || reassemble; // umount => reassemble
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert inArchive == null || inFile != null; // input archive => input file
         assert !isTouched() || outArchive != null; // file system touched => output archive
         assert outArchive == null || outFile != null; // output archive => output file
@@ -764,24 +760,24 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * Updates all nodes in the virtual file system to the (temporary) output
      * archive file.
      * <p>
-     * <b>This method is intended to be called by <code>update()</code> only!</b>
+     * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
      * @return If any warning exception condition occurs throughout the course
      *         of this method, an {@link ArchiveWarningException} is created
-     *         (but not thrown), prepended to <code>exceptionChain</code> and
+     *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
      *         If multiple warning exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
      * @throws ArchiveException If any exception condition occurs throughout
      *         the course of this method, an {@link ArchiveException}
-     *         is created, prepended to <code>exceptionChain</code> and finally
+     *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveWarningException}.
      */
     private ArchiveException update(ArchiveException exceptionChain)
     throws ArchiveException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
         assert checkNoDeletedEntriesWithNewData(exceptionChain) == exceptionChain;
@@ -944,12 +940,12 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * target archive file, which may be an entry in an enclosing
      * archive file.
      * <p>
-     * <b>This method is intended to be called by <code>update()</code> only!</b>
+     * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
      * @return If any warning condition occurs throughout the course of this
-     *         method, a <code>ArchiveWarningException</code> is created (but not
-     *         thrown), prepended to <code>exceptionChain</code> and finally
+     *         method, a {@code ArchiveWarningException} is created (but not
+     *         thrown), prepended to {@code exceptionChain} and finally
      *         returned.
      *         If multiple warning conditions occur,
      *         the prepended exceptions are ordered by appearance so that the
@@ -957,19 +953,19 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      *         exception chain.
      * @return If any warning exception condition occurs throughout the course
      *         of this method, an {@link ArchiveWarningException} is created
-     *         (but not thrown), prepended to <code>exceptionChain</code> and
+     *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
      *         If multiple warning exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
      * @throws ArchiveException If any exception condition occurs throughout
      *         the course of this method, an {@link ArchiveException}
-     *         is created, prepended to <code>exceptionChain</code> and finally
+     *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveWarningException}.
      */
     private ArchiveException reassemble(ArchiveException exceptionChain)
     throws ArchiveException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
             // The archive file managed by this object is NOT enclosed in
@@ -1032,14 +1028,14 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             final ArchiveController controller,
             final String entryName)
     throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
         assert entryName != null;
         assert !ROOT_NAME.equals(entryName);
 
-        controller.runWriteLocked(new IORunnable() {
+        controller.runWriteLocked(new Action<IOException>() {
             public void run() throws IOException {
                 wrapToWriteLockedController(controller, entryName);
             }
@@ -1051,7 +1047,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             final String entryName)
     throws IOException {
         assert controller != null;
-        assert controller.writeLock().isLocked();
+        assert controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
         assert !ROOT_NAME.equals(entryName);
 
@@ -1078,8 +1074,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
      */
+    @Override
     void reset() throws IOException {
-        assert writeLock().isLocked();
+        assert writeLock().isLockedByCurrentThread();
 
         ArchiveException exceptionChain = shutdownStep1(null);
         shutdownStep2(exceptionChain);
@@ -1090,6 +1087,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             throw exceptionChain;
     }
 
+    @Override
+    @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
         try {
             logger.log(Level.FINEST, "finalize.entering", getPath()); // NOI18N
@@ -1102,7 +1101,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             // this object should never be made elegible for finalization!
             // Tactical note: Assertions don't work in a finalizer, so we use
             // logging.
-            if (isTouched() || readLock().isLocked() || writeLock().isLocked())
+            if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
                 logger.log(Level.SEVERE, "finalize.invalidState", getPath());
             shutdownStep1(null);
             shutdownStep2(null);
@@ -1170,7 +1169,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     /**
      * Cleans up temporary files.
      * 
-     * @param deleteOutFile If this parameter is <code>true</code>,
+     * @param deleteOutFile If this parameter is {@code true},
      *        this method also deletes the temporary output file unless it's
      *        the target archive file (i.e. unless the archive file has been
      *        newly created).

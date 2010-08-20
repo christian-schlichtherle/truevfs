@@ -17,9 +17,7 @@
 package de.schlichtherle.io.archive.spi;
 
 import de.schlichtherle.io.ArchiveEntryMetaData;
-
 import java.io.File;
-
 import javax.swing.Icon;
 
 /**
@@ -35,23 +33,23 @@ public class RfsEntry implements ArchiveEntry {
     private final File file;
 
     /**
-     * Constructs a new <code>RfsEntry</code>.
+     * Constructs a new {@code RfsEntry}.
      * This constructor uses the file's path to build a valid entry name.
      * 
-     * @param file A valid <code>File</code> instance.
-     * @throws NullPointerException If <code>file</code> is <code>null</code>.
+     * @param file A valid {@code File} instance.
+     * @throws NullPointerException If {@code file} is {@code null}.
      */
     public RfsEntry(final File file) {
         this(file, getName(file));
     }
 
     /**
-     * Constructs a new <code>RfsEntry</code>.
+     * Constructs a new {@code RfsEntry}.
      * 
-     * @param file A valid <code>File</code> instance.
+     * @param file A valid {@code File} instance.
      * @param entryName A valid archive entry name.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
-     * @throws NullPointerException If any parameter is <code>null</code>.
+     * @throws NullPointerException If any parameter is {@code null}.
      */
     public RfsEntry(final File file, final String entryName) {
         if (entryName == null || file == null)
@@ -98,17 +96,17 @@ public class RfsEntry implements ArchiveEntry {
         file.setLastModified(time);
     }
 
-    /** Returns <code>null</code>. */
+    /** Returns {@code null}. */
     public Icon getOpenIcon() {
         return null;
     }
 
-    /** Returns <code>null</code>. */
+    /** Returns {@code null}. */
     public Icon getClosedIcon() {
         return null;
     }
 
-    /** Returns <code>null</code>. */
+    /** Returns {@code null}. */
     public ArchiveEntryMetaData getMetaData() {
         return null;
     }

@@ -16,10 +16,13 @@
 
 package de.schlichtherle.crypto.io.raes;
 
-import de.schlichtherle.crypto.io.*;
-import de.schlichtherle.io.rof.*;
-
-import java.io.*;
+import de.schlichtherle.crypto.io.CipherReadOnlyFile;
+import de.schlichtherle.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.io.rof.ReadOnlyFile;
+import de.schlichtherle.io.rof.SimpleReadOnlyFile;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * This class implements a {@link de.schlichtherle.io.rof.ReadOnlyFile}
@@ -44,18 +47,18 @@ import java.io.*;
  * <p>
  * So it is up to the application which level of security it needs to
  * provide:
- * Most applications should always call <code>authenticate()</code> in
+ * Most applications should always call {@code authenticate()} in
  * order to guard against integrity attacks.
  * However, some applications may provide additional (faster) methods for
  * authentication of the pay load, in which case the authentication
  * provided by this class may be safely skipped.
  * <p>
  * Note that this class implements its own virtual file pointer.
- * Thus, if you would like to access the underlying <code>ReadOnlyFile</code>
+ * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link FilterReadOnlyFile}.
- * 
+ *
  * @see RaesOutputStream
  *
  * @author Christian Schlichtherle
@@ -64,15 +67,15 @@ import java.io.*;
  */
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
-    static final short readUByte(final byte[] b, final int off) {
+    static short readUByte(final byte[] b, final int off) {
         return (short) (b[off] & 0xff);
     }
 
-    static final int readUShort(final byte[] b, final int off) {
+    static int readUShort(final byte[] b, final int off) {
         return ((b[off + 1] & 0xff) << 8) | (b[off] & 0xff);
     }
-    
-    static final long readUInt(final byte[] b, int off) {
+
+    static long readUInt(final byte[] b, int off) {
         off += 3;
         long v = b[off--] & 0xffL;
         v <<= 8;
@@ -85,8 +88,8 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of <code>RaesReadOnlyFile</code>.
-     * 
+     * Creates a new instance of {@code RaesReadOnlyFile}.
+     *
      * @param file The file to read.
      * @param parameters The {@link RaesParameters} required to access the
      *        RAES type actually found in the file.
@@ -96,7 +99,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        {@link RaesParametersAgent} interface, it is used to find
      *        the required RAES parameters.
      *        This is applied recursively.
-     * 
+     *
      * @throws NullPointerException If any of the parameters is <tt>null</tt>.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws RaesParametersException If no suitable RAES parameters have been
@@ -122,7 +125,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
     /**
      * Creates a new instance of <tt>RaesReadOnlyFile</tt>.
-     * 
+     *
      * @param rof The read only file to read.
      * @param parameters The {@link RaesParameters} required to access the
      *        RAES type actually found in the file.
@@ -132,8 +135,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        {@link RaesParametersAgent} interface, it is used to find
      *        the required RAES parameters.
      *        This is applied recursively.
-     *
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws RaesParametersException If no suitable RAES parameters have been
      *         provided or something is wrong with the parameters.
@@ -143,10 +145,10 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     public static RaesReadOnlyFile getInstance(
             final ReadOnlyFile rof,
             RaesParameters parameters)
-    throws  FileNotFoundException,
-            RaesParametersException,
-            RaesException,
-            IOException {
+    throws IOException {
+        if (parameters == null)
+            throw new NullPointerException();
+
         // Load header data.
         final byte[] leadIn = new byte[RAES.LEAD_IN_LENGTH];
         rof.seek(0);
@@ -168,7 +170,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     private static RaesParameters findParameters(
-            final Class type,
+            final Class<? extends RaesParameters> type,
             final RaesParameters parameters)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
@@ -203,7 +205,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      * The first, mandatory step is to computeMac the cipher key and
      * cipher text length only and has already been successfully completed
      * in the constructor.
-     * 
+     *
      * @throws RaesAuthenticationException If the computed MAC does not match
      *         the MAC declared in the RAES file.
      * @throws IOException On any I/O related issue.

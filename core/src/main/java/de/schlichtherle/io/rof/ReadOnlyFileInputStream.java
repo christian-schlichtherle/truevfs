@@ -16,8 +16,10 @@
 
 package de.schlichtherle.io.rof;
 
-import java.io.*;
-import java.util.logging.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An adapter class turning a provided {@link ReadOnlyFile} into
@@ -25,6 +27,8 @@ import java.util.logging.*;
  * Note that this stream supports marking.
  * Note that any of the methods in this class throw a
  * {@link NullPointerException} if {@link #rof} hasn't been initialized.
+ * <p>
+ * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -41,15 +45,15 @@ public class ReadOnlyFileInputStream extends InputStream {
 
     /**
      * The position of the last mark.
-     * Initialized to <code>-1</code> to indicate that no mark has been set.
+     * Initialized to {@code -1} to indicate that no mark has been set.
      */
     private long mark = -1;
 
     /**
-     * Adapts the given <code>ReadOnlyFile</code>.
+     * Adapts the given {@code ReadOnlyFile}.
      *
-     * @param rof The underlying <code>ReadOnlyFile</code>. May be
-     *        <code>null</code>, but must be initialized before any method
+     * @param rof The underlying {@code ReadOnlyFile}. May be
+     *        {@code null}, but must be initialized before any method
      *        of this class can be used.
      */
     public ReadOnlyFileInputStream(ReadOnlyFile rof) {
@@ -60,14 +64,17 @@ public class ReadOnlyFileInputStream extends InputStream {
         return rof.read();
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
         return rof.read(b);
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         return rof.read(b, off, len);
     }
 
+    @Override
     public long skip(long n) throws IOException {
         if (n <= 0)
             return 0; // for compatibility to RandomAccessFile
@@ -81,15 +88,18 @@ public class ReadOnlyFileInputStream extends InputStream {
         return n;
     }
 
+    @Override
     public int available() throws IOException {
         final long rem = rof.length() - rof.getFilePointer();
         return rem > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) rem;
     }
 
+    @Override
     public void close() throws IOException {
         rof.close();
     }
 
+    @Override
     public void mark(int readlimit) {
         try {
             mark = rof.getFilePointer();
@@ -100,6 +110,7 @@ public class ReadOnlyFileInputStream extends InputStream {
         }
     }
 
+    @Override
     public void reset() throws IOException {
         if (mark < 0)
             throw new IOException(mark == -1
@@ -108,6 +119,7 @@ public class ReadOnlyFileInputStream extends InputStream {
         rof.seek(mark);
     }
 
+    @Override
     public boolean markSupported() {
         try {
             rof.seek(rof.getFilePointer());

@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * Defines the interface used to read entries from an archive file.
  * <p>
  * Implementations do <em>not</em> need to be thread safe:
- * Multithreading is addressed in the package <code>de.schlichtherle.io</code>.
+ * Multithreading is addressed in the package {@code de.schlichtherle.io}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -47,15 +47,15 @@ public interface InputArchive {
 
     /**
      * Returns the {@link ArchiveEntry} for the given entry name or
-     * <code>null</code> if no entry with this name exists.
+     * {@code null} if no entry with this name exists.
      * 
-     * @param entryName A valid archive entry name - never <code>null</code>.
+     * @param entryName A valid archive entry name - never {@code null}.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
      */
     ArchiveEntry getArchiveEntry(String entryName);
 
     /**
-     * Returns a new <code>InputStream</code> for reading the contents of the
+     * Returns a new {@code InputStream} for reading the contents of the
      * given archive entry.
      * <p>
      * The returned stream should preferrably be unbuffered, as buffering is
@@ -69,7 +69,7 @@ public interface InputArchive {
      * @param entry A valid reference to an archive entry.
      *        The runtime class of this entry is the same as the runtime class
      *        of the entries returned by {@link #getArchiveEntries}.
-     * @param dstEntry If not <code>null</code>, this identifies the entry
+     * @param dstEntry If not {@code null}, this identifies the entry
      *        to which TrueZIP is actually copying data to and should be
      *        used to implement the Direct Data Copying (DDC) feature.
      *        Note that there is no guarantee on the runtime type of this
@@ -80,7 +80,7 @@ public interface InputArchive {
      *        destination entry is another ZIP file entry.
      * @return A (preferrably unbuffered) {@link InputStream} to read the
      *         archive entry data from.
-     *         <code>null</code> is not allowed!
+     *         {@code null} is not allowed!
      * @throws InputArchiveBusyException If the archive is currently busy
      *         on input for another entry.
      *         This exception is guaranteed to be recoverable, meaning it
@@ -104,14 +104,14 @@ public interface InputArchive {
 
     /**
      * Returns the meta data for this input archive.
-     * The default value is <code>null</code>.
+     * The default value is {@code null}.
      */
     InputArchiveMetaData getMetaData();
 
     /**
      * Sets the meta data for this input archive.
      *
-     * @param metaData The meta data - may not be <code>null</code>.
+     * @param metaData The meta data - may not be {@code null}.
      */
     void setMetaData(InputArchiveMetaData metaData);
 }

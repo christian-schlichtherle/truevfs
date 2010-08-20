@@ -22,7 +22,7 @@ import de.schlichtherle.key.KeyPromptingDisabledException;
  * A simple key manager which enables users to enter passwords as keys using
  * console I/O.
  * This key manager is used by default if the JVM is running in headless mode
- * and the API complies to JSE6 (i.e. the class <code>java.io.Console</code>
+ * and the API complies to JSE6 (i.e. the class {@code java.io.Console}
  * is available)!
  * To request it explicitly, set the system property
  * {@code de.schlichtherle.key.KeyManager} to
@@ -44,7 +44,7 @@ import de.schlichtherle.key.KeyPromptingDisabledException;
 public class PromptingKeyManager extends de.schlichtherle.key.PromptingKeyManager {
 
     /**
-     * Constructs a new <code>PromptingKeyManager</code>.
+     * Constructs a new {@code PromptingKeyManager}.
      * This instance maps the following key provider UI types using
      * {@link de.schlichtherle.key.PromptingKeyManager#mapPromptingKeyProviderUIType}:
      * <table border="2" cellpadding="4">

@@ -23,10 +23,10 @@ package de.schlichtherle.util;
 public class Arrays {
 
     /**
-     * Compares <tt>max</tt> bytes at the specified offsets of the given
+     * Compares {@code max} bytes at the specified offsets of the given
      * arrays.
      * If the remaining bytes at the given offset of any array is smaller than
-     * <tt>max</tt> bytes, it must match the number of remaining bytes at the
+     * {@code max} bytes, it must match the number of remaining bytes at the
      * given offset in the other array.
      */
     public static boolean equals(

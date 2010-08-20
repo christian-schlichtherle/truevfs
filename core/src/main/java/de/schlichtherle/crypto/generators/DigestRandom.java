@@ -18,13 +18,12 @@ package de.schlichtherle.crypto.generators;
 
 import java.security.SecureRandom;
 import java.util.Random;
-
 import org.bouncycastle.crypto.Digest;
 
 /**
  * A Pseudo Random Number Generator (PRNG) using an arbitrary digest function.
  * Similar to {@link SecureRandom}, this class is self-seeding.
- * However, unlike <code>SecureRandom</code>, it's not seedable:
+ * However, unlike {@code SecureRandom}, it's not seedable:
  * Calling one of the {@link Random#setSeed} methods does not have any effect!
  * <p>
  * Unlike its super class, this class does not support serialization.
@@ -35,6 +34,7 @@ import org.bouncycastle.crypto.Digest;
 public class DigestRandom extends Random {
 
     private static final SecureRandom seeder = new SecureRandom();
+    private static final long serialVersionUID = 1236745263589856228L;
 
     private final byte[] in;
     private long counter;
@@ -54,6 +54,9 @@ public class DigestRandom extends Random {
         // Seed the PRNG from the seeder PRNG and the current time.
         // Note: DON'T use seeder.generateSeed(size)! While this makes a very
         // good seed indeed (on Linux), it seriously KILLS PERFORMANCE!
+        // The resulting performance is so bad that the unit test in
+        // truevfs.io.RandomDataZip32RaesTest may compute for hours
+        // instead of a few minutes (on my computer).
         // Note that the seeder is self-seeded whith a true random number on
         // the first call anyway, so calling generateSeed() is not required.
         seeder.nextBytes(in);
@@ -70,9 +73,10 @@ public class DigestRandom extends Random {
      * Generates a user-specified number of pseudo random bytes.
      * This method is used as the basis of all random entities returned by
      * this class (except seed bytes).
-     * 
+     *
      * @param bytes The array to be filled in with random bytes.
      */
+    @Override
     synchronized public void nextBytes(byte[] bytes) {
         for (int i = bytes.length; --i >= 0; ) {
             update();
@@ -83,17 +87,18 @@ public class DigestRandom extends Random {
     /**
      * Generates an integer containing the user-specified number of
      * pseudo-random bits (right justified, with leading zeros).
-     * This method overrides a <tt>java.util.Random</tt> method, and serves
+     * This method overrides a {@code java.util.Random} method, and serves
      * to provide a source of random bits to all of the methods inherited
-     * from that class (for example, <tt>nextInt</tt>, <tt>nextLong</tt>,
-     * and <tt>nextFloat</tt>).
+     * from that class (for example, {@code nextInt}, {@code nextLong},
+     * and {@code nextFloat}).
      *
      * @param numBits Number of pseudo-random bits to be generated, where
-     *        0 <= <tt>numBits</tt> <= 32.
+     *        0 <= {@code numBits} <= 32.
      *
-     * @return An <tt>int</tt> containing the user-specified number
+     * @return An {@code int} containing the user-specified number
      *         of pseudo-random bits (right justified, with leading zeros).
      */
+    @Override
     final protected int next(final int numBits) {
 	final int numBytes = (numBits + 7) >>> 3; // round up
 
@@ -102,7 +107,7 @@ public class DigestRandom extends Random {
             update();
 	    next = (next << 8) | (out[outOff++] & 0xFF);
         }
- 
+
 	return next >>> ((numBytes << 3) - numBits); // shift away rounded bits
     }
 

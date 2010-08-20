@@ -16,8 +16,7 @@
 
 package de.schlichtherle.awt;
 
-import java.lang.reflect.*;
-import java.util.logging.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Subclasses {@link java.awt.EventQueue} in order to provide utility methods
@@ -34,9 +33,9 @@ public class EventQueue extends java.awt.EventQueue {
     /**
      * Equivalent to {@link #invokeAndWaitUninterruptibly(Runnable, long)
      * invokeAndWaitUninterruptibly(task, 0)}, but cannot throw an
-     * <code>EventDispatchTimeoutException</code>.
+     * {@code EventDispatchTimeoutException}.
      */
-    public static final void invokeAndWaitUninterruptibly(Runnable task)
+    public static void invokeAndWaitUninterruptibly(Runnable task)
     throws  InvocationTargetException {
         try {
             invokeAndWait(task, false, 0);
@@ -48,33 +47,33 @@ public class EventQueue extends java.awt.EventQueue {
     }
 
     /**
-     * Invokes the given <code>task</code> on the AWT Event Dispatching Thread
+     * Invokes the given {@code task} on the AWT Event Dispatching Thread
      * (EDT) and waits until it's finished.
      * If this method is called on the EDT itself, it will just invoke the
-     * given <code>task</code>.
+     * given {@code task}.
      * <p>
      * If the current thread gets interrupted while waiting for the EDT to
      * finish the task, then waiting is continued normally, but the current
      * thread's interrupt status is {@link Thread#interrupt() set} upon return.
-     * 
-     * @param task The {@link Runnable} whose <code>run</code>
+     *
+     * @param task The {@link Runnable} whose {@code run}
      *        method should be executed synchronously in the EDT.
      * @param startTimeout If positive, then this parameter specifies the
      *        maximum time to wait before the EDT starts to process
-     *        <code>task</code> in milliseconds.
-     * @throws IllegalArgumentException If <code>startTimeout</code> is
+     *        {@code task} in milliseconds.
+     * @throws IllegalArgumentException If {@code startTimeout} is
      *         negative.
-     * @throws EventDispatchTimeoutException If <code>startTimeout</code> is
+     * @throws EventDispatchTimeoutException If {@code startTimeout} is
      *         positive and waiting for the EDT to start processing the
-     *         <code>task</code> timed out.
+     *         {@code task} timed out.
      *         The task has been cancelled, i.e. it will not be executed.
      * @throws InvocationTargetException If an exception is thrown when
-     *         running <code>task</code>.
-     *         <code>getCause()</code> yields the cause of this exception,
+     *         running {@code task}.
+     *         {@code getCause()} yields the cause of this exception,
      *         which must be a {@link RuntimeException} or an {@link Error}.
      * @see Thread#interrupted
      */
-    public static final void invokeAndWaitUninterruptibly(
+    public static void invokeAndWaitUninterruptibly(
             Runnable task,
             long startTimeout)
     throws  EventDispatchTimeoutException,
@@ -85,26 +84,6 @@ public class EventQueue extends java.awt.EventQueue {
             throw new AssertionError(cannotHappen);
         }
     }
-
-    /*public static final void invokeAndWaitInterruptibly(
-            Runnable task)
-    throws  InterruptedException,
-            InvocationTargetException {
-        try {
-            invokeAndWait(task, true, 0);
-        } catch (EventDispatchTimeoutException cannotHappen) {
-            throw new AssertionError(cannotHappen);
-        }
-    }*/
-
-    /*public static final void invokeAndWaitInterruptibly(
-            Runnable task,
-            long startTimeout)
-    throws  EventDispatchTimeoutException,
-            InterruptedException,
-            InvocationTargetException {
-        invokeAndWait(task, true, startTimeout);
-    }*/
 
     public static void invokeAndWait(
             final Runnable task,

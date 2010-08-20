@@ -14,37 +14,32 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.io;
+package de.schlichtherle.util.concurrent.locks;
 
 /**
- * Similar to <code>java.util.concurrent.locks.Lock</code>,
- * but simplified and adapted to the particular needs of TrueZIP.
+ * Similar to {@link java.util.concurrent.locks.Lock},
+ * but adapted to the particular needs of TrueZIP.
  * The subset of methods common to both this interface and its cousin
- * in JSE 1.5 is identical in functionality.
+ * in JSE 5 is identical in functionality.
  * However, some other methods have been added here in order to suit
- * the particular needs of TrueZIP (see {@link ArchiveController}).
- * 
+ * the particular needs of TrueZIP.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.2
  */
-interface ReentrantLock {
+public interface ReentrantLock {
+
+    /** Returns the number of times the current thread has acquired this lock. */
+    int getLockCount();
 
     /**
-     * Returns <code>true</code> if and only if the current thread has
+     * Returns {@code true} if and only if the current thread has
      * acquired this lock.
      */
-    boolean isLocked();
+    boolean isLockedByCurrentThread();
 
-    /**
-     * Returns the number of times the current thread has successfully
-     * acquired this lock.
-     */
-    int lockCount();
-
-    /**
-     * Acquires this lock by the current thread, eventually blocking.
-     */
+    /** Acquires this lock by the current thread, eventually blocking. */
     void lock();
 
     /**
@@ -55,8 +50,8 @@ interface ReentrantLock {
 
     /**
      * Acquires this lock if and only if it is available at the time of
-     * invocation by the current thread and returns <code>true</code>.
-     * Otherwise, If this lock is not available then <code>false</code>
+     * invocation by the current thread and returns {@code true}.
+     * Otherwise, If this lock is not available then {@code false}
      * is returned.
      */
     boolean tryLock();

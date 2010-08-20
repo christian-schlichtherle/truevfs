@@ -41,7 +41,7 @@ import java.util.Map;
  * If there is more than one entry to be written concurrently, the additional
  * entries are actually written to temp files and copied to the target
  * output archive upon a call to their {@link OutputStream#close} method.
- * Note that this implies that the <code>close()</code> method may fail with
+ * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
  * @author Christian Schlichtherle
@@ -68,10 +68,10 @@ public class MultiplexedOutputArchive implements OutputArchive {
     private boolean targetBusy;
 
     /**
-     * Constructs a new <code>MultiplexedOutputArchive</code>.
+     * Constructs a new {@code MultiplexedOutputArchive}.
      * 
      * @param target The decorated output archive.
-     * @throws NullPointerException Iff <code>target</code> is <code>null</code>.
+     * @throws NullPointerException Iff {@code target} is {@code null}.
      */
     public MultiplexedOutputArchive(final OutputArchive target) {
         if (target == null)
@@ -146,14 +146,17 @@ public class MultiplexedOutputArchive implements OutputArchive {
             targetBusy = true;
         }
 
+        @Override
         public void write(byte[] b) throws IOException {
             out.write(b, 0, b.length);
         }
 
+        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             out.write(b, off, len);
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -178,6 +181,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
         private final java.io.File temp;
         private boolean closed;
 
+        @SuppressWarnings("LeakingThisInConstructor")
         private TempEntryOutputStream(
                 final ArchiveEntry entry,
                 final ArchiveEntry srcEntry,
@@ -190,6 +194,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             temps.put(entry.getName(), this);
         }
 
+        @Override
         public void close() throws IOException {
             if (closed)
                 return;
@@ -268,18 +273,6 @@ public class MultiplexedOutputArchive implements OutputArchive {
 
         if (exception != null)
             throw exception.sortPriority();
-    }
-
-    /**
-     * @deprecated This method will be removed in the next major version number
-     *             release and should be implemented as
-     *             <code>getOutputStream(entry, null).close()</code>.
-     */
-    public final void storeDirectory(ArchiveEntry entry) throws IOException {
-        assert false : "Since TrueZIP 6.5, this is not used anymore!";
-        if (!entry.isDirectory())
-            throw new IllegalArgumentException();
-        getOutputStream(entry, null).close();
     }
 
     public void close() throws IOException {

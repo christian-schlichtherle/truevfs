@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -54,7 +55,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     private static int createKeyStrength() {
         final int keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
         //final int keyStrength = KEY_STRENGTH_ULTRA;
-        logger.fine("Using " + (128 + keyStrength * 64) + " bits cipher key.");
+        logger.log(Level.FINE, "Using {0} bits cipher key.", (128 + keyStrength * 64));
         return keyStrength;
     }
 
@@ -83,18 +84,20 @@ public abstract class RaesZipTestCase extends ZipTestCase {
         super(testName);
     }
 
+    @Override
     protected ZipOutputStream createZipOutputStream(final OutputStream out)
     throws IOException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
                 out, raesParameters);
         try {
             return new ZipOutputStream(ros);
-        } catch (NullPointerException exc) {
+        } catch (RuntimeException exc) {
             ros.close();
             throw exc;
         }
     }
 
+    @Override
     protected ZipOutputStream createZipOutputStream(
             final OutputStream out, final String encoding)
     throws IOException, UnsupportedEncodingException {
@@ -102,7 +105,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
                 out, raesParameters);
         try {
             return new ZipOutputStream(ros, encoding);
-        } catch (NullPointerException exc) {
+        } catch (RuntimeException exc) {
             ros.close();
             throw exc;
         } catch (UnsupportedEncodingException exc) {
@@ -111,73 +114,16 @@ public abstract class RaesZipTestCase extends ZipTestCase {
         }
     }
 
+    @Override
     protected ZipFile createZipFile(final String name)
     throws IOException {
-        return new ZipFile(name) {
-            protected ReadOnlyFile createReadOnlyFile(final File file)
-            throws IOException {
-                final RaesReadOnlyFile rof = RaesReadOnlyFile.getInstance(
-                        file, raesParameters);
-                if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                    rof.authenticate();
-                return rof;
-            }
-        };
-    }
-
-    protected ZipFile createZipFile(
-            final String name, final String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipFile(name, encoding) {
-            protected ReadOnlyFile createReadOnlyFile(final File file)
-            throws IOException {
-                final RaesReadOnlyFile rof = RaesReadOnlyFile.getInstance(
-                        file, raesParameters);
-                if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                    rof.authenticate();
-                return rof;
-            }
-        };
-    }
-
-    protected ZipFile createZipFile(final File file)
-    throws IOException {
-        return new ZipFile(file) {
-            protected ReadOnlyFile createReadOnlyFile(final File file)
-            throws IOException {
-                final RaesReadOnlyFile rof = RaesReadOnlyFile.getInstance(
-                        file, raesParameters);
-                if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                    rof.authenticate();
-                return rof;
-            }
-        };
-    }
-
-    protected ZipFile createZipFile(
-            final File file, final String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipFile(file, encoding) {
-            protected ReadOnlyFile createReadOnlyFile(final File file)
-            throws IOException {
-                final RaesReadOnlyFile rof = RaesReadOnlyFile.getInstance(
-                        file, raesParameters);
-                if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-                    rof.authenticate();
-                return rof;
-            }
-        };
-    }
-
-    protected ZipFile createZipFile(final ReadOnlyFile file)
-    throws IOException {
-        final RaesReadOnlyFile rof;
-        rof = RaesReadOnlyFile.getInstance(file, raesParameters);
-        if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-            rof.authenticate();
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(new File(name), raesParameters);
         try {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
             return new ZipFile(rof);
-        } catch (NullPointerException exc) {
+        } catch (RuntimeException exc) {
             rof.close();
             throw exc;
         } catch (IOException exc) {
@@ -186,21 +132,103 @@ public abstract class RaesZipTestCase extends ZipTestCase {
         }
     }
 
+    @Override
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile createZipFile(
-            final ReadOnlyFile file, final String encoding)
-    throws NullPointerException, IOException, UnsupportedEncodingException {
-        // Check parameters (fail fast).
-        if (encoding == null)
-            throw new NullPointerException("encoding");
-        new String(new byte[0], encoding); // may throw UnsupportedEncodingException!
-
-        final RaesReadOnlyFile rof;
-        rof = RaesReadOnlyFile.getInstance(file, raesParameters);
-        if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
-            rof.authenticate();
+            final String name, final String charset)
+    throws IOException, UnsupportedEncodingException {
+        if (charset == null)
+            throw new NullPointerException();
+        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(new File(name), raesParameters);
         try {
-            return new ZipFile(rof, encoding);
-        } catch (NullPointerException exc) {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
+            return new ZipFile(rof, charset);
+        } catch (RuntimeException exc) {
+            rof.close();
+            throw exc;
+        } catch (IOException exc) {
+            rof.close();
+            throw exc;
+        }
+    }
+
+    @Override
+    protected ZipFile createZipFile(final File file)
+    throws IOException {
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        try {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
+            return new ZipFile(rof);
+        } catch (RuntimeException exc) {
+            rof.close();
+            throw exc;
+        } catch (IOException exc) {
+            rof.close();
+            throw exc;
+        }
+    }
+
+    @Override
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    protected ZipFile createZipFile(
+            final File file, final String charset)
+    throws IOException, UnsupportedEncodingException {
+        if (charset == null)
+            throw new NullPointerException();
+        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        try {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
+            return new ZipFile(rof, charset);
+        } catch (RuntimeException exc) {
+            rof.close();
+            throw exc;
+        } catch (IOException exc) {
+            rof.close();
+            throw exc;
+        }
+    }
+
+    @Override
+    protected ZipFile createZipFile(final ReadOnlyFile file)
+    throws IOException {
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        try {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
+            return new ZipFile(rof);
+        } catch (RuntimeException exc) {
+            rof.close();
+            throw exc;
+        } catch (IOException exc) {
+            rof.close();
+            throw exc;
+        }
+    }
+
+    @Override
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    protected ZipFile createZipFile(
+            final ReadOnlyFile file, final String charset)
+    throws IOException {
+        if (charset == null)
+            throw new NullPointerException();
+        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
+        final RaesReadOnlyFile rof
+                = RaesReadOnlyFile.getInstance(file, raesParameters);
+        try {
+            if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
+                rof.authenticate();
+            return new ZipFile(rof, charset);
+        } catch (RuntimeException exc) {
             rof.close();
             throw exc;
         } catch (IOException exc) {

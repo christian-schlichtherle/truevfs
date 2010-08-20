@@ -27,7 +27,8 @@ package de.schlichtherle.crypto.io.raes;
  * @since TrueZIP 6.0
  */
 public class RaesAuthenticationException extends RaesException {
-    
+    private static final long serialVersionUID = 2362389234686232732L;
+
     public RaesAuthenticationException() {
         super("File has been tampered with!");
     }

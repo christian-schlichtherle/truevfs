@@ -33,7 +33,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * Returns the password required to create or overwrite the RAES type 0 file.
      *
      * @return A clone of the char array holding the password to use for
-     *         creating or overwriting the RAES file - never <tt>null</tt>.
+     *         creating or overwriting the RAES file - never {@code null}.
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
@@ -46,7 +46,7 @@ public interface Type0RaesParameters extends RaesParameters {
      * returned password is correct or an exception has been thrown.
      *
      * @return A clone of the char array holding the password to open the RAES
-     *         file for reading - never <tt>null</tt>.
+     *         file for reading - never {@code null}.
      * @throws RaesKeyException If password retrieval has been disabled or
      *         cancelled.
      */
@@ -66,7 +66,7 @@ public interface Type0RaesParameters extends RaesParameters {
 
     /** Identifier for a 256 bit ciphering key. */
     int KEY_STRENGTH_256 = 2;
-    
+
     /**
      * Returns the key strength to use for creating or overwriting the RAES file.
      *

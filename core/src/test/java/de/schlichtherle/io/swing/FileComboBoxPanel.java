@@ -16,11 +16,8 @@
 
 package de.schlichtherle.io.swing;
 
-import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.File;
-
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
@@ -30,6 +27,7 @@ import javax.swing.WindowConstants;
  * @version $Id$
  */
 public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
+    private static final long serialVersionUID = 1065812374938719922L;
 
     /** Creates new form FileComboBoxPanel */
     public FileComboBoxPanel() {

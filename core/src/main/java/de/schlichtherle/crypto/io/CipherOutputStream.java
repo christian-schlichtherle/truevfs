@@ -19,19 +19,18 @@ package de.schlichtherle.crypto.io;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 /**
- * Similar to <code>javax.crypto.CipherOutputStream</code>,
+ * Similar to {@code javax.crypto.CipherOutputStream},
  * with some exceptions:
  * <ul>
- * <li>This implementation uses Bouncy Castle's lightweight API.
- *     In particular, a {@link BufferedBlockCipher} is used for ciphering.
+ * <li>This implementation is based on Bouncy Castle's lightweight crypto API
+ *     and uses a {@link BufferedBlockCipher} for ciphering.
  * <li>The {@link #cipher} used for encryption or decryption is accessible to
  *     subclasses.
- * <li>The <tt>flush()</tt> method just flushes the underlying output stream
+ * <li>The {@code flush()} method just flushes the underlying output stream
  *     and has no effect on the cipher.
  * <li>A {@link #finish()} method has been added to allow finishing the output
  *     (probably producing padding bytes) without closing the output.
@@ -45,7 +44,7 @@ public class CipherOutputStream extends FilterOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
     protected BufferedBlockCipher cipher;
-    
+
     /**
      * The buffer used for preprocessing the output.
      * This buffer is autosized to the largest buffer written to this stream.
@@ -57,21 +56,31 @@ public class CipherOutputStream extends FilterOutputStream {
 
     /**
      * Creates a new instance of CipherOutputStream.
-     * Please note that unlike <code>javax.crypto.CipherOutputStream</code>,
+     * Please note that unlike {@code javax.crypto.CipherOutputStream},
      * the cipher does not need to be initialized before calling this
      * constructor.
      * However, the cipher must be initialized before anything is actually
      * written to this stream or before this stream is closed.
      *
      * @param out The output stream to write the encrypted or decrypted data to.
-     *        Maybe <tt>null</tt> if initialized by the subclass constructor.
+     *        Maybe {@code null} if initialized by the subclass constructor.
      * @param cipher The cipher to use for encryption or decryption.
-     *        Maybe <tt>null</tt> for subsequent initialization by a subclass.
+     *        Maybe {@code null} for subsequent initialization by a subclass.
      */
     public CipherOutputStream(OutputStream out, BufferedBlockCipher cipher) {
         super(out);
-        
         this.cipher = cipher;
+    }
+
+    /**
+     * Ensures that this cipher output stream is in open state, which requires
+     * that {@link #cipher} is not {@code null}.
+     *
+     * @throws IOException If the preconditions do not hold.
+     */
+    private void ensureOpen() throws IOException {
+        if (cipher == null)
+            throw new IOException("cipher output stream is not in open state");
     }
 
     /**
@@ -82,9 +91,10 @@ public class CipherOutputStream extends FilterOutputStream {
      * @throws IOException If out or cipher aren't properly initialized,
      *         the stream has been closed or an I/O error occured.
      */
+    @Override
     public void write(final int b)
     throws IOException {
-        ensureInit();
+        ensureOpen();
 
         int outLen = cipher.getUpdateOutputSize(1);
         if (outLen > outBuf.length)
@@ -105,9 +115,10 @@ public class CipherOutputStream extends FilterOutputStream {
      * @throws IOException If out or cipher aren't properly initialized,
      *         the stream has been closed or an I/O error occured.
      */
+    @Override
     public void write(final byte[] buf, final int off, final int len)
     throws IOException {
-        ensureInit();
+        ensureOpen();
 
         int outLen = cipher.getUpdateOutputSize(len);
         if (outLen > outBuf.length)
@@ -130,7 +141,7 @@ public class CipherOutputStream extends FilterOutputStream {
      *         text is invalid, i.e. required padding information is missing.
      */
     public void finish() throws IOException {
-        ensureInit();
+        ensureOpen();
 
         int outLen = cipher.getOutputSize(0);
         if (outLen > outBuf.length)
@@ -138,9 +149,7 @@ public class CipherOutputStream extends FilterOutputStream {
         try {
             outLen = cipher.doFinal(outBuf, 0);
         } catch (InvalidCipherTextException icte) {
-            IOException ioe = new IOException(icte.toString());
-            ioe.initCause(icte);
-            throw ioe;
+            throw new IOException(icte);
         }
         out.write(outBuf, 0, outLen);
         out.flush();
@@ -148,22 +157,13 @@ public class CipherOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Ensures that this stream is open and has been initialized.
-     *
-     * @throws IOException If the preconditions do not hold.
-     */
-    private final void ensureInit() throws IOException {
-        if (cipher == null)
-            throw new IOException("CipherOutputStream has already been closed or is not initialized!");
-    }
-
-    /**
-     * Closes this output stream and releases any resources associated with it. 
+     * Closes this output stream and releases any resources associated with it.
      * This method calls {@link #finish()} and then closes and nullifies
      * the underlying output stream {@link #out} and the cipher {@link #cipher}.
      *
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         // Order is important here!
         if (!closed) {

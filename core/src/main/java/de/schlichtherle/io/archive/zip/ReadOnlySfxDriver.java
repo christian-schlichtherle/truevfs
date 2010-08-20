@@ -72,6 +72,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
         super(charset, openIcon, closedIcon, postambled, level);
     }
 
+    @Override
     protected ZipOutputArchive createZipOutputArchive(
             Archive archive,
             OutputStream out,

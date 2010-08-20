@@ -31,9 +31,10 @@ import de.schlichtherle.io.FileBusyException;
  * @since TrueZIP 6.0
  */
 public class OutputArchiveBusyException extends FileBusyException {
+    private static final long serialVersionUID = 962318648273654198L;
     
     /**
-     * Constructs an instance of <code>ArchiveDriverBusyException</code> with
+     * Constructs an instance of {@code ArchiveDriverBusyException} with
      * the specified archive entry.
      * 
      * @param entry The archive entry which was tried to write while

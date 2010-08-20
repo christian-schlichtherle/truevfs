@@ -18,13 +18,10 @@ package de.schlichtherle.crypto.io.raes;
 
 import de.schlichtherle.crypto.SeekableBlockCipher;
 import de.schlichtherle.crypto.modes.SICSeekableBlockCipher;
-import de.schlichtherle.io.rof.FilterReadOnlyFile;
 import de.schlichtherle.io.rof.ReadOnlyFile;
 import de.schlichtherle.util.Arrays;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
@@ -38,7 +35,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Reads a type 0 RAES file.
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
@@ -178,6 +175,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         init(cipher, start, length);
     }
 
+    @SuppressWarnings("SleepWhileHoldingLock")
     private static long enforceSuspensionPenalty(final long last) {
         long delay;
         InterruptedException interrupted = null;

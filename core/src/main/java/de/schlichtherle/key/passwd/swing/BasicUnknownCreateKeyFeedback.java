@@ -24,7 +24,7 @@ package de.schlichtherle.key.passwd.swing;
  * If you would like to play a nice sound for feedback, you need to override
  * the {@link #startSound} method.
  * <p>
- * <b>Warning:</b> Playing a <code>java.applet.AudioClip</code> on J2SE
+ * <b>Warning:</b> Playing a {@code java.applet.AudioClip} on J2SE
  * 1.4.2_12 causes a client application not to terminate until System.exit(0)
  * is called explicitly - hence this feature is currently not implemented in
  * this class!

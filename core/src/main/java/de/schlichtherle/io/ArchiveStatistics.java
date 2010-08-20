@@ -44,12 +44,12 @@ public interface ArchiveStatistics {
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.
      * The return value will be reset automatically where required,
-     * so if this value is going to <code>0</code> again you know that a knew
+     * so if this value is going to {@code 0} again you know that a knew
      * update cycle has begun.
      * Other than this, you should not rely on its actual value.
      * <p>
      * For an example how to use this please refer to the source
-     * code for <code>nzip.ProgressMonitor</code> in the base package.
+     * code for {@code nzip.ProgressMonitor} in the base package.
      *
      * @see File#update
      * @see File#umount
@@ -70,12 +70,12 @@ public interface ArchiveStatistics {
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.
      * The return value will be reset automatically where required,
-     * so if this value is going to <code>0</code> again you know that a knew
+     * so if this value is going to {@code 0} again you know that a knew
      * update cycle has begun.
      * Other than this, you should not rely on its actual value.
      * <p>
      * For an example how to use this please refer to the source
-     * code for <code>nzip.ProgressMonitor</code> in the base package.
+     * code for {@code nzip.ProgressMonitor} in the base package.
      *
      * @see File#update
      * @see File#umount
@@ -92,7 +92,7 @@ public interface ArchiveStatistics {
      * hence need to be processed on the next call to {@link File#update} or
      * {@link File#umount}.
      * Note that you should <em>not</em> use the returned value to call
-     * <code>File.update()</code> or <code>File.umount()</code> only
+     * {@code File.update()} or {@code File.umount()} only
      * conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
@@ -108,7 +108,7 @@ public interface ArchiveStatistics {
      * hence need to be processed on the next call to {@link File#update} or
      * {@link File#umount}.
      * Note that you should <em>not</em> use the returned value to call
-     * <code>File.update()</code> or <code>File.umount()</code> only
+     * {@code File.update()} or {@code File.umount()} only
      * conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */

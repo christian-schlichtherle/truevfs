@@ -34,13 +34,13 @@ import java.util.zip.ZipException;
  * stream for the archive entry will throw a
  * {@link de.schlichtherle.util.zip.CRC32Exception}.
  * This exception is then propagated through the stack up to the corresponding
- * file operation in the package <code>de.schlichtherle.io</code> where it is
+ * file operation in the package {@code de.schlichtherle.io} where it is
  * either allowed to pass on or is catched and processed accordingly.
  * For example, the {@link de.schlichtherle.io.FileInputStream#close()}
- * method would allow the <code>CRC32Exception</code> to pass on to the
+ * method would allow the {@code CRC32Exception} to pass on to the
  * client application, whereas the
  * {@link de.schlichtherle.io.File#catTo(OutputStream)} method would simply
- * return <code>false</code>.
+ * return {@code false}.
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
@@ -69,6 +69,7 @@ public class CheckedJarInputArchive extends JarInputArchive {
     /**
      * Overridden to read from a checked input stream.
      */
+    @Override
     public InputStream getInputStream(
             ArchiveEntry entry,
             ArchiveEntry dstEntry)

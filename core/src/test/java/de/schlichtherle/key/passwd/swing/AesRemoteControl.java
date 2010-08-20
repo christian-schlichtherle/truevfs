@@ -16,9 +16,9 @@
 
 package de.schlichtherle.key.passwd.swing;
 
-import de.schlichtherle.key.*;
-
-import org.netbeans.jemmy.operators.*;
+import de.schlichtherle.key.AesKeyProvider;
+import org.netbeans.jemmy.operators.JComboBoxOperator;
+import org.netbeans.jemmy.operators.JDialogOperator;
 
 /**
  * @author Christian Schlichtherle

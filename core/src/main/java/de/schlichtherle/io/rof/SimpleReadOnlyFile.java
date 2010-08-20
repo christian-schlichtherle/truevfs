@@ -21,7 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
 /**
- * A {@link ReadOnlyFile} implementation using a {@link RandomAccessFile}.
+ * A {@link ReadOnlyFile} implementation derived from {@link RandomAccessFile}.
+ * <p>
+ * This class <em>is</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

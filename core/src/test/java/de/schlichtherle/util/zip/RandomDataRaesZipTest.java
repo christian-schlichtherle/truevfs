@@ -16,11 +16,8 @@
 
 package de.schlichtherle.util.zip;
 
-import java.security.SecureRandom;
-import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.*;
 
 /**
  * Tests compression of a data with 1MB of random data.
@@ -36,16 +33,10 @@ public class RandomDataRaesZipTest extends RaesZipTestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.config("Java assertions enabled: " + ea);
+        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         rnd.nextBytes(data);
-        logger.config("Created " + data.length + " bytes of random data.");
-    }
-
-    public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite(RandomDataRaesZipTest.class);
-        
-        return suite;
+        logger.log(Level.CONFIG, "Created {0} bytes of random data.", data.length);
     }
     
     /**
@@ -55,6 +46,7 @@ public class RandomDataRaesZipTest extends RaesZipTestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.data = RandomDataRaesZipTest.data;
         

@@ -98,7 +98,7 @@ public class ZipDriver extends AbstractArchiveDriver {
     /**
      * Constructs a new ZIP driver.
      *
-     * @param preambled <code>true</code> if and only if a prospective ZIP
+     * @param preambled {@code true} if and only if a prospective ZIP
      *        compatible file is allowed to contain preamble data before the
      *        actual ZIP file data.
      *        Self Extracting Archives typically use the preamble to store the
@@ -106,22 +106,22 @@ public class ZipDriver extends AbstractArchiveDriver {
      *        <p>
      *        Please note that any ZIP compatible file may actually have a
      *        preamble. However, for performance reasons this parameter should
-     *        be set to <code>false</code>, unless required.
-     * @param postambled <code>true</code> if and only if a prospective ZIP
+     *        be set to {@code false}, unless required.
+     * @param postambled {@code true} if and only if a prospective ZIP
      *        compatible file is allowed to have a postamble of arbitrary
      *        length.
-     *        If set to <code>false</code>, the ZIP compatible file may still
+     *        If set to {@code false}, the ZIP compatible file may still
      *        have a postamble. However, the postamble must not exceed 64KB
      *        size, including the End Of Central Directory record and thus
      *        the ZIP file comment. This causes the initial ZIP file
      *        compatibility test to fail fast if the file is not compatible
      *        to the ZIP File Format Specification.
      *        For performance reasons, this parameter should be set to
-     *        <code>false</code> unless you need to support Self Extracting
+     *        {@code false} unless you need to support Self Extracting
      *        Archives with very large postambles.
      * @param level The compression level to use when deflating an entry to
      *        a ZIP output stream.
-     * @throws IllegalArgumentException If <code>level</code> is not in the
+     * @throws IllegalArgumentException If {@code level} is not in the
      *         range [{@value java.util.zip.Deflater#NO_COMPRESSION}, {@value java.util.zip.Deflater#BEST_COMPRESSION}]
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
@@ -147,7 +147,7 @@ public class ZipDriver extends AbstractArchiveDriver {
     //
     
     /**
-     * Returns the value of the property <code>preambled</code> which was 
+     * Returns the value of the property {@code preambled} which was 
      * provided to the constructor.
      */
     public final boolean getPreambled() {
@@ -155,7 +155,7 @@ public class ZipDriver extends AbstractArchiveDriver {
     }
 
     /**
-     * Returns the value of the property <code>postambled</code> which was 
+     * Returns the value of the property {@code postambled} which was 
      * provided to the constructor.
      */
     public final boolean getPostambled() {
@@ -163,7 +163,7 @@ public class ZipDriver extends AbstractArchiveDriver {
     }
 
     /**
-     * Returns the value of the property <code>level</code> which was 
+     * Returns the value of the property {@code level} which was 
      * provided to the constructor.
      */
     public final int getLevel() {
@@ -225,14 +225,6 @@ public class ZipDriver extends AbstractArchiveDriver {
                 rof, getCharset(), getPreambled(), getPostambled());
     }
 
-    /** @deprecated Use {@link #createZipInputArchive} instead. */
-    protected ZipInputArchive createZip32InputArchive(
-            Archive archive,
-            ReadOnlyFile rof)
-    throws IOException {
-        return createZipInputArchive(archive, rof);
-    }
-
     /**
      * {@inheritDoc}
      * <p>
@@ -255,14 +247,5 @@ public class ZipDriver extends AbstractArchiveDriver {
             ZipInputArchive source)
     throws IOException {
         return new ZipOutputArchive(out, getCharset(), level, source);
-    }
-
-    /** @deprecated Use {@link #createZipOutputArchive} instead. */
-    protected ZipOutputArchive createZip32OutputArchive(
-            Archive archive,
-            OutputStream out,
-            ZipInputArchive source)
-    throws IOException {
-        return createZipOutputArchive(archive, out, source);
     }
 }

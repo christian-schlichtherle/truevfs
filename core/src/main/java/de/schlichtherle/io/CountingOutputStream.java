@@ -16,7 +16,9 @@
 
 package de.schlichtherle.io;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * An output stream which logs the number of bytes written.
@@ -58,17 +60,20 @@ final class CountingOutputStream extends FilterOutputStream {
         reset = true;
     }
 
+    @Override
     public void write(final int b) throws IOException {
         out.write(b);
         total++;
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         int len = b.length;
         out.write(b, 0, len);
         total += len;
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
         total += len;

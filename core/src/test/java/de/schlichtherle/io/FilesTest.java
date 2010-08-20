@@ -16,10 +16,11 @@
 
 package de.schlichtherle.io;
 
-import java.io.*;
-import java.util.logging.*;
-
-import junit.framework.*;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
@@ -36,6 +37,8 @@ public class FilesTest extends TestCase {
     public void testNormalize() {
         final java.io.File empty = new java.io.File("");
         assertEquals(".", Files.normalize(empty).getPath());
+
+        testNormalize("a/b/c/d", "a/b/c/d");
 
         testNormalize("a", "./a");
 
@@ -86,6 +89,88 @@ public class FilesTest extends TestCase {
         testNormalize("a",       "a/b/c/d/./.././.././..");
         testNormalize("a",       "a/b/c/d/././../././../././..");
         testNormalize("a",       "a/b/c/d/./././.././././.././././..");
+
+        testNormalize("a/b/c/d", "a//b//c//d");
+        testNormalize("a/b/c/d", "a///b///c///d");
+        testNormalize("a/b/c/d", "a////b////c////d");
+        testNormalize("a/b/c",   "a////b////c////d////..");
+        testNormalize("a/b",     "a////b////c////d////..////..");
+        testNormalize("a/b",     "a//.//b/.///c///./d//.//.././//..");
+        testNormalize("a/b",     "a/////b/////c/////d/////../////..");
+
+        testNormalize("a",       "x/../a");
+        testNormalize("a/b",     "x/../a/y/../b");
+        testNormalize("a/b/c",   "x/../a/y/../b/z/../c");
+
+        testNormalize("../a",       "x/../../a");
+        testNormalize("../a/b",     "x/../../a/y/../b");
+        testNormalize("../a/b/c",   "x/../../a/y/../b/z/../c");
+
+        testNormalize("../a",       "x/.././../a");
+        testNormalize("../a/b",     "x/.././../a/y/../b");
+        testNormalize("../a/b/c",   "x/.././../a/y/../b/z/../c");
+
+        testNormalize("../a",       "x/..//../a");
+        testNormalize("../a/b",     "x/..//../a/y/../b");
+        testNormalize("../a/b/c",   "x/..//../a/y/../b/z/../c");
+
+        testNormalize("../../a",       "x/../../../a");
+        testNormalize("../../a/b",     "x/../../../a/y/../b");
+        testNormalize("../../a/b/c",   "x/../../../a/y/../b/z/../c");
+
+        testNormalize("../../a",       "x/.././.././../a");
+        testNormalize("../../a/b",     "x/.././.././../a/y/../b");
+        testNormalize("../../a/b/c",   "x/.././.././../a/y/../b/z/../c");
+
+        testNormalize("../../a",       "x/..//..//../a");
+        testNormalize("../../a/b",     "x/..//..//../a/y/../b");
+        testNormalize("../../a/b/c",   "x/..//..//../a/y/../b/z/../c");
+
+        testNormalize("a",       "x/x/../../a");
+        testNormalize("a/b",     "x/x/../../a/y/y/../../b");
+        testNormalize("a/b/c",   "x/x/../../a/y/y/../../b/z/z/../../c");
+
+        //testNormalize("/", "/");
+        //testNormalize("/", "//");
+        testNormalize("/", "/.");
+        testNormalize("/", "/./");
+
+        testNormalize("/..", "/..");
+        testNormalize("/..", "/../.");
+        testNormalize("/../..", "/.././..");
+        testNormalize("/../..", "/.././../.");
+
+        testNormalize(".", ".");
+        testNormalize(".", "./");
+        testNormalize("..", "..");
+        testNormalize("..", "../");
+        testNormalize("a", "./a");
+        testNormalize("a", "./a/");
+        testNormalize("../a", "../a");
+        testNormalize("../a", "../a/");
+        testNormalize("a/b", "./a/./b");
+        testNormalize("a/b", "./a/./b/");
+        testNormalize("../a/b", "../a/./b");
+        testNormalize("../a/b", "../a/./b/");
+        testNormalize("b", "./a/../b");
+        testNormalize("b", "./a/../b/");
+        testNormalize("../b", "../a/../b");
+        testNormalize("../b", "../a/../b/");
+
+        testNormalize(".", ".//");
+        testNormalize(".", ".///");
+        testNormalize(".", ".////");
+        testNormalize("..", "..//");
+        testNormalize("a", ".//a//");
+        testNormalize("../a", "..//a");
+        testNormalize("../a", "..//a//");
+        testNormalize("a/b", ".//a//.//b");
+        testNormalize("a/b", ".//a//.//b//");
+        testNormalize("../a/b", "..//a//.//b");
+        testNormalize("../a/b", "..//a//.//b//");
+        testNormalize("b", ".//a//..//b//");
+        testNormalize("../b", "..//a//..//b");
+        testNormalize("../b", "..//a//..//b//");
     }
     
     void testNormalize(String result, final String path) {
@@ -138,7 +223,7 @@ public class FilesTest extends TestCase {
                 raf.close();
             }
             if (!result)
-                logger.finer("Overwriting a file which has an open RandomAccessFile in \"" + mode + "\" mode is not tolerated!");
+                logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
         }
         
         if (!total)

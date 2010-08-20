@@ -55,7 +55,7 @@ public abstract class AbstractArchiveDriver
     private final Icon openIcon, closedIcon;
 
     /**
-     * This field should be considered to be <code>final</code>!
+     * This field should be considered to be {@code final}!
      *
      * @see #ensureEncodable
      */
@@ -68,14 +68,14 @@ public abstract class AbstractArchiveDriver
      *        entry names and probably other meta data when reading or writing
      *        archive files.
      * @param openIcon The icon to return by {@link #getOpenIcon}.
-     *        May be <code>null</code>.
+     *        May be {@code null}.
      * @param closedIcon The icon to return by {@link #getClosedIcon}.
-     *        May be <code>null</code>.
-     * @throws NullPointerException If <code>charset</code> is
-     *         <code>null</code>.
-     * @throws UnsupportedCharsetException If <code>charset</code> is not
+     *        May be {@code null}.
+     * @throws NullPointerException If {@code charset} is
+     *         {@code null}.
+     * @throws UnsupportedCharsetException If {@code charset} is not
      *         supported by both the JSE 1.1 API and JSE 1.4 API.
-     * @throws InconsistentCharsetSupportError If <code>charset</code> is
+     * @throws InconsistentCharsetSupportError If {@code charset} is
      *         supported by the JSE 1.1 API, but not the JSE 1.4 API,
      *         or vice versa.
      */
@@ -164,7 +164,7 @@ public abstract class AbstractArchiveDriver
      *
      * @throws AssertionError If any invariant is violated even if assertions
      *         are disabled.
-     * @return <code>true</code>
+     * @return {@code true}
      */
     private boolean invariants() {
         if (charset == null)
@@ -183,7 +183,7 @@ public abstract class AbstractArchiveDriver
      * Should be called by sub classes in their implementation of the method
      * {@link ArchiveDriver#createArchiveEntry}.
      * 
-     * @param entryName A valid archive entry name - <code>null</code> is not
+     * @param entryName A valid archive entry name - {@code null} is not
      *        permissible.
      * @see #getCharset
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
@@ -198,7 +198,7 @@ public abstract class AbstractArchiveDriver
     }
 
     /**
-     * Returns the value of the property <code>charset</code> which was 
+     * Returns the value of the property {@code charset} which was 
      * provided to the constructor.
      */
     public final String getCharset() {
@@ -206,7 +206,7 @@ public abstract class AbstractArchiveDriver
     }
 
     /**
-     * Returns the value of the property <code>openIcon</code> which was 
+     * Returns the value of the property {@code openIcon} which was 
      * provided to the constructor.
      *
      * @param archive Ignored.
@@ -216,7 +216,7 @@ public abstract class AbstractArchiveDriver
     }
 
     /**
-     * Returns the value of the property <code>closedIcon</code> which was 
+     * Returns the value of the property {@code closedIcon} which was 
      * provided to the constructor.
      *
      * @param archive Ignored.

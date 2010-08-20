@@ -25,9 +25,10 @@ package de.schlichtherle.crypto.io.raes;
  * @since TrueZIP 6.0
  */
 public class RaesKeyException extends RaesParametersException {
+    private static final long serialVersionUID = 1375629384612351398L;
 
     /**
-     * Creates a new instance of <code>RaesKeyException</code> with a
+     * Creates a new instance of {@code RaesKeyException} with a
      * detail message indicating that key retrieval has been disabled
      * or cancelled.
      */
@@ -36,7 +37,7 @@ public class RaesKeyException extends RaesParametersException {
     }
     
     /**
-     * Constructs an instance of <code>RaesKeyException</code> with the
+     * Constructs an instance of {@code RaesKeyException} with the
      * specified detail message.
      * 
      * @param msg The detail message.
@@ -46,7 +47,7 @@ public class RaesKeyException extends RaesParametersException {
     }
 
     /**
-     * Constructs an instance of <code>RaesKeyException</code> with the
+     * Constructs an instance of {@code RaesKeyException} with the
      * specified cause.
      * 
      * @param cause The cause.

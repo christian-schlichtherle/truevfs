@@ -22,7 +22,7 @@ package de.schlichtherle.io;
  * The canonical path name of the archive file is provided as the detail
  * message.
  * <p>
- * With the exception of their <code>close()</code> method, any subsequent
+ * With the exception of their {@code close()} method, any subsequent
  * I/O operation on the closed entry streams will throw an
  * {@link ArchiveEntryStreamClosedException}.
  *
@@ -34,18 +34,9 @@ package de.schlichtherle.io;
  * @since TrueZIP 6.0
  */
 public class ArchiveBusyWarningException extends ArchiveWarningException {
+    private static final long serialVersionUID = 2635419873651362891L;
 
     ArchiveBusyWarningException(ArchiveException priorException, String cPath) {
         super(priorException, cPath);
-    }
-
-    // TODO: Remove this.
-    /**
-     * @deprecated You should not use this constructor.
-     * It will vanish in the next major version.
-     */
-    public ArchiveBusyWarningException(
-            ArchiveException priorException, java.io.File target) {
-        super(priorException, target.getPath());
     }
 }

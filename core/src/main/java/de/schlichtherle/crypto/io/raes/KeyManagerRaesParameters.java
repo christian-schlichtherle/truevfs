@@ -17,14 +17,14 @@
 package de.schlichtherle.crypto.io.raes;
 
 import de.schlichtherle.key.AesKeyProvider;
+import de.schlichtherle.key.KeyManager;
 import de.schlichtherle.key.KeyProvider;
 import de.schlichtherle.key.UnknownKeyException;
-import de.schlichtherle.key.KeyManager;
 
 /**
  * A facade which retrieves {@link RaesParameters} by using the
  * {@link KeyManager}.
- * The <code>KeyManager</code> usually prompts the user via a pluggable user
+ * The {@link KeyManager} usually prompts the user via a pluggable user
  * interface.
  * <p>
  * According to the current state of RAES, only password based encryption
@@ -33,17 +33,17 @@ import de.schlichtherle.key.KeyManager;
  * requiring to change the client code.
  * <p>
  * Implementation note: Of course this class could implement
- * <code>Type0RaesParameters</code> directly.
+ * {@link Type0RaesParameters} directly.
  * But then this interface and all its methods would be public.
  * However, it is anticipated that with the advent of additional parameter
  * interfaces for new RAES types, the explicit implementation of interfaces
  * would limit this classes ability to implement preferences for certain
  * RAES types.
- * Now, implementing the <code>RaesParametersAgent</code> interface
+ * Now, implementing the {@link RaesParametersAgent} interface
  * allows us to control the search for suitable RAES parameters according
  * to the <em>user's</em> preferences, whereas any direct implementation
  * of these interfaces would put us at the mercy of {@link RaesOutputStream}!
- * 
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  * @since TrueZIP 6.0
@@ -56,7 +56,7 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
      * Constructs a new set of default RAES parameters.
      *
      * @param cPath The canonical pathname of the RAES file
-     *        - <code>null</code> is not allowed!
+     *        - {@code null} is not allowed!
      */
     public KeyManagerRaesParameters(String cPath) {
         this.cPath = cPath;
@@ -67,7 +67,7 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
     }
 
     /**
-     * An adapter which presents the KeyManager's <code>KeyProvider</code>
+     * An adapter which presents the KeyManager's {@code KeyProvider}
      * interface as <ocde>Type0RaesParameters</code>.
      */
     private class Type0 implements Type0RaesParameters {

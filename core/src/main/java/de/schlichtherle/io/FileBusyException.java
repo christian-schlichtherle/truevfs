@@ -37,7 +37,7 @@ import java.io.*;
  * unless other exceptional conditions apply.
  * However, if the client application is still using a disconnected stream,
  * it will receive an {@link ArchiveEntryStreamClosedException} on the next
- * call to any other method than <code>close()</code>.
+ * call to any other method than {@code close()}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see FileInputStream
@@ -46,6 +46,7 @@ import java.io.*;
  * @version $Id$
  */
 public class FileBusyException extends FileNotFoundException {
+    private static final long serialVersionUID = 2056108562576389242L;
 
     /**
      * For use by

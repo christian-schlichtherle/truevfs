@@ -30,10 +30,10 @@ interface RAES {
 
     /**
      * The signature of any RAES compatible content in little endian format
-     * (<tt>"RAES"</tt> as a US-ASCII character sequence).
+     * ({@code "RAES"} as a US-ASCII character sequence).
      */
     int SIGNATURE = 'R' | (('A' | (('E' | ('S' << 8)) << 8)) << 8);
-    
+
     int LEAD_IN_LENGTH =
             4 + // SIGNATURE
             1;  // Envelope type
@@ -53,17 +53,17 @@ interface RAES {
                 // The ciphered data which has the same length as the plain data.
                 // The KLAC (first half of 256 bit SHA output = 128 bits).
                 // The  MAC (first half of 256 bit SHA output = 128 bits).
-    
+
     /**
      * The data envelope type reserved for certificate based encryption and
      * authentication.
      * This type is not yet specified, but reserved for future use.
      */
     byte ENVELOPE_TYPE_1 = 1;
-    
+
     /**
      * The block size of the Advanced Encryption Specification (AES) Algorithm
-     * in bits (<tt>128</tt>).
+     * in bits ({@code 128}).
      */
     int AES_BLOCK_SIZE = 128;
 }

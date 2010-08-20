@@ -31,9 +31,9 @@ import java.util.logging.Logger;
  * The head of a chain of registries for archive file suffixes and archive
  * drivers.
  * Each element in the chain is an instance of this class which
- * maps single archive file suffixes (not lists) [<code>String</code>] to the
+ * maps single archive file suffixes (not lists) [{@code String}] to the
  * fully qualified class name, class object or instance of an archive driver
- * [<code>String</code>, <code>Class</code> or {@link ArchiveDriver}].
+ * [{@code String}, {@code Class} or {@link ArchiveDriver}].
  * The {@link #getArchiveDriver} method can then be used to recursively
  * lookup an archive driver for a given (file name) suffix in the registry
  * chain.
@@ -65,35 +65,35 @@ class ArchiveDriverRegistry extends HashMap {
     /**
      * The delegate used to lookup archive drivers when no driver is
      * configured locally.
-     * May be <code>null</code>.
+     * May be {@code null}.
      */
     private final ArchiveDriverRegistry delegate;
 
     /**
-     * Creates an empty <code>ArchiveDriverRegistry</code>.
+     * Creates an empty {@code ArchiveDriverRegistry}.
      */
     ArchiveDriverRegistry() {
         this.delegate = null;
     }
 
     /**
-     * Creates a new <code>DefaultArchiveDriverRegistry</code> by
-     * decorating the configuration of <code>delegate</code> with
-     * mappings for all entries in <code>config</code>.
+     * Creates a new {@code DefaultArchiveDriverRegistry} by
+     * decorating the configuration of {@code delegate} with
+     * mappings for all entries in {@code config}.
      * 
-     * @param delegate The <code>ArchiveDriverRegistry</code> which's
+     * @param delegate The {@code ArchiveDriverRegistry} which's
      *        configuration is to be virtually inherited.
      * @param config A map of suffix lists and archive drivers.
      *        Each key in this map must be a non-null, non-empty archive file
      *        suffix list, obeying the usual syntax.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or <code>null</code>.
-     *        A <code>null</code> archive driver may be used to shadow a
-     *        mapping for the same archive driver in <code>delegate</code>,
+     *        an archive driver class, or {@code null}.
+     *        A {@code null} archive driver may be used to shadow a
+     *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
      * @throws NullPointerException If any parameter or configuration element
-     *         other than an archive driver is <code>null</code>.
+     *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
@@ -109,7 +109,7 @@ class ArchiveDriverRegistry extends HashMap {
     }
 
     /**
-     * Processes the given <code>config</code> and adds the configured archive
+     * Processes the given {@code config} and adds the configured archive
      * driver mappings.
      * 
      * @param config A map of suffix lists and archive driver IDs.
@@ -118,12 +118,12 @@ class ArchiveDriverRegistry extends HashMap {
      *        Each value must either be an archive driver instance, an archive
      *        driver class, or a string with the fully qualified name name of
      *        an archive driver class.
-     * @param eager Iff <code>true</code>, archive drivers are immediately
-     *        instantiated and the keyword <code>DEFAULT</code> is not allowed.
+     * @param eager Iff {@code true}, archive drivers are immediately
+     *        instantiated and the keyword {@code DEFAULT} is not allowed.
      * @throws NullPointerException If any parameter or config element
-     *         is <code>null</code>.
+     *         is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
-     *         does not hold or the keyword <code>DRIVER</code> is found.
+     *         does not hold or the keyword {@code DRIVER} is found.
      */
     final void registerArchiveDrivers(final Map config, final boolean eager) {
         try {
@@ -157,15 +157,15 @@ class ArchiveDriverRegistry extends HashMap {
     }
 
     /**
-     * Registers the given archive <code>id</code> for the given
-     * list of <code>suffixes</code>.
+     * Registers the given archive {@code id} for the given
+     * list of {@code suffixes}.
      * 
      * @param eager Whether the archive driver shall be instantiated or not.
-     * @throws NullPointerException If <code>id</code> is <code>null</code>.
-     * @throws ClassCastException If <code>eager</code> is <code>false</code>
-     *         and <code>driver</code> isn't a string.
-     * @throws IllegalArchiveDriverException If <code>eager</code> is
-     *         <code>true</code> and <code>driver</code> can't get instantiated
+     * @throws NullPointerException If {@code id} is {@code null}.
+     * @throws ClassCastException If {@code eager} is {@code false}
+     *         and {@code driver} isn't a string.
+     * @throws IllegalArchiveDriverException If {@code eager} is
+     *         {@code true} and {@code driver} can't get instantiated
      *         for some reason.
      *         The cause is wrapped in the exception.
      */
@@ -189,8 +189,8 @@ class ArchiveDriverRegistry extends HashMap {
     }
 
     /**
-     * Returns the archive driver for the given canonical <code>suffix</code>
-     * or <code>null</code> if no archive driver is found in the registry.
+     * Returns the archive driver for the given canonical {@code suffix}
+     * or {@code null} if no archive driver is found in the registry.
      * <p>
      * This instance is the head element of the registry chain.
      * If this head element does not hold an archive driver for the given
@@ -201,14 +201,14 @@ class ArchiveDriverRegistry extends HashMap {
      * An archive driver is looked up in the registry as follows:
      * <ol>
      * <li>If the registry holds a string, it's supposed to be the fully
-     *     qualified class name of an <code>ArchiveDriver</code>
+     *     qualified class name of an {@code ArchiveDriver}
      *     implementation. The class will be loaded and stored in the registry.
      * <li>If the registry then holds a class instance, it's instantiated
      *     with its no-arguments constructor, cast to the
-     *     <code>ArchiveDriver</code> type and stored in the registry.
+     *     {@code ArchiveDriver} type and stored in the registry.
      * <li>If the registry then holds an instance of an
-     *     <code>ArchiveDriver</code> implementation, it's returned.
-     * <li>Otherwise, <code>null</code> is returned.
+     *     {@code ArchiveDriver} implementation, it's returned.
+     * <li>Otherwise, {@code null} is returned.
      * </ol>
      * This method is thread safe.
      *
@@ -245,9 +245,9 @@ class ArchiveDriverRegistry extends HashMap {
      *
      * @param driver A string with the fully qualified class name of an archive
      *        driver implementation, a class instance for an archive driver
-     *        implementation, an archive driver instance or <code>null</code>.
-     * @return An archive driver instance or <code>null</code> iff
-     *         <code>driver</code> is <code>null</code>.
+     *        implementation, an archive driver instance or {@code null}.
+     * @return An archive driver instance or {@code null} iff
+     *         {@code driver} is {@code null}.
      * @throws IllegalArchiveDriverException If an archive driver cannot get
      *         returned.
      *         The cause is wrapped in the exception.
@@ -278,10 +278,10 @@ class ArchiveDriverRegistry extends HashMap {
     /**
      * Decorates the given suffix set by adding all suffixes which map to a
      * valid archive driver and removing all suffixes which map to
-     * <code>null</code> in the local registry.
+     * {@code null} in the local registry.
      *
      * @param set A non-null set of canonical archive file suffixes.
-     * @return <code>set</code>, decorated according to the mappings in the
+     * @return {@code set}, decorated according to the mappings in the
      *         local registry.
      */
     public final SuffixSet decorate(final SuffixSet set) {
@@ -308,6 +308,8 @@ class ArchiveDriverRegistry extends HashMap {
 
     static class IllegalArchiveDriverException
             extends IllegalArgumentException {
+        private static final long serialVersionUID = 923470364629386423L;
+
         private IllegalArchiveDriverException(String msg, Exception ex) {
             super(msg);
             initCause(ex);

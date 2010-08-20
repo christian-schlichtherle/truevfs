@@ -16,7 +16,7 @@
 
 package de.schlichtherle.io;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 /**
  *

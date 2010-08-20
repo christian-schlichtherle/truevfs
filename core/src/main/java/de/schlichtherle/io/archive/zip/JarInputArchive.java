@@ -48,6 +48,7 @@ public class JarInputArchive extends ZipInputArchive {
         super(rof, charset, preambled, postambled);
     }
 
+    @Override
     protected de.schlichtherle.util.zip.ZipEntry createZipEntry(String entryName) {
         return new JarEntry(Paths.normalize(entryName, '/'));
     }

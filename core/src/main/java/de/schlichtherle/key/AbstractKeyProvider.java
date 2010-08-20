@@ -57,10 +57,10 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
     /**
      * Forwards the call to {@link #getCreateKeyImpl}.
      *
-     * @return A clone of the return value of <code>getCreateKeyImpl</code>.
+     * @return A clone of the return value of {@code getCreateKeyImpl}.
      *         In case of an array, a shallow copy of the array is returned.
-     * @throws UnknownKeyException If <code>getCreateKeyImpl</code> throws
-     *         this or the returned key is <code>null</code>.
+     * @throws UnknownKeyException If {@code getCreateKeyImpl} throws
+     *         this or the returned key is {@code null}.
      * @throws RuntimeException If cloning the key results in a runtime
      *         exception.
      * @see KeyProvider#getCreateKey
@@ -77,7 +77,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * resource or entirely replace the contents of an already existing
      * protected resource.
      *
-     * @return A template for the <code>key</code> to use or <code>null</code>.
+     * @return A template for the {@code key} to use or {@code null}.
      * @throws UnknownKeyException If the required key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
@@ -92,13 +92,13 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * seconds suspension penalty if {@link #invalidOpenKey} was called by
      * the same thread before.
      * Because this method is final, this qualifies the implementation in
-     * this class as a "friendly" <code>KeyProvider</code> implementation,
+     * this class as a "friendly" {@code KeyProvider} implementation,
      * even when subclassed.
      *
-     * @return A clone of the return value of <code>getOpenKeyImpl</code>.
+     * @return A clone of the return value of {@code getOpenKeyImpl}.
      *         In case of an array, a shallow copy of the array is returned.
-     * @throws UnknownKeyException If <code>getOpenKeyImpl</code> throws
-     *         this or the returned key is <code>null</code>.
+     * @throws UnknownKeyException If {@code getOpenKeyImpl} throws
+     *         this or the returned key is {@code null}.
      * @throws RuntimeException If cloning the key results in a runtime
      *         exception.
      * @see KeyProvider#getOpenKey
@@ -118,7 +118,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * Returns the key which should be used to open an existing protected
      * resource in order to access its contents.
      *
-     * @return A template for the <code>key</code> to use or <code>null</code>.
+     * @return A template for the {@code key} to use or {@code null}.
      * @throws UnknownKeyException If the required key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
@@ -133,7 +133,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * is later used by {@link #getOpenKey} to enforce the suspension penalty
      * and then calls {@link #invalidOpenKeyImpl}.
      * Because this method is final, this implementation qualifies as a
-     * "friendly" <code>KeyProvider</code> implementation, even when subclassed.
+     * "friendly" {@code KeyProvider} implementation, even when subclassed.
      *
      * @see KeyProvider#invalidOpenKey
      */
@@ -159,12 +159,12 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
     }
 
     /**
-     * Clones <code>key</code> reflectively.
+     * Clones {@code key} reflectively.
      * If the key is an array, a shallow copy of the array is returned.
      *
-     * @param key The key to get cloned - may be <code>null</code>.
-     * @return A clone of the <code>key</code> property, which may be
-     *         <code>null</code>.
+     * @param key The key to get cloned - may be {@code null}.
+     * @return A clone of the {@code key} property, which may be
+     *         {@code null}.
      * @throws RuntimeException If cloning the key results in an exception.
      */
     @SuppressWarnings("SuspiciousSystemArraycopy")
@@ -216,13 +216,13 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * The key manager will use this method whenever it adds a key provider
      * which is actually an instance of this class.
      * This allows subclasses to add additional behaviour or constraints
-     * whenever an instance is mapped in the <code>KeyManager</code>.
+     * whenever an instance is mapped in the {@code KeyManager}.
      *
      * @param resourceID The resource identifier to map this instance for.
      * @return The key provider previously mapped for the given resource
-     *         identifier or <code>null</code> if no key provider was mapped.
-     * @throws NullPointerException If <code>resourceID</code> is
-     *         <code>null</code>.
+     *         identifier or {@code null} if no key provider was mapped.
+     * @throws NullPointerException If {@code resourceID} is
+     *         {@code null}.
      * @throws IllegalStateException If mapping this instance is prohibited
      *         by a constraint in a subclass.
      *         Please refer to the respective subclass documentation for
@@ -239,13 +239,13 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * The key manager will use this method whenever it adds a key provider
      * which is actually an instance of this class.
      * This allows subclasses to add additional behaviour or constraints
-     * whenever an instance is unmapped in the <code>KeyManager</code>.
+     * whenever an instance is unmapped in the {@code KeyManager}.
      *
      * @param resourceID The resource identifier to unmap this instance from.
      * @return The key provider previously mapped for the given resource
      *         identifier.
-     * @throws NullPointerException If <code>resourceID</code> is
-     *         <code>null</code>.
+     * @throws NullPointerException If {@code resourceID} is
+     *         {@code null}.
      * @throws IllegalStateException If unmapping this instance is prohibited
      *         by a constraint in a subclass.
      *         Please refer to the respective subclass documentation for
