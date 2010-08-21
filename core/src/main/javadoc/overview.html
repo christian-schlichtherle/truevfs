@@ -49,7 +49,7 @@
         <p>TrueZIP is covered under the Apache License, Version 2.0.</p>
         <h3><a name="defaults"></a>Default Configuration</h3>
         <p>The following archive types and access parameters are defined by the
-            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.truezip.io.registry.properties</i>.
+            default configuration resource file in <i>truezip.jar/META-INF/services/de.schlichtherle.truezip.io.archive.driver.registry.properties</i>.
             Note that only the archive file suffixes {@code "ear|jar|war|zip"}
             are recognized in file paths by default.</p>
         <table border="2" cellpadding="0" cellspacing="2">
@@ -150,7 +150,7 @@
                     <p><i>lcrypto.jar</i><sup>6</sup></p>
                 </td>
                 <td>
-                    <p>{@linkplain de.schlichtherle.truezip.io.archive.zip.raes RAES encrypted ZIP file}.</p>
+                    <p>{@linkplain de.schlichtherle.truezip.io.archive.driver.zip.raes RAES encrypted ZIP file}.</p>
                 </td>
             </tr>
             <tr>
@@ -247,11 +247,11 @@
                 </td>
             </tr>
         </table>
-        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.DefaultArchiveDetector}
+        <p><sup>0</sup> Suffix recognition is case insensitive with the {@link de.schlichtherle.truezip.io.archive.detector.DefaultArchiveDetector}
             class.<br/>
-            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.ArchiveDetector#DEFAULT}?
+            <sup>1</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.archive.detector.ArchiveDetector#DEFAULT}?
             Note that this may be extended (but not restricted) in future releases.<br/>
-            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.ArchiveDetector#ALL}?
+            <sup>2</sup> Recognized by the predefined instance {@link de.schlichtherle.truezip.io.archive.detector.ArchiveDetector#ALL}?
             Note that this may be extended (but not restricted) in future releases.<br/>
             <sup>3</sup> The code page to use for entry names and other entry meta data. This
             access parameter is determined by the archive driver (not the archive detector)

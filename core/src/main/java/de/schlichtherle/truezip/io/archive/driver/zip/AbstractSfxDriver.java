@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip;
+package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

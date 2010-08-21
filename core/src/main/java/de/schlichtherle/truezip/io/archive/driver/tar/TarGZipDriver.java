@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.tar;
+package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;

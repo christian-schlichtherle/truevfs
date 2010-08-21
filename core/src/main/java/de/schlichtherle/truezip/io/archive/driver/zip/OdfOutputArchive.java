@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip;
+package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;

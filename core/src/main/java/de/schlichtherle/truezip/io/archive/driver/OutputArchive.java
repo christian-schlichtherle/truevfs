@@ -26,7 +26,7 @@ import java.util.Enumeration;
  * Defines the interface used to write entries to an archive file.
  * <p>
  * Implementations do <em>not</em> need to be thread safe:
- * Multithreading is addressed in the package {@code de.schlichtherle.truezip.io}.
+ * Multithreading must be addressed by the client classes.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -93,7 +93,7 @@ public interface OutputArchive {
      *        For example, the ZIP driver family uses this to copy the
      *        already deflated data if the source entry is another
      *        ZIP file entry.
-     *        As another example, the {@link de.schlichtherle.truezip.io.archive.tar.TarDriver}
+     *        As another example, the {@link de.schlichtherle.truezip.io.archive.driver.tar.TarDriver}
      *        uses this to determine the size of the input file, thereby
      *        removing the need to create (yet another) temporary file.
      * @return A (preferrably unbuffered) {@link OutputStream} to write the
