@@ -38,6 +38,10 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+
 /**
  * This is the base class for any archive controller, providing all the
  * essential services required by the {@link File} class to implement its
@@ -92,7 +96,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveController implements Archive, Entry {
+abstract class ArchiveController implements Archive {
 
     //
     // Static fields.

@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-
 /**
  * A package private interface with some useful constants for archive entry
  * names.
@@ -28,12 +26,6 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
  * @version $Id$
  */
 interface Entry {
-
-    /** The entry name separator as a string. */
-    String SEPARATOR = ArchiveEntry.SEPARATOR;
-
-    /** The entry name separator as a character. */
-    char SEPARATOR_CHAR = ArchiveEntry.SEPARATOR_CHAR;
 
     /**
      * Denotes the entry name of the virtual root directory.

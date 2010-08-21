@@ -28,6 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+
 /**
  * This class implements a virtual file system of archive entries for use
  * by the archive controller provided to the constructor.
@@ -39,7 +43,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveFileSystem implements Entry {
+final class ArchiveFileSystem {
 
     /**
      * Denotes the entry name of the virtual root directory as a valid
