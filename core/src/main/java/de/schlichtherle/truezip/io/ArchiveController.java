@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -406,11 +406,11 @@ abstract class ArchiveController implements Archive {
      * only the last written entry would be added to the central directory
      * of the archive (unless the archive type doesn't support this).
      * 
-     * @see #umount(ArchiveException, boolean, boolean, boolean, boolean, boolean, boolean)
-     * @see ArchiveException
+     * @see #umount(ArchiveControllerException, boolean, boolean, boolean, boolean, boolean, boolean)
+     * @see ArchiveControllerException
      */
     final void autoUmount(final String entryName)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
 
         if (hasNewData(entryName))
@@ -439,21 +439,21 @@ abstract class ArchiveController implements Archive {
      *        is set as well. Failing to comply to this requirement may throw
      *        a {@link java.lang.AssertionError} and will incur loss of data!
      * @see #autoUmount
-     * @see ArchiveException
-     * @throws ArchiveException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveException}
+     * @see ArchiveControllerException
+     * @throws ArchiveControllerException If any exception condition occurs throughout
+     *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
      *         thrown.
      */
     abstract void umount(
-            ArchiveException exceptionChain,
+            ArchiveControllerException exceptionChain,
             final boolean waitInputStreams,
             final boolean closeInputStreams,
             final boolean waitOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount,
             final boolean reassemble)
-    throws ArchiveException;
+    throws ArchiveControllerException;
     /* FIXME:
      * The implementation in the class {@code ArchiveController} just
      * deletes the entries in this archive controller which have been passed
@@ -488,7 +488,7 @@ abstract class ArchiveController implements Archive {
                               waitInputStreams, closeInputStreams,
                               waitOutputStreams, closeOutputStreams,
                               umount, reassemble);
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             logger.log(Level.FINEST, "umount.throwing", ex); // NOI18N
             throw ex;
         }
@@ -508,14 +508,14 @@ abstract class ArchiveController implements Archive {
     }
 
     private int umount0(
-            ArchiveException exceptionChain,
+            ArchiveControllerException exceptionChain,
             final boolean waitInputStreams,
             final boolean closeInputStreams,
             final boolean waitOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount,
             final boolean reassemble)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         //System.err.println("FIXME: Write algorithm to delete archive entries on umount!");
         return 0;
     }*/

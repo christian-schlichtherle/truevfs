@@ -16,7 +16,10 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;
@@ -41,7 +44,7 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveControllers {
+public final class ArchiveControllers {
 
     private static final String CLASS_NAME
             = "de.schlichtherle.truezip.io.ArchiveControllers";
@@ -253,7 +256,7 @@ final class ArchiveControllers {
      *         because the application is using an open stream.
      *         No data is lost and the archive file can still get updated by
      *         calling this method again.
-     * @throws ArchiveException If any error conditions occur throughout the
+     * @throws ArchiveControllerException If any error conditions occur throughout the
      *         course of this method which imply loss of data.
      *         This usually means that at least one of the archive files
      *         has been created externally and was corrupted or it cannot
@@ -264,14 +267,14 @@ final class ArchiveControllers {
      *         {@code false} and {@code closeOutputStreams} is
      *         {@code true}.
      */
-    static void umount(
+    public static void umount(
             final String prefix,
             final boolean waitInputStreams,
             final boolean closeInputStreams,
             final boolean waitOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         if (prefix == null)
             throw new NullPointerException();
         if (!closeInputStreams && closeOutputStreams)
@@ -293,7 +296,7 @@ final class ArchiveControllers {
             CountingOutputStream.init();
             try {
                 // Used to chain archive exceptions.
-                ArchiveException exceptionChain = null;
+                ArchiveControllerException exceptionChain = null;
 
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
@@ -318,7 +321,7 @@ final class ArchiveControllers {
                                     waitInputStreams, closeInputStreams,
                                     waitOutputStreams, closeOutputStreams,
                                     umount, true);
-                        } catch (ArchiveException exception) {
+                        } catch (ArchiveControllerException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
@@ -335,12 +338,12 @@ final class ArchiveControllers {
                 // Reorder exception chain if necessary to support conditional
                 // exception catching based on their priority (i.e. class).
                 if (exceptionChain != null)
-                    throw (ArchiveException) exceptionChain.sortPriority();
+                    throw (ArchiveControllerException) exceptionChain.sortPriority();
             } finally {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveException failure) {
+        } catch (ArchiveControllerException failure) {
             logger.log(Level.FINE, "update.throwing", failure);// NOI18N
             throw failure;
         }
@@ -421,7 +424,7 @@ final class ArchiveControllers {
                 } finally {
                     try {
                         umount("", false, true, false, true, true);
-                    } catch (ArchiveException ouch) {
+                    } catch (ArchiveControllerException ouch) {
                         ouch.printStackTrace();
                     }
                 }

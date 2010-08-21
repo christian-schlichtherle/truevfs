@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;

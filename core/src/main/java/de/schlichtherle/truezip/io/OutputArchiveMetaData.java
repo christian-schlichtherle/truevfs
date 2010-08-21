@@ -16,10 +16,11 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
@@ -177,8 +178,8 @@ public final class OutputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized ArchiveException closeAllOutputStreams(
-            ArchiveException exceptionChain) {
+    synchronized ArchiveControllerException closeAllOutputStreams(
+            ArchiveControllerException exceptionChain) {
         assert !stopped;
 
         stopped = true;
@@ -188,7 +189,7 @@ public final class OutputArchiveMetaData {
             try {
                 out.doClose();
             } catch (IOException failure) {
-                exceptionChain = new ArchiveWarningException(
+                exceptionChain = new ArchiveControllerWarningException(
                         exceptionChain, failure);
             }
         }

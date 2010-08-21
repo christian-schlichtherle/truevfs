@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.InputArchiveMetaData;
-import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;

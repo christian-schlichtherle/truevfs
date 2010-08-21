@@ -19,9 +19,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 /**
  * Like its super class, but indicates the existance of open output streams.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see File#umount
- * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -33,7 +30,7 @@ public class ArchiveOutputBusyWarningException
 
     // TODO: Make this package private!
     public ArchiveOutputBusyWarningException(
-            ArchiveException priorException, String cPath, int numStreams) {
+            ArchiveControllerException priorException, String cPath, int numStreams) {
         super(priorException, cPath);
         this.numStreams = numStreams;
     }
