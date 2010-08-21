@@ -16,6 +16,9 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -42,11 +45,13 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Make this class package private!
 public final class InputArchiveMetaData {
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.InputArchiveMetaData";
-    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+            = InputArchiveMetaData.class.getName();
+    private static final Logger logger
+            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**
      * The archive which uses this instance.
@@ -202,7 +207,7 @@ public final class InputArchiveMetaData {
     private final class EntryInputStream extends SynchronizedInputStream {
         private /*volatile*/ boolean closed;
 
-        @SuppressWarnings("NotifyWhileNotSynced")
+        @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryInputStream(final InputStream in) {
             super(in, InputArchiveMetaData.this);
             assert in != null;

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**

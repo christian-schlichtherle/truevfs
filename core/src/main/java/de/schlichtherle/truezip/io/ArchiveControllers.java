@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;

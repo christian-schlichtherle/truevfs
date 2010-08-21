@@ -22,30 +22,38 @@ import java.io.IOException;
 /**
  * Thrown if an {@link IOException} happened on the input side rather than
  * the output side when copying an InputStream to an OutputStream.
- * This exception is always initialized with an {@code IOException} as
- * its cause, so it is safe to cast the return value of
- * {@link Throwable#getCause} to an {@code IOException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-// TODO: Review: Rename this to IException?
-public class InputIOException extends IOException {
+public class InputException extends IOException {
     private static final long serialVersionUID = 1287654325546872424L;
 
     /**
-     * Constructs a new {@code InputIOException}.
+     * Constructs a new {@code InputException}.
      *
      * @param cause A valid {@code IOException}.
      *        This must not be {@code null} and must not be an instance
-     *        of {@link FileNotFoundException} (which means that they cannot
-     *        not be masked).
+     *        of {@link FileNotFoundException} in order to prevent masking it.
      * @throws IllegalArgumentException If {@code cause} is an instance of
      *         {@code FileNotFoundException}.
      */
-    public InputIOException(final IOException cause) {
+    public InputException(final IOException cause) {
         super(cause != null ? cause.toString() : null);
         if (cause instanceof FileNotFoundException)
             throw new IllegalArgumentException(cause);
+        initCause(cause);
+    }
+
+    /**
+     * Returns the {@link IOException} provided as the cause when this
+     * exception was created.
+     *
+     * @return The {@link IOException} provided as the cause when this
+     * exception was created.
+     */
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
     }
 }

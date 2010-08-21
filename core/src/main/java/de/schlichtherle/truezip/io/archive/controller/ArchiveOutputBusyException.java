@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 /**
- * Like its super class, but indicates the existance of open input streams.
+ * Like its super class, but indicates the existance of open output streams.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see File#umount
@@ -25,21 +25,20 @@ package de.schlichtherle.truezip.io;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveInputBusyWarningException
-        extends ArchiveBusyWarningException {
-    private static final long serialVersionUID = 965098472652287563L;
+public class ArchiveOutputBusyException extends ArchiveBusyException {
+    private static final long serialVersionUID = 4652936465192837172L;
 
     private final int numStreams;
 
     // TODO: Make this package private!
-    public ArchiveInputBusyWarningException(
+    public ArchiveOutputBusyException(
             ArchiveException priorException, String cPath, int numStreams) {
         super(priorException, cPath);
         this.numStreams = numStreams;
     }
 
     /**
-     * Returns the number of open entry input streams, whereby an open stream
+     * Returns the number of open entry output streams, whereby an open stream
      * is a stream which's {@code close()} method hasn't been called.
      */
     public int getNumStreams() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 /**
  * Thrown if an archive file could not get updated because some input or
