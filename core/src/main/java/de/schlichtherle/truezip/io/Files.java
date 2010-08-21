@@ -19,8 +19,8 @@ import de.schlichtherle.truezip.io.ArchiveController.ArchiveEntryFalsePositiveEx
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.RfsEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
 import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.util.Action;

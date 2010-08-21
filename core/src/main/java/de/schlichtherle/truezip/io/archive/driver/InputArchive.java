@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.spi;
+package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.InputArchiveMetaData;
 import java.io.FileNotFoundException;

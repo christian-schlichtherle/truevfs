@@ -85,9 +85,10 @@ abstract class ExtraField {
                     ? (ExtraField) c.newInstance()
                     : new DefaultExtraField(headerID);
         } catch (Exception cannotHappen) {
-            throw new AssertionError(
-                    "register(Class) should have checked the instantiatability of " + c,
-                    cannotHappen);
+            final AssertionError ae
+                    = new AssertionError("register(Class) should have checked the instantiatability of " + c);
+            ae.initCause(cannotHappen);
+            throw ae;
         }
         assert headerID == ef.getHeaderID();
         return ef;

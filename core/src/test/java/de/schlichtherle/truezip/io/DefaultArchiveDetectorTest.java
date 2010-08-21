@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.zip.ZipDriver;
 import java.io.ByteArrayInputStream;

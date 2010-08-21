@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.spi;
+package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.ArchiveEntryMetaData;
 import java.io.File;

@@ -16,11 +16,11 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.InputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.TransientIOException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.Streams;

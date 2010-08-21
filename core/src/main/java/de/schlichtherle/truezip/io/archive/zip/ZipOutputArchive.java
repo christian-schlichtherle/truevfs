@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.zip;
 
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.spi.RfsEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import de.schlichtherle.truezip.util.zip.BasicZipOutputStream;
@@ -39,7 +39,7 @@ import java.util.zip.CheckedOutputStream;
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive}
+ * {@link de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive}
  * to overcome this limitation.
  * 
  * @author Christian Schlichtherle

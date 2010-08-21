@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.registry;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
 import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.io.File;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * on the class path (this ensures that TrueZIP is compatible with JNLP as used
  * by Java Web Start and can be safely added to the Extension Class Path).
  * <p>
- * The configuration files are processed in arbitrary order.
+ * These configuration files are processed in arbitrary order.
  * However, configuration files which contain the entry
  * {@code DRIVER=true} have lesser priority and will be overruled by
  * any other configuration files which do not contain this entry.

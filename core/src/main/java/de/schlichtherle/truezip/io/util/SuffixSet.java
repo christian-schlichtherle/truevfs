@@ -24,6 +24,9 @@ import java.util.Locale;
 
 /**
  * An ordered set of canonicalized suffixes.
+ * A {@code SuffixSet} can be converted into a string representation by
+ * calling {@link #toString()}.
+ * <p>
  * A <i>suffix</i> is the part of a file name string after the last dot.
  * It must not contain the character {@code '|'}.
  * A suffix in canonical form (or <i>canonical suffix</i> for short) is a
@@ -40,18 +43,20 @@ import java.util.Locale;
  * {@code ".ZIP"}, and
  * {@code "zip|Zip|ZIP|.zip|.Zip|.ZIP"} aren't.
  * <p>
- * Suffix sets can be converted from and to suffix lists by using
- * {@link #addAll(String)} and {@link #toString()}.
  * A <i>suffix list</i> is a string which consists of zero or more suffixes
  * which are separated by the character {@code '|'}.
  * Note that in general, a suffix list is just a sequence of suffixes.
  * In particular, a suffix list may be empty (but not {@code null}) and
  * its suffixes don't have to be in canonical form, may be duplicated in the
- * list and may be listed in arbitrary order.
- * However, suffix lists have a canonical form, too:
+ * list and may appear in arbitrary order.
+ * <p>
+ * Suffix lists have a canonical form, too:
  * A suffix list in canonical form (or <i>canonical suffix list</i> for short)
- * is a suffix list which contains only canonical suffixes in natural order
- * and does not contain any duplicates (so it's actually a set).
+ * is a suffix list which contains only canonical suffixes in natural sort
+ * order and does not contain any duplicates (so it's actually a set).
+ * <p>
+ * A suffix list can be canonicalized using this class by calling
+ * {@code new {@link #SuffixSet(String) SuffixSet(list)}.{@link #toString()}}.
  * <p>
  * Unless otherwise documented, all {@link java.util.Set} methods work on the
  * canonical form of the suffixes in this set.

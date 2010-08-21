@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.spi;
+package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 
 /**
- * Thrown to indicate that the {@link OutputArchive#getOutputStream} method
- * failed because the archive is already busy on output.
+ * Thrown to indicate that the {@link InputArchive#getInputStream} method
+ * failed because the archive is already busy on input.
  * This exception is guaranteed to be recoverable,
- * meaning it must be possible to write the same entry again as soon as the
- * archive is not busy on output anymore, unless another exceptional condition
+ * meaning it must be possible to read the same entry again as soon as the
+ * archive is not busy on input anymore, unless another exceptional condition
  * applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OutputArchiveBusyException extends FileBusyException {
-    private static final long serialVersionUID = 962318648273654198L;
-    
+public class InputArchiveBusyException extends FileBusyException {
+    private static final long serialVersionUID = 1983745618753823654L;
+
     /**
-     * Constructs an instance of {@code ArchiveDriverBusyException} with
+     * Constructs an instance of {@code InputArchiveBusyException} with
      * the specified archive entry.
      * 
-     * @param entry The archive entry which was tried to write while
-     *        its associated {@link OutputArchive} was busy.
+     * @param entry The archive entry which was tried to read while
+     *        its associated {@link InputArchive} was busy.
      */
-    public OutputArchiveBusyException(ArchiveEntry entry) {
+    public InputArchiveBusyException(ArchiveEntry entry) {
         super(entry.getName());
     }
 }

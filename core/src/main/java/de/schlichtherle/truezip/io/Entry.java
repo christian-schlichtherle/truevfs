@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.spi.*;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 
 /**
  * A package private interface with some useful constants for archive entry

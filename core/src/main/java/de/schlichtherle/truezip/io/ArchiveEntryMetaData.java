@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;

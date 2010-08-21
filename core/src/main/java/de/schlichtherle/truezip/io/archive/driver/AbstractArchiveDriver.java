@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.spi;
+package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import java.io.CharConversionException;
@@ -46,8 +46,9 @@ public abstract class AbstractArchiveDriver
     private static final long serialVersionUID = 6546816846546846516L;
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.archive.spi.AbstractArchiveDriver";
-    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+            = AbstractArchiveDriver.class.getName();
+    private static final Logger logger
+            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private final String charset;
 
