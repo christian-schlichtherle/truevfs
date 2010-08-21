@@ -23,7 +23,6 @@ package de.schlichtherle.truezip.key;
  * if the JVM is running in headless mode.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.1
  * @version $Id$
  */
 public class KeyPromptingDisabledException extends UnknownKeyException  {

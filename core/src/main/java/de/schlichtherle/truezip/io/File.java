@@ -316,7 +316,6 @@ import javax.swing.Icon;
  *
  * @see DefaultArchiveDetector API reference for configuring archive type
  *      recognition
- * @since TrueZIP 1.0
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -1595,7 +1594,6 @@ public class File extends java.io.File {
      *
      * @see #getCanonicalFile()
      * @see #getNormalizedFile()
-     * @since TrueZIP 6.0
      */
     public File getNormalizedAbsoluteFile() {
         File enclArchive = this.enclArchive;
@@ -1616,7 +1614,6 @@ public class File extends java.io.File {
      *
      * @see #getCanonicalPath()
      * @see #getNormalizedPath()
-     * @since TrueZIP 6.0
      */
     public String getNormalizedAbsolutePath() {
         return Paths.normalize(getAbsolutePath(), separatorChar);
@@ -1644,8 +1641,6 @@ public class File extends java.io.File {
      * from the path wherever possible.
      *
      * @return The normalized path of this file as a {@link String}.
-     *
-     * @since TrueZIP 6.0
      */
     public String getNormalizedPath() {
         return Paths.normalize(getPath(), separatorChar);
@@ -1687,7 +1682,6 @@ public class File extends java.io.File {
      *
      * @return The canonical or absolute path of this file as a
      *         {@code String} instance.
-     * @since TrueZIP 6.0
      */
     public String getCanOrAbsPath() {
         return getCanOrAbsFile().getPath();
@@ -1901,10 +1895,7 @@ public class File extends java.io.File {
      * </ul>
      *
      * @param file The path to test for being contained by this path.
-     *
      * @throws NullPointerException If the parameter is {@code null}.
-     *
-     * @since TrueZIP 5.1
      */
     public boolean contains(java.io.File file) {
         return Files.contains(this, file);
@@ -1929,7 +1920,6 @@ public class File extends java.io.File {
      * @param a The path to test for containing {@code b}.
      * @param b The path to test for being contained by {@code a}.
      * @throws NullPointerException If any parameter is {@code null}.
-     * @since TrueZIP 5.1
      */
     public static boolean contains(java.io.File a, java.io.File b) {
         return Files.contains(a, b);

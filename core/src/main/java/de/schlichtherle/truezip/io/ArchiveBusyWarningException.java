@@ -31,7 +31,6 @@ package de.schlichtherle.truezip.io;
  * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class ArchiveBusyWarningException extends ArchiveWarningException {
     private static final long serialVersionUID = 2635419873651362891L;

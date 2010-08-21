@@ -43,7 +43,6 @@ import javax.swing.JOptionPane;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
         implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<P> {

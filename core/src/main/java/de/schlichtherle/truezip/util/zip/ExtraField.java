@@ -29,7 +29,6 @@ import java.util.Map;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 abstract class ExtraField {
 

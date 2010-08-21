@@ -46,7 +46,6 @@ import java.util.Map;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class PromptingKeyManager extends KeyManager {
 
@@ -117,8 +116,6 @@ public class PromptingKeyManager extends KeyManager {
      *
      * @see #setPromptingImpl
      * @see #getInstance
-     *
-     * @since TrueZIP 6.1
      */
     protected boolean isPromptingImpl() {
         return prompting;
@@ -161,8 +158,6 @@ public class PromptingKeyManager extends KeyManager {
      *
      * @see #isPromptingImpl
      * @see #getInstance
-     *
-     * @since TrueZIP 6.1
      */
     protected void setPromptingImpl(boolean prompting) {
         PromptingKeyManager.prompting = prompting;
@@ -186,8 +181,6 @@ public class PromptingKeyManager extends KeyManager {
         if (!isPromptingImpl())
             throw new KeyPromptingDisabledException();
      * </pre>
-     *
-     * @since TrueZIP 6.1
      */
     protected void ensurePromptingImpl()
     throws KeyPromptingDisabledException {
@@ -226,7 +219,6 @@ public class PromptingKeyManager extends KeyManager {
      * @param uiClass The user interface class.
      *        This class must have a nullary constructor.
      * @see #getKeyProvider(String, Class)
-     * @since TrueZIP 6.1
      * @throws NullPointerException If any of the parameters is
      *         {@code null}.
      * @throws IllegalArgumentException If {@code uiClass} does not

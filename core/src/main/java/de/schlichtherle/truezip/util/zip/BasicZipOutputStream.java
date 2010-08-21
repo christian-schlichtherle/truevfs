@@ -42,7 +42,6 @@ import java.util.zip.ZipException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class BasicZipOutputStream
         extends FilterOutputStream

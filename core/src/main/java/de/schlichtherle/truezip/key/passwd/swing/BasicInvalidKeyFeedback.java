@@ -45,7 +45,6 @@ import javax.swing.Timer;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public abstract class BasicInvalidKeyFeedback extends BasicFeedback {
 

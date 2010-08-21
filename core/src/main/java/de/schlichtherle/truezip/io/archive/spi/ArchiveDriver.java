@@ -55,7 +55,6 @@ import javax.swing.Icon;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public interface ArchiveDriver {
 
@@ -214,8 +213,6 @@ public interface ArchiveDriver {
      * {@link Object#equals} and the best possible implementation is the
      * default implementation in {@code Object} which is most
      * discriminating.
-     *
-     * @since TrueZIP 6.4
      */
     @Override
     boolean equals(Object o);
@@ -227,8 +224,6 @@ public interface ArchiveDriver {
      * {@link Object#hashCode} and the best possible implementation is the
      * default implementation in {@code Object} which is most
      * discriminating.
-     *
-     * @since TrueZIP 6.4
      */
     @Override
     int hashCode();

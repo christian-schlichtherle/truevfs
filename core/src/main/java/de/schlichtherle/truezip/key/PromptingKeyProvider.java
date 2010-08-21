@@ -50,7 +50,6 @@ import java.util.Arrays;
  * @see PromptingKeyManager
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class PromptingKeyProvider<K extends Cloneable>
         extends AbstractKeyProvider<K> {

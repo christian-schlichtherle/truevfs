@@ -26,7 +26,6 @@ import javax.swing.JComponent;
  * This class is thread safe.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0
  * @version @version@
  */
 public class PromptingAesKeyProviderUI

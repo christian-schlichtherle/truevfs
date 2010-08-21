@@ -25,7 +25,6 @@ import java.io.InputStream;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class SynchronizedInputStream extends InputStream {
     /** The object to synchronize on - never {@code null}. */

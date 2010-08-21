@@ -30,7 +30,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = 1045639746091876245L;

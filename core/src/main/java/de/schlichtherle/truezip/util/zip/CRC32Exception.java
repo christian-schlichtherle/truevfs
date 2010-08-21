@@ -30,7 +30,6 @@ import java.util.zip.ZipException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  */
 public class CRC32Exception extends ZipException {
     private static final long serialVersionUID = 1656298435298526391L;

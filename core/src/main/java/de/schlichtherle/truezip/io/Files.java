@@ -43,7 +43,6 @@ import java.util.Arrays;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 final class Files {
 

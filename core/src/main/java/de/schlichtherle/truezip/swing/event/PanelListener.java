@@ -24,7 +24,6 @@ import java.util.EventListener;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public interface PanelListener extends EventListener {
     

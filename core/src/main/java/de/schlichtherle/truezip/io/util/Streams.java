@@ -37,7 +37,6 @@ import java.util.concurrent.Future;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class Streams {
 

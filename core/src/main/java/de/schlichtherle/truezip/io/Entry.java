@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.io.archive.spi.*;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 interface Entry {
 

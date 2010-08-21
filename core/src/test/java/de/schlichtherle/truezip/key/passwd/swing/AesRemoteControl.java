@@ -23,7 +23,6 @@ import org.netbeans.jemmy.operators.JDialogOperator;
 /**
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  */
 public class AesRemoteControl extends RemoteControl {
     public AesRemoteControl(final String id) {

@@ -26,7 +26,6 @@ package de.schlichtherle.truezip.util.concurrent.locks;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.2
  */
 public interface ReentrantLock {
 

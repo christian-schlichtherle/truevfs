@@ -26,7 +26,6 @@ import javax.swing.DefaultComboBoxModel;
  * A panel which allows the user to select the key strength for the AES cipher.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0 (refactored from package de.schlichtherle.truezip.crypto.io.swing)
  * @version $Id$
  */
 public class AesKeyStrengthPanel extends EnhancedPanel {

@@ -38,7 +38,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0 (refactored from the former {@code ZipFileSystem})
  */
 final class ArchiveFileSystem implements Entry {
 
@@ -47,8 +46,6 @@ final class ArchiveFileSystem implements Entry {
      * directory entry name.
      * <p>
      * This constant <em>cannot</em> be used for identity comparison!
-     *
-     * @since TrueZIP 6.5
      */
     private static final String ROOT_DIRECTORY_NAME = SEPARATOR;
 

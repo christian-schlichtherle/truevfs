@@ -28,7 +28,6 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.6
  */
 public class Temps {
 

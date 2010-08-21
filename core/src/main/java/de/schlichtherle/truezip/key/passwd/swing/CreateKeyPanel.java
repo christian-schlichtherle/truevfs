@@ -44,7 +44,6 @@ import javax.swing.event.DocumentListener;
  * extensible for use with certificate based authentication, too.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0
  * @version $Id$
  */
 public class CreateKeyPanel extends EnhancedPanel {

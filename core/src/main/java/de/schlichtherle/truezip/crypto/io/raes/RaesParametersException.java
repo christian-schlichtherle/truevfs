@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class RaesParametersException extends FileNotFoundException {
     private static final long serialVersionUID = 1605398165986459281L;

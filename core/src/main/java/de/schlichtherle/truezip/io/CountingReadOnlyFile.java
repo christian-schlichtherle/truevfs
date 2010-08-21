@@ -23,7 +23,6 @@ import java.io.IOException;
 /**
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 final class CountingReadOnlyFile extends FilterReadOnlyFile {
     private static volatile long total;

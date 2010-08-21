@@ -58,7 +58,6 @@ import java.util.Set;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class KeyManager {
 
@@ -257,7 +256,6 @@ public class KeyManager {
      * not an instance of {@link AbstractKeyProvider}, it is just removed from
      * the map.
      *
-     * @since TrueZIP 6.1
      * @throws IllegalStateException If resetting or unmapping one or more
      *         key providers is prohibited by a constraint in a subclass of
      *         {@link AbstractKeyProvider}, in which case the respective key
@@ -406,7 +404,6 @@ public class KeyManager {
      * @throws IllegalArgumentException If {@code useType} is the same as
      *         {@code forType}, or if {@code useType} does not
      *         provide a public constructor with no parameters.
-     * @since TrueZIP 6.1
      */
     protected final synchronized <P extends KeyProvider<?>> void mapKeyProviderType(
             final Class<P> forType,

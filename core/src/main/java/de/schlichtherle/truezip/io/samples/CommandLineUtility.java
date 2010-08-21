@@ -28,7 +28,6 @@ import java.text.MessageFormat;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 abstract class CommandLineUtility {
 

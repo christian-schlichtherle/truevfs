@@ -34,7 +34,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class JarDriver extends ZipDriver {
     private static final long serialVersionUID = 3333659381918211087L;

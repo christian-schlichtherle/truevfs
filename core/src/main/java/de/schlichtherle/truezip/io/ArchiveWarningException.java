@@ -48,7 +48,6 @@ import java.io.IOException;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class ArchiveWarningException extends ArchiveException {
     private static final long serialVersionUID = 2302357394858347366L;

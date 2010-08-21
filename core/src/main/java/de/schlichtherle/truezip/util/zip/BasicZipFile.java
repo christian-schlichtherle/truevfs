@@ -55,7 +55,6 @@ import java.util.zip.ZipException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class BasicZipFile implements Closeable {
 
@@ -573,7 +572,6 @@ public class BasicZipFile implements Closeable {
      * @return A positive value or zero to indicate that this ZIP compatible
      *         file does not have a preamble.
      *
-     * @since TrueZIP 5.1
      */
     public long getPreambleLength() {
         return preamble;
@@ -592,7 +590,6 @@ public class BasicZipFile implements Closeable {
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
      *
-     * @since TrueZIP 5.1
      * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPreambleInputStream() throws IOException {
@@ -605,8 +602,6 @@ public class BasicZipFile implements Closeable {
      *
      * @return A positive value or zero to indicate that this ZIP compatible
      *         file does not have an postamble.
-     *
-     * @since TrueZIP 5.1
      */
     public long getPostambleLength() {
         return postamble;
@@ -625,7 +620,6 @@ public class BasicZipFile implements Closeable {
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
      *
-     * @since TrueZIP 5.1
      * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPostambleInputStream() throws IOException {
@@ -718,7 +712,6 @@ public class BasicZipFile implements Closeable {
      * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
-     * @since TrueZIP 6.4
      */
     protected InputStream getInputStream(
             final String name,

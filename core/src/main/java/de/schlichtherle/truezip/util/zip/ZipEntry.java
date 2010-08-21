@@ -153,8 +153,6 @@ public class ZipEntry implements Cloneable {
      * This method can be called at most once and only if this entry has
      * been created with the {@link #ZipEntry(ZipEntry) copy constructor}
      * or the {@link #clone} method.
-     *
-     * @since TrueZIP 6.0
      */
     protected void setName(final String name) {
         setName0(name);

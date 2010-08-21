@@ -24,7 +24,6 @@ import org.bouncycastle.crypto.BlockCipher;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 3.1
  */
 public interface SeekableBlockCipher extends BlockCipher {
 

@@ -27,7 +27,6 @@ import java.io.IOException;
  * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class ArchiveEntryStreamClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;

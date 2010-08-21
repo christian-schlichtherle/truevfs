@@ -70,14 +70,12 @@ import javax.swing.Icon;
  *      entry name
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public interface ArchiveEntry {
 
     /**
      * The entry name separator as a string.
      *
-     * @since TrueZIP 6.5
      * @see #SEPARATOR_CHAR
      */
     String SEPARATOR = "/";
@@ -85,7 +83,6 @@ public interface ArchiveEntry {
     /**
      * The entry name separator as a character.
      *
-     * @since TrueZIP 6.5
      * @see #SEPARATOR
      */
     char SEPARATOR_CHAR = '/';

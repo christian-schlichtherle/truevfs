@@ -39,7 +39,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 class Type0RaesOutputStream extends RaesOutputStream {
 

@@ -24,7 +24,6 @@ import junit.framework.TestCase;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 public class ULongTest extends TestCase {
 

@@ -39,7 +39,6 @@ import javax.swing.Icon;
  * @see CheckedZipDriver
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class ZipDriver extends AbstractArchiveDriver {
     private static final long serialVersionUID = -7061546656075796996L;

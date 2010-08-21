@@ -33,7 +33,6 @@ import junit.framework.TestCase;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public abstract class ReadOnlyFileTestCase extends TestCase {
 

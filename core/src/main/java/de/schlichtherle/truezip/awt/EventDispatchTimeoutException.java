@@ -21,7 +21,6 @@ package de.schlichtherle.truezip.awt;
  * Thread (EDT).
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.4
  * @version $Id$
  */
 public class EventDispatchTimeoutException extends Exception {

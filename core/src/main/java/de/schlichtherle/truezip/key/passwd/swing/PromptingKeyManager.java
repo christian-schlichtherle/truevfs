@@ -43,7 +43,6 @@ import javax.swing.JOptionPane;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class PromptingKeyManager
         extends de.schlichtherle.truezip.key.PromptingKeyManager {

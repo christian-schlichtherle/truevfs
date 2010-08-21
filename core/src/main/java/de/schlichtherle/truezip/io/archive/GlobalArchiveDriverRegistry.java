@@ -69,7 +69,6 @@ import java.util.logging.Logger;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
 

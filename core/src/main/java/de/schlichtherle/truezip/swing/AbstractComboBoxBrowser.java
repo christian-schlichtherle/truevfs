@@ -49,7 +49,6 @@ import javax.swing.text.JTextComponent;
  * default for a plain {@code JComboBox}).
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.2
  * @version $Id$
  */
 public abstract class AbstractComboBoxBrowser implements Serializable {

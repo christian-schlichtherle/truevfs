@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.tar.TarBZip2Driver;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarBzip2FileTest extends FileTestCase {
 

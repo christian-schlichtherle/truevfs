@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
  * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class FileReader extends InputStreamReader {
 

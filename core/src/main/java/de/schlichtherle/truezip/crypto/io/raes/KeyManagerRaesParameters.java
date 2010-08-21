@@ -46,7 +46,6 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class KeyManagerRaesParameters implements RaesParametersAgent {
 

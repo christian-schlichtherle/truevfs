@@ -30,7 +30,6 @@ import java.util.Enumeration;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public interface OutputArchive {
 

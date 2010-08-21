@@ -22,7 +22,6 @@ package de.schlichtherle.truezip.crypto.io.raes;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class RaesKeyException extends RaesParametersException {
     private static final long serialVersionUID = 1375629384612351398L;

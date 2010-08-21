@@ -22,7 +22,6 @@ package de.schlichtherle.truezip.util;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueVFS 0.1
  */
 public interface Action<T extends Throwable> {
 

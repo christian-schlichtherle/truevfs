@@ -26,7 +26,6 @@ package de.schlichtherle.truezip.key;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class PromptingAesKeyProvider<K extends Cloneable>
         extends PromptingKeyProvider<K>

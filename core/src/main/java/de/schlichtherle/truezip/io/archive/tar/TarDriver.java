@@ -37,7 +37,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarDriver extends AbstractArchiveDriver {
 

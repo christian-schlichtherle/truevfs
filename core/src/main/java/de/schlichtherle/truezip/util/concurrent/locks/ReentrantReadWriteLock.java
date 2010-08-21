@@ -46,7 +46,6 @@ import java.util.logging.Logger;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.2
  */
 public final class ReentrantReadWriteLock implements ReadWriteLock {
 
@@ -98,7 +97,6 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      * @param action The action to run while the write lock is acquired.
      * @throws NullPointerException If {@code action} is {@code null}.
      * @throws Throwable Upon the discretion of {@code action}.
-     * @since TrueVFS 0.1
      */
     public <T extends Throwable> void runWriteLocked(final Action<T> action)
     throws T {

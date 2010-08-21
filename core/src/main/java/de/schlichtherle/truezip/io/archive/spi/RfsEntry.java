@@ -26,7 +26,6 @@ import javax.swing.Icon;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class RfsEntry implements ArchiveEntry {
     private final String entryName;

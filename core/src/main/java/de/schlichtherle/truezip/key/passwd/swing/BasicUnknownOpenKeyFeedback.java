@@ -31,7 +31,6 @@ package de.schlichtherle.truezip.key.passwd.swing;
  * This issue is fixed in JSE 1.5.0_07 (and probably earlier versions).
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.2
  * @version $Id$
  */
 public class BasicUnknownOpenKeyFeedback extends BasicUnknownKeyFeedback {

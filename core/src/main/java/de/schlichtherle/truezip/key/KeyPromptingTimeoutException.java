@@ -21,7 +21,6 @@ package de.schlichtherle.truezip.key;
  * protected resource has timed out.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.4
  * @version $Id$
  */
 public class KeyPromptingTimeoutException extends UnknownKeyException {

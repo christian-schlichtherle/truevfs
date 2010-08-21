@@ -40,7 +40,6 @@ import javax.swing.JComboBox;
  * </pre>
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.2
  * @version $Id$
  */
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser {

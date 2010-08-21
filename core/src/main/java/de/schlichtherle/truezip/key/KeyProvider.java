@@ -98,7 +98,6 @@ package de.schlichtherle.truezip.key;
  * @see KeyManager
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0
  * @version $Id$
  */
 public interface KeyProvider<K extends Cloneable> {

@@ -58,7 +58,6 @@ import javax.swing.Icon;
  * @see OdfOutputArchive
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class OdfDriver extends JarDriver {
     private static final long serialVersionUID = 1586715698610542033L;

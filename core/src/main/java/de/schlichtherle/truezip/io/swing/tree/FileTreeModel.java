@@ -41,7 +41,6 @@ import javax.swing.tree.TreePath;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public class FileTreeModel implements TreeModel {
 
@@ -141,7 +140,6 @@ public class FileTreeModel implements TreeModel {
      *         {@code null} and {@code comparator} isn't a
      *         {@code Comparator} for {@code java.io.File} or super
      *         class instances.
-     * @since TrueZIP 6.5.4 (this constructor)
      */
     public FileTreeModel(
             final java.io.File root,

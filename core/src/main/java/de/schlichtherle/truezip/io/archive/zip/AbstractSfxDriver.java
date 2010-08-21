@@ -27,7 +27,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 abstract public class AbstractSfxDriver extends ZipDriver {
     private static final long serialVersionUID = -656184651651654635L;
