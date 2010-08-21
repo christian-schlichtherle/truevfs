@@ -23,7 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * A set of canonicalized strings in natural order.
+ * A set of canonicalized strings in natural sort order.
  * A string is canonicalized by the template method {@link #canonicalize},
  * which should get overridden by subclasses.
  * <p>
@@ -38,7 +38,7 @@ import java.util.TreeMap;
  * list and may be listed in arbitrary order.
  * However, string lists have a canonical form, too:
  * A string list in canonical form (or <i>canonical string list</i> for short)
- * is a string list which contains only canonical strings in natural order
+ * is a string list which contains only canonical strings in natural sort order
  * and does not contain any duplicates (so it's actually a set).
  * <p>
  * Unless otherwise documented, all {@link java.util.Set} methods work on the
@@ -338,7 +338,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
     //
 
     /**
-     * Returns the canonical string list representation of this set.
+     * Returns the canonical string representation of this set.
      * If this string set is empty, an empty string is returned.
      */
     @Override

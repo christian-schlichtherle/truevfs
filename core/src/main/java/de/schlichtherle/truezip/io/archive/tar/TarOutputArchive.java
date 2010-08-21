@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.tar;
 
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.util.Temps;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;

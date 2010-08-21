@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.zip;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
 

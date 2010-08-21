@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.spi.InputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.swing.Icon;

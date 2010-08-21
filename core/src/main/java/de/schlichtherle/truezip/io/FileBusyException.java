@@ -16,9 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.spi.*;
-
-import java.io.*;
+import java.io.FileNotFoundException;
 
 /**
  * Thrown if an archive entry cannot get accessed because either
@@ -50,8 +48,8 @@ public class FileBusyException extends FileNotFoundException {
 
     /**
      * For use by
-     * {@link de.schlichtherle.truezip.io.archive.spi.InputArchiveBusyException} and
-     * {@link de.schlichtherle.truezip.io.archive.spi.OutputArchiveBusyException} only.
+     * {@link de.schlichtherle.truezip.io.archive.driver.InputArchiveBusyException} and
+     * {@link de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException} only.
      */
     protected FileBusyException(final String msg) {
         super(msg);

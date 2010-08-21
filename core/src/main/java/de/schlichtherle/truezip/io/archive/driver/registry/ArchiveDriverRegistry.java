@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.registry;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
 import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.io.Serializable;

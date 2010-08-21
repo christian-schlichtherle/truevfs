@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.zip;
 
 import de.schlichtherle.truezip.io.InputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.zip.BasicZipFile;
 import java.io.FileNotFoundException;

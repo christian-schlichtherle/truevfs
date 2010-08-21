@@ -42,18 +42,30 @@ public class SuffixSetTest extends TestCase {
         empty = new SuffixSet("");
 
         sets = new SuffixSet[] {
-            new SuffixSet("suffix"),
-            new SuffixSet(".suffix"),
-            new SuffixSet("SUFFIX"),
-            new SuffixSet(".SUFFIX"),
-            new SuffixSet("SuFfIx"),
-            new SuffixSet(".sUfFiX"),
-            new SuffixSet("suffix|.suffix"),
-            new SuffixSet("SUFFIX|.SUFFIX"),
-            new SuffixSet("SuFfIx|.sUfFiX"),
-            new SuffixSet("suffix|.suffix|SUFFIX|.SUFFIX"),
-            new SuffixSet("suffix|.suffix|SUFFIX|.SUFFIX|SuFfIx|.sUfFiX"),
-            new SuffixSet("suffix||.suffix||SUFFIX||.SUFFIX||SuFfIx||.sUfFiX"),
+            new SuffixSet("suffix1|suffix2"),
+            new SuffixSet("suffix2|suffix1"),
+            new SuffixSet(".suffix1|.suffix2"),
+            new SuffixSet(".suffix2|.suffix1"),
+            new SuffixSet("SUFFIX1|SUFFIX2"),
+            new SuffixSet("SUFFIX2|SUFFIX1"),
+            new SuffixSet(".SUFFIX1|.SUFFIX2"),
+            new SuffixSet(".SUFFIX2|.SUFFIX1"),
+            new SuffixSet("SuFfIx1|SuFfIx2"),
+            new SuffixSet("SuFfIx2|SuFfIx1"),
+            new SuffixSet(".sUfFiX1|.sUfFiX2"),
+            new SuffixSet(".sUfFiX2|.sUfFiX1"),
+            new SuffixSet("suffix1|.suffix2|suffix2|.suffix1"),
+            new SuffixSet("suffix2|.suffix1|suffix1|.suffix2"),
+            new SuffixSet("SUFFIX1|.SUFFIX2|SUFFIX2|.SUFFIX1"),
+            new SuffixSet("SUFFIX2|.SUFFIX1|SUFFIX1|.SUFFIX2"),
+            new SuffixSet("SuFfIx1|.sUfFiX2|SuFfIx2|.sUfFiX1"),
+            new SuffixSet("SuFfIx2|.sUfFiX1|SuFfIx1|.sUfFiX2"),
+            new SuffixSet("suffix1|.suffix1|SUFFIX1|.SUFFIX1|suffix2|.suffix2|SUFFIX2|.SUFFIX2"),
+            new SuffixSet("suffix2|.suffix2|SUFFIX2|.SUFFIX2|suffix1|.suffix1|SUFFIX1|.SUFFIX1"),
+            new SuffixSet("suffix1|.suffix1|SUFFIX1|.SUFFIX1|SuFfIx1|.sUfFiX1|suffix2|.suffix2|SUFFIX2|.SUFFIX2|SuFfIx2|.sUfFiX2"),
+            new SuffixSet("suffix2|.suffix2|SUFFIX2|.SUFFIX2|SuFfIx2|.sUfFiX2|suffix1|.suffix1|SUFFIX1|.SUFFIX1|SuFfIx1|.sUfFiX1"),
+            new SuffixSet("suffix1||.suffix1||SUFFIX1||.SUFFIX1||SuFfIx1||.sUfFiX1||suffix2||.suffix2||SUFFIX2||.SUFFIX2||SuFfIx2||.sUfFiX2"),
+            new SuffixSet("suffix2||.suffix2||SUFFIX2||.SUFFIX2||SuFfIx2||.sUfFiX2||suffix1||.suffix1||SUFFIX1||.SUFFIX1||SuFfIx1||.sUfFiX1"),
         };
     }
 
@@ -69,9 +81,8 @@ public class SuffixSetTest extends TestCase {
     public void testIsEmpty() {
         assertTrue(empty.isEmpty());
 
-        for (int i = 0; i < sets.length; i++) {
+        for (int i = 0; i < sets.length; i++)
             assertFalse(sets[i].isEmpty());
-        }
     }
 
     public void testCanonicalIteratorAndContains() {
@@ -101,19 +112,15 @@ public class SuffixSetTest extends TestCase {
     }
 
     public void testAddAll() {
-        for (int i = 0; i < sets.length; i++) {
-            for (int j = 0; j < sets.length ; j++) {
+        for (int i = 0; i < sets.length; i++)
+            for (int j = 0; j < sets.length ; j++)
                 assertFalse(sets[i].addAll(sets[j]));
-            }
-        }
     }
 
     public void testRetainAll() {
-        for (int i = 0; i < sets.length; i++) {
-            for (int j = 0; j < sets.length ; j++) {
+        for (int i = 0; i < sets.length; i++)
+            for (int j = 0; j < sets.length ; j++)
                 assertFalse(sets[i].retainAll(sets[j]));
-            }
-        }
     }
 
     public void testRemoveAll() {
@@ -138,17 +145,21 @@ public class SuffixSetTest extends TestCase {
     public void testToString() {
         for (int i = 0; i < sets.length; i++) {
             final SuffixSet set = sets[i];
-            assertTrue("suffix".equals(set.toString()));
+            assertTrue("suffix1|suffix2".equals(set.toString()));
         }
     }
 
     public void testToRegex() {
         for (int i = 0; i < sets.length; i++) {
             final SuffixSet set = sets[i];
-            assertTrue(Pattern.matches(set.toRegex(), ".suffix"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.SUFFIX"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.suffix"));
-            assertTrue(Pattern.matches(set.toRegex(), "a.b.c.SUFFIX"));
+            assertTrue(Pattern.matches(set.toRegex(), ".suffix1"));
+            assertTrue(Pattern.matches(set.toRegex(), ".suffix2"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.SUFFIX1"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.SUFFIX2"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.b.suffix1"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.b.suffix2"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.b.c.SUFFIX1"));
+            assertTrue(Pattern.matches(set.toRegex(), "a.b.c.SUFFIX2"));
         }
     }
 }

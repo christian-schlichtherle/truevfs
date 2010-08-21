@@ -17,15 +17,15 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 
 /**
  * Detects archive files solely by scanning file paths -
  * usually by testing for file name suffixes like <i>.zip</i> or the
  * like.
- * Whenever an archive file is recognized, the
- * {@link #getArchiveDriver(String)} method returns an instance of the
- * {@link ArchiveDriver} interface which allows to access it.
+ * If the method {@link #getArchiveDriver(String)} detects an archive file, it
+ * returns an instance of the {@link ArchiveDriver} interface for subsequent
+ * access to it.
  * <p>
  * {@code ArchiveDetector} instances are assigned to {@code File}
  * instances in the following way:
@@ -40,8 +40,8 @@ import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
  *     Both the class property and the predefined instance can be customized.
  * </ol>
  * <p>
- * An archive file which has been recognized by an archive detector is said
- * to be a <i>prospective archive file</i>.
+ * An archive file which has been recognized by an {@code ArchiveDetector} is
+ * said to be a <i>prospective archive file</i>.
  * On the first read or write access to a prospective archive file, TrueZIP
  * checks its <i>true state</i> in cooperation with the {@link ArchiveDriver}.
  * If the true state of the file turns out to be actually a directory or not
@@ -59,17 +59,16 @@ import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
  * This class provides a registry for archive file suffixes and archive drivers
  * which can be easily customized via configuration files or Java code.
  * <p>
- * Since TrueZIP 6.4, although it's not required, it's recommended for
- * implementations to implement the {@link java.io.Serializable} interface,
- * too, so that {@link de.schlichtherle.truezip.io.File} instances which use it can
- * be serialized.
- * 
+ * Although not strictly required, it's recommended for implementations to
+ * implement the {@link java.io.Serializable} interface too, so that
+ * {@link File} instances which use it can be serialized.
+ *
  * @see ArchiveDriver
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveDetector
-        extends de.schlichtherle.truezip.io.archive.ArchiveDetector,
+        extends de.schlichtherle.truezip.io.archive.detector.ArchiveDetector,
                 FileFactory {
 
     /**
@@ -77,42 +76,35 @@ public interface ArchiveDetector
      * This can be used as the end of a chain of
      * {@code DefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
-     *
-     * @see DefaultArchiveDetector
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector NULL = new DefaultArchiveDetector(""); // or null
-    
+
     /**
-     * Recognizes the archive file suffixes defined by the key
-     * {@code DEFAULT} in the configuration file(s).
-     * If only TrueZIP's default configuration file is used, then this is set
-     * so that no additional JARs are required on the runtime class path.
+     * Recognizes the archive file suffixes registered in the global archive
+     * driver registry which have been defined by the key {@code DEFAULT}
+     * in the configuration file(s).
      * <p>
-     * This archive detector is initially returned by
-     * {@link File#getDefaultArchiveDetector}.
-     * <p>
-     * Note that the actual set of archive file suffixes detected by this
-     * instance may be extended without prior notice in future releases.
+     * If only TrueZIP's original configuration file is used, then this is
+     * defined so that no additional JARs are required on the runtime class
+     * path.
+     * Please check the <a href="{@docRoot}/overview.html#defaults">Overview</a>
+     * to see which archive file suffixes are detected by default.
      *
-     * @see DefaultArchiveDetector How Configuration Files are located and
-     *      processed by the DefaultArchiveDetector class
+     * @see GlobalArchiveDriverRegistry
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector DEFAULT = new DefaultArchiveDetector(
             GlobalArchiveDriverRegistry.INSTANCE.defaultSuffixes);
 
     /**
-     * Recognizes all archive file suffixes registerd in the global registry
-     * by the configuration file(s).
-     * This requires <a href="{@docRoot}/overview-summary.html#defaults">additional JARs</a>
-     * on the runtime class path.
+     * Recognizes all archive file suffixes registered in the global archive
+     * driver registry by the configuration file(s).
      * <p>
-     * Note that the actual set of archive file suffixes detected by this
-     * instance may be extended without prior notice in future releases.
+     * This requires <a href="{@docRoot}/overview.html#defaults">additional JARs</a>
+     * on the runtime class path.
      *
-     * @see DefaultArchiveDetector How Configuration Files are located and
-     *      processed by the DefaultArchiveDetector class
+     * @see GlobalArchiveDriverRegistry
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector ALL = new DefaultArchiveDetector(

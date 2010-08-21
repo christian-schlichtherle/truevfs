@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.zip;
 
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.archive.tar;
 
 import de.schlichtherle.truezip.io.InputArchiveMetaData;
 import de.schlichtherle.truezip.io.InputIOException;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.InputArchive;
-import de.schlichtherle.truezip.io.archive.spi.TransientIOException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;

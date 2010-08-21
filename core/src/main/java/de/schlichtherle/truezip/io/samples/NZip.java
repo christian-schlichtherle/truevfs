@@ -87,7 +87,7 @@ public class NZip extends CommandLineUtility {
      * which shall be used as the
      * {@link File#getDefaultArchiveDetector default archive detector} while
      * a command is running.
-     * The {@link de.schlichtherle.truezip.io.archive.spi.ArchiveDriver}s returned
+     * The {@link de.schlichtherle.truezip.io.archive.driver.ArchiveDriver}s returned
      * by the archive detector should use their default charsets.
      * <p>
      * Note that the archive detector which is returned by the implementation
@@ -105,7 +105,7 @@ public class NZip extends CommandLineUtility {
 
     /**
      * May be overridden by subclasses to create the {@link ArchiveDetector}
-     * which returns {@link de.schlichtherle.truezip.io.archive.spi.ArchiveDriver}s
+     * which returns {@link de.schlichtherle.truezip.io.archive.driver.ArchiveDriver}s
      * which should use the specified charset if supported.
      * This is used by selected commands in this class.
      * <p>

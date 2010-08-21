@@ -16,18 +16,12 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
-import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Locale;
+import java.io.FileNotFoundException;
+import java.net.URI;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * An {@link ArchiveDetector} which matches file paths against a pattern of
@@ -98,55 +92,25 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#ALL
  */
 public class DefaultArchiveDetector
-        extends AbstractArchiveDetector
-        implements Serializable {
-
-    private static final long serialVersionUID = 848158760183179884L;
-
-    /**
-     * The local registry for archive file suffixes and archive drivers.
-     * This could actually be the global registry
-     * ({@link GlobalArchiveDriverRegistry#INSTANCE}), filtered by a custom
-     * {@link #list}.
-     */
-    private final ArchiveDriverRegistry registry;
-
-    /**
-     * The canonical suffix list recognized by this archive detector.
-     * This list is used to filter the registered archive file suffixes in
-     * {@link #registry}.
-     */
-    private final String list;
-
-    /**
-     * The thread local matcher used to match archive file suffixes.
-     * This field should be considered final!
-     */
-    private transient ThreadLocalMatcher matcher; // never transmit this over the wire!
+        extends de.schlichtherle.truezip.io.archive.detector.DefaultArchiveDetector
+        implements ArchiveDetector {
+    private static final long serialVersionUID = 848158760326123684L;
 
     /**
      * Creates a new {@code DefaultArchiveDetector} by filtering the
-     * global registry for all canonicalized suffixes in {@code list}.
-     * 
+     * {@link GlobalArchiveDriverRegistry} for all canonicalized suffixes in
+     * the {@code list}.
+     *
      * @param list A list of suffixes which shall identify prospective
-     *        archive files. May be {@code null} or empty, but must
-     *        obeye the usual syntax.
-     * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
+     *        archive files.
+     *        May be {@code null} or empty.
+     * @see SuffixSet Syntax definition for suffix lists.
      * @throws IllegalArgumentException If any of the suffixes in the suffix
      *         list names a suffix for which no {@link ArchiveDriver} is
-     *         configured in the global registry.
+     *         configured in the {@link GlobalArchiveDriverRegistry}.
      */
-    public DefaultArchiveDetector(final String list) {
-        registry = GlobalArchiveDriverRegistry.INSTANCE;
-        final SuffixSet set = new SuffixSet(list);
-        final SuffixSet all = registry.suffixes();
-        if (set.retainAll(all)) {
-            final SuffixSet unknown = new SuffixSet(list);
-            unknown.removeAll(all);
-            throw new IllegalArgumentException("\"" + unknown + "\" (no archive driver installed for these suffixes)");
-        }
-        this.list = set.toString();
-        matcher = new ThreadLocalMatcher(set.toRegex());
+    public DefaultArchiveDetector(String list) {
+        super(list);
     }
 
     /**
@@ -155,7 +119,7 @@ public class DefaultArchiveDetector
      * DefaultArchiveDetector(ArchiveDetector.NULL, list, driver)}.
      */
     public DefaultArchiveDetector(String list, ArchiveDriver driver) {
-        this(NULL, list, driver);
+        super(list, driver);
     }
 
     /**
@@ -163,18 +127,19 @@ public class DefaultArchiveDetector
      * decorating the configuration of {@code delegate} with
      * mappings for all canonicalized suffixes in {@code list} to
      * {@code driver}.
-     * 
+     *
      * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
-     * @param list A non-null, non-empty archive file suffix list, obeying
-     *        the usual syntax.
+     * @param list A list of suffixes which shall identify prospective
+     *        archive files.
+     *        Must not be {@code null} and must not be empty.
+     * @see SuffixSet Syntax definition for suffix lists.
      * @param driver The archive driver to map for the suffix list.
      *        This must either be an archive driver instance or
      *        {@code null}.
      *        A {@code null} archive driver may be used to shadow a
      *        mapping for the same archive driver in {@code delegate},
      *        effectively removing it.
-     * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
      * @throws NullPointerException If {@code delegate} or
      *         {@code list} is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
@@ -185,19 +150,19 @@ public class DefaultArchiveDetector
             DefaultArchiveDetector delegate,
             String list,
             ArchiveDriver driver) {
-        this(delegate, new Object[] { list, driver });
+        super(delegate, list, driver);
     }
 
     /**
      * Creates a new {@code DefaultArchiveDetector} by
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
-     * 
+     *
      * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
      * @param config An array of suffix lists and archive driver IDs.
      *        Each key in this map must be a non-null, non-empty archive file
-     *        suffix list, obeying the usual syntax.
+     *        suffix list.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, a string with the fully qualified name name of
      *        an archive driver class, or {@code null}.
@@ -209,24 +174,24 @@ public class DefaultArchiveDetector
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
-     * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
+     * @see SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
             DefaultArchiveDetector delegate,
             Object[] config) {
-        this(delegate, toMap(config));
+        super(delegate, config);
     }
 
     /**
      * Creates a new {@code DefaultArchiveDetector} by
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
-     * 
+     *
      * @param delegate The {@code DefaultArchiveDetector} which's
      *        configuration is to be virtually inherited.
      * @param config A map of suffix lists and archive drivers.
      *        Each key in this map must be a non-null, non-empty archive file
-     *        suffix list, obeying the usual syntax.
+     *        suffix list.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, a string with the fully qualified name name of
      *        an archive driver class, or {@code null}.
@@ -238,76 +203,62 @@ public class DefaultArchiveDetector
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
-     * @see DefaultArchiveDetector Syntax Definition for Suffix Lists
+     * @see SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
-            final DefaultArchiveDetector delegate,
-            final Map config) {
-        registry = new ArchiveDriverRegistry(delegate.registry, config);
-        final SuffixSet set = registry.decorate(new SuffixSet(delegate.list)); // may be a subset of delegate.registry.decorate(new SuffixSet())!
-        list = set.toString();
-        matcher = new ThreadLocalMatcher(set.toRegex());
+            DefaultArchiveDetector delegate,
+            Map config) {
+        super(delegate, config);
     }
 
-    private void readObject(final ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        matcher = new ThreadLocalMatcher(new SuffixSet(list).toRegex());
+    public File createFile(java.io.File blueprint) {
+        return new File(blueprint, this);
     }
 
-    private static Map toMap(final Object[] config) {
-        if (config == null)
-            return null;
 
-        final Map map = new LinkedHashMap((int) (config.length / .75) + 1); // order may be important!
-        for (int i = 0, l = config.length; i < l; i++)
-            map.put(config[i], config[++i]);
-
-        return map;
+    public File createFile(java.io.File delegate, File innerArchive) {
+        return new File(delegate, innerArchive, this);
     }
 
-    /**
-     * Looks up a registered archive driver for the given (file) path by
-     * matching it against the set of configured archive file suffixes.
-     * An archive driver is looked up in the registry as follows:
-     * <ol>
-     * <li>If the registry holds a string, it's supposed to be the fully
-     *     qualified class name of an {@code ArchiveDriver}
-     *     implementation. The class will be loaded and stored in the registry.
-     * <li>If the registry then holds a class instance, it's instantiated
-     *     with its no-arguments constructor, cast to the
-     *     {@code ArchiveDriver} type and stored in the registry.
-     * <li>If the registry then holds an instance of an
-     *     {@code ArchiveDriver} implementation, it's returned.
-     * <li>Otherwise, {@code null} is returned.
-     * </ol>
-     *
-     * @throws RuntimeException A subclass is thrown if loading or
-     *         instantiating an archive driver class fails.
-     */
-    public ArchiveDriver getArchiveDriver(final String path) {
-        final Matcher m = matcher.reset(path);
-        if (!m.matches())
-            return null;
-        final ArchiveDriver driver = registry.getArchiveDriver(
-                m.group(1).toLowerCase(Locale.ENGLISH));
-        assert driver != null : "archive driver does not exist for a recognized suffix";
-        return driver;
+
+    public File createFile(
+            File blueprint,
+            java.io.File delegate,
+            File enclArchive) {
+        return new File(blueprint, delegate, enclArchive);
     }
 
-    /**
-     * Returns the set of archive file suffixes recognized by this archive
-     * detector in canonical form.
-     * 
-     * @return Either {@code &quot;&quot;} to indicate an empty set or
-     *         a string of the form {@code &quot;suffix[|suffix]*&quot;},
-     *         where {@code suffix} is a combination of lower case
-     *         letters which does <em>not</em> start with a dot.
-     *         The string never contains empty or duplicated suffixes and the
-     *         suffixes are sorted in natural order.
-     * @see #DefaultArchiveDetector(String)
-     */
-    public String getSuffixes() {
-        return list; // canonical form
+
+    public File createFile(java.io.File parent, String child) {
+        return new File(parent, child, this);
+    }
+
+
+    public File createFile(String pathName) {
+        return new File(pathName, this);
+    }
+
+
+    public File createFile(String parent, String child) {
+        return new File(parent, child, this);
+    }
+
+
+    public File createFile(URI uri) {
+        return new File(uri, this);
+    }
+
+
+    public FileInputStream createFileInputStream(java.io.File file)
+    throws FileNotFoundException {
+        return new FileInputStream(file);
+    }
+
+
+    public FileOutputStream createFileOutputStream(
+            java.io.File file,
+            boolean append)
+    throws FileNotFoundException {
+        return new FileOutputStream(file, append);
     }
 }

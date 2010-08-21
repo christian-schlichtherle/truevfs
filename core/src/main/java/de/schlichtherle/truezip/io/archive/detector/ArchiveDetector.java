@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive;
+package de.schlichtherle.truezip.io.archive.detector;
 
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 
 /**
  * Detects archive files solely by scanning file paths -

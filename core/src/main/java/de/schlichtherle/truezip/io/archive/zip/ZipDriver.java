@@ -17,11 +17,11 @@
 package de.schlichtherle.truezip.io.archive.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.spi.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.spi.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.InputArchive;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
-import de.schlichtherle.truezip.io.archive.spi.OutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;
