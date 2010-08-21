@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.zip;
 
 import de.schlichtherle.truezip.io.util.Paths;
-import de.schlichtherle.truezip.util.zip.ZipEntry;
 
 /**
  * A factory for {@link ZipEntry}s.
