@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.net.URI;
 import junit.framework.TestCase;
 
-import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
-
 /**
  * Tests archive type independent features of the {@link File} class.
  *
@@ -29,6 +27,9 @@ import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
  * @version $Id$
  */
 public class GeneralFileTest extends TestCase {
+
+    // TODO: Harmonize the notation of the root directory!
+    private static final String ROOT = "";
 
     private String suffix;
 
@@ -70,13 +71,13 @@ public class GeneralFileTest extends TestCase {
         // One ZIP file in path.
         file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "file:/a " + suffix + "/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -96,13 +97,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -122,13 +123,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -148,13 +149,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("b " + suffix + "", file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("b " + suffix + "", file.getEnclEntryName());
 
@@ -162,13 +163,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
         file = new File(new URI("jar", "file:/a " + suffix + "!/b " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -176,13 +177,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 
@@ -191,13 +192,13 @@ public class GeneralFileTest extends TestCase {
 
         file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 
         file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT_NAME, file.getInnerEntryName());
+        assertSame(ROOT, file.getInnerEntryName());
         assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
         assertEquals("c " + suffix + "", file.getEnclEntryName());
 

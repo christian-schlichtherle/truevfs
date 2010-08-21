@@ -38,7 +38,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -98,17 +97,8 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  */
 abstract class ArchiveController implements Archive {
 
-    //
-    // Static fields.
-    //
-
-    /*private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.ArchiveController";
-    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);*/
-
-    //
-    // Instance fields.
-    //
+    // TODO: Harmonize the notation of the root directory!
+    static final String ROOT = "";
 
     /**
      * A weak reference to this archive controller.
@@ -254,7 +244,7 @@ abstract class ArchiveController implements Archive {
      * virtual root directory within this controller.
      */
     static boolean isRoot(String entryName) {
-        return ROOT_NAME == entryName; // possibly assigned by File.init(...), so using == is OK!
+        return ROOT == entryName; // possibly assigned by File.init(...), so using == is OK!
     }
 
     /**

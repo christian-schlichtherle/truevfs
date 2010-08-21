@@ -41,8 +41,6 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
-
 /**
  * This archive controller implements the mounting/unmounting strategy
  * by performing a full update of the target archive file.
@@ -253,7 +251,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
         assert entryName != null;
-        assert !ROOT_NAME.equals(entryName);
+        assert !ROOT.equals(entryName);
         assert inFile == null;
 
         try {
@@ -321,7 +319,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         assert controller != null;
         assert controller.readLock().isLockedByCurrentThread() || controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
-        assert !ROOT_NAME.equals(entryName);
+        assert !ROOT.equals(entryName);
         assert inFile == null;
 
         final ArchiveFileSystem controllerFileSystem;
@@ -1040,7 +1038,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
         assert entryName != null;
-        assert !ROOT_NAME.equals(entryName);
+        assert !ROOT.equals(entryName);
 
         controller.runWriteLocked(new Action<IOException>() {
             public void run() throws IOException {
@@ -1056,7 +1054,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         assert controller != null;
         assert controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
-        assert !ROOT_NAME.equals(entryName);
+        assert !ROOT.equals(entryName);
 
         // Write the updated output archive file as an entry
         // to its enclosing archive file, preserving the
