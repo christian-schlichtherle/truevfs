@@ -20,27 +20,28 @@ package de.schlichtherle.truezip.io.archive.controller;
 import java.io.IOException;
 
 /**
- * Represents a chain of exceptions thrown by the {@link File#umount} and
- * {@link File#update} methods to indicate an error condition which
+ * Represents a chain of exceptions thrown to indicate an error condition which
  * does <em>not</em> incur loss of data and may be ignored.
- * 
- * <p>Both methods catch any exceptions occuring throughout their processing
- * and store them in an exception chain until all archive files have been
- * updated.
- * Finally, if the exception chain is not empty, it's reordered and thrown
- * so that if its head is an instance of {@code ArchiveWarningException},
- * only instances of this class or its subclasses are in the chain, but no
- * instances of {@code ArchiveException} or its subclasses (except
- * {@code ArchiveWarningException}, of course).
+ *
+ * <p>Some public methods in this package operate on multiple archive files
+ * consecutively. To ensure that all archive files are processed, they catch
+ * any exception occuring throughout their processing of an archive file and
+ * store it in an exception chain of this type before continuing with the next
+ * archive file.
+ * Finally, if all archive files have been processed and the exception chain
+ * is not empty, it's reordered and thrown so that if its head is an instance
+ * of {@code ArchiveControllerWarningException}, only instances of this class or its
+ * subclasses are in the chain, but no instances of {@code ArchiveControllerException}
+ * or its subclasses (except {@code ArchiveControllerWarningException}, of course).
  *
  * <p>This enables client applications to do a simple case distinction with a
  * try-catch-block like this to react selectively:</p>
- * <pre>{@code 
+ * <pre>{@code
  * try {
- *     File.umount();
- * } catch (ArchiveWarningException warning) {
+ *     ArchiveControllers.umount("", false, true, false, true, true);
+ * } catch (ArchiveControllerWarningException warning) {
  *     // Only warnings have occured and no data has been lost - ignore this.
- * } catch (ArchiveException error) {
+ * } catch (ArchiveControllerException error) {
  *     // Some data has been lost - panic!
  *     error.printStackTrace();
  * }
@@ -49,27 +50,27 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveWarningException extends ArchiveException {
+public class ArchiveControllerWarningException extends ArchiveControllerException {
     private static final long serialVersionUID = 2302357394858347366L;
     
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(
-            ArchiveException priorException,
+    public ArchiveControllerWarningException(
+            ArchiveControllerException priorException,
             String message) {
         super(priorException, message);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(
-            ArchiveException priorException,
+    public ArchiveControllerWarningException(
+            ArchiveControllerException priorException,
             String message,
             IOException cause) {
         super(priorException, message, cause);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(
-            ArchiveException priorException,
+    public ArchiveControllerWarningException(
+            ArchiveControllerException priorException,
             IOException cause) {
         super(priorException, cause);
     }

@@ -22,9 +22,6 @@ import java.io.IOException;
  * Thrown if an input or output stream for an archive entry has been forced to
  * close when the archive file was (explicitly or implicitly) unmounted.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see File#umount
- * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
  */

@@ -17,13 +17,14 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
+import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.JointEnumeration;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             setSize(entry, srcEntry.getSize()); // data may be compressed!
         
         if (isTargetBusy()) {
-            final java.io.File temp = Temps.createTempFile(TEMP_FILE_PREFIX);
+            final File temp = Temps.createTempFile(TEMP_FILE_PREFIX);
             return new TempEntryOutputStream(entry, srcEntry, temp);
         }
         return new EntryOutputStream(entry, srcEntry);
@@ -177,14 +178,14 @@ public class MultiplexedOutputArchive implements OutputArchive {
      */
     private class TempEntryOutputStream extends java.io.FileOutputStream {
         private final ArchiveEntry entry, srcEntry;
-        private final java.io.File temp;
+        private final File temp;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         private TempEntryOutputStream(
                 final ArchiveEntry entry,
                 final ArchiveEntry srcEntry,
-                final java.io.File temp)
+                final File temp)
         throws IOException {
             super(temp);
             this.entry = entry;
@@ -238,14 +239,14 @@ public class MultiplexedOutputArchive implements OutputArchive {
             try {
                 final ArchiveEntry entry = tempOut.entry;
                 final ArchiveEntry srcEntry = tempOut.srcEntry;
-                final java.io.File temp = tempOut.temp;
+                final File temp = tempOut.temp;
                 try {
                     final InputStream in = new java.io.FileInputStream(temp);
                     try {
                         final OutputStream out = target.getOutputStream(
                                 entry, srcEntry);
                         try {
-                            File.cat(in, out);
+                            Streams.cat(in, out);
                         } finally {
                             out.close();
                         }

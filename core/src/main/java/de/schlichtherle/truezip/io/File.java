@@ -18,7 +18,10 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -1107,7 +1110,7 @@ public class File extends java.io.File {
      * umount(false, true, false, true)}.
      */
     public static void umount()
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("", false, true, false, true, true);
     }
 
@@ -1116,7 +1119,7 @@ public class File extends java.io.File {
      * umount(false, closeStreams, false, closeStreams)}.
      */
     public static void umount(boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("",
                 false, closeStreams,
                 false, closeStreams,
@@ -1187,7 +1190,7 @@ public class File extends java.io.File {
      *         because the application is using an open stream.
      *         No data is lost and the archive file can still get updated by
      *         calling this method again.
-     * @throws ArchiveException If any error conditions occur throughout the
+     * @throws ArchiveControllerException If any error conditions occur throughout the
      *         course of this method which imply loss of data.
      *         This usually means that at least one of the archive files
      *         has been created externally and was corrupted or it cannot
@@ -1204,7 +1207,7 @@ public class File extends java.io.File {
     public static void umount(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("",
                 waitInputStreams, closeInputStreams,
                 waitOutputStreams, closeOutputStreams,
@@ -1216,7 +1219,7 @@ public class File extends java.io.File {
      * umount(archive, false, true, false, true)}.
      */
     public static void umount(File archive)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         umount(archive, false, true, false, true);
     }
 
@@ -1225,7 +1228,7 @@ public class File extends java.io.File {
      * umount(archive, false, closeStreams, false, closeStreams)}.
      */
     public static void umount(File archive, boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         umount(archive, false, closeStreams, false, closeStreams);
     }
 
@@ -1255,7 +1258,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
@@ -1271,7 +1274,7 @@ public class File extends java.io.File {
      * update(false, true, false, true)}.
      */
     public static void update()
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("",
                 false, true,
                 false, true,
@@ -1283,7 +1286,7 @@ public class File extends java.io.File {
      * update(false, closeStreams, false, closeStreams)}.
      */
     public static void update(boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("",
                 false, closeStreams,
                 false, closeStreams,
@@ -1311,7 +1314,7 @@ public class File extends java.io.File {
     public static void update(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         ArchiveControllers.umount("",
                 waitInputStreams, closeInputStreams,
                 waitOutputStreams, closeOutputStreams,
@@ -1323,7 +1326,7 @@ public class File extends java.io.File {
      * update(archive, false, true, false, true)}.
      */
     public static void update(File archive)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         update(archive, false, true, false, true);
     }
 
@@ -1332,7 +1335,7 @@ public class File extends java.io.File {
      * update(archive, false, closeStreams, false, closeStreams)}.
      */
     public static void update(File archive, boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         update(archive, false, closeStreams, false, closeStreams);
     }
 
@@ -1356,7 +1359,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
@@ -2772,7 +2775,7 @@ public class File extends java.io.File {
                 try {
                     umount(this);
                     umount((File) dst);
-                } catch (ArchiveException ex) {
+                } catch (ArchiveControllerException ex) {
                     return false;
                 }
                 return delegate.renameTo(dst);

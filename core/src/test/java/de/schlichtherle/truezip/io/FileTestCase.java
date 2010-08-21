@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
@@ -150,7 +150,7 @@ public abstract class FileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (ArchiveException ignored) {
+        } catch (ArchiveControllerException ignored) {
             // You should never (!) ignore all exceptions thrown by this method.
             // The reason we do it here is that they are usually after effects
             // of failed tests and we don't want any exception from the tests

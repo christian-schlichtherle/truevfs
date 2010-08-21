@@ -16,10 +16,11 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.util.InputException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -607,14 +608,14 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     }
 
     void umount(
-            final ArchiveException exceptionChain,
+            final ArchiveControllerException exceptionChain,
             final boolean waitInputStreams,
             final boolean closeInputStreams,
             final boolean waitOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount,
             final boolean reassemble)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert closeInputStreams || !closeOutputStreams; // closeOutputStreams => closeInputStreams
         assert !umount || reassemble; // umount => reassemble
         assert writeLock().isLockedByCurrentThread();
@@ -639,7 +640,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                     waitInputStreams, closeInputStreams,
                     waitOutputStreams, closeOutputStreams,
                     umount, reassemble);
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
         }
@@ -647,15 +648,15 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     }
 
     private void umount0(
-            final ArchiveException exceptionChain,
+            final ArchiveControllerException exceptionChain,
             final boolean waitInputStreams,
             final boolean closeInputStreams,
             final boolean waitOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount,
             final boolean reassemble)
-    throws ArchiveException {
-        ArchiveException newExceptionChain = exceptionChain;
+    throws ArchiveControllerException {
+        ArchiveControllerException newExceptionChain = exceptionChain;
 
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
@@ -737,10 +738,10 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
             }
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw new ArchiveException(newExceptionChain, ex);
+            throw new ArchiveControllerException(newExceptionChain, ex);
         } finally {
             setScheduled(needsReassembly);
         }
@@ -769,19 +770,19 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
      * @return If any warning exception condition occurs throughout the course
-     *         of this method, an {@link ArchiveWarningException} is created
+     *         of this method, an {@link ArchiveControllerWarningException} is created
      *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
      *         If multiple warning exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveException}
+     * @throws ArchiveControllerException If any exception condition occurs throughout
+     *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
-     *         thrown unless it's an {@link ArchiveWarningException}.
+     *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
-    private ArchiveException update(ArchiveException exceptionChain)
-    throws ArchiveException {
+    private ArchiveControllerException update(ArchiveControllerException exceptionChain)
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
@@ -794,8 +795,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 try {
                     exceptionChain = shutdownStep1(exceptionChain);
 
-                    ArchiveWarningException inputEntryCorrupted = null;
-                    ArchiveWarningException outputEntryCorrupted = null;
+                    ArchiveControllerWarningException inputEntryCorrupted = null;
+                    ArchiveControllerWarningException outputEntryCorrupted = null;
 
                     final Enumeration e = fileSystem.getArchiveEntries();
                     while (e.hasMoreElements()) {
@@ -821,7 +822,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                             } catch (IOException ex) {
                                 if (inputEntryCorrupted == null) {
                                     exceptionChain = inputEntryCorrupted
-                                            = new ArchiveWarningException(
+                                            = new ArchiveControllerWarningException(
                                                 exceptionChain,
                                                 getPath() + " (skipped one or more corrupted archive entries in the input)",
                                                 ex);
@@ -839,7 +840,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                 } catch (InputException ex) {
                                     if (outputEntryCorrupted == null) {
                                         exceptionChain = outputEntryCorrupted
-                                                = new ArchiveWarningException(
+                                                = new ArchiveControllerWarningException(
                                                     exceptionChain,
                                                     getPath() + " (one or more archive entries in the output are corrupted)",
                                                     ex);
@@ -853,7 +854,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                 } catch (IOException ex) {
                                     if (inputEntryCorrupted == null) {
                                         exceptionChain = inputEntryCorrupted
-                                                = new ArchiveWarningException(
+                                                = new ArchiveControllerWarningException(
                                                     exceptionChain,
                                                     getPath() + " (one or more archive entries in the input are corrupted)",
                                                     ex);
@@ -895,10 +896,10 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 assert deleted;
                 throw ex;
             }
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw new ArchiveException(exceptionChain,
+            throw new ArchiveControllerException(exceptionChain,
                     getPath() + " (could not update archive file - all changes are lost)",
                     ex);
         }
@@ -907,14 +908,14 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         // to the last modification time of the virtual root directory,
         // hence preserving it.
         if (!outFile.setLastModified(root.getTime()))
-            exceptionChain = new ArchiveWarningException(exceptionChain,
+            exceptionChain = new ArchiveControllerWarningException(exceptionChain,
                     getPath() + " (couldn't preserve last modification time)");
 
         return exceptionChain;
     }
 
-    private ArchiveException checkNoDeletedEntriesWithNewData(
-            ArchiveException exceptionChain) {
+    private ArchiveControllerException checkNoDeletedEntriesWithNewData(
+            ArchiveControllerException exceptionChain) {
         assert isTouched();
         assert getFileSystem() != null;
 
@@ -932,7 +933,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warning exception, but do not yet throw it.
-                exceptionChain = new ArchiveWarningException(exceptionChain,
+                exceptionChain = new ArchiveControllerWarningException(exceptionChain,
                         getPath() + " (couldn't remove archive entry: " + entryName + ")");
             }
         }
@@ -949,7 +950,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
      * @return If any warning condition occurs throughout the course of this
-     *         method, a {@code ArchiveWarningException} is created (but not
+     *         method, a {@code ArchiveControllerWarningException} is created (but not
      *         thrown), prepended to {@code exceptionChain} and finally
      *         returned.
      *         If multiple warning conditions occur,
@@ -957,19 +958,19 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      *         <i>last</i> exception created is the head of the returned
      *         exception chain.
      * @return If any warning exception condition occurs throughout the course
-     *         of this method, an {@link ArchiveWarningException} is created
+     *         of this method, an {@link ArchiveControllerWarningException} is created
      *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
      *         If multiple warning exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveException}
+     * @throws ArchiveControllerException If any exception condition occurs throughout
+     *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
-     *         thrown unless it's an {@link ArchiveWarningException}.
+     *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
-    private ArchiveException reassemble(ArchiveException exceptionChain)
-    throws ArchiveException {
+    private ArchiveControllerException reassemble(ArchiveControllerException exceptionChain)
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
@@ -993,7 +994,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                     }
                     File.cp(in , out); // always closes in and out
                 } catch (IOException cause) {
-                    throw new ArchiveException(
+                    throw new ArchiveControllerException(
                             exceptionChain,
                             getPath()
                                 + " (could not reassemble archive file - all changes are lost)",
@@ -1006,7 +1007,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // directory during update(...).
                 final long time = outFile.lastModified();
                 if (time != 0 && !getTarget().setLastModified(time)) {
-                    exceptionChain = new ArchiveWarningException(
+                    exceptionChain = new ArchiveControllerWarningException(
                             exceptionChain,
                             getPath()
                                 + " (couldn't preserve last modification time)");
@@ -1018,7 +1019,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             try {
                 wrap(getEnclController(), getEnclEntryName());
             } catch (IOException cause) {
-                throw new ArchiveException(
+                throw new ArchiveControllerException(
                         exceptionChain,
                         getEnclController().getPath() + "/" + getEnclEntryName()
                             + " (could not update archive entry - all changes are lost)",
@@ -1083,7 +1084,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     void reset() throws IOException {
         assert writeLock().isLockedByCurrentThread();
 
-        ArchiveException exceptionChain = shutdownStep1(null);
+        ArchiveControllerException exceptionChain = shutdownStep1(null);
         shutdownStep2(exceptionChain);
         shutdownStep3(true);
         setScheduled(false);
@@ -1120,7 +1121,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      */
-    private ArchiveException shutdownStep1(ArchiveException exceptionChain) {
+    private ArchiveControllerException shutdownStep1(ArchiveControllerException exceptionChain) {
         if (outArchive != null)
             exceptionChain = outArchive.getMetaData().closeAllOutputStreams(
                     exceptionChain);
@@ -1134,9 +1135,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     /**
      * Discards the file system and closes the output and input archive.
      */
-    private void shutdownStep2(ArchiveException exceptionChain)
+    private void shutdownStep2(ArchiveControllerException exceptionChain)
     throws IOException {
-        final ArchiveException oldExceptionChain = exceptionChain;
+        final ArchiveControllerException oldExceptionChain = exceptionChain;
 
         super.reset(); // discard file system
 
@@ -1151,7 +1152,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             try {
                 outArchive.close();
             } catch (IOException ex) {
-                exceptionChain = new ArchiveException(exceptionChain, ex);
+                exceptionChain = new ArchiveControllerException(exceptionChain, ex);
             } finally {
                 outArchive = null;
             }
@@ -1161,7 +1162,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             try {
                 inArchive.close();
             } catch (IOException ex) {
-                exceptionChain = new ArchiveException(exceptionChain, ex);
+                exceptionChain = new ArchiveControllerException(exceptionChain, ex);
             } finally {
                 inArchive = null;
             }

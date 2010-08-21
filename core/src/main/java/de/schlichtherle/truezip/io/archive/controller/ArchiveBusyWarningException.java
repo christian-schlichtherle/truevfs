@@ -26,16 +26,13 @@ package de.schlichtherle.truezip.io.archive.controller;
  * I/O operation on the closed entry streams will throw an
  * {@link ArchiveEntryStreamClosedException}.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see File#umount
- * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyWarningException extends ArchiveWarningException {
+public class ArchiveBusyWarningException extends ArchiveControllerWarningException {
     private static final long serialVersionUID = 2635419873651362891L;
 
-    ArchiveBusyWarningException(ArchiveException priorException, String cPath) {
+    ArchiveBusyWarningException(ArchiveControllerException priorException, String cPath) {
         super(priorException, cPath);
     }
 }

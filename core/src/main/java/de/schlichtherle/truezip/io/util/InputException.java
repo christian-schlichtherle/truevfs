@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

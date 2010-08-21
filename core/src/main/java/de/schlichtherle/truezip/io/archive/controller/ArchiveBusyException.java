@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.ArchiveControllers;
+
 /**
  * Thrown if an archive file could not get updated because some input or
  * output streams for its entries are still open.
@@ -23,25 +25,22 @@ package de.schlichtherle.truezip.io.archive.controller;
  * message.
  * <p>
  * In order to recover from this exception, client applications may call
- * {@link File#umount()} or {@link File#update()} in order to force all
- * entry streams for all archive files to close and prepare to catch the
- * resulting {@link ArchiveBusyWarningException}.
+ * {@link ArchiveControllers#umount(String, boolean, boolean, boolean, boolean, boolean)}
+ * in order to force all entry streams for all archive files to close and
+ * prepare to catch the resulting {@link ArchiveBusyWarningException}.
  * A subsequent try to create the archive entry stream will then succeed
  * unless other exceptional conditions apply.
  * However, if the client application is still using a disconnected stream,
  * it will receive an {@link ArchiveEntryStreamClosedException} on the next
  * call to any other method than {@code close()}.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see File#umount
- * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyException extends ArchiveException {
+public class ArchiveBusyException extends ArchiveControllerException {
     private static final long serialVersionUID = 1937861953461235716L;
 
-    ArchiveBusyException(ArchiveException priorException, String cPath) {
+    ArchiveBusyException(ArchiveControllerException priorException, String cPath) {
         super(priorException, cPath);
     }
 
