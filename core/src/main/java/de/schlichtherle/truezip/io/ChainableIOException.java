@@ -55,8 +55,6 @@ import java.util.Comparator;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0 (generalized from the former
- *        {@code ArchiveControllerException}).
  */
 public class ChainableIOException extends IOException implements Cloneable {
 

@@ -26,7 +26,6 @@ package de.schlichtherle.truezip.key;
  * Thread (EDT).
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.4
  * @version $Id$
  */
 public class KeyPromptingInterruptedException extends UnknownKeyException  {

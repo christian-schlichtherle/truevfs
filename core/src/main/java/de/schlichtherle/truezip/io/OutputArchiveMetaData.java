@@ -41,7 +41,6 @@ import java.util.logging.Logger;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public final class OutputArchiveMetaData {
 

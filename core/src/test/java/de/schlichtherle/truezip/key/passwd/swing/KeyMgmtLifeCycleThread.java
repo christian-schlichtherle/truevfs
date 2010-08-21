@@ -25,7 +25,6 @@ import java.util.logging.Logger;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  */
 public class KeyMgmtLifeCycleThread extends Thread {
 

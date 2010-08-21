@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.util.zip.ZipEntry;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 7.0
  */
 public class JarEntryFactory implements de.schlichtherle.truezip.util.zip.ZipEntryFactory {
     

@@ -25,7 +25,6 @@ import java.io.OutputStream;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class SynchronizedOutputStream extends OutputStream {
     /** The object to synchronize on - never {@code null}. */

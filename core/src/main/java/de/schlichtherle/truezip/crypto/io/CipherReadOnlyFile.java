@@ -36,7 +36,6 @@ import org.bouncycastle.crypto.Mac;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 //
 // Implementation notes:

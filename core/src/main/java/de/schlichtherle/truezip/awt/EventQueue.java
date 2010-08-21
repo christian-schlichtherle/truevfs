@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationTargetException;
  * for dealing with the AWT Event Queue.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.1
  * @version $Id$
  */
 public class EventQueue extends java.awt.EventQueue {

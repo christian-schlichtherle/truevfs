@@ -25,7 +25,6 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class RaesException extends IOException {
     private static final long serialVersionUID = 8564203786508562247L;

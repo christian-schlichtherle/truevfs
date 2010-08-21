@@ -21,7 +21,6 @@ package de.schlichtherle.truezip.util.zip;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 7.0
  * @see BasicZipFile
  */
 public interface ZipEntryFactory {

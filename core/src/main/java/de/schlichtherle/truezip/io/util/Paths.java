@@ -24,7 +24,6 @@ import java.io.File;
  * detect Windows drives (&quot;[a-zA-Z]:&quot;) and UNCs (&quot;\\&quot;) in
  * a path name, even on non-Windows platforms.
  *
- * @since TrueZIP 5.1.4
  * @author Christian Schlichtherle
  * @version $Id$
  */

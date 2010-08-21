@@ -36,7 +36,6 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 
 /**
  * @author Christian Schlichtherle
- * @since TrueZIP 6.2
  * @version $Id$
  */
 public class FileComboBoxBrowserTest extends TestCase {

@@ -42,7 +42,6 @@ import java.lang.reflect.Array;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4 (renamed from SharedKeyProvider)
  */
 public abstract class AbstractKeyProvider<K extends Cloneable>
         implements KeyProvider<K> {

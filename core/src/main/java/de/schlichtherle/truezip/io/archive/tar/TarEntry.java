@@ -27,7 +27,6 @@ import javax.swing.Icon;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarEntry
         extends org.apache.tools.tar.TarEntry

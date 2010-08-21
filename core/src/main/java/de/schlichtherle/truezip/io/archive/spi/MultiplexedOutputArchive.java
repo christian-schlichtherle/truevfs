@@ -46,7 +46,6 @@ import java.util.Map;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class MultiplexedOutputArchive implements OutputArchive {
 

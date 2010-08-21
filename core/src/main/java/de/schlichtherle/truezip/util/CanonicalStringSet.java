@@ -48,7 +48,6 @@ import java.util.TreeMap;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class CanonicalStringSet extends AbstractSet<String> {
 

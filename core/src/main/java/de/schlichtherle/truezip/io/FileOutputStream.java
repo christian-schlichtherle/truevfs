@@ -141,7 +141,6 @@ public class FileOutputStream extends FilterOutputStream {
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
      *         stream for the archive file.
-     * @since TrueZIP 6.4
      */
     public FileOutputStream(FileDescriptor fd) {
         super(new java.io.FileOutputStream(fd));

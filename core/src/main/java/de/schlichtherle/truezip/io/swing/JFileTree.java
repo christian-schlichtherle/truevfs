@@ -42,7 +42,6 @@ import javax.swing.tree.TreePath;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public class JFileTree extends JTree {
 

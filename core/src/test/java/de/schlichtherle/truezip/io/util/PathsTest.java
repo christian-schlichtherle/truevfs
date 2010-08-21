@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
- * @since TrueZIP 5.1.4
  * @version $Id$
  */
 public class PathsTest extends TestCase {

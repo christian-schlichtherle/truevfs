@@ -24,7 +24,6 @@ package de.schlichtherle.truezip.util.zip;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 final class LittleEndian {
 

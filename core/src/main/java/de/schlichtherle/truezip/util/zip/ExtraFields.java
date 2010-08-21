@@ -28,7 +28,6 @@ import java.util.TreeMap;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 final class ExtraFields implements Cloneable {
 

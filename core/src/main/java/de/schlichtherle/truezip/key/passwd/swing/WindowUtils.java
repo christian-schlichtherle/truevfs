@@ -31,7 +31,6 @@ import javax.swing.JOptionPane;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 final class WindowUtils {
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";

@@ -35,7 +35,6 @@ import java.util.zip.ZipException;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 public class ZipInputArchive
         extends BasicZipFile

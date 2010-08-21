@@ -47,8 +47,6 @@ import java.io.IOException;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0 (refactored from the predecessor class
- *        {@code ArchiveControllerException})
  */
 public class ArchiveException extends ChainableIOException {
     private static final long serialVersionUID = 4893204620357369739L;

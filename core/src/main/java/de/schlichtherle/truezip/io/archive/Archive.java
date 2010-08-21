@@ -27,7 +27,6 @@ package de.schlichtherle.truezip.io.archive;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public interface Archive {
 

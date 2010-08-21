@@ -112,7 +112,6 @@ public class FileInputStream extends FilterInputStream {
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional stream
      *         for the archive file.
-     * @since TrueZIP 6.4
      */
     public FileInputStream(FileDescriptor fd) {
         super(new java.io.FileInputStream(fd));

@@ -38,7 +38,6 @@ import org.netbeans.jemmy.util.NameComponentChooser;
 /**
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  */
 public class CreateKeyPanelTest extends TestCase {
     static {

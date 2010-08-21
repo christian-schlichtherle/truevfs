@@ -28,7 +28,6 @@ import java.util.Enumeration;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.8
  */
 // TODO: Exchange this class for a more general solution, e.g. OSGi.
 public class ClassLoaderUtil {

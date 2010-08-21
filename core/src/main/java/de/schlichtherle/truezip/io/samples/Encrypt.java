@@ -39,7 +39,6 @@ import java.util.ResourceBundle;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public class Encrypt extends CommandLineUtility {
 

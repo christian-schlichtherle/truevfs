@@ -94,7 +94,6 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#NULL
  * @see ArchiveDetector#DEFAULT
  * @see ArchiveDetector#ALL
- * @since TrueZIP 6.0
  */
 public class DefaultArchiveDetector
         extends AbstractArchiveDetector

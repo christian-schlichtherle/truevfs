@@ -47,7 +47,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  * @see ReadWriteSfxDriver
  * @see CheckedZipInputArchive
  */

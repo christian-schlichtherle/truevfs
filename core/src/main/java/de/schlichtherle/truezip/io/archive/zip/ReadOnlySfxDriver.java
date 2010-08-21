@@ -32,7 +32,6 @@ import javax.swing.Icon;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  * @see ReadWriteSfxDriver
  */
 public class ReadOnlySfxDriver extends AbstractSfxDriver {

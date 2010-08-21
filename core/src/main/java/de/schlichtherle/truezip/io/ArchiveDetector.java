@@ -66,7 +66,6 @@ import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
  * @see ArchiveDriver
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public interface ArchiveDetector
         extends de.schlichtherle.truezip.io.archive.ArchiveDetector,

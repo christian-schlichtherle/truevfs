@@ -32,7 +32,6 @@ import javax.swing.JPanel;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.2
  */
 public abstract class BasicFeedback implements Feedback {
 

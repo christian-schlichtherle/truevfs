@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class ContainsFileException extends FileNotFoundException {
     private static final long serialVersionUID = 1237683475282761476L;

@@ -45,7 +45,6 @@ import java.util.zip.CheckedOutputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  * @see ZipDriver
- * @since TrueZIP 6.7
  */
 public class ZipOutputArchive
         extends BasicZipOutputStream

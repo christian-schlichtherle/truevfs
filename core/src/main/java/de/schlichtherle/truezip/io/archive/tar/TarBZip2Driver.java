@@ -34,7 +34,6 @@ import org.apache.tools.bzip2.CBZip2OutputStream;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarBZip2Driver extends TarDriver {
 

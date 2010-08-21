@@ -44,7 +44,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  * @see SafeZipRaesDriver
  */
 public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {

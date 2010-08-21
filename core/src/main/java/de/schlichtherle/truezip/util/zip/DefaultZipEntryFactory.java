@@ -21,7 +21,6 @@ package de.schlichtherle.truezip.util.zip;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.8
  */
 class DefaultZipEntryFactory implements ZipEntryFactory {
 

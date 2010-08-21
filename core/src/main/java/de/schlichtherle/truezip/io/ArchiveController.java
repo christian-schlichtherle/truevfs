@@ -89,7 +89,6 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 abstract class ArchiveController implements Archive, Entry {
 

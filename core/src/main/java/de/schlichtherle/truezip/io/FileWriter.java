@@ -34,7 +34,6 @@ import java.io.OutputStreamWriter;
  * @see File#setLenient
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 
 public class FileWriter extends OutputStreamWriter {

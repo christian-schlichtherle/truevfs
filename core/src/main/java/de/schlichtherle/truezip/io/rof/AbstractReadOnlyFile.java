@@ -27,7 +27,6 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 

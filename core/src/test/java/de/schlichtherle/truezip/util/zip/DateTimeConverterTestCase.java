@@ -26,7 +26,6 @@ import junit.framework.TestCase;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 public abstract class DateTimeConverterTestCase extends TestCase {
 

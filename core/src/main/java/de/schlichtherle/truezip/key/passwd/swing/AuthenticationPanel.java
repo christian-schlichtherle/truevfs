@@ -37,7 +37,6 @@ import javax.swing.text.JTextComponent;
  * the user select an authentication method and enter the key.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0
  * @version $Id$
  */
 public class AuthenticationPanel extends JPanel {

@@ -32,7 +32,6 @@ import java.util.logging.Logger;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4 Support for marking.
  */
 public class ReadOnlyFileInputStream extends InputStream {
 

@@ -60,7 +60,6 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarInputArchive implements InputArchive {
 

@@ -29,7 +29,6 @@ package de.schlichtherle.truezip.key;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.1
  */
 public interface AesKeyProvider<K extends Cloneable> extends KeyProvider<K> {
 

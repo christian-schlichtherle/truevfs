@@ -28,7 +28,6 @@ import static de.schlichtherle.truezip.key.AesKeyProvider.KEY_STRENGTH_256;
  * This class is thread safe.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.4
  * @version $Id$
  */
 public class PromptingAesKeyProviderUI

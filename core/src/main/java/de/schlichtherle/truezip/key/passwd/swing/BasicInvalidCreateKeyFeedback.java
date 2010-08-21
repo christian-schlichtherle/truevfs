@@ -37,7 +37,6 @@ package de.schlichtherle.truezip.key.passwd.swing;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class BasicInvalidCreateKeyFeedback extends BasicInvalidKeyFeedback {
 }

@@ -37,7 +37,6 @@ import java.awt.Window;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public class PanelEvent extends AWTEvent {
 

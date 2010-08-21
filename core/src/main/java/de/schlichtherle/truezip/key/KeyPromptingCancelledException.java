@@ -23,7 +23,6 @@ package de.schlichtherle.truezip.key;
  * the prompting dialog.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.1
  * @version $Id$
  */
 public class KeyPromptingCancelledException extends UnknownKeyException {

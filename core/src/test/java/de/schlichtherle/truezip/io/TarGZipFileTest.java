@@ -21,7 +21,6 @@ package de.schlichtherle.truezip.io;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public class TarGZipFileTest extends FileTestCase {
     

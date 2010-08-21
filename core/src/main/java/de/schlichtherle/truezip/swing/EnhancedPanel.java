@@ -44,7 +44,6 @@ import javax.swing.event.EventListenerList;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 5.1
  */
 public class EnhancedPanel extends JPanel  {
 

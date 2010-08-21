@@ -43,7 +43,6 @@ import javax.swing.event.DocumentListener;
  * key or shares the same key for multiple protected resources.
  *
  * @author Christian Schlichtherle
- * @since TrueZIP 6.0
  * @version $Id$
  */
 public class OpenKeyPanel extends EnhancedPanel {

@@ -25,7 +25,6 @@ import java.net.URI;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.0
  */
 public abstract class AbstractArchiveDetector implements ArchiveDetector {
 

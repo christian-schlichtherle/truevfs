@@ -40,7 +40,6 @@ import java.io.IOException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public final class TransientIOException extends IOException {
     private static final long serialVersionUID = 7456923867016329838L;

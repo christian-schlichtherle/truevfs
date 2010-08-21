@@ -23,7 +23,6 @@ import java.util.*;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public final class JointEnumeration implements Enumeration {
     private Enumeration e1;

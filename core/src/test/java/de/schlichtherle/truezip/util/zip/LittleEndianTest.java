@@ -24,7 +24,6 @@ import java.util.Arrays;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.7
  */
 public class LittleEndianTest extends TestCase {
 

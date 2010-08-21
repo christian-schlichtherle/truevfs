@@ -283,8 +283,6 @@ public class ZipFile extends BasicZipFile {
     /**
      * Returns the path name of the ZIP file or {@code null} if this object
      * was created with a {@link ReadOnlyFile}.
-     *
-     * @since TrueZIP 6.8
      */
     public String getName() {
         return name;

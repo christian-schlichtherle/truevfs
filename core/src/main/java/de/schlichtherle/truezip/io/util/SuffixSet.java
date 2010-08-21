@@ -60,7 +60,6 @@ import java.util.Locale;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.5
  */
 public final class SuffixSet extends CanonicalStringSet {
 

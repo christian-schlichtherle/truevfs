@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @since TrueZIP 6.4
  */
 public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[]>>
         implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<P> {
