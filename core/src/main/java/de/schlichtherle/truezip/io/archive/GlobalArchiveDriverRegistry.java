@@ -70,12 +70,12 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
+public final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
 
     private static final long serialVersionUID = 1579600190374703884L;
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.GlobalArchiveDriverRegistry";
+            = "de.schlichtherle.truezip.io.archive.GlobalArchiveDriverRegistry";
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -83,9 +83,9 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
     private static final String KWD_ALL = "ALL";    // NOI18N
 
     private static final String PROP_KEY_DEFAULT_SUFFIXES
-            = "de.schlichtherle.truezip.io.default";
+            = "de.schlichtherle.truezip.io.archive.default";
     private static final String PROP_KEY_REGISTRY
-            = "de.schlichtherle.truezip.io.registry";
+            = "de.schlichtherle.truezip.io.archive.registry";
 
     /** The (pseudo) singleton instance. */
     public static final GlobalArchiveDriverRegistry INSTANCE
@@ -137,7 +137,7 @@ final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
      */
     private static String[] getServices() {
         return System.getProperty(PROP_KEY_REGISTRY,
-                "META-INF/services/de.schlichtherle.truezip.io.registry.properties") // since TrueZIP 6.5.2 - NOI18N
+                "META-INF/services/de.schlichtherle.truezip.io.archive.registry.properties") // since TrueZIP 6.5.2 - NOI18N
                 .split("\\" + File.pathSeparator); // NOI18N
     }
 

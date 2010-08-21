@@ -47,12 +47,12 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class ArchiveDriverRegistry extends HashMap {
+public class ArchiveDriverRegistry extends HashMap {
 
     private static final long serialVersionUID = 3445783613096128268L;
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.ArchiveDriverRegistry";
+            = "de.schlichtherle.truezip.io.archive.ArchiveDriverRegistry";
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final Logger logger
@@ -71,7 +71,7 @@ class ArchiveDriverRegistry extends HashMap {
     /**
      * Creates an empty {@code ArchiveDriverRegistry}.
      */
-    ArchiveDriverRegistry() {
+    public ArchiveDriverRegistry() {
         this.delegate = null;
     }
 
@@ -98,7 +98,7 @@ class ArchiveDriverRegistry extends HashMap {
      *         configuration.
      * @see SuffixSet Syntax Definition for Suffix Lists
      */
-    ArchiveDriverRegistry(
+    public ArchiveDriverRegistry(
             final ArchiveDriverRegistry delegate,
             final Map config) {
         if (delegate == null)
