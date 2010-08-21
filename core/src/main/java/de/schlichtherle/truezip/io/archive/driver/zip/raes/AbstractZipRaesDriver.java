@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip.raes;
+package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
-import de.schlichtherle.truezip.io.archive.zip.JarDriver;
-import de.schlichtherle.truezip.io.archive.zip.JarEntry;
+import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
+import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;

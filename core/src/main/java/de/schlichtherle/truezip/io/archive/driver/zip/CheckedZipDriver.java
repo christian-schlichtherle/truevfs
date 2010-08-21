@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2009-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip;
+package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * An archive driver for SFX/EXE files which checks the CRC-32 value for all
+ * An archive driver for ZIP files which checks the CRC-32 values for all
  * ZIP entries in input archives.
  * The additional CRC-32 computation makes this class slower than its super
  * class.
@@ -47,44 +47,44 @@ import javax.swing.Icon;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @see ReadWriteSfxDriver
  * @see CheckedZipInputArchive
  */
-public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
-    private static final long serialVersionUID = -940108057195872802L;
+public class CheckedZipDriver extends ZipDriver {
+    private static final long serialVersionUID = -4645615422084918979L;
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
+     * this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL)}.
      */
-    public CheckedReadOnlySfxDriver() {
-        this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL);
+    public CheckedZipDriver() {
+        this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL);
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(charset, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
+     * this(charset, null, null, false, false, DEFAULT_LEVEL)}.
      */
-    public CheckedReadOnlySfxDriver(String charset) {
-        this(charset, null, null, false, DEFAULT_LEVEL);
+    public CheckedZipDriver(String charset) {
+        this(charset, null, null, false, false, DEFAULT_LEVEL);
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, level)}.
+     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
+     * this(charset, null, null, false, false, DEFAULT_LEVEL)}.
      */
-    public CheckedReadOnlySfxDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, level);
+    public CheckedZipDriver(int level) {
+        this(DEFAULT_CHARSET, null, null, false, false, level);
     }
 
-    /** Constructs a new checked read-only SFX/EXE driver. */
-    public CheckedReadOnlySfxDriver(
+    /** Constructs a new checked ZIP driver. */
+    public CheckedZipDriver(
             String charset,
             Icon openIcon,
             Icon closedIcon,
+            boolean preambled,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, postambled, level);
+        super(charset, openIcon, closedIcon, preambled, postambled, level);
     }
     
     @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.tar;
+package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;

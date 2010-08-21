@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip.raes;
+package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.zip.CheckedZipInputArchive;
-import de.schlichtherle.truezip.io.archive.zip.JarEntryFactory;
-import de.schlichtherle.truezip.io.archive.zip.ZipInputArchive;
+import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputArchive;
+import de.schlichtherle.truezip.io.archive.driver.zip.JarEntryFactory;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import javax.swing.Icon;

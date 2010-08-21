@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2010 Schlichtherle IT Services
+ * Copyright (C) 2006-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.zip;
+package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * An archive driver for ODF files which checks the CRC-32 value for all ZIP
+ * An archive driver for JAR files which checks the CRC-32 value for all ZIP
  * entries in input archives.
  * The additional CRC-32 computation makes this class slower than its super
  * class.
@@ -49,27 +49,27 @@ import javax.swing.Icon;
  * @version $Id$
  * @see CheckedZipInputArchive
  */
-public class CheckedOdfDriver extends OdfDriver {
-    private static final long serialVersionUID = -6546216832168462491L;
+public class CheckedJarDriver extends JarDriver {
+    private static final long serialVersionUID = -2148911260108380591L;
 
     /**
-     * Equivalent to {@link #CheckedOdfDriver(Icon, Icon, boolean, boolean, int)
+     * Equivalent to {@link #CheckedJarDriver(Icon, Icon, boolean, boolean, int)
      * this(null, null, false, false, DEFAULT_LEVEL)}.
      */
-    public CheckedOdfDriver() {
+    public CheckedJarDriver() {
         this(null, null, false, false, DEFAULT_LEVEL);
     }
 
     /**
-     * Equivalent to {@link #CheckedOdfDriver(Icon, Icon, boolean, boolean, int)
+     * Equivalent to {@link #CheckedJarDriver(Icon, Icon, boolean, boolean, int)
      * this(null, null, false, false, level)}.
      */
-    public CheckedOdfDriver(int level) {
+    public CheckedJarDriver(int level) {
         this(null, null, false, false, level);
     }
 
-    /** Constructs a new checked ODF driver. */
-    public CheckedOdfDriver(
+    /** Constructs a new checked JAR driver. */
+    public CheckedJarDriver(
             Icon openIcon,
             Icon closedIcon,
             boolean preambled,
@@ -84,7 +84,7 @@ public class CheckedOdfDriver extends OdfDriver {
             ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputArchive(
-                rof, getCharset(), ZipEntryFactory.INSTANCE,
+                rof, getCharset(), JarEntryFactory.INSTANCE,
                 getPreambled(), getPostambled());
     }
 }
