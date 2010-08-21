@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -45,13 +44,8 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  */
 final class ArchiveFileSystem {
 
-    /**
-     * Denotes the entry name of the virtual root directory as a valid
-     * directory entry name.
-     * <p>
-     * This constant <em>cannot</em> be used for identity comparison!
-     */
-    private static final String ROOT_DIRECTORY_NAME = SEPARATOR;
+    // TODO: Harmonize the notation of the root directory!
+    private static final String ROOT = SEPARATOR;
 
     /** The controller that this filesystem belongs to. */
     private final ArchiveFileSystemController controller;
@@ -97,9 +91,9 @@ final class ArchiveFileSystem {
         master = new LinkedHashMap(64);
 
         // Setup root.
-        root = createArchiveEntry(ROOT_DIRECTORY_NAME);
+        root = createArchiveEntry(ROOT);
         root.setTime(System.currentTimeMillis());
-        master.put(ROOT_DIRECTORY_NAME, root);
+        master.put(ROOT, root);
 
         readOnly = false;
         controller.touch();
@@ -141,16 +135,16 @@ final class ArchiveFileSystem {
         master = new LinkedHashMap(iniCap);
 
         // Setup root.
-        root = createArchiveEntry(ROOT_DIRECTORY_NAME);
+        root = createArchiveEntry(ROOT);
         root.setTime(rootTime); // do NOT yet touch the file system!
-        master.put(ROOT_DIRECTORY_NAME, root);
+        master.put(ROOT, root);
 
         Enumeration entries = archive.getArchiveEntries();
         while (entries.hasMoreElements()) {
             final ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
             final String entryName = entry.getName();
             // Map entry if it doesn't address the virtual root directory.
-            if (!ROOT_DIRECTORY_NAME.equals(entryName)
+            if (!ROOT.equals(entryName)
                     && !("." + SEPARATOR).equals(entryName)) {
                 entry.setMetaData(new ArchiveEntryMetaData(entry));
                 master.put(entryName, entry);
@@ -308,7 +302,7 @@ final class ArchiveFileSystem {
             result[1] = entryName.substring(base, end); // between separator and trailing separator
         } else { // no slash
             if (end > 0) { // At least one character exists, excluding a trailing separator?
-                result[0] = ROOT_DIRECTORY_NAME;
+                result[0] = ROOT;
             } else {
                 result[0] = null; // no parent
             }
@@ -380,8 +374,8 @@ final class ArchiveFileSystem {
      * Returns {@code true} iff the given entry name refers to the
      * virtual root directory within this controller.
      */
-    static boolean isRoot(String entryName) {
-        return ROOT_NAME == entryName; // possibly assigned by File.init(...)
+    private static boolean isRoot(String entryName) {
+        return ROOT == entryName; // possibly assigned by File.init(...)
     }
 
     /**

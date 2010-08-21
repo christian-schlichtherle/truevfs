@@ -329,6 +329,9 @@ public class File extends java.io.File {
 
     private static final long serialVersionUID = 3617072883686191745L;
 
+    // TODO: Harmonize the notation of the root directory!
+    private static final String ROOT = "";
+
     /** The filesystem roots. */
     private static final Set roots = new TreeSet(Arrays.asList(listRoots()));
 
@@ -690,7 +693,7 @@ public class File extends java.io.File {
             if (path.length() == innerArchivePathLength) {
                 this.detector = innerArchive.detector;
                 this.innerArchive = this;
-                this.innerEntryName = Entry.ROOT_NAME;
+                this.innerEntryName = ROOT;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
                 this.controller = ArchiveControllers.get(this);
@@ -825,7 +828,7 @@ public class File extends java.io.File {
             // controller initialization has been deferred until now in
             // order to provide the ArchiveController with an otherwise fully
             // initialized object.
-            innerEntryName = Entry.ROOT_NAME;
+            innerEntryName = ROOT;
             controller = ArchiveControllers.get(this);
         } else if (innerArchive == enclArchive) {
             innerEntryName = enclEntryName;
@@ -986,7 +989,7 @@ public class File extends java.io.File {
             } else {
                 if (isArchive) {
                     innerArchive = this;
-                    innerEntryName = Entry.ROOT_NAME;
+                    innerEntryName = ROOT;
                     int i = parent.indexOf(':');
                     assert i >= 0;
                     scheme = parent.substring(0, i);
@@ -1027,12 +1030,12 @@ public class File extends java.io.File {
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        if (Entry.ROOT_NAME.equals(innerEntryName)) {  // equal, but...
-            assert Entry.ROOT_NAME != innerEntryName;  // not identical!
+        if (ROOT.equals(innerEntryName)) {  // equal, but...
+            assert ROOT != innerEntryName;  // not identical!
             //assert innerArchive == null;             // may be non-null when serialized by previous version
             assert controller == null;                 // transient!
             innerArchive = this;                       // postfix!
-            innerEntryName = Entry.ROOT_NAME;          // postfix!
+            innerEntryName = ROOT;          // postfix!
             controller = ArchiveControllers.get(this); // postfix!
         }
 
@@ -1078,7 +1081,7 @@ public class File extends java.io.File {
         if (enclArchive == this)
             throw new AssertionError();
         if (!((innerArchive == this
-                    && innerEntryName == Entry.ROOT_NAME
+                    && innerEntryName == ROOT
                     && !innerEntryName.equals(enclEntryName)
                     && controller != null)
                 ^ (innerArchive == enclArchive
