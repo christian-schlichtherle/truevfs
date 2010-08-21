@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io;
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
@@ -698,7 +699,7 @@ public class File extends java.io.File {
                 this.innerArchive = this.enclArchive = innerArchive;
                 this.innerEntryName = this.enclEntryName
                         = path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                        .replace(separatorChar, Entry.SEPARATOR_CHAR);
+                        .replace(separatorChar, ArchiveEntry.SEPARATOR_CHAR);
             }
         } else {
             this.detector = detector;

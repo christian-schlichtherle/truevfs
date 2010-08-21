@@ -41,6 +41,8 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static de.schlichtherle.truezip.io.Entry.ROOT_NAME;
+
 /**
  * This archive controller implements the mounting/unmounting strategy
  * by performing a full update of the target archive file.
