@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.util;
 
-import de.schlichtherle.truezip.io.InputIOException;
+import de.schlichtherle.truezip.io.InputException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -89,7 +89,7 @@ public class Streams {
             int len;
 
             /** The IOException that happened in this task, if any. */
-            volatile InputIOException exception;
+            volatile InputException exception;
 
             public void run() {
                 // Cache some data for better performance.
@@ -124,7 +124,7 @@ public class Streams {
                     try {
                         read = _in.read(buf, 0, buf.length);
                     } catch (IOException ex) {
-                        exception = new InputIOException(ex);
+                        exception = new InputException(ex);
                         read = -1;
                     }
                     /*if (Thread.interrupted())

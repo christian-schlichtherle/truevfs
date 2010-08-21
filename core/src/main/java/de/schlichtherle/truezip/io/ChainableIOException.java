@@ -49,44 +49,41 @@ import java.util.Comparator;
  * J2SE 1.4 and higher. Exceptions chained by this class are <b>not</b>
  * causes of each other, but have just been merely collected over time
  * and then thrown as one exception (list).
- * 
- * @see File#update
- * @see File#umount
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class ChainableIOException extends IOException implements Cloneable {
+    private static final long serialVersionUID = 2305749434187324928L;
 
     /**
-     * Compares two ZIP controller exceptions in descending order of their
+     * Compares two {@code ChainableIOException}s in descending order of their
      * priority.
      * If the priority is equal, the elements are compared in descending
      * order of their appearance.
      */
     // Note: Not private for unit testing purposes only!
-    static final Comparator PRIORITY_COMP = new Comparator() {
-        public int compare(Object o1, Object o2) {
-            final int cmp = ((ChainableIOException) o1).getPriority()
-                          - ((ChainableIOException) o2).getPriority();
-            return cmp != 0 ? cmp : APPEARANCE_COMP.compare(o1, o2);
+    static final Comparator<ChainableIOException> PRIORITY_COMP
+            = new Comparator<ChainableIOException>() {
+        public int compare(ChainableIOException l, ChainableIOException r) {
+            final int cmp = l.getPriority() - r.getPriority();
+            return cmp != 0 ? cmp : APPEARANCE_COMP.compare(l, r);
         }
     };
     
     /**
-     * Compares two ZIP controller exceptions in descending order of their
+     * Compares two {@code ChainableIOException}s in descending order of their
      * appearance.
      */
     // Note: Not private for unit testing purposes only!
-    static final Comparator APPEARANCE_COMP = new Comparator() {
-        public int compare(Object o1, Object o2) {
-            return ((ChainableIOException) o1).getAppearance()
-                 - ((ChainableIOException) o2).getAppearance();
+    static final Comparator<ChainableIOException> APPEARANCE_COMP
+            = new Comparator<ChainableIOException>() {
+        public int compare(ChainableIOException l, ChainableIOException r) {
+            return l.getAppearance() - r.getAppearance();
         }
     };
 
     private static int maxPrintExceptions = 3;
-    private static final long serialVersionUID = 2305749434187324928L;
     
     /**
      * The tail chain of this exception chain.
@@ -94,9 +91,6 @@ public class ChainableIOException extends IOException implements Cloneable {
      * If this exception chain has not been reordered,
      * the head of the tail is either {@code null} or an exception which
      * occured before this exception was created.
-     * <p>
-     * Please note that this is totally unrelated to a possible cause for
-     * this exception!
      */
     private ChainableIOException prior;
 
@@ -249,8 +243,9 @@ public class ChainableIOException extends IOException implements Cloneable {
     public ChainableIOException sortAppearance() {
         return sort(APPEARANCE_COMP);
     }
-    
-    private ChainableIOException sort(final Comparator comp) {
+
+    private ChainableIOException sort(
+            final Comparator<ChainableIOException> comp) {
         if (prior != null) {
             final ChainableIOException sortedPrior = prior.sort(comp);
             if (sortedPrior == prior && comp.compare(this, prior) >= 0)
@@ -264,7 +259,7 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     private ChainableIOException insert(
             final ChainableIOException element,
-            final Comparator comp) {
+            final Comparator<ChainableIOException> comp) {
         if (comp.compare(element, this) >= 0) {
             // Prepend to chain.
             element.prior = this;
@@ -272,8 +267,7 @@ public class ChainableIOException extends IOException implements Cloneable {
             return element;
         } else {
             // Insert element in the prior exception chain.
-            final ChainableIOException clone
-                    = (ChainableIOException) clone();
+            final ChainableIOException clone = (ChainableIOException) clone();
             if (prior != null) {
                 clone.prior = prior.insert(element, comp);
                 clone.maxAppearance = Math.max(clone.appearance, clone.prior.maxAppearance);

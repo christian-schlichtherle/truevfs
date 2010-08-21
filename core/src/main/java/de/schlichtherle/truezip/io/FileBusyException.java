@@ -16,10 +16,12 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import java.io.FileNotFoundException;
 
 /**
  * Thrown if an archive entry cannot get accessed because either
+ * <p>
  * (a) the client application is trying to input or output to the same archive
  * file concurrently and the respective archive driver does not support this,
  * or
@@ -38,8 +40,6 @@ import java.io.FileNotFoundException;
  * call to any other method than {@code close()}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileInputStream
- * @see FileOutputStream
  * @author Christian Schlichtherle
  * @version $Id$
  */

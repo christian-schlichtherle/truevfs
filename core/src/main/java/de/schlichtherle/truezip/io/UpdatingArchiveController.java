@@ -16,6 +16,12 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -830,7 +836,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                         .getOutputStream(entry, entry);
                                 try {
                                     Streams.cat(in, out);
-                                } catch (InputIOException ex) {
+                                } catch (InputException ex) {
                                     if (outputEntryCorrupted == null) {
                                         exceptionChain = outputEntryCorrupted
                                                 = new ArchiveWarningException(

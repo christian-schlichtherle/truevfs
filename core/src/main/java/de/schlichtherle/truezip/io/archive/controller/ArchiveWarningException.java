@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 
 import java.io.IOException;
@@ -54,24 +54,24 @@ public class ArchiveWarningException extends ArchiveException {
     
     // TODO: Make this constructor package private!
     public ArchiveWarningException(
-            ArchiveException priorZipException,
+            ArchiveException priorException,
             String message) {
-        super(priorZipException, message);
+        super(priorException, message);
     }
 
     // TODO: Make this constructor package private!
     public ArchiveWarningException(
-            ArchiveException priorZipException,
+            ArchiveException priorException,
             String message,
             IOException cause) {
-        super(priorZipException, message, cause);
+        super(priorException, message, cause);
     }
 
     // TODO: Make this constructor package private!
     public ArchiveWarningException(
-            ArchiveException priorZipException,
+            ArchiveException priorException,
             IOException cause) {
-        super(priorZipException, cause);
+        super(priorException, cause);
     }
     
     @Override

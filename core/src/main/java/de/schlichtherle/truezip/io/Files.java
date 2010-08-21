@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.ArchiveFileSystemException;
@@ -427,7 +428,7 @@ final class Files {
         try {
           in.close();
         } catch (IOException ex) {
-          throw new InputIOException(ex);
+          throw new InputException(ex);
         }
       }
     } catch (FileNotFoundException ex) {
@@ -454,7 +455,7 @@ final class Files {
    *
    * @throws FileNotFoundException If either the source or the destination
    *         cannot get accessed.
-   * @throws InputIOException If copying the data fails because of an
+   * @throws InputException If copying the data fails because of an
    *         IOException in the source.
    * @throws IOException If copying the data fails because of an
    *         IOException in the destination.
@@ -505,7 +506,7 @@ final class Files {
    * @throws FalsePositiveException If the source or the destination is a
    *         false positive and the exception
    *         cannot get resolved within this method.
-   * @throws InputIOException If copying the data fails because of an
+   * @throws InputException If copying the data fails because of an
    *         IOException in the source.
    * @throws IOException If copying the data fails because of an
    *         IOException in the destination.
@@ -560,7 +561,7 @@ final class Files {
         try {
           in.close();
         } catch (IOException inFailure) {
-          throw new InputIOException(inFailure);
+          throw new InputException(inFailure);
         }
         throw ex;
       }
@@ -587,7 +588,7 @@ final class Files {
    * @throws FalsePositiveException If the source or the destination is a
    *         false positive and the exception for the destination
    *         cannot get resolved within this method.
-   * @throws InputIOException If copying the data fails because of an
+   * @throws InputException If copying the data fails because of an
    *         IOException in the source.
    * @throws IOException If copying the data fails because of an
    *         IOException in the destination.
@@ -663,7 +664,7 @@ final class Files {
             try {
               in.close();
             } catch (IOException inFailure) {
-              throw new InputIOException(inFailure);
+              throw new InputException(inFailure);
             }
             throw ex;
           }
@@ -704,7 +705,7 @@ final class Files {
    * @throws FalsePositiveException If the destination is a
    *         false positive and the exception
    *         cannot get resolved within this method.
-   * @throws InputIOException If copying the data fails because of an
+   * @throws InputException If copying the data fails because of an
    *         IOException in the source.
    * @throws IOException If copying the data fails because of an
    *         IOException in the destination.
@@ -790,7 +791,7 @@ final class Files {
       try {
         in.close();
       } catch (IOException ex) {
-        throw new InputIOException(ex);
+        throw new InputException(ex);
       }
     }
   }

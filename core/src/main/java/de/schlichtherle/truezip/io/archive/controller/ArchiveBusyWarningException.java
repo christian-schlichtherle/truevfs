@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2005-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 /**
- * Like its super class, but indicates the existance of open input streams.
+ * Thrown if an archive file has been successfully updated, but some input
+ * or output streams for its entries have been forced to close.
+ * The canonical path name of the archive file is provided as the detail
+ * message.
+ * <p>
+ * With the exception of their {@code close()} method, any subsequent
+ * I/O operation on the closed entry streams will throw an
+ * {@link ArchiveEntryStreamClosedException}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see File#umount
@@ -25,23 +32,10 @@ package de.schlichtherle.truezip.io;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveInputBusyException extends ArchiveBusyException {
-    private static final long serialVersionUID = 4560238423870456234L;
+public class ArchiveBusyWarningException extends ArchiveWarningException {
+    private static final long serialVersionUID = 2635419873651362891L;
 
-    private final int numStreams;
-
-    // TODO: Make this package private!
-    public ArchiveInputBusyException(
-            ArchiveException priorException, String cPath, int numStreams) {
+    ArchiveBusyWarningException(ArchiveException priorException, String cPath) {
         super(priorException, cPath);
-        this.numStreams = numStreams;
-    }
-
-    /**
-     * Returns the number of open entry input streams, whereby an open stream
-     * is a stream which's {@code close()} method hasn't been called.
-     */
-    public int getNumStreams() {
-        return numStreams;
     }
 }

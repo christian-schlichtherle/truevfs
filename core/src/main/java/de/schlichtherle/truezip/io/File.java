@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
 import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;

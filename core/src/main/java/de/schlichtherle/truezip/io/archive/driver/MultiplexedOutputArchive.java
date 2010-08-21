@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.InputIOException;
+import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
@@ -259,7 +259,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             } catch (FileNotFoundException ex) {
                 // Input exception - let's continue!
                 exception = new ChainableIOException(exception, ex);
-            } catch (InputIOException ex) {
+            } catch (InputException ex) {
                 // Input exception - let's continue!
                 exception = new ChainableIOException(exception, ex);
             } catch (IOException ex) {
