@@ -27,8 +27,6 @@ import java.util.regex.PatternSyntaxException;
  *
  * @see #reset(CharSequence)
  * @version $Id$
- * @since TrueZIP 6.5 (refactored from inner class in
- *        {@link de.schlichtherle.truezip.io.DefaultArchiveDetector})
  */
 public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
     private final Pattern pattern;
@@ -66,6 +64,6 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * returns it.
      */
     public Matcher reset(CharSequence input) {
-        return ((Matcher) get()).reset(input);
+        return get().reset(input);
     }
 }
