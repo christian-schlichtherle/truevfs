@@ -38,23 +38,123 @@ import java.net.URI;
  */
 public interface FileFactory {
 
+    /**
+     * Constructs a new {@link File} instance from the given
+     * {@code blueprint}.
+     *
+     * @param blueprint The file to use as a blueprint. If this is an instance
+     *        of the {@link File} class, its fields are simply copied.
+     *
+     * @return A newly created instance of the class {@link File}.
+     */
     File createFile(java.io.File blueprint);
 
+    /**
+     * This is used by {@link File#getParentFile()} for fast file construction
+     * without rescanning the entire path for archive files, which could even
+     * lead to wrong results.
+     * <p>
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
+     * <p>
+     * Calling this constructor with illegal arguments may result in
+     * {@link IllegalArgumentException}, {@link AssertionError} or
+     * may even silently fail!
+     */
     File createFile(java.io.File delegate, File innerArchive);
 
+    /**
+     * Used for fast file construction without rescanning the pathname for
+     * archive files when rewriting the pathname of an existing {@link File}
+     * instance.
+     * <p>
+     * <b>Warning:</b> This method is <em>not</em> intended for public use!
+     * <p>
+     * Calling this method with illegal arguments may result in
+     * {@link IllegalArgumentException}, {@link AssertionError} or
+     * may even silently fail!
+     */
     File createFile(File blueprint, java.io.File delegate, File enclArchive);
 
+    /**
+     * Constructs a new {@link File} instance which uses this
+     * {@link ArchiveDetector} to detect any archive files in its pathname.
+     *
+     * @param path The pathname of the file.
+     * @return A newly created instance of the class {@link File}.
+     */
     File createFile(String path);
 
+    /**
+     * Constructs a new {@link File} instance which uses this
+     * {@link ArchiveDetector} to detect any archive files in its pathname.
+     *
+     * @param parent The parent pathname as a {@link String}.
+     * @param child The child pathname as a {@link String}.
+     *
+     * @return A newly created instance of the class {@link File}.
+     */
     File createFile(String parent, String child);
 
+    /**
+     * Constructs a new {@link File} instance which uses this
+     * {@link ArchiveDetector} to detect any archive files in its pathname.
+     *
+     * @param parent The parent pathname as a {@code File}.
+     * @param child The child pathname as a {@link String}.
+     *
+     * @return A newly created instance of the class {@link File}.
+     */
     File createFile(java.io.File parent, String child);
 
+    /**
+     * Constructs a new {@link File} instance from the given
+     * {@code uri}. This method behaves similar to
+     * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
+     * amendment:
+     * If the URI matches the pattern
+     * <code>(jar:)*file:(<i>path</i>!/)*<i>entry</i></code>, then the
+     * constructed file object treats the URI like a (possibly ZIPped) file.
+     * <p>
+     * The newly created {@link File} instance uses this
+     * {@link ArchiveDetector} to detect any archive files in its pathname.
+     *
+     * @param uri an absolute, hierarchical URI with a scheme equal to
+     *        {@code file} or {@code jar}, a non-empty path component,
+     *        and undefined authority, query, and fragment components.
+     *
+     * @return A newly created instance of the class {@link File}.
+     *
+     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @throws IllegalArgumentException if the preconditions on the
+     *         parameter {@code uri} do not hold.
+     */
     File createFile(URI uri);
 
+    /**
+     * Creates a new {@link FileInputStream} to read the content of the
+     * given file.
+     *
+     * @param file The file to read.
+     *
+     * @return A newly created instance of the class {@link FileInputStream}.
+     *
+     * @throws FileNotFoundException On any I/O related issue when opening the file.
+     */
     FileInputStream createFileInputStream(java.io.File file)
     throws FileNotFoundException;
 
+    /**
+     * Creates a new {@link FileOutputStream} to write the new content of the
+     * given file.
+     *
+     * @param file The file to write.
+     * @param append If {@code true} the new content should be appended
+     *        to the old content rather than overwriting it.
+     *
+     * @return A newly created instance of the class {@link FileOutputStream}.
+     *
+     * @throws FileNotFoundException On any I/O related issue when opening the file.
+     */
     FileOutputStream createFileOutputStream(java.io.File file, boolean append)
     throws FileNotFoundException;
 }
