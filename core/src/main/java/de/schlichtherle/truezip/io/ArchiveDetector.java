@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.GlobalArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
 
 /**

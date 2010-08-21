@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive;
+package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
 import de.schlichtherle.truezip.util.ClassLoaderUtil;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,25 +35,23 @@ import java.util.logging.Logger;
  * maps single archive file suffixes (not lists) [{@code String}] to the
  * fully qualified class name, class object or instance of an archive driver
  * [{@code String}, {@code Class} or {@link ArchiveDriver}].
- * The {@link #getArchiveDriver} method can then be used to recursively
- * lookup an archive driver for a given (file name) suffix in the registry
- * chain.
+ * The {@link #getArchiveDriver} method can then be used to lookup an archive
+ * driver for a given (file name) suffix in the chain.
  * <p>
- * This class is serializable in order to meet the requirements of the
- * {@link de.schlichtherle.truezip.io.File} class.
- * However, it's not really recommended to serialize this class:
- * Together with the instance, all associated archive drivers are serialized
- * too, which is pretty inefficient for a single instance.
+ * This class is serializable in order to meet the requirements of some client
+ * classes. However, it's not really recommended to serialize this class
+ * because all associated archive drivers will be serialized too,
+ * which is pretty inefficient.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveDriverRegistry extends HashMap {
+public class ArchiveDriverRegistry extends HashMap implements Serializable {
 
     private static final long serialVersionUID = 3445783613096128268L;
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.archive.ArchiveDriverRegistry";
+            = ArchiveDriverRegistry.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final Logger logger
@@ -76,9 +75,9 @@ public class ArchiveDriverRegistry extends HashMap {
     }
 
     /**
-     * Creates a new {@code DefaultArchiveDriverRegistry} by
-     * decorating the configuration of {@code delegate} with
-     * mappings for all entries in {@code config}.
+     * Creates a new {@link ArchiveDriverRegistry} by decorating the
+     * configuration of {@code delegate} with mappings for all entries in
+     * {@code config}.
      * 
      * @param delegate The {@code ArchiveDriverRegistry} which's
      *        configuration is to be virtually inherited.

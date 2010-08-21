@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive;
+package de.schlichtherle.truezip.io.archive.driver.registry;
 
+import de.schlichtherle.truezip.io.archive.spi.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
 import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.io.File;
@@ -31,13 +32,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A global registry for archive file suffixes and archive drivers which is
- * configured by the set of all <i>configuration files</i> on the class path.
+ * A global registry for mappings from archive file suffixes [{@link String}]
+ * to archive drivers [{@link ArchiveDriver}] which is configured by the set
+ * of all <i>configuration files</i> on the class path.
  * This registry does not have a delegate, so it can only be used as the tail
  * in a {@link ArchiveDriverRegistry registry chain}.
  * <p>
  * When this class is instantiated, it enumerate all instances of the relative
- * path <i>META-INF/services/de.schlichtherle.truezip.io.registry.properties</i>
+ * path {@code META-INF/services/de.schlichtherle.truezip.io.archive.registry.properties}
  * on the class path (this ensures that TrueZIP is compatible with JNLP as used
  * by Java Web Start and can be safely added to the Extension Class Path).
  * <p>
@@ -52,40 +54,33 @@ import java.util.logging.Logger;
  * This class may appear to be a singleton (there's not much point in
  * having multiple instances of this class, all with the same configuration).
  * However, it actually isn't a true singleton because it's
- * {@link Serializable} in order to support serialization of {@link File}
- * instances.
- * This implies that a JVM can send an instance of this class to another JVM,
- * which's own global archive driver registry instance may be configured
- * completely different by its local configuration files.
- * This requires that the
- * {@link de.schlichtherle.truezip.io.archive.spi.ArchiveDriver}s used by the global
- * archive driver registry are serializable, too.
- * <p>
- * Note that it's actually discouraged to serialize {@link File} instances.
- * It's only supported due to the implementation of this feature in its base
- * class {@code java.io.File}.
- * Instead of serializing {@link File} instances, a client application
- * should serialize path names instead, which are plain strings.
+ * {@link Serializable} in order to meet the requirements of some client
+ * classes.
+ * Of course, this will only work if the mapped {@link ArchiveDriver}s are
+ * serializable, too.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
+public final class GlobalArchiveDriverRegistry
+        extends ArchiveDriverRegistry
+        implements Serializable {
 
     private static final long serialVersionUID = 1579600190374703884L;
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.archive.GlobalArchiveDriverRegistry";
+            = GlobalArchiveDriverRegistry.class.getName();
+    private static final String PACKAGE_NAME
+            = GlobalArchiveDriverRegistry.class.getPackage().getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private static final String KWD_NULL = "NULL";  // NOI18N
-    private static final String KWD_ALL = "ALL";    // NOI18N
+    static final String KWD_NULL = "NULL";  // NOI18N
+    static final String KWD_ALL = "ALL";    // NOI18N
 
+    private static final String PROP_KEY_REGISTRY = PACKAGE_NAME;
     private static final String PROP_KEY_DEFAULT_SUFFIXES
-            = "de.schlichtherle.truezip.io.archive.default";
-    private static final String PROP_KEY_REGISTRY
-            = "de.schlichtherle.truezip.io.archive.registry";
+            = PROP_KEY_REGISTRY + ".default";
 
     /** The (pseudo) singleton instance. */
     public static final GlobalArchiveDriverRegistry INSTANCE
@@ -137,7 +132,7 @@ public final class GlobalArchiveDriverRegistry extends ArchiveDriverRegistry {
      */
     private static String[] getServices() {
         return System.getProperty(PROP_KEY_REGISTRY,
-                "META-INF/services/de.schlichtherle.truezip.io.archive.registry.properties") // since TrueZIP 6.5.2 - NOI18N
+                "META-INF/services/" + PACKAGE_NAME + ".properties") // NOI18N
                 .split("\\" + File.pathSeparator); // NOI18N
     }
 
