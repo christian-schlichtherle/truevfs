@@ -1534,13 +1534,8 @@ public class File extends java.io.File {
         File.defaultDetector = detector;
     }
 
-    /**
-     * Behaves like the superclass implementation, but actually either
-     * returns {@code null} or a new instance of this class, so you can
-     * safely cast it.
-     */
     @Override
-    public java.io.File getParentFile() {
+    public File getParentFile() {
         final java.io.File parent = delegate.getParentFile();
         if (parent == null)
             return null;
@@ -1571,12 +1566,8 @@ public class File extends java.io.File {
                 : (File) getParentFile();
     }
 
-    /**
-     * Behaves like the superclass implementation, but returns a new instance
-     * of this class, so you can safely cast it.
-     */
     @Override
-    public java.io.File getAbsoluteFile() {
+    public File getAbsoluteFile() {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = (File) enclArchive.getAbsoluteFile();
@@ -1646,12 +1637,8 @@ public class File extends java.io.File {
         return Paths.normalize(getPath(), separatorChar);
     }
 
-    /**
-     * Behaves like the superclass implementation, but returns a new instance
-     * of this class, so you can safely cast it.
-     */
     @Override
-    public java.io.File getCanonicalFile() throws IOException {
+    public File getCanonicalFile() throws IOException {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = (File) enclArchive.getCanonicalFile();
@@ -2470,7 +2457,7 @@ public class File extends java.io.File {
      * listFiles((FilenameFilter) null, getArchiveDetector())}.
      */
     @Override
-    public java.io.File[] listFiles() {
+    public File[] listFiles() {
         return listFiles((FilenameFilter) null, detector);
     }
 
@@ -2478,10 +2465,6 @@ public class File extends java.io.File {
      * Returns {@code File} objects for the members in this directory
      * in a newly created array.
      * The returned array is <em>not</em> sorted.
-     * <p>
-     * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of {@code java.io.File}
-     * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
@@ -2504,7 +2487,7 @@ public class File extends java.io.File {
      * listFiles(filenameFilter, getArchiveDetector())}.
      */
     @Override
-    public java.io.File[] listFiles(final FilenameFilter filenameFilter) {
+    public File[] listFiles(final FilenameFilter filenameFilter) {
         return listFiles(filenameFilter, detector);
     }
 
@@ -2513,10 +2496,6 @@ public class File extends java.io.File {
      * which are accepted by {@code filenameFilter} in a newly created
      * array.
      * The returned array is <em>not</em> sorted.
-     * <p>
-     * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of {@code java.io.File}
-     * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
@@ -2562,7 +2541,7 @@ public class File extends java.io.File {
      * listFiles(fileFilter, getArchiveDetector())}.
      */
     @Override
-    public final java.io.File[] listFiles(final FileFilter fileFilter) {
+    public final File[] listFiles(final FileFilter fileFilter) {
         return listFiles(fileFilter, detector);
     }
 
@@ -2570,10 +2549,6 @@ public class File extends java.io.File {
      * Returns {@code File} objects for the members in this directory
      * which are accepted by {@code fileFilter} in a newly created array.
      * The returned array is <em>not</em> sorted.
-     * <p>
-     * Since TrueZIP 6.4, the returned array is an array of this class.
-     * Previously, the returned array was an array of {@code java.io.File}
-     * which solely contained instances of this class.
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
