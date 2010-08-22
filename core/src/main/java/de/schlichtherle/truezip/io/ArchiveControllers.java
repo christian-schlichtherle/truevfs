@@ -543,7 +543,7 @@ public final class ArchiveControllers {
                     }
                     assert value != null;
                     assert value instanceof ArchiveController;
-                    if (((ArchiveController) value).getPath().startsWith(prefix))
+                    if (((ArchiveController) value).getCanonicalPath().startsWith(prefix))
                         snapshot.add((ArchiveController) value);
                 }
             }

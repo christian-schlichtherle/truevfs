@@ -231,7 +231,7 @@ abstract class ArchiveController implements Archive {
         return target;
     }
 
-    public final String getPath() {
+    public final String getCanonicalPath() {
         return target.getPath();
     }
 
@@ -471,7 +471,7 @@ abstract class ArchiveController implements Archive {
         int deleted = 0;
         // Do the logging part and leave the work to umount0.
         Object[] stats = new Object[] {
-            getPath(),
+            getCanonicalPath(),
             exceptionChain,
             Boolean.valueOf(waitInputStreams),
             Boolean.valueOf(closeInputStreams),
@@ -493,7 +493,7 @@ abstract class ArchiveController implements Archive {
             throw ex;
         }
         stats = new Object[] { // update
-            getPath(),
+            getCanonicalPath(),
             exceptionChain,
             Boolean.valueOf(waitInputStreams),
             Boolean.valueOf(closeInputStreams),
@@ -541,7 +541,7 @@ abstract class ArchiveController implements Archive {
 
     @Override
     public String toString() {
-        return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getPath() + ")";
+        return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getCanonicalPath() + ")";
     }
 
     //
@@ -1286,7 +1286,7 @@ abstract class ArchiveController implements Archive {
                 // TODO: Review: This is an archive driver dependency!
                 // Calling it doesn't harm, but please consider a more opaque
                 // way to model this.
-                PromptingKeyManager.resetKeyProvider(getPath());
+                PromptingKeyManager.resetKeyProvider(getCanonicalPath());
                 // Delete the target file or the entry in the enclosing
                 // archive file, too.
                 if (isRfsEntryTarget()) {
@@ -1571,9 +1571,9 @@ abstract class ArchiveController implements Archive {
         public String getMessage() {
             String msg = super.getMessage();
             if (msg != null)
-                return getPath() + " (" + msg + ")";
+                return getCanonicalPath() + " (" + msg + ")";
             else
-                return getPath();
+                return getCanonicalPath();
         }
     } // class ArchiveFileNotFoundException
 
@@ -1598,7 +1598,7 @@ abstract class ArchiveController implements Archive {
 
         @Override
         public String getMessage() {
-            String path = getPath();
+            String path = getCanonicalPath();
             if (!isRoot(entryName))
                 path += File.separator
                      + entryName.replace(SEPARATOR_CHAR, File.separatorChar);

@@ -183,6 +183,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *         prospective RAES encrypted ZIP file.
      */
     public RaesParameters getRaesParameters(Archive archive) {
-        return new KeyManagerRaesParameters(archive.getPath());
+        return new KeyManagerRaesParameters(archive.getCanonicalPath());
     }
 }
