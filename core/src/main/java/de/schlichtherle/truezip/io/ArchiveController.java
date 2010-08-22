@@ -568,10 +568,10 @@ abstract class ArchiveController implements Archive {
             return createInputStream0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.createInputStream(enclEntryName(entryName));
-        } catch (ArchiveFileBusyException ex) {
-            throw new FileBusyException(ex);
         } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
             throw ex;
+        } catch (ArchiveFileBusyException ex) {
+            throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
                     = new FileNotFoundException(ioe.toString());
@@ -652,10 +652,10 @@ abstract class ArchiveController implements Archive {
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.createOutputStream(enclEntryName(entryName),
                     append);
-        } catch (ArchiveFileBusyException ex) {
-            throw new FileBusyException(ex);
         } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
             throw ex;
+        } catch (ArchiveFileBusyException ex) {
+            throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
                     = new FileNotFoundException(ioe.toString());
