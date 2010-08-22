@@ -81,11 +81,12 @@ import java.io.InputStream;
 public class FileInputStream extends FilterInputStream {
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileInputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional stream
-     *         for the archive file.
+     *         archive driver does not support to create an additional input
+     *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
     public FileInputStream(String name)
@@ -94,11 +95,12 @@ public class FileInputStream extends FilterInputStream {
     }
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileInputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional stream
-     *         for the archive file.
+     *         archive driver does not support to create an additional input
+     *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
     public FileInputStream(java.io.File file)
@@ -106,13 +108,6 @@ public class FileInputStream extends FilterInputStream {
         super(createInputStream(file));
     }
 
-    /**
-     * Behaves like the super class.
-     *
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional stream
-     *         for the archive file.
-     */
     public FileInputStream(FileDescriptor fd) {
         super(new java.io.FileInputStream(fd));
     }
