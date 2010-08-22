@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.ArchiveEntryMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.util.zip.DateTimeConverter;
+import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 import javax.swing.Icon;
 
 /**
@@ -31,16 +31,16 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public class ZipEntry
-        extends de.schlichtherle.truezip.util.zip.ZipEntry
+        extends de.schlichtherle.truezip.io.zip.ZipEntry
         implements ArchiveEntry {
 
     static {
-        assert de.schlichtherle.truezip.util.zip.ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
+        assert de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
     }
 
     /** The unknown value for numeric properties. */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final byte UNKNOWN = de.schlichtherle.truezip.util.zip.ZipEntry.UNKNOWN;
+    public static final byte UNKNOWN = de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
 
     private ArchiveEntryMetaData metaData;
 
@@ -62,7 +62,7 @@ public class ZipEntry
      *         required for ArchiveDriver's anyway.
      */
     @Override
-    public de.schlichtherle.truezip.util.zip.ZipEntry clone() {
+    public de.schlichtherle.truezip.io.zip.ZipEntry clone() {
         throw new UnsupportedOperationException("Cloning doesn't work with ArchiveEntryMetaData and is not required for an ArchiveDriver anyway.");
     }
 

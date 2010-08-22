@@ -25,18 +25,17 @@ import javax.swing.Icon;
  * Drivers need to implement this interface in order to allow TrueZIP to
  * read and write entries for the supported archive types.
  * <p>
- * Implementations do <em>not</em> need to be thread safe:
+ * Note that implementations do <em>not</em> need to be thread safe:
  * Multithreading is addressed in the package {@code de.schlichtherle.truezip.io}.
  *
  * <h3><a name="entryName">Requirements for Archive Entry Names</a></h3>
  * <p>
- * TrueZIP 6 has the following requirements for archive entry names:
+ * TrueZIP has the following requirements for archive entry names:
  * <ol>
  * <li>An entry name is a list of directory or file names whichs elements
  *     are separated by single separators ({@link #SEPARATOR}).
- * <li>An empty string ({@code &quot;&quot;}), a dot
- *     ({@code &quot;.&quot;}), or a dot-dot ({@code &quot;..&quot;})
- *     is not permissible as a directory or file name.
+ * <li>A dot ({@code "."}) or a dot-dot ({@code ".."})
+ *     is not permissible as a directory or file name in an entry name.
  * <li>If an entry name starts with a separator, it's said to be
  *     <i>absolute</i>.
  *     Absolute entries are not accessible by client applications, but are
@@ -44,8 +43,8 @@ import javax.swing.Icon;
  * <li>If an entry name ends with a separator, it denotes a directory
  *     and vice versa.
  * </ol>
- * For example, {@code &quot;foo/bar&quot;} denotes a valid entry
- * name for a file, but {@code &quot;./abc/../foo/./def/./../bar/.&quot;}
+ * For example, {@code "foo/bar"} denotes a valid entry
+ * name for a file, but {@code "./abc/../foo/./def/./../bar/."}
  * would not, although both refer to the same entry.
  * <p>
  * As another example, {@code &quot;dir/&quot;} denotes a valid entry
@@ -58,16 +57,9 @@ import javax.swing.Icon;
  * For example, the ZIP and TAR file formats conform to all but the second
  * requirement.
  * So the driver implementations for the archive types use
- * {@link de.schlichtherle.truezip.io.util.Paths#normalize(String, char)} to remove
+ * {@link de.schlichtherle.truezip.io.util.PathUtils#normalize(String, char)} to remove
  * any redundant elements from the path.
- * <p>
- * It's hoped that these requirements can be relaxed, but this would imply
- * some minor changes in the service provider interface for archive drivers,
- * so it's not going to happen in this major version number.
  *
- * @see de.schlichtherle.truezip.io.util.Paths#normalize(String, char) A utility
- *      method to remove empty and dot and dot-dot elements from an archive
- *      entry name
  * @author Christian Schlichtherle
  * @version $Id$
  */

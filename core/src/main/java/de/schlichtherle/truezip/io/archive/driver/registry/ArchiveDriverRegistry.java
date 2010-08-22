@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
-import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -27,6 +26,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
 
 /**
  * The head of a chain of registries for archive file suffixes and archive
@@ -253,7 +254,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
     private static ArchiveDriver createArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
-                driver = ClassLoaderUtil.loadClass((String) driver, ArchiveDriverRegistry.class);
+                driver = loadClass((String) driver, ArchiveDriverRegistry.class);
             if (driver instanceof Class)
                 driver = ((Class) driver).newInstance();
             return (ArchiveDriver) driver; // may throw ClassCastException

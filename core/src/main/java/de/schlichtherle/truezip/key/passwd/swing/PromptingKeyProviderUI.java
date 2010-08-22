@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.key.KeyPromptingTimeoutException;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
-import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.awt.Window;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -36,6 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+
+import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.
@@ -166,7 +167,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
             String n = System.getProperty(
                     PACKAGE_NAME + "." + type,
                     PACKAGE_NAME + ".Basic" + type);
-            Class c = ClassLoaderUtil.loadClass(n, PromptingKeyProviderUI.class);
+            Class c = loadClass(n, PromptingKeyProviderUI.class);
             Feedback f = (Feedback) c.newInstance();
             return f;
         } catch (ClassNotFoundException ex) {

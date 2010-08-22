@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.InputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.zip.BasicZipFile;
+import de.schlichtherle.truezip.io.zip.BasicZipFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ public class ZipInputArchive
     public ZipInputArchive(
             ReadOnlyFile rof,
             String charset,
-            de.schlichtherle.truezip.util.zip.ZipEntryFactory factory,
+            de.schlichtherle.truezip.io.zip.ZipEntryFactory factory,
             boolean preambled,
             boolean postambled)
     throws  NullPointerException,
