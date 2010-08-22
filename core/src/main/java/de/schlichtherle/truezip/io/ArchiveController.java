@@ -1339,9 +1339,9 @@ abstract class ArchiveController implements Archive {
     //
 
     /**
-     * Thrown if a controller's target file is a false positive archive file
-     * which actually exists as a plain file or directory in the real file
-     * system or in an enclosing archive file.
+     * Indicates that the target file of an archive controller is a false
+     * positive archive file which actually exists as a plain file or directory
+     * in the real file system or in an enclosing archive file.
      * <p>
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
@@ -1394,9 +1394,9 @@ abstract class ArchiveController implements Archive {
     } // class FalsePositiveException
 
     /**
-     * Thrown if a controller's target file is a false positive archive file
-     * which actually exists as a plain file or directory in the real file
-     * system.
+     * Indicates that the target file of an archive controller is a false
+     * positive archive file which actually exists as a plain file or directory
+     * in the real file system.
      * <p>
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
@@ -1420,9 +1420,9 @@ abstract class ArchiveController implements Archive {
     } // class RfsEntryFalsePositiveException
 
     /**
-     * Thrown if a controller's target file is a false positive archive file
-     * which actually exists as a plain file or directory in an enclosing
-     * archive file.
+     * Indicates that the target file of an archive controller is a false
+     * positive archive file which actually exists as a plain file or directory
+     * in an enclosing archive file.
      * <p>
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
@@ -1482,8 +1482,9 @@ abstract class ArchiveController implements Archive {
     } // class ArchiveEntryFalsePositiveException
 
     /**
-     * Thrown if a controller's target file is a false positive archive file
-     * which actually exists as a plain file in an enclosing archive file.
+     * Indicates that the target file of an archive controller is a false
+     * positive archive file which actually exists as a plain file in an
+     * enclosing archive file.
      * <p>
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
@@ -1517,8 +1518,9 @@ abstract class ArchiveController implements Archive {
     } // class FileArchiveEntryFalsePositiveException
 
     /**
-     * Thrown if a controller's target file is a false positive archive file
-     * which actually exists as a plain directory in an enclosing archive file.
+     * Indicates that the target file of an archive controller is a false
+     * positive archive file which actually exists as a plain directory in an
+     * enclosing archive file.
      * <p>
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
