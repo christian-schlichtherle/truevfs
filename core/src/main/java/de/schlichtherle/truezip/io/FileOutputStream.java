@@ -82,7 +82,8 @@ import java.io.OutputStream;
 public class FileOutputStream extends FilterOutputStream {
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileOutputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
@@ -96,7 +97,8 @@ public class FileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileOutputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
@@ -110,7 +112,8 @@ public class FileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileOutputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
@@ -123,7 +126,8 @@ public class FileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Behaves like the super class, but also supports archive entry files.
+     * Creates a new {@code FileOutputStream} for accessing regular files or
+     * archive entries.
      *
      * @throws FileBusyException If the path denotes an archive entry and the
      *         archive driver does not support to create an additional output
@@ -135,13 +139,6 @@ public class FileOutputStream extends FilterOutputStream {
         super(createOutputStream(file, append));
     }
 
-    /**
-     * Behaves like the super class.
-     *
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional output
-     *         stream for the archive file.
-     */
     public FileOutputStream(FileDescriptor fd) {
         super(new java.io.FileOutputStream(fd));
     }
