@@ -56,9 +56,9 @@ public class AbstractKeyProviderTest extends TestCase {
         private final int rnd = (int) Math.random();
 
         @Override
-        public Object clone() {
+        public CloneMe clone() {
             try {
-                return super.clone();
+                return (CloneMe) super.clone();
             } catch (CloneNotSupportedException ex) {
                 throw new AssertionError();
             }
