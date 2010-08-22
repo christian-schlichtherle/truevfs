@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.ArchiveControllers;
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 
 /**
  * Indicates that an archive file could not get updated because some input or
@@ -27,7 +28,7 @@ import de.schlichtherle.truezip.io.ArchiveControllers;
  * In order to recover from this exception, client applications may call
  * {@link ArchiveControllers#umount(String, boolean, boolean, boolean, boolean, boolean)}
  * in order to force all entry streams for all archive files to close and
- * prepare to catch the resulting {@link ArchiveBusyWarningException}.
+ * prepare to catch the resulting {@link ArchiveFileBusyWarningException}.
  * A subsequent try to create the archive entry stream will then succeed
  * unless other exceptional conditions apply.
  * However, if the client application is still using a disconnected stream,

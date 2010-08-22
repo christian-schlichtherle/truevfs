@@ -40,7 +40,7 @@ import java.io.FileNotFoundException;
  * unless any other exceptional condition occurs.
  * However, if the client application is still using a disconnected stream,
  * it will receive an {@link ArchiveEntryStreamClosedException} on the next
- * call to any other method than {@close close()}.
+ * call to any other method than {@code close()}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @author Christian Schlichtherle
