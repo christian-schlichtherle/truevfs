@@ -133,7 +133,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         // Do the logging part and leave the work to mount0.
         logger.log(Level.FINER, "mount.entering", // NOI18N
                 new Object[] {
-                    getPath(),
+                    getCanonicalPath(),
                     Boolean.valueOf(autoCreate),
         });
         try {
@@ -622,7 +622,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
 
         // Do the logging part and leave the work to umount0.
         final Object[] stats = new Object[] {
-            getPath(),
+            getCanonicalPath(),
             exceptionChain,
             Boolean.valueOf(waitInputStreams),
             Boolean.valueOf(closeInputStreams),
@@ -666,9 +666,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             if (outStreams > 0) {
                 if (!closeOutputStreams)
                     throw new ArchiveFileOutputBusyException(
-                            newExceptionChain, getPath(), outStreams);
+                            newExceptionChain, getCanonicalPath(), outStreams);
                 newExceptionChain = new ArchiveFileOutputBusyWarningException(
-                        newExceptionChain, getPath(), outStreams);
+                        newExceptionChain, getCanonicalPath(), outStreams);
             }
         }
         if (inArchive != null) {
@@ -678,9 +678,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             if (inStreams > 0) {
                 if (!closeInputStreams)
                     throw new ArchiveFileInputBusyException(
-                            newExceptionChain, getPath(), inStreams);
+                            newExceptionChain, getCanonicalPath(), inStreams);
                 newExceptionChain = new ArchiveFileInputBusyWarningException(
-                        newExceptionChain, getPath(), inStreams);
+                        newExceptionChain, getCanonicalPath(), inStreams);
             }
         }
 
@@ -821,7 +821,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                     exceptionChain = inputEntryCorrupted
                                             = new ArchiveControllerWarningException(
                                                 exceptionChain,
-                                                getPath() + " (skipped one or more corrupted archive entries in the input)",
+                                                getCanonicalPath() + " (skipped one or more corrupted archive entries in the input)",
                                                 ex);
                                 }
                                 continue;
@@ -839,7 +839,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                         exceptionChain = outputEntryCorrupted
                                                 = new ArchiveControllerWarningException(
                                                     exceptionChain,
-                                                    getPath() + " (one or more archive entries in the output are corrupted)",
+                                                    getCanonicalPath() + " (one or more archive entries in the output are corrupted)",
                                                     ex);
                                     }
                                 } finally {
@@ -853,7 +853,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                                         exceptionChain = inputEntryCorrupted
                                                 = new ArchiveControllerWarningException(
                                                     exceptionChain,
-                                                    getPath() + " (one or more archive entries in the input are corrupted)",
+                                                    getCanonicalPath() + " (one or more archive entries in the input are corrupted)",
                                                     ex);
                                     }
                                     throw ex;
@@ -897,7 +897,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             throw ex;
         } catch (IOException ex) {
             throw new ArchiveControllerException(exceptionChain,
-                    getPath() + " (could not update archive file - all changes are lost)",
+                    getCanonicalPath() + " (could not update archive file - all changes are lost)",
                     ex);
         }
 
@@ -906,7 +906,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         // hence preserving it.
         if (!outFile.setLastModified(root.getTime()))
             exceptionChain = new ArchiveControllerWarningException(exceptionChain,
-                    getPath() + " (couldn't preserve last modification time)");
+                    getCanonicalPath() + " (couldn't preserve last modification time)");
 
         return exceptionChain;
     }
@@ -931,7 +931,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 // has been deleted from the master directory meanwhile.
                 // Create a warning exception, but do not yet throw it.
                 exceptionChain = new ArchiveControllerWarningException(exceptionChain,
-                        getPath() + " (couldn't remove archive entry: " + entryName + ")");
+                        getCanonicalPath() + " (couldn't remove archive entry: " + entryName + ")");
             }
         }
 
@@ -993,7 +993,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 } catch (IOException cause) {
                     throw new ArchiveControllerException(
                             exceptionChain,
-                            getPath()
+                            getCanonicalPath()
                                 + " (could not reassemble archive file - all changes are lost)",
                             cause);
                 }
@@ -1006,7 +1006,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                 if (time != 0 && !getTarget().setLastModified(time)) {
                     exceptionChain = new ArchiveControllerWarningException(
                             exceptionChain,
-                            getPath()
+                            getCanonicalPath()
                                 + " (couldn't preserve last modification time)");
                 }
             }
@@ -1018,7 +1018,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             } catch (IOException cause) {
                 throw new ArchiveControllerException(
                         exceptionChain,
-                        getEnclController().getPath() + "/" + getEnclEntryName()
+                        getEnclController().getCanonicalPath() + "/" + getEnclEntryName()
                             + " (could not update archive entry - all changes are lost)",
                         cause);
             }
@@ -1094,7 +1094,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
     @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
         try {
-            logger.log(Level.FINEST, "finalize.entering", getPath()); // NOI18N
+            logger.log(Level.FINEST, "finalize.entering", getCanonicalPath()); // NOI18N
             // Note: If fileSystem or inArchive are not null, then the controller
             // has been used to perform read operations.
             // If outArchive is not null, the controller has been used to perform
@@ -1105,7 +1105,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             // Tactical note: Assertions don't work in a finalizer, so we use
             // logging.
             if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
-                logger.log(Level.SEVERE, "finalize.invalidState", getPath());
+                logger.log(Level.SEVERE, "finalize.invalidState", getCanonicalPath());
             shutdownStep1(null);
             shutdownStep2(null);
             shutdownStep3(true);

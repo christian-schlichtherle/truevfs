@@ -45,7 +45,7 @@ public interface Archive {
      *         - never {@code null}.
      * @see #getEnclArchive
      */
-    String getPath();
+    String getCanonicalPath();
 
     /**
      * @return The enclosing archive or {@code null} if this archive is

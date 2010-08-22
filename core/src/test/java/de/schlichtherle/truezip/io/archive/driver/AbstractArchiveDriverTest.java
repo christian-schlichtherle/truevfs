@@ -177,7 +177,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         public InputArchive createInputArchive(Archive archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
-                    archive.getPath() + " (inaccessible archive file)");
+                    archive.getCanonicalPath() + " (inaccessible archive file)");
         }
 
         public ArchiveEntry createArchiveEntry(Archive archive, String entryName, ArchiveEntry template)
@@ -188,7 +188,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         public OutputArchive createOutputArchive(Archive archive, OutputStream out, InputArchive source)
         throws IOException {
             throw new FileNotFoundException(
-                    archive.getPath() + " (inaccessible archive file)");
+                    archive.getCanonicalPath() + " (inaccessible archive file)");
         }
     }
 }
