@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 public final class ArchiveControllers {
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.ArchiveControllers";
+            = ArchiveControllers.class.getName();
     private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**
@@ -57,12 +57,13 @@ public final class ArchiveControllers {
      * to {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map controllers = new WeakHashMap();
+    private static final Map<java.io.File, Object> controllers
+            = new WeakHashMap<java.io.File, Object>();
 
-    private static final Comparator REVERSE_CONTROLLERS = new Comparator() {
-        public int compare(Object o1, Object o2) {
-            return  ((ArchiveController) o2).getTarget().compareTo(
-                    ((ArchiveController) o1).getTarget());
+    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
+            = new Comparator<ArchiveController>() {
+        public int compare(ArchiveController l, ArchiveController r) {
+            return  r.getTarget().compareTo(l.getTarget());
         }
     };
 
@@ -171,7 +172,7 @@ public final class ArchiveControllers {
      * @param target The target file. This must not be {@code null} or
      *        an instance of the {@code File} class in this package!
      * @param controller An {@link ArchiveController} or a
-     *        {@link WeakReference} to an archive controller.
+     *        {@link WeakReference} to an {@link ArchiveController}.
      */
     static void set(final java.io.File target, final Object controller) {
         assert target != null;
@@ -508,8 +509,8 @@ public final class ArchiveControllers {
         }
     } // class LiveStatistics
 
-    private static final class ControllerEnumeration implements Enumeration {
-        private final Iterator it;
+    private static final class ControllerEnumeration implements Enumeration<ArchiveController> {
+        private final Iterator<ArchiveController> it;
 
         ControllerEnumeration() {
             this("", null);
@@ -518,7 +519,7 @@ public final class ArchiveControllers {
         ControllerEnumeration(final String prefix, final Comparator c) {
             assert prefix != null;
 
-            final Set snapshot;
+            final Set<ArchiveController> snapshot;
             synchronized (controllers) {
                 if (c != null) {
                     snapshot = new TreeSet(c);
@@ -543,7 +544,7 @@ public final class ArchiveControllers {
                     assert value != null;
                     assert value instanceof ArchiveController;
                     if (((ArchiveController) value).getPath().startsWith(prefix))
-                        snapshot.add(value);
+                        snapshot.add((ArchiveController) value);
                 }
             }
 
@@ -554,7 +555,7 @@ public final class ArchiveControllers {
             return it.hasNext();
         }
 
-        public Object nextElement() {
+        public ArchiveController nextElement() {
             return it.next();
         }
     } // class ControllerEnumeration
