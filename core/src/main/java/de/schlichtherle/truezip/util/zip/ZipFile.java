@@ -115,16 +115,24 @@ public class ZipFile extends BasicZipFile {
      * @throws IOException On any other I/O related issue.
      */
     public ZipFile(
-            String name,
-            String charset,
-            boolean preambled,
-            boolean postambled)
+            final String name,
+            final String charset,
+            final boolean preambled,
+            final boolean postambled)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,
             ZipException,
             IOException {
-        super(  new SimpleReadOnlyFile(new File(name)),
+        super(  new ReadOnlyFileSource() {
+                    public ReadOnlyFile fetch() throws IOException {
+                        return new SimpleReadOnlyFile(new File(name));
+                    }
+
+                    public void release(ReadOnlyFile rof) throws IOException {
+                        rof.close();
+                    }
+                },
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = name;
@@ -190,16 +198,24 @@ public class ZipFile extends BasicZipFile {
      * @throws IOException On any other I/O related issue.
      */
     public ZipFile(
-            File file,
-            String charset,
-            boolean preambled,
-            boolean postambled)
+            final File file,
+            final String charset,
+            final boolean preambled,
+            final boolean postambled)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,
             ZipException,
             IOException {
-        super(  new SimpleReadOnlyFile(file),
+        super(  new ReadOnlyFileSource() {
+                    public ReadOnlyFile fetch() throws IOException {
+                        return new SimpleReadOnlyFile(file);
+                    }
+
+                    public void release(ReadOnlyFile rof) throws IOException {
+                        rof.close();
+                    }
+                },
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = file.getPath();
@@ -290,17 +306,17 @@ public class ZipFile extends BasicZipFile {
 
     /** Enumerates clones of all entries in this ZIP file. */
     @Override
-    public synchronized Enumeration entries() {
-	return new Enumeration() {
-            Enumeration e = ZipFile.super.entries();
+    public synchronized Enumeration<? extends ZipEntry> entries() {
+        return new Enumeration<ZipEntry>() {
+            Enumeration<? extends ZipEntry> e = ZipFile.super.entries();
 
             public boolean hasMoreElements() {
-		return e.hasMoreElements();
-	    }
+                return e.hasMoreElements();
+            }
 
-	    public Object nextElement() {
-		return ((ZipEntry) e.nextElement()).clone();
-	    }
+            public ZipEntry nextElement() {
+                return e.nextElement().clone();
+            }
         };
     }
 

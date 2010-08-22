@@ -142,162 +142,134 @@ public abstract class ZipTestCase extends TestCase {
 
         try {
             createZipOutputStream(null, null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipOutputStream(new ByteArrayOutputStream(), null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipOutputStream(null, "UTF-8");
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipOutputStream(new ByteArrayOutputStream(), "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        }
-        catch (UnsupportedEncodingException uee) {
-            // This is the expected result!
+        } catch (UnsupportedEncodingException uee) {
         }
 
         try {
             createZipFile((String) null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((String) null, null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((String) null, "UTF-8");
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
-            createZipFile(zip.getName(), null);
-            fail("Use of null arguments must throw a NullPointerException!");
-        }
-        catch (NullPointerException npe) {
-            // This is the expected result!
+            createZipFile(zip.getPath(), null);
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
 
         try {
             createZipFile((File) null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((File) null, null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((File) null, "UTF-8");
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(zip, null);
-            fail("Use of null arguments must throw a NullPointerException!");
-        }
-        catch (NullPointerException npe) {
-            // This is the expected result!
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
 
         try {
             createZipFile((ReadOnlyFile) null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((ReadOnlyFile) null, null);
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile((ReadOnlyFile) null, "UTF-8");
-            fail("Use of null arguments must throw a NullPointerException!");
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
-        catch (NullPointerException npe) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(rof, null);
-            fail("Use of null arguments must throw a NullPointerException!");
-        }
-        catch (NullPointerException npe) {
-            // This is the expected result!
+            fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
         }
 
-        try {
+        /*try {
             createZipFile(zip, "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        }
-        catch (UnsupportedEncodingException uee) {
-            // This is the expected result!
-        }
+        } catch (UnsupportedEncodingException uee) {
+        }*/
 
         try {
-            createZipFile(zip.getName());
+            createZipFile(zip.getPath());
             fail("This is not a valid ZIP file!");
+        } catch (IOException ioe) {
         }
-        catch (IOException ze) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(zip);
             fail("This is not a valid ZIP file!");
+        } catch (IOException ioe) {
         }
-        catch (IOException ze) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(rof);
             fail("This is not a valid ZIP file!");
+        } catch (IOException ioe) {
         }
-        catch (IOException ze) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(zip, "UTF-8");
             fail("This is not a valid ZIP file!");
+        } catch (IOException ioe) {
         }
-        catch (IOException ze) {
-            // This is the expected result!
-        }
+
         try {
             createZipFile(rof, "UTF-8");
             fail("This is not a valid ZIP file!");
-        }
-        catch (IOException ze) {
-            // This is the expected result!
+        } catch (IOException ioe) {
         }
 
         rof.close();

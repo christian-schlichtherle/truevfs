@@ -25,8 +25,6 @@ package de.schlichtherle.truezip.util.zip;
  */
 public interface ZipEntryFactory {
 
-    //ZipEntryFactory DEFAULT = DefaultZipEntryFactory.SINGLETON;
-
     /**
      * Creates a new {@link ZipEntry} with the given name.
      *
