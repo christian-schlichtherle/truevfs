@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningExceptio
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -43,6 +42,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.util.PathUtils.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.util.PathUtils.normalize;
+import static de.schlichtherle.truezip.io.util.PathUtils.split;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -634,7 +637,7 @@ public class File extends java.io.File {
     private static URI unjarFileURI(final URI uri) {
         try {
             final String scheme = uri.getScheme();
-            final String ssp = Paths.normalize(uri.getSchemeSpecificPart(), '/');
+            final String ssp = normalize(uri.getSchemeSpecificPart(), '/');
             return unjarFileURI0(new URI(scheme, ssp, null));
         } catch (URISyntaxException ignored) {
             // Ignore any exception with possibly only a subpart of the
@@ -851,7 +854,7 @@ public class File extends java.io.File {
             return;
         }
 
-        Paths.split(path, separatorChar, split);
+        split(path, separatorChar, split);
         final String parent = split[0];
         final String base = split[1];
 
@@ -939,7 +942,7 @@ public class File extends java.io.File {
         assert detector != null;
 
         init(uri, 0,
-                Paths.cutTrailingSeparators(uri.getSchemeSpecificPart(), '/'),
+                cutTrailingSeparators(uri.getSchemeSpecificPart(), '/'),
                 new String[2]);
 
         if (innerArchive == this) {
@@ -966,7 +969,7 @@ public class File extends java.io.File {
             return;
         }
 
-        Paths.split(path, '/', split);
+        split(path, '/', split);
         String parent = split[0];
         final String base = split[1];
 
@@ -1615,7 +1618,7 @@ public class File extends java.io.File {
      * @see #getNormalizedPath()
      */
     public String getNormalizedAbsolutePath() {
-        return Paths.normalize(getAbsolutePath(), separatorChar);
+        return normalize(getAbsolutePath(), separatorChar);
     }
 
     /**
@@ -1642,7 +1645,7 @@ public class File extends java.io.File {
      * @return The normalized path of this file as a {@link String}.
      */
     public String getNormalizedPath() {
-        return Paths.normalize(getPath(), separatorChar);
+        return normalize(getPath(), separatorChar);
     }
 
     @Override

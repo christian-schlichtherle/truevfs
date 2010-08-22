@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.JointEnumeration;
-import de.schlichtherle.truezip.util.zip.BasicZipOutputStream;
+import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

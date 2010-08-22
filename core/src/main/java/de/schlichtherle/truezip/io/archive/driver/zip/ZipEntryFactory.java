@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.util.Paths;
+import static de.schlichtherle.truezip.io.util.PathUtils.normalize;
 
 /**
  * A factory for {@link ZipEntry}s.
@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.util.Paths;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipEntryFactory implements de.schlichtherle.truezip.util.zip.ZipEntryFactory {
+public class ZipEntryFactory implements de.schlichtherle.truezip.io.zip.ZipEntryFactory {
     
     public static final ZipEntryFactory INSTANCE = new ZipEntryFactory();
 
@@ -32,6 +32,6 @@ public class ZipEntryFactory implements de.schlichtherle.truezip.util.zip.ZipEnt
     }
 
     public ZipEntry newZipEntry(String entryName) {
-        return new ZipEntry(Paths.normalize(entryName, '/'));
+        return new ZipEntry(normalize(entryName, '/'));
     }
 }

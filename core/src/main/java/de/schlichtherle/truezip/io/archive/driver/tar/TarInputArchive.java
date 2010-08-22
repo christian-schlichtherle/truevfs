@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
-import de.schlichtherle.truezip.io.util.Paths;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;
 import java.io.EOFException;
@@ -40,6 +39,7 @@ import org.apache.tools.tar.TarBuffer;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
+import static de.schlichtherle.truezip.io.util.PathUtils.normalize;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
 import static org.apache.tools.tar.TarConstants.MODTIMELEN;
@@ -95,7 +95,7 @@ public class TarInputArchive implements InputArchive {
         try {
             org.apache.tools.tar.TarEntry tinEntry;
             while ((tinEntry = tin.getNextEntry()) != null) {
-                final String name = Paths.normalize(tinEntry.getName(), '/');
+                final String name = normalize(tinEntry.getName(), '/');
                 TarEntry entry;
                 if (tinEntry.isDirectory()) {
                     entry = new TarEntry(tinEntry);

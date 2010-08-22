@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.ArchiveFileSystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
-import de.schlichtherle.truezip.io.util.Paths;
+import de.schlichtherle.truezip.io.util.PathUtils;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.util.Action;
 import java.io.FileNotFoundException;
@@ -134,8 +134,8 @@ final class Files {
    */
   public static java.io.File normalize(final java.io.File file) {
     final String path = file.getPath();
-    final String newPath = Paths.normalize(path, File.separatorChar);
-    return newPath != path // mind contract of Paths.normalize!
+    final String newPath = PathUtils.normalize(path, File.separatorChar);
+    return newPath != path // mind contract of PathUtils.normalize!
             ? new java.io.File(newPath)
             : file;
   }

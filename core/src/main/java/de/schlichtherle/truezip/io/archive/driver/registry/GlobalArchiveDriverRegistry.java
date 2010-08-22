@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.util.SuffixSet;
-import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.schlichtherle.truezip.util.ClassLoaderUtils.getResources;
 
 /**
  * A global registry for mappings from archive file suffixes [{@link String}]
@@ -165,7 +166,7 @@ public final class GlobalArchiveDriverRegistry
 
         final Enumeration urls;
         try {
-            urls = ClassLoaderUtil.getResources(service, GlobalArchiveDriverRegistry.class);
+            urls = getResources(service, GlobalArchiveDriverRegistry.class);
         } catch (IOException ex) {
             logger.log(Level.WARNING, "lookup.ex", ex); // NOI18N
             return;

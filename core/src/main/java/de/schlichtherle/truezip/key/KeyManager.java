@@ -16,12 +16,13 @@
 
 package de.schlichtherle.truezip.key;
 
-import de.schlichtherle.truezip.util.ClassLoaderUtil;
 import java.awt.GraphicsEnvironment;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
 
 /**
  * An abstract class which maintains a static map of {@link KeyProvider}
@@ -118,7 +119,7 @@ public class KeyManager {
                 "de.schlichtherle.truezip.key.KeyManager",
                 getDefaultKeyManagerClassName());
         try {
-            Class c = ClassLoaderUtil.loadClass(n, KeyManager.class);
+            Class c = loadClass(n, KeyManager.class);
             keyManager = (KeyManager) c.newInstance();
         } catch (RuntimeException ex) {
             throw ex;

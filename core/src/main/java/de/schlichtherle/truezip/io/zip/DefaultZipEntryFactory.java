@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,22 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.driver.zip;
-
-import de.schlichtherle.truezip.io.zip.DateTimeConverter;
+package de.schlichtherle.truezip.io.zip;
 
 /**
- * Extends {@link ZipEntry} in order to reflect the different date/time
- * conversion in JAR files.
- *
- * @see ZipDriver
+ * The default factory for {@link ZipEntry}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JarEntry extends ZipEntry {
+class DefaultZipEntryFactory implements ZipEntryFactory {
 
-    protected JarEntry(String entryName) {
-        super(entryName);
+    static final ZipEntryFactory SINGLETON = new DefaultZipEntryFactory();
+
+    private DefaultZipEntryFactory() {
     }
 
-    protected JarEntry(ZipEntry blueprint) {
-        super(blueprint);
-    }
-
-    @Override
-    protected DateTimeConverter getDateTimeConverter() {
-        return DateTimeConverter.JAR;
+    public ZipEntry newZipEntry(String name) {
+        return new ZipEntry(name);
     }
 }

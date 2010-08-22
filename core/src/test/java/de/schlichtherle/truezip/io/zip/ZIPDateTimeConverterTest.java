@@ -14,31 +14,32 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.driver.zip;
+package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
- * Extends {@link ZipEntry} in order to reflect the different date/time
- * conversion in JAR files.
- *
- * @see ZipDriver
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JarEntry extends ZipEntry {
+public class ZIPDateTimeConverterTest extends DateTimeConverterTestCase {
 
-    protected JarEntry(String entryName) {
-        super(entryName);
+    public static Test suite() throws Exception {
+        TestSuite suite = new TestSuite(ZIPDateTimeConverterTest.class);
+
+        return suite;
     }
 
-    protected JarEntry(ZipEntry blueprint) {
-        super(blueprint);
+    public ZIPDateTimeConverterTest(String testName) {
+        super(testName);
     }
 
-    @Override
-    protected DateTimeConverter getDateTimeConverter() {
-        return DateTimeConverter.JAR;
+    protected DateTimeConverter getInstance() {
+        return DateTimeConverter.ZIP;
     }
+
+    // TODO: Add behavioral tests here.
 }
