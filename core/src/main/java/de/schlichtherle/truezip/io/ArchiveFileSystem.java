@@ -48,7 +48,7 @@ final class ArchiveFileSystem {
     private static final String ROOT = SEPARATOR;
 
     /** The controller that this filesystem belongs to. */
-    private final ArchiveFileSystemController controller;
+    private final FileSystemArchiveController controller;
 
     /** The read only status of this file system. */
     private final boolean readOnly;
@@ -81,10 +81,10 @@ final class ArchiveFileSystem {
      * 
      * @param controller The controller which will use this file system.
      *        This constructor will finally call
-     *        {@link ArchiveFileSystemController#touch} once it has fully
+     *        {@link FileSystemArchiveController#touch} once it has fully
      *        initialized this instance.
      */
-    ArchiveFileSystem(final ArchiveFileSystemController controller)
+    ArchiveFileSystem(final FileSystemArchiveController controller)
     throws IOException {
         this.controller = controller;
         touched = 1;
@@ -116,7 +116,7 @@ final class ArchiveFileSystem {
      * @param controller The controller which will use this file system.
      *        This constructor will solely use the controller as a factory
      *        to create missing archive entries using
-     *        {@link ArchiveFileSystemController#createArchiveEntry}.
+     *        {@link FileSystemArchiveController#createArchiveEntry}.
      * @param archive The archive to mount the file system from.
      * @param rootTime The last modification time of the root of the mounted
      *        file system in milliseconds since the epoch.
@@ -125,7 +125,7 @@ final class ArchiveFileSystem {
      *        {@link ArchiveReadOnlyException}.
      */
     ArchiveFileSystem(
-            final ArchiveFileSystemController controller,
+            final FileSystemArchiveController controller,
             final InputArchive archive,
             final long rootTime,
             final boolean readOnly) {
