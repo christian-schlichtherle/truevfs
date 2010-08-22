@@ -87,12 +87,12 @@ public class BasicZipFile implements Closeable {
     private String comment;
 
     /** Maps entry names to zip entries. */
-    private final Map entries = new LinkedHashMap();
+    private final Map<String, ZipEntry> entries = new LinkedHashMap<String, ZipEntry>();
 
     /** The actual data source. */
     private ReadOnlyFile archive;
 
-    /** The number of open streams reading from this ZIP compatible file. */
+    /** The number of fetch streams reading from this ZIP compatible file. */
     private int openStreams;
 
     /** The number of bytes in the preamble of this ZIP compatible file. */
@@ -107,10 +107,11 @@ public class BasicZipFile implements Closeable {
     private final ZipEntryFactory factory;
 
     /**
-     * Opens the given {@link ReadOnlyFile} for reading its entries.
+     * Reads the given {@code archive} in order to provide random access
+     * to its ZIP entries.
      *
-     * @param archive The {@link ReadOnlyFile} instance for random access to
-     *        the ZIP file.
+     * @param archive The {@link ReadOnlyFile} instance to be read in order to
+     *        provide random access to its ZIP entries.
      * @param charset The charset to use for decoding entry names and ZIP file
      *        comment.
      * @param preambled If this is {@code true}, then the ZIP file may have a
@@ -142,7 +143,7 @@ public class BasicZipFile implements Closeable {
      * @throws IOException On any other I/O related issue.
      */
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public BasicZipFile(
+    protected BasicZipFile(
             final ReadOnlyFile archive,
             final String charset,
             final ZipEntryFactory factory,
@@ -153,25 +154,55 @@ public class BasicZipFile implements Closeable {
             FileNotFoundException,
             ZipException,
             IOException {
-        if (archive == null || charset == null || factory == null)
+        this(   new ReadOnlyFileSource() {
+                    public ReadOnlyFile fetch() {
+                        return archive;
+                    }
+
+                    public void release(ReadOnlyFile rof) {
+                        assert archive == rof;
+                    }
+                },
+                charset, factory, preambled, postambled);
+    }
+
+    BasicZipFile(
+            final ReadOnlyFileSource source,
+            final String charset,
+            final ZipEntryFactory zipEntryFactory,
+            boolean preambled,
+            boolean postambled)
+    throws IOException {
+        if (charset == null || zipEntryFactory == null)
             throw new NullPointerException();
         //new String(new byte[0], charset); // may throw UnsupportedEncodingException!
 
-        this.archive = archive;
-        this.charset = charset;
-        this.factory = factory;
+        final ReadOnlyFile rof = source.fetch();
+        try {
+            this.archive = rof;
+            this.charset = charset;
+            this.factory = zipEntryFactory;
 
-        final BufferedReadOnlyFile bzip;
-        if (archive instanceof BufferedReadOnlyFile)
-            bzip = (BufferedReadOnlyFile) archive;
-        else
-            bzip = new BufferedReadOnlyFile(archive);
-        mountCentralDirectory(bzip, preambled, postambled);
-        // Do NOT close brof - would close rof as well!
+            final BufferedReadOnlyFile bzip;
+            if (rof instanceof BufferedReadOnlyFile)
+                bzip = (BufferedReadOnlyFile) rof;
+            else
+                bzip = new BufferedReadOnlyFile(rof);
+            mountCentralDirectory(bzip, preambled, postambled);
+            // Do NOT release brof - would release rof as well!
+        } catch (IOException ioe) {
+            source.release(rof);
+            throw ioe;
+        }
 
-        assert archive != null;
+        assert rof != null;
         assert charset != null;
         assert mapper != null;
+    }
+
+    interface ReadOnlyFileSource {
+        ReadOnlyFile fetch() throws IOException;
+        void release(ReadOnlyFile rof) throws IOException;
     }
 
     /**
@@ -518,7 +549,7 @@ public class BasicZipFile implements Closeable {
     }
 
     /**
-     * Returns {@code true} if and only if some input streams are open to
+     * Returns {@code true} if and only if some input streams are fetch to
      * read from this ZIP compatible file.
      */
     public boolean busy() {
@@ -535,7 +566,7 @@ public class BasicZipFile implements Closeable {
      * Note that the enumerated entries are shared with this class.
      * It is illegal to change their state!
      */
-    public Enumeration entries() {
+    public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 
@@ -548,14 +579,14 @@ public class BasicZipFile implements Closeable {
      * @param name Name of the ZIP entry.
      */
     public ZipEntry getEntry(String name) {
-        return (ZipEntry) entries.get(name);
+        return entries.get(name);
     }
 
     /**
      * Returns the number of entries in this ZIP compatible file.
      */
     public int size() {
-	return entries.size();
+        return entries.size();
     }
 
     /**
@@ -585,7 +616,7 @@ public class BasicZipFile implements Closeable {
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
      * allocated for it. Instead, all streams returned by this method share
      * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
-     * This allows to close this object (and hence the underlying
+     * This allows to release this object (and hence the underlying
      * {@code ReadOnlyFile}) without cooperation of the returned
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
@@ -615,7 +646,7 @@ public class BasicZipFile implements Closeable {
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
      * allocated for it. Instead, all streams returned by this method share
      * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
-     * This allows to close this object (and hence the underlying
+     * This allows to release this object (and hence the underlying
      * {@code ReadOnlyFile}) without cooperation of the returned
      * streams, which is important if the application wants to work on the
      * underlying file again (e.g. update or delete it).
@@ -679,7 +710,7 @@ public class BasicZipFile implements Closeable {
      * Returns an {@code InputStream} for reading the inflated or
      * deflated data of the given entry.
      * <p>
-     * If the {@link #close} method is called on this instance, all input
+     * If the {@link #release} method is called on this instance, all input
      * streams returned by this method are closed, too.
      *
      * @param name The name of the entry to get the stream for
@@ -690,7 +721,7 @@ public class BasicZipFile implements Closeable {
      *        <ol>
      *        <li>All entry headers are checked to have consistent declarations
      *            of the CRC-32 value for the inflated entry data.
-     *        <li>When calling {@link InputStream#close} on the returned entry
+     *        <li>When calling {@link InputStream#release} on the returned entry
      *            stream, the CRC-32 value computed from the inflated entry
      *            data is checked against the declared CRC-32 values.
      *            This is independent from the {@code inflate} parameter.
@@ -806,7 +837,7 @@ public class BasicZipFile implements Closeable {
     }
 
     /**
-     * Ensures that this archive is still open.
+     * Ensures that this archive is still fetch.
      */
     private void ensureOpen() throws ZipException {
         if (archive == null)
@@ -892,7 +923,7 @@ public class BasicZipFile implements Closeable {
     /**
      * A stream which reads and returns deflated data from its input
      * while a CRC-32 checksum is computed over the inflated data and
-     * checked in the method {@code close}.
+     * checked in the method {@code release}.
      */
     private static final class RawCheckedInputStream extends FilterInputStream {
 
@@ -1019,7 +1050,7 @@ public class BasicZipFile implements Closeable {
 
     /**
      * Closes the file.
-     * This closes any open input streams reading from this ZIP file.
+     * This closes any fetch input streams reading from this ZIP file.
      *
      * @throws IOException if an error occurs closing the file.
      */
@@ -1036,8 +1067,8 @@ public class BasicZipFile implements Closeable {
      * InputStream that delegates requests to the underlying
      * RandomAccessFile, making sure that only bytes from a certain
      * range can be read.
-     * Calling close() on the enclosing BasicZipFile instance causes all
-     * corresponding instances of this member class to get close()d, too.
+     * Calling release() on the enclosing BasicZipFile instance causes all
+     * corresponding instances of this member class to get release()d, too.
      * Note that this class is <em>not</em> thread safe!
      */
     private class IntervalInputStream extends AccountedInputStream {

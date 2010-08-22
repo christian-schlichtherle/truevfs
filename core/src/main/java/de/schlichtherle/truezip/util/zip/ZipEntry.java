@@ -114,7 +114,7 @@ public class ZipEntry implements Cloneable {
     }
 
     @Override
-    public Object clone() {
+    public ZipEntry clone() {
         try {
             final ZipEntry entry = (ZipEntry) super.clone();
             entry.setExtra(getExtra());

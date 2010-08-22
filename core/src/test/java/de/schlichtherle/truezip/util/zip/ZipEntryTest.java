@@ -63,7 +63,7 @@ public class ZipEntryTest extends TestCase {
         }
         assertEquals("foo", entry.getName());
 
-        entry = (ZipEntry) entry.clone(); // unlock name in clone
+        entry = entry.clone(); // unlock name in clone
         assertEquals("foo", entry.getName());
         entry.setName("bar");
         try {

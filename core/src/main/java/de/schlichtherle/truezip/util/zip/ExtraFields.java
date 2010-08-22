@@ -41,7 +41,7 @@ final class ExtraFields implements Cloneable {
 
     /** Returns a shallow clone of this collection. */
     @Override
-    public Object clone() {
+    public ExtraFields clone() {
         try {
             final ExtraFields clone = (ExtraFields) super.clone();
             clone.extra = new TreeMap(extra);

@@ -62,7 +62,7 @@ public class ZipEntry
      *         required for ArchiveDriver's anyway.
      */
     @Override
-    public Object clone() {
+    public de.schlichtherle.truezip.util.zip.ZipEntry clone() {
         throw new UnsupportedOperationException("Cloning doesn't work with ArchiveEntryMetaData and is not required for an ArchiveDriver anyway.");
     }
 
