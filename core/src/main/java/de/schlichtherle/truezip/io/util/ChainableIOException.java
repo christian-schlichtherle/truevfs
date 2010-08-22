@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.util;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -22,7 +22,9 @@ import java.io.PrintWriter;
 import java.util.Comparator;
 
 /**
- * Represents a chain of {@link IOException}s.
+ * Represents a chain of subsequently occured {@link IOException}s which have
+ * <em>not</em> caused each other.
+ * <p>
  * This class supports chaining exceptions for reasons other than causes
  * (which is a functionality already provided by J2SE 1.4 and later).
  * A {@code ChainableIOException} can be used to implement an algorithm
@@ -30,25 +32,20 @@ import java.util.Comparator;
  * {@code IOException}s have occured.
  * <p>
  * For example, when looping through a list of files, an algorithm might
- * encounter an {@code IOException} when processing a file element in the list.
+ * encounter an {@link IOException} when processing a file element in the list.
  * However, it may still be required to process the remaining files in the list
- * before actually throwing the corresponding {@code IOException}.
- * Hence, whenever this algorithm encounters an {@code IOException},
- * it would catch the {@code IOException}, create a
+ * before actually throwing the corresponding {@link IOException}.
+ * Hence, whenever this algorithm encounters an {@link IOException},
+ * it would catch the {@link IOException}, create a
  * {@code ChainableIOException} for it and continue processing the
  * remainder of the list.
- * Finally, at the end of the algorithm, if any {@code IOException}s
+ * Finally, at the end of the algorithm, if any {@link IOException}s
  * have occured, the {@code ChainableIOException} chain would get sorted
  * according to priority (see {@link #getPriority()} and
  * {@link #sortPriority()}) and finally thrown.
  * This would allow a client application to filter the exceptions by priority
  * with a simple try-catch statement, ensuring that no other exception of
  * higher priority is in the catched exception chain.
- * <p>
- * <b>Note:</b> This is not related to the cause concept of exceptions in
- * J2SE 1.4 and higher. Exceptions chained by this class are <b>not</b>
- * causes of each other, but have just been merely collected over time
- * and then thrown as one exception (list).
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -70,7 +67,7 @@ public class ChainableIOException extends IOException implements Cloneable {
             return cmp != 0 ? cmp : APPEARANCE_COMP.compare(l, r);
         }
     };
-    
+
     /**
      * Compares two {@code ChainableIOException}s in descending order of their
      * appearance.
@@ -178,9 +175,9 @@ public class ChainableIOException extends IOException implements Cloneable {
      * Returns a <em>shallow</em> clone of this exception.
      */
     @Override
-    public Object clone() {
+    public ChainableIOException clone() {
         try {
-            return super.clone();
+            return (ChainableIOException) super.clone();
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }

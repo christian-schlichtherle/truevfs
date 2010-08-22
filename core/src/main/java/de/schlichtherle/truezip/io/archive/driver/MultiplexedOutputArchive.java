@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.io.util.ChainableIOException;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
