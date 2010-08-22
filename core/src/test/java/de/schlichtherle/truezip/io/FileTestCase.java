@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -634,7 +634,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of fis1
             fail("ArchiveWarningException expected!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (ArchiveFileBusyWarningException expected) {
             // Warning about fis1 still being used.
         }
         assertTrue(file2.isFile());
@@ -655,7 +655,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (ArchiveFileBusyWarningException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -698,7 +698,7 @@ public abstract class FileTestCase extends TestCase {
         } catch (FileBusyException busy) {
             // This is actually an implementation detail which may change in
             // a future version.
-            assertTrue(busy.getCause() instanceof ArchiveBusyException);
+            assertTrue(busy.getCause() instanceof ArchiveFileBusyException);
         }
         
         // fosA is still open!
@@ -714,7 +714,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (ArchiveFileBusyWarningException expected) {
         }
         
         try {
@@ -740,7 +740,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (ArchiveFileBusyWarningException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1485,7 +1485,7 @@ public abstract class FileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (ArchiveBusyException mayHappen) {
+                    } catch (ArchiveFileBusyException mayHappen) {
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1555,7 +1555,7 @@ public abstract class FileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (ArchiveBusyException mayHappen) {
+                        } catch (ArchiveFileBusyException mayHappen) {
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.

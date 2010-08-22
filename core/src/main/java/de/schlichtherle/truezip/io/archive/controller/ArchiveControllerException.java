@@ -53,7 +53,6 @@ import java.io.IOException;
 public class ArchiveControllerException extends ChainableIOException {
     private static final long serialVersionUID = 4893204620357369739L;
 
-    // TODO: Make this constructor package private!
     /**
      * Constructs a new exception with the specified prior exception.
      * This is used when e.g. updating all ZIP files and more than one ZIP
@@ -64,11 +63,10 @@ public class ArchiveControllerException extends ChainableIOException {
      * @param  priorException An exception that happened before and that was
      *         caught. This is <b>not</b> a cause! May be {@code null}.
      */
-    public ArchiveControllerException(ArchiveControllerException priorException) {
+    ArchiveControllerException(ArchiveControllerException priorException) {
         super(priorException);
     }
 
-    // TODO: Make this constructor package private!
     /**
      * Constructs a new exception with the specified prior exception
      * and a message.
@@ -81,13 +79,12 @@ public class ArchiveControllerException extends ChainableIOException {
      *         caught. This is <b>not</b> a cause! May be {@code null}.
      * @param  message The message for this exception.
      */
-    public ArchiveControllerException(
+    ArchiveControllerException(
             ArchiveControllerException priorException,
             String message) {
         super(priorException, message);
     }
     
-    // TODO: Make this constructor package private!
     /**
      * Constructs a new exception with the specified prior exception and the
      * cause.
@@ -103,13 +100,13 @@ public class ArchiveControllerException extends ChainableIOException {
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      */
+    // TODO: Make this constructor package private!
     public ArchiveControllerException(
             ArchiveControllerException priorException,
             IOException cause) {
         super(priorException, cause);
     }
 
-    // TODO: Make this constructor package private!
     /**
      * Constructs a new exception with the specified prior exception,
      * a message and a cause.
@@ -126,6 +123,7 @@ public class ArchiveControllerException extends ChainableIOException {
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.).
      */
+    // TODO: Make this constructor package private!
     public ArchiveControllerException(
             ArchiveControllerException priorException,
             String message,

@@ -29,10 +29,10 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyWarningException extends ArchiveControllerWarningException {
+public class ArchiveFileBusyWarningException extends ArchiveControllerWarningException {
     private static final long serialVersionUID = 2635419873651362891L;
 
-    ArchiveBusyWarningException(ArchiveControllerException priorException, String cPath) {
+    ArchiveFileBusyWarningException(ArchiveControllerException priorException, String cPath) {
         super(priorException, cPath);
     }
 }

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.metadata;
 
 import java.io.IOException;
 
 /**
- * Thrown if an input or output stream for an archive entry has been forced to
- * close when the archive file was (explicitly or implicitly) unmounted.
+ * Indicates that an input or output stream for an archive entry has been
+ * forced to close when the archive file was (explicitly or implicitly)
+ * unmounted.
  *
  * @author Christian Schlichtherle
  * @version $Id$

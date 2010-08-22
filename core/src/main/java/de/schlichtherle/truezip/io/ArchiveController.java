@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
@@ -570,7 +570,7 @@ abstract class ArchiveController implements Archive {
             return enclController.createInputStream(enclEntryName(entryName));
         } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
             throw ex;
-        } catch (ArchiveBusyException ex) {
+        } catch (ArchiveFileBusyException ex) {
             throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
@@ -654,7 +654,7 @@ abstract class ArchiveController implements Archive {
                     append);
         } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
             throw ex;
-        } catch (ArchiveBusyException ex) {
+        } catch (ArchiveFileBusyException ex) {
             throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe

@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;
@@ -216,7 +216,7 @@ public final class ArchiveControllers {
      *        close all {@link FileInputStream} objects or another thread is
      *        still busy doing I/O on an archive.
      *        Then if this parameter is {@code true}, an update is forced
-     *        and an {@link ArchiveBusyWarningException} is finally thrown to
+     *        and an {@link ArchiveFileBusyWarningException} is finally thrown to
      *        indicate that any subsequent operations on these streams
      *        will fail with an {@link ArchiveEntryStreamClosedException}
      *        because they have been forced to close.
@@ -224,7 +224,7 @@ public final class ArchiveControllers {
      *        {@link FileBusyException} thrown by a constructor of
      *        {@link FileInputStream} or {@link FileOutputStream}.
      *        If this parameter is {@code false}, the respective archive
-     *        file is <em>not</em> updated and an {@link ArchiveBusyException}
+     *        file is <em>not</em> updated and an {@link ArchiveFileBusyException}
      *        is thrown to indicate that the application must close all entry
      *        input streams first.
      * @param waitOutputStreams Similar to {@code waitInputStreams},
@@ -253,7 +253,7 @@ public final class ArchiveControllers {
      *         constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         virtual root directory.
-     * @throws ArchiveBusyException If an archive file could not get updated
+     * @throws ArchiveFileBusyException If an archive file could not get updated
      *         because the application is using an open stream.
      *         No data is lost and the archive file can still get updated by
      *         calling this method again.
