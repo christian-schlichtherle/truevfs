@@ -50,15 +50,12 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController extends ArchiveFileSystemController {
-
-    //
-    // Static fields.
-    //
+final class UpdatingArchiveController extends FileSystemArchiveController {
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.UpdatingArchiveController";
-    private static final Logger logger = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+            = UpdatingArchiveController.class.getName();
+    private static final Logger logger
+            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /** Prefix for temporary files created by this class. */
     static final String TEMP_FILE_PREFIX = "tzp-ctrl";

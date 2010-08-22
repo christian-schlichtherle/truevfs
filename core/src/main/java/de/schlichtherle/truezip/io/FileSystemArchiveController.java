@@ -30,15 +30,15 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveFileSystemController extends ArchiveController {
+abstract class FileSystemArchiveController extends ArchiveController {
 
     /** The mount state of the archive file system. */
     private AutoMounter autoMounter = new ResetFileSystem();
 
     /**
-     * Creates a new instance of ArchiveFileSystemController
+     * Creates a new instance of FileSystemArchiveController
      */
-    ArchiveFileSystemController(
+    FileSystemArchiveController(
             java.io.File target,
             ArchiveController enclController,
             String enclEntryName,
