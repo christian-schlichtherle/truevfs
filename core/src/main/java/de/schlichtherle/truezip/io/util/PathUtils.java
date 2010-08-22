@@ -38,10 +38,10 @@ public class PathUtils {
     }
 
     /**
-     * Removes all redundant separators, dot directories
-     * ({@code &quot;.&quot;}) and dot-dot directories
-     * ({@code &quot;..&quot;}) from the path and returns the result.
-     * An empty path results in {@code &quot;.&quot;}.
+     * Removes all redundant separators, dot directories ({@code "."}) and
+     * dot-dot directories ({@code ".."}) from the path name and returns the
+     * result.
+     * An empty path results in {@code "."}.
      * On Windows, a path may be prefixed by a drive letter followed by a
      * colon.
      * On all platforms, a path may be prefixed by two leading separators
@@ -79,10 +79,9 @@ public class PathUtils {
     }
 
     /**
-     * Removes all redundant separators, dot directories
-     * ({@code &quot;.&quot;}) and dot-dot directories
-     * ({@code &quot;..&quot;}) from the path and collects the result
-     * in a string builder.
+     * Removes all redundant separators, dot directories ({@code "."}) and
+     * dot-dot directories ({@code ".."}) from the path name and collects the
+     * result in the given {@link StringBuilder}.
      * This is a recursive call: The top level call should provide
      * {@code 0} as the {@code toSkip} parameter, the length
      * of the path as the {@code end} parameter and an empty string

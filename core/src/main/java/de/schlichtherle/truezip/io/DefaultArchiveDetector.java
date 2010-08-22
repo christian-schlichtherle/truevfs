@@ -67,13 +67,13 @@ import java.util.Map;
  * </ol>
  * <p>
  * Where a constructor expects a suffix list as a parameter, this string must
- * have the form {@code &quot;suffix[|suffix]*&quot;}, where
- * {@code suffix} is a combination of case insensitive letters.
+ * have the form {@code "suffix[|suffix]*"}, where {@code suffix} is a
+ * combination of case insensitive letters.
  * Empty or duplicated suffixes and leading dots are silently ignored
  * and {@code null} is interpreted as an empty list.
- * As an example, the parameter {@code &quot;zip|jar&quot;} would cause
- * the archive detector to recognize ZIP and JAR files in a path.
- * The same would be true for {@code &quot;||.ZIP||.JAR||ZIP||JAR||&quot;},
+ * As an example, the parameter {@code "zip|jar"} would cause the archive
+ * detector to recognize ZIP and JAR files in a path.
+ * The same would be true for {@code "||.ZIP||.JAR||ZIP||JAR||"},
  * but this notation is discouraged because it's not in canonical form
  * (see {@link #getSuffixes}.
  * <p>

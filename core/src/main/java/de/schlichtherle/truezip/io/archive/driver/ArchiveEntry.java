@@ -47,8 +47,8 @@ import javax.swing.Icon;
  * name for a file, but {@code "./abc/../foo/./def/./../bar/."}
  * would not, although both refer to the same entry.
  * <p>
- * As another example, {@code &quot;dir/&quot;} denotes a valid entry
- * name for a directory, but {@code &quot;dir&quot;} would not.
+ * As another example, {@code "dir/"} denotes a valid entry name for a
+ * directory, but {@code "dir"} would not.
  * <p>
  * If an archive driver is to be written for an archive type which does not
  * support these requirements, an adapter for the entry name must be
