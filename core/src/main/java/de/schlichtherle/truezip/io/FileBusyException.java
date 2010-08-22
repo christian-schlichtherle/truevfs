@@ -22,24 +22,25 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedEx
 import java.io.FileNotFoundException;
 
 /**
- * Thrown if an archive entry cannot get accessed because either
- * <p>
- * (a) the client application is trying to input or output to the same archive
- * file concurrently and the respective archive driver does not support this,
- * or
- * (b) the archive file needs an implicit unmount which cannot get performed
- * because the client application is still using some other open streams for
- * the same archive file.
+ * Indicates that an archive entry cannot get accessed because either...
+ * <ul>
+ * <li> the client application is trying to input or output to the same archive
+ *      file concurrently and the respective archive driver does not support
+ *      this, or
+ * <li> the archive file needs an implicit umount which cannot get performed
+ *      because the client application is still using some other open streams
+ *      for the same archive file.
+ * </ul>
  * <p>
  * In order to recover from this exception, client applications may call
  * {@link File#umount()} or {@link File#update()} in order to force all
  * entry streams for all archive files to close and prepare to catch the
  * resulting {@link ArchiveBusyWarningException}.
  * A subsequent try to create the archive entry stream will then succeed
- * unless other exceptional conditions apply.
+ * unless any other exceptional condition occurs.
  * However, if the client application is still using a disconnected stream,
  * it will receive an {@link ArchiveEntryStreamClosedException} on the next
- * call to any other method than {@code close()}.
+ * call to any other method than {@close close()}.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @author Christian Schlichtherle
