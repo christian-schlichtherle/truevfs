@@ -63,7 +63,8 @@ public class ArchiveControllerException extends ChainableIOException {
      * @param  priorException An exception that happened before and that was
      *         caught. This is <b>not</b> a cause! May be {@code null}.
      */
-    ArchiveControllerException(ArchiveControllerException priorException) {
+    // TODO: Make this constructor package private!
+    public ArchiveControllerException(ArchiveControllerException priorException) {
         super(priorException);
     }
 
@@ -79,12 +80,13 @@ public class ArchiveControllerException extends ChainableIOException {
      *         caught. This is <b>not</b> a cause! May be {@code null}.
      * @param  message The message for this exception.
      */
-    ArchiveControllerException(
+    // TODO: Make this constructor package private!
+    public ArchiveControllerException(
             ArchiveControllerException priorException,
             String message) {
         super(priorException, message);
     }
-    
+
     /**
      * Constructs a new exception with the specified prior exception and the
      * cause.
