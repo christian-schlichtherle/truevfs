@@ -86,9 +86,9 @@ public final class InputArchiveMetaData {
      * in case a sloppy client application has forgot to close a stream before
      * calling {@link File#umount} or {@link File#update}.
      */
-    private final Map streams = File.isLenient()
-            ? (Map) new WeakHashMap()
-            : new HashMap();
+    private final Map<InputStream, Thread> streams = File.isLenient()
+            ? new WeakHashMap<InputStream, Thread>()
+            : new HashMap<InputStream, Thread>();
 
     private volatile boolean stopped;
 
@@ -163,11 +163,9 @@ public final class InputArchiveMetaData {
     private int threadStreams() {
         final Thread thisThread = Thread.currentThread();
         int n = 0;
-        for (final Iterator i = streams.values().iterator(); i.hasNext(); ) {
-            final Thread thread = (Thread) i.next();
+        for (final Thread thread : streams.values())
             if (thisThread == thread)
                 n++;
-        }
         return n;
     }
 
