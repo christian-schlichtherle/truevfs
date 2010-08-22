@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
+
 /**
  * Thrown if an archive file has been successfully updated, but some input
  * or output streams for its entries have been forced to close.
