@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.io.util.ChainableIOException;
 import java.io.IOException;
 
 /**

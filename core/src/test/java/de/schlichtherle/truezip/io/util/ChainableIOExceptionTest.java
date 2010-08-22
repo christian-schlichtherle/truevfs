@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.util;
 
+import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.util.ChainableIOException;
 import junit.framework.TestCase;
 
 /**

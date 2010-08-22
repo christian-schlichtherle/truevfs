@@ -1552,8 +1552,9 @@ abstract class ArchiveController implements Archive {
     } // class DirectoryArchiveEntryFalsePositiveException
 
     /**
-     * Thrown if a controller's target file does not exist or is not
-     * accessible.
+     * Indicates that an <i>archive file</i> (the controller's target file)
+     * does not exist or is not accessible.
+     * <p>
      * May be thrown by {@link #autoMount(boolean)} if automatic creation of
      * the target file is not allowed.
      */
@@ -1575,8 +1576,9 @@ abstract class ArchiveController implements Archive {
     } // class ArchiveFileNotFoundException
 
     /**
-     * Thrown if an archive entry does not exist
-     * or is not accessible.
+     * Indicates that an <i>archive entry</i>
+     * does not exist or is not accessible.
+     * <p>
      * May be thrown by {@link #createInputStream} or
      * {@link #createOutputStream}.
      */
