@@ -172,8 +172,8 @@ final class ArchiveFileSystem {
     /**
      * Checks whether the given entry entryName is a legal entry name.
      * A legal entry name does not denote the virtual root directory, the dot
-     * directory ({@code &quot;.&quot;}) or the dot-dot directory
-     * ({@code &quot;..&quot;}) or any of their descendants.
+     * directory ({@code "."}) or the dot-dot directory ({@code ".."}) or any
+     * of their descendants.
      */
     private static boolean isLegalEntryName(final String entryName) {
         final int l = entryName.length();

@@ -523,10 +523,11 @@ monitor.<b>start</b>();
         <p>However, elements in a path which refer to archive entries are always case sensitive.
             This enables the client application to address all files in existing archive files,
             regardless of the operating system they&#39;ve been created on. </p>
-        <p>For existing archive files, redundant elements in entry names such as the empty
-            string ({@code &quot;&quot;}), the dot ({@code &quot;.&quot;}) directory, or the dot-dot ({@code &quot;..&quot;})
-            directory are removed in the VFS when the archive file is read and <em>not</em>
-            retained when the archive file is modified.</p>
+        <p>For existing archive files, redundant elements in entry names such
+            as the empty string ({@code ""}), the dot ({@code "."}) directory,
+            or the dot-dot ({@code ".."}) directory are removed from the path
+            name when the archive file is read and <em>not</em> retained when
+            the archive file is updated.</p>
         <p>If an entry name contains characters which have no representation in the character
             set of the corresponding archive file type, then all file operations to
             create the archive entry will fail gracefully according to the documented contract

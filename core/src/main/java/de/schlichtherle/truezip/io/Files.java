@@ -124,8 +124,8 @@ final class Files {
   }
 
   /**
-   * Removes any {@code &quot;.&quot;} and {@code &quot;..&quot;}
-   * directories from the path wherever possible.
+   * Removes any {@code "."} and {@code ".."} directories from the path name
+   * wherever possible.
    *
    * @param file The file instance which's path is to be normalized.
    * @return {@code file} if it was already in normalized form.

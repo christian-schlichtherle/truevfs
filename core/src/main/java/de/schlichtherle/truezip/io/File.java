@@ -955,7 +955,7 @@ public class File extends java.io.File {
 
     /**
      * TODO: Provide a means to detect other archive schemes, not only
-     * {@code &quot;jar:&quot;}.
+     * {@code "jar:"}.
      */
     private void init(
             URI uri,
@@ -1587,8 +1587,8 @@ public class File extends java.io.File {
 
     /**
      * Similar to {@link #getAbsoluteFile()}, but removes any
-     * {@code &quot;.&quot;} and {@code &quot;..&quot;} directories
-     * from the path wherever possible.
+     * {@code "."} and {@code ".."} directories from the path name wherever
+     * possible.
      * The result is similar to {@link #getCanonicalFile()}, but symbolic
      * links are not resolved.
      * This may be useful if {@code getCanonicalFile()} throws an
@@ -1606,9 +1606,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Similar to {@link #getAbsolutePath()}, but removes any
-     * {@code &quot;.&quot;} and {@code &quot;..&quot;} directories
-     * from the path wherever possible.
+     * Similar to {@link #getAbsolutePath()}, but removes any {@code "."} and
+     * {@code ".."} directories from the path name wherever possible.
      * The result is similar to {@link #getCanonicalPath()}, but symbolic
      * links are not resolved.
      * This may be useful if {@code getCanonicalPath()} throws an
@@ -1622,8 +1621,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Removes any {@code &quot;.&quot;} and {@code &quot;..&quot;}
-     * directories from the path wherever possible.
+     * Removes any {@code "."} and {@code ".."} directories from the path name
+     * wherever possible.
      *
      * @return If this file is already normalized, it is returned.
      *         Otherwise a new instance of this class is returned.
@@ -1639,8 +1638,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Removes any {@code &quot;.&quot;}, {@code &quot;..&quot;} and empty directories
-     * from the path wherever possible.
+     * Removes any {@code "."}, {@code ".."} directories from the path name
+     * wherever possible.
      *
      * @return The normalized path of this file as a {@link String}.
      */
@@ -1741,9 +1740,9 @@ public class File extends java.io.File {
      * archive file, then this methods returns the file representing the
      * enclosing archive file, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all
-     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
-     * removed according to their meaning wherever possible.
+     * This method always returns an undotified path, i.e. all occurences of
+     * {@code "."} and {@code ".."} in the path name are removed according to
+     * their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
      * a {@code File} instance which again could be an entry within
@@ -1755,17 +1754,17 @@ public class File extends java.io.File {
 
     /**
      * Returns the entry name in the innermost archive file.
-     * I.e. if this object is a archive file, then this method returns
-     * the empty string {@code &quot;&quot;}.
+     * I.e. if this object is a archive file, then this method returns the
+     * empty string {@code ""}.
      * If this object is a file or directory located within an
      * archive file, then this method returns the relative path of
      * the entry in the enclosing archive file separated by the entry
      * separator character {@code '/'}, or {@code null}
      * otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all
-     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
-     * removed according to their meaning wherever possible.
+     * This method always returns an undotified path, i.e. all occurences of
+     * {@code "."} and {@code ".."} in the path name are removed according to
+     * their meaning wherever possible.
      */
     public final String getInnerEntryName() {
         return innerEntryName;
@@ -1777,9 +1776,9 @@ public class File extends java.io.File {
      * then this method returns the file representing the enclosing archive
      * file, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all
-     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
-     * removed according to their meaning wherever possible.
+     * This method always returns an undotified path, i.e. all occurences of
+     * {@code "."} and {@code ".."} in the path name are removed according to
+     * their meaning wherever possible.
      * <p>
      * In order to support unlimited nesting levels, this method returns
      * a {@code File} instance which again could be an entry within
@@ -1796,9 +1795,9 @@ public class File extends java.io.File {
      * enclosing archive file separated by the entry separator character
      * {@code '/'}, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all
-     * occurences of {@code &quot;.&quot;} and {@code &quot;..&quot;} in the path are
-     * removed according to their meaning wherever possible.
+     * This method always returns an undotified path, i.e. all occurences of
+     * {@code "."} and {@code ".."} in the path are removed according to their
+     * meaning wherever possible.
      */
     public final String getEnclEntryName() {
         return enclEntryName;
@@ -2069,7 +2068,7 @@ public class File extends java.io.File {
      * This case distinction allows an application on the Windows platform to
      * deal with archive files generated on other platforms which may contain
      * different entries with names that just differ in case
-     * (like e.g. {@code &quot;hello.txt&quot;} and {@code &quot;HELLO.txt&quot;}).
+     * (like e.g. {@code "hello.txt"} and {@code "HELLO.txt"}).
      *
      * @param other The file to be compared with this abstract path.
      *
