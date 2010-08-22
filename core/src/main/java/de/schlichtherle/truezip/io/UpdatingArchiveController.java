@@ -33,6 +33,7 @@ import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.locks.ReentrantLock;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -486,9 +487,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
 
         final InputStream in
                 = inArchive.getMetaData().createInputStream(entry, dstEntry);
-        if (in == null)
-            throw new ArchiveEntryNotFoundException(entry.getName(),
-                    "bad archive driver: returned illegal null value");
+        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + entry.getName() + '"';
         return in;
     }
 
@@ -504,9 +503,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
         ensureOutArchive();
         final OutputStream out
                 = outArchive.getMetaData().createOutputStream(entry, srcEntry);
-        if (out == null)
-            throw new ArchiveEntryNotFoundException(entry.getName(),
-                    "bad archive driver: returned illegal null value");
+        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + entry.getName() + '"';
         return out;
     }
 
@@ -1121,15 +1118,28 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      */
-    private ArchiveControllerException shutdownStep1(ArchiveControllerException exceptionChain) {
-        if (outArchive != null)
-            exceptionChain = outArchive.getMetaData().closeAllOutputStreams(
-                    exceptionChain);
-        if (inArchive != null)
-            exceptionChain = inArchive.getMetaData().closeAllInputStreams(
-                    exceptionChain);
+    private ArchiveControllerException shutdownStep1(final ArchiveControllerException exceptionChain) {
+        class ArchiveExceptionHandler
+        implements ExceptionHandler<IOException, RuntimeException> {
+            ArchiveControllerException chain = exceptionChain;
 
-        return exceptionChain;
+            public void warning(IOException cause) {
+                chain = new ArchiveControllerWarningException(chain, cause);
+            }
+
+            public RuntimeException error(IOException cause) {
+                AssertionError ae = new AssertionError("cannot happen");
+                ae.initCause(cause);
+                throw ae;
+            }
+        }
+
+        final ArchiveExceptionHandler handler = new ArchiveExceptionHandler();
+        if (outArchive != null)
+            outArchive.getMetaData().closeAllOutputStreams(handler);
+        if (inArchive != null)
+            inArchive.getMetaData().closeAllInputStreams(handler);
+        return handler.chain;
     }
 
     /**

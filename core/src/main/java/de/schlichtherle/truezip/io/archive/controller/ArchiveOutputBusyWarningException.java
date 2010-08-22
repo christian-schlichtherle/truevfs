@@ -23,7 +23,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @version $Id$
  */
 public class ArchiveOutputBusyWarningException
-        extends ArchiveBusyWarningException {
+        extends ArchiveFileBusyWarningException {
     private static final long serialVersionUID = 8465202307683484734L;
 
     private final int numStreams;

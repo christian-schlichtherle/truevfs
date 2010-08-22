@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.ArchiveControllers;
 
 /**
- * Thrown if an archive file could not get updated because some input or
+ * Indicates that an archive file could not get updated because some input or
  * output streams for its entries are still open.
  * The canonical path name of the archive file is provided as the detail
  * message.
@@ -37,10 +37,10 @@ import de.schlichtherle.truezip.io.ArchiveControllers;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyException extends ArchiveControllerException {
+public class ArchiveFileBusyException extends ArchiveControllerException {
     private static final long serialVersionUID = 1937861953461235716L;
 
-    ArchiveBusyException(ArchiveControllerException priorException, String cPath) {
+    ArchiveFileBusyException(ArchiveControllerException priorException, String cPath) {
         super(priorException, cPath);
     }
 

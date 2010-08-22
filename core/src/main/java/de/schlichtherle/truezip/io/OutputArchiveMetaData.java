@@ -19,11 +19,12 @@ package de.schlichtherle.truezip.io;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public final class OutputArchiveMetaData {
      * However, it's provided for symmetry between input archive meta data
      * and output archive meta data.
      */
-    private final Archive archive;
+    //private final Archive archive;
 
     private final OutputArchive outArchive;
 
@@ -82,13 +83,13 @@ public final class OutputArchiveMetaData {
      * instantiated as a {@link WeakHashMap}. Otherwise, it's a {@link HashMap}.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
-     * This reduces the likeliness of an {@link ArchiveBusyWarningException}
+     * This reduces the likeliness of an {@link ArchiveFileBusyWarningException}
      * in case a sloppy client application has forgot to close a stream before
      * calling {@link File#umount} or {@link File#update}.
      */
-    private final Map<OutputStream, Thread> streams = File.isLenient()
-            ? new WeakHashMap<OutputStream, Thread>()
-            : new HashMap<OutputStream, Thread>();
+    private final Map<EntryOutputStream, Thread> streams = File.isLenient()
+            ? new WeakHashMap<EntryOutputStream, Thread>()
+            : new HashMap<EntryOutputStream, Thread>();
 
     private volatile boolean stopped;
 
@@ -99,7 +100,7 @@ public final class OutputArchiveMetaData {
     OutputArchiveMetaData(final Archive archive, final OutputArchive outArchive) {
         assert outArchive != null;
 
-        this.archive = archive;
+        //this.archive = archive;
         this.outArchive = outArchive;
     }
 
@@ -176,24 +177,23 @@ public final class OutputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized ArchiveControllerException closeAllOutputStreams(
-            ArchiveControllerException exceptionChain) {
+    synchronized <T extends Throwable> void closeAllOutputStreams(
+            ExceptionHandler<IOException, T> handler)
+    throws T {
         assert !stopped;
-
         stopped = true;
-
-        for (final Iterator i = streams.keySet().iterator(); i.hasNext(); ) {
-            final EntryOutputStream out = (EntryOutputStream) i.next();
+        for (final Iterator<EntryOutputStream> it = streams.keySet().iterator();
+        it.hasNext(); ) {
             try {
-                out.doClose();
+                try {
+                    it.next().doClose();
+                } finally {
+                    it.remove();
+                }
             } catch (IOException failure) {
-                exceptionChain = new ArchiveControllerWarningException(
-                        exceptionChain, failure);
+                handler.warning(failure);
             }
         }
-        streams.clear();
-
-        return exceptionChain;
     }
 
     /**

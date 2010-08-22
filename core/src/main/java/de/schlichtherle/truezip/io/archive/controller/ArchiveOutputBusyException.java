@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveOutputBusyException extends ArchiveBusyException {
+public class ArchiveOutputBusyException extends ArchiveFileBusyException {
     private static final long serialVersionUID = 4652936465192837172L;
 
     private final int numStreams;
