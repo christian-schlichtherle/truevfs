@@ -1119,7 +1119,7 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
      * archive.
      */
     private ArchiveControllerException shutdownStep1(final ArchiveControllerException exceptionChain) {
-        class ArchiveExceptionHandler
+        class ArchiveControllerWarningExceptionHandler
         implements ExceptionHandler<IOException, RuntimeException> {
             ArchiveControllerException chain = exceptionChain;
 
@@ -1134,7 +1134,8 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
             }
         }
 
-        final ArchiveExceptionHandler handler = new ArchiveExceptionHandler();
+        final ArchiveControllerWarningExceptionHandler handler
+                = new ArchiveControllerWarningExceptionHandler();
         if (outArchive != null)
             outArchive.getMetaData().closeAllOutputStreams(handler);
         if (inArchive != null)
