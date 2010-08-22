@@ -237,9 +237,9 @@ public class ZipDriver extends AbstractArchiveDriver {
             OutputStream out,
             InputArchive source)
     throws IOException {
-        /*return new MultiplexedOutputArchive(createZipOutputArchive(
-                archive, out, (ZipInputArchive) source));*/
-        return createZipOutputArchive(archive, out, (ZipInputArchive) source);
+        return new MultiplexedOutputArchive(createZipOutputArchive(
+                archive, out, (ZipInputArchive) source));
+        //return createZipOutputArchive(archive, out, (ZipInputArchive) source);
     }
 
     protected ZipOutputArchive createZipOutputArchive(
