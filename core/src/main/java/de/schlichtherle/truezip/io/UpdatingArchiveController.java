@@ -18,11 +18,11 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -665,9 +665,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                     waitOutputStreams ? 0 : 50);
             if (outStreams > 0) {
                 if (!closeOutputStreams)
-                    throw new ArchiveOutputBusyException(
+                    throw new ArchiveFileOutputBusyException(
                             newExceptionChain, getPath(), outStreams);
-                newExceptionChain = new ArchiveOutputBusyWarningException(
+                newExceptionChain = new ArchiveFileOutputBusyWarningException(
                         newExceptionChain, getPath(), outStreams);
             }
         }
@@ -677,9 +677,9 @@ final class UpdatingArchiveController extends ArchiveFileSystemController {
                     waitInputStreams ? 0 : 50);
             if (inStreams > 0) {
                 if (!closeInputStreams)
-                    throw new ArchiveInputBusyException(
+                    throw new ArchiveFileInputBusyException(
                             newExceptionChain, getPath(), inStreams);
-                newExceptionChain = new ArchiveInputBusyWarningException(
+                newExceptionChain = new ArchiveFileInputBusyWarningException(
                         newExceptionChain, getPath(), inStreams);
             }
         }
