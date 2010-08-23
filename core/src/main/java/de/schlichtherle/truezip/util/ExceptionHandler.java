@@ -85,46 +85,58 @@ package de.schlichtherle.truezip.util;
  * Otherwise, the client would be required to catch or declare to throw
  * {@link Throwable}, which is a bad idea in general.
  *
- * @param <C> The cause exception type.
- * @param <T> The mapped exception type.
+ * @param <C> The type of the cause exception.
+ * @param <T> The type of the thrown exception.
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
 
     /**
+     * Called by an algorithm if an exceptional condition occured which does
+     * not allow to proceed the execution.
+     * The implementation must return an appropriate exception to be thrown
+     * by the algorithm.
+     * <p>
+     * If the implementation maintains a state, then it must be
+     * updated so that this method may be consecutively called by the algorithm
+     * without causing the implementation to (re)throw an exception for the
+     * same cause unless provided by the algorithm.
+     *
+     * @param cause The exception to handle.
+     *        {@code null} is not permitted.
+     * @return The exception to throw.
+     *         {@code null} is not permitted.
+     */
+    T fail(C cause);
+
+    /**
      * Called by an algorithm if an exceptional condition occured which allows
-     * to proceed the execution.
-     * The implementation is free to throw an appropriate exception or return
-     * from the call.
+     * to proceed its execution.
+     * <p>
+     * The implementation may throw an exception parameter type {@code T} or
+     * return from the call.
+     * Optionally, it may store an exception of parameter type {@code T} for
+     * deferred processing by the method {@link #check()}.
      *
      * @param cause The exception to handle.
      *        {@code null} is not permitted.
      * @throws T The type of exception to throw, if at all.
      */
-    void warning(C cause) throws T;
+    void warn(C cause) throws T;
 
     /**
-     * Called by an algorithm if an exceptional condition occured which does
-     * not allow to proceed the execution.
-     * The implementation must return an appropriate exception to be thrown
-     * by the algorithm.
+     * Called by an algorithm in order to check if an exception was stored by
+     * the method {@link #warn(Throwable)} and process it.
+     * The implementation may throw an exception parameter type {@code T} or
+     * return from the call.
+     * <p>
+     * In any case, if the implementation maintains a state, then it must be
+     * updated so that this method may be consecutively called by the algorithm
+     * without causing the implementation to (re)throw an exception for the
+     * same cause unless provided by the algorithm.
      *
-     * @param cause The exception to handle.
-     *        {@code null} is not permitted.
-     * @return The exception to throw.
-     *        {@code null} is not permitted.
+     * @throws T The type of exception to throw, if at all.
      */
-    T error(C cause);
-
-    /** This exception handler class simply throws/returns the cause. */
-    class Throw<T extends Throwable> implements ExceptionHandler<T, T> {
-        public void warning(T cause) throws T {
-            throw cause;
-        }
-
-        public T error(T cause) {
-            return cause;
-        }
-    }
+    void check() throws T;
 }
