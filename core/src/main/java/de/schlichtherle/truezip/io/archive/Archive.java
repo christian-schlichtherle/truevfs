@@ -31,17 +31,18 @@ package de.schlichtherle.truezip.io.archive;
 public interface Archive {
 
     /**
-     * Returns the <em>canonical</em> path of the archive file.
-     * A canonical path is both absolute and unique.
+     * Returns the <em>canonical</em> path name of the archive file.
+     * A canonical path is both absolute and unique within the virtual file
+     * system.
      * The precise definition depends on the platform, but all elements in
      * a canonical path are separated by {@link java.io.File#separator}s.
      * <p>
      * This property may be used to determine some archive file specific
      * parameters, such as passwords or similar.
      * However, implementations must not assume that the file denoted by the
-     * path actually exists as a file in the native file system!
+     * path actually exists as a file in the real file system!
      *
-     * @return A valid reference to a {@link String} object
+     * @return A string representing the canonical path of this archive
      *         - never {@code null}.
      * @see #getEnclArchive
      */
