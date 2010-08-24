@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -648,7 +650,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (!config.getCloseOutputStreams())
                     throw builder.fail(new ArchiveFileOutputBusyException(
                             this, outStreams));
-                builder.warn(new ArchiveFileOutputBusyException(
+                builder.warn(new ArchiveFileOutputBusyWarningException(
                         this, outStreams));
             }
         }
@@ -660,7 +662,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (!config.getCloseInputStreams())
                     throw builder.fail(new ArchiveFileInputBusyException(
                             this, inStreams));
-                builder.warn(new ArchiveFileInputBusyException(
+                builder.warn(new ArchiveFileInputBusyWarningException(
                         this, inStreams));
             }
         }
@@ -724,7 +726,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             setScheduled(needsReassembly);
         }
 
-        builder.check();
+        builder.checkout();
     }
 
     final int waitAllInputStreamsByOtherThreads(long timeout) {
@@ -740,23 +742,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     /**
-     * Updates all nodes in the virtual file system to the (temporary) output
+     * Updates all entries in the virtual file system to the (temporary) output
      * archive file.
      * <p>
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
-     * @param exceptionChain the head of a chain of exceptions created so far.
-     * @return If any warn exception condition occurs throughout the course
-     *         of this method, an {@link ArchiveControllerWarningException} is created
-     *         (but not thrown), prepended to {@code exceptionChain} and
-     *         finally returned.
-     *         If multiple warn exception conditions occur, the prepended
-     *         exceptions are ordered by appearance so that the <i>last</i>
-     *         exception created is the head of the returned exception chain.
-     * @throws ArchiveControllerException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveControllerException}
-     *         is created, prepended to {@code exceptionChain} and finally
-     *         thrown unless it's an {@link ArchiveControllerWarningException}.
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     private void update(final ArchiveControllerExceptionHandler handler)
     throws ArchiveControllerException {
@@ -923,32 +916,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     /**
-     * Uses the updated output archive file to reassemble the
+     * Uses the updated temporary output archive file to reassemble the
      * target archive file, which may be an entry in an enclosing
      * archive file.
      * <p>
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
-     * @param exceptionChain the head of a chain of exceptions created so far.
-     * @return If any warn condition occurs throughout the course of this
-     *         method, a {@code ArchiveControllerWarningException} is created (but not
-     *         thrown), prepended to {@code exceptionChain} and finally
-     *         returned.
-     *         If multiple warn conditions occur,
-     *         the prepended exceptions are ordered by appearance so that the
-     *         <i>last</i> exception created is the head of the returned
-     *         exception chain.
-     * @return If any warn exception condition occurs throughout the course
-     *         of this method, an {@link ArchiveControllerWarningException} is created
-     *         (but not thrown), prepended to {@code exceptionChain} and
-     *         finally returned.
-     *         If multiple warn exception conditions occur, the prepended
-     *         exceptions are ordered by appearance so that the <i>last</i>
-     *         exception created is the head of the returned exception chain.
-     * @throws ArchiveControllerException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveControllerException}
-     *         is created, prepended to {@code exceptionChain} and finally
-     *         thrown unless it's an {@link ArchiveControllerWarningException}.
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     private void reassemble(final ArchiveControllerExceptionHandler handler)
     throws ArchiveControllerException {
@@ -1055,6 +1031,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Thereafter, the archive controller will behave as if it has just been
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
+     *
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     @Override
     void reset(final ArchiveControllerExceptionHandler handler)
@@ -1099,10 +1079,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     /**
      * Closes and disconnects all entry streams of the output and input
      * archive.
+     * 
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     private void shutdownStep1(final ArchiveControllerExceptionHandler handler)
     throws ArchiveControllerException {
-        class ArchiveControllerWarningExceptionHandler
+        class DecoratedHandler
         implements ExceptionHandler<IOException, ArchiveControllerException> {
             public ArchiveControllerException fail(IOException cause) {
                 AssertionError ae = new AssertionError("cannot happen");
@@ -1111,20 +1095,24 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
 
             public void warn(IOException ioe) throws ArchiveControllerException {
-                handler.warn(new ArchiveControllerWarningException(UpdatingArchiveController.this, ioe));
+                handler.warn(new ArchiveControllerWarningException(
+                        UpdatingArchiveController.this, ioe));
             }
         }
 
-        final ArchiveControllerWarningExceptionHandler wrappedHandler
-                = new ArchiveControllerWarningExceptionHandler();
+        final DecoratedHandler decoratedHandler = new DecoratedHandler();
         if (outArchive != null)
-            outArchive.getMetaData().closeAllOutputStreams(wrappedHandler);
+            outArchive.getMetaData().closeAllOutputStreams(decoratedHandler);
         if (inArchive != null)
-            inArchive.getMetaData().closeAllInputStreams(wrappedHandler);
+            inArchive.getMetaData().closeAllInputStreams(decoratedHandler);
     }
 
     /**
      * Discards the file system and closes the output and input archive.
+     * 
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     private void shutdownStep2(final ArchiveControllerExceptionHandler handler)
     throws ArchiveControllerException {

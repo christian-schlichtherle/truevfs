@@ -409,8 +409,9 @@ abstract class ArchiveController implements Archive {
      * only the last written entry would be added to the central directory
      * of the archive (unless the archive type doesn't support this).
      * 
-     * @see #umount(ArchiveControllerException, boolean, boolean, boolean, boolean, boolean, boolean)
-     * @see ArchiveControllerException
+     * @see #umount(UmountConfiguration)
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     final void autoUmount(final String entryName)
     throws ArchiveControllerException {
@@ -435,11 +436,12 @@ abstract class ArchiveController implements Archive {
      * controller get reset (filesystem, entries, streams, etc.)!
      * As an implication, this method requires external synchronization on
      * this controller's write lock!
-     * 
-     * @throws ArchiveControllerException If any exception condition occurs
-     *         throughout the course of this method, an
-     *         {@link ArchiveControllerException} is created, prepended to
-     *         {@code exceptionChain} and finally thrown.
+     *
+     * @param config The parameters for processing - {@code null} is not
+     *        permitted.
+     * @throws NullPointerException If {@code config} is {@code null}.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      */
     abstract void umount(UmountConfiguration config)
     throws ArchiveControllerException;
@@ -461,7 +463,7 @@ abstract class ArchiveController implements Archive {
         final ArchiveControllerExceptionBuilder builder
                 = new DefaultArchiveControllerExceptionBuilder();
         reset(builder);
-        builder.check();
+        builder.checkout();
     }
 
     /**

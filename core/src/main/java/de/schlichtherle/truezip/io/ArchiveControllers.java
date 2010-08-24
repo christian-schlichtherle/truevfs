@@ -194,18 +194,8 @@ public final class ArchiveControllers {
      *        which shall get updated - {@code null} is not allowed!
      *        If the canonical pathname of an archive file does not start with
      *        this string, then it is not updated.
-     * @throws ArchiveWarningException If only warning conditions occur
-     *         throughout the course of this method which imply that the
-     *         respective archive file has been updated with
-     *         constraints, such as a failure to set the last modification
-     *         time of the archive file to the last modification time of its
-     *         virtual root directory.
-     * @throws ArchiveControllerException If any error conditions occur throughout the
-     *         course of this method which imply loss of data.
-     *         This usually means that at least one of the archive files
-     *         has been created externally and was corrupted or it cannot
-     *         get updated because the file system of the temp file or target
-     *         file folder is full.
+     * @throws ArchiveControllerException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
      * @throws NullPointerException If {@code prefix} is {@code null}.
      * @throws IllegalArgumentException If {@code closeInputStreams} is
      *         {@code false} and {@code closeOutputStreams} is
@@ -219,13 +209,9 @@ public final class ArchiveControllers {
             final boolean closeOutputStreams,
             final boolean umount)
     throws ArchiveControllerException {
-        if (prefix == null)
-            throw new NullPointerException();
-        final DefaultArchiveControllerExceptionBuilder builder
-                = new DefaultArchiveControllerExceptionBuilder();
         final UmountConfiguration config = new UmountConfiguration()
-                .setArchiveControllerExceptionBuilder(builder)
-                .setArchiveControllerExceptionBuilder(new DefaultArchiveControllerExceptionBuilder())
+                .setArchiveControllerExceptionBuilder(
+                    new DefaultArchiveControllerExceptionBuilder())
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -297,7 +283,7 @@ public final class ArchiveControllers {
                 }
 
                 // Check to rethrow exception chain sorted by priority.
-                builder.check();
+                builder.checkout();
             } finally {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();

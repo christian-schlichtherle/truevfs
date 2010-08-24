@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.Archive;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @deprecated Use {@link ArchiveFileInputBusyException} instead.
  */
 public class ArchiveFileInputBusyWarningException
 extends ArchiveFileBusyWarningException {
