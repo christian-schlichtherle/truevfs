@@ -16,13 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
-import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -196,68 +191,13 @@ public final class ArchiveControllers {
      *        which shall get updated - {@code null} is not allowed!
      *        If the canonical pathname of an archive file does not start with
      *        this string, then it is not updated.
-     * @param waitInputStreams Suppose any other thread has still one or more
-     *        archive entry input streams open.
-     *        Then if and only if this parameter is {@code true}, this
-     *        method will wait until all other threads have closed their
-     *        archive entry input streams.
-     *        Archive entry input streams opened (and not yet closed) by the
-     *        current thread are always ignored.
-     *        If the current thread gets interrupted while waiting, it will
-     *        stop waiting and proceed normally as if this parameter were
-     *        {@code false}.
-     *        Be careful with this parameter value: If a stream has not been
-     *        closed because the client application does not always properly
-     *        close its streams, even on an {@link IOException} (which is a
-     *        typical bug in many Java applications), then this method may
-     *        not return until the current thread gets interrupted!
-     * @param closeInputStreams Suppose there are any open input streams
-     *        for any archive entries because the application has forgot to
-     *        close all {@link FileInputStream} objects or another thread is
-     *        still busy doing I/O on an archive.
-     *        Then if this parameter is {@code true}, an update is forced
-     *        and an {@link ArchiveFileBusyWarningException} is finally thrown to
-     *        indicate that any subsequent operations on these streams
-     *        will fail with an {@link ArchiveEntryStreamClosedException}
-     *        because they have been forced to close.
-     *        This may also be used to recover an application from a
-     *        {@link FileBusyException} thrown by a constructor of
-     *        {@link FileInputStream} or {@link FileOutputStream}.
-     *        If this parameter is {@code false}, the respective archive
-     *        file is <em>not</em> updated and an {@link ArchiveFileBusyException}
-     *        is thrown to indicate that the application must close all entry
-     *        input streams first.
-     * @param waitOutputStreams Similar to {@code waitInputStreams},
-     *        but applies to archive entry output streams instead.
-     * @param closeOutputStreams Similar to {@code closeInputStreams},
-     *        but applies to archive entry output streams instead.
-     *        If this parameter is {@code true}, then
-     *        {@code closeInputStreams} must be {@code true}, too.
-     *        Otherwise, an {@code IllegalArgumentException} is thrown.
-     * @param umount If {@code true}, all temporary files get deleted, too.
-     *        Thereafter, the archive controller will behave as if it has just
-     *        been created and any subsequent operations on its entries will
-     *        remount the virtual file system from the archive file again.
-     *        Use this to allow subsequent changes to the archive files
-     *        by other processes or via the {@code java.io.File*} classes
-     *        <em>before</em> this package is used for read or write access to
-     *        these archive files again.
-     * @throws ArchiveBusyWarningExcepion If a archive file has been updated
-     *         while the application is using any open streams to access it
-     *         concurrently.
-     *         These streams have been forced to close and the entries of
-     *         output streams may contain only partial data.
      * @throws ArchiveWarningException If only warning conditions occur
      *         throughout the course of this method which imply that the
      *         respective archive file has been updated with
      *         constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         virtual root directory.
-     * @throws ArchiveFileBusyException If an archive file could not get updated
-     *         because the application is using an open stream.
-     *         No data is lost and the archive file can still get updated by
-     *         calling this method again.
-     * @throws ArchiveControllerException If any error conditions occur throughout the
+     * @throws ArchiveException If any error conditions occur throughout the
      *         course of this method which imply loss of data.
      *         This usually means that at least one of the archive files
      *         has been created externally and was corrupted or it cannot
@@ -270,46 +210,63 @@ public final class ArchiveControllers {
      */
     public static void umount(
             final String prefix,
-            final boolean waitInputStreams,
+            final boolean waitForInputStreams,
             final boolean closeInputStreams,
-            final boolean waitOutputStreams,
+            final boolean waitForOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         if (prefix == null)
             throw new NullPointerException();
-        if (!closeInputStreams && closeOutputStreams)
+        final DefaultArchiveControllerExceptionBuilder builder
+                = new DefaultArchiveControllerExceptionBuilder();
+        final UmountConfiguration config = new UmountConfiguration()
+                .setArchiveControllerExceptionBuilder(builder)
+                .setArchiveExceptionBuilder(new DefaultArchiveExceptionBuilder(builder))
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(umount)
+                .setReassemble(true);
+        umount0(prefix, config);
+    }
+
+    private static void umount0(
+            final String prefix,
+            final UmountConfiguration config)
+    throws ArchiveException {
+        if (prefix == null)
+            throw new NullPointerException();
+        if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
             throw new IllegalArgumentException();
 
         int controllersTotal = 0, controllersTouched = 0;
         logger.log(Level.FINE, "update.entering", // NOI18N
                 new Object[] {
             prefix,
-            Boolean.valueOf(waitInputStreams),
-            Boolean.valueOf(closeInputStreams),
-            Boolean.valueOf(waitOutputStreams),
-            Boolean.valueOf(closeOutputStreams),
-            Boolean.valueOf(umount),
+            Boolean.valueOf(config.getWaitForInputStreams()),
+            Boolean.valueOf(config.getCloseInputStreams()),
+            Boolean.valueOf(config.getWaitForOutputStreams()),
+            Boolean.valueOf(config.getCloseOutputStreams()),
+            Boolean.valueOf(config.getRelease()),
         });
         try {
             // Reset statistics if it hasn't happened yet.
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
-                // Used to chain archive exceptions.
-                ArchiveControllerException exceptionChain = null;
-
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
                 // call the umount() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                final Enumeration e = new ControllerEnumeration(
-                        prefix, REVERSE_CONTROLLERS);
+                final Enumeration<ArchiveController> e
+                        = new ControllerEnumeration(
+                            prefix, REVERSE_CONTROLLERS);
                 while (e.hasMoreElements()) {
-                    final ArchiveController controller
-                            = (ArchiveController) e.nextElement();
+                    final ArchiveController controller = e.nextElement();
                     controller.writeLock().lock();
                     try {
                         if (controller.isTouched())
@@ -318,17 +275,14 @@ public final class ArchiveControllers {
                             // Upon return, some new ArchiveWarningException's may
                             // have been generated. We need to remember them for
                             // later throwing.
-                            controller.umount(exceptionChain,
-                                    waitInputStreams, closeInputStreams,
-                                    waitOutputStreams, closeOutputStreams,
-                                    umount, true);
-                        } catch (ArchiveControllerException exception) {
+                            controller.umount(config);
+                        } catch (ArchiveException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
                             // We are bullheaded and store the exception chain for
                             // later throwing only and continue updating the rest.
-                            exceptionChain = exception;
+                            config.getArchiveExceptionBuilder().reset(exception);
                         }
                     } finally {
                         controller.writeLock().unlock();
@@ -336,17 +290,15 @@ public final class ArchiveControllers {
                     controllersTotal++;
                 }
 
-                // Reorder exception chain if necessary to support conditional
-                // exception catching based on their priority (i.e. class).
-                if (exceptionChain != null)
-                    throw (ArchiveControllerException) exceptionChain.sortPriority();
+                // Check to rethrow exception chain sorted by priority.
+                config.getArchiveExceptionBuilder().check();
             } finally {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveControllerException failure) {
-            logger.log(Level.FINE, "update.throwing", failure);// NOI18N
-            throw failure;
+        } catch (ArchiveException chain) {
+            logger.log(Level.FINE, "update.throwing", chain);// NOI18N
+            throw chain;
         }
         logger.log(Level.FINE, "update.exiting", // NOI18N
                 new Object[] {
@@ -425,13 +377,15 @@ public final class ArchiveControllers {
                 } finally {
                     try {
                         umount("", false, true, false, true, true);
-                    } catch (ArchiveControllerException ouch) {
+                    } catch (ArchiveException ouch) {
                         ouch.printStackTrace();
                     }
                 }
             }
         }
     } // class ShutdownHook
+
+;
 
     private static final class LiveArchiveStatistics
             implements ArchiveStatistics {

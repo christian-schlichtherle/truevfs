@@ -407,18 +407,28 @@ abstract class ArchiveController implements Archive {
      * of the archive (unless the archive type doesn't support this).
      * 
      * @see #umount(ArchiveControllerException, boolean, boolean, boolean, boolean, boolean, boolean)
-     * @see ArchiveControllerException
+     * @see ArchiveException
      */
     final void autoUmount(final String entryName)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         assert writeLock().isLockedByCurrentThread();
-
-        if (hasNewData(entryName))
-            umount(null, true, false, true, false, false, false);
+        if (hasNewData(entryName)) {
+            final DefaultArchiveControllerExceptionBuilder builder
+                    = new DefaultArchiveControllerExceptionBuilder();
+            umount(new UmountConfiguration()
+                    .setArchiveControllerExceptionBuilder(builder)
+                    .setArchiveExceptionBuilder(new DefaultArchiveExceptionBuilder(builder))
+                    .setWaitForInputStreams(true)
+                    .setCloseInputStreams(false)
+                    .setWaitForOutputStreams(true)
+                    .setCloseOutputStreams(false)
+                    .setRelease(false)
+                    .setReassemble(false));
+        }
     }
 
     /**
-     * Synchronizes the contents of the target archive file managed by this
+     * Updates the contents of the target archive file managed by this
      * archive controller to the real file system.
      * <p>
      * <b>Warning:</b> As a side effect, all data structures returned by this
@@ -426,99 +436,12 @@ abstract class ArchiveController implements Archive {
      * As an implication, this method requires external synchronization on
      * this controller's write lock!
      * 
-     * @param waitInputStreams See {@link ArchiveControllers#umount}.
-     * @param closeInputStreams See {@link ArchiveControllers#umount}.
-     * @param waitOutputStreams See {@link ArchiveControllers#umount}.
-     * @param closeOutputStreams See {@link ArchiveControllers#umount}.
-     * @param umount See {@link ArchiveControllers#umount}.
-     * @param reassemble Let's assume this archive file is enclosed
-     *        in another archive file.
-     *        Then if this parameter is {@code true}, the updated archive
-     *        file is also written to its enclosing archive file.
-     *        Note that this parameter <em>must</em> be set if {@code umount}
-     *        is set as well. Failing to comply to this requirement may throw
-     *        a {@link java.lang.AssertionError} and will incur loss of data!
-     * @see #autoUmount
-     * @see ArchiveControllerException
-     * @throws ArchiveControllerException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveControllerException}
-     *         is created, prepended to {@code exceptionChain} and finally
-     *         thrown.
+     * @throws ArchiveException If any exception condition occurs
+     *         throughout the course of this method, an
+     *         {@link ArchiveControllerException} is created, prepended to
+     *         {@code exceptionChain} and finally thrown.
      */
-    abstract void umount(
-            ArchiveControllerException exceptionChain,
-            final boolean waitInputStreams,
-            final boolean closeInputStreams,
-            final boolean waitOutputStreams,
-            final boolean closeOutputStreams,
-            final boolean umount,
-            final boolean reassemble)
-    throws ArchiveControllerException;
-    /* FIXME:
-     * The implementation in the class {@code ArchiveController} just
-     * deletes the entries in this archive controller which have been passed
-     * to the {@link #deleteOnUmount} method.
-     * It is up to the subclass to implement the updating strategy for the
-     * target archive file.
-     * When overriding this method, the subclass must call the implementation
-     * of this class before the actual update is performed!
-     */
-    /*{
-        assert closeInputStreams || !closeOutputStreams; // closeOutputStreams => closeInputStreams
-        assert !umount || reassemble; // umount => reassemble
-        assert writeLock().isLocked();
-
-        int deleted = 0;
-        // Do the logging part and leave the work to umount0.
-        Object[] stats = new Object[] {
-            getCanonicalPath(),
-            exceptionChain,
-            Boolean.valueOf(waitInputStreams),
-            Boolean.valueOf(closeInputStreams),
-            Boolean.valueOf(waitOutputStreams),
-            Boolean.valueOf(closeOutputStreams),
-            Boolean.valueOf(umount),
-            Boolean.valueOf(reassemble),
-            // TODO: For JSE 5: Integer.valueOf(deleted),
-            new Integer(deleted),
-        };
-        logger.log(Level.FINEST, "umount.entering", stats); // NOI18N
-        try {
-            deleted = umount0(exceptionChain,
-                              waitInputStreams, closeInputStreams,
-                              waitOutputStreams, closeOutputStreams,
-                              umount, reassemble);
-        } catch (ArchiveControllerException ex) {
-            logger.log(Level.FINEST, "umount.throwing", ex); // NOI18N
-            throw ex;
-        }
-        stats = new Object[] { // update
-            getCanonicalPath(),
-            exceptionChain,
-            Boolean.valueOf(waitInputStreams),
-            Boolean.valueOf(closeInputStreams),
-            Boolean.valueOf(waitOutputStreams),
-            Boolean.valueOf(closeOutputStreams),
-            Boolean.valueOf(umount),
-            Boolean.valueOf(reassemble),
-            // TODO: For JSE 5: Integer.valueOf(deleted),
-            new Integer(deleted),
-        };
-        logger.log(Level.FINEST, "umount.exiting", stats); // NOI18N
-    }
-
-    private int umount0(
-            ArchiveControllerException exceptionChain,
-            final boolean waitInputStreams,
-            final boolean closeInputStreams,
-            final boolean waitOutputStreams,
-            final boolean closeOutputStreams,
-            final boolean umount,
-            final boolean reassemble)
-    throws ArchiveControllerException {
-        //System.err.println("FIXME: Write algorithm to delete archive entries on umount!");
-        return 0;
-    }*/
+    abstract void umount(UmountConfiguration config) throws ArchiveException;
 
     // TODO: Document this!
     abstract int waitAllInputStreamsByOtherThreads(long timeout);
@@ -532,12 +455,26 @@ abstract class ArchiveController implements Archive {
      * Thereafter, the archive controller will behave as if it has just been
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
+     */
+    final void reset() throws ArchiveException {
+        final ArchiveControllerExceptionBuilder builder
+                = new DefaultArchiveControllerExceptionBuilder();
+        reset(builder);
+        builder.check();
+    }
+
+    /**
+     * Resets the archive controller to its initial state - all changes to the
+     * archive file which have not yet been updated get lost!
+     * Thereafter, the archive controller will behave as if it has just been
+     * created and any subsequent operations on its entries will remount
+     * the virtual file system from the archive file again.
      * <p>
      * This method should be overridden by subclasses, but must still be
      * called when doing so.
      */
-    abstract void reset()
-    throws IOException;
+    abstract void reset(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException;
 
     @Override
     public String toString() {
@@ -1259,7 +1196,7 @@ abstract class ArchiveController implements Archive {
                     // anyway, so we need to reset now.
                     try {
                         reset();
-                    } catch (IOException cannotHappen) {
+                    } catch (ArchiveException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
                     throw ex;
@@ -1568,12 +1505,15 @@ abstract class ArchiveController implements Archive {
         }
 
         @Override
-        public String getMessage() {
-            String msg = super.getMessage();
+        public String getLocalizedMessage() {
+            final String msg = getMessage();
             if (msg != null)
-                return getCanonicalPath() + " (" + msg + ")";
-            else
-                return getCanonicalPath();
+                return new StringBuilder(getCanonicalPath())
+                        .append(" (")
+                        .append(msg)
+                        .append(")")
+                        .toString();
+            return getCanonicalPath();
         }
     } // class ArchiveFileNotFoundException
 
@@ -1598,14 +1538,14 @@ abstract class ArchiveController implements Archive {
 
         @Override
         public String getMessage() {
-            String path = getCanonicalPath();
+            final StringBuilder result = new StringBuilder(getCanonicalPath());
             if (!isRoot(entryName))
-                path += File.separator
-                     + entryName.replace(SEPARATOR_CHAR, File.separatorChar);
-            String msg = super.getMessage();
+                result.append(File.separator)
+                        .append(entryName.replace(SEPARATOR_CHAR, File.separatorChar));
+            final String msg = super.getMessage();
             if (msg != null)
-                path += " (" + msg + ")";
-            return path;
+                result.append(" (").append(msg).append(")");
+            return result.toString();
         }
     } // class ArchiveEntryNotFoundException
 }

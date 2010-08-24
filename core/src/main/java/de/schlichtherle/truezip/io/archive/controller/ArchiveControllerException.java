@@ -16,120 +16,85 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.util.ChainableIOException;
+import de.schlichtherle.truezip.io.archive.Archive;
 import java.io.IOException;
 
 /**
- * Represents a chain of exceptions thrown to indicate an error condition which
- * <em>does</em> incur loss of data.
- * 
- * <p>Some public methods in this package operate on multiple archive files
- * consecutively. To ensure that all archive files are processed, they catch
- * any exception occuring throughout their processing of an archive file and
- * store it in an exception chain of this type before continuing with the next
- * archive file.
- * Finally, if all archive files have been processed and the exception chain
- * is not empty, it's reordered and thrown so that if its head is an instance
- * of {@code ArchiveWarningException}, only instances of this class or its
- * subclasses are in the chain, but no instances of {@code ArchiveControllerException}
- * or its subclasses (except {@code ArchiveWarningException}, of course).
+ * Indicates an exceptional condition detected by an {@link ArchiveController}.
  *
- * <p>This enables client applications to do a simple case distinction with a
- * try-catch-block like this to react selectively:</p>
- * <pre>{@code 
- * try {
- *     ArchiveControllers.umount("", false, true, false, true, true);
- * } catch (ArchiveWarningException warning) {
- *     // Only warnings have occured and no data has been lost - ignore this.
- * } catch (ArchiveControllerException error) {
- *     // Some data has been lost - panic!
- *     error.printStackTrace();
- * }
- * }</pre>
- * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveControllerException extends ChainableIOException {
+public class ArchiveControllerException
+extends IOException {
+
     private static final long serialVersionUID = 4893204620357369739L;
 
-    /**
-     * Constructs a new exception with the specified prior exception.
-     * This is used when e.g. updating all ZIP files and more than one ZIP
-     * compatible file cannot get updated. The prior exception would then be
-     * the exception for the ZIP compatible file which couldn't get updated
-     * before.
-     *
-     * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be {@code null}.
-     */
+    private final String path;
+
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(ArchiveControllerException priorException) {
-        super(priorException);
+    public ArchiveControllerException(Archive archive) {
+        this.path = archive.getCanonicalPath();
+    }
+
+    // TODO: Make this constructor package private!
+    public ArchiveControllerException(Archive archive, String message) {
+        super(message);
+        this.path = archive.getCanonicalPath();
+    }
+
+    // TODO: Make this constructor package private!
+    public ArchiveControllerException(Archive archive, IOException cause) {
+        super(cause != null ? cause.toString() : null);
+        super.initCause(cause);
+        this.path = archive.getCanonicalPath();
+    }
+
+    // TODO: Make this constructor package private!
+    public ArchiveControllerException(Archive archive, String message, IOException cause) {
+        super(message);
+        super.initCause(cause);
+        this.path = archive.getCanonicalPath();
     }
 
     /**
-     * Constructs a new exception with the specified prior exception
-     * and a message.
-     * This is used when e.g. updating all ZIP files and more than one ZIP
-     * compatible file cannot get updated. The prior exception would then be
-     * the exception for the ZIP compatible file which couldn't get updated
-     * before.
-     *
-     * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be {@code null}.
-     * @param  message The message for this exception.
+     * Equivalent to
+     * {@code return (ArchiveControllerException) super.initCause(cause);}.
      */
-    // TODO: Make this constructor package private!
-    public ArchiveControllerException(
-            ArchiveControllerException priorException,
-            String message) {
-        super(priorException, message);
+    @Override
+    public ArchiveControllerException initCause(final Throwable cause) {
+        return (ArchiveControllerException) super.initCause(cause);
     }
 
     /**
-     * Constructs a new exception with the specified prior exception and the
-     * cause.
-     * This is used when e.g. updating all ZIP files and more than one ZIP
-     * compatible file cannot get updated. The prior exception would then be
-     * the exception for the ZIP compatible file which couldn't get updated
-     * before.
+     * Returns the <em>canonical</em> path name of the archive file which's
+     * processing caused this exception to be created.
+     * A canonical path is both absolute and unique within the virtual file
+     * system.
+     * The precise definition depends on the platform, but all elements in
+     * a canonical path are separated by {@link java.io.File#separator}s.
+     * <p>
+     * This property may be used to determine some archive file specific
+     * parameters, such as passwords or similar.
+     * However, implementations must not assume that the file denoted by the
+     * path actually exists as a file in the real file system!
      *
-     * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be {@code null}.
-     * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A {@code null} value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.).
+     * @return A string representing the canonical path of this archive
+     *         - never {@code null}.
      */
-    // TODO: Make this constructor package private!
-    public ArchiveControllerException(
-            ArchiveControllerException priorException,
-            IOException cause) {
-        super(priorException, cause);
+    public String getCanonicalPath() {
+        return path;
     }
 
-    /**
-     * Constructs a new exception with the specified prior exception,
-     * a message and a cause.
-     * This is used when e.g. updating all ZIP files and more than one ZIP
-     * compatible file cannot get updated. The prior exception would then be
-     * the exception for the ZIP compatible file which couldn't get updated
-     * before.
-     *
-     * @param  priorException An exception that happened before and that was
-     *         caught. This is <b>not</b> a cause! May be {@code null}.
-     * @param  message The message for this exception.
-     * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A {@code null} value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.).
-     */
-    // TODO: Make this constructor package private!
-    public ArchiveControllerException(
-            ArchiveControllerException priorException,
-            String message,
-            IOException cause) {
-        super(priorException, message, cause);
+    @Override
+    public String getLocalizedMessage() {
+        final String msg = getMessage();
+        if (msg != null)
+            return new StringBuilder(getCanonicalPath())
+                    .append(" (")
+                    .append(msg)
+                    .append(")")
+                    .toString();
+        return getCanonicalPath();
     }
 }

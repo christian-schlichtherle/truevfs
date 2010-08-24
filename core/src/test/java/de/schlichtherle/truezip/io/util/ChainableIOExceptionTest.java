@@ -94,7 +94,7 @@ public class ChainableIOExceptionTest extends TestCase {
             assertNotNull(exp);
             assertNotNull(exc);
             assertTrue(c.equals(exp, exc));
-            exc = exc.getPrior();
+            exc = exc.getPredecessor();
         }
         assertNull(exc);
     }
@@ -115,25 +115,15 @@ public class ChainableIOExceptionTest extends TestCase {
         private static final long serialVersionUID = 2302357394858347366L;
 
         Exception1(ChainableIOException priorException, String message) {
-            super(priorException, message);
-        }
-
-        @Override
-        public int getPriority() {
-            return -1;
+            super(priorException, message, null, -1);
         }
     }
 
     static class Exception2 extends ChainableIOException {
         private static final long serialVersionUID = 1937861953461235716L;
 
-        Exception2(ChainableIOException priorException, String cPath) {
-            super(priorException, cPath);
-        }
-
-        @Override
-        public int getPriority() {
-            return -2;
+        Exception2(ChainableIOException priorException, String message) {
+            super(priorException, message, null, -2);
         }
     }
 }

@@ -17,8 +17,6 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -150,7 +148,7 @@ public abstract class FileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (ArchiveControllerException ignored) {
+        } catch (ArchiveException ignored) {
             // You should never (!) ignore all exceptions thrown by this method.
             // The reason we do it here is that they are usually after effects
             // of failed tests and we don't want any exception from the tests
@@ -627,14 +625,15 @@ public abstract class FileTestCase extends TestCase {
             FileInputStream fisB = new FileInputStream(file2);
             fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
         } catch (FileBusyException expected) {
+            // FIXME: The exception signature has chained. This exception is not thrown anymore!
         }
         assertFalse(file2.catFrom(fisA)); // fails for same reason.
         
         // fis1 is still open!
         try {
             File.update(); // forces closing of fis1
-            fail("ArchiveWarningException expected!");
-        } catch (ArchiveFileBusyWarningException expected) {
+            fail("ArchiveException expected!");
+        } catch (ArchiveException expected) {
             // Warning about fis1 still being used.
         }
         assertTrue(file2.isFile());
@@ -655,7 +654,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (ArchiveFileBusyWarningException failure) {
+        } catch (ArchiveException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -696,6 +695,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             FileOutputStream fosB = new FileOutputStream(file1);
         } catch (FileBusyException busy) {
+            // FIXME: The exception signature has chained. This exception is not thrown anymore!
             // This is actually an implementation detail which may change in
             // a future version.
             assertTrue(busy.getCause() instanceof ArchiveFileBusyException);
@@ -714,7 +714,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (ArchiveFileBusyWarningException expected) {
+        } catch (ArchiveException expected) {
         }
         
         try {
@@ -740,7 +740,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (ArchiveFileBusyWarningException failure) {
+        } catch (ArchiveException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1485,7 +1485,7 @@ public abstract class FileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (ArchiveFileBusyException mayHappen) {
+                    } catch (ArchiveException mayHappen) {
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1555,7 +1555,7 @@ public abstract class FileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (ArchiveFileBusyException mayHappen) {
+                        } catch (ArchiveException mayHappen) {
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.

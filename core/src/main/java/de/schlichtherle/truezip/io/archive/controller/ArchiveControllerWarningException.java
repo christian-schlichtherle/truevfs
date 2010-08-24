@@ -16,67 +16,39 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-
+import de.schlichtherle.truezip.io.archive.Archive;
 import java.io.IOException;
 
 /**
- * Represents a chain of exceptions thrown to indicate an error condition which
- * does <em>not</em> incur loss of data and may be ignored.
- *
- * <p>Some public methods in this package operate on multiple archive files
- * consecutively. To ensure that all archive files are processed, they catch
- * any exception occuring throughout their processing of an archive file and
- * store it in an exception chain of this type before continuing with the next
- * archive file.
- * Finally, if all archive files have been processed and the exception chain
- * is not empty, it's reordered and thrown so that if its head is an instance
- * of {@code ArchiveControllerWarningException}, only instances of this class or its
- * subclasses are in the chain, but no instances of {@code ArchiveControllerException}
- * or its subclasses (except {@code ArchiveControllerWarningException}, of course).
- *
- * <p>This enables client applications to do a simple case distinction with a
- * try-catch-block like this to react selectively:</p>
- * <pre>{@code
- * try {
- *     ArchiveControllers.umount("", false, true, false, true, true);
- * } catch (ArchiveControllerWarningException warning) {
- *     // Only warnings have occured and no data has been lost - ignore this.
- * } catch (ArchiveControllerException error) {
- *     // Some data has been lost - panic!
- *     error.printStackTrace();
- * }
- * }</pre>
+ * Indicates an exceptional condition detected by an {@link ArchiveController}
+ * which implies no or only insignificant loss of data.
+ * Exceptions of this type may be ignored.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveControllerWarningException extends ArchiveControllerException {
+public class ArchiveControllerWarningException
+extends ArchiveControllerException {
+
     private static final long serialVersionUID = 2302357394858347366L;
-    
+
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(
-            ArchiveControllerException priorException,
-            String message) {
-        super(priorException, message);
+    public ArchiveControllerWarningException(Archive archive) {
+        super(archive);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(
-            ArchiveControllerException priorException,
-            String message,
-            IOException cause) {
-        super(priorException, message, cause);
+    public ArchiveControllerWarningException(Archive archive, String message) {
+        super(archive, message);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(
-            ArchiveControllerException priorException,
-            IOException cause) {
-        super(priorException, cause);
+    public ArchiveControllerWarningException(Archive archive, IOException cause) {
+        super(archive, cause);
     }
-    
-    @Override
-    public int getPriority() {
-        return -1;
+
+    // TODO: Make this constructor package private!
+    public ArchiveControllerWarningException(Archive archive, String message, IOException cause) {
+        super(archive, message, cause);
     }
 }

@@ -42,8 +42,6 @@ import java.io.IOException;
  * @version $Id$
  */
 public final class TransientIOException extends IOException {
-    private static final long serialVersionUID = 7456923867016329838L;
-
     /**
      * @param cause The transient cause of this exception.
      * @throws NullPointerException If {@code cause} is {@code null}.
@@ -58,7 +56,8 @@ public final class TransientIOException extends IOException {
      * Returns the transient cause of this exception as an
      * {@code IOException} - {@code null} is never returned.
      */
-    public IOException getTransientCause() {
-        return (IOException) getCause();
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
     }
 }
