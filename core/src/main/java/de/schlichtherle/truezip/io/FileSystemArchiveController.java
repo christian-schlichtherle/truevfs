@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerExceptionHandler;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -214,7 +215,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
     throws IOException;
 
     void reset(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         setFileSystem(null);
     }
 

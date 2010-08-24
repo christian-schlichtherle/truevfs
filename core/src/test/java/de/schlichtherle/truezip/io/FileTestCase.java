@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
@@ -148,7 +149,7 @@ public abstract class FileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (ArchiveException ignored) {
+        } catch (ArchiveControllerException ignored) {
             // You should never (!) ignore all exceptions thrown by this method.
             // The reason we do it here is that they are usually after effects
             // of failed tests and we don't want any exception from the tests
@@ -632,8 +633,8 @@ public abstract class FileTestCase extends TestCase {
         // fis1 is still open!
         try {
             File.update(); // forces closing of fis1
-            fail("ArchiveException expected!");
-        } catch (ArchiveException expected) {
+            fail("ArchiveControllerException expected!");
+        } catch (ArchiveControllerException expected) {
             // Warning about fis1 still being used.
         }
         assertTrue(file2.isFile());
@@ -654,7 +655,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (ArchiveException failure) {
+        } catch (ArchiveControllerException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -714,7 +715,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (ArchiveException expected) {
+        } catch (ArchiveControllerException expected) {
         }
         
         try {
@@ -740,7 +741,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (ArchiveException failure) {
+        } catch (ArchiveControllerException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1485,7 +1486,7 @@ public abstract class FileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (ArchiveException mayHappen) {
+                    } catch (ArchiveControllerException mayHappen) {
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1555,7 +1556,7 @@ public abstract class FileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (ArchiveException mayHappen) {
+                        } catch (ArchiveControllerException mayHappen) {
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.
