@@ -80,9 +80,9 @@ public final class InputArchiveMetaData {
      * instantiated as a {@link WeakHashMap}. Otherwise, it's a {@link HashMap}.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
-     * This reduces the likeliness of an {@link ArchiveFileBusyWarningException}
-     * in case a sloppy client application has forgot to close a stream before
-     * calling {@link File#umount} or {@link File#update}.
+     * This reduces the likeliness of an exception in case a sloppy client
+     * application has forgot to close a stream before the target archive file
+     * gets updated.
      */
     private final Map<EntryInputStream, Thread> streams = File.isLenient()
             ? new WeakHashMap<EntryInputStream, Thread>()

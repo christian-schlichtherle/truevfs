@@ -24,7 +24,7 @@ package de.schlichtherle.truezip.util;
  * continue its task even if one or more exceptional conditions occur.
  * This interface would then allow to collect all cause exceptions during
  * the processing by calling {@link #warn(Throwable)} and later process the
- * assembled exception by calling {@link #fail(Throwable)}, {@link #check()}
+ * assembled exception by calling {@link #fail(Throwable)}, {@link #checkout()}
  * or {@link #reset(Throwable)}.
  *
  * @param <C> The type of the cause exception.
@@ -51,7 +51,7 @@ extends ExceptionHandler<C, T> {
      * <p>
      * The implementation may store an exception of parameter type {@code T}
      * for deferred processing by the method {@link #fail(Throwable)},
-     * {@link #check()} or {@link #reset(Throwable)}.
+     * {@link #checkout()} or {@link #reset(Throwable)}.
      */
     void warn(C cause) throws T;
 
@@ -66,7 +66,7 @@ extends ExceptionHandler<C, T> {
      *
      * @throws T The type of exception to throw, if at all.
      */
-    void check() throws T;
+    void checkout() throws T;
 
     /**
      * Resets the assembled exception to the given object and returns the

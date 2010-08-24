@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @deprecated Use {@link ArchiveFileBusyException} instead.
  */
 public class ArchiveFileBusyWarningException
 extends ArchiveControllerWarningException {

@@ -274,7 +274,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             }
         }
 
-        builder.check();
+        builder.checkout();
     }
 
     public void close() throws IOException {

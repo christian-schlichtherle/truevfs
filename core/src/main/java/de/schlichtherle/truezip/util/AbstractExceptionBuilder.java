@@ -92,7 +92,7 @@ implements ExceptionBuilder<C, T> {
      * This enables post-processing the assembled exception by overriding the
      * method {@link #reset(Throwable)} appropriately.
      */
-    public final void check() throws T {
+    public final void checkout() throws T {
         final T t = reset(null);
         if (t != null)
             throw t;
