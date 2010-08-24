@@ -259,13 +259,13 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 }
             } catch (FileNotFoundException ex) {
                 // Input exception - let's continue!
-                exception = new ChainableIOException(exception, ex);
+                exception = new ChainableIOException(ex, exception);
             } catch (InputException ex) {
                 // Input exception - let's continue!
-                exception = new ChainableIOException(exception, ex);
+                exception = new ChainableIOException(ex, exception);
             } catch (IOException ex) {
                 // Something's wrong writing this MultiplexedOutputStream!
-                throw new ChainableIOException(exception, ex);
+                throw new ChainableIOException(ex, exception);
             } finally {
                 i.remove();
             }

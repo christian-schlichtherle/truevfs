@@ -63,9 +63,8 @@ public class ArchiveWarningException extends ArchiveException {
      * @throws NullPointerException If {@code cause} is {@code null}.
      */
     ArchiveWarningException(
-            ArchiveException predecessor,
-            ArchiveControllerException cause) {
-        super(predecessor, cause, -1);
+            ArchiveControllerException cause, ArchiveException predecessor) {
+        super(cause, predecessor, -1);
     }
 
     /*ArchiveWarningException(
