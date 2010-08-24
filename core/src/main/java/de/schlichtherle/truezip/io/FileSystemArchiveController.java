@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerExceptionHandler;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionHandler;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.util.Action;
@@ -214,8 +214,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
     abstract void mount(boolean create)
     throws IOException;
 
-    void reset(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveControllerException {
+    void reset(final ArchiveExceptionHandler handler)
+    throws ArchiveException {
         setFileSystem(null);
     }
 

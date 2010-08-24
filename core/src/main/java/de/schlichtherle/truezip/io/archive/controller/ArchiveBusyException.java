@@ -28,14 +28,14 @@ import de.schlichtherle.truezip.io.archive.Archive;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileBusyException
-extends RecoverableArchiveControllerException {
+public class ArchiveBusyException
+extends ArchiveException {
 
     private static final long serialVersionUID = 1937356783082645716L;
 
     private final int numStreams;
 
-    ArchiveFileBusyException(Archive archive, int numStreams) {
+    ArchiveBusyException(Archive archive, int numStreams) {
         super(archive);
         this.numStreams = numStreams;
     }

@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import java.io.FileNotFoundException;
 
@@ -35,7 +35,7 @@ import java.io.FileNotFoundException;
  * In order to recover from this exception, client applications may call
  * {@link File#umount()} or {@link File#update()} in order to force all
  * entry streams for all archive files to close and prepare to catch the
- * resulting {@link ArchiveFileBusyWarningException}.
+ * resulting {@link ArchiveBusyWarningException}.
  * A subsequent try to create the archive entry stream will then succeed
  * unless any other exceptional condition occurs.
  * However, if the client application is still using a disconnected stream,
@@ -58,7 +58,7 @@ public class FileBusyException extends FileNotFoundException {
         super(msg);
     }
 
-    FileBusyException(ArchiveFileBusyException cause) {
+    FileBusyException(ArchiveBusyException cause) {
         super(cause != null ? cause.toString() : null);
         initCause(cause);
     }

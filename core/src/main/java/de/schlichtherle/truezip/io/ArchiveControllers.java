@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveControllerExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.lang.ref.Reference;
@@ -194,7 +194,7 @@ public final class ArchiveControllers {
      *        which shall get updated - {@code null} is not allowed!
      *        If the canonical pathname of an archive file does not start with
      *        this string, then it is not updated.
-     * @throws ArchiveControllerException If any exceptional condition occurs
+     * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      * @throws NullPointerException If {@code prefix} is {@code null}.
      * @throws IllegalArgumentException If {@code closeInputStreams} is
@@ -208,10 +208,10 @@ public final class ArchiveControllers {
             final boolean waitForOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         final UmountConfiguration config = new UmountConfiguration()
-                .setArchiveControllerExceptionBuilder(
-                    new DefaultArchiveControllerExceptionBuilder())
+                .setArchiveExceptionBuilder(
+                    new DefaultArchiveExceptionBuilder())
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -224,7 +224,7 @@ public final class ArchiveControllers {
     private static void umount0(
             final String prefix,
             final UmountConfiguration config)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         if (prefix == null)
             throw new NullPointerException();
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
@@ -245,8 +245,8 @@ public final class ArchiveControllers {
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
-                final ArchiveControllerExceptionBuilder builder
-                        = config.getArchiveControllerExceptionBuilder();
+                final ArchiveExceptionBuilder builder
+                        = config.getArchiveExceptionBuilder();
 
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
@@ -268,7 +268,7 @@ public final class ArchiveControllers {
                             // have been generated. We need to remember them for
                             // later throwing.
                             controller.umount(config);
-                        } catch (ArchiveControllerException exception) {
+                        } catch (ArchiveException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
@@ -288,7 +288,7 @@ public final class ArchiveControllers {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveControllerException chain) {
+        } catch (ArchiveException chain) {
             logger.log(Level.FINE, "update.throwing", chain);// NOI18N
             throw chain;
         }
@@ -369,7 +369,7 @@ public final class ArchiveControllers {
                 } finally {
                     try {
                         umount("", false, true, false, true, true);
-                    } catch (ArchiveControllerException ouch) {
+                    } catch (ArchiveException ouch) {
                         ouch.printStackTrace();
                     }
                 }

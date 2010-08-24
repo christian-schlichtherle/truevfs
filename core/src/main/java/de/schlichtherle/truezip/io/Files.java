@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.ArchiveFileSystemException;
@@ -434,7 +434,7 @@ final class Files {
       }
     } catch (FileNotFoundException ex) {
       throw ex;
-    } catch (ArchiveFileBusyException ex) {
+    } catch (ArchiveBusyException ex) {
       throw new FileBusyException(ex);
     } catch (ArchiveFileSystemException afse) {
       final FileNotFoundException fnfe

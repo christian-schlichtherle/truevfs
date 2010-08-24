@@ -21,29 +21,29 @@ import java.io.IOException;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
- * which is recoverable. Please consult
+ * which is recoverable.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class RecoverableArchiveControllerException
-extends ArchiveControllerWarningException {
+public abstract class ArchiveRecoverableException
+extends ArchiveWarningException {
 
     private static final long serialVersionUID = 4893204620324852936L;
 
-    public RecoverableArchiveControllerException(Archive archive) {
+    public ArchiveRecoverableException(Archive archive) {
         super(archive);
     }
 
-    public RecoverableArchiveControllerException(Archive archive, String message) {
+    public ArchiveRecoverableException(Archive archive, String message) {
         super(archive, message);
     }
 
-    public RecoverableArchiveControllerException(Archive archive, IOException cause) {
+    public ArchiveRecoverableException(Archive archive, IOException cause) {
         super(archive, cause);
     }
 
-    public RecoverableArchiveControllerException(Archive archive, String message, IOException cause) {
+    public ArchiveRecoverableException(Archive archive, String message, IOException cause) {
         super(archive, message, cause);
     }
 }
