@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
+import de.schlichtherle.truezip.io.ArchiveException;
+import de.schlichtherle.truezip.io.ArchiveWarningException;
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 
 public final class DefaultArchiveControllerExceptionBuilder

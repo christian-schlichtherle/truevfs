@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
 import de.schlichtherle.truezip.io.util.ChainableIOException;
-import java.io.IOException;
 
 /**
  * Represents a chain of exceptions thrown by the {@link File#umount} and
@@ -62,7 +61,7 @@ public class ArchiveException extends ChainableIOException {
      * @param  cause The cause (which is saved for later retrieval by the
      *         {@link #getCause()} method - {@code null} is discouraged.
      */
-    ArchiveException(
+    public ArchiveException(
             ArchiveControllerException cause, ArchiveException predecessor) {
         this(cause, predecessor, 0);
     }
