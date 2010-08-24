@@ -17,10 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
@@ -119,7 +116,7 @@ public final class InputArchiveMetaData {
      * Waits until all entry streams which have been opened (and not yet closed)
      * by all <em>other threads</em> are closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
-     * a warning message is logged using {@code java.util.logging} and
+     * a warn message is logged using {@code java.util.logging} and
      * this method returns.
      * <p>
      * Unless otherwise prevented, another thread could immediately open
@@ -190,8 +187,8 @@ public final class InputArchiveMetaData {
                 } finally {
                     it.remove();
                 }
-            } catch (IOException failure) {
-                handler.warning(failure);
+            } catch (IOException ioe) {
+                handler.warn(ioe);
             }
         }
     }
@@ -276,7 +273,7 @@ public final class InputArchiveMetaData {
 
         /**
          * Closes the underlying stream and marks this stream as being closed.
-         * It is an error to call this method on an already closed stream.
+         * It is an fail to call this method on an already closed stream.
          * This method does <em>not</em> remove this stream from the pool.
          * This method is not synchronized!
          *

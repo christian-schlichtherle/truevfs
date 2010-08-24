@@ -16,30 +16,22 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.Archive;
+
 /**
  * Like its super class, but indicates the existance of open output streams.
  *
  * @author Christian Schlichtherle
  * @version $Id$
+ * @deprecated Use {@link ArchiveFileOutputBusyException} instead.
  */
 public class ArchiveFileOutputBusyWarningException
-        extends ArchiveFileBusyWarningException {
-    private static final long serialVersionUID = 8465202307683484734L;
+extends ArchiveFileBusyWarningException {
 
-    private final int numStreams;
+    private static final long serialVersionUID = 962506102376252946L;
 
     // TODO: Make this package private!
-    public ArchiveFileOutputBusyWarningException(
-            ArchiveControllerException priorException, String cPath, int numStreams) {
-        super(priorException, cPath);
-        this.numStreams = numStreams;
-    }
-
-    /**
-     * Returns the number of open entry output streams, whereby an open stream
-     * is a stream which's {@code close()} method hasn't been called.
-     */
-    public int getNumStreams() {
-        return numStreams;
+    public ArchiveFileOutputBusyWarningException(Archive archive, int numStreams) {
+        super(archive, numStreams);
     }
 }

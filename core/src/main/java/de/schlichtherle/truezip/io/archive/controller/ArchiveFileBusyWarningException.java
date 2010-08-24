@@ -16,13 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 
 /**
- * Thrown if an archive file has been successfully updated, but some input
- * or output streams for its entries have been forced to close.
- * The canonical path name of the archive file is provided as the detail
- * message.
+ * Indicates that an archive file has been successfully updated, but some
+ * input or output streams for its entries have been forced to close.
  * <p>
  * With the exception of their {@code close()} method, any subsequent
  * I/O operation on the closed entry streams will throw an
@@ -30,11 +29,25 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
  *
  * @author Christian Schlichtherle
  * @version $Id$
+ * @deprecated Use {@link ArchiveFileBusyException} instead.
  */
-public class ArchiveFileBusyWarningException extends ArchiveControllerWarningException {
+public class ArchiveFileBusyWarningException
+extends ArchiveControllerWarningException {
+
     private static final long serialVersionUID = 2635419873651362891L;
 
-    ArchiveFileBusyWarningException(ArchiveControllerException priorException, String cPath) {
-        super(priorException, cPath);
+    private final int numStreams;
+
+    ArchiveFileBusyWarningException(Archive archive, int numStreams) {
+        super(archive);
+        this.numStreams = numStreams;
+    }
+
+    /**
+     * Returns the number of open entry input streams, whereby an open stream
+     * is a stream which's {@code close()} method hasn't been called.
+     */
+    public int getNumStreams() {
+        return numStreams;
     }
 }

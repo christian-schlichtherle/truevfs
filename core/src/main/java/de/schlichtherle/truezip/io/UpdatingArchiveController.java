@@ -18,11 +18,9 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -539,7 +537,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // Currently we do not have any use for this wrapper exception
             // when creating output archives, so we unwrap the transient
             // cause here.
-            throw ex.getTransientCause();
+            throw ex.getCause();
         }
         outFile = tmp; // init outFile on success only!
     }
@@ -601,17 +599,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         return outArchive != null && outArchive.getArchiveEntry(entryName) != null;
     }
 
-    void umount(
-            final ArchiveControllerException exceptionChain,
-            final boolean waitInputStreams,
-            final boolean closeInputStreams,
-            final boolean waitOutputStreams,
-            final boolean closeOutputStreams,
-            final boolean umount,
-            final boolean reassemble)
-    throws ArchiveControllerException {
-        assert closeInputStreams || !closeOutputStreams; // closeOutputStreams => closeInputStreams
-        assert !umount || reassemble; // umount => reassemble
+    void umount(final UmountConfiguration config)
+    throws ArchiveException {
+        assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
+        assert !config.getRelease() || config.getReassemble(); // umount => reassemble
         assert writeLock().isLockedByCurrentThread();
         assert inArchive == null || inFile != null; // input archive => input file
         assert !isTouched() || outArchive != null; // file system touched => output archive
@@ -620,37 +611,27 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // Do the logging part and leave the work to umount0.
         final Object[] stats = new Object[] {
             getCanonicalPath(),
-            exceptionChain,
-            Boolean.valueOf(waitInputStreams),
-            Boolean.valueOf(closeInputStreams),
-            Boolean.valueOf(waitOutputStreams),
-            Boolean.valueOf(closeOutputStreams),
-            Boolean.valueOf(umount),
-            Boolean.valueOf(reassemble),
+            Boolean.valueOf(config.getWaitForInputStreams()),
+            Boolean.valueOf(config.getCloseInputStreams()),
+            Boolean.valueOf(config.getWaitForOutputStreams()),
+            Boolean.valueOf(config.getCloseOutputStreams()),
+            Boolean.valueOf(config.getRelease()),
+            Boolean.valueOf(config.getReassemble()),
         };
         logger.log(Level.FINER, "umount.entering", stats); // NOI18N
         try {
-            umount0(exceptionChain,
-                    waitInputStreams, closeInputStreams,
-                    waitOutputStreams, closeOutputStreams,
-                    umount, reassemble);
-        } catch (ArchiveControllerException ex) {
+            umount0(config);
+        } catch (ArchiveException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
         }
         logger.log(Level.FINER, "umount.exiting", stats); // NOI18N
     }
 
-    private void umount0(
-            final ArchiveControllerException exceptionChain,
-            final boolean waitInputStreams,
-            final boolean closeInputStreams,
-            final boolean waitOutputStreams,
-            final boolean closeOutputStreams,
-            final boolean umount,
-            final boolean reassemble)
-    throws ArchiveControllerException {
-        ArchiveControllerException newExceptionChain = exceptionChain;
+    private void umount0(final UmountConfiguration config)
+    throws ArchiveException {
+        final ArchiveControllerExceptionBuilder builder
+                = config.getArchiveControllerExceptionBuilder();
 
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
@@ -659,25 +640,25 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         if (outArchive != null) {
             final OutputArchiveMetaData outMetaData = outArchive.getMetaData();
             final int outStreams = outMetaData.waitAllOutputStreamsByOtherThreads(
-                    waitOutputStreams ? 0 : 50);
+                    config.getWaitForOutputStreams() ? 0 : 50);
             if (outStreams > 0) {
-                if (!closeOutputStreams)
-                    throw new ArchiveFileOutputBusyException(
-                            newExceptionChain, getCanonicalPath(), outStreams);
-                newExceptionChain = new ArchiveFileOutputBusyWarningException(
-                        newExceptionChain, getCanonicalPath(), outStreams);
+                if (!config.getCloseOutputStreams())
+                    throw builder.fail(new ArchiveFileOutputBusyException(
+                            this, outStreams));
+                builder.warn(new ArchiveFileOutputBusyException(
+                        this, outStreams));
             }
         }
         if (inArchive != null) {
             final InputArchiveMetaData inMetaData = inArchive.getMetaData();
             final int inStreams = inMetaData.waitAllInputStreamsByOtherThreads(
-                    waitInputStreams ? 0 : 50);
+                    config.getWaitForInputStreams() ? 0 : 50);
             if (inStreams > 0) {
-                if (!closeInputStreams)
-                    throw new ArchiveFileInputBusyException(
-                            newExceptionChain, getCanonicalPath(), inStreams);
-                newExceptionChain = new ArchiveFileInputBusyWarningException(
-                        newExceptionChain, getCanonicalPath(), inStreams);
+                if (!config.getCloseInputStreams())
+                    throw builder.fail(new ArchiveFileInputBusyException(
+                            this, inStreams));
+                builder.warn(new ArchiveFileInputBusyException(
+                        this, inStreams));
             }
         }
 
@@ -692,39 +673,39 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             if (isTouched()) {
                 needsReassembly = true;
                 try {
-                    newExceptionChain = update(newExceptionChain);
+                    update(builder);
                     assert getFileSystem() == null;
                     assert inArchive == null;
                 } finally {
                     assert outArchive == null;
                 }
                 try {
-                    if (reassemble) {
-                        newExceptionChain = reassemble(newExceptionChain);
+                    if (config.getReassemble()) {
+                        reassemble(builder);
                         needsReassembly = false;
                     }
                 } finally {
-                    shutdownStep3(umount && !needsReassembly);
+                    shutdownStep3(config.getRelease() && !needsReassembly);
                 }
-            } else if (reassemble && needsReassembly) {
+            } else if (config.getReassemble() && needsReassembly) {
                 // Nesting this archive file to its enclosing archive file
                 // has been deferred until now.
                 assert outFile == null; // isTouched() otherwise!
                 assert inFile != null; // !needsReassembly otherwise!
                 // Beware: inArchive or fileSystem may be initialized!
-                shutdownStep2(newExceptionChain);
+                shutdownStep2(builder);
                 outFile = inFile;
                 inFile = null;
                 try {
-                    newExceptionChain = reassemble(newExceptionChain);
+                    reassemble(builder);
                     needsReassembly = false;
                 } finally {
-                    shutdownStep3(umount && !needsReassembly);
+                    shutdownStep3(config.getRelease() && !needsReassembly);
                 }
-            } else if (umount) {
-                assert reassemble;
+            } else if (config.getRelease()) {
+                assert config.getReassemble();
                 assert !needsReassembly;
-                shutdownStep2(newExceptionChain);
+                shutdownStep2(builder);
                 shutdownStep3(true);
             } else {
                 // This may happen if File.update() or File.umount() has
@@ -732,16 +713,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
             }
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw new ArchiveControllerException(newExceptionChain, ex);
+            throw builder.fail(new ArchiveControllerException(this, ex));
         } finally {
             setScheduled(needsReassembly);
         }
 
-        if (newExceptionChain != exceptionChain)
-            throw newExceptionChain;
+        builder.check();
     }
 
     final int waitAllInputStreamsByOtherThreads(long timeout) {
@@ -763,31 +743,31 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
-     * @return If any warning exception condition occurs throughout the course
+     * @return If any warn exception condition occurs throughout the course
      *         of this method, an {@link ArchiveControllerWarningException} is created
      *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
-     *         If multiple warning exception conditions occur, the prepended
+     *         If multiple warn exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveControllerException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveControllerException}
+     * @throws ArchiveException If any exception condition occurs throughout
+     *         the course of this method, an {@link ArchiveException}
      *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
-    private ArchiveControllerException update(ArchiveControllerException exceptionChain)
-    throws ArchiveControllerException {
+    private void update(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
         assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
-        assert checkNoDeletedEntriesWithNewData(exceptionChain) == exceptionChain;
+        assert checkNoDeletedEntriesWithNewData(handler);
 
         final ArchiveFileSystem fileSystem = getFileSystem();
         final ArchiveEntry root = fileSystem.getRoot();
         try {
             try {
                 try {
-                    exceptionChain = shutdownStep1(exceptionChain);
+                    shutdownStep1(handler);
 
                     ArchiveControllerWarningException inputEntryCorrupted = null;
                     ArchiveControllerWarningException outputEntryCorrupted = null;
@@ -815,11 +795,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                                 assert in != null;
                             } catch (IOException ex) {
                                 if (inputEntryCorrupted == null) {
-                                    exceptionChain = inputEntryCorrupted
+                                    inputEntryCorrupted
                                             = new ArchiveControllerWarningException(
-                                                exceptionChain,
-                                                getCanonicalPath() + " (skipped one or more corrupted archive entries in the input)",
-                                                ex);
+                                            this,
+                                            "skipped one or more corrupted archive entries in the input",
+                                            ex);
+                                    handler.warn(inputEntryCorrupted);
                                 }
                                 continue;
                             }
@@ -833,11 +814,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                                     Streams.cat(in, out);
                                 } catch (InputException ex) {
                                     if (outputEntryCorrupted == null) {
-                                        exceptionChain = outputEntryCorrupted
+                                        outputEntryCorrupted
                                                 = new ArchiveControllerWarningException(
-                                                    exceptionChain,
-                                                    getCanonicalPath() + " (one or more archive entries in the output are corrupted)",
-                                                    ex);
+                                                this,
+                                                "one or more archive entries in the output are corrupted",
+                                                ex);
+                                        handler.warn(outputEntryCorrupted);
                                     }
                                 } finally {
                                     out.close();
@@ -847,11 +829,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                                     in.close();
                                 } catch (IOException ex) {
                                     if (inputEntryCorrupted == null) {
-                                        exceptionChain = inputEntryCorrupted
+                                        inputEntryCorrupted
                                                 = new ArchiveControllerWarningException(
-                                                    exceptionChain,
-                                                    getCanonicalPath() + " (one or more archive entries in the input are corrupted)",
-                                                    ex);
+                                                this,
+                                                "one or more archive entries in the input are corrupted",
+                                                ex);
+                                        handler.warn(inputEntryCorrupted);
                                     }
                                     throw ex;
                                 }
@@ -873,7 +856,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // and thus cannot get used anymore to access the input;
                     // and (2) if there has been any IOException on the
                     // output archive there is no way to recover from it.
-                    shutdownStep2(exceptionChain);
+                    shutdownStep2(handler);
                 }
             } catch (IOException ex) {
                 // The output file is corrupted! We must remove it now to
@@ -891,31 +874,32 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 throw ex;
             }
         } catch (ArchiveControllerException ex) {
-            throw ex;
+            throw handler.fail(ex);
         } catch (IOException ex) {
-            throw new ArchiveControllerException(exceptionChain,
-                    getCanonicalPath() + " (could not update archive file - all changes are lost)",
-                    ex);
+            throw handler.fail(new ArchiveControllerException(
+                    this,
+                    "could not update archive file - all changes are lost",
+                    ex));
         }
 
         // Set the last modification time of the output archive file
         // to the last modification time of the virtual root directory,
         // hence preserving it.
         if (!outFile.setLastModified(root.getTime()))
-            exceptionChain = new ArchiveControllerWarningException(exceptionChain,
-                    getCanonicalPath() + " (couldn't preserve last modification time)");
-
-        return exceptionChain;
+            handler.warn(new ArchiveControllerWarningException(
+                    this,
+                    "couldn't preserve last modification time"));
     }
 
-    private ArchiveControllerException checkNoDeletedEntriesWithNewData(
-            ArchiveControllerException exceptionChain) {
+    private boolean checkNoDeletedEntriesWithNewData(
+            final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
         assert isTouched();
         assert getFileSystem() != null;
 
         // Check if we have written out any entries that have been
         // deleted from the master directory meanwhile and prepare
-        // to throw a warning exception.
+        // to throw a warn exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
         final Enumeration e = outArchive.getArchiveEntries();
         while (e.hasMoreElements()) {
@@ -926,13 +910,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             if (fileSystem.get(entryName) == null) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
-                // Create a warning exception, but do not yet throw it.
-                exceptionChain = new ArchiveControllerWarningException(exceptionChain,
-                        getCanonicalPath() + " (couldn't remove archive entry: " + entryName + ")");
+                // Create a warn exception, but do not yet throw it.
+                handler.warn(new ArchiveControllerWarningException(
+                        this,
+                        "couldn't remove archive entry '" + entryName + "'"));
             }
         }
-
-        return exceptionChain;
+        return true;
     }
 
     /**
@@ -943,28 +927,28 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param exceptionChain the head of a chain of exceptions created so far.
-     * @return If any warning condition occurs throughout the course of this
+     * @return If any warn condition occurs throughout the course of this
      *         method, a {@code ArchiveControllerWarningException} is created (but not
      *         thrown), prepended to {@code exceptionChain} and finally
      *         returned.
-     *         If multiple warning conditions occur,
+     *         If multiple warn conditions occur,
      *         the prepended exceptions are ordered by appearance so that the
      *         <i>last</i> exception created is the head of the returned
      *         exception chain.
-     * @return If any warning exception condition occurs throughout the course
+     * @return If any warn exception condition occurs throughout the course
      *         of this method, an {@link ArchiveControllerWarningException} is created
      *         (but not thrown), prepended to {@code exceptionChain} and
      *         finally returned.
-     *         If multiple warning exception conditions occur, the prepended
+     *         If multiple warn exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveControllerException If any exception condition occurs throughout
+     * @throws ArchiveException If any exception condition occurs throughout
      *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
-    private ArchiveControllerException reassemble(ArchiveControllerException exceptionChain)
-    throws ArchiveControllerException {
+    private void reassemble(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
         assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
@@ -988,11 +972,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     }
                     File.cp(in , out); // always closes in and out
                 } catch (IOException cause) {
-                    throw new ArchiveControllerException(
-                            exceptionChain,
-                            getCanonicalPath()
-                                + " (could not reassemble archive file - all changes are lost)",
-                            cause);
+                    throw handler.fail(new ArchiveControllerException(
+                            this,
+                            "could not reassemble archive file - all changes are lost",
+                            cause));
                 }
 
                 // Set the last modification time of the target archive file
@@ -1001,10 +984,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // directory during update(...).
                 final long time = outFile.lastModified();
                 if (time != 0 && !getTarget().setLastModified(time)) {
-                    exceptionChain = new ArchiveControllerWarningException(
-                            exceptionChain,
-                            getCanonicalPath()
-                                + " (couldn't preserve last modification time)");
+                    handler.warn(new ArchiveControllerWarningException(
+                            this,
+                            "couldn't preserve last modification time"));
                 }
             }
         } else {
@@ -1013,15 +995,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 wrap(getEnclController(), getEnclEntryName());
             } catch (IOException cause) {
-                throw new ArchiveControllerException(
-                        exceptionChain,
-                        getEnclController().getCanonicalPath() + "/" + getEnclEntryName()
-                            + " (could not update archive entry - all changes are lost)",
-                        cause);
+                throw handler.fail(new ArchiveControllerException(
+                        getEnclController(),
+                        "could not update archive entry '" + getEnclEntryName() + "' - all changes are lost",
+                        cause));
             }
         }
-
-        return exceptionChain;
     }
 
     private void wrap(
@@ -1075,16 +1054,17 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * the virtual file system from the archive file again.
      */
     @Override
-    void reset() throws IOException {
+    void reset(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
         assert writeLock().isLockedByCurrentThread();
 
-        ArchiveControllerException exceptionChain = shutdownStep1(null);
-        shutdownStep2(exceptionChain);
+        try {
+            shutdownStep1(handler);
+        } finally {
+            shutdownStep2(handler);
+        }
         shutdownStep3(true);
         setScheduled(false);
-
-        if (exceptionChain != null)
-            throw exceptionChain;
     }
 
     @Override
@@ -1103,8 +1083,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // logging.
             if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
                 logger.log(Level.SEVERE, "finalize.invalidState", getCanonicalPath());
-            shutdownStep1(null);
-            shutdownStep2(null);
+            final ArchiveControllerExceptionBuilder handler
+                    = new DefaultArchiveControllerExceptionBuilder();
+            shutdownStep1(handler);
+            shutdownStep2(handler);
             shutdownStep3(true);
         } finally {
             super.finalize();
@@ -1115,39 +1097,35 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      */
-    private ArchiveControllerException shutdownStep1(final ArchiveControllerException exceptionChain) {
+    private void shutdownStep1(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
         class ArchiveControllerWarningExceptionHandler
-        implements ExceptionHandler<IOException, RuntimeException> {
-            ArchiveControllerException chain = exceptionChain;
-
-            public void warning(IOException cause) {
-                chain = new ArchiveControllerWarningException(chain, cause);
-            }
-
-            public RuntimeException error(IOException cause) {
+        implements ExceptionHandler<IOException, ArchiveException> {
+            public ArchiveException fail(IOException cause) {
                 AssertionError ae = new AssertionError("cannot happen");
                 ae.initCause(cause);
                 throw ae;
             }
+
+            public void warn(IOException ioe) throws ArchiveException {
+                handler.warn(new ArchiveControllerWarningException(UpdatingArchiveController.this, ioe));
+            }
         }
 
-        final ArchiveControllerWarningExceptionHandler handler
+        final ArchiveControllerWarningExceptionHandler wrappedHandler
                 = new ArchiveControllerWarningExceptionHandler();
         if (outArchive != null)
-            outArchive.getMetaData().closeAllOutputStreams(handler);
+            outArchive.getMetaData().closeAllOutputStreams(wrappedHandler);
         if (inArchive != null)
-            inArchive.getMetaData().closeAllInputStreams(handler);
-        return handler.chain;
+            inArchive.getMetaData().closeAllInputStreams(wrappedHandler);
     }
 
     /**
      * Discards the file system and closes the output and input archive.
      */
-    private void shutdownStep2(ArchiveControllerException exceptionChain)
-    throws IOException {
-        final ArchiveControllerException oldExceptionChain = exceptionChain;
-
-        super.reset(); // discard file system
+    private void shutdownStep2(final ArchiveControllerExceptionHandler handler)
+    throws ArchiveException {
+        super.reset(handler); // discard file system
 
         // The output archive must be closed BEFORE the input archive is
         // closed. This is because the input archive has been presented
@@ -1156,28 +1134,27 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // meta data information.
         // E.g. with ZIP archive files, the OutputArchive copies the postamble
         // from the InputArchive when it closes.
-        if (outArchive != null) {
-            try {
-                outArchive.close();
-            } catch (IOException ex) {
-                exceptionChain = new ArchiveControllerException(exceptionChain, ex);
-            } finally {
-                outArchive = null;
+        try {
+            if (outArchive != null) {
+                try {
+                    outArchive.close();
+                } catch (IOException ioe) {
+                    handler.warn(new ArchiveControllerException(this, ioe));
+                } finally {
+                    outArchive = null;
+                }
+            }
+        } finally {
+            if (inArchive != null) {
+                try {
+                    inArchive.close();
+                } catch (IOException ioe) {
+                    handler.warn(new ArchiveControllerWarningException(this, ioe));
+                } finally {
+                    inArchive = null;
+                }
             }
         }
-
-        if (inArchive != null) {
-            try {
-                inArchive.close();
-            } catch (IOException ex) {
-                exceptionChain = new ArchiveControllerException(exceptionChain, ex);
-            } finally {
-                inArchive = null;
-            }
-        }
-
-        if (exceptionChain != oldExceptionChain)
-            throw exceptionChain;
     }
 
     /**
