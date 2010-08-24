@@ -16,44 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ArchiveException;
-import de.schlichtherle.truezip.io.ArchiveWarningException;
-import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
+import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 
+/**
+ * @author Christian Schlichtherle
+ * @version $Id$
+ */
 public final class DefaultArchiveControllerExceptionBuilder
-extends AbstractExceptionBuilder<ArchiveControllerException, ArchiveException>
+extends ChainableIOExceptionBuilder<ArchiveControllerException>
 implements ArchiveControllerExceptionBuilder {
-
-    /**
-     * If the given {@link ArchiveControllerException} is an instance of an
-     * {@link ArchiveControllerWarningException}, it is wrapped in a new
-     * {@link ArchiveWarningException}.
-     * Otherwise, it's wrapped in an {@link ArchiveException}.
-     * In either case, the {@code previous} assembled exception is used as the
-     * tail of the new exception chain.
-     * <p>
-     * {@inheritDoc}
-     */
-    protected ArchiveException assemble(
-            final ArchiveControllerException cause,
-            final ArchiveException previous) {
-        return cause instanceof ArchiveControllerWarningException
-                ? new ArchiveWarningException(cause, previous)
-                : new ArchiveException(cause, previous);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class
-     * {@link DefaultArchiveControllerExceptionBuilder}
-     * sorts the assembled exception by
-     * {@link ArchiveException#sortPriority() priority}
-     * before returning the result.
-     */
-    @Override
-    public ArchiveException reset(final ArchiveException exception) {
-        final ArchiveException e = super.reset(exception);
-        return e != null ? e.sortPriority() : null;
-    }
 }

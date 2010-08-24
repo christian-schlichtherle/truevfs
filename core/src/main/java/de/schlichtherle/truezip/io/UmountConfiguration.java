@@ -24,7 +24,6 @@ import java.io.IOException;
  */
 final class UmountConfiguration implements Cloneable {
     private ArchiveControllerExceptionBuilder archiveControllerExceptionBuilder;
-    private ArchiveExceptionBuilder archiveExceptionBuilder;
     private boolean waitForInputStreams;
     private boolean closeInputStreams;
     private boolean waitForOutputStreams;
@@ -52,19 +51,6 @@ final class UmountConfiguration implements Cloneable {
             final ArchiveControllerExceptionBuilder archiveControllerExceptionBuilder) {
         final UmountConfiguration clone = clone();
         clone.archiveControllerExceptionBuilder = archiveControllerExceptionBuilder;
-        return clone;
-    }
-
-    /** The handler to use to process archive exceptions. */
-    public ArchiveExceptionBuilder getArchiveExceptionBuilder() {
-        return archiveExceptionBuilder;
-    }
-
-    /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setArchiveExceptionBuilder(
-            final ArchiveExceptionBuilder archiveExceptionBuilder) {
-        final UmountConfiguration clone = clone();
-        clone.archiveExceptionBuilder = archiveExceptionBuilder;
         return clone;
     }
 

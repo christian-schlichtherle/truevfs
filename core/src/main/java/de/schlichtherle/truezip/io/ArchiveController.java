@@ -410,17 +410,14 @@ abstract class ArchiveController implements Archive {
      * of the archive (unless the archive type doesn't support this).
      * 
      * @see #umount(ArchiveControllerException, boolean, boolean, boolean, boolean, boolean, boolean)
-     * @see ArchiveException
+     * @see ArchiveControllerException
      */
     final void autoUmount(final String entryName)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
         if (hasNewData(entryName)) {
-            final DefaultArchiveControllerExceptionBuilder builder
-                    = new DefaultArchiveControllerExceptionBuilder();
             umount(new UmountConfiguration()
-                    .setArchiveControllerExceptionBuilder(builder)
-                    .setArchiveExceptionBuilder(new DefaultArchiveExceptionBuilder(builder))
+                    .setArchiveControllerExceptionBuilder(new DefaultArchiveControllerExceptionBuilder())
                     .setWaitForInputStreams(true)
                     .setCloseInputStreams(false)
                     .setWaitForOutputStreams(true)
@@ -439,12 +436,13 @@ abstract class ArchiveController implements Archive {
      * As an implication, this method requires external synchronization on
      * this controller's write lock!
      * 
-     * @throws ArchiveException If any exception condition occurs
+     * @throws ArchiveControllerException If any exception condition occurs
      *         throughout the course of this method, an
      *         {@link ArchiveControllerException} is created, prepended to
      *         {@code exceptionChain} and finally thrown.
      */
-    abstract void umount(UmountConfiguration config) throws ArchiveException;
+    abstract void umount(UmountConfiguration config)
+    throws ArchiveControllerException;
 
     // TODO: Document this!
     abstract int waitAllInputStreamsByOtherThreads(long timeout);
@@ -459,7 +457,7 @@ abstract class ArchiveController implements Archive {
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
      */
-    final void reset() throws ArchiveException {
+    final void reset() throws ArchiveControllerException {
         final ArchiveControllerExceptionBuilder builder
                 = new DefaultArchiveControllerExceptionBuilder();
         reset(builder);
@@ -477,7 +475,7 @@ abstract class ArchiveController implements Archive {
      * called when doing so.
      */
     abstract void reset(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException;
+    throws ArchiveControllerException;
 
     @Override
     public String toString() {
@@ -1199,7 +1197,7 @@ abstract class ArchiveController implements Archive {
                     // anyway, so we need to reset now.
                     try {
                         reset();
-                    } catch (ArchiveException cannotHappen) {
+                    } catch (ArchiveControllerException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
                     throw ex;

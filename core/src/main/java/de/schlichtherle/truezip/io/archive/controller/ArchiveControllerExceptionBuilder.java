@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ArchiveException;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 
 /**
@@ -25,5 +24,5 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
  */
 public interface ArchiveControllerExceptionBuilder
 extends ArchiveControllerExceptionHandler,
-        ExceptionBuilder<ArchiveControllerException, ArchiveException> {
+        ExceptionBuilder<ArchiveControllerException, ArchiveControllerException> {
 }

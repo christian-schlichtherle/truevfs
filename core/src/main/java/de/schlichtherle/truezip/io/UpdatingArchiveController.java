@@ -603,7 +603,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     void umount(final UmountConfiguration config)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
         assert !config.getRelease() || config.getReassemble(); // umount => reassemble
         assert writeLock().isLockedByCurrentThread();
@@ -624,7 +624,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         logger.log(Level.FINER, "umount.entering", stats); // NOI18N
         try {
             umount0(config);
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
         }
@@ -632,7 +632,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void umount0(final UmountConfiguration config)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         final ArchiveControllerExceptionBuilder builder
                 = config.getArchiveControllerExceptionBuilder();
 
@@ -716,7 +716,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
             }
-        } catch (ArchiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             throw builder.fail(new ArchiveControllerException(this, ex));
@@ -753,13 +753,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      *         If multiple warn exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveException If any exception condition occurs throughout
-     *         the course of this method, an {@link ArchiveException}
+     * @throws ArchiveControllerException If any exception condition occurs throughout
+     *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
     private void update(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
@@ -896,7 +896,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     private boolean checkNoDeletedEntriesWithNewData(
             final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert isTouched();
         assert getFileSystem() != null;
 
@@ -945,13 +945,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      *         If multiple warn exception conditions occur, the prepended
      *         exceptions are ordered by appearance so that the <i>last</i>
      *         exception created is the head of the returned exception chain.
-     * @throws ArchiveException If any exception condition occurs throughout
+     * @throws ArchiveControllerException If any exception condition occurs throughout
      *         the course of this method, an {@link ArchiveControllerException}
      *         is created, prepended to {@code exceptionChain} and finally
      *         thrown unless it's an {@link ArchiveControllerWarningException}.
      */
     private void reassemble(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
@@ -1058,7 +1058,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     @Override
     void reset(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         assert writeLock().isLockedByCurrentThread();
 
         try {
@@ -1101,16 +1101,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * archive.
      */
     private void shutdownStep1(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         class ArchiveControllerWarningExceptionHandler
-        implements ExceptionHandler<IOException, ArchiveException> {
-            public ArchiveException fail(IOException cause) {
+        implements ExceptionHandler<IOException, ArchiveControllerException> {
+            public ArchiveControllerException fail(IOException cause) {
                 AssertionError ae = new AssertionError("cannot happen");
                 ae.initCause(cause);
                 throw ae;
             }
 
-            public void warn(IOException ioe) throws ArchiveException {
+            public void warn(IOException ioe) throws ArchiveControllerException {
                 handler.warn(new ArchiveControllerWarningException(UpdatingArchiveController.this, ioe));
             }
         }
@@ -1127,7 +1127,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Discards the file system and closes the output and input archive.
      */
     private void shutdownStep2(final ArchiveControllerExceptionHandler handler)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         super.reset(handler); // discard file system
 
         // The output archive must be closed BEFORE the input archive is

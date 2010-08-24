@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveControllerExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
@@ -198,7 +200,7 @@ public final class ArchiveControllers {
      *         constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         virtual root directory.
-     * @throws ArchiveException If any error conditions occur throughout the
+     * @throws ArchiveControllerException If any error conditions occur throughout the
      *         course of this method which imply loss of data.
      *         This usually means that at least one of the archive files
      *         has been created externally and was corrupted or it cannot
@@ -216,14 +218,14 @@ public final class ArchiveControllers {
             final boolean waitForOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         if (prefix == null)
             throw new NullPointerException();
         final DefaultArchiveControllerExceptionBuilder builder
                 = new DefaultArchiveControllerExceptionBuilder();
         final UmountConfiguration config = new UmountConfiguration()
                 .setArchiveControllerExceptionBuilder(builder)
-                .setArchiveExceptionBuilder(new DefaultArchiveExceptionBuilder(builder))
+                .setArchiveControllerExceptionBuilder(new DefaultArchiveControllerExceptionBuilder())
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -236,7 +238,7 @@ public final class ArchiveControllers {
     private static void umount0(
             final String prefix,
             final UmountConfiguration config)
-    throws ArchiveException {
+    throws ArchiveControllerException {
         if (prefix == null)
             throw new NullPointerException();
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
@@ -257,6 +259,9 @@ public final class ArchiveControllers {
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
+                final ArchiveControllerExceptionBuilder builder
+                        = config.getArchiveControllerExceptionBuilder();
+
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
@@ -277,13 +282,13 @@ public final class ArchiveControllers {
                             // have been generated. We need to remember them for
                             // later throwing.
                             controller.umount(config);
-                        } catch (ArchiveException exception) {
+                        } catch (ArchiveControllerException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
                             // We are bullheaded and store the exception chain for
                             // later throwing only and continue updating the rest.
-                            config.getArchiveExceptionBuilder().reset(exception);
+                            builder.reset(exception);
                         }
                     } finally {
                         controller.writeLock().unlock();
@@ -292,12 +297,12 @@ public final class ArchiveControllers {
                 }
 
                 // Check to rethrow exception chain sorted by priority.
-                config.getArchiveExceptionBuilder().check();
+                builder.check();
             } finally {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveException chain) {
+        } catch (ArchiveControllerException chain) {
             logger.log(Level.FINE, "update.throwing", chain);// NOI18N
             throw chain;
         }
@@ -378,7 +383,7 @@ public final class ArchiveControllers {
                 } finally {
                     try {
                         umount("", false, true, false, true, true);
-                    } catch (ArchiveException ouch) {
+                    } catch (ArchiveControllerException ouch) {
                         ouch.printStackTrace();
                     }
                 }
