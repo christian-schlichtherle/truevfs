@@ -51,7 +51,7 @@ import java.util.Comparator;
  * @version $Id$
  */
 public class ChainableIOException extends IOException implements Cloneable {
-    private static final long serialVersionUID = 2305749434187324928L;
+    private static final long serialVersionUID = 2203967634187324928L;
 
     private static int maxPrintExceptions = 3;
 
@@ -66,7 +66,7 @@ public class ChainableIOException extends IOException implements Cloneable {
             = new Comparator<ChainableIOException>() {
         public int compare(ChainableIOException l, ChainableIOException r) {
             final int cmp = l.getPriority() - r.getPriority();
-            return cmp != 0 ? cmp : APPEARANCE_COMP.compare(l, r);
+            return cmp != 0 ? cmp : INDEX_COMP.compare(l, r);
         }
     };
 
@@ -75,117 +75,100 @@ public class ChainableIOException extends IOException implements Cloneable {
      * appearance.
      */
     // Note: Not private for unit testing purposes only!
-    static final Comparator<ChainableIOException> APPEARANCE_COMP
+    static final Comparator<ChainableIOException> INDEX_COMP
             = new Comparator<ChainableIOException>() {
         public int compare(ChainableIOException l, ChainableIOException r) {
-            return l.getAppearance() - r.getAppearance();
+            return l.getIndex() - r.getIndex();
         }
     };
-    
-    /**
-     * The tail chain of this exception chain.
-     * Maybe {@code null} if there are no more exceptions.
-     * If this exception chain has not been reordered,
-     * the head of the tail is either {@code null} or an exception which
-     * occured before this exception was created.
-     */
-    private ChainableIOException predecessor;
-
-    private final int priority;
-
-    private final int appearance;
-
-    int maxAppearance;
 
     /**
-     * Constructs a new chainable I/O exception with the specified predecessor.
-     *
-     * @param  predecessor An exception that happened <em>before</em> and is
-     *         <em>not</em> the cause for this exception! May be {@code null}.
+     * The tail of this exception chain.
+     * Maybe {@code this} if the predecessor hasn't been
+     * {@link #initPredecessor(ChainableIOException)} initialized yet or
+     * {@code null} if there are no more exceptions in this chain.
      */
+    private ChainableIOException predecessor = this;
+
+    private int priority; // effectively final
+
+    private int index; // effectively final
+
+    // Note: Not private for unit testing purposes only!
+    int maxIndex; // effectively final
+
+    public ChainableIOException() {
+    }
+
     public ChainableIOException(ChainableIOException predecessor) {
-        this(predecessor, null, null, 0);
+        init(predecessor, 0);
     }
 
-    /**
-     * Constructs a new chainable I/O exception with the specified predecessor
-     * and message.
-     *
-     * @param  predecessor An exception that happened <em>before</em> and is
-     *         <em>not</em> the cause for this exception! May be {@code null}.
-     * @param  message The message for this exception.
-     */
     public ChainableIOException(
-            ChainableIOException predecessor,
-            String message) {
-        this(predecessor, message, null, 0);
+            String message,
+            ChainableIOException predecessor) {
+        super(message);
+        init(predecessor, 0);
     }
     
-    /**
-     * Constructs a new chainable I/O exception with the specified predecessor
-     * and cause.
-     *
-     * @param  predecessor An exception that happened <em>before</em> and is
-     *         <em>not</em> the cause for this exception! May be {@code null}.
-     * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).
-     *         A {@code null} value is permitted, and indicates that the cause
-     *         is nonexistent or unknown.
-     */
     public ChainableIOException(
-            ChainableIOException predecessor,
-            IOException cause) {
-        this(predecessor, null, cause, 0);
+            IOException cause,
+            ChainableIOException predecessor) {
+        super.initCause(cause);
+        init(predecessor, 0);
+    }
+
+    public ChainableIOException(
+            String message,
+            IOException cause,
+            ChainableIOException predecessor) {
+        super(message);
+        super.initCause(cause);
+        init(predecessor, 0);
+    }
+
+    @SuppressWarnings("LeakingThisInConstructor")
+    public ChainableIOException(
+            String message,
+            IOException cause,
+            int priority) {
+        super(message);
+        super.initCause(cause);
+        init(this, priority);
     }
 
     /**
-     * Constructs a new chainable I/O exception with the specified predecessor,
-     * message and cause.
+     * Constructs a new chainable I/O exception with the specified
+     * {@code message}, {@code cause}, {@code predecessor} and {@code priority}.
      *
-     * @param  predecessor An exception that happened <em>before</em> and is
-     *         <em>not</em> the cause for this exception! May be {@code null}.
      * @param  message The message for this exception.
      * @param  cause The cause (which is saved for later retrieval by the
      *         {@link #getCause()} method).
      *         A {@code null} value is permitted, and indicates that the cause
      *         is nonexistent or unknown.
-     */
-    public ChainableIOException(
-            final ChainableIOException predecessor,
-            final String message,
-            final IOException cause) {
-        this(predecessor, message, cause, 0);
-    }
-
-    /**
-     * Constructs a new chainable I/O exception with the specified predecessor,
-     * message, cause and priority.
-     *
      * @param  predecessor An exception that happened <em>before</em> and is
      *         <em>not</em> the cause for this exception! May be {@code null}.
-     * @param  message The message for this exception.
-     * @param  cause The cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).
-     *         A {@code null} value is permitted, and indicates that the cause
-     *         is nonexistent or unknown.
      * @param priority The priority of this exception to be used for
-     *        {@link #sortPriority() sorting}.
+     *        {@link #sortPriority() priority sorting}.
      */
     public ChainableIOException(
-            final ChainableIOException predecessor,
             final String message,
             final IOException cause,
+            final ChainableIOException predecessor,
             final int priority) {
-        super(message != null ? message : cause != null ? cause.toString() : null);
-        this.predecessor = predecessor;
+        super(message);
+        super.initCause(cause);
+        init(predecessor, priority);
+    }
+
+    private void init(
+            final ChainableIOException predecessor,
+            final int priority) {
+        setPredecessor(predecessor);
+        this.maxIndex = getPredecessor() != null
+                ? predecessor.maxIndex + 1 : 0;
         this.priority = priority;
-        if (cause != null)
-            super.initCause(cause);
-        if (predecessor != null)
-            maxAppearance = predecessor.maxAppearance + 1;
-        else
-            maxAppearance = 0;
-        appearance = maxAppearance;
+        this.index = maxIndex;
     }
 
     /** Returns a <em>shallow</em> clone of this exception. */
@@ -198,24 +181,59 @@ public class ChainableIOException extends IOException implements Cloneable {
         }
     }
 
+    /**
+     * Equivalent to
+     * {@code return (ChainableIOException) super.initCause(cause);}.
+     */
+    @Override
+    public ChainableIOException initCause(final Throwable cause) {
+        return (ChainableIOException) super.initCause(cause);
+    }
+
+    /**
+     * Returns the exception chain represented by the predecessor exception,
+     * or {@code null} if no predecessing exception exists or this property
+     * hasn't been
+     * {@link #initPredecessor(ChainableIOException) initialized} yet.
+     */
+    public final ChainableIOException getPredecessor() {
+        return predecessor == this ? null : predecessor;
+    }
+
+    private void setPredecessor(
+            final ChainableIOException predecessor) {
+        if (this.predecessor != this)
+            throw new IllegalStateException("Can't overwrite predecessor!");
+        if (predecessor == this)
+            throw new IllegalArgumentException("Can't be predecessor of myself!");
+        if (predecessor != null)
+            if (predecessor.predecessor == predecessor)
+                throw new IllegalArgumentException("The predecessor's predecessor must be initialized in order to inhibit loops!");
+        this.predecessor = predecessor;
+    }
+
+    public synchronized ChainableIOException initPredecessor(
+            ChainableIOException predecessor) {
+        setPredecessor(predecessor);
+        return this;
+    }
+
     /** Returns the priority of this exception. */
     public final int getPriority() {
         return priority;
     }
 
     /**
-     * @return The order of appearance for this ZIP exception.
+     * Returns the zero-based index number of this exception when it was first
+     * linked into this chain.
      */
-    public final int getAppearance() {
-        return appearance;
+    public final int getIndex() {
+        return index;
     }
 
-    /**
-     * @return The exception chain represented by the predecessor exception,
-     *         or {@code null} if no predecessing exception exists.
-     */
-    public ChainableIOException getPredecessor() {
-        return predecessor;
+    /** Returns the number of exceptions in this chain. */
+    public final int getLength() {
+        return maxIndex + 1;
     }
 
     /**
@@ -237,7 +255,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     
     /**
      * Sorts the elements of this exception chain in descending order
-     * of their appearance.
+     * of their index.
      *
      * @return The sorted exception chain, consisting of cloned elements where
      *         required to enforce the immutability of this class.
@@ -246,53 +264,45 @@ public class ChainableIOException extends IOException implements Cloneable {
      *         If and only if all elements are in order, this exception chain
      *         is returned and no elements are cloned.
      */
-    public ChainableIOException sortAppearance() {
-        return sort(APPEARANCE_COMP);
+    public ChainableIOException sortIndex() {
+        return sort(INDEX_COMP);
     }
 
     private ChainableIOException sort(
-            final Comparator<ChainableIOException> comp) {
-        if (predecessor != null) {
-            final ChainableIOException sortedPrior = predecessor.sort(comp);
-            if (sortedPrior == predecessor && comp.compare(this, predecessor) >= 0)
-                return this;
-            else
-                return sortedPrior.insert(clone(), comp);
-        } else {
+            final Comparator<ChainableIOException> cmp) {
+        final ChainableIOException pre = getPredecessor();
+        if (pre == null)
             return this;
-        }
+        final ChainableIOException tail = pre.sort(cmp);
+        if (tail == pre && cmp.compare(this, pre) >= 0)
+            return this;
+        else
+            return tail.insert(clone(), cmp);
     }
 
     private ChainableIOException insert(
             final ChainableIOException element,
-            final Comparator<ChainableIOException> comp) {
-        if (comp.compare(element, this) >= 0) {
+            final Comparator<ChainableIOException> cmp) {
+        if (cmp.compare(element, this) >= 0) {
             // Prepend to chain.
             element.predecessor = this;
-            element.maxAppearance = Math.max(element.appearance, maxAppearance);
+            element.maxIndex = Math.max(element.index, maxIndex);
             return element;
         } else {
             // Insert element in the prior exception chain.
+            final ChainableIOException predecessor = this.predecessor;
+            assert predecessor != this;
             final ChainableIOException clone = clone();
             if (predecessor != null) {
-                clone.predecessor = predecessor.insert(element, comp);
-                clone.maxAppearance = Math.max(clone.appearance, clone.predecessor.maxAppearance);
+                clone.predecessor = predecessor.insert(element, cmp);
+                clone.maxIndex = Math.max(clone.index, clone.predecessor.maxIndex);
             } else {
                 element.predecessor = null;
                 clone.predecessor = element;
-                clone.maxAppearance = element.maxAppearance;
+                clone.maxIndex = element.maxIndex;
             }
             return clone;
         }
-    }
-
-    /**
-     * Equivalent to
-     * {@code return (ChainableIOException) super.initCause(cause);}.
-     */
-    @Override
-    public ChainableIOException initCause(final Throwable cause) {
-        return (ChainableIOException) super.initCause(cause);
     }
 
     /**

@@ -35,11 +35,11 @@ implements ArchiveControllerExceptionBuilder {
      * {@inheritDoc}
      */
     protected ArchiveException assemble(
-            final ArchiveException previous,
-            final ArchiveControllerException cause) {
+            final ArchiveControllerException cause,
+            final ArchiveException previous) {
         return cause instanceof ArchiveControllerWarningException
-                ? new ArchiveWarningException(previous, cause)
-                : new ArchiveException(previous, cause);
+                ? new ArchiveWarningException(cause, previous)
+                : new ArchiveException(cause, previous);
     }
 
     /**

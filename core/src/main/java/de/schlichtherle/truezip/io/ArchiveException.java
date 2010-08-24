@@ -63,16 +63,14 @@ public class ArchiveException extends ChainableIOException {
      *         {@link #getCause()} method - {@code null} is discouraged.
      */
     ArchiveException(
-            ArchiveException predecessor,
-            ArchiveControllerException cause) {
-        this(predecessor, cause, 0);
+            ArchiveControllerException cause, ArchiveException predecessor) {
+        this(cause, predecessor, 0);
     }
 
     ArchiveException(
-            ArchiveException predecessor,
-            ArchiveControllerException cause,
+            ArchiveControllerException cause, ArchiveException predecessor,
             int priority) {
-        super(predecessor, null, cause, priority);
+        super(null, cause, predecessor, priority);
     }
 
     /**
@@ -85,12 +83,12 @@ public class ArchiveException extends ChainableIOException {
     }
 
     @Override
-    public ArchiveException sortAppearance() {
-        return (ArchiveException) super.sortAppearance();
+    public ArchiveException sortPriority() {
+        return (ArchiveException) super.sortPriority();
     }
 
     @Override
-    public ArchiveException sortPriority() {
-        return (ArchiveException) super.sortPriority();
+    public ArchiveException sortIndex() {
+        return (ArchiveException) super.sortIndex();
     }
 }

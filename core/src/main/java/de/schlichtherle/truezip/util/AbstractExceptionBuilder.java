@@ -35,14 +35,14 @@ implements ExceptionBuilder<C, T> {
      * Assembles an exception from the given previous result and a(nother)
      * cause.
      * 
+     * @param cause A(nother) non-{@code null} cause exception to add to the
+     *        assembly.
      * @param previous The previous result of calling this method or
      *        {@code null} if this is the first call after object creation or
      *        a call to {@link #reset(Throwable)}.
-     * @param cause A(nother) non-{@code null} cause exception to add to the
-     *        assembly.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract T assemble(T previous, C cause);
+    protected abstract T assemble(C cause, T previous);
 
     /**
      * {@inheritDoc}
@@ -60,7 +60,7 @@ implements ExceptionBuilder<C, T> {
      * method {@link #reset(Throwable)} appropriately.
      */
     public final T fail(final C cause) {
-        throwable = assemble(throwable, cause);
+        throwable = assemble(cause, throwable);
         return reset(null);
     }
 
@@ -76,7 +76,7 @@ implements ExceptionBuilder<C, T> {
      * builder has been instantiated or reset.
      */
     public final void warn(final C cause) {
-        throwable = assemble(throwable, cause);
+        throwable = assemble(cause, throwable);
     }
 
     /**
