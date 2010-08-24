@@ -21,10 +21,12 @@ import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
+import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -229,7 +231,8 @@ public class MultiplexedOutputArchive implements OutputArchive {
         if (isTargetBusy())
             return;
 
-        ChainableIOException exception = null;
+        final ChainableIOExceptionBuilder<ChainableIOException> builder
+                = new ChainableIOExceptionBuilder<ChainableIOException>();
 
         for (final Iterator i = temps.values().iterator(); i.hasNext(); ) {
             final TempEntryOutputStream tempOut
@@ -241,7 +244,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 final ArchiveEntry srcEntry = tempOut.srcEntry;
                 final File temp = tempOut.temp;
                 try {
-                    final InputStream in = new java.io.FileInputStream(temp);
+                    final InputStream in = new FileInputStream(temp);
                     try {
                         final OutputStream out = target.getOutputStream(
                                 entry, srcEntry);
@@ -255,24 +258,23 @@ public class MultiplexedOutputArchive implements OutputArchive {
                     }
                 } finally {
                     if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                        temp.deleteOnExit(); // we're bullish never to leavy any temps!
+                        temp.deleteOnExit(); // be bullish never to leavy any temps!
                 }
             } catch (FileNotFoundException ex) {
                 // Input exception - let's continue!
-                exception = new ChainableIOException(ex, exception);
+                builder.warn(new ChainableIOException(ex));
             } catch (InputException ex) {
                 // Input exception - let's continue!
-                exception = new ChainableIOException(ex, exception);
+                builder.warn(new ChainableIOException(ex));
             } catch (IOException ex) {
                 // Something's wrong writing this MultiplexedOutputStream!
-                throw new ChainableIOException(ex, exception);
+                throw builder.fail(new ChainableIOException(ex));
             } finally {
                 i.remove();
             }
         }
 
-        if (exception != null)
-            throw exception.sortPriority();
+        builder.check();
     }
 
     public void close() throws IOException {

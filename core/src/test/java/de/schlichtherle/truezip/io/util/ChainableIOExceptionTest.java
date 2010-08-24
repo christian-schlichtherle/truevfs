@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.util;
 
-import de.schlichtherle.truezip.io.File;
+import java.io.File;
 import junit.framework.TestCase;
 
 /**
@@ -36,41 +36,28 @@ public class ChainableIOExceptionTest extends TestCase {
         final int max = 9;
         assertEquals(0, max % 3);
         final ChainableIOException[] appearance = new ChainableIOException[max];
-        final ChainableIOException[] revAppearance = new ChainableIOException[max];
         final ChainableIOException[] priority = new ChainableIOException[max];
         for (int i = 0; i < max; i++) {
-            File dummy = (File) new File("" + i + 1).getAbsoluteFile();
-            switch (i % 3) {
-            case 0:
-                exc = new Exception0(exc, dummy.getPath());
-                break;
-            
-            case 1:
-                exc = new Exception1(exc, dummy.getPath());
-                break;
-
-            case 2:
-                exc = new Exception2(exc, dummy.getPath());
-                break;
-            }
-            appearance[i]
-                    = revAppearance[max - 1 - i]
-                    = priority[(i % 3) * (max / 3) + (2 - i / 3)]
+            final File dummy = (File) new File("" + (i + 1)).getAbsoluteFile();
+            exc = new TestException(dummy.getPath(), i % 3).initPredecessor(exc);
+            appearance[max - 1 - i]
+                    = priority[max - 1 - (i % 3) * (max / 3) - (i / 3)]
                     = exc;
         }
 
-        final int maxAppearance = exc.maxIndex;
-        final Check appearanceCheck = new Check() {
+        final int maxIndex = exc.maxIndex;
+        assertEquals(max - 1, maxIndex);
+        final Check indexCheck = new Check() {
             public boolean equals(ChainableIOException e1, ChainableIOException e2) {
                 //return Exception0.INDEX_COMP.compare(e1, e2) == 0;
                 return e1 == e2;
             }
         };
-        testChain(appearanceCheck, revAppearance, exc);
+        testChain(indexCheck, appearance, exc);
 
         final ChainableIOException appearanceExc = exc.sortIndex();
-        assertEquals(maxAppearance, appearanceExc.maxIndex);
-        testChain(appearanceCheck, revAppearance, appearanceExc);
+        assertEquals(maxIndex, appearanceExc.maxIndex);
+        testChain(indexCheck, appearance, appearanceExc);
 
         final Check priorityCheck = new Check() {
             public boolean equals(ChainableIOException e1, ChainableIOException e2) {
@@ -79,7 +66,7 @@ public class ChainableIOExceptionTest extends TestCase {
         };
         final ChainableIOException priorityExc = exc.sortPriority();
         assertNotSame(exc, priorityExc);
-        assertEquals(maxAppearance, priorityExc.maxIndex);
+        assertEquals(maxIndex, priorityExc.maxIndex);
         testChain(priorityCheck, priority, priorityExc);
     }
 
@@ -87,7 +74,7 @@ public class ChainableIOExceptionTest extends TestCase {
             final Check c,
             final ChainableIOException[] expected,
             ChainableIOException exc) {
-        assertNotNull(c);
+        assert c != null;
         for (int i = 0; i < expected.length; i++) {
             final ChainableIOException exp = expected[i];
             assertNotNull(exp);
@@ -102,27 +89,11 @@ public class ChainableIOExceptionTest extends TestCase {
         boolean equals(ChainableIOException e1, ChainableIOException e2);
     }
 
-    static class Exception0 extends ChainableIOException {
+    static class TestException extends ChainableIOException {
         private static final long serialVersionUID = 4893204620357369739L;
 
-        Exception0(ChainableIOException priorException, String message) {
-            super(message, priorException);
-        }
-    }
-
-    static class Exception1 extends ChainableIOException {
-        private static final long serialVersionUID = 2302357394858347366L;
-
-        Exception1(ChainableIOException priorException, String message) {
-            super(message, null, priorException, -1);
-        }
-    }
-
-    static class Exception2 extends ChainableIOException {
-        private static final long serialVersionUID = 1937861953461235716L;
-
-        Exception2(ChainableIOException priorException, String message) {
-            super(message, null, priorException, -2);
+        TestException(String message, int priority) {
+            super(message, priority);
         }
     }
 
@@ -144,12 +115,6 @@ public class ChainableIOExceptionTest extends TestCase {
         } catch (IllegalArgumentException expected) {
         }
 
-        try {
-            exc2 = new ChainableIOException(exc1);
-            fail("A chainable exception's predecessor's predecessor must be initialized!");
-        } catch (IllegalArgumentException expected) {
-        }
-
         exc1.initPredecessor(null);
 
         try {
@@ -159,7 +124,6 @@ public class ChainableIOExceptionTest extends TestCase {
         }
 
         exc2.initPredecessor(exc1);
-        exc2 = new ChainableIOException(exc1);
 
         try {
             exc2.initPredecessor(exc1);
