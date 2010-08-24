@@ -66,22 +66,18 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
         String msg = id + ": key strength is ";
         switch(keyStrength) {
             case AesKeyProvider.KEY_STRENGTH_128:
-
                 msg += "128";
-
                 break;
+
             case AesKeyProvider.KEY_STRENGTH_192:
-
                 msg += "192";
-
                 break;
+
             case AesKeyProvider.KEY_STRENGTH_256:
-
                 msg += "256";
-
                 break;
-            default:
 
+            default:
                 throw new AssertionError("Illegal key strength!");
         }
         msg += " bits.";

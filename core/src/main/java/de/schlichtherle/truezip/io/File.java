@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.ArchiveController.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -1112,7 +1112,7 @@ public class File extends java.io.File {
      * umount(false, true, false, true)}.
      */
     public static void umount()
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("", false, true, false, true, true);
     }
 
@@ -1121,7 +1121,7 @@ public class File extends java.io.File {
      * umount(false, closeStreams, false, closeStreams)}.
      */
     public static void umount(boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("",
                 false, closeStreams,
                 false, closeStreams,
@@ -1167,7 +1167,7 @@ public class File extends java.io.File {
      *        {@link FileBusyException} thrown by a constructor of
      *        {@link FileInputStream} or {@link FileOutputStream}.
      *        If this parameter is {@code false}, the respective archive
-     *        file is <em>not</em> updated and an {@link ArchiveBusyException}
+     *        file is <em>not</em> updated and an {@link ArchiveFileBusyException}
      *        is thrown to indicate that the application must close all entry
      *        input streams first.
      * @param waitOutputStreams Similar to {@code waitInputStreams},
@@ -1200,7 +1200,7 @@ public class File extends java.io.File {
     public static void umount(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("",
                 waitInputStreams, closeInputStreams,
                 waitOutputStreams, closeOutputStreams,
@@ -1212,7 +1212,7 @@ public class File extends java.io.File {
      * umount(archive, false, true, false, true)}.
      */
     public static void umount(File archive)
-    throws ArchiveException {
+    throws ArchiveFileException {
         umount(archive, false, true, false, true);
     }
 
@@ -1221,7 +1221,7 @@ public class File extends java.io.File {
      * umount(archive, false, closeStreams, false, closeStreams)}.
      */
     public static void umount(File archive, boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         umount(archive, false, closeStreams, false, closeStreams);
     }
 
@@ -1251,7 +1251,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
@@ -1267,7 +1267,7 @@ public class File extends java.io.File {
      * update(false, true, false, true)}.
      */
     public static void update()
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("",
                 false, true,
                 false, true,
@@ -1279,7 +1279,7 @@ public class File extends java.io.File {
      * update(false, closeStreams, false, closeStreams)}.
      */
     public static void update(boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("",
                 false, closeStreams,
                 false, closeStreams,
@@ -1307,7 +1307,7 @@ public class File extends java.io.File {
     public static void update(
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         ArchiveControllers.umount("",
                 waitInputStreams, closeInputStreams,
                 waitOutputStreams, closeOutputStreams,
@@ -1319,7 +1319,7 @@ public class File extends java.io.File {
      * update(archive, false, true, false, true)}.
      */
     public static void update(File archive)
-    throws ArchiveException {
+    throws ArchiveFileException {
         update(archive, false, true, false, true);
     }
 
@@ -1328,7 +1328,7 @@ public class File extends java.io.File {
      * update(archive, false, closeStreams, false, closeStreams)}.
      */
     public static void update(File archive, boolean closeStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         update(archive, false, closeStreams, false, closeStreams);
     }
 
@@ -1352,7 +1352,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitInputStreams, boolean closeInputStreams,
             boolean waitOutputStreams, boolean closeOutputStreams)
-    throws ArchiveException {
+    throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)

@@ -14,62 +14,57 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive;
 
-import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.util.ChainableIOException;
 
 /**
- * Indicates an exceptional condition detected by an {@link ArchiveController}.
+ * Indicates an exceptional condition when processing archive files.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveException extends ChainableIOException {
+public abstract class ArchiveException extends ChainableIOException {
 
-    private static final long serialVersionUID = 4893204620357369739L;
+    private static final long serialVersionUID = 4893232550396764539L;
 
     private final String path;
 
-    // TODO: Make this constructor package private!
-    public ArchiveException(Archive archive) {
+    protected ArchiveException(Archive archive) {
         this.path = archive.getCanonicalPath();
     }
 
-    // TODO: Make this constructor package private!
-    public ArchiveException(Archive archive, String message) {
+    protected ArchiveException(Archive archive, String message) {
         super(message);
         this.path = archive.getCanonicalPath();
     }
 
-    // TODO: Make this constructor package private!
-    public ArchiveException(Archive archive, Throwable cause) {
+    protected ArchiveException(Archive archive, Throwable cause) {
         super(cause);
         this.path = archive.getCanonicalPath();
     }
 
-    // TODO: Make this constructor package private!
-    public ArchiveException(Archive archive, String message, Throwable cause) {
+    protected ArchiveException(Archive archive, String message, Throwable cause) {
         super(message, cause);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveException(Archive archive, int priority) {
+    protected ArchiveException(Archive archive, int priority) {
         super(priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveException(Archive archive, String message, int priority) {
+    protected ArchiveException(Archive archive, String message, int priority) {
         super(message, priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveException(Archive archive, Throwable cause, int priority) {
+    protected ArchiveException(Archive archive, Throwable cause, int priority) {
         super(cause, priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveException(Archive archive, String message, Throwable cause, int priority) {
+    protected ArchiveException(Archive archive, String message, Throwable cause, int priority) {
         super(message, cause, priority);
         this.path = archive.getCanonicalPath();
     }

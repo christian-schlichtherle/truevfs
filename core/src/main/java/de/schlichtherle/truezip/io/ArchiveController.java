@@ -16,13 +16,13 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionHandler;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
 import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionHandler;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -414,11 +414,11 @@ abstract class ArchiveController implements Archive {
      *         throughout the processing of the target archive file.
      */
     final void autoUmount(final String entryName)
-    throws ArchiveException {
+    throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
         if (hasNewData(entryName)) {
             umount(new UmountConfiguration()
-                    .setArchiveExceptionBuilder(new DefaultArchiveExceptionBuilder())
+                    .setArchiveFileExceptionBuilder(new DefaultArchiveFileExceptionBuilder())
                     .setWaitForInputStreams(true)
                     .setCloseInputStreams(false)
                     .setWaitForOutputStreams(true)
@@ -444,7 +444,7 @@ abstract class ArchiveController implements Archive {
      *         throughout the processing of the target archive file.
      */
     abstract void umount(UmountConfiguration config)
-    throws ArchiveException;
+    throws ArchiveFileException;
 
     // TODO: Document this!
     abstract int waitAllInputStreamsByOtherThreads(long timeout);
@@ -459,9 +459,9 @@ abstract class ArchiveController implements Archive {
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
      */
-    final void reset() throws ArchiveException {
-        final ArchiveExceptionBuilder builder
-                = new DefaultArchiveExceptionBuilder();
+    final void reset() throws ArchiveFileException {
+        final ArchiveFileExceptionBuilder builder
+                = new DefaultArchiveFileExceptionBuilder();
         reset(builder);
         builder.checkout();
     }
@@ -476,8 +476,8 @@ abstract class ArchiveController implements Archive {
      * This method should be overridden by subclasses, but must still be
      * called when doing so.
      */
-    abstract void reset(final ArchiveExceptionHandler handler)
-    throws ArchiveException;
+    abstract void reset(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException;
 
     @Override
     public String toString() {
@@ -501,22 +501,13 @@ abstract class ArchiveController implements Archive {
      *         any reason.
      */
     final InputStream createInputStream(final String entryName)
-    throws FileNotFoundException {
+    throws IOException {
         assert entryName != null;
 
         try {
             return createInputStream0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.createInputStream(enclEntryName(entryName));
-        } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
-            throw ex;
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
-        } catch (IOException ioe) {
-            final FileNotFoundException fnfe
-                    = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
         }
     }
 
@@ -584,7 +575,7 @@ abstract class ArchiveController implements Archive {
     final OutputStream createOutputStream(
             final String entryName,
             final boolean append)
-    throws FileNotFoundException {
+    throws IOException {
         assert entryName != null;
 
         try {
@@ -592,15 +583,6 @@ abstract class ArchiveController implements Archive {
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.createOutputStream(enclEntryName(entryName),
                     append);
-        } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
-            throw ex;
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
-        } catch (IOException ioe) {
-            final FileNotFoundException fnfe
-                    = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
         }
     }
 
@@ -1199,7 +1181,7 @@ abstract class ArchiveController implements Archive {
                     // anyway, so we need to reset now.
                     try {
                         reset();
-                    } catch (ArchiveException cannotHappen) {
+                    } catch (ArchiveFileException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
                     throw ex;

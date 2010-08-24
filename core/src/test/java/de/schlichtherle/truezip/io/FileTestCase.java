@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -150,7 +150,7 @@ public abstract class FileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (ArchiveException ignored) {
+        } catch (ArchiveFileException ignored) {
             // You should never (!) ignore all exceptions thrown by this method.
             // The reason we do it here is that they are usually after effects
             // of failed tests and we don't want any exception from the tests
@@ -613,6 +613,7 @@ public abstract class FileTestCase extends TestCase {
         assertEquals(0, file.length());
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileInputStream()
     throws IOException {
         File file1 = new File(archive, "file1");
@@ -624,7 +625,7 @@ public abstract class FileTestCase extends TestCase {
         assertTrue(file2.createNewFile());
         FileInputStream fisA = new FileInputStream(file1);
         try {
-            FileInputStream fisB = new FileInputStream(file2);
+            new FileInputStream(file2);
             fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
         } catch (FileBusyException expected) {
             // FIXME: The exception signature has chained. This exception is not thrown anymore!
@@ -635,7 +636,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of fis1
             fail("ArchiveFileBusyWarningException expected!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (ArchiveFileBusyWarningException expected) {
             // Warning about fis1 still being used.
         }
         assertTrue(file2.isFile());
@@ -643,9 +644,7 @@ public abstract class FileTestCase extends TestCase {
             assertFalse(file2.exists()); // previous op has removed file2!
         
         // Open file2 as stream and let the garbage collection close the stream automatically.
-        FileInputStream fisB = new FileInputStream(file1);
-        //fis2.close();
-        fisB = null;
+        new FileInputStream(file1);
         System.gc();
         try {
             Thread.sleep(100);
@@ -656,7 +655,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (ArchiveFileBusyWarningException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -671,6 +670,7 @@ public abstract class FileTestCase extends TestCase {
         assertFalse(file1.exists());
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileOutputStream()
     throws IOException {
         File file1 = new File(archive, "file1");
@@ -700,12 +700,12 @@ public abstract class FileTestCase extends TestCase {
             // FIXME: The exception signature has chained. This exception is not thrown anymore!
             // This is actually an implementation detail which may change in
             // a future version.
-            assertTrue(busy.getCause() instanceof ArchiveBusyException);
+            assertTrue(busy.getCause() instanceof ArchiveFileBusyException);
         }
         
         // fosA is still open!
         try {
-            FileOutputStream fosB = new FileOutputStream(file2);
+            new FileOutputStream(file2);
         } catch (FileBusyException busy) {
             logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
@@ -716,7 +716,7 @@ public abstract class FileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (ArchiveFileBusyWarningException expected) {
         }
         
         try {
@@ -742,7 +742,7 @@ public abstract class FileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (ArchiveFileBusyWarningException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1487,7 +1487,7 @@ public abstract class FileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (ArchiveBusyException mayHappen) {
+                    } catch (ArchiveFileBusyException mayHappen) {
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1557,7 +1557,7 @@ public abstract class FileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (ArchiveBusyException mayHappen) {
+                        } catch (ArchiveFileBusyException mayHappen) {
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.

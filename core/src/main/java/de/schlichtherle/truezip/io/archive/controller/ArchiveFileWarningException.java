@@ -25,28 +25,28 @@ import de.schlichtherle.truezip.io.archive.Archive;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveWarningException
-extends ArchiveException {
+public class ArchiveFileWarningException
+extends ArchiveFileException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(Archive archive) {
+    public ArchiveFileWarningException(Archive archive) {
         super(archive, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(Archive archive, String message) {
+    public ArchiveFileWarningException(Archive archive, String message) {
         super(archive, message, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(Archive archive, Throwable cause) {
+    public ArchiveFileWarningException(Archive archive, Throwable cause) {
         super(archive, cause, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveWarningException(Archive archive, String message, Throwable cause) {
+    public ArchiveFileWarningException(Archive archive, String message, Throwable cause) {
         super(archive, message, cause, -1);
     }
 }
