@@ -70,7 +70,8 @@ public class ArchiveException extends ChainableIOException {
     ArchiveException(
             ArchiveControllerException cause, ArchiveException predecessor,
             int priority) {
-        super(null, cause, predecessor, priority);
+        super(cause, priority);
+        super.initPredecessor(predecessor);
     }
 
     /**
