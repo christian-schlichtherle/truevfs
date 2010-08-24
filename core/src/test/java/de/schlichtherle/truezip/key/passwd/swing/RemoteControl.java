@@ -68,7 +68,7 @@ public class RemoteControl extends Assert implements Runnable {
     }
 
     @SuppressWarnings("deprecation")
-    private void runIt() throws AssertionError {
+    private void runIt() {
         JDialogOperator dialog;
         JPasswordFieldOperator passwd1,  passwd2;
         String passwd;

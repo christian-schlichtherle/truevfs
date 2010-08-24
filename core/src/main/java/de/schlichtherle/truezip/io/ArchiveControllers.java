@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.lang.ref.Reference;
@@ -208,10 +208,10 @@ public final class ArchiveControllers {
             final boolean waitForOutputStreams,
             final boolean closeOutputStreams,
             final boolean umount)
-    throws ArchiveException {
+    throws ArchiveFileException {
         final UmountConfiguration config = new UmountConfiguration()
-                .setArchiveExceptionBuilder(
-                    new DefaultArchiveExceptionBuilder())
+                .setArchiveFileExceptionBuilder(
+                    new DefaultArchiveFileExceptionBuilder())
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -224,7 +224,7 @@ public final class ArchiveControllers {
     private static void umount0(
             final String prefix,
             final UmountConfiguration config)
-    throws ArchiveException {
+    throws ArchiveFileException {
         if (prefix == null)
             throw new NullPointerException();
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
@@ -245,8 +245,8 @@ public final class ArchiveControllers {
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
-                final ArchiveExceptionBuilder builder
-                        = config.getArchiveExceptionBuilder();
+                final ArchiveFileExceptionBuilder builder
+                        = config.getArchiveFileExceptionBuilder();
 
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
@@ -268,7 +268,7 @@ public final class ArchiveControllers {
                             // have been generated. We need to remember them for
                             // later throwing.
                             controller.umount(config);
-                        } catch (ArchiveException exception) {
+                        } catch (ArchiveFileException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
@@ -288,7 +288,7 @@ public final class ArchiveControllers {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveException chain) {
+        } catch (ArchiveFileException chain) {
             logger.log(Level.FINE, "update.throwing", chain);// NOI18N
             throw chain;
         }
@@ -369,7 +369,7 @@ public final class ArchiveControllers {
                 } finally {
                     try {
                         umount("", false, true, false, true, true);
-                    } catch (ArchiveException ouch) {
+                    } catch (ArchiveFileException ouch) {
                         ouch.printStackTrace();
                     }
                 }

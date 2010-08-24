@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
@@ -126,6 +127,16 @@ public class FileInputStream extends FilterInputStream {
                             .createInputStream(entryName);
             }
         } catch (RfsEntryFalsePositiveException isNotArchive) {
+            // fall through!
+        } catch (FileNotFoundException ex) { // includes RfsEntryFalsePositiveException!
+            throw ex;
+        } catch (ArchiveFileBusyException ex) {
+            throw new FileBusyException(ex);
+        } catch (IOException ioe) {
+            final FileNotFoundException fnfe
+                    = new FileNotFoundException(ioe.toString());
+            fnfe.initCause(ioe);
+            throw fnfe;
         }
         return new java.io.FileInputStream(file);
     }

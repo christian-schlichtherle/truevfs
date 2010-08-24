@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
-
-import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
+package de.schlichtherle.truezip.io.archive;
 
 /**
+ * A marker interface to be implemented by exception classes to indicate
+ * that they represent an issue which could be resolved at runtime by the
+ * client application.
+ * Implementations should clearly document how to resolve the issue.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class DefaultArchiveExceptionBuilder
-extends ChainableIOExceptionBuilder<ArchiveException>
-implements ArchiveExceptionBuilder {
+public interface ResolvableIssue {
 }

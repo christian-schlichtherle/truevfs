@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 
@@ -30,14 +31,15 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyWarningException
-extends ArchiveWarningException {
+public class ArchiveFileBusyWarningException
+extends ArchiveFileWarningException
+implements ResolvableIssue {
 
     private static final long serialVersionUID = 2635419873651362891L;
 
     private final int numStreams;
 
-    ArchiveBusyWarningException(Archive archive, int numStreams) {
+    ArchiveFileBusyWarningException(Archive archive, int numStreams) {
         super(archive);
         this.numStreams = numStreams;
     }

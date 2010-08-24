@@ -16,16 +16,15 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveExceptionHandler;
-import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionHandler;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -33,6 +32,7 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.util.Temps;
 import de.schlichtherle.truezip.util.Action;
@@ -605,7 +605,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     void umount(final UmountConfiguration config)
-    throws ArchiveException {
+    throws ArchiveFileException {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
         assert !config.getRelease() || config.getReassemble(); // umount => reassemble
         assert writeLock().isLockedByCurrentThread();
@@ -626,7 +626,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         logger.log(Level.FINER, "umount.entering", stats); // NOI18N
         try {
             umount0(config);
-        } catch (ArchiveException ex) {
+        } catch (ArchiveFileException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
         }
@@ -634,9 +634,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void umount0(final UmountConfiguration config)
-    throws ArchiveException {
-        final ArchiveExceptionBuilder builder
-                = config.getArchiveExceptionBuilder();
+    throws ArchiveFileException {
+        final ArchiveFileExceptionBuilder builder
+                = config.getArchiveFileExceptionBuilder();
 
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
@@ -648,9 +648,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     config.getWaitForOutputStreams() ? 0 : 50);
             if (outStreams > 0) {
                 if (!config.getCloseOutputStreams())
-                    throw builder.fail(new ArchiveOutputBusyException(
+                    throw builder.fail(new ArchiveFileOutputBusyException(
                             this, outStreams));
-                builder.warn(new ArchiveOutputBusyWarningException(
+                builder.warn(new ArchiveFileOutputBusyWarningException(
                         this, outStreams));
             }
         }
@@ -660,9 +660,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     config.getWaitForInputStreams() ? 0 : 50);
             if (inStreams > 0) {
                 if (!config.getCloseInputStreams())
-                    throw builder.fail(new ArchiveInputBusyException(
+                    throw builder.fail(new ArchiveFileInputBusyException(
                             this, inStreams));
-                builder.warn(new ArchiveInputBusyWarningException(
+                builder.warn(new ArchiveFileInputBusyWarningException(
                         this, inStreams));
             }
         }
@@ -718,10 +718,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
             }
-        } catch (ArchiveException ex) {
+        } catch (ArchiveFileException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw builder.fail(new ArchiveException(this, ex));
+            throw builder.fail(new ArchiveFileException(this, ex));
         } finally {
             setScheduled(needsReassembly);
         }
@@ -751,8 +751,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void update(final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+    private void update(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
@@ -765,8 +765,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     shutdownStep1(handler);
 
-                    ArchiveWarningException inputEntryCorrupted = null;
-                    ArchiveWarningException outputEntryCorrupted = null;
+                    ArchiveFileWarningException inputEntryCorrupted = null;
+                    ArchiveFileWarningException outputEntryCorrupted = null;
 
                     final Enumeration e = fileSystem.getArchiveEntries();
                     while (e.hasMoreElements()) {
@@ -792,7 +792,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                             } catch (IOException ex) {
                                 if (inputEntryCorrupted == null) {
                                     inputEntryCorrupted
-                                            = new ArchiveWarningException(
+                                            = new ArchiveFileWarningException(
                                             this,
                                             "skipped one or more corrupted archive entries in the input",
                                             ex);
@@ -811,7 +811,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                                 } catch (InputException ex) {
                                     if (outputEntryCorrupted == null) {
                                         outputEntryCorrupted
-                                                = new ArchiveWarningException(
+                                                = new ArchiveFileWarningException(
                                                 this,
                                                 "one or more archive entries in the output are corrupted",
                                                 ex);
@@ -826,7 +826,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                                 } catch (IOException ex) {
                                     if (inputEntryCorrupted == null) {
                                         inputEntryCorrupted
-                                                = new ArchiveWarningException(
+                                                = new ArchiveFileWarningException(
                                                 this,
                                                 "one or more archive entries in the input are corrupted",
                                                 ex);
@@ -869,10 +869,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 assert deleted;
                 throw ex;
             }
-        } catch (ArchiveException ex) {
+        } catch (ArchiveFileException ex) {
             throw handler.fail(ex);
         } catch (IOException ex) {
-            throw handler.fail(new ArchiveException(
+            throw handler.fail(new ArchiveFileException(
                     this,
                     "could not update archive file - all changes are lost",
                     ex));
@@ -882,14 +882,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // to the last modification time of the virtual root directory,
         // hence preserving it.
         if (!outFile.setLastModified(root.getTime()))
-            handler.warn(new ArchiveWarningException(
+            handler.warn(new ArchiveFileWarningException(
                     this,
                     "couldn't preserve last modification time"));
     }
 
     private boolean checkNoDeletedEntriesWithNewData(
-            final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+            final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         assert isTouched();
         assert getFileSystem() != null;
 
@@ -907,7 +907,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
-                handler.warn(new ArchiveWarningException(
+                handler.warn(new ArchiveFileWarningException(
                         this,
                         "couldn't remove archive entry '" + entryName + "'"));
             }
@@ -926,8 +926,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reassemble(final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+    private void reassemble(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
@@ -951,7 +951,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     }
                     File.cp(in , out); // always closes in and out
                 } catch (IOException cause) {
-                    throw handler.fail(new ArchiveException(
+                    throw handler.fail(new ArchiveFileException(
                             this,
                             "could not reassemble archive file - all changes are lost",
                             cause));
@@ -963,7 +963,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // directory during update(...).
                 final long time = outFile.lastModified();
                 if (time != 0 && !getTarget().setLastModified(time)) {
-                    handler.warn(new ArchiveWarningException(
+                    handler.warn(new ArchiveFileWarningException(
                             this,
                             "couldn't preserve last modification time"));
                 }
@@ -974,7 +974,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 wrap(getEnclController(), getEnclEntryName());
             } catch (IOException cause) {
-                throw handler.fail(new ArchiveException(
+                throw handler.fail(new ArchiveFileException(
                         getEnclController(),
                         "could not update archive entry '" + getEnclEntryName() + "' - all changes are lost",
                         cause));
@@ -1037,8 +1037,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      *         throughout the processing of the target archive file.
      */
     @Override
-    void reset(final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+    void reset(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
 
         try {
@@ -1066,8 +1066,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // logging.
             if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
                 logger.log(Level.SEVERE, "finalize.invalidState", getCanonicalPath());
-            final ArchiveExceptionBuilder handler
-                    = new DefaultArchiveExceptionBuilder();
+            final ArchiveFileExceptionBuilder handler
+                    = new DefaultArchiveFileExceptionBuilder();
             shutdownStep1(handler);
             shutdownStep2(handler);
             shutdownStep3(true);
@@ -1084,18 +1084,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep1(final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+    private void shutdownStep1(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         class DecoratedHandler
-        implements ExceptionHandler<IOException, ArchiveException> {
-            public ArchiveException fail(IOException cause) {
-                AssertionError ae = new AssertionError("cannot happen");
-                ae.initCause(cause);
-                throw ae;
+        implements ExceptionHandler<IOException, ArchiveFileException> {
+            public ArchiveFileException fail(IOException cause) {
+                throw new AssertionError(cause);
             }
 
-            public void warn(IOException ioe) throws ArchiveException {
-                handler.warn(new ArchiveWarningException(
+            public void warn(IOException ioe) throws ArchiveFileException {
+                handler.warn(new ArchiveFileWarningException(
                         UpdatingArchiveController.this, ioe));
             }
         }
@@ -1114,8 +1112,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep2(final ArchiveExceptionHandler handler)
-    throws ArchiveException {
+    private void shutdownStep2(final ArchiveFileExceptionHandler handler)
+    throws ArchiveFileException {
         super.reset(handler); // discard file system
 
         // The output archive must be closed BEFORE the input archive is
@@ -1130,7 +1128,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     outArchive.close();
                 } catch (IOException ioe) {
-                    handler.warn(new ArchiveException(this, ioe));
+                    handler.warn(new ArchiveFileException(this, ioe));
                 } finally {
                     outArchive = null;
                 }
@@ -1140,7 +1138,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     inArchive.close();
                 } catch (IOException ioe) {
-                    handler.warn(new ArchiveWarningException(this, ioe));
+                    handler.warn(new ArchiveFileWarningException(this, ioe));
                 } finally {
                     inArchive = null;
                 }

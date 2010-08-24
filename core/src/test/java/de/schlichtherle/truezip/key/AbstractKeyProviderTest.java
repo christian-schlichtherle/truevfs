@@ -60,7 +60,7 @@ public class AbstractKeyProviderTest extends TestCase {
             try {
                 return (CloneMe) super.clone();
             } catch (CloneNotSupportedException ex) {
-                throw new AssertionError();
+                throw new AssertionError(ex);
             }
         }
 
