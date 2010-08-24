@@ -25,62 +25,62 @@ import de.schlichtherle.truezip.io.util.ChainableIOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveControllerException extends ChainableIOException {
+public class ArchiveException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893204620357369739L;
 
     private final String path;
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive) {
+    public ArchiveException(Archive archive) {
         this.path = archive.getCanonicalPath();
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive, String message) {
+    public ArchiveException(Archive archive, String message) {
         super(message);
         this.path = archive.getCanonicalPath();
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive, Throwable cause) {
+    public ArchiveException(Archive archive, Throwable cause) {
         super(cause);
         this.path = archive.getCanonicalPath();
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive, String message, Throwable cause) {
+    public ArchiveException(Archive archive, String message, Throwable cause) {
         super(message, cause);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveControllerException(Archive archive, int priority) {
+    ArchiveException(Archive archive, int priority) {
         super(priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveControllerException(Archive archive, String message, int priority) {
+    ArchiveException(Archive archive, String message, int priority) {
         super(message, priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveControllerException(Archive archive, Throwable cause, int priority) {
+    ArchiveException(Archive archive, Throwable cause, int priority) {
         super(cause, priority);
         this.path = archive.getCanonicalPath();
     }
 
-    ArchiveControllerException(Archive archive, String message, Throwable cause, int priority) {
+    ArchiveException(Archive archive, String message, Throwable cause, int priority) {
         super(message, cause, priority);
         this.path = archive.getCanonicalPath();
     }
 
     /**
      * Equivalent to
-     * {@code return (ArchiveControllerException) super.initCause(cause);}.
+     * {@code return (ArchiveException) super.initCause(cause);}.
      */
     @Override
-    public ArchiveControllerException initCause(final Throwable cause) {
-        return (ArchiveControllerException) super.initCause(cause);
+    public ArchiveException initCause(final Throwable cause) {
+        return (ArchiveException) super.initCause(cause);
     }
 
     /**

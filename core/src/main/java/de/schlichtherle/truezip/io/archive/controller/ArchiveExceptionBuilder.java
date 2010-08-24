@@ -16,12 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveControllerExceptionHandler
-extends ExceptionHandler<ArchiveControllerException, ArchiveControllerException> {
+public interface ArchiveExceptionBuilder
+extends ArchiveExceptionHandler,
+        ExceptionBuilder<ArchiveException, ArchiveException> {
 }

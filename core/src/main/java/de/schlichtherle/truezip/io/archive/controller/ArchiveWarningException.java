@@ -21,33 +21,32 @@ import de.schlichtherle.truezip.io.archive.Archive;
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
  * which implies no or only insignificant loss of data.
- * Exceptions of this type may be ignored.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveControllerWarningException
-extends ArchiveControllerException {
+public class ArchiveWarningException
+extends ArchiveException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive) {
+    public ArchiveWarningException(Archive archive) {
         super(archive, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive, String message) {
+    public ArchiveWarningException(Archive archive, String message) {
         super(archive, message, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive, Throwable cause) {
+    public ArchiveWarningException(Archive archive, Throwable cause) {
         super(archive, cause, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive, String message, Throwable cause) {
+    public ArchiveWarningException(Archive archive, String message, Throwable cause) {
         super(archive, message, cause, -1);
     }
 }

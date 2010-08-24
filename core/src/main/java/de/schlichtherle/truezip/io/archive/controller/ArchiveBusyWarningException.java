@@ -30,14 +30,14 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileBusyWarningException
-extends ArchiveControllerWarningException {
+public class ArchiveBusyWarningException
+extends ArchiveWarningException {
 
     private static final long serialVersionUID = 2635419873651362891L;
 
     private final int numStreams;
 
-    ArchiveFileBusyWarningException(Archive archive, int numStreams) {
+    ArchiveBusyWarningException(Archive archive, int numStreams) {
         super(archive);
         this.numStreams = numStreams;
     }
