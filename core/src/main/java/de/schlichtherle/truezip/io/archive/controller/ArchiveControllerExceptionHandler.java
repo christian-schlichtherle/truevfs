@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerException;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.io.ArchiveException;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveControllerExceptionBuilder
-extends ArchiveControllerExceptionHandler,
-        ExceptionBuilder<ArchiveControllerException, ArchiveException> {
+public interface ArchiveControllerExceptionHandler
+extends ExceptionHandler<ArchiveControllerException, ArchiveException> {
 }

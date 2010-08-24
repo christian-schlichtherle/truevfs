@@ -62,7 +62,7 @@ public class ArchiveWarningException extends ArchiveException {
      *         {@code null} is <em>not</em> permitted!
      * @throws NullPointerException If {@code cause} is {@code null}.
      */
-    ArchiveWarningException(
+    public ArchiveWarningException(
             ArchiveControllerException cause, ArchiveException predecessor) {
         super(cause, predecessor, -1);
     }

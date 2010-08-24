@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import java.io.IOException;
+import de.schlichtherle.truezip.io.util.ChainableIOException;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}.
@@ -25,8 +25,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveControllerException
-extends IOException {
+public class ArchiveControllerException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893204620357369739L;
 
@@ -44,16 +43,34 @@ extends IOException {
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive, IOException cause) {
-        super(cause != null ? cause.toString() : null);
-        super.initCause(cause);
+    public ArchiveControllerException(Archive archive, Throwable cause) {
+        super(cause);
         this.path = archive.getCanonicalPath();
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerException(Archive archive, String message, IOException cause) {
-        super(message);
-        super.initCause(cause);
+    public ArchiveControllerException(Archive archive, String message, Throwable cause) {
+        super(message, cause);
+        this.path = archive.getCanonicalPath();
+    }
+
+    ArchiveControllerException(Archive archive, int priority) {
+        super(priority);
+        this.path = archive.getCanonicalPath();
+    }
+
+    ArchiveControllerException(Archive archive, String message, int priority) {
+        super(message, priority);
+        this.path = archive.getCanonicalPath();
+    }
+
+    ArchiveControllerException(Archive archive, Throwable cause, int priority) {
+        super(cause, priority);
+        this.path = archive.getCanonicalPath();
+    }
+
+    ArchiveControllerException(Archive archive, String message, Throwable cause, int priority) {
+        super(message, cause, priority);
         this.path = archive.getCanonicalPath();
     }
 

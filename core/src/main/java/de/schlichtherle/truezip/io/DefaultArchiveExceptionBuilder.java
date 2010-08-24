@@ -1,5 +1,7 @@
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveControllerExceptionBuilder;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$

@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import java.io.IOException;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
@@ -34,21 +33,21 @@ extends ArchiveControllerException {
 
     // TODO: Make this constructor package private!
     public ArchiveControllerWarningException(Archive archive) {
-        super(archive);
+        super(archive, -1);
     }
 
     // TODO: Make this constructor package private!
     public ArchiveControllerWarningException(Archive archive, String message) {
-        super(archive, message);
+        super(archive, message, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive, IOException cause) {
-        super(archive, cause);
+    public ArchiveControllerWarningException(Archive archive, Throwable cause) {
+        super(archive, cause, -1);
     }
 
     // TODO: Make this constructor package private!
-    public ArchiveControllerWarningException(Archive archive, String message, IOException cause) {
-        super(archive, message, cause);
+    public ArchiveControllerWarningException(Archive archive, String message, Throwable cause) {
+        super(archive, message, cause, -1);
     }
 }

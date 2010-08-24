@@ -104,11 +104,12 @@ public class ChainableIOException extends IOException implements Cloneable {
         super(message);
     }
 
-    public ChainableIOException(IOException cause) {
+    public ChainableIOException(Throwable cause) {
+        super(cause != null ? cause.toString() : null);
         super.initCause(cause);
     }
 
-    public ChainableIOException(String message, IOException cause) {
+    public ChainableIOException(String message, Throwable cause) {
         super(message);
         super.initCause(cause);
     }
@@ -122,7 +123,8 @@ public class ChainableIOException extends IOException implements Cloneable {
         this.priority = priority;
     }
 
-    public ChainableIOException(IOException cause, int priority) {
+    public ChainableIOException(Throwable cause, int priority) {
+        super(cause != null ? cause.toString() : null);
         super.initCause(cause);
         this.priority = priority;
     }
@@ -140,7 +142,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * @param priority The priority of this exception to be used for
      *        {@link #sortPriority() priority sorting}.
      */
-    public ChainableIOException(String message, IOException cause, int priority) {
+    public ChainableIOException(String message, Throwable cause, int priority) {
         super(message);
         super.initCause(cause);
         this.priority = priority;
@@ -188,16 +190,14 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     /**
      * Initializes the <i>predecessor</i> of this chainable I/O exception to
-     * the given object.
-     * <p>
-     * This method can be called at most once.
+     * the given object. This method can be called at most once.
      *
      * @param predecessor An exception that happened <em>before</em> and is
      *        <em>not</em> the cause for this exception!
      *        Must be {@code null} to indicate that a predecessor does not
      *        exist.
      * @return A reference to this object.
-     * @throws IllegalStateException If this method has already been called.
+     * @throws IllegalStateException If the predecessor has already been set.
      * @throws IllegalArgumentException If the given {@code predecessor} is
      *         this instance or has not been initialized with a predecessor
      *         itself.

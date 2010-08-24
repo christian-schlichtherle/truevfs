@@ -1,5 +1,6 @@
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllerExceptionBuilder;
 import java.io.IOException;
 
 /**
