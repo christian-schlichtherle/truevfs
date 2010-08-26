@@ -648,12 +648,12 @@ public abstract class ArchiveController implements Archive {
     //
 
     public final boolean exists(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return exists0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.exists(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -672,7 +672,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean isFile(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return isFile0(entryName);
         } catch (FileArchiveEntryFalsePositiveException ex) {
@@ -683,7 +683,7 @@ public abstract class ArchiveController implements Archive {
             return enclController.isFile(enclEntryName(entryName));
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
             return enclController.isFile(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -702,14 +702,14 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean isDirectory(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return isDirectory0(entryName);
         } catch (FileArchiveEntryFalsePositiveException ex) {
             return false;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
             return enclController.isDirectory(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -728,12 +728,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final Icon getOpenIcon(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return getOpenIcon0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.getOpenIcon(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -754,12 +754,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final Icon getClosedIcon(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return getClosedIcon0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.getOpenIcon(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -780,12 +780,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean canRead(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return canRead0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.canRead(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -804,12 +804,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean canWrite(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return canWrite0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.canWrite(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -828,12 +828,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final long length(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return length0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.length(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return 0;
@@ -852,12 +852,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final long lastModified(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return lastModified0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.lastModified(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return 0;
@@ -876,12 +876,12 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final String[] list(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return list0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.list(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -903,13 +903,13 @@ public abstract class ArchiveController implements Archive {
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return list0(entryName, filenameFilter, dir);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.list(enclEntryName(entryName),
                     filenameFilter, dir);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -935,13 +935,13 @@ public abstract class ArchiveController implements Archive {
             final FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return listFiles0(entryName, filenameFilter, dir, factory);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.listFiles(enclEntryName(entryName),
                     filenameFilter, dir, factory);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -968,13 +968,13 @@ public abstract class ArchiveController implements Archive {
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return listFiles0(entryName, fileFilter, dir, factory);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.listFiles(enclEntryName(entryName),
                     fileFilter, dir, factory);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -1002,12 +1002,12 @@ public abstract class ArchiveController implements Archive {
     //
 
     public final boolean setReadOnly(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return setReadOnly0(entryName);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.setReadOnly(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -1028,13 +1028,13 @@ public abstract class ArchiveController implements Archive {
     public final boolean setLastModified(
             final String entryName,
             final long time)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             return setLastModified0(entryName, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.setLastModified(enclEntryName(entryName),
                     time);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -1092,13 +1092,13 @@ public abstract class ArchiveController implements Archive {
     public final boolean mkdir(
             final String entryName,
             final boolean autoCreate)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             mkdir0(entryName, autoCreate);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
             return enclController.mkdir(enclEntryName(entryName), autoCreate);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -1132,7 +1132,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean delete(final String entryName)
-    throws RfsEntryFalsePositiveException {
+    throws FalsePositiveException {
         try {
             delete0(entryName);
             return true;
@@ -1145,7 +1145,7 @@ public abstract class ArchiveController implements Archive {
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
             return enclController.delete(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;

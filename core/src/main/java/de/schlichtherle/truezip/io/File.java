@@ -16,20 +16,17 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.ArchiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
-import de.schlichtherle.truezip.io.archive.controller.RfsEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.UmountConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -2249,7 +2246,10 @@ public class File extends java.io.File {
             if (enclArchive != null)
                 return enclArchive.getArchiveController()
                         .exists(enclEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.exists();
     }
@@ -2268,10 +2268,13 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .isFile(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
             // TODO: Document this!
             if (isArchive()
-            && ex.getCause() instanceof FileNotFoundException)
+                    && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
         }
         return delegate.isFile();
@@ -2299,7 +2302,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .isDirectory(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.isDirectory();
     }
@@ -2314,7 +2320,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .getOpenIcon(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return null;
     }
@@ -2329,7 +2338,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .getClosedIcon(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return null;
     }
@@ -2341,7 +2353,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .canRead(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.canRead();
     }
@@ -2352,7 +2367,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .canWrite(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.canWrite();
     }
@@ -2372,7 +2390,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .setReadOnly(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.setReadOnly();
     }
@@ -2400,7 +2421,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .length(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.length();
     }
@@ -2422,7 +2446,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .lastModified(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.lastModified();
     }
@@ -2452,7 +2479,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .setLastModified(innerEntryName, time);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.setLastModified(time);
     }
@@ -2474,7 +2504,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .list(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.list();
     }
@@ -2498,7 +2531,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .list(innerEntryName, filenameFilter, this);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegate.list(filenameFilter);
     }
@@ -2569,7 +2605,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .listFiles(innerEntryName, filenameFilter, this, factory);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return convert(delegate.listFiles(filenameFilter), factory);
     }
@@ -2622,7 +2661,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .listFiles(innerEntryName, fileFilter, this, factory);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         }
         return delegateListFiles(fileFilter, factory);
     }
@@ -2670,7 +2712,10 @@ public class File extends java.io.File {
             if (enclArchive != null)
                 return enclArchive.getArchiveController()
                         .createNewFile(enclEntryName, isLenient());
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
         } catch (IOException ex) {
             throw ex;
         }
@@ -2716,7 +2761,10 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .mkdir(innerEntryName, isLenient());
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
             // We are trying to create a directory which is enclosed in a false
             // positive archive file which is actually a regular
             // directory in the real file system.
@@ -2745,11 +2793,14 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .delete(innerEntryName);
-        } catch (RfsEntryFalsePositiveException ex) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "Must be handled by ArchiveController!";
+            // Fall through!
             // TODO: Document this!
             if (isArchive()
-            && !delegate.isDirectory()
-            && ex.getCause() instanceof FileNotFoundException)
+                    && !delegate.isDirectory()
+                    && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
         }
         return delegate.delete();

@@ -24,6 +24,7 @@ package de.schlichtherle.truezip.issues;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
+ * @deprecated FIXME: This needs more thinking!
  */
 public interface ResolvableIssue {
 }

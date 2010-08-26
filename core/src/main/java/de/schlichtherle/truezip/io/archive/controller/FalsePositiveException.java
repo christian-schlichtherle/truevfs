@@ -17,9 +17,8 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.ArchiveException;
-import de.schlichtherle.truezip.issues.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import de.schlichtherle.truezip.issues.ResolvableIssue;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -31,7 +30,7 @@ import java.io.IOException;
  * Instances of this class are always associated with an
  * {@code IOException} as their cause.
  */
-public abstract class FalsePositiveException
+public class FalsePositiveException
 extends FileNotFoundException
 implements ResolvableIssue {
 
