@@ -41,11 +41,11 @@ public class ContainsFileException extends FileNotFoundException {
         this.descendant = descendant;
     }
 
-    public java.io.File getAncestor() {
+    public final java.io.File getAncestor() {
         return ancestor;
     }
 
-    public java.io.File getDescendant() {
+    public final java.io.File getDescendant() {
         return descendant;
     }
 }

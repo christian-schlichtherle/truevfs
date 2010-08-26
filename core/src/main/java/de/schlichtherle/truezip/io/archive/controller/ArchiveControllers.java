@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -519,7 +519,7 @@ public final class ArchiveControllers {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
             // find out which controller actually detected the false positive.
-            if (dstController != ex.getController()) {
+            if (!dstController.getCanonicalPath().equals(ex.getCanonicalPath())) {
                 throw ex; // not my job - pass on!
             }      // Reroute call to the destination's enclosing archive controller.
             cp(preserve, srcController, srcEntryName,
@@ -603,7 +603,7 @@ public final class ArchiveControllers {
                 out.close();
             }
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert dstController == ex.getController();
+            assert dstController.getCanonicalPath().equals(ex.getCanonicalPath());
             // Reroute call to the destination's enclosing ArchiveController.
             cp(preserve, src, in,
                     dstController.getEnclController(),

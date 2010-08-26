@@ -28,45 +28,45 @@ public abstract class ArchiveException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893232550396764539L;
 
-    private final String path;
+    private final String canonicalPath;
 
     protected ArchiveException(Archive archive) {
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, String message) {
         super(message);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, Throwable cause) {
         super(cause);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, String message, Throwable cause) {
         super(message, cause);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, int priority) {
         super(priority);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, String message, int priority) {
         super(message, priority);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, Throwable cause, int priority) {
         super(cause, priority);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     protected ArchiveException(Archive archive, String message, Throwable cause, int priority) {
         super(message, cause, priority);
-        this.path = archive.getCanonicalPath();
+        this.canonicalPath = archive.getCanonicalPath();
     }
 
     /**
@@ -94,13 +94,13 @@ public abstract class ArchiveException extends ChainableIOException {
      * @return A string representing the canonical path of this archive
      *         - never {@code null}.
      */
-    public String getCanonicalPath() {
-        return path;
+    public final String getCanonicalPath() {
+        return canonicalPath;
     }
 
     @Override
-    public String getLocalizedMessage() {
-        final String msg = getMessage();
+    public String getMessage() {
+        final String msg = super.getMessage();
         if (msg != null)
             return new StringBuilder(getCanonicalPath())
                     .append(" (")

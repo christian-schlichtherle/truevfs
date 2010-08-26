@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.ResolvableIssue;
+import de.schlichtherle.truezip.issues.ResolvableIssue;
 import java.io.IOException;
 
 /**

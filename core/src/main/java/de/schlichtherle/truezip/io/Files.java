@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.ArchiveEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.RfsEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.ArchiveFileSystemException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileNotFoundException;
@@ -355,7 +355,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                 // Both the source and/or the destination may be false positives,
                 // so we need to use the exception's additional information to
                 // find out which controller actually detected the false positive.
-                if (isNotArchive.getController() == srcController)
+                if (isNotArchive.getCanonicalPath().equals(srcController.getCanonicalPath()))
                     throw isNotArchive; // not my job - pass on!
             }
 
@@ -387,7 +387,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert srcController == ex.getController();
+            assert srcController.getCanonicalPath().equals(ex.getCanonicalPath());
             // Reroute call to the source's enclosing archive controller.
             cp0(preserve, srcController.getEnclController(),
                     srcController.enclEntryName(srcEntryName),

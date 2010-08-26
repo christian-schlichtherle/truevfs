@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;

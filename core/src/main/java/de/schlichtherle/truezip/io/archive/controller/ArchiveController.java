@@ -20,10 +20,8 @@ import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Action;
@@ -40,7 +38,6 @@ import java.lang.ref.WeakReference;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -266,15 +263,6 @@ public abstract class ArchiveController implements Archive {
         return isRoot(entryName)
                 ? enclEntryName
                 : enclEntryName + SEPARATOR + entryName;
-    }
-
-    private boolean isEnclosedBy(ArchiveController wannabe) {
-        assert wannabe != null;
-        if (enclController == wannabe)
-            return true;
-        if (enclController == null)
-            return false;
-        return enclController.isEnclosedBy(wannabe);
     }
 
     /**
@@ -522,7 +510,7 @@ public abstract class ArchiveController implements Archive {
                     if (!(ex.getCause() instanceof FileNotFoundException))
                         throw ex;
                 }
-                throw new ArchiveEntryNotFoundException(entryName,
+                throw new ArchiveEntryNotFoundException(this, entryName,
                         "cannot read (potential) virtual root directory");
             } else {
                 if (hasNewData(entryName)) {
@@ -535,7 +523,7 @@ public abstract class ArchiveController implements Archive {
 
                 final ArchiveEntry entry = autoMount(false).get(entryName); // lookup file entries only!
                 if (entry == null)
-                    throw new ArchiveEntryNotFoundException(entryName,
+                    throw new ArchiveEntryNotFoundException(this, entryName,
                             "no such file entry");
 
                 return createInputStream(entry, null);
@@ -604,7 +592,7 @@ public abstract class ArchiveController implements Archive {
                     if (!(ex.getCause() instanceof FileNotFoundException))
                         throw ex;
                 }
-                throw new ArchiveEntryNotFoundException(entryName,
+                throw new ArchiveEntryNotFoundException(this, entryName,
                         "cannot write (potential) virtual root directory");
             } else {
                 autoUmount(entryName);
@@ -1228,310 +1216,4 @@ public abstract class ArchiveController implements Archive {
             writeLock().unlock();
         }
     }
-
-    /*final void deleteOnUmount(final String entryName)
-    throws RfsEntryFalsePositiveException {
-        try {
-            deleteOnUmount0(entryName);
-        } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            enclController.deleteOnUmount(enclEntryName(entryName));
-        } catch (FileArchiveEntryFalsePositiveException ex) {
-            // TODO: Document this!
-            if (isRoot(entryName)
-            && !enclController.isDirectory(enclEntryName(entryName))
-            && ex.getCause() instanceof FileNotFoundException)
-                return;
-            enclController.deleteOnUmount(enclEntryName(entryName));
-        } catch (RfsEntryFalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
-    private final void deleteOnUmount0(final String entryName)
-    throws IOException {
-        // FIXME: Delete entries.
-    }*/
-
-    //
-    // Exception classes.
-    // Note that these are all inner classes, not just static member classes.
-    //
-
-    /**
-     * Indicates that the target file of an archive controller is a false
-     * positive archive file which actually exists as a plain file or directory
-     * in the real file system or in an enclosing archive file.
-     * <p>
-     * Instances of this class are always associated with an
-     * {@code IOException} as their cause.
-     */
-    public abstract class FalsePositiveException
-    extends FileNotFoundException
-    implements ResolvableIssue {
-        private static final long serialVersionUID = 947139561381472363L;
-
-        private final boolean cacheable;
-
-        /**
-         * Creates a new {@code FalsePositiveException}.
-         * 
-         * @param cause The cause for this exception.
-         *        If this is an instance of {@link TransientIOException},
-         *        then its transient cause is unwrapped and used as the cause
-         *        of this exception instead and
-         *        {@link FalsePositiveException#isCacheable} is set to return
-         *        {@code false}.
-         */
-        private FalsePositiveException(IOException cause) {
-            // This exception type is never passed to the client application,
-            // so a descriptive message would be waste of performance.
-            //super(cause.toString());
-            assert cause != null;
-            // A transient I/O exception is just a wrapper exception to mark
-            // the real transient cause, therefore we can safely throw it away.
-            // We must do this in order to allow the File class to inspect
-            // the real transient cause and act accordingly.
-            final boolean trans = cause instanceof TransientIOException;
-            super.initCause(trans ? cause.getCause() : cause);
-            cacheable = !trans;
-        }
-
-        /**
-         * Returns the archive controller which has thrown this exception.
-         * This is the controller which detected the false positive archive
-         * file.
-         */
-        public ArchiveController getController() {
-            return ArchiveController.this;
-        }
-
-        /**
-         * Returns {@code true} if and only if there is no cause
-         * associated with this exception or it is safe to cache it.
-         */
-        boolean isCacheable() {
-            return cacheable;
-        }
-    } // class FalsePositiveException
-
-    /**
-     * Indicates that the target file of an archive controller is a false
-     * positive archive file which actually exists as a plain file or directory
-     * in the real file system.
-     * <p>
-     * Instances of this class are always associated with an
-     * {@code IOException} as their cause.
-     */
-    public final class RfsEntryFalsePositiveException extends FalsePositiveException {
-        private static final long serialVersionUID = 5234672956837622323L;
-
-        /**
-         * Creates a new {@code RfsEntryFalsePositiveException}.
-         *
-         * @param cause The cause for this exception.
-         *        If this is an instance of {@link TransientIOException},
-         *        then its transient cause is unwrapped and used as the cause
-         *        of this exception instead and
-         *        {@link FalsePositiveException#isCacheable} is set to return
-         *        {@code false}.
-         */
-        RfsEntryFalsePositiveException(IOException cause) {
-            super(cause);
-        }
-    } // class RfsEntryFalsePositiveException
-
-    /**
-     * Indicates that the target file of an archive controller is a false
-     * positive archive file which actually exists as a plain file or directory
-     * in an enclosing archive file.
-     * <p>
-     * Instances of this class are always associated with an
-     * {@code IOException} as their cause.
-     */
-    public abstract class ArchiveEntryFalsePositiveException extends FalsePositiveException {
-        private static final long serialVersionUID = 1234562841928746533L;
-
-        private final ArchiveController enclController;
-        private final String enclEntryName;
-
-        /**
-         * Creates a new {@code ArchiveEntryFalsePositiveException}.
-         * 
-         * @param enclController The controller in which the archive file
-         *        exists as a false positive.
-         *        This must be an enclosing controller.
-         * @param enclEntryName The entry name which is a false positive
-         *        archive file.
-         *        {@code null} is not permitted.
-         * @param cause The cause for this exception.
-         *        If this is an instance of {@link TransientIOException},
-         *        then its transient cause is unwrapped and used as the cause
-         *        of this exception instead and
-         *        {@link FalsePositiveException#isCacheable} is set to return
-         *        {@code false}.
-         */
-        private ArchiveEntryFalsePositiveException(
-                ArchiveController enclController,
-                String enclEntryName,
-                IOException cause) {
-            super(cause);
-            assert enclController != ArchiveController.this;
-            assert isEnclosedBy(enclController);
-            assert enclEntryName != null;
-            this.enclController = enclController;
-            this.enclEntryName = enclEntryName;
-        }
-
-        /**
-         * Returns the controller which's target file contains the
-         * false positive archive file as an archive entry.
-         * Never {@code null}.
-         * <p>
-         * Note that this is not the same
-         */
-        ArchiveController getEnclController() {
-            return enclController;
-        }
-
-        /**
-         * Returns the entry name of the false positive archive file.
-         * Never {@code null}.
-         */
-        String getEnclEntryName() {
-            return enclEntryName;
-        }
-    } // class ArchiveEntryFalsePositiveException
-
-    /**
-     * Indicates that the target file of an archive controller is a false
-     * positive archive file which actually exists as a plain file in an
-     * enclosing archive file.
-     * <p>
-     * Instances of this class are always associated with an
-     * {@code IOException} as their cause.
-     */
-    public final class FileArchiveEntryFalsePositiveException
-            extends ArchiveEntryFalsePositiveException {
-        private static final long serialVersionUID = 2846364592164215345L;
-
-        /**
-         * Creates a new {@code FileArchiveEntryFalsePositiveException}.
-         *
-         * @param enclController The controller in which the archive file
-         *        exists as a false positive.
-         *        This must be an enclosing controller.
-         * @param enclEntryName The entry name which is a false positive
-         *        archive file.
-         *        {@code null} is not permitted.
-         * @param cause The cause for this exception.
-         *        If this is an instance of {@link TransientIOException},
-         *        then its transient cause is unwrapped and used as the cause
-         *        of this exception instead and
-         *        {@link FalsePositiveException#isCacheable} is set to return
-         *        {@code false}.
-         */
-        FileArchiveEntryFalsePositiveException(
-                ArchiveController enclController,
-                String enclEntryName,
-                IOException cause) {
-            super(enclController, enclEntryName, cause);
-        }
-    } // class FileArchiveEntryFalsePositiveException
-
-    /**
-     * Indicates that the target file of an archive controller is a false
-     * positive archive file which actually exists as a plain directory in an
-     * enclosing archive file.
-     * <p>
-     * Instances of this class are always associated with an
-     * {@code IOException} as their cause.
-     */
-    public final class DirectoryArchiveEntryFalsePositiveException
-            extends ArchiveEntryFalsePositiveException {
-        private static final long serialVersionUID = 5672345295269335783L;
-
-        /**
-         * Creates a new {@code DirectoryArchiveEntryFalsePositiveException}.
-         *
-         * @param enclController The controller in which the archive file
-         *        exists as a false positive.
-         *        This must be an enclosing controller.
-         * @param enclEntryName The entry name which is a false positive
-         *        archive file.
-         *        {@code null} is not permitted.
-         * @param cause The cause for this exception.
-         *        If this is an instance of {@link TransientIOException},
-         *        then its transient cause is unwrapped and used as the cause
-         *        of this exception instead and
-         *        {@link FalsePositiveException#isCacheable} is set to return
-         *        {@code false}.
-         */
-        DirectoryArchiveEntryFalsePositiveException(
-                ArchiveController enclController,
-                String enclEntryName,
-                IOException cause) {
-            super(enclController, enclEntryName, cause);
-        }
-    } // class DirectoryArchiveEntryFalsePositiveException
-
-    /**
-     * Indicates that an <i>archive file</i> (the controller's target file)
-     * does not exist or is not accessible.
-     * <p>
-     * May be thrown by {@link #autoMount(boolean)} if automatic creation of
-     * the target file is not allowed.
-     */
-    public final class ArchiveFileNotFoundException extends FileNotFoundException {
-        private static final long serialVersionUID = 2654293654126325623L;
-
-        public ArchiveFileNotFoundException(String msg) {
-            super(msg);
-        }
-
-        @Override
-        public String getLocalizedMessage() {
-            final String msg = getMessage();
-            if (msg != null)
-                return new StringBuilder(getCanonicalPath())
-                        .append(" (")
-                        .append(msg)
-                        .append(")")
-                        .toString();
-            return getCanonicalPath();
-        }
-    } // class ArchiveFileNotFoundException
-
-    /**
-     * Indicates that an <i>archive entry</i>
-     * does not exist or is not accessible.
-     * <p>
-     * May be thrown by {@link #createInputStream} or
-     * {@link #createOutputStream}.
-     */
-    public final class ArchiveEntryNotFoundException extends FileNotFoundException {
-        private static final long serialVersionUID = 2972350932856838564L;
-
-        private final String entryName;
-
-        ArchiveEntryNotFoundException(final String entryName, final String msg) {
-            super(msg);
-            assert entryName != null;
-            assert msg != null;
-            this.entryName = entryName;
-        }
-
-        @Override
-        public String getMessage() {
-            final StringBuilder result = new StringBuilder(getCanonicalPath());
-            if (!isRoot(entryName))
-                result.append(File.separator)
-                        .append(entryName.replace(SEPARATOR_CHAR, File.separatorChar));
-            final String msg = super.getMessage();
-            if (msg != null)
-                result.append(" (").append(msg).append(")");
-            return result.toString();
-        }
-    } // class ArchiveEntryNotFoundException
 }

@@ -22,8 +22,8 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.ArchiveFileNotFoundException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
+import de.schlichtherle.truezip.io.archive.controller.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
@@ -2230,7 +2230,7 @@ public class File extends java.io.File {
             String msg = "virtual root directory";
             if (prefix != null)
                 msg = prefix + " " + msg;
-            throw getArchiveController().new ArchiveFileNotFoundException(msg);
+            throw new ArchiveFileNotFoundException(getArchiveController(), msg);
         }
     }
 

@@ -26,6 +26,8 @@ import java.io.IOException;
  */
 public class ArchiveDriverException extends IOException {
 
+    private static final long serialVersionUID = 3452347561202342332L;
+
     /**
      * Creates a new {@code ArchiveDriverException} with the specified detail
      * message.
