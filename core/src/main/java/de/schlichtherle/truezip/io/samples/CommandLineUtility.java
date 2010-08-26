@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.samples;
 
-import de.schlichtherle.truezip.io.ArchiveStatistics;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.File;
 import java.io.IOException;
 import java.io.OutputStream;

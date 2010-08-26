@@ -16,16 +16,28 @@
 
 package de.schlichtherle.truezip.io.util;
 
+import java.util.logging.Level;
+import java.io.RandomAccessFile;
+import java.util.logging.Logger;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.File;
 import junit.framework.TestCase;
+
+import static de.schlichtherle.truezip.io.util.Files.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.util.Files.normalize;
+import static de.schlichtherle.truezip.io.util.Files.split;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PathUtilsTest extends TestCase {
+public class FilesTest extends TestCase {
 
-    public PathUtilsTest(String testName) {
+    private static final Logger logger = Logger.getLogger(
+            FilesTest.class.getName());
+
+    public FilesTest(String testName) {
         super(testName);
     }
 
@@ -34,25 +46,25 @@ public class PathUtilsTest extends TestCase {
         String path;
 
         path = "";
-        assertSame(path, PathUtils.cutTrailingSeparators(path, '/'));
+        assertSame(path, cutTrailingSeparators(path, '/'));
 
         path = "dir";
-        assertSame(path, PathUtils.cutTrailingSeparators(path, '/'));
-        assertEquals("dir", PathUtils.cutTrailingSeparators("dir/", '/'));
-        assertEquals("dir", PathUtils.cutTrailingSeparators("dir//", '/'));
-        assertEquals("dir", PathUtils.cutTrailingSeparators("dir///", '/'));
+        assertSame(path, cutTrailingSeparators(path, '/'));
+        assertEquals("dir", cutTrailingSeparators("dir/", '/'));
+        assertEquals("dir", cutTrailingSeparators("dir//", '/'));
+        assertEquals("dir", cutTrailingSeparators("dir///", '/'));
 
         path = "/dir";
-        assertSame(path, PathUtils.cutTrailingSeparators(path, '/'));
-        assertEquals("/dir", PathUtils.cutTrailingSeparators("/dir/", '/'));
-        assertEquals("/dir", PathUtils.cutTrailingSeparators("/dir//", '/'));
-        assertEquals("/dir", PathUtils.cutTrailingSeparators("/dir///", '/'));
+        assertSame(path, cutTrailingSeparators(path, '/'));
+        assertEquals("/dir", cutTrailingSeparators("/dir/", '/'));
+        assertEquals("/dir", cutTrailingSeparators("/dir//", '/'));
+        assertEquals("/dir", cutTrailingSeparators("/dir///", '/'));
 
         path = new String("/");
-        assertSame(path, PathUtils.cutTrailingSeparators(path, '/'));
-        assertEquals("/", PathUtils.cutTrailingSeparators("//", '/'));
-        assertEquals("/", PathUtils.cutTrailingSeparators("///", '/'));
-        assertEquals("/", PathUtils.cutTrailingSeparators("////", '/'));
+        assertSame(path, cutTrailingSeparators(path, '/'));
+        assertEquals("/", cutTrailingSeparators("//", '/'));
+        assertEquals("/", cutTrailingSeparators("///", '/'));
+        assertEquals("/", cutTrailingSeparators("////", '/'));
     }
 
     public void testSplitPathName() {
@@ -126,14 +138,14 @@ public class PathUtilsTest extends TestCase {
     }
 
     /**
-     * Test of split method, of class de.schlichtherle.truezip.io.util.PathUtils.
+     * Test of split method, of class de.schlichtherle.truezip.io.util.Paths.
      */
     public void testSplit(final String path) {
         final java.io.File file = new java.io.File(path);
         final String parent = file.getParent();
         final String base = file.getName();
 
-        final String[] split = PathUtils.split(path, File.separatorChar);
+        final String[] split = split(path, File.separatorChar);
         assertEquals(2, split.length);
         assertEquals(parent, split[0]);
         assertEquals(base, split[1]);
@@ -297,15 +309,215 @@ public class PathUtilsTest extends TestCase {
     }
 
     private void testNormalize(String expected, final String path, final char separatorChar) {
-        final String result = PathUtils.normalize(path, separatorChar);
+        final String result = normalize(path, separatorChar);
         assertEquals(expected, result);
         assertTrue(!result.equals(path) || result == path);
         if (path.length() > 0 && !path.endsWith(separatorChar + "")) {
             String appended = path;
             for (int i = 0; i < 3; i++) {
                 appended += separatorChar + ".";
-                assertEquals(expected, PathUtils.normalize(appended, separatorChar));
+                assertEquals(expected, normalize(appended, separatorChar));
             }
         }
+    }
+
+    public void testNormalize2() {
+        final java.io.File empty = new java.io.File("");
+        assertEquals(".", normalize(empty).getPath());
+
+        testNormalize2("a/b/c/d", "a/b/c/d");
+
+        testNormalize2("a", "./a");
+
+        testNormalize2(".",        ".");
+        testNormalize2("..",       "./..");
+        testNormalize2("../..",    "./../..");
+        testNormalize2("../../..", "./../../..");
+        testNormalize2("../../..", "./.././.././..");
+        testNormalize2("../../..", "././../././../././..");
+        testNormalize2("../../..", "./././.././././.././././..");
+
+        testNormalize2("..",          "..");
+        testNormalize2("../..",       "../..");
+        testNormalize2("../../..",    "../../..");
+        testNormalize2("../../../..", "../../../..");
+        testNormalize2("../../../..", "../.././.././..");
+        testNormalize2("../../../..", ".././../././../././..");
+        testNormalize2("../../../..", "../././.././././.././././..");
+
+        testNormalize2("a",     "a");
+        testNormalize2(".",     "a/..");
+        testNormalize2("..",    "a/../..");
+        testNormalize2("../..", "a/../../..");
+        testNormalize2("../..", "a/./.././.././..");
+        testNormalize2("../..", "a/././../././../././..");
+        testNormalize2("../..", "a/./././.././././.././././..");
+
+        testNormalize2("a/b", "a/b");
+        testNormalize2("a",   "a/b/..");
+        testNormalize2(".",   "a/b/../..");
+        testNormalize2("..",  "a/b/../../..");
+        testNormalize2("..",  "a/b/./.././.././..");
+        testNormalize2("..",  "a/b/././../././../././..");
+        testNormalize2("..",  "a/b/./././.././././.././././..");
+
+        testNormalize2("a/b/c", "a/b/c");
+        testNormalize2("a/b",   "a/b/c/..");
+        testNormalize2("a",     "a/b/c/../..");
+        testNormalize2(".",     "a/b/c/../../..");
+        testNormalize2(".",     "a/b/c/./.././.././..");
+        testNormalize2(".",     "a/b/c/././../././../././..");
+        testNormalize2(".",     "a/b/c/./././.././././.././././..");
+
+        testNormalize2("a/b/c/d", "a/b/c/d");
+        testNormalize2("a/b/c",   "a/b/c/d/..");
+        testNormalize2("a/b",     "a/b/c/d/../..");
+        testNormalize2("a",       "a/b/c/d/../../..");
+        testNormalize2("a",       "a/b/c/d/./.././.././..");
+        testNormalize2("a",       "a/b/c/d/././../././../././..");
+        testNormalize2("a",       "a/b/c/d/./././.././././.././././..");
+
+        testNormalize2("a/b/c/d", "a//b//c//d");
+        testNormalize2("a/b/c/d", "a///b///c///d");
+        testNormalize2("a/b/c/d", "a////b////c////d");
+        testNormalize2("a/b/c",   "a////b////c////d////..");
+        testNormalize2("a/b",     "a////b////c////d////..////..");
+        testNormalize2("a/b",     "a//.//b/.///c///./d//.//.././//..");
+        testNormalize2("a/b",     "a/////b/////c/////d/////../////..");
+
+        testNormalize2("a",       "x/../a");
+        testNormalize2("a/b",     "x/../a/y/../b");
+        testNormalize2("a/b/c",   "x/../a/y/../b/z/../c");
+
+        testNormalize2("../a",       "x/../../a");
+        testNormalize2("../a/b",     "x/../../a/y/../b");
+        testNormalize2("../a/b/c",   "x/../../a/y/../b/z/../c");
+
+        testNormalize2("../a",       "x/.././../a");
+        testNormalize2("../a/b",     "x/.././../a/y/../b");
+        testNormalize2("../a/b/c",   "x/.././../a/y/../b/z/../c");
+
+        testNormalize2("../a",       "x/..//../a");
+        testNormalize2("../a/b",     "x/..//../a/y/../b");
+        testNormalize2("../a/b/c",   "x/..//../a/y/../b/z/../c");
+
+        testNormalize2("../../a",       "x/../../../a");
+        testNormalize2("../../a/b",     "x/../../../a/y/../b");
+        testNormalize2("../../a/b/c",   "x/../../../a/y/../b/z/../c");
+
+        testNormalize2("../../a",       "x/.././.././../a");
+        testNormalize2("../../a/b",     "x/.././.././../a/y/../b");
+        testNormalize2("../../a/b/c",   "x/.././.././../a/y/../b/z/../c");
+
+        testNormalize2("../../a",       "x/..//..//../a");
+        testNormalize2("../../a/b",     "x/..//..//../a/y/../b");
+        testNormalize2("../../a/b/c",   "x/..//..//../a/y/../b/z/../c");
+
+        testNormalize2("a",       "x/x/../../a");
+        testNormalize2("a/b",     "x/x/../../a/y/y/../../b");
+        testNormalize2("a/b/c",   "x/x/../../a/y/y/../../b/z/z/../../c");
+
+        //testNormalize2("/", "/");
+        //testNormalize2("/", "//");
+        testNormalize2("/", "/.");
+        testNormalize2("/", "/./");
+
+        testNormalize2("/..", "/..");
+        testNormalize2("/..", "/../.");
+        testNormalize2("/../..", "/.././..");
+        testNormalize2("/../..", "/.././../.");
+
+        testNormalize2(".", ".");
+        testNormalize2(".", "./");
+        testNormalize2("..", "..");
+        testNormalize2("..", "../");
+        testNormalize2("a", "./a");
+        testNormalize2("a", "./a/");
+        testNormalize2("../a", "../a");
+        testNormalize2("../a", "../a/");
+        testNormalize2("a/b", "./a/./b");
+        testNormalize2("a/b", "./a/./b/");
+        testNormalize2("../a/b", "../a/./b");
+        testNormalize2("../a/b", "../a/./b/");
+        testNormalize2("b", "./a/../b");
+        testNormalize2("b", "./a/../b/");
+        testNormalize2("../b", "../a/../b");
+        testNormalize2("../b", "../a/../b/");
+
+        testNormalize2(".", ".//");
+        testNormalize2(".", ".///");
+        testNormalize2(".", ".////");
+        testNormalize2("..", "..//");
+        testNormalize2("a", ".//a//");
+        testNormalize2("../a", "..//a");
+        testNormalize2("../a", "..//a//");
+        testNormalize2("a/b", ".//a//.//b");
+        testNormalize2("a/b", ".//a//.//b//");
+        testNormalize2("../a/b", "..//a//.//b");
+        testNormalize2("../a/b", "..//a//.//b//");
+        testNormalize2("b", ".//a//..//b//");
+        testNormalize2("../b", "..//a//..//b");
+        testNormalize2("../b", "..//a//..//b//");
+    }
+
+    void testNormalize2(String result, final String path) {
+        result = result.replace('/', File.separatorChar);
+        java.io.File file = new java.io.File(path);
+        assertEquals(result, normalize(file).getPath());
+        file = new java.io.File(path + '/');
+        assertEquals(result, normalize(file).getPath());
+        file = new java.io.File(path + File.separator);
+        assertEquals(result, normalize(file).getPath());
+        file = new java.io.File(path + File.separator + ".");
+        assertEquals(result, normalize(file).getPath());
+        file = new java.io.File(path + File.separator + "." + File.separator + ".");
+        assertEquals(result, normalize(file).getPath());
+        file = new java.io.File(path + File.separator + "." + File.separator + "." + File.separator + ".");
+        assertEquals(result, normalize(file).getPath());
+    }
+
+    /**
+     * Test of isWritableOrCreatable method, of class de.schlichtherle.truezip.io.ArchiveController.
+     * <p>
+     * Note that this test is not quite correctly designed: It tests the
+     * operating system rather than the method.
+     */
+    public void testIsWritableOrCreatable() throws IOException {
+        final java.io.File file = File.createTempFile("tzp-test", null);
+
+        boolean result = Files.isWritableOrCreatable(file);
+        assertTrue(result);
+
+        boolean total = true;
+        final FileInputStream fin = new FileInputStream(file);
+        try {
+            result = Files.isWritableOrCreatable(file);
+            total &= result;
+        } finally {
+            fin.close();
+        }
+        if (!result)
+            logger.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
+
+        final String[] modes = { "r", "rw", "rws", "rwd" };
+        for (int i = 0, l = modes.length; i < l; i++) {
+            final String mode = modes[i];
+            final RandomAccessFile raf = new RandomAccessFile(file, mode);
+            try {
+                result = Files.isWritableOrCreatable(file);
+                total &= result;
+            } finally {
+                raf.close();
+            }
+            if (!result)
+                logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
+        }
+
+        if (!total)
+            logger.finer(
+                    "Applications should ALWAYS close their streams or you may face strange 'errors'.\n"
+                    + "Note that this issue is NOT AT ALL specific to TrueZIP, but rather imposed by this platform!");
+
+        assertTrue(file.delete());
     }
 }

@@ -16,10 +16,15 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
-import de.schlichtherle.truezip.io.ArchiveController.ArchiveFileNotFoundException;
-import de.schlichtherle.truezip.io.ArchiveController.RfsEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.ArchiveFileNotFoundException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.UmountConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -42,9 +47,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.util.PathUtils.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.util.PathUtils.normalize;
-import static de.schlichtherle.truezip.io.util.PathUtils.split;
+import static de.schlichtherle.truezip.io.util.Files.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.util.Files.normalize;
+import static de.schlichtherle.truezip.io.util.Files.split;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -342,13 +347,6 @@ public class File extends java.io.File {
 
     /** The prefix of a UNC (a Windows concept). */
     private static final String uncPrefix = separator + separator;
-
-    /**
-     * @see #setLenient(boolean)
-     * @see #isLenient()
-     */
-    private static boolean lenient
-            = !Boolean.getBoolean("de.schlichtherle.truezip.io.strict");
 
     private static ArchiveDetector defaultDetector = ArchiveDetector.DEFAULT;
 
@@ -780,7 +778,7 @@ public class File extends java.io.File {
         assert template != null : "template is null!";
 
         String delegatePath = delegate.getPath();
-        final java.io.File normalizedTemplate = Files.normalize(template);
+        final java.io.File normalizedTemplate = normalize(template);
         String normalizedTemplatePath = normalizedTemplate.getPath();
         String normalizedTemplateBase = normalizedTemplate.getName();
         // Windows and MacOS are case preserving, however UNIX is case
@@ -1113,7 +1111,7 @@ public class File extends java.io.File {
      */
     public static void umount()
     throws ArchiveFileException {
-        ArchiveControllers.umount("", false, true, false, true, true);
+        umount(false, true, false, true);
     }
 
     /**
@@ -1122,10 +1120,7 @@ public class File extends java.io.File {
      */
     public static void umount(boolean closeStreams)
     throws ArchiveFileException {
-        ArchiveControllers.umount("",
-                false, closeStreams,
-                false, closeStreams,
-                true);
+        umount(false, closeStreams, false, closeStreams);
     }
 
     /**
@@ -1139,7 +1134,7 @@ public class File extends java.io.File {
      * &quot;<a href="package-summary.html#state">Managing Archive File State</a>&quot;
      * in the package summary.
      * 
-     * @param waitInputStreams Suppose any other thread has still one or more
+     * @param waitForInputStreams Suppose any other thread has still one or more
      *        archive entry input streams open.
      *        Then if and only if this parameter is {@code true}, this
      *        method will wait until all other threads have closed their
@@ -1170,7 +1165,7 @@ public class File extends java.io.File {
      *        file is <em>not</em> updated and an {@link ArchiveFileBusyException}
      *        is thrown to indicate that the application must close all entry
      *        input streams first.
-     * @param waitOutputStreams Similar to {@code waitInputStreams},
+     * @param waitForOutputStreams Similar to {@code waitInputStreams},
      *        but applies to archive entry output streams instead.
      * @param closeOutputStreams Similar to {@code closeInputStreams},
      *        but applies to archive entry output streams instead.
@@ -1198,13 +1193,16 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
     public static void umount(
-            boolean waitInputStreams, boolean closeInputStreams,
-            boolean waitOutputStreams, boolean closeOutputStreams)
+            boolean waitForInputStreams, boolean closeInputStreams,
+            boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
         ArchiveControllers.umount("",
-                waitInputStreams, closeInputStreams,
-                waitOutputStreams, closeOutputStreams,
-                true);
+                new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(true));
     }
 
     /**
@@ -1249,17 +1247,20 @@ public class File extends java.io.File {
      */
     public static void umount(
             File archive,
-            boolean waitInputStreams, boolean closeInputStreams,
-            boolean waitOutputStreams, boolean closeOutputStreams)
+            boolean waitForInputStreams, boolean closeInputStreams,
+            boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
         ArchiveControllers.umount(archive.getCanOrAbsPath(),
-                waitInputStreams, closeInputStreams,
-                waitOutputStreams, closeOutputStreams,
-                true);
+                new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(true));
     }
 
     /**
@@ -1268,10 +1269,7 @@ public class File extends java.io.File {
      */
     public static void update()
     throws ArchiveFileException {
-        ArchiveControllers.umount("",
-                false, true,
-                false, true,
-                false);
+        update(false, true, false, true);
     }
 
     /**
@@ -1280,10 +1278,7 @@ public class File extends java.io.File {
      */
     public static void update(boolean closeStreams)
     throws ArchiveFileException {
-        ArchiveControllers.umount("",
-                false, closeStreams,
-                false, closeStreams,
-                false);
+        update(false, closeStreams, false, closeStreams);
     }
 
     /**
@@ -1305,13 +1300,16 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
     public static void update(
-            boolean waitInputStreams, boolean closeInputStreams,
-            boolean waitOutputStreams, boolean closeOutputStreams)
+            boolean waitForInputStreams, boolean closeInputStreams,
+            boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
         ArchiveControllers.umount("",
-                waitInputStreams, closeInputStreams,
-                waitOutputStreams, closeOutputStreams,
-                false);
+                new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(false));
     }
 
     /**
@@ -1350,33 +1348,34 @@ public class File extends java.io.File {
      */
     public static void update(
             File archive,
-            boolean waitInputStreams, boolean closeInputStreams,
-            boolean waitOutputStreams, boolean closeOutputStreams)
+            boolean waitForInputStreams, boolean closeInputStreams,
+            boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
         ArchiveControllers.umount(archive.getCanOrAbsPath(),
-                waitInputStreams, closeInputStreams,
-                waitOutputStreams, closeOutputStreams,
-                false);
+                new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(false));
     }
 
     /**
      * Returns a proxy instance which encapsulates <em>live</em> statistics
-     * about the total set of archives operated by this package.
-     * Any call to a method of the returned instance returns an element of
-     * the statistics which is lively updated, so there is no need to
-     * repeatedly call this method in order to get updated statistics.
+     * about the total set of archive files accessed by this package.
+     * Any call to a method of the returned interface instance returns
+     * up-to-date data, so there is no need to repeatedly call this method in
+     * order to optain updated statistics.
      * <p>
      * Note that this method returns <em>live</em> statistics rather than
      * <em>real time</em> statistics.
      * So there may be a slight delay until the values returned reflect
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
-     *
-     * @see ArchiveStatistics
      */
     public static ArchiveStatistics getLiveArchiveStatistics() {
         return ArchiveControllers.getLiveArchiveStatistics();
@@ -1385,15 +1384,16 @@ public class File extends java.io.File {
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}.
      * In other words, this returns {@code true} unless you set the
-     * system property {@code de.schlichtherle.truezip.io.strict} to
-     * {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
+     * system property
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}
+     * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
      */
     public static boolean isLenient() {
-        return lenient;
+        return ArchiveControllers.isLenient();
     }
 
     /**
@@ -1475,21 +1475,13 @@ public class File extends java.io.File {
      * change must be made before an archive is first accessed.
      * The setting will then persist until the archive is reset by the next
      * call to {@link #umount} or {@link #update}.
-     * <p>
-     * Historical note: Since TrueZIP 6.0 and before TrueZIP 6.4, archive
-     * entry streams were always only referenced by a weak reference by
-     * TrueZIP.
-     * This class property has been overloaded with this semantic in order
-     * to allow client applications to test for the &quot;unclosed streams issue&quot;.
      * </li>
      * </ol>
-     * 
-     * @see #createNewFile
-     * @see FileInputStream
-     * @see FileOutputStream
+     *
+     * @see #isLenient()
      */
-    public static void setLenient(final boolean lenient) {
-        File.lenient = lenient;
+    public static void setLenient(boolean lenient) {
+        ArchiveControllers.setLenient(lenient);
     }
 
     /**
@@ -1592,7 +1584,7 @@ public class File extends java.io.File {
         if (enclArchive != null)
             enclArchive = enclArchive.getNormalizedAbsoluteFile();
         return detector.createFile(
-                this, Files.normalize(delegate.getAbsoluteFile()), enclArchive);
+                this, normalize(delegate.getAbsoluteFile()), enclArchive);
     }
 
     /**
@@ -1618,12 +1610,12 @@ public class File extends java.io.File {
      *         Otherwise a new instance of this class is returned.
      */
     public File getNormalizedFile() {
-        final java.io.File normalizedFile = Files.normalize(this);
+        final java.io.File normalizedFile = normalize(this);
         assert normalizedFile != null;
         if (normalizedFile == this)
             return this;
         assert !(normalizedFile instanceof File);
-        assert enclArchive == null || Files.normalize(enclArchive) == enclArchive;
+        assert enclArchive == null || normalize(enclArchive) == enclArchive;
         return detector.createFile(this, normalizedFile, enclArchive);
     }
 
@@ -1659,7 +1651,7 @@ public class File extends java.io.File {
         if (enclArchive != null)
             enclArchive = enclArchive.getCanOrAbsFile();
         return detector.createFile(
-                this, Files.getCanOrAbsFile(delegate), enclArchive);
+                this, de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(delegate), enclArchive);
     }
 
     /**
@@ -1835,7 +1827,8 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final ArchiveController getArchiveController() {
+    // FIXME: Make this package private again!
+    public final ArchiveController getArchiveController() {
         assert (controller != null) == isArchive();
         return controller;
     }
@@ -1859,8 +1852,8 @@ public class File extends java.io.File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final java.io.File file) {
-        final String a = Files.getCanOrAbsFile(this).getPath();
-        final String b = Files.getCanOrAbsFile(file).getParent();
+        final String a = de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(this).getPath();
+        final String b = de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(file).getParent();
         return b != null ? Files.contains(a, b) : false;
     }
 
@@ -1896,16 +1889,15 @@ public class File extends java.io.File {
      * <p>
      * <b>Note:</b>
      * <ul>
-     * <li>This method uses the canonical paths or, if failing to
-     *     canonicalize the paths, at least the normalized absolute
-     *     paths in order to compute reliable results.
-     * <li>This method does <em>not</em> test the actual status
-     *     of any file or directory in the file system.
-     *     It just tests the paths.
+     * <li>This method uses the canonical path name of the given files or,
+     *     if failing to canonicalize the path names, the normalized absolute
+     *     path names in order to compute reliable results.
+     * <li>This method does <em>not</em> access the file system.
+     *     It just tests the path names.
      * </ul>
      *
-     * @param a The path to test for containing {@code b}.
-     * @param b The path to test for being contained by {@code a}.
+     * @param a The file to test for containing {@code b}.
+     * @param b The file to test for being contained by {@code a}.
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(java.io.File a, java.io.File b) {
@@ -2207,7 +2199,8 @@ public class File extends java.io.File {
     public boolean exists() {
         try {
             if (enclArchive != null)
-                return enclArchive.getArchiveController().exists(enclEntryName);
+                return enclArchive.getArchiveController()
+                        .exists(enclEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.exists();
@@ -2225,7 +2218,8 @@ public class File extends java.io.File {
     public boolean isFile() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().isFile(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .isFile(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
             // TODO: Document this!
             if (isArchive()
@@ -2255,7 +2249,8 @@ public class File extends java.io.File {
     public boolean isDirectory() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().isDirectory(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .isDirectory(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.isDirectory();
@@ -2269,7 +2264,8 @@ public class File extends java.io.File {
     public Icon getOpenIcon() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().getOpenIcon(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .getOpenIcon(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return null;
@@ -2283,7 +2279,8 @@ public class File extends java.io.File {
     public Icon getClosedIcon() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().getClosedIcon(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .getClosedIcon(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return null;
@@ -2294,7 +2291,8 @@ public class File extends java.io.File {
         // More thorough test than exists
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().canRead(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .canRead(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.canRead();
@@ -2304,7 +2302,8 @@ public class File extends java.io.File {
     public boolean canWrite() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().canWrite(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .canWrite(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.canWrite();
@@ -2323,7 +2322,8 @@ public class File extends java.io.File {
     public boolean setReadOnly() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().setReadOnly(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .setReadOnly(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.setReadOnly();
@@ -2350,7 +2350,8 @@ public class File extends java.io.File {
     public long length() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().length(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .length(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.length();
@@ -2371,7 +2372,8 @@ public class File extends java.io.File {
     public long lastModified() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().lastModified(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .lastModified(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.lastModified();
@@ -2400,8 +2402,8 @@ public class File extends java.io.File {
     public boolean setLastModified(final long time) {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().setLastModified(
-                        innerEntryName, time);
+                return innerArchive.getArchiveController()
+                        .setLastModified(innerEntryName, time);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.setLastModified(time);
@@ -2422,7 +2424,8 @@ public class File extends java.io.File {
     public String[] list() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().list(innerEntryName);
+                return innerArchive.getArchiveController()
+                        .list(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.list();
@@ -2445,8 +2448,8 @@ public class File extends java.io.File {
     public String[] list(final FilenameFilter filenameFilter) {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().list(
-                        innerEntryName, filenameFilter, this);
+                return innerArchive.getArchiveController()
+                        .list(innerEntryName, filenameFilter, this);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegate.list(filenameFilter);
@@ -2516,8 +2519,8 @@ public class File extends java.io.File {
             final FileFactory factory) {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().listFiles(
-                        innerEntryName, filenameFilter, this, factory);
+                return innerArchive.getArchiveController()
+                        .listFiles(innerEntryName, filenameFilter, this, factory);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return convert(delegate.listFiles(filenameFilter), factory);
@@ -2569,8 +2572,8 @@ public class File extends java.io.File {
             final FileFactory factory) {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().listFiles(
-                        innerEntryName, fileFilter, this, factory);
+                return innerArchive.getArchiveController()
+                        .listFiles(innerEntryName, fileFilter, this, factory);
         } catch (RfsEntryFalsePositiveException ex) {
         }
         return delegateListFiles(fileFilter, factory);
@@ -2617,8 +2620,8 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null)
-                return enclArchive.getArchiveController().createNewFile(
-                        enclEntryName, isLenient());
+                return enclArchive.getArchiveController()
+                        .createNewFile(enclEntryName, isLenient());
         } catch (RfsEntryFalsePositiveException ex) {
         } catch (IOException ex) {
             throw ex;
@@ -2663,8 +2666,8 @@ public class File extends java.io.File {
     public boolean mkdir() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().mkdir(
-                        innerEntryName, isLenient());
+                return innerArchive.getArchiveController()
+                        .mkdir(innerEntryName, isLenient());
         } catch (RfsEntryFalsePositiveException ex) {
             // We are trying to create a directory which is enclosed in a false
             // positive archive file which is actually a regular
@@ -2692,8 +2695,8 @@ public class File extends java.io.File {
     public boolean delete() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController().delete(
-                        innerEntryName);
+                return innerArchive.getArchiveController()
+                        .delete(innerEntryName);
         } catch (RfsEntryFalsePositiveException ex) {
             // TODO: Document this!
             if (isArchive()
@@ -2734,7 +2737,15 @@ public class File extends java.io.File {
             isDirectory();
         }
 
-        ArchiveControllers.ShutdownHook.deleteOnExit.add(this);
+        class DeleteOnExit implements Runnable {
+            public void run() {
+                if (exists() && !delete()) {
+                    // Logging may not work in a shutdown hook!
+                    System.err.println(getPath() + ": failed to deleteOnExit()!");
+                }
+            }
+        }
+        ArchiveControllers.addToShutdownHook(new DeleteOnExit());
     }
 
     /**
@@ -4022,16 +4033,16 @@ public class File extends java.io.File {
      *
      * @param in The input stream.
      * @param out The output stream.
-     * @throws InputIOException If copying the data fails because of an
-     *         IOException in the input stream.
+     * @throws InputException If copying the data fails because of an
+     *         {@code IOException} in the <em>input</em> stream.
      * @throws IOException If copying the data fails because of an
-     *         IOException in the output stream.
+     *         {@code IOException} in the <em>output</em> stream.
      * @throws NullPointerException If any parameter is {@code null}.
      * @see <a href="#copy_methods">Copy Methods</a>
      */
     public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
-        Files.cp(in, out);
+        Streams.cp(in, out);
     }
 
     /**
@@ -4092,7 +4103,7 @@ public class File extends java.io.File {
      *         file.
      * @throws FileNotFoundException If either the source or the destination
      *         cannot get accessed.
-     * @throws InputIOException If copying the data fails because of an
+     * @throws InputException If copying the data fails because of an
      *         IOException in the source.
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
@@ -4164,7 +4175,7 @@ public class File extends java.io.File {
      *         file.
      * @throws FileNotFoundException If either the source or the destination
      *         cannot get accessed.
-     * @throws InputIOException If copying the data fails because of an
+     * @throws InputException If copying the data fails because of an
      *         IOException in the source.
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
@@ -4347,7 +4358,7 @@ public class File extends java.io.File {
      *
      * @param in The input stream.
      * @param out The output stream.
-     * @throws InputIOException If copying the data fails because of an
+     * @throws InputException If copying the data fails because of an
      *         IOException in the input stream.
      * @throws IOException If copying the data fails because of an
      *         IOException in the output stream.

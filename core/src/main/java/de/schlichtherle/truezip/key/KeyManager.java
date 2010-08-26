@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
+import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
  * An abstract class which maintains a static map of {@link KeyProvider}
@@ -115,8 +115,7 @@ public class KeyManager {
         if (keyManager != null)
             return keyManager;
 
-        final String n = System.getProperty(
-                "de.schlichtherle.truezip.key.KeyManager",
+        final String n = System.getProperty(KeyManager.class.getName(),
                 getDefaultKeyManagerClassName());
         try {
             Class c = loadClass(n, KeyManager.class);
@@ -134,13 +133,13 @@ public class KeyManager {
         if (GraphicsEnvironment.isHeadless()) {
             try {
                 Class.forName("java.io.Console");
-                return "de.schlichtherle.truezip.key.passwd.console.PromptingKeyManager";
+                return de.schlichtherle.truezip.key.passwd.console.PromptingKeyManager.class.getName();
             } catch (ClassNotFoundException noJSE6ConsoleAvailable) {
                 // Ignore and fall through - prompting will be disabled.
             }
         }
 
-        return "de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager";
+        return de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager.class.getName();
     }
 
     /**
@@ -406,7 +405,8 @@ public class KeyManager {
      *         {@code forType}, or if {@code useType} does not
      *         provide a public constructor with no parameters.
      */
-    protected final synchronized <P extends KeyProvider<?>> void mapKeyProviderType(
+    protected final synchronized <P extends KeyProvider<?>>
+    void mapKeyProviderType(
             final Class<P> forType,
             final Class<? extends P> useType) {
         if (useType == forType)

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import static de.schlichtherle.truezip.io.util.PathUtils.normalize;
+import static de.schlichtherle.truezip.io.util.Files.normalize;
 
 /**
  * A factory for {@link ZipEntry}s.

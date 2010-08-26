@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
-import de.schlichtherle.truezip.io.util.Temps;
+import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
 import java.io.FilterOutputStream;
@@ -160,7 +160,7 @@ public class ZipOutputArchive
                         || entry.getCompressedSize() == ZipEntry.UNKNOWN
                         || entry.getSize() == ZipEntry.UNKNOWN) {
                     if (!(srcEntry instanceof RfsEntry)) {
-                        final java.io.File temp = Temps.createTempFile(
+                        final java.io.File temp = Files.createTempFile(
                                 TEMP_FILE_PREFIX);
                         return new TempEntryOutputStream(entry, temp);
                     }

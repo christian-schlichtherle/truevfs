@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
-import de.schlichtherle.truezip.io.util.Temps;
+import de.schlichtherle.truezip.io.util.Files;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -105,7 +105,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
         // to the destination entry.
         // So we need to buffer the output in a temporary file and write
         // it upon close().
-        final java.io.File temp = Temps.createTempFile(TEMP_FILE_PREFIX);
+        final java.io.File temp = Files.createTempFile(TEMP_FILE_PREFIX);
         return new TempEntryOutputStream(tarEntry, temp);
     }
 

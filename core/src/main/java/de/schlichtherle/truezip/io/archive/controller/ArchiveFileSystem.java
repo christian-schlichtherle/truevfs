@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.FileFactory;
+import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import java.io.CharConversionException;
@@ -42,7 +44,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveFileSystem {
+public final class ArchiveFileSystem {
 
     // TODO: Harmonize the notation of the root directory!
     private static final String ROOT = SEPARATOR;
@@ -382,7 +384,7 @@ final class ArchiveFileSystem {
      * Looks up the specified entry in the file system and returns it or
      * {@code null} if not existent.
      */
-    ArchiveEntry get(String entryName) {
+    public ArchiveEntry get(String entryName) {
         assert entryName != null;
         assert controller.getFileSystem() == this;
         return (ArchiveEntry) master.get(entryName);
@@ -448,7 +450,7 @@ final class ArchiveFileSystem {
      *         <li>One of the entry's parents denotes a file.
      *         </ul>
      */
-    Delta link(
+    public Delta link(
             final String entryName,
             final boolean createParents,
             final ArchiveEntry template)
@@ -604,7 +606,7 @@ final class ArchiveFileSystem {
      * constructor of the implementation and must not modify the file system,
      * so that an explicit {@code rollback} is not required.
      */
-    interface Delta {
+    public interface Delta {
 
         /**
          * Returns the entry operated by this file system delta.
@@ -906,7 +908,7 @@ final class ArchiveFileSystem {
      * This exception is private by intention: Clients applications should not
      * even know about the existence of virtual archive file systems.
      */
-    static class ArchiveFileSystemException extends IOException {
+    public static class ArchiveFileSystemException extends IOException {
         private static final long serialVersionUID = 4652084652223428651L;
 
         /** The entry's path name. */

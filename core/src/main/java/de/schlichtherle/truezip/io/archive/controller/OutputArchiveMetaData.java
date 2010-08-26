@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
-import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,8 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Annotates an {@link InputArchive} with the methods required for safe
- * reading of archive entries.
+ * Annotates an {@link OutputArchive} with the methods required for safe
+ * writing of archive entries.
  * As an implication of this, it's also responsible for the synchronization
  * of the streams between multiple threads.
  * <p>
@@ -45,10 +45,10 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 // TODO: Make this class package private!
-public final class InputArchiveMetaData {
+public final class OutputArchiveMetaData {
 
     private static final String CLASS_NAME
-            = InputArchiveMetaData.class.getName();
+            = OutputArchiveMetaData.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -70,7 +70,7 @@ public final class InputArchiveMetaData {
      */
     //private final Archive archive;
 
-    private final InputArchive inArchive;
+    private final OutputArchive outArchive;
 
     /**
      * The pool of all open entry streams.
@@ -84,32 +84,33 @@ public final class InputArchiveMetaData {
      * application has forgot to close a stream before the target archive file
      * gets updated.
      */
-    private final Map<EntryInputStream, Thread> streams = File.isLenient()
-            ? new WeakHashMap<EntryInputStream, Thread>()
-            : new HashMap<EntryInputStream, Thread>();
+    private final Map<EntryOutputStream, Thread> streams
+            = ArchiveControllers.isLenient()
+            ? new WeakHashMap<EntryOutputStream, Thread>()
+            : new HashMap<EntryOutputStream, Thread>();
 
     private volatile boolean stopped;
 
     /**
-     * Creates a new instance of {@code InputArchiveMetaData}
-     * and sets itself as the meta data for the given input archive.
+     * Creates a new instance of {@code OutputArchiveMetaData}
+     * and sets itself as the meta data for the given output archive.
      */
-    InputArchiveMetaData(final Archive archive, final InputArchive inArchive) {
-        assert inArchive != null;
+    OutputArchiveMetaData(final Archive archive, final OutputArchive outArchive) {
+        assert outArchive != null;
 
         //this.archive = archive;
-        this.inArchive = inArchive;
+        this.outArchive = outArchive;
     }
 
-    synchronized InputStream createInputStream(
+    synchronized OutputStream createOutputStream(
             final ArchiveEntry entry,
-            final ArchiveEntry dstEntry)
+            final ArchiveEntry srcEntry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
-        final InputStream in = inArchive.getInputStream(entry, dstEntry);
-        return in != null ? new EntryInputStream(in) : null;
+        final OutputStream out = outArchive.getOutputStream(entry, srcEntry);
+        return out != null ? new EntryOutputStream(out) : null;
     }
 
     /**
@@ -126,7 +127,7 @@ public final class InputArchiveMetaData {
      *
      * @return The number of all open streams.
      */
-    synchronized int waitAllInputStreamsByOtherThreads(final long timeout) {
+    synchronized int waitAllOutputStreamsByOtherThreads(final long timeout) {
         assert !stopped;
 
         final long start = System.currentTimeMillis();
@@ -142,7 +143,7 @@ public final class InputArchiveMetaData {
                 } else {
                     toWait = 0;
                 }
-                if (File.isLenient()) {
+                if (ArchiveControllers.isLenient()) {
                     System.gc(); // trigger garbage collection
                     System.runFinalization(); // trigger finalizers - is this required at all?
                 }
@@ -174,12 +175,12 @@ public final class InputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized <T extends Throwable> void closeAllInputStreams(
+    synchronized <T extends Throwable> void closeAllOutputStreams(
             ExceptionHandler<IOException, T> handler)
     throws T {
         assert !stopped;
         stopped = true;
-        for (final Iterator<EntryInputStream> it = streams.keySet().iterator();
+        for (final Iterator<EntryOutputStream> it = streams.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -194,21 +195,21 @@ public final class InputArchiveMetaData {
     }
 
     /**
-     * An {@link InputStream} to read the entry data from an
-     * {@link InputArchive}.
-     * This input stream provides support for finalization and throws an
-     * {@link IOException} on any subsequent attempt to read data after
-     * {@link #closeAllInputStreams} has been called.
+     * An {@link OutputStream} to write the entry data to an
+     * {@link OutputArchive}.
+     * This output stream provides support for finalization and throws an
+     * {@link IOException} on any subsequent attempt to write data after
+     * {@link #closeAllOutputStreams} has been called.
      */
-    private final class EntryInputStream extends SynchronizedInputStream {
+    private final class EntryOutputStream extends SynchronizedOutputStream {
         private /*volatile*/ boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
-        private EntryInputStream(final InputStream in) {
-            super(in, InputArchiveMetaData.this);
-            assert in != null;
+        private EntryOutputStream(final OutputStream out) {
+            super(out, OutputArchiveMetaData.this);
+            assert out != null;
             streams.put(this, Thread.currentThread());
-            InputArchiveMetaData.this.notify(); // there can be only one waiting thread!
+            OutputArchiveMetaData.this.notify(); // there can be only one waiting thread!
         }
 
         private void ensureNotStopped() throws IOException {
@@ -217,47 +218,41 @@ public final class InputArchiveMetaData {
         }
 
         @Override
-        public int read() throws IOException {
+        public void write(int b) throws IOException {
             ensureNotStopped();
-            return super.read();
+            super.write(b);
         }
 
         @Override
-        public int read(byte[] b) throws IOException {
+        public void write(byte[] b) throws IOException {
             ensureNotStopped();
-            return super.read(b);
+            super.write(b);
         }
 
         @Override
-        public int read(byte[] b, int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             ensureNotStopped();
-            return super.read(b, off, len);
+            super.write(b, off, len);
         }
 
         @Override
-        public long skip(long n) throws IOException {
+        public void flush() throws IOException {
             ensureNotStopped();
-            return super.skip(n);
-        }
-
-        @Override
-        public int available() throws IOException {
-            ensureNotStopped();
-            return super.available();
+            super.flush();
         }
 
         /**
          * Closes this archive entry stream and releases any resources
          * associated with it.
          * This method tolerates multiple calls to it: Only the first
-         * invocation closes the underlying stream.
+         * invocation flushes and closes the underlying stream.
          *
          * @throws IOException If an I/O exception occurs.
          */
         @Override
         public final void close() throws IOException {
-            assert InputArchiveMetaData.this == lock;
-            synchronized (InputArchiveMetaData.this) {
+            assert OutputArchiveMetaData.this == lock;
+            synchronized (OutputArchiveMetaData.this) {
                 if (closed)
                     return;
 
@@ -266,7 +261,7 @@ public final class InputArchiveMetaData {
                     doClose();
                 } finally {
                     streams.remove(this);
-                    InputArchiveMetaData.this.notify(); // there can be only one waiting thread!
+                    OutputArchiveMetaData.this.notify(); // there can be only one waiting thread!
                 }
             }
         }
@@ -290,28 +285,11 @@ public final class InputArchiveMetaData {
             super.doClose();
         }
 
-        @Override
-        public void mark(int readlimit) {
-            if (!stopped)
-                super.mark(readlimit);
-        }
-
-        @Override
-        public void reset() throws IOException {
-            ensureNotStopped();
-            super.reset();
-        }
-
-        @Override
-        public boolean markSupported() {
-            return !stopped && super.markSupported();
-        }
-
         /**
-         * The finalizer in this class forces this archive entry input
+         * The finalizer in this class forces this archive entry output
          * stream to close.
          * This is used to ensure that an archive can be updated although
-         * the client may have "forgot" to close this input stream before.
+         * the client may have "forgot" to close this output stream before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
@@ -330,5 +308,5 @@ public final class InputArchiveMetaData {
                 super.finalize();
             }
         }
-    } // class EntryInputStream
+    } // class EntryOutputStream
 }

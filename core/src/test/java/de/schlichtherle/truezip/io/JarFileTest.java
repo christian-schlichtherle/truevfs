@@ -23,6 +23,8 @@ package de.schlichtherle.truezip.io;
  * @version $Id$
  */
 public class JarFileTest extends FileTestCase {
+    private static final java.io.File _tempDir = new java.io.File(System.getProperty("java.io.tmpdir"));
+    private static final java.io.File _baseDir = _tempDir;
     
     /**
      * Creates a new instance of {@code JarFileTest}.
