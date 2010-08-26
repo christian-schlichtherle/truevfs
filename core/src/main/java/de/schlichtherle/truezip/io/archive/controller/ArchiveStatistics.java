@@ -29,13 +29,12 @@ public interface ArchiveStatistics {
 
     /**
      * Returns the total number of bytes read from all <em>non-enclosed</em>
-     * archive files which are updated during {@link File#update()} or
-     * {@link File#umount()}.
+     * archive files which have been updated by a call to
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
      * <p>
      * Please note that this method counts input from top level archive
      * files which require an update only, i.e. archive files which are
-     * actually updated throughout the course of {@link File#update()} or
-     * {@link File#update()} and are not enclosed in other archive
+     * actually updated and are not enclosed in other archive
      * files and hence are present in the real file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
@@ -48,20 +47,18 @@ public interface ArchiveStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see File#update
-     * @see File#umount
+     * @see ArchiveControllers#umount(String, UmountConfiguration)
      */
     long getUpdateTotalByteCountRead();
     
     /**
      * Returns the total number of bytes written to all <em>non-enclosed</em>
-     * archive files which are updated during {@link File#update()} or
-     * {@link File#umount()}.
+     * archive files which have been updated by a call to
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
      * <p>
      * Please note that this method counts output to top level archive
      * files which require an update only, i.e. archive files which are
-     * actually updated throughout the course of {@link File#update()} or
-     * {@link File#update()} and are not enclosed in other archive
+     * actually updated and are not enclosed in other archive
      * files and hence are present in the real file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
@@ -74,8 +71,7 @@ public interface ArchiveStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see File#update
-     * @see File#umount
+     * @see ArchiveControllers#umount(String, UmountConfiguration)
      */
     long getUpdateTotalByteCountWritten();
 
@@ -86,11 +82,10 @@ public interface ArchiveStatistics {
     
     /**
      * Returns the number of archives which have been changed and
-     * hence need to be processed on the next call to {@link File#update} or
-     * {@link File#umount}.
-     * Note that you should <em>not</em> use the returned value to call
-     * {@code File.update()} or {@code File.umount()} only
-     * conditionally - this is unreliable!
+     * hence need to be updated when calling
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
+     * Note that you should <em>not</em> use the returned value to call this
+     * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
     int getArchivesTouched();
@@ -102,11 +97,10 @@ public interface ArchiveStatistics {
     
     /**
      * Returns the number of top level archives which have been changed and
-     * hence need to be processed on the next call to {@link File#update} or
-     * {@link File#umount}.
-     * Note that you should <em>not</em> use the returned value to call
-     * {@code File.update()} or {@code File.umount()} only
-     * conditionally - this is unreliable!
+     * hence need to be updated when calling
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
+     * Note that you should <em>not</em> use the returned value to call this
+     * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
     int getTopLevelArchivesTouched();

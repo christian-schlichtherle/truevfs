@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.archive.ResolvableIssue;
 import java.io.IOException;
 
 /**
@@ -41,7 +42,10 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TransientIOException extends IOException {
+public final class TransientIOException
+extends IOException
+implements ResolvableIssue {
+
     /**
      * @param cause The transient cause of this exception.
      * @throws NullPointerException If {@code cause} is {@code null}.
