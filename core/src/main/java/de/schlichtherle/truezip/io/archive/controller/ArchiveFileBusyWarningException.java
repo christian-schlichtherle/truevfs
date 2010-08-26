@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.issues.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 
@@ -32,8 +31,7 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
  * @version $Id$
  */
 public class ArchiveFileBusyWarningException
-extends ArchiveFileWarningException
-implements ResolvableIssue {
+extends ArchiveFileWarningException {
 
     private static final long serialVersionUID = 2635419873651362891L;
 

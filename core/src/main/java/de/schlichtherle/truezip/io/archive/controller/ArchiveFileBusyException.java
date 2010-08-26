@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.issues.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.Archive;
 
 /**
@@ -30,8 +29,7 @@ import de.schlichtherle.truezip.io.archive.Archive;
  * @version $Id$
  */
 public class ArchiveFileBusyException
-extends ArchiveFileException
-implements ResolvableIssue {
+extends ArchiveFileException {
 
     private static final long serialVersionUID = 1937356783082645716L;
 

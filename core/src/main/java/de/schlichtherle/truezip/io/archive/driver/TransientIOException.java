@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.issues.ResolvableIssue;
 import java.io.IOException;
 
 /**
@@ -43,8 +42,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public final class TransientIOException
-extends IOException
-implements ResolvableIssue {
+extends IOException {
 
     /**
      * @param cause The transient cause of this exception.
