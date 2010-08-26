@@ -95,10 +95,13 @@ package de.schlichtherle.truezip.util;
 public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
 
     /**
-     * Called by a cooperative algorithm if an exceptional condition occured
-     * which does not allow to proceed the execution.
+     * Called to handle an exceptional condition which
+     * does <em>not</em>
+     * allow the caller to proceed its task.
      * The implementation must return an appropriate exception to be thrown
      * by the cooperative algorithm.
+     * Finally, if the implementation maintains a state, it must be updated
+     * so that this instance can be reused to handle more exceptions!
      *
      * @param cause The exception to handle - {@code null} is not permitted.
      * @return The exception to throw - {@code null} is not permitted.
@@ -106,14 +109,16 @@ public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
     T fail(C cause);
 
     /**
-     * Called by a cooperative algorithm if an exceptional condition occured
-     * which allows to proceed its execution.
+     * Called to handle an exceptional condition which
+     * <em>does</em>
+     * allow the caller to proceed its task.
      * The implementation may throw an exception of the parameter type
      * {@code T} or return from the call.
+     * If the implementation maintains a state, it must be updated
+     * so that this instance can be reused to handle more exceptions.
      *
      * @param cause The exception to handle - {@code null} is not permitted.
-     * @throws T If the implementation does not want the cooperative algorithm
-     *         to proceed its task.
+     * @throws T If the implementation wants the caller to abort its task.
      */
     void warn(C cause) throws T;
 }

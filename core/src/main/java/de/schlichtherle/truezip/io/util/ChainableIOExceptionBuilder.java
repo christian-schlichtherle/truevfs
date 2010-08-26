@@ -43,22 +43,25 @@ extends AbstractExceptionBuilder<E, E> {
      *         is already initialized by a previous call to
      *         {@link ChainableIOException#initPredecessor(ChainableIOException)}.
      */
-    protected final E assemble(
-            final E cause,
-            final E previous) {
-        return (E) cause.initPredecessor(previous);
+    protected final E update(E previous, E cause) {
+        try {
+            return (E) cause.initPredecessor(previous);
+        } catch (IllegalStateException ise) {
+            if (previous != null)
+                throw ise;
+            return cause;
+        }
     }
 
     /**
-     * Replaces the assembled exception chain with the given new exception
-     * chain.
-     * The previously assembled exception chain is sorted by
-     * {@link ChainableIOException#sortPriority() priority} before it is
-     * returned.
+     * {@inheritDoc}
+     * <p>
+     * Sorts the given exception chain by
+     * {@link ChainableIOException#sortPriority() priority}
+     * and returns the result.
      */
     @Override
-    public final E reset(final E exception) {
-        final E e = super.reset(exception);
-        return e != null ? (E) e.sortPriority() : null;
+    protected final E post(E assembly) {
+        return assembly != null ? (E) assembly.sortPriority() : null;
     }
 }

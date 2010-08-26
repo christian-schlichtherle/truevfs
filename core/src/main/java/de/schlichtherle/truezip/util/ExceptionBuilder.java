@@ -23,9 +23,9 @@ package de.schlichtherle.truezip.util;
  * This may be used in scenarios where a cooperative algorithm needs to
  * continue its task even if one or more exceptional conditions occur.
  * This interface would then allow to collect all cause exceptions during
- * the processing by calling {@link #warn(Throwable)} and later process the
- * assembled exception by calling {@link #fail(Throwable)}, {@link #checkout()}
- * or {@link #reset(Throwable)}.
+ * the processing by calling {@link #warn(Throwable)} and later check out the
+ * assembled exception by calling {@link #fail(Throwable)} or
+ * {@link #check()}.
  *
  * @param <C> The type of the cause exception.
  * @param <T> The type of the assembled exception.
@@ -36,44 +36,37 @@ public interface ExceptionBuilder<C extends Throwable, T extends Throwable>
 extends ExceptionHandler<C, T> {
 
     /**
-     * {@inheritDoc}
+     * Adds the {@code cause} exception to the assembly and
+     * and checks out and returns
+     * the result
+     * in order to enable the assembly of another exception.
      * <p>
-     * If an exception has been assembled from previous calls to the
-     * method {@link #warn(Throwable)}, then the {@code cause} exception is
-     * added to the assembly and the resulting exception is returned.
-     * Finally, the implementation must reset its state so that this instance
-     * can be reused to assemble another exception.
+     * {@inheritDoc}
+     *
+     * @return The assembled exception to throw - {@code null} is not permitted.
      */
     T fail(C cause);
 
     /**
-     * {@inheritDoc}
+     * Adds the {@code cause} exception to the assembly and
+     * either returns or checks out and throws
+     * the result
+     * in order to enable the assembly of another exception.
      * <p>
-     * The implementation may store an exception of parameter type {@code T}
-     * for deferred processing by the method {@link #fail(Throwable)},
-     * {@link #checkout()} or {@link #reset(Throwable)}.
+     * {@inheritDoc}
+     *
+     * @throws T The assembled exception if the implementation wants the caller
+     *         to abort its task.
      */
     void warn(C cause) throws T;
 
     /**
-     * Called by a cooperative algorithm in order to check if the
-     * implementation has assembled an exception from previous calls to the
-     * method {@link #warn(Throwable)}.
-     * The implementation may throw an exception parameter type {@code T} or
-     * return from the call.
-     * Finally, the implementation must reset its state so that this instance
-     * can be reused to assemble another exception.
+     * Either returns or checks out and throws
+     * the result of the assembly
+     * in order to enable the assembly of another exception.
      *
-     * @throws T The type of exception to throw, if at all.
+     * @throws T The assembled exception if the implementation wants the caller
+     *         to abort its task.
      */
-    void checkout() throws T;
-
-    /**
-     * Resets the assembled exception to the given object and returns the
-     * previously assembled exception.
-     *
-     * @param throwable The new assembled exception - may be {@code null}.
-     * @return The old assembled exception - may be {@code null}.
-     */
-    T reset(final T throwable);
+    void check() throws T;
 }
