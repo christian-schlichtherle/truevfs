@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive;
+package de.schlichtherle.truezip.issues;
 
 /**
  * A marker interface to be implemented by exception classes to indicate

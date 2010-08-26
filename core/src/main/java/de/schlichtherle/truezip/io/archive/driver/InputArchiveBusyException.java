@@ -29,7 +29,9 @@ import de.schlichtherle.truezip.io.FileBusyException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class InputArchiveBusyException extends FileBusyException {
+public class InputArchiveBusyException
+extends FileBusyException {
+
     private static final long serialVersionUID = 1983745618753823654L;
 
     /**

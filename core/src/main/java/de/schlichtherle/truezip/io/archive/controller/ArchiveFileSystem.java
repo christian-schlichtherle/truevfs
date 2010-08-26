@@ -124,7 +124,7 @@ public final class ArchiveFileSystem {
      *        file system in milliseconds since the epoch.
      * @param readOnly If and only if {@code true}, any subsequent
      *        modifying operation will result in a
-     *        {@link ArchiveReadOnlyException}.
+     *        {@link ReadOnlyArchiveFileSystemException}.
      */
     ArchiveFileSystem(
             final FileSystemArchiveController controller,
@@ -343,7 +343,7 @@ public final class ArchiveFileSystem {
      */
     private void touch() throws IOException {
         if (isReadOnly())
-            throw new ArchiveReadOnlyException();
+            throw new ReadOnlyArchiveFileSystemException();
 
         // Order is important here because of exceptions!
         if (touched == 0)
@@ -480,7 +480,7 @@ public final class ArchiveFileSystem {
                 final ArchiveEntry template)
         throws ArchiveFileSystemException {
             if (isReadOnly())
-                throw new ArchiveReadOnlyException();
+                throw new ReadOnlyArchiveFileSystemException();
             try {
                 elements = createElements(entryName, createParents, template, 1);
             } catch (CharConversionException cce) {
@@ -707,7 +707,7 @@ public final class ArchiveFileSystem {
             if (parent.getTime() != ArchiveEntry.UNKNOWN) // never touch ghosts!
                 parent.setTime(System.currentTimeMillis());
         } catch (UnsupportedOperationException unmodifiableMap) {
-            throw new ArchiveReadOnlyException();
+            throw new ReadOnlyArchiveFileSystemException();
         }
     }
 
@@ -895,54 +895,5 @@ public final class ArchiveFileSystem {
 
         throw new ArchiveFileSystemException(entryName,
                 "archive entry does not exist");
-    }
-
-    //
-    // Exceptions:
-    //
-
-    /**
-     * This exception is thrown when a client application tries to perform an
-     * illegal operation on an archive file system.
-     * <p>
-     * This exception is private by intention: Clients applications should not
-     * even know about the existence of virtual archive file systems.
-     */
-    public static class ArchiveFileSystemException extends IOException {
-        private static final long serialVersionUID = 4652084652223428651L;
-
-        /** The entry's path name. */
-        private final String entryName;
-
-        private ArchiveFileSystemException(String message) {
-            super(message);
-            this.entryName = null;
-        }
-
-        private ArchiveFileSystemException(String entryName, String message) {
-            super(message);
-            this.entryName = entryName;
-        }
-
-        @Override
-        public String getMessage() {
-            // For performance reasons, this string is constructed on demand
-            // only!
-            return entryName != null
-                    ? entryName + " (" + super.getMessage() + ")"
-                    : super.getMessage();
-        }
-    }
-
-    /**
-     * This exception is thrown when a client tries to modify a read only
-     * virtual archive file system.
-     */
-    static class ArchiveReadOnlyException extends ArchiveFileSystemException {
-        private static final long serialVersionUID = 987645923519873262L;
-
-        private ArchiveReadOnlyException() {
-            super("Archive file is read-only!");
-        }
     }
 }

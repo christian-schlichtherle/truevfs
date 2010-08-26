@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.ResolvableIssue;
+import de.schlichtherle.truezip.issues.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.Archive;
 
 /**
@@ -46,7 +46,7 @@ implements ResolvableIssue {
      * Returns the number of open entry streams, whereby an open stream
      * is a stream which's {@code close()} method hasn't been called.
      */
-    public int getNumStreams() {
+    public final int getNumStreams() {
         return numStreams;
     }
 }

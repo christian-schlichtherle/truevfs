@@ -67,7 +67,7 @@ public class Files {
      * @see #setTempDirectory
      */
     public static File createTempFile(final String prefix, final String suffix)
-            throws IOException {
+    throws IOException {
         return File.createTempFile(prefix, suffix, tempDirectory);
     }
 
@@ -79,7 +79,7 @@ public class Files {
      * @see #setTempDirectory
      */
     public static File createTempFile(final String prefix)
-            throws IOException {
+    throws IOException {
         return File.createTempFile(prefix, null, tempDirectory);
     }
 

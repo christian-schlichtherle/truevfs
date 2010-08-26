@@ -24,7 +24,9 @@ import de.schlichtherle.truezip.io.archive.Archive;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileOutputBusyException extends ArchiveFileBusyException {
+public class ArchiveFileOutputBusyException
+extends ArchiveFileBusyException {
+
     private static final long serialVersionUID = 4652936465192837172L;
 
     // TODO: Make this package private!

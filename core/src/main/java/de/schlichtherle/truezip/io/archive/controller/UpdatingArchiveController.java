@@ -170,14 +170,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 } catch (IOException ex) {
                     // Wrap cause so that a matching catch block can assume
                     // that it can access the target in the real file system.
-                    throw new RfsEntryFalsePositiveException(ex);
+                    throw new RfsEntryFalsePositiveException(this, ex);
                 }
                 setFileSystem(new ArchiveFileSystem(
                         this, inArchive, time, isReadOnly));
             } else if (!autoCreate) {
                 // The archive file does not exist and we may not create it
                 // automatically.
-                throw new ArchiveFileNotFoundException("may not create");
+                throw new ArchiveFileNotFoundException(this, "may not create");
             } else {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
@@ -218,6 +218,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // a bug.
                     assert false : "We should never get here! Read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
+                            this,
                             getEnclController(), // probably not correct!
                             getEnclEntryName(), // dito
                             ex);
@@ -346,7 +347,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     initInArchive(tmp);
                 } catch (IOException ex) {
                     throw new FileArchiveEntryFalsePositiveException(
-                            controller, entryName, ex);
+                            this, controller, entryName, ex);
                 }
                 setFileSystem(new ArchiveFileSystem(this, inArchive,
                         controllerFileSystem.lastModified(entryName),
@@ -372,12 +373,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
         } else if (controllerFileSystem.isDirectory(entryName)) {
             throw new DirectoryArchiveEntryFalsePositiveException(
-                    controller, entryName,
-                    new FileNotFoundException("cannot read directories"));
+                    this, controller, entryName,
+                    new FileNotFoundException("cannot read directories"), this);
         } else if (!autoCreate) {
             // The entry does NOT exist in the enclosing archive
             // file and we may not create it automatically.
-            throw new ArchiveFileNotFoundException("may not create");
+            throw new ArchiveFileNotFoundException(this, "may not create");
         } else {
             assert autoCreate;
             assert controller.writeLock().isLockedByCurrentThread();
