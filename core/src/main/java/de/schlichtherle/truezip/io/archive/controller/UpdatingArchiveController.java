@@ -717,7 +717,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             setScheduled(needsReassembly);
         }
 
-        builder.checkout();
+        builder.check();
     }
 
     final int waitAllInputStreamsByOtherThreads(long timeout) {

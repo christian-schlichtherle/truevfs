@@ -258,14 +258,14 @@ public final class ArchiveControllers {
                             // exception for some reason.
                             // We are bullheaded and store the exception chain for
                             // later throwing only and continue updating the rest.
-                            builder.reset(exception);
+                            builder.warn(exception);
                         }
                     } finally {
                         controller.writeLock().unlock();
                     }
                     total++;
                 }
-                builder.checkout();
+                builder.check();
             } finally {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();

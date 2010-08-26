@@ -233,7 +233,6 @@ public class MultiplexedOutputArchive implements OutputArchive {
 
         final ChainableIOExceptionBuilder<ChainableIOException> builder
                 = new ChainableIOExceptionBuilder<ChainableIOException>();
-
         for (final Iterator i = temps.values().iterator(); i.hasNext(); ) {
             final TempEntryOutputStream tempOut
                     = (TempEntryOutputStream) i.next();
@@ -273,8 +272,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 i.remove();
             }
         }
-
-        builder.checkout();
+        builder.check();
     }
 
     public void close() throws IOException {

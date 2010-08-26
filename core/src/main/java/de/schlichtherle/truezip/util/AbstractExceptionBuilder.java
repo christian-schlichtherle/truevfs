@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.util;
 
 /**
  * Abstract implementation of exception builder.
- * Subclasses must implement {@link #assemble(Throwable, Throwable)} and may
- * override {@link #reset(Throwable)}.
+ * Subclasses must implement {@link #update(Throwable, Throwable)} and may
+ * override {@link #post(Throwable)}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -29,90 +29,71 @@ package de.schlichtherle.truezip.util;
 public abstract class AbstractExceptionBuilder<C extends Throwable, T extends Throwable>
 implements ExceptionBuilder<C, T> {
 
-    private T throwable;
+    private T assembly;
 
     /**
-     * Assembles an exception from the given previous result and a(nother)
-     * cause.
+     * This method is called to update the given {@code previous} result of
+     * the assembly with the given {@code cause}.
      * 
      * @param cause A(nother) non-{@code null} cause exception to add to the
      *        assembly.
-     * @param previous The previous result of calling this method or
-     *        {@code null} if this is the first call after object creation or
-     *        a call to {@link #reset(Throwable)}.
+     * @param previous The previous result of the assembly or {@code null} if
+     *        this is the first call since the creation of this instance or the
+     *        last assembly has been checked out.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract T assemble(C cause, T previous);
+    protected abstract T update(T previous, C cause);
 
     /**
-     * {@inheritDoc}
+     * This method is called to post-process the given result of the assembly
+     * after it has been checked out.
      * <p>
-     * The implementation in the class {@link AbstractExceptionBuilder} calls
-     * <pre>{@code
-     * throwable = assemble(throwable, cause);
-     * return reset(null);
-     * }</pre>
-     * where {@code throwable} is the result of any previous assembly or
-     * {@code null} if there has been no previous assembly since this exception
-     * builder has been instantiated or reset.
-     * <p>
-     * This enables post-processing the assembled exception by overriding the
-     * method {@link #reset(Throwable)} appropriately.
+     * The implementation in the class {@link AbstractExceptionBuilder} simply
+     * returns the parameter.
+     *
+     * @param assembly The checked out result of the exception assembly
+     *        - may be {@code null}.
+     * @return The post-processed checked out result of the exception assembly
+     *         - may be {@code null}.
      */
-    public final T fail(final C cause) {
-        throwable = assemble(cause, throwable);
-        return reset(null);
+    protected T post(T assembly) {
+        return assembly;
+    }
+
+    private T checkout() {
+        T t = assembly;
+        assembly = null;
+        return t;
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link AbstractExceptionBuilder} calls
-     * <pre>{@code
-     * throwable = assemble(throwable, cause);
-     * }</pre>
-     * where {@code throwable} is the result of any previous assembly or
-     * {@code null} if there has been no previous assembly since this exception
-     * builder has been instantiated or reset.
+     *
+     * @see #update(Throwable, Throwable)
+     * @see #post(Throwable)
      */
-    public final void warn(final C cause) {
-        throwable = assemble(cause, throwable);
+    public final T fail(C cause) {
+        assembly = update(assembly, cause);
+        return post(checkout());
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link AbstractExceptionBuilder} calls
-     * <pre>{@code
-     * final T t = reset(null);
-     * if (t != null)
-     *     throw t;
-     * }</pre>
-     * <p>
-     * This enables post-processing the assembled exception by overriding the
-     * method {@link #reset(Throwable)} appropriately.
+     *
+     * @see #update(Throwable, Throwable)
      */
-    public final void checkout() throws T {
-        final T t = reset(null);
+    public final void warn(C cause) {
+        assembly = update(assembly, cause);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see #post(Throwable)
+     */
+    public final void check() throws T {
+        T t = post(checkout());
         if (t != null)
             throw t;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link AbstractExceptionBuilder} may get
-     * overridden in order to post-process its returned assembled exception
-     * like so:
-     * <pre>{@code
-     * public T reset(final T throwable) {
-     *     return post_process(super.reset(throwable));
-     * }
-     * }</pre>
-     */
-    public T reset(final T throwable) {
-        final T t = this.throwable;
-        this.throwable = throwable;
-        return t;
     }
 }

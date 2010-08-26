@@ -460,7 +460,7 @@ public abstract class ArchiveController implements Archive {
         final ArchiveFileExceptionBuilder builder
                 = new DefaultArchiveFileExceptionBuilder();
         reset(builder);
-        builder.checkout();
+        builder.check();
     }
 
     /**
