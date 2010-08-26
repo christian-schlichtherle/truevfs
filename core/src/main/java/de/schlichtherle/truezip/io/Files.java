@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -234,7 +234,9 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                         return;
                     }
                 }
-            } catch (RfsEntryFalsePositiveException srcIsNotArchive) {
+            } catch (ArchiveEntryFalsePositiveException ex) {
+                throw ex;
+            } catch (FalsePositiveException srcIsNotArchive) {
             }
 
             // Treat the source like a regular file.
@@ -294,7 +296,9 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                     return;
                 }
             }
-        } catch (RfsEntryFalsePositiveException dstIsNotArchive) {
+        } catch (ArchiveEntryFalsePositiveException ex) {
+            throw ex;
+        } catch (FalsePositiveException dstIsNotArchive) {
         }
 
         // Treat the destination like a regular file.
@@ -351,7 +355,9 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                         return;
                     }
                 }
-            } catch (RfsEntryFalsePositiveException isNotArchive) {
+            } catch (ArchiveEntryFalsePositiveException ex) {
+                throw ex;
+            } catch (FalsePositiveException isNotArchive) {
                 // Both the source and/or the destination may be false positives,
                 // so we need to use the exception's additional information to
                 // find out which controller actually detected the false positive.

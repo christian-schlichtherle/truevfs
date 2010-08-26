@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.ArchiveException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -170,7 +171,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 } catch (IOException ex) {
                     // Wrap cause so that a matching catch block can assume
                     // that it can access the target in the real file system.
-                    throw new RfsEntryFalsePositiveException(this, ex);
+                    throw new FalsePositiveException(this, ex);
                 }
                 setFileSystem(new ArchiveFileSystem(
                         this, inArchive, time, isReadOnly));
@@ -317,15 +318,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inFile == null;
 
         final ArchiveFileSystem controllerFileSystem;
-        try {
-            controllerFileSystem = controller.autoMount(
-                    autoCreate && ArchiveControllers.isLenient());
-        } catch (RfsEntryFalsePositiveException ex) {
-            assert false : "FIXME: Explain or remove this!";
-            // Unwrap cause so that we don't catch recursively here and
-            // disable any other matching catch blocks for ex.
-            throw (IOException) ex.getCause();
-        }
+        controllerFileSystem = controller.autoMount(
+                autoCreate && ArchiveControllers.isLenient());
         if (controllerFileSystem.isFile(entryName)) {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
