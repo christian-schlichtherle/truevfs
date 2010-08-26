@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionHandler;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileInputBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileOutputBusyWarningException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -34,7 +25,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.io.util.Temps;
+import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.util.Action;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.locks.ReentrantLock;
@@ -327,7 +318,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         final ArchiveFileSystem controllerFileSystem;
         try {
             controllerFileSystem = controller.autoMount(
-                    autoCreate && File.isLenient());
+                    autoCreate && ArchiveControllers.isLenient());
         } catch (RfsEntryFalsePositiveException ex) {
             assert false : "FIXME: Explain or remove this!";
             // Unwrap cause so that we don't catch recursively here and
@@ -338,7 +329,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
             // archive file entry.
-            final java.io.File tmp = Temps.createTempFile(
+            final java.io.File tmp = Files.createTempFile(
                     TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
             // We do properly delete our temps, so this is not required.
             // In addition, this would be dangerous as the deletion
@@ -347,7 +338,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                File.cp(controller.createInputStream0(entryName),
+                Streams.cp(controller.createInputStream0(entryName),
                         new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
@@ -397,7 +388,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // instead of just true?
             final ArchiveFileSystem.Delta delta
                     = controllerFileSystem.link(
-                        entryName, File.isLenient());
+                        entryName, ArchiveControllers.isLenient());
 
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -476,7 +467,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inArchive != null;
     }
 
-    InputStream createInputStream(
+    public InputStream createInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
@@ -491,7 +482,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         return in;
     }
 
-    OutputStream createOutputStream(
+    public OutputStream createOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -527,7 +518,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 tmp = getTarget();
             } else {
                 // Use a new temporary file as the output archive file.
-                tmp = Temps.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+                tmp = Files.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
                 // We do properly delete our temps, so this is not required.
                 // In addition, this would be dangerous as the deletion
                 // could happen before our shutdown hook has a chance to
@@ -949,7 +940,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         out.close();
                         throw ex;
                     }
-                    File.cp(in , out); // always closes in and out
+                    Streams.cp(in , out); // always closes in and out
                 } catch (IOException cause) {
                     throw handler.fail(new ArchiveFileException(
                             this,
@@ -1015,10 +1006,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // modification time of the entry.
         final InputStream in = new java.io.FileInputStream(outFile);
         try {
-            // We know that the enclosing controller's entry is not a false
-            // positive, so we may safely pass in null as the destination
-            // de.schlichtherle.truezip.io.File.
-            Files.cp0(true, outFile, in, controller, entryName);
+            ArchiveControllers.cp(true, outFile, in, controller, entryName);
         } finally {
             in.close();
         }

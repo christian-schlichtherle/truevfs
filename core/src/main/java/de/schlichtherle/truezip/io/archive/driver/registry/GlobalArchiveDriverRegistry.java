@@ -30,7 +30,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.util.ClassLoaderUtils.getResources;
+import static de.schlichtherle.truezip.util.ClassLoaders.getResources;
 
 /**
  * A global registry for mappings from archive file suffixes [{@link String}]

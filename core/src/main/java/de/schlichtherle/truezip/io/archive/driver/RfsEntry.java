@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.ArchiveEntryMetaData;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
 import java.io.File;
 import javax.swing.Icon;
 

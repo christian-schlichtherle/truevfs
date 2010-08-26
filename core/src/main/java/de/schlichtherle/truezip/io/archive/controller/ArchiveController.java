@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ArchiveFileSystem.Delta;
+import de.schlichtherle.truezip.io.FileFactory;
+import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionHandler;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -98,7 +95,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveController implements Archive {
+public abstract class ArchiveController implements Archive {
 
     // TODO: Harmonize the notation of the root directory!
     static final String ROOT = "";
@@ -176,11 +173,11 @@ abstract class ArchiveController implements Archive {
     // Methods.
     //
 
-    final ReentrantLock readLock() {
+    public final ReentrantLock readLock() {
         return readLock;
     }
 
-    final ReentrantLock writeLock() {
+    public final ReentrantLock writeLock() {
         return writeLock;
     }
 
@@ -199,7 +196,7 @@ abstract class ArchiveController implements Archive {
      *        acquired.
      *        No read lock is acquired while it's running.
      */
-    final void runWriteLocked(Action<IOException> runnable)
+    public final void runWriteLocked(Action<IOException> runnable)
     throws IOException {
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.
@@ -254,7 +251,7 @@ abstract class ArchiveController implements Archive {
      * Returns the {@link ArchiveController} of the enclosing archive file,
      * if any.
      */
-    final ArchiveController getEnclController() {
+    public final ArchiveController getEnclController() {
         return enclController;
     }
 
@@ -262,11 +259,11 @@ abstract class ArchiveController implements Archive {
      * Returns the entry name of this controller within the enclosing archive
      * file, if any.
      */
-    final String getEnclEntryName() {
+    public final String getEnclEntryName() {
         return enclEntryName;
     }
 
-    final String enclEntryName(final String entryName) {
+    public final String enclEntryName(final String entryName) {
         return isRoot(entryName)
                 ? enclEntryName
                 : enclEntryName + SEPARATOR + entryName;
@@ -289,7 +286,7 @@ abstract class ArchiveController implements Archive {
      * @return A valid reference to an {@link ArchiveDriver} object
      *         - never {@code null}.
      */
-    final ArchiveDriver getDriver() {
+    public final ArchiveDriver getDriver() {
         return driver;
     }
 
@@ -392,7 +389,7 @@ abstract class ArchiveController implements Archive {
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
-    abstract ArchiveFileSystem autoMount(boolean create)
+    public abstract ArchiveFileSystem autoMount(boolean create)
     throws IOException;
 
     /**
@@ -413,7 +410,7 @@ abstract class ArchiveController implements Archive {
      * @throws ArchiveException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    final void autoUmount(final String entryName)
+    public final void autoUmount(final String entryName)
     throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
         if (hasNewData(entryName)) {
@@ -500,7 +497,7 @@ abstract class ArchiveController implements Archive {
      * @throws FileNotFoundException If the entry cannot get read for
      *         any reason.
      */
-    final InputStream createInputStream(final String entryName)
+    public final InputStream createInputStream(final String entryName)
     throws IOException {
         assert entryName != null;
 
@@ -511,7 +508,8 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    InputStream createInputStream0(final String entryName)
+    // TODO: Make this private!
+    public InputStream createInputStream0(final String entryName)
     throws IOException {
         assert entryName != null;
 
@@ -556,7 +554,8 @@ abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream createInputStream(
+    // TODO: Make this private!
+    public abstract InputStream createInputStream(
             ArchiveEntry entry,
             ArchiveEntry dstEntry)
     throws IOException;
@@ -572,7 +571,7 @@ abstract class ArchiveController implements Archive {
      * @throws FileNotFoundException If the entry cannot get (re)written for
      *         any reason.
      */
-    final OutputStream createOutputStream(
+    public final OutputStream createOutputStream(
             final String entryName,
             final boolean append)
     throws IOException {
@@ -586,6 +585,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
+    // TODO: Make this private!
     OutputStream createOutputStream0(
             final String entryName,
             final boolean append)
@@ -610,7 +610,7 @@ abstract class ArchiveController implements Archive {
             } else {
                 autoUmount(entryName);
 
-                final boolean lenient = File.isLenient();
+                final boolean lenient = ArchiveControllers.isLenient();
                 final ArchiveFileSystem fileSystem = autoMount(lenient);
 
                 in = append && fileSystem.isFile(entryName)
@@ -650,7 +650,7 @@ abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream createOutputStream(
+    public abstract OutputStream createOutputStream(
             ArchiveEntry entry,
             ArchiveEntry srcEntry)
     throws IOException;
@@ -660,7 +660,7 @@ abstract class ArchiveController implements Archive {
     // Read only operations:
     //
 
-    final boolean exists(final String entryName)
+    public final boolean exists(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return exists0(entryName);
@@ -684,7 +684,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean isFile(final String entryName)
+    public final boolean isFile(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return isFile0(entryName);
@@ -714,7 +714,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean isDirectory(final String entryName)
+    public final boolean isDirectory(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return isDirectory0(entryName);
@@ -740,7 +740,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final Icon getOpenIcon(final String entryName)
+    public final Icon getOpenIcon(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return getOpenIcon0(entryName);
@@ -766,7 +766,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final Icon getClosedIcon(final String entryName)
+    public final Icon getClosedIcon(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return getClosedIcon0(entryName);
@@ -792,7 +792,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean canRead(final String entryName)
+    public final boolean canRead(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return canRead0(entryName);
@@ -816,7 +816,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean canWrite(final String entryName)
+    public final boolean canWrite(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return canWrite0(entryName);
@@ -840,7 +840,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final long length(final String entryName)
+    public final long length(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return length0(entryName);
@@ -864,7 +864,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final long lastModified(final String entryName)
+    public final long lastModified(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return lastModified0(entryName);
@@ -888,7 +888,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final String[] list(final String entryName)
+    public final String[] list(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return list0(entryName);
@@ -912,7 +912,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final String[] list(
+    public final String[] list(
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir)
@@ -943,7 +943,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final File[] listFiles(
+    public final File[] listFiles(
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir,
@@ -976,7 +976,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final File[] listFiles(
+    public final File[] listFiles(
             final String entryName,
             final FileFilter fileFilter,
             final File dir,
@@ -1014,7 +1014,7 @@ abstract class ArchiveController implements Archive {
     // Write operations:
     //
 
-    final boolean setReadOnly(final String entryName)
+    public final boolean setReadOnly(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             return setReadOnly0(entryName);
@@ -1038,7 +1038,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean setLastModified(
+    public final boolean setLastModified(
             final String entryName,
             final long time)
     throws RfsEntryFalsePositiveException {
@@ -1068,7 +1068,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean createNewFile(
+    public final boolean createNewFile(
             final String entryName,
             final boolean autoCreate)
     throws IOException {
@@ -1102,7 +1102,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean mkdir(
+    public final boolean mkdir(
             final String entryName,
             final boolean autoCreate)
     throws RfsEntryFalsePositiveException {
@@ -1144,7 +1144,7 @@ abstract class ArchiveController implements Archive {
         }
     }
 
-    final boolean delete(final String entryName)
+    public final boolean delete(final String entryName)
     throws RfsEntryFalsePositiveException {
         try {
             delete0(entryName);
@@ -1268,7 +1268,7 @@ abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    abstract class FalsePositiveException extends FileNotFoundException {
+    public abstract class FalsePositiveException extends FileNotFoundException {
         private static final long serialVersionUID = 947139561381472363L;
 
         private final boolean cacheable;
@@ -1302,7 +1302,7 @@ abstract class ArchiveController implements Archive {
          * This is the controller which detected the false positive archive
          * file.
          */
-        ArchiveController getController() {
+        public ArchiveController getController() {
             return ArchiveController.this;
         }
 
@@ -1323,7 +1323,7 @@ abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    final class RfsEntryFalsePositiveException extends FalsePositiveException {
+    public final class RfsEntryFalsePositiveException extends FalsePositiveException {
         private static final long serialVersionUID = 5234672956837622323L;
 
         /**
@@ -1349,7 +1349,7 @@ abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    abstract class ArchiveEntryFalsePositiveException extends FalsePositiveException {
+    public abstract class ArchiveEntryFalsePositiveException extends FalsePositiveException {
         private static final long serialVersionUID = 1234562841928746533L;
 
         private final ArchiveController enclController;
@@ -1411,7 +1411,7 @@ abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    final class FileArchiveEntryFalsePositiveException
+    public final class FileArchiveEntryFalsePositiveException
             extends ArchiveEntryFalsePositiveException {
         private static final long serialVersionUID = 2846364592164215345L;
 
@@ -1447,7 +1447,7 @@ abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    final class DirectoryArchiveEntryFalsePositiveException
+    public final class DirectoryArchiveEntryFalsePositiveException
             extends ArchiveEntryFalsePositiveException {
         private static final long serialVersionUID = 5672345295269335783L;
 
@@ -1482,10 +1482,10 @@ abstract class ArchiveController implements Archive {
      * May be thrown by {@link #autoMount(boolean)} if automatic creation of
      * the target file is not allowed.
      */
-    final class ArchiveFileNotFoundException extends FileNotFoundException {
+    public final class ArchiveFileNotFoundException extends FileNotFoundException {
         private static final long serialVersionUID = 2654293654126325623L;
 
-        ArchiveFileNotFoundException(String msg) {
+        public ArchiveFileNotFoundException(String msg) {
             super(msg);
         }
 
@@ -1509,7 +1509,7 @@ abstract class ArchiveController implements Archive {
      * May be thrown by {@link #createInputStream} or
      * {@link #createOutputStream}.
      */
-    final class ArchiveEntryNotFoundException extends FileNotFoundException {
+    public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         private static final long serialVersionUID = 2972350932856838564L;
 
         private final String entryName;

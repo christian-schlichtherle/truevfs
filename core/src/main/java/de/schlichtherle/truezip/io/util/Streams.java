@@ -37,12 +37,42 @@ import java.util.concurrent.Future;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Streams {
+public final class Streams {
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
-    /** This class cannot get instantiated. */
+    /** You cannot instantiate this class. */
     private Streams() {
+    }
+
+    /**
+     * Copies the input stream {@code in} to the output stream {@code out}.
+     * This method <em>always</em> closes <em>both</em> streams - even if an
+     * exception occurs.
+     *
+     * @param in The input stream.
+     * @param out The output stream.
+     * @throws InputException If copying the data fails because of an
+     *         {@code IOException} in the <em>input</em> stream.
+     * @throws IOException If copying the data fails because of an
+     *         {@code IOException} in the <em>output</em> stream.
+     * @throws NullPointerException If any parameter is {@code null}.
+     */
+    public static void cp(final InputStream in, final OutputStream out)
+    throws IOException {
+        try {
+            try {
+                Streams.cat(in, out);
+            } finally {
+                out.close();
+            }
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                throw new InputException(ex);
+            }
+        }
     }
 
     /**
@@ -127,7 +157,7 @@ public class Streams {
                         read = -1;
                     }
                     /*if (Thread.interrupted())
-                        read = -1; // throws away buf - OK in this context*/
+                    read = -1; // throws away buf - OK in this context*/
                     buffer.read = read;
 
                     // Advance head and notify writer.
@@ -216,8 +246,8 @@ public class Streams {
                 i.remove();
                 if (buffers != null)
                     return buffers;
+                }
             }
-        }
 
         // A minimum of two buffers is required.
         // The actual number is optimized to compensate for oscillating

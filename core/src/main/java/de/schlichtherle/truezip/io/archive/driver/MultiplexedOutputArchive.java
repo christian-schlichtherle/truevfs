@@ -18,12 +18,12 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.util.ChainableIOException;
 import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.io.util.Temps;
+import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import java.io.File;
 import java.io.FileInputStream;
@@ -120,7 +120,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             setSize(entry, srcEntry.getSize()); // data may be compressed!
         
         if (isTargetBusy()) {
-            final File temp = Temps.createTempFile(TEMP_FILE_PREFIX);
+            final File temp = Files.createTempFile(TEMP_FILE_PREFIX);
             return new TempEntryOutputStream(entry, srcEntry, temp);
         }
         return new EntryOutputStream(entry, srcEntry);

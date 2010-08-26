@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
+import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.

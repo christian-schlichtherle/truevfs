@@ -46,6 +46,8 @@ import java.util.Comparator;
  * This would allow a client application to filter the exceptions by priority
  * with a simple try-catch statement, ensuring that no other exception of
  * higher priority is in the catched exception chain.
+ * <p>
+ * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

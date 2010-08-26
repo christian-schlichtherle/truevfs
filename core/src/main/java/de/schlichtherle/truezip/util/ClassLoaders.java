@@ -30,9 +30,10 @@ import java.util.Enumeration;
  * @version $Id$
  */
 // TODO: Exchange this class for a more general solution, e.g. OSGi.
-public class ClassLoaderUtils {
+public final class ClassLoaders {
 
-    private ClassLoaderUtils() {
+    /** You cannot instantiate this class. */
+    private ClassLoaders() {
     }
 
     /**

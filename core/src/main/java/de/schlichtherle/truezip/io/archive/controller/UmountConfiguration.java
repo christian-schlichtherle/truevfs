@@ -1,6 +1,5 @@
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionBuilder;
 import java.io.IOException;
 
 /**
@@ -22,8 +21,9 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UmountConfiguration implements Cloneable {
-    private ArchiveFileExceptionBuilder archiveFileExceptionBuilder;
+public final class UmountConfiguration implements Cloneable {
+    private ArchiveFileExceptionBuilder archiveFileExceptionBuilder
+            = new DefaultArchiveFileExceptionBuilder();
     private boolean waitForInputStreams;
     private boolean closeInputStreams;
     private boolean waitForOutputStreams;
@@ -41,7 +41,10 @@ final class UmountConfiguration implements Cloneable {
         }
     }
 
-    /** The handler to use to process archive exceptions. */
+    /**
+     * The handler to use to process archive exceptions.
+     * This defaults to a {@code new {@link DefaultArchiveFileExceptionBuilder}()}.
+     */
     public ArchiveFileExceptionBuilder getArchiveFileExceptionBuilder() {
         return archiveFileExceptionBuilder;
     }

@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.util.ClassLoaderUtils.loadClass;
+import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
  * The head of a chain of registries for archive file suffixes and archive

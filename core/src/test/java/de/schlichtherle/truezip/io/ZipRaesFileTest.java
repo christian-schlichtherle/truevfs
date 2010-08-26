@@ -35,6 +35,8 @@ import java.io.IOException;
 public class ZipRaesFileTest extends FileTestCase {
 
     private static boolean cancelling;
+    private static final java.io.File _tempDir = new java.io.File(System.getProperty("java.io.tmpdir"));
+    private static final java.io.File _baseDir = _tempDir;
 
     private String oldKeyManager;
 

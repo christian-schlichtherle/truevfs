@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileExceptionHandler;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.util.Action;
@@ -67,7 +65,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         setScheduled(true);
     }
 
-    final ArchiveFileSystem autoMount(final boolean create)
+    public final ArchiveFileSystem autoMount(final boolean create)
     throws IOException {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         return autoMounter.autoMount(create);

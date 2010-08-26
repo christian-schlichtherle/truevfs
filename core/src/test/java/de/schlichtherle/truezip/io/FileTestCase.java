@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
@@ -32,15 +34,10 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 /**
  * Tests the VFS implementation for a particular archive type.
@@ -49,21 +46,12 @@ import junit.framework.TestCase;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileTestCase extends TestCase {
+public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
 
     private static final Logger logger = Logger.getLogger(
             FileTestCase.class.getName());
 
-    private static final java.io.File _tempDir = new java.io.File(
-            System.getProperty("java.io.tmpdir"));
-
-    private static final Matcher _tempMatcher
-            = Pattern.compile(UpdatingArchiveController.TEMP_FILE_PREFIX
-            + ".*\\" + UpdatingArchiveController.TEMP_FILE_SUFFIX).matcher("");
-
-    private static final Set totalTemps = new HashSet();
-
-    private static final java.io.File _baseDir = _tempDir;
+    private static final java.io.File _baseDir = tempDir;
 
     /** The data to get compressed. */
     private static final byte[] _data = new byte[100 * 1024]; // enough to waste some heat on CPU cycles
@@ -76,7 +64,7 @@ public abstract class FileTestCase extends TestCase {
 
         new Random().nextBytes(_data);
         logger.log(Level.CONFIG, "Created {0} bytes of random data.", _data.length);
-        logger.log(Level.CONFIG, "Temp dir for TrueZIP API: {0}", _tempDir.getPath());
+        logger.log(Level.CONFIG, "Temp dir for TrueZIP API: {0}", tempDir.getPath());
         logger.log(Level.CONFIG, "Default temp dir for unit tests: {0}", _baseDir.getPath());
         logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
         logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
@@ -107,7 +95,7 @@ public abstract class FileTestCase extends TestCase {
         
         File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
     }
-    
+
     /**
      * A subclass must override this method to create the {@link #data}
      * to be archived.
@@ -116,6 +104,7 @@ public abstract class FileTestCase extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
         if (data == null)
             data = _data; // (byte[]) _data.clone();
         if (baseDir == null)
@@ -128,22 +117,22 @@ public abstract class FileTestCase extends TestCase {
             archive = new File(createTempFile(prefix, suffix));
             assertTrue(archive.delete());
         }
-        
+
         File.setLenient(true); // Restore default
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
         data = null;
         baseDir = null;
         prefix = null;
         suffix = null;
-        
+
         final boolean deleted = archive.delete();
         if (!deleted && archive.exists())
             logger.log(Level.WARNING, "{0} (could not delete)", archive);
         archive = null;
-        
+
         // umount now to delete temps and free memory.
         // This prevents subsequent warnings about left over temporary files
         // and removes cached data from the memory, so it helps to start on a
@@ -156,22 +145,7 @@ public abstract class FileTestCase extends TestCase {
             // of failed tests and we don't want any exception from the tests
             // to be overridden by an exception thrown in this clean up method.
         }
-        
-        final String[] temps = _tempDir.list(new FilenameFilter() {
-            public boolean accept(java.io.File dir, String name) {
-                _tempMatcher.reset(name);
-                return _tempMatcher.matches();
-            }
-        });
-        assert temps != null;
-        for (int i = 0; i < temps.length; i++) {
-            if (totalTemps.add(temps[i])) {
-                // If the TrueZIP API itself (rather than this test code)
-                // leaves a temporary file, then that's considered a bug!
-                logger.log(Level.WARNING, "Bug in TrueZIP API: Temp file found: {0}", temps[i]);
-            }
-        }
-        
+        super.tearDown();
     }
 
     private static File createNonArchiveFile(File file) {
@@ -318,15 +292,7 @@ public abstract class FileTestCase extends TestCase {
         // Test details of the persistet object graph - part of this is
         // repeated in the tests for DefaultArchiveDetector.
         //
-        
-        // Assert that controllers haven't been persistet.
-        final ArchiveController innerController = inner.getArchiveController();
-        final ArchiveController archiveController = archive.getArchiveController();
-        final ArchiveController inner2Controller = inner2.getArchiveController();
-        final ArchiveController archive2Controller = archive2.getArchiveController();
-        assertSame(innerController, inner2Controller);
-        assertSame(archiveController, archive2Controller);
-        
+
         // Assert that detectors have been persistet.
         final ArchiveDetector innerDetector = inner.getArchiveDetector();
         final ArchiveDetector archiveDetector = archive.getArchiveDetector();
@@ -342,6 +308,14 @@ public abstract class FileTestCase extends TestCase {
         final ArchiveDriver archive2Driver = archive2Detector.getArchiveDriver(archive2.getPath());
         assertNotSame(innerDriver, inner2Driver);
         assertNotSame(archiveDriver, archive2Driver);
+
+        // Assert that the controllers haven't been persistet.
+        final ArchiveController innerController = inner.getArchiveController();
+        final ArchiveController archiveController = archive.getArchiveController();
+        final ArchiveController inner2Controller = inner2.getArchiveController();
+        final ArchiveController archive2Controller = archive2.getArchiveController();
+        assertSame(innerController, inner2Controller);
+        assertSame(archiveController, archive2Controller);
         
         // Test that the controllers have been reconfigured with the new drivers.
         // Note that this is only possible because the file systems haven't

@@ -50,7 +50,7 @@ public interface Archive {
 
     /**
      * @return The enclosing archive or {@code null} if this archive is
-     *         not enclosed in another archive
+     *         not enclosed in another archive.
      */
     Archive getEnclArchive();
 }

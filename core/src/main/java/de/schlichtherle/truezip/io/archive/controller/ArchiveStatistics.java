@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
 /**
  * A proxy interface which encapsulates statistics about the total set of
- * archives operated by this package.
- * Client applications should never implement this interface; simply because
- * there is no need to and because this interface may be amended over time.
- *
- * @see File#getLiveArchiveStatistics
+ * archives accessed by this package.
+ * Client applications should never implement this interface because (a)
+ * there is no need to and (b) it may get extended over time.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveStatistics {
-    
+
     /**
      * Returns the total number of bytes read from all <em>non-enclosed</em>
      * archive files which are updated during {@link File#update()} or

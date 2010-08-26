@@ -14,35 +14,33 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import java.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
- * An output stream which logs the number of bytes written.
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class CountingOutputStream extends FilterOutputStream {
+final class CountingReadOnlyFile extends FilterReadOnlyFile {
     private static volatile long total;
     private static volatile boolean reset;
 
-    CountingOutputStream(OutputStream out) {
-        super(out);
+    CountingReadOnlyFile(ReadOnlyFile rof) {
+        super(rof);
         init();
     }
 
-    /** Returns the total number of bytes written. */
+    /** Returns the total number of bytes read. */
     static long getTotal() {
         return total;
     }
 
     /**
-     * Resets the total number of bytes written if {@link #resetOnInit} has
-     * been called before.
+     * Resets the total number of bytes read if {@link #resetOnInit} has been
+     * called before.
      */
     static void init() {
         if (reset) {
@@ -52,7 +50,7 @@ final class CountingOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Requests that the total number of bytes written gets reset on the
+     * Requests that the total number of bytes read gets reset on the
      * next call to {@link #init}.
      */
     static void resetOnInit() {
@@ -60,21 +58,26 @@ final class CountingOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(final int b) throws IOException {
-        out.write(b);
-        total++;
+    public int read() throws IOException {
+        int ret = rof.read();
+        if (ret != -1)
+            total++;
+        return ret;
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
-        int len = b.length;
-        out.write(b, 0, len);
-        total += len;
+    public int read(byte[] b) throws IOException {
+        int ret = rof.read(b);
+        if (ret != -1)
+            total += ret;
+        return ret;
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        out.write(b, off, len);
-        total += len;
+    public int read(byte[] b, int off, int len) throws IOException {
+        int ret = rof.read(b, off, len);
+        if (ret != -1)
+            total += ret;
+        return ret;
     }
 }
