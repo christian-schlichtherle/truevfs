@@ -1,6 +1,8 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Holds the configuration parameters for
@@ -90,19 +92,15 @@ public final class UmountConfiguration implements Cloneable {
 
     /**
      * Suppose there are any open input streams for any archive entries of
-     * an archive file because the client application has forgot to close
-     * all {@link FileInputStream} objects or another thread is still busy
-     * doing I/O on the archive file.
+     * an archive file because the client application has forgot to
+     * {@link InputStream#close()} all {@code InputStream} objects or another
+     * thread is still busy doing I/O on the archive file.
      * Then if this property is {@code true}, the respective archive
      * controller will proceed to update the archive file anyway and
      * finally throw an {@link ArchiveFileBusyWarningException} to indicate
      * that any subsequent operations on these streams will fail with an
      * {@link ArchiveEntryStreamClosedException} because they have been
      * forced to close.
-     * <p>
-     * This may also be used to recover a client application from a
-     * {@link FileBusyException} thrown by a constructor of
-     * {@link FileInputStream} or {@link FileOutputStream}.
      * <p>
      * If this property is {@code false}, the archive file is <em>not</em>
      * updated and an {@link ArchiveFileBusyException} is thrown to

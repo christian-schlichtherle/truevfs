@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.archive.ArchiveException;
+import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
@@ -23,6 +25,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.RfsEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.UmountConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -1106,98 +1109,89 @@ public class File extends java.io.File {
     //
 
     /**
-     * Equivalent to {@link #umount(boolean, boolean, boolean, boolean)
-     * umount(false, true, false, true)}.
+     * Updates the real file system with all changes to all accessed archive
+     * files.
+     * This will reset the state of the respective archive controller and
+     * delete all temporary files held for the selected archive files.
+     * This method is thread-safe.
+     *
+     * @throws ArchiveWarningException If the configuration uses the
+     *         {@link DefaultArchiveFileExceptionBuilder} and <em>only</em>
+     *         warning conditions occured throughout the course of this method.
+     *         This implies that the respective archive file has been updated
+     *         with constraints, such as a failure to set the last modification
+     *         time of the archive file to the last modification time of its
+     *         implicit root directory.
+     * @throws ArchiveWarningException If the configuration uses the
+     *         {@link DefaultArchiveFileExceptionBuilder} and any error
+     *         condition occured throughout the course of this method.
+     *         This implies loss of data!
+     * @throws NullPointerException If {@code config} is {@code null}.
+     * @throws IllegalArgumentException If the configuration property
+     *         {@code closeInputStreams} is {@code false} and
+     *         {@code closeOutputStreams} is {@code true}.
+     * @see <a href="package-summary.html#state">Managing Archive File State</a>
+     */
+    public static void umount(UmountConfiguration config)
+    throws ArchiveFileException {
+        ArchiveControllers.umount("", config);
+    }
+
+    /**
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(true));
+     * }.
      */
     public static void umount()
     throws ArchiveFileException {
-        umount(false, true, false, true);
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(true));
     }
 
     /**
-     * Equivalent to {@link #umount(boolean, boolean, boolean, boolean)
-     * umount(false, closeStreams, false, closeStreams)}.
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(true));
+     * }.
      */
     public static void umount(boolean closeStreams)
     throws ArchiveFileException {
-        umount(false, closeStreams, false, closeStreams);
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(true));
     }
 
     /**
-     * Updates <em>all</em> archive files in the real file system
-     * with the contents of their virtual file system, resets all cached
-     * state and deletes all temporary files.
-     * This method is thread safe.
-     * <p>
-     * For a detailed explanation of when and how to use this method, please
-     * refer to the section
-     * &quot;<a href="package-summary.html#state">Managing Archive File State</a>&quot;
-     * in the package summary.
-     * 
-     * @param waitForInputStreams Suppose any other thread has still one or more
-     *        archive entry input streams open.
-     *        Then if and only if this parameter is {@code true}, this
-     *        method will wait until all other threads have closed their
-     *        archive entry input streams.
-     *        Archive entry input streams opened (and not yet closed) by the
-     *        current thread are always ignored.
-     *        If the current thread gets interrupted while waiting, it will
-     *        stop waiting and proceed normally as if this parameter were
-     *        {@code false}.
-     *        Be careful with this parameter value: If a stream has not been
-     *        closed because the client application does not always properly
-     *        close its streams, even on an {@link IOException} (which is a
-     *        typical bug in many Java applications), then this method may
-     *        not return until the current thread gets interrupted!
-     * @param closeInputStreams Suppose there are any open input streams
-     *        for any archive entries because the application has forgot to
-     *        close all {@link FileInputStream} objects or another thread is
-     *        still busy doing I/O on an archive.
-     *        Then if this parameter is {@code true}, an update is forced
-     *        and an {@link ArchiveFileBusyWarningException} is finally thrown to
-     *        indicate that any subsequent operations on these streams
-     *        will fail with an {@link ArchiveEntryStreamClosedException}
-     *        because they have been forced to close.
-     *        This may also be used to recover an application from a
-     *        {@link FileBusyException} thrown by a constructor of
-     *        {@link FileInputStream} or {@link FileOutputStream}.
-     *        If this parameter is {@code false}, the respective archive
-     *        file is <em>not</em> updated and an {@link ArchiveFileBusyException}
-     *        is thrown to indicate that the application must close all entry
-     *        input streams first.
-     * @param waitForOutputStreams Similar to {@code waitInputStreams},
-     *        but applies to archive entry output streams instead.
-     * @param closeOutputStreams Similar to {@code closeInputStreams},
-     *        but applies to archive entry output streams instead.
-     *        If this parameter is {@code true}, then
-     *        {@code closeInputStreams} must be {@code true}, too.
-     *        Otherwise, an {@code IllegalArgumentException} is thrown.
-     * @throws ArchiveWarningException If only warning conditions occur
-     *         throughout the course of this method which imply that the
-     *         respective archive file has been updated with constraints,
-     *         such as a failure to set the last modification time of the
-     *         archive file to the last modification time of its implicit
-     *         root directory.
-     * @throws ArchiveException If any error conditions occur throughout the
-     *         course of this method which imply loss of data.
-     *         This usually means that at least one of the archive files
-     *         has been created externally and was corrupted or it cannot
-     *         get updated because the file system of the temp file or target
-     *         file folder is full.
-     * @throws IllegalArgumentException If {@code closeInputStreams} is
-     *         {@code false} and {@code closeOutputStreams} is
-     *         {@code true}.
-     * @see #update(File)
-     * @see #update()
-     * @see #umount(File)
-     * @see <a href="package-summary.html#state">Managing Archive File State</a>
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(true));
+     * }.
      */
     public static void umount(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        ArchiveControllers.umount("",
-                new UmountConfiguration()
+        umount(new UmountConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -1206,27 +1200,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@link #umount(File, boolean, boolean, boolean, boolean)
-     * umount(archive, false, true, false, true)}.
-     */
-    public static void umount(File archive)
-    throws ArchiveFileException {
-        umount(archive, false, true, false, true);
-    }
-
-    /**
-     * Equivalent to {@link #umount(File, boolean, boolean, boolean, boolean)
-     * umount(archive, false, closeStreams, false, closeStreams)}.
-     */
-    public static void umount(File archive, boolean closeStreams)
-    throws ArchiveFileException {
-        umount(archive, false, closeStreams, false, closeStreams);
-    }
-
-    /**
-     * Similar to
-     * {@link #umount(boolean, boolean, boolean, boolean)
-     * umount(waitInputStreams, closeInputStreams, waitOutputStreams, closeOutputStreams)},
+     * Similar to {@link #umount(UmountConfiguration) umount(config)},
      * but will only update the given {@code archive} and all its enclosed
      * (nested) archives.
      * <p>
@@ -1235,27 +1209,77 @@ public class File extends java.io.File {
      * <pre><code>if (file.{@link #isArchive()} && file.{@link #getEnclArchive()} == null) // filter top level archive<br>    if (file.{@link #isDirectory()}) // ignore false positives<br>        File.{@link #umount(File)}; // update archive and all enclosed archives</code></pre>
      * Again, this will also unmount all archive files which are located
      * within the archive file referred to by the {@code file} instance.
-     * 
+     *
      * @param archive A top level archive file.
      * @throws NullPointerException If {@code archive} is {@code null}.
      * @throws IllegalArgumentException If {@code archive} is not an
      *         archive or is enclosed in another archive (is not top level).
-     * @see #update()
-     * @see #update(File)
-     * @see #umount()
-     * @see <a href="package-summary.html#state">Managing Archive File State</a>
+     * @see #umount(UmountConfiguration)
      */
-    public static void umount(
-            File archive,
-            boolean waitForInputStreams, boolean closeInputStreams,
-            boolean waitForOutputStreams, boolean closeOutputStreams)
+    public static void umount(File archive, UmountConfiguration config)
     throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.umount(archive.getCanOrAbsPath(),
-                new UmountConfiguration()
+        ArchiveControllers.umount(archive.getCanOrAbsPath(), config);
+    }
+
+    /**
+     * Equivalent to {@link #umount(File, UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(true));
+     * }.
+     */
+    public static void umount(File archive)
+    throws ArchiveFileException {
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(true));
+    }
+
+    /**
+     * Equivalent to {@link #umount(File, UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(true));
+     * }.
+     */
+    public static void umount(File archive, boolean closeStreams)
+    throws ArchiveFileException {
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(true));
+    }
+
+    /**
+     * Equivalent to {@link #umount(File, UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(true));
+     * }.
+     */
+    public static void umount(File archive,
+            boolean waitForInputStreams, boolean closeInputStreams,
+            boolean waitForOutputStreams, boolean closeOutputStreams)
+    throws ArchiveFileException {
+        umount(archive, new UmountConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -1264,47 +1288,60 @@ public class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@link #update(boolean, boolean, boolean, boolean)
-     * update(false, true, false, true)}.
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(false));
+     * }.
      */
     public static void update()
     throws ArchiveFileException {
-        update(false, true, false, true);
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(false));
     }
 
     /**
-     * Equivalent to {@link #update(boolean, boolean, boolean, boolean)
-     * update(false, closeStreams, false, closeStreams)}.
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(false));
+     * }.
      */
     public static void update(boolean closeStreams)
     throws ArchiveFileException {
-        update(false, closeStreams, false, closeStreams);
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(false));
     }
 
     /**
-     * Like {@link #umount(boolean, boolean, boolean, boolean)
-     * umount(waitInputStreams, closeInputStreams, waitOutputStreams, closeOutputStreams)},
-     * but may retain some temporary files in order to speed up subsequent
-     * access to their archive files again.
-     * <p>
-     * <b>Warning:</b> Do not use this method unless you fully understand
-     * its implications.
-     * In particular, if the client application does not seem to recognize
-     * changes made to archive files by
-     * <a href="package_summary.html#third_parties">third parties</code>,
-     * replace the calls to this method with {@code umount(*)}.
-     * 
-     * @see #update()
-     * @see #umount()
-     * @see #umount(boolean, boolean, boolean, boolean)
-     * @see <a href="package-summary.html#state">Managing Archive File State</a>
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(false));
+     * }.
      */
     public static void update(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        ArchiveControllers.umount("",
-                new UmountConfiguration()
+        umount(new UmountConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -1313,50 +1350,61 @@ public class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@link #update(File, boolean, boolean, boolean, boolean)
-     * update(archive, false, true, false, true)}.
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(false));
+     * }.
      */
     public static void update(File archive)
     throws ArchiveFileException {
-        update(archive, false, true, false, true);
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(true)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(true)
+                .setRelease(false));
     }
 
     /**
-     * Equivalent to {@link #update(File, boolean, boolean, boolean, boolean)
-     * update(archive, false, closeStreams, false, closeStreams)}.
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(false));
+     * }.
      */
     public static void update(File archive, boolean closeStreams)
     throws ArchiveFileException {
-        update(archive, false, closeStreams, false, closeStreams);
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(false)
+                .setCloseInputStreams(closeStreams)
+                .setWaitForOutputStreams(false)
+                .setCloseOutputStreams(closeStreams)
+                .setRelease(false));
     }
 
     /**
-     * Similar to
-     * {@link #update(boolean, boolean, boolean, boolean)
-     * update(waitInputStreams, closeInputStreams, waitOutputStreams, closeOutputStreams)},
-     * but will only update the given {@code archive} and all its enclosed
-     * (nested) archives.
-     * 
-     * @param archive A top level archive file.
-     * @throws NullPointerException If {@code archive} is {@code null}.
-     * @throws IllegalArgumentException If {@code archive} is not an
-     *         archive or is enclosed in another archive (is not top level).
-     * @see #update()
-     * @see #umount()
-     * @see #umount(File)
-     * @see <a href="package-summary.html#state">Managing Archive File State</a>
+     * Equivalent to {@link #umount(UmountConfiguration)
+        umount(archive, new UmountConfiguration()
+                .setWaitForInputStreams(waitForInputStreams)
+                .setCloseInputStreams(closeInputStreams)
+                .setWaitForOutputStreams(waitForOutputStreams)
+                .setCloseOutputStreams(closeOutputStreams)
+                .setRelease(false));
+     * }.
      */
     public static void update(
             File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        if (!archive.isArchive())
-            throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
-        if (archive.getEnclArchive() != null)
-            throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.umount(archive.getCanOrAbsPath(),
-                new UmountConfiguration()
+        umount(archive, new UmountConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
@@ -1384,10 +1432,10 @@ public class File extends java.io.File {
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}.
      * In other words, this returns {@code true} unless you set the
      * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
@@ -1444,7 +1492,7 @@ public class File extends java.io.File {
      * This is called the &quot;unclosed streams issue&quot;.
      * <p>
      * Likewise, in TrueZIP an unclosed archive entry stream may result in an
-     * {@code ArchiveBusy(Warning)?Exception} to be thrown when
+     * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
      * {@link #umount} or {@link #update} is called.
      * In order to prevent this, TrueZIP's archive entry streams have a
      * {@link Object#finalize()} method which closes an archive entry stream
@@ -1454,7 +1502,7 @@ public class File extends java.io.File {
      * TrueZIP maintains a hard reference to all archive entry streams
      * until {@link #umount} or {@link #update} is called, which will deal
      * with them: If they are not closed, an
-     * {@code ArchiveBusy(Warning)?Exception} is thrown, depending on
+     * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
      * the boolean parameters to these methods.
      * <p>
      * This setting is useful if you do not want to tolerate the

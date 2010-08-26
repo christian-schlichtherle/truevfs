@@ -17,6 +17,9 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
+import de.schlichtherle.truezip.io.swing.FileSystemView;
+import de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer;
+import de.schlichtherle.truezip.io.util.Files;
 
 import javax.swing.Icon;
 
@@ -56,9 +59,9 @@ import javax.swing.Icon;
  * <p>
  * For example, the ZIP and TAR file formats conform to all but the second
  * requirement.
- * So the driver implementations for the archive types use
- * {@link de.schlichtherle.truezip.io.util.PathUtils#normalize(String, char)} to remove
- * any redundant elements from the path.
+ * So the driver implementations for these archive types use
+ * {@link Files#normalize(String, char)} to remove any redundant elements from
+ * the path.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -130,7 +133,7 @@ public interface ArchiveEntry {
     void setTime(long time);
 
     /**
-     * Returns the icon that {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
+     * Returns the icon that {@link FileTreeCellRenderer}
      * should display for this entry if it is open/expanded in the view.
      * If {@code null} is returned, a default icon will be used,
      * depending on the type of this entry and its state in the view.
@@ -138,8 +141,8 @@ public interface ArchiveEntry {
     Icon getOpenIcon();
 
     /**
-     * Returns the icon that {@link de.schlichtherle.truezip.io.swing.FileSystemView}
-     * and {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer} should
+     * Returns the icon that {@link FileSystemView}
+     * and {@link FileTreeCellRenderer} should
      * display for this entry if it is closed/collapsed in the view.
      * If {@code null} is returned, a default icon will be used,
      * depending on the type of this entry and its state in the view.

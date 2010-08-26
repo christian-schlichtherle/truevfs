@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ResolvableIssue;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -64,12 +65,11 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  * and output streams for the entries of the archive file and methods
  * to update the contents of the virtual file system to the target file
  * in the real file system.
- * In cooperation with the {@link File} class, it also knows how to deal with
+ * In cooperation with the calling methods, it also knows how to deal with
  * nested archive files (such as {@code "outer.zip/inner.tar.gz"}
  * and <i>false positives</i>, i.e. plain files or directories or file or
  * directory entries in an enclosing archive file which have been incorrectly
- * recognized to be <i>prospective archive files</i> by the
- * {@link ArchiveDetector} interface.
+ * recognized to be <i>prospective archive files</i>.
  * <p>
  * To ensure that for each archive file there is at most one
  * {code ArchiveController}, the path name of the archive file (called
@@ -82,12 +82,10 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  * This is important because the {@link File} class may repeatedly call them,
  * triggered by the client application. Of course, depending on the context,
  * some or all of the archive file's data may be lost in this case.
- * For more information, please refer to {@link File#umount} and
- * {@link File#update}.
  * <p>
  * This class is actually the abstract base class for any archive controller.
  * It encapsulates all the code which is not depending on a particular entry
- * synchronization strategy and the corresponding state of the controller.
+ * updating strategy and the corresponding state of the controller.
  * Though currently unused, this is intended to be helpful for future
  * extensions of TrueZIP, where different synchronization strategies may be
  * implemented.
@@ -135,14 +133,15 @@ public abstract class ArchiveController implements Archive {
     //
 
     /**
-     * This constructor schedules this controller to be thrown away if no
-     * more {@code File} objects are referring to it.
+     * This constructor schedules this controller to be thrown away if the
+     * client application holds no more references to it.
      * The subclass must update this schedule according to the controller's
      * state.
      * For example, if the controller has started to update some entry data,
-     * it must call {@link #setScheduled} in order to force the
-     * controller to be updated on the next call to {@link #umount} even if
-     * no more {@code File} objects are referring to it.
+     * it must call {@link #setScheduled(boolean)} in order to force the
+     * controller to be updated on the next call to
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}
+     * even if the client application holds no more references to it.
      * Otherwise, all changes may get lost!
      * 
      * @see #setScheduled(boolean)
@@ -334,7 +333,7 @@ public abstract class ArchiveController implements Archive {
 
     /**
      * (Re)schedules this archive controller for the next call to
-     * {@link ArchiveControllers#umount(String, boolean, boolean, boolean, boolean, boolean)}.
+     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
      * 
      * @param scheduled If set to {@code true}, this controller and hence
      *        its target archive file is guaranteed to get updated during the
@@ -407,7 +406,7 @@ public abstract class ArchiveController implements Archive {
      * of the archive (unless the archive type doesn't support this).
      * 
      * @see #umount(UmountConfiguration)
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     public final void autoUmount(final String entryName)
@@ -437,7 +436,7 @@ public abstract class ArchiveController implements Archive {
      * @param config The parameters for processing - {@code null} is not
      *        permitted.
      * @throws NullPointerException If {@code config} is {@code null}.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     abstract void umount(UmountConfiguration config)
@@ -1268,7 +1267,9 @@ public abstract class ArchiveController implements Archive {
      * Instances of this class are always associated with an
      * {@code IOException} as their cause.
      */
-    public abstract class FalsePositiveException extends FileNotFoundException {
+    public abstract class FalsePositiveException
+    extends FileNotFoundException
+    implements ResolvableIssue {
         private static final long serialVersionUID = 947139561381472363L;
 
         private final boolean cacheable;

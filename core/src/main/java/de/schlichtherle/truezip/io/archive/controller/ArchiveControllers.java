@@ -192,8 +192,8 @@ public final class ArchiveControllers {
     }
 
     /**
-     * Synchronize all updated contents for archive file which's canonical path
-     * name starts with {@code prefix} to the real file system.
+     * Updates the real file system with all changes to archive files which's
+     * canonical path name start with {@code prefix}.
      * This will reset the state of the respective archive controller and
      * delete all temporary files held for the selected archive files.
      * This method is thread-safe.
@@ -202,16 +202,23 @@ public final class ArchiveControllers {
      *        which shall get synchronized to the real file system.
      *        This may be {@code null} or empty in order to select all accessed
      *        archive files.
-     * @throws ArchiveFileException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
+     * @throws ArchiveWarningException If the configuration uses the
+     *         {@link DefaultArchiveFileExceptionBuilder} and <em>only</em>
+     *         warning conditions occured throughout the course of this method.
+     *         This implies that the respective archive file has been updated
+     *         with constraints, such as a failure to set the last modification
+     *         time of the archive file to the last modification time of its
+     *         implicit root directory.
+     * @throws ArchiveWarningException If the configuration uses the
+     *         {@link DefaultArchiveFileExceptionBuilder} and any error
+     *         condition occured throughout the course of this method.
+     *         This implies loss of data!
      * @throws NullPointerException If {@code config} is {@code null}.
      * @throws IllegalArgumentException If the configuration property
      *         {@code closeInputStreams} is {@code false} and
      *         {@code closeOutputStreams} is {@code true}.
      */
-    public static void umount(
-            final String prefix,
-            UmountConfiguration config)
+    public static void umount(final String prefix, UmountConfiguration config)
     throws ArchiveFileException {
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
             throw new IllegalArgumentException();
@@ -234,7 +241,6 @@ public final class ArchiveControllers {
             try {
                 final ArchiveFileExceptionBuilder builder
                         = config.getArchiveFileExceptionBuilder();
-
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
@@ -625,10 +631,10 @@ public final class ArchiveControllers {
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}.
      * In other words, this returns {@code true} unless you set the
      * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveConrtollers.strict}
+     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
@@ -685,17 +691,17 @@ public final class ArchiveControllers {
      * This is called the &quot;unclosed streams issue&quot;.
      * <p>
      * Likewise, in TrueZIP an unclosed archive entry stream may result in an
-     * {@code ArchiveBusy(Warning)?Exception} to be thrown when
-     * {@link #umount} or {@link #update} is called.
+     * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
+     * {@link #umount} is called.
      * In order to prevent this, TrueZIP's archive entry streams have a
      * {@link Object#finalize()} method which closes an archive entry stream
      * if its garbage collected.
      * <p>
      * Now if this class property is set to {@code false}, then
      * TrueZIP maintains a hard reference to all archive entry streams
-     * until {@link #umount} or {@link #update} is called, which will deal
+     * until {@link #umount} is called, which will deal
      * with them: If they are not closed, an
-     * {@code ArchiveBusy(Warning)?Exception} is thrown, depending on
+     * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
      * the boolean parameters to these methods.
      * <p>
      * This setting is useful if you do not want to tolerate the
@@ -704,30 +710,21 @@ public final class ArchiveControllers {
      * If this class property is set to {@code true} however, then
      * TrueZIP maintains only a weak reference to all archive entry streams.
      * This allows the garbage collector to finalize them before
-     * {@link #umount} or {@link #update} is called.
+     * {@link #umount} is called.
      * The finalize() method will then close these archive entry streams,
      * which exempts them, from triggering an
      * {@code ArchiveBusy(Warning)?Exception} on the next call to
-     * {@link #umount} or {@link #update}.
+     * {@link #umount}.
      * However, closing an archive entry output stream this way may result
      * in loss of buffered data, so it's only a workaround for this issue.
      * <p>
      * Note that for the setting of this class property to take effect, any
      * change must be made before an archive is first accessed.
      * The setting will then persist until the archive is reset by the next
-     * call to {@link #umount} or {@link #update}.
-     * <p>
-     * Historical note: Since TrueZIP 6.0 and before TrueZIP 6.4, archive
-     * entry streams were always only referenced by a weak reference by
-     * TrueZIP.
-     * This class property has been overloaded with this semantic in order
-     * to allow client applications to test for the &quot;unclosed streams issue&quot;.
+     * call to {@link #umount}.
      * </li>
      * </ol>
      *
-     * @see #createNewFile
-     * @see FileInputStream
-     * @see FileOutputStream
      * @see #isLenient()
      */
     public static void setLenient(final boolean lenient) {
