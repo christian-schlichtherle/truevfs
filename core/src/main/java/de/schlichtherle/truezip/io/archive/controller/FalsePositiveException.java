@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.issues.ResolvableIssue;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -31,7 +30,7 @@ import java.io.IOException;
  * {@code IOException} as their cause.
  */
 public class FalsePositiveException
-extends FileNotFoundException
+extends Exception
 implements ResolvableIssue {
 
     private static final long serialVersionUID = 947139561381472363L;
