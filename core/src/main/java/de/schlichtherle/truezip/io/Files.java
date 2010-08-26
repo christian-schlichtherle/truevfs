@@ -141,7 +141,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final java.io.File dst,
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector)
-            throws IOException {
+    throws IOException {
         if (contains(src, dst))
             throw new ContainsFileException(src, dst);
         cp_r0(preserve, src, dst, srcDetector, dstDetector);
@@ -156,7 +156,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final java.io.File dst,
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector)
-            throws IOException {
+    throws IOException {
         if (src.isDirectory()) {
             final long srcLastModified = src.lastModified();
             final boolean srcIsArchived = src instanceof File
@@ -204,7 +204,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst)
-            throws IOException {
+    throws IOException {
         if (contains(src, dst))
             throw new ContainsFileException(src, dst);
         cp0(preserve, src, dst);
@@ -217,7 +217,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst)
-            throws IOException {
+    throws IOException {
         assert src != null;
         assert dst != null;
 
@@ -228,15 +228,17 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                     srcFile.ensureNotVirtualRoot("cannot read");
                     final String srcEntryName = srcFile.getEnclEntryName();
                     if (srcEntryName != null) {
-                        cp0(preserve,
+                        cp0(    preserve,
                                 srcFile.getEnclArchive().getArchiveController(),
-                                srcEntryName, dst);
+                                srcEntryName,
+                                dst);
                         return;
                     }
                 }
-            } catch (ArchiveEntryFalsePositiveException ex) {
-                throw ex;
-            } catch (FalsePositiveException srcIsNotArchive) {
+            } catch (FalsePositiveException isNotArchive) {
+                assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                        : "must be handled in try-block!";
+                // Fall through!
             }
 
             // Treat the source like a regular file.
@@ -283,7 +285,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final java.io.File src,
             final InputStream in,
             final java.io.File dst)
-            throws IOException {
+    throws IOException {
         try {
             if (dst instanceof File) {
                 final File dstFile = (File) dst;
@@ -296,9 +298,10 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                     return;
                 }
             }
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            throw ex;
-        } catch (FalsePositiveException dstIsNotArchive) {
+        } catch (FalsePositiveException isNotArchive) {
+            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+                    : "must be handled in try-block!";
+            // Fall through!
         }
 
         // Treat the destination like a regular file.
@@ -336,7 +339,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final ArchiveController srcController,
             final String srcEntryName,
             final java.io.File dst)
-            throws IOException {
+    throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !srcController.readLock().isLocked();
@@ -395,7 +398,8 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
         } catch (ArchiveEntryFalsePositiveException ex) {
             assert srcController.getCanonicalPath().equals(ex.getCanonicalPath());
             // Reroute call to the source's enclosing archive controller.
-            cp0(preserve, srcController.getEnclController(),
+            cp0(    preserve,
+                    srcController.getEnclController(),
                     srcController.enclEntryName(srcEntryName),
                     dst);
         }

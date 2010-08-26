@@ -66,7 +66,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
     }
 
     public final ArchiveFileSystem autoMount(final boolean create)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         return autoMounter.autoMount(create);
     }
@@ -85,7 +85,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
      */
     private static abstract class AutoMounter {
         abstract ArchiveFileSystem autoMount(boolean create)
-        throws IOException;
+        throws FalsePositiveException, IOException;
 
         ArchiveFileSystem getFileSystem() {
             return null;
@@ -96,10 +96,10 @@ abstract class FileSystemArchiveController extends ArchiveController {
 
     private class ResetFileSystem extends AutoMounter {
         ArchiveFileSystem autoMount(final boolean create)
-        throws IOException {
+        throws FalsePositiveException, IOException {
             try {
-                class Mounter implements Action<IOException> {
-                    public void run() throws IOException {
+                class Mounter implements Action<Exception> {
+                    public void run() throws FalsePositiveException, IOException {
                         // Check state again: Another thread may have changed
                         // it while we released all read locks in order to
                         // acquire the write lock!
@@ -114,7 +114,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 } // class Mounter
 
                 runWriteLocked(new Mounter());
-            } catch (FalsePositiveException ex) {
+            } catch (FalsePositiveException fpe) {
                 // Catch and cache exceptions for uncacheable false positives.
                 // The state is reset when File.delete() is called on the false
                 // positive archive file or File.update() or File.umount().
@@ -127,9 +127,13 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 //   Note that it is important to cache the exceptions for
                 // cacheable false positives only: Otherwise, side effects
                 // of the archive driver may not be accounted for.
-                if (ex.isCacheable())
-                    autoMounter = new FalsePositiveFileSystem(ex);
-                throw ex;
+                if (fpe.isCacheable())
+                    autoMounter = new FalsePositiveFileSystem(fpe);
+                throw fpe;
+            } catch (IOException ioe) {
+                throw ioe;
+            } catch (Exception cannotHappen) {
+                throw new AssertionError(cannotHappen);
             }
 
             assert autoMounter != this;
@@ -179,7 +183,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         ArchiveFileSystem autoMount(boolean create)
-        throws IOException {
+        throws FalsePositiveException {
             throw exception;
         }
 
@@ -210,7 +214,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
      *         or the target file of any enclosing archive file's controller.
      */
     abstract void mount(boolean create)
-    throws IOException;
+    throws FalsePositiveException, IOException;
 
     void reset(final ArchiveFileExceptionHandler handler)
     throws ArchiveFileException {

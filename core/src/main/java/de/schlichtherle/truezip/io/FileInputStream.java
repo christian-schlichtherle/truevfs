@@ -130,7 +130,7 @@ public class FileInputStream extends FilterInputStream {
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
-            // fall through!
+            // Fall through!
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (ArchiveFileBusyException ex) {

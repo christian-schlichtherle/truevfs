@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -436,7 +435,7 @@ public final class ArchiveControllers {
             final String srcEntryName,
             final ArchiveController dstController,
             final String dstEntryName)
-            throws IOException {
+    throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !srcController.readLock().isLocked();
@@ -445,12 +444,12 @@ public final class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class IOStreamCreator implements Action<IOException> {
+            class IOStreamCreator implements Action<Exception> {
 
                 InputStream in;
                 OutputStream out;
 
-                public void run() throws IOException {
+                public void run() throws FalsePositiveException, IOException {
                     // Update controllers.
                     // This may invalidate the file system object, so it must be
                     // done first in case srcController and dstController are the
@@ -510,7 +509,15 @@ public final class ArchiveControllers {
 
             final IOStreamCreator streams = new IOStreamCreator();
             synchronized (copyLock) {
-                dstController.runWriteLocked(streams);
+                try {
+                    dstController.runWriteLocked(streams);
+                } catch (FalsePositiveException ex) {
+                    throw ex;
+                } catch (IOException ex) {
+                    throw ex;
+                } catch (Exception ex) {
+                    throw new AssertionError(ex);
+                }
             }
 
             // Finally copy the entry data.
@@ -553,18 +560,18 @@ public final class ArchiveControllers {
             final InputStream in,
             final ArchiveController dstController,
             final String dstEntryName)
-            throws IOException {
+    throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !dstController.readLock().isLocked();
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class OStreamCreator implements Action<IOException> {
+            class OStreamCreator implements Action<Exception> {
 
                 OutputStream out; // = null;
 
-                public void run() throws IOException {
+                public void run() throws FalsePositiveException, IOException {
                     // Update controller.
                     // This may invalidate the file system object, so it must be
                     // done first in case srcController and dstController are the
@@ -593,7 +600,15 @@ public final class ArchiveControllers {
             // Create the output stream while the destination controller is
             // write locked.
             final OStreamCreator stream = new OStreamCreator();
-            dstController.runWriteLocked(stream);
+            try {
+                dstController.runWriteLocked(stream);
+            } catch (FalsePositiveException ex) {
+                throw ex;
+            } catch (IOException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new AssertionError(ex);
+            }
             final OutputStream out = stream.out;
 
             // Finally copy the entry data.

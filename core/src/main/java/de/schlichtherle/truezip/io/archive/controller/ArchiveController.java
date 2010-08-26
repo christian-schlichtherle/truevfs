@@ -192,8 +192,8 @@ public abstract class ArchiveController implements Archive {
      *        acquired.
      *        No read lock is acquired while it's running.
      */
-    public final void runWriteLocked(Action<IOException> runnable)
-    throws IOException {
+    final <T extends Throwable> void runWriteLocked(Action<T> runnable)
+    throws T {
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.
         // Note that this is not just a limitation of the current
@@ -377,7 +377,7 @@ public abstract class ArchiveController implements Archive {
      *         or the target file of any enclosing archive file's controller.
      */
     public abstract ArchiveFileSystem autoMount(boolean create)
-    throws IOException;
+    throws FalsePositiveException, IOException;
 
     /**
      * Unmounts the archive file only if the archive file has already new
@@ -481,11 +481,9 @@ public abstract class ArchiveController implements Archive {
      *        - {@code null} or {@code ""} is not permitted.
      * @return A valid {@code InputStream} object
      *         - {@code null} is never returned.
-     * @throws FileNotFoundException If the entry cannot get read for
-     *         any reason.
      */
     public final InputStream createInputStream(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert entryName != null;
 
         try {
@@ -497,7 +495,7 @@ public abstract class ArchiveController implements Archive {
 
     // TODO: Make this private!
     public InputStream createInputStream0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert entryName != null;
 
         readLock().lock();
@@ -541,8 +539,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    // TODO: Make this private!
-    public abstract InputStream createInputStream(
+    abstract InputStream createInputStream(
             ArchiveEntry entry,
             ArchiveEntry dstEntry)
     throws IOException;
@@ -555,13 +552,11 @@ public abstract class ArchiveController implements Archive {
      *        - {@code null} or {@code ""} is not permitted.
      * @return A valid {@code OutputStream} object
      *         - {@code null} is never returned.
-     * @throws FileNotFoundException If the entry cannot get (re)written for
-     *         any reason.
      */
     public final OutputStream createOutputStream(
             final String entryName,
             final boolean append)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert entryName != null;
 
         try {
@@ -572,11 +567,10 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    // TODO: Make this private!
-    OutputStream createOutputStream0(
+    private OutputStream createOutputStream0(
             final String entryName,
             final boolean append)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert entryName != null;
 
         final InputStream in;
@@ -637,7 +631,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    public abstract OutputStream createOutputStream(
+    abstract OutputStream createOutputStream(
             ArchiveEntry entry,
             ArchiveEntry srcEntry)
     throws IOException;
@@ -661,7 +655,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean exists0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -691,7 +685,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean isFile0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -717,7 +711,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean isDirectory0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -741,7 +735,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private Icon getOpenIcon0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
@@ -767,7 +761,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private Icon getClosedIcon0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
@@ -793,7 +787,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean canRead0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -817,7 +811,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean canWrite0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -841,7 +835,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private long length0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -865,7 +859,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private long lastModified0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -889,7 +883,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private String[] list0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -920,7 +914,7 @@ public abstract class ArchiveController implements Archive {
             final String entryName,
             final FilenameFilter filenameFilter,
             final File dir)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -953,7 +947,7 @@ public abstract class ArchiveController implements Archive {
             final FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -986,7 +980,7 @@ public abstract class ArchiveController implements Archive {
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -1015,7 +1009,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean setReadOnly0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
@@ -1044,7 +1038,7 @@ public abstract class ArchiveController implements Archive {
     private boolean setLastModified0(
             final String entryName,
             final long time)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             autoUmount(entryName);
@@ -1058,7 +1052,7 @@ public abstract class ArchiveController implements Archive {
     public final boolean createNewFile(
             final String entryName,
             final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         try {
             return createNewFile0(entryName, autoCreate);
         } catch (ArchiveEntryFalsePositiveException ex) {
@@ -1070,7 +1064,7 @@ public abstract class ArchiveController implements Archive {
     private boolean createNewFile0(
             final String entryName,
             final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert !isRoot(entryName);
 
         writeLock().lock();
@@ -1106,7 +1100,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private void mkdir0(final String entryName, final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             if (isRoot(entryName)) {
@@ -1153,7 +1147,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private void delete0(final String entryName)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             autoUmount(entryName);

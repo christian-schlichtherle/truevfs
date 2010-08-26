@@ -115,7 +115,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     //
 
     void mount(final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert writeLock().isLockedByCurrentThread();
         assert inArchive == null;
         assert outFile == null;
@@ -151,7 +151,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void mount0(final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         // We need to mount the virtual file system from the input file.
         // and so far we have not successfully opened the input file.
         if (isRfsEntryTarget()) {
@@ -241,7 +241,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final ArchiveController controller,
             final String entryName,
             final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
@@ -310,7 +310,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final ArchiveController controller,
             final String entryName,
             final boolean autoCreate)
-    throws IOException {
+    throws FalsePositiveException, IOException {
         assert controller != null;
         assert controller.readLock().isLockedByCurrentThread() || controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
@@ -329,12 +329,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // We do properly delete our temps, so this is not required.
             // In addition, this would be dangerous as the deletion
             // could happen before our shutdown hook has a chance to
-            // process this controller!!!
+            // process this archive controller!!!
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.cp(controller.createInputStream0(entryName),
-                        new java.io.FileOutputStream(tmp));
+                Streams.cp( controller.createInputStream0(entryName),
+                            new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
                 try {
@@ -347,23 +347,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         controllerFileSystem.lastModified(entryName),
                         controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
-            } catch (Throwable ex) {
-                // ex could be a NoClassDefFoundError if
-                // target is an RAES encrypted ZIP file and
-                // Bouncycastle's Lightweight Crypto API is not
-                // in the classpath.
-                // We are just catching all kinds of Throwables
-                // to make sure that we always delete the newly
-                // created temp file.
-                // Finally, we pass on the catched exception.
-                if (!tmp.delete())
-                    throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)", ex);
-                if (ex instanceof IOException)
-                    throw (IOException) ex;
-                else if (ex instanceof RuntimeException)
-                    throw (RuntimeException) ex;
-                else
-                    throw (Error) ex; // must be Error, throws ClassCastException otherwise!
+            } finally {
+                // An archive driver could throw a NoClassDefFoundError or
+                // similar if the class path is not set up correctly.
+                // We are checking success to make sure that we always delete
+                // the newly created temp file in case of an error.
+                if (inFile == null && !tmp.delete())
+                    throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)");
             }
         } else if (controllerFileSystem.isDirectory(entryName)) {
             throw new DirectoryArchiveEntryFalsePositiveException(
@@ -433,22 +423,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (isRfsEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
                 inArchive = getDriver().createInputArchive(this, rof);
-            } catch (Throwable ex) {
-                // ex could be a NoClassDefFoundError if target is an RAES
-                // encrypted ZIP file and Bouncycastle's Lightweight
-                // Crypto API is not in the classpath.
-                // We are just catching all kinds of Throwables to make sure
-                // that we close the read only file.
-                // Finally, we will pass on the catched exception.
-                rof.close();
-                if (ex instanceof IOException)
-                    throw (IOException) ex;
-                else if (ex instanceof RuntimeException)
-                    throw (RuntimeException) ex;
-                else if (ex instanceof Error)
-                    throw (Error) ex;
-                else
-                    throw new AssertionError(ex); // cannot happen!
+            } finally {
+                // An archive driver could throw a NoClassDefFoundError or
+                // similar if the class path is not set up correctly.
+                // We are checking success to make sure that we always delete
+                // the newly created temp file in case of an error.
+                if (inArchive == null)
+                    rof.close();
             }
             inArchive.setMetaData(new InputArchiveMetaData(this, inArchive));
         } catch (IOException ex) {
@@ -462,7 +443,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inArchive != null;
     }
 
-    public InputStream createInputStream(
+    InputStream createInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
@@ -477,7 +458,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         return in;
     }
 
-    public OutputStream createOutputStream(
+    OutputStream createOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -555,24 +536,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 outArchive = getDriver().createOutputArchive(this, out, inArchive);
-            } catch (Throwable ex) {
-                // ex could be a NoClassDefFoundError if target is an RAES
-                // encrypted archive file and Bouncycastle's Lightweight
-                // Crypto API is not in the classpath.
-                // We are just catching all kinds of Throwables to make sure
-                // that we delete the newly created temp file.
-                // Finally, we will pass on the catched exception.
-                out.close();
-                if (!outFile.delete())
-                    throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)", ex);
-                if (ex instanceof IOException)
-                    throw (IOException) ex;
-                else if (ex instanceof RuntimeException)
-                    throw (RuntimeException) ex;
-                else if (ex instanceof Error)
-                    throw (Error) ex;
-                else
-                    throw new AssertionError(ex); // cannot happen!
+            } finally {
+                // An archive driver could throw a NoClassDefFoundError or
+                // similar if the class path is not set up correctly.
+                // We are checking success to make sure that we always delete
+                // the newly created temp file in case of an error.
+                if (outArchive == null) {
+                    out.close();
+                    if (!outFile.delete())
+                        throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)");
+                }
             }
             outArchive.setMetaData(new OutputArchiveMetaData(this, outArchive));
         } catch (IOException ex) {
@@ -1002,6 +975,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         final InputStream in = new java.io.FileInputStream(outFile);
         try {
             ArchiveControllers.cp(true, outFile, in, controller, entryName);
+        } catch (FalsePositiveException cannotHappen) {
+            throw new AssertionError(cannotHappen);
         } finally {
             in.close();
         }
