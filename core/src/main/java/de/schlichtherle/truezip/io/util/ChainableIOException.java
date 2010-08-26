@@ -331,6 +331,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     public void printStackTrace(final PrintStream s, int maxExceptions) {
         maxExceptions--;
 
+        final ChainableIOException predecessor = getPredecessor();
         if (predecessor != null) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
@@ -344,6 +345,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     private int getNumExceptions() {
+        final ChainableIOException predecessor = getPredecessor();
         return predecessor != null ? predecessor.getNumExceptions() + 1 : 1;
     }
 
@@ -383,6 +385,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     public void printStackTrace(final PrintWriter s, int maxExceptions) {
         maxExceptions--;
 
+        final ChainableIOException predecessor = getPredecessor();
         if (predecessor != null) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
