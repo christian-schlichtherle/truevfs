@@ -94,7 +94,7 @@ public interface ArchiveDriver {
      *        {@link ReadOnlyFileInputStream}.
      * @return A new input archive instance.
      * @throws TransientIOException If calling this method for the same
-     *         archive file again could finally succeed.
+     *         archive file again could possibly succeed.
      *         This exception is associated with another {@link IOException}
      *         as its cause which is unwrapped and interpreted as below.
      * @throws FileNotFoundException If the input archive is inaccessible
@@ -158,7 +158,7 @@ public interface ArchiveDriver {
      *        file.
      * @return A new output archive instance.
      * @throws TransientIOException If calling this method for the same
-     *         archive file again could finally succeed.
+     *         archive file again could possibly succeed.
      *         This exception is associated with another {@code IOException}
      *         as its cause which is unwrapped and interpreted as below.
      * @throws FileNotFoundException If the output archive is inaccessible
