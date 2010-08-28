@@ -24,11 +24,11 @@ import java.util.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class JointEnumeration implements Enumeration {
-    private Enumeration e1;
-    private final Enumeration e2;
+public final class JointEnumeration<E> implements Enumeration<E> {
+    private Enumeration<E> e1;
+    private final Enumeration<E> e2;
 
-    public JointEnumeration(final Enumeration e1, final Enumeration e2) {
+    public JointEnumeration(final Enumeration<E> e1, final Enumeration<E> e2) {
         this.e1 = e1;
         this.e2 = e2;
     }
@@ -38,7 +38,7 @@ public final class JointEnumeration implements Enumeration {
            || (e1 != e2 && (e1 = e2).hasMoreElements());
     }
 
-    public Object nextElement() {
+    public E nextElement() {
         try {
             return e1.nextElement();
         } catch (NoSuchElementException ex) {
