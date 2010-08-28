@@ -141,9 +141,9 @@ public final class ArchiveFileSystem {
         root.setTime(rootTime); // do NOT yet touch the file system!
         master.put(ROOT, root);
 
-        Enumeration entries = archive.getArchiveEntries();
+        Enumeration<? extends ArchiveEntry> entries = archive.getArchiveEntries();
         while (entries.hasMoreElements()) {
-            final ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
+            final ArchiveEntry entry = entries.nextElement();
             final String entryName = entry.getName();
             // Map entry if it doesn't address the virtual root directory.
             if (!ROOT.equals(entryName)
@@ -158,7 +158,7 @@ public final class ArchiveFileSystem {
         //entries = Collections.enumeration(master.values()); // concurrent modification!
         entries = archive.getArchiveEntries();
         while (entries.hasMoreElements()) {
-            final ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
+            final ArchiveEntry entry = entries.nextElement();
             if (isLegalEntryName(entry.getName()))
                 fixParents(entry);
         }

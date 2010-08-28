@@ -97,11 +97,11 @@ public class ZipOutputArchive
         return size() + (tempEntry != null ? 1 : 0);
     }
 
-    public Enumeration getArchiveEntries() {
+    public Enumeration<? extends ZipEntry> getArchiveEntries() {
         if (tempEntry == null)
-            return super.entries();
-        return new JointEnumeration(
-                super.entries(),
+            return (Enumeration<? extends ZipEntry>) super.entries();
+        return new JointEnumeration<ZipEntry>(
+                (Enumeration<? extends ZipEntry>) super.entries(),
                 Collections.enumeration(
                     Collections.singletonList(tempEntry)));
     }
