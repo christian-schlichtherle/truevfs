@@ -20,7 +20,11 @@ package de.schlichtherle.truezip.util;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Arrays {
+public final class Arrays {
+
+    /** You cannot instantiate this class. */
+    private Arrays() {
+    }
 
     /**
      * Compares {@code max} bytes at the specified offsets of the given
@@ -63,8 +67,5 @@ public class Arrays {
                 return false;
 
         return true;
-    }
-    
-    protected Arrays() {
     }
 }
