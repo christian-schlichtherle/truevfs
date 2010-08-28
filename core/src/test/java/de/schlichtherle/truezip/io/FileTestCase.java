@@ -346,18 +346,30 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(archive.delete());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     void testFalsePositive(File file) throws IOException {
         assert file.isArchive();
 
         // Note that file's parent directory may be a false positive directory!
 
         // Create false positive file.
+        {
+            OutputStream out = new FileOutputStream(file);
+            try {
+                out.write(data);
+            } finally {
+                out.close();
+            }
+        }
 
-        OutputStream os = new FileOutputStream(file);
-        try {
-            os.write(data);
-        } finally {
-            os.close();
+        // Overwrite.
+        {
+            OutputStream out = new FileOutputStream(file);
+            try {
+                out.write(data);
+            } finally {
+                out.close();
+            }
         }
 
         assertTrue(file.exists());
@@ -366,6 +378,16 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertEquals(data.length, file.length());
         assertTrue(file.lastModified() > 0);
 
+        // Read back portion
+        {
+            InputStream in = new FileInputStream(file);
+            try {
+                byte[] buf = new byte[data.length];
+                assertTrue(de.schlichtherle.truezip.util.Arrays.equals(data, 0, buf, 0, in.read(buf)));
+            } finally {
+                in.close();
+            }
+        }
         testDelete(file);
 
         // Create false positive directory.
@@ -376,6 +398,18 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertFalse(file.isFile());
         //assertEquals(0, file.length());
         assertTrue(file.lastModified() > 0);
+
+        try {
+            new FileInputStream(archive);
+            fail("Expected FileNotFoundException");
+        } catch (FileNotFoundException expected) {
+        }
+
+        try {
+            new FileOutputStream(archive);
+            fail("Expected FileNotFoundException");
+        } catch (FileNotFoundException expected) {
+        }
 
         testDelete(file);
 
@@ -388,6 +422,18 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertFalse(file.isFile());
         //assertEquals(0, file.length());
         assertTrue(file.lastModified() > 0);
+
+        try {
+            new FileInputStream(archive);
+            fail("Expected FileNotFoundException");
+        } catch (FileNotFoundException expected) {
+        }
+
+        try {
+            new FileOutputStream(archive);
+            fail("Expected FileNotFoundException");
+        } catch (FileNotFoundException expected) {
+        }
 
         testDelete(file);
     }
