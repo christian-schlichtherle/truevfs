@@ -25,10 +25,12 @@ import java.util.*;
  * @version $Id$
  */
 public final class JointEnumeration<E> implements Enumeration<E> {
-    private Enumeration<E> e1;
-    private final Enumeration<E> e2;
+    private Enumeration<? extends E> e1;
+    private final Enumeration<? extends E> e2;
 
-    public JointEnumeration(final Enumeration<E> e1, final Enumeration<E> e2) {
+    public JointEnumeration(
+            final Enumeration<? extends E> e1,
+            final Enumeration<? extends E> e2) {
         this.e1 = e1;
         this.e2 = e2;
     }
