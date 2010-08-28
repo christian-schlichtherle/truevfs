@@ -114,18 +114,18 @@ public class FileInputStream extends FilterInputStream {
         super(new java.io.FileInputStream(fd));
     }
 
-    private static InputStream createInputStream(final java.io.File file)
+    private static InputStream createInputStream(final java.io.File src)
     throws FileNotFoundException {
         try {
-            if (file instanceof File) {
-                final File smartFile = (File) file;
-                smartFile.ensureNotVirtualRoot("cannot read");
-                final File archive = smartFile.getEnclArchive();
-                final String entryName = smartFile.getEnclEntryName();
-                assert (archive != null) == (entryName != null);
-                if (archive != null)
+            if (src instanceof File) {
+                final File file = (File) src;
+                final File archive = file.getInnerArchive();
+                if (archive != null) {
+                    final String entryName = file.getInnerEntryName();
+                    assert entryName != null;
                     return archive.getArchiveController()
                             .createInputStream(entryName);
+                }
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -141,7 +141,7 @@ public class FileInputStream extends FilterInputStream {
             fnfe.initCause(ioe);
             throw fnfe;
         }
-        return new java.io.FileInputStream(file);
+        return new java.io.FileInputStream(src);
     }
 
     @Override

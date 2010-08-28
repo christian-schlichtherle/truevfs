@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
@@ -146,19 +147,19 @@ public class FileOutputStream extends FilterOutputStream {
     }
 
     private static OutputStream createOutputStream(
-            final java.io.File file,
+            final java.io.File dst,
             final boolean append)
     throws FileNotFoundException {
         try {
-            if (file instanceof File) {
-                final File smartFile = (File) file;
-                smartFile.ensureNotVirtualRoot("cannot write");
-                final File archive = smartFile.getEnclArchive();
-                final String entryName = smartFile.getEnclEntryName();
-                assert (archive != null) == (entryName != null);
-                if (archive != null)
+            if (dst instanceof File) {
+                final File dstFile = (File) dst;
+                final File archive = dstFile.getInnerArchive();
+                if (archive != null) {
+                    final String entryName = dstFile.getInnerEntryName();
+                    assert entryName != null;
                     return archive.getArchiveController()
                             .createOutputStream(entryName, append);
+                }
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -174,7 +175,7 @@ public class FileOutputStream extends FilterOutputStream {
             fnfe.initCause(ioe);
             throw fnfe;
         }
-        return new java.io.FileOutputStream(file, append);
+        return new java.io.FileOutputStream(dst, append);
     }
 
     @Override

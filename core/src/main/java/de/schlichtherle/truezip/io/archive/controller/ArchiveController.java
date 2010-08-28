@@ -204,7 +204,7 @@ public abstract class ArchiveController implements Archive {
         for (int c = lockCount; c > 0; c--)
             readLock().unlock();
 
-        // The current thread may get deactivated here!
+        // The current thread may get blocked here!
         writeLock().lock();
         try {
             try {
@@ -502,28 +502,29 @@ public abstract class ArchiveController implements Archive {
         try {
             if (isRoot(entryName)) {
                 try {
-                    final boolean directory = isDirectory0(entryName); // detect false positives
+                    final boolean directory = isDirectory0(entryName); // detects false positives
                     assert directory : "The root entry must be a directory!";
-                } catch (FalsePositiveException ex) {
-                    if (!(ex.getCause() instanceof FileNotFoundException))
-                        throw ex;
+                } catch (EnclosedArchiveFileNotFoundException ex) {
+                    return enclController.createInputStream0(enclEntryName(entryName));
+                } catch (ArchiveFileNotFoundException ex) {
+                    throw new FalsePositiveException(this, ex);
                 }
                 throw new ArchiveEntryNotFoundException(this, entryName,
-                        "cannot read (potential) virtual root directory");
+                        "cannot read from (virtual root) directories");
             } else {
                 if (hasNewData(entryName)) {
-                    runWriteLocked(new Action<IOException>() {
+                    class AutoUmount4CreateInputStream
+                    implements Action<IOException> {
                         public void run() throws IOException {
                             autoUmount(entryName);
                         }
-                    });
+                    }
+                    runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-
-                final ArchiveEntry entry = autoMount(false).get(entryName); // lookup file entries only!
+                final ArchiveEntry entry = autoMount(false).get(entryName); // looks up file entries only!
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, entryName,
                             "no such file entry");
-
                 return createInputStream(entry, null);
             }
         } finally {
@@ -575,44 +576,38 @@ public abstract class ArchiveController implements Archive {
 
         final InputStream in;
         final OutputStream out;
-
         writeLock().lock();
         try {
             if (isRoot(entryName)) {
                 try {
-                    final boolean directory = isDirectory0(entryName); // detect false positives
+                    final boolean directory = isDirectory0(entryName); // detects false positives
                     assert directory : "The root entry must be a directory!";
-                } catch (FalsePositiveException ex) {
-                    if (!(ex.getCause() instanceof FileNotFoundException))
-                        throw ex;
+                } catch (EnclosedArchiveFileNotFoundException ex) {
+                    return enclController.createOutputStream0(enclEntryName(entryName), append);
+                } catch (ArchiveFileNotFoundException ex) {
+                    throw new FalsePositiveException(this, ex);
                 }
                 throw new ArchiveEntryNotFoundException(this, entryName,
-                        "cannot write (potential) virtual root directory");
+                        "cannot write to (virtual root) directories");
             } else {
                 autoUmount(entryName);
-
                 final boolean lenient = ArchiveControllers.isLenient();
                 final ArchiveFileSystem fileSystem = autoMount(lenient);
-
                 in = append && fileSystem.isFile(entryName)
                         ? createInputStream0(entryName)
                         : null;
-
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already exists as a
                 // directory.
                 final Delta delta = fileSystem.link(entryName, lenient);
-
                 // Create output stream.
                 out = createOutputStream(delta.getEntry(), null);
-
                 // Now link the entry into the file system.
                 delta.commit();
             }
         } finally {
             writeLock().unlock();
         }
-
         if (in != null) {
             try {
                 Streams.cat(in, out);
