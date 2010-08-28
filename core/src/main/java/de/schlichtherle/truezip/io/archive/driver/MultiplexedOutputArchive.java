@@ -61,10 +61,9 @@ public class MultiplexedOutputArchive implements OutputArchive {
     /**
      * The map of temporary archive entries which have not yet been written
      * to the target output archive.
-     * Maps from entry names [{@link String}] to temporary entry output
-     * streams [{@link TempEntryOutputStream}].
      */
-    private final Map temps = new LinkedHashMap();
+    private final Map<String, TempEntryOutputStream> temps
+            = new LinkedHashMap<String, TempEntryOutputStream>();
 
     /** @see #isTargetBusy */
     private boolean targetBusy;
@@ -86,20 +85,21 @@ public class MultiplexedOutputArchive implements OutputArchive {
         return target.getNumArchiveEntries() + temps.size();
     }
 
-    public Enumeration getArchiveEntries() {
+    public Enumeration<ArchiveEntry> getArchiveEntries() {
         return new JointEnumeration(target.getArchiveEntries(),
                                     new TempEntriesEnumeration());
     }
 
-    private class TempEntriesEnumeration implements Enumeration {
-        private final Iterator i = temps.values().iterator();
+    private class TempEntriesEnumeration implements Enumeration<ArchiveEntry> {
+        private final Iterator<TempEntryOutputStream> i
+                = temps.values().iterator();
 
         public boolean hasMoreElements() {
             return i.hasNext();
         }
 
-        public Object nextElement() {
-            return ((TempEntryOutputStream) i.next()).entry;
+        public ArchiveEntry nextElement() {
+            return i.next().entry;
         }
     }
 
@@ -107,8 +107,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
         ArchiveEntry entry = target.getArchiveEntry(entryName);
         if (entry != null)
             return entry;
-        final TempEntryOutputStream tempOut
-                = (TempEntryOutputStream) temps.get(entryName);
+        final TempEntryOutputStream tempOut = temps.get(entryName);
         return tempOut != null ? tempOut.entry : null;
     }
 
