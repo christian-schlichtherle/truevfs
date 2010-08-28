@@ -71,7 +71,7 @@ final class UShort {
         if (MIN_VALUE <= i && i <= MAX_VALUE)
             return;
 
-        final StringBuffer message = new StringBuffer();
+        final StringBuilder message = new StringBuilder();
         if (subject != null) {
             message.append(subject);
             message.append(": ");

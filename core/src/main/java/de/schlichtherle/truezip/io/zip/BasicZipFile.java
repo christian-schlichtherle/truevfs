@@ -39,9 +39,8 @@ import java.util.zip.ZipException;
  * Provides unsafe access to a ZIP file using unsynchronized methods and shared
  * {@link ZipEntry} instances.
  * <p>
- * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * This class is used within other parts of the TrueZIP API in order to benefit
- * from the slightly better performance.
+ * <b>Warning:</b> This class is <em>not</em> intended for public use
+ * - its API may change at will without prior notification!
  * <p>
  * Where the constructors of this class accept a {@code charset}
  * parameter, this is used to decode comments and entry names in the ZIP file.
@@ -87,7 +86,8 @@ public class BasicZipFile implements Closeable {
     private String comment;
 
     /** Maps entry names to zip entries. */
-    private final Map<String, ZipEntry> entries = new LinkedHashMap<String, ZipEntry>();
+    private final Map<String, ZipEntry> entries
+            = new LinkedHashMap<String, ZipEntry>();
 
     /** The actual data source. */
     private ReadOnlyFile archive;
@@ -753,7 +753,7 @@ public class BasicZipFile implements Closeable {
         if (name == null)
             throw new NullPointerException();
 
-        final ZipEntry entry = (ZipEntry) entries.get(name);
+        final ZipEntry entry = entries.get(name);
         if (entry == null)
             return null;
 

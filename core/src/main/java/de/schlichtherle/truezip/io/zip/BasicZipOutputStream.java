@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
@@ -36,9 +35,8 @@ import java.util.zip.ZipException;
  * Provides unsafe access to a ZIP file using unsynchronized methods and shared
  * {@link ZipEntry} instances.
  * <p>
- * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * This class is used within other parts of the TrueZIP API in order to benefit
- * from the slightly better performance.
+ * <b>Warning:</b> This class is <em>not</em> intended for public use
+ * - its API may change at will without prior notification!
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -80,7 +78,8 @@ public class BasicZipOutputStream
      * The list of ZIP entries started to be written so far.
      * Maps entry names to zip entries.
      */
-    private final Map entries = new LinkedHashMap();
+    private final Map<String, ZipEntry> entries
+            = new LinkedHashMap<String, ZipEntry>();
 
     /** Start of entry data. */
     private long dataStart;
@@ -168,7 +167,7 @@ public class BasicZipOutputStream
      * It is illegal to put more entries into this ZIP output stream
      * concurrently or modify the state of the enumerated entries.
      */
-    public Enumeration entries() {
+    public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 
@@ -181,7 +180,7 @@ public class BasicZipOutputStream
      * @param name Name of the ZIP entry.
      */
     public ZipEntry getEntry(String name) {
-        return (ZipEntry) entries.get(name);
+        return entries.get(name);
     }
 
     /**
@@ -341,8 +340,7 @@ public class BasicZipOutputStream
 
         // Store entry now so that an immediate subsequent call to getEntry(...)
         // returns it.
-        final ZipEntry old = (ZipEntry) entries.put(name, entry);
-        assert old == null;
+        entries.put(name, entry);
     }
 
     private static void checkLocalFileHeaderData(final ZipEntry entry)
@@ -608,8 +606,8 @@ public class BasicZipOutputStream
         closeEntry();
         final LEDataOutputStream dos = (LEDataOutputStream) out;
         cdOffset = dos.size();
-        for (final Iterator i = entries.values().iterator(); i.hasNext(); )
-            writeCentralFileHeader((ZipEntry) i.next());
+        for (ZipEntry entry : entries.values())
+            writeCentralFileHeader(entry);
         writeEndOfCentralDirectory();
     }
 
