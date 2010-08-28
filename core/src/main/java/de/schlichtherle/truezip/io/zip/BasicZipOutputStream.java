@@ -41,7 +41,7 @@ import java.util.zip.ZipException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BasicZipOutputStream
+public abstract class BasicZipOutputStream
         extends FilterOutputStream
         implements Closeable, Flushable {
 
@@ -107,7 +107,7 @@ public class BasicZipOutputStream
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
-    public BasicZipOutputStream(final OutputStream out)
+    protected BasicZipOutputStream(final OutputStream out)
     throws NullPointerException {
         super(toLEDataOutputStream(out));
 
@@ -126,7 +126,7 @@ public class BasicZipOutputStream
      * @throws UnsupportedEncodingException If {@code charset} is not supported
      *         by this JVM.
      */
-    public BasicZipOutputStream(
+    protected BasicZipOutputStream(
             final OutputStream out,
             final String charset)
     throws  NullPointerException,

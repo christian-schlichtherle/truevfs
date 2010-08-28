@@ -55,7 +55,7 @@ import java.util.zip.ZipException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BasicZipFile implements Closeable {
+public abstract class BasicZipFile implements Closeable {
 
     private static final long LONG_MSB = 0x8000000000000000L;
 
