@@ -226,13 +226,14 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                 if (src instanceof File) {
                     final File srcFile = (File) src;
                     srcFile.ensureNotVirtualRoot("cannot read");
-                    final String srcEntryName = srcFile.getEnclEntryName();
-                    if (srcEntryName != null) {
+                    final File srcArchive = srcFile.getEnclArchive();
+                    if (srcArchive != null) {
+                        final String srcEntryName = srcFile.getEnclEntryName();
+                        assert srcEntryName != null;
                         cp0(    preserve,
-                                srcFile.getEnclArchive().getArchiveController(),
+                                srcArchive.getArchiveController(),
                                 srcEntryName,
                                 dst);
-                        return;
                     }
                 }
             } catch (FalsePositiveException isNotArchive) {
@@ -290,12 +291,16 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             if (dst instanceof File) {
                 final File dstFile = (File) dst;
                 dstFile.ensureNotVirtualRoot("cannot write");
-                final String dstEntryName = dstFile.getEnclEntryName();
-                if (dstEntryName != null) {
-                    ArchiveControllers.cp(preserve, src, in,
-                            dstFile.getEnclArchive().getArchiveController(),
+                final File dstArchive = dstFile.getEnclArchive();
+                if (dstArchive != null) {
+                    final String dstEntryName = dstFile.getEnclEntryName();
+                    assert dstEntryName != null;
+                    ArchiveControllers.cp(
+                            preserve,
+                            src,
+                            in,
+                            dstArchive.getArchiveController(),
                             dstEntryName);
-                    return;
                 }
             }
         } catch (FalsePositiveException isNotArchive) {
@@ -350,10 +355,15 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                 if (dst instanceof File) {
                     final File dstFile = (File) dst;
                     dstFile.ensureNotVirtualRoot("cannot write");
-                    final String dstEntryName = dstFile.getEnclEntryName();
-                    if (dstEntryName != null) {
-                        ArchiveControllers.cp(preserve, srcController, srcEntryName,
-                                dstFile.getEnclArchive().getArchiveController(),
+                    final File dstArchive = dstFile.getEnclArchive();
+                    if (dstArchive != null) {
+                        final String dstEntryName = dstFile.getEnclEntryName();
+                        assert dstEntryName != null;
+                        ArchiveControllers.cp(
+                                preserve,
+                                srcController,
+                                srcEntryName,
+                                dstArchive.getArchiveController(),
                                 dstEntryName);
                         return;
                     }

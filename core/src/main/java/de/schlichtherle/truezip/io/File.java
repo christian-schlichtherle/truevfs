@@ -2228,7 +2228,7 @@ public class File extends java.io.File {
             if (prefix != null)
                 msg = prefix + " " + msg;
             throw new ArchiveFileNotFoundException(getArchiveController(), msg);
-        }
+    }
     }
 
     //
