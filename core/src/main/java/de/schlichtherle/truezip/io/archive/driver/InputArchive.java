@@ -42,7 +42,7 @@ public interface InputArchive {
      * Returns an enumeration of the {@link ArchiveEntry} instances in this
      * archive.
      */
-    Enumeration getArchiveEntries();
+    Enumeration<ArchiveEntry> getArchiveEntries();
 
     /**
      * Returns the {@link ArchiveEntry} for the given entry name or
