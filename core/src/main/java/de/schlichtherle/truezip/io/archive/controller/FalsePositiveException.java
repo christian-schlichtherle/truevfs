@@ -47,7 +47,7 @@ extends Exception {
         canonicalPath = archive.getCanonicalPath();
         // A transient I/O exception is just a wrapper exception to mark
         // the real transient cause, therefore we can safely throw it away.
-        // We must do this in order to allow the File class to inspect
+        // We must do this in order to allow an archive controller to inspect
         // the real transient cause and act accordingly.
         final boolean trans = cause instanceof TransientIOException;
         super.initCause(trans ? cause.getCause() : cause);

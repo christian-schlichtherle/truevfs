@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.ArchiveException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -178,7 +177,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             } else if (!autoCreate) {
                 // The archive file does not exist and we may not create it
                 // automatically.
-                throw new ArchiveFileNotFoundException(this, "may not create");
+                throw new ArchiveFileNotFoundException(this);
             } else {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
@@ -362,7 +361,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         } else if (!autoCreate) {
             // The entry does NOT exist in the enclosing archive
             // file and we may not create it automatically.
-            throw new ArchiveFileNotFoundException(this, "may not create");
+            throw new EnclosedArchiveFileNotFoundException(this);
         } else {
             assert autoCreate;
             assert controller.writeLock().isLockedByCurrentThread();
@@ -503,14 +502,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
         }
 
-        try {
-            initOutArchive(tmp);
-        } catch (TransientIOException ex) {
-            // Currently we do not have any use for this wrapper exception
-            // when creating output archives, so we unwrap the transient
-            // cause here.
-            throw ex.getCause();
-        }
+        initOutArchive(tmp);
         outFile = tmp; // init outFile on success only!
     }
 
@@ -535,7 +527,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // we want to log the byte count.
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
-                outArchive = getDriver().createOutputArchive(this, out, inArchive);
+                try {
+                    outArchive = getDriver().createOutputArchive(this, out, inArchive);
+                } catch (TransientIOException ex) {
+                    // Currently we do not have any use for this wrapper exception
+                    // when creating output archives, so we unwrap the transient
+                    // cause here.
+                    throw ex.getCause();
+                }
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -707,7 +706,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     private void update(final ArchiveFileExceptionHandler handler)
@@ -856,9 +855,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // deleted from the master directory meanwhile and prepare
         // to throw a warn exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final Enumeration e = outArchive.getArchiveEntries();
+        final Enumeration<? extends ArchiveEntry> e = outArchive.getArchiveEntries();
         while (e.hasMoreElements()) {
-            final ArchiveEntry entry = (ArchiveEntry) e.nextElement();
+            final ArchiveEntry entry = e.nextElement();
             final String entryName = entry.getName();
             /*final String entryName
                     = Paths.normalize(entry.getName(), ENTRY_SEPARATOR_CHAR);*/
@@ -882,7 +881,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     private void reassemble(final ArchiveFileExceptionHandler handler)
@@ -991,7 +990,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * the virtual file system from the archive file again.
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     @Override
@@ -1039,7 +1038,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     private void shutdownStep1(final ArchiveFileExceptionHandler handler)
@@ -1067,7 +1066,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Discards the file system and closes the output and input archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveException If any exceptional condition occurs
+     * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     private void shutdownStep2(final ArchiveFileExceptionHandler handler)
