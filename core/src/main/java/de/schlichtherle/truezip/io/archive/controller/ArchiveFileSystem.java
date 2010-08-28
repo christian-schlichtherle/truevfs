@@ -64,7 +64,7 @@ public final class ArchiveFileSystem {
      * Note that the ArchiveEntries in this map are shared with the 
      * {@link InputArchive} object provided to this class' constructor.
      */
-    private Map master;
+    private Map<String, ArchiveEntry> master;
 
     /** The archive entry for the virtual root of this file system. */
     private final ArchiveEntry root;
@@ -90,7 +90,7 @@ public final class ArchiveFileSystem {
     throws IOException {
         this.controller = controller;
         touched = 1;
-        master = new LinkedHashMap(64);
+        master = new LinkedHashMap<String, ArchiveEntry>(64);
 
         // Setup root.
         root = createArchiveEntry(ROOT);
@@ -134,7 +134,7 @@ public final class ArchiveFileSystem {
         this.controller = controller;
 
         final int iniCap = (int) (archive.getNumArchiveEntries() / 0.75f) + 1;
-        master = new LinkedHashMap(iniCap);
+        master = new LinkedHashMap<String, ArchiveEntry>(iniCap);
 
         // Setup root.
         root = createArchiveEntry(ROOT);
@@ -245,7 +245,7 @@ public final class ArchiveFileSystem {
         final String parentName = split[0];
         final String baseName = split[1];
 
-        ArchiveEntry parent = (ArchiveEntry) master.get(parentName);
+        ArchiveEntry parent = master.get(parentName);
         if (parent == null) {
             parent = createArchiveEntry(parentName);
             master.put(parentName, parent);
@@ -355,7 +355,7 @@ public final class ArchiveFileSystem {
      * Returns an enumeration of all {@code ArchiveEntry} instances
      * in this file system.
      */
-    Enumeration getArchiveEntries() {
+    Enumeration<ArchiveEntry> getArchiveEntries() {
         assert controller.getFileSystem() == this;
         return Collections.enumeration(master.values());
     }
@@ -387,7 +387,7 @@ public final class ArchiveFileSystem {
     public ArchiveEntry get(String entryName) {
         assert entryName != null;
         assert controller.getFileSystem() == this;
-        return (ArchiveEntry) master.get(entryName);
+        return master.get(entryName);
     }
 
     /**
@@ -504,11 +504,10 @@ public final class ArchiveFileSystem {
             final Element[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final ArchiveEntry parent = (ArchiveEntry) master.get(parentName);
+            final ArchiveEntry parent = master.get(parentName);
             final ArchiveEntry entry;
             if (parent != null) {
-                final ArchiveEntry oldEntry
-                        = (ArchiveEntry) master.get(entryName);
+                final ArchiveEntry oldEntry = master.get(entryName);
                 ensureMayBeReplaced(entryName, oldEntry);
                 elements = new Element[level + 1];
                 elements[0] = new Element(parentName, parent);
@@ -589,8 +588,8 @@ public final class ArchiveFileSystem {
 
             // This constructor is provided for convenience only.
             Element(String baseName, ArchiveEntry entry) {
-                this.baseName = baseName; // may be null!
                 assert entry != null;
+                this.baseName = baseName; // may be null!
                 this.entry = entry;
             }
         }
@@ -645,8 +644,8 @@ public final class ArchiveFileSystem {
             final String entryName,
             final ArchiveEntry blueprint)
     throws CharConversionException {
-        final ArchiveEntry entry
-                = controller.createArchiveEntry(entryName, blueprint);
+        final ArchiveEntry entry = controller.createArchiveEntry(
+                entryName, blueprint);
         entry.setMetaData(new ArchiveEntryMetaData(entry));
         return entry;
     }
@@ -684,7 +683,7 @@ public final class ArchiveFileSystem {
                     "virtual root directory cannot get unlinked");
 
         try {
-            final ArchiveEntry entry = (ArchiveEntry) master.remove(entryName);
+            final ArchiveEntry entry = master.remove(entryName);
             if (entry == null)
                 throw new ArchiveFileSystemException(entryName,
                         "entry does not exist");
@@ -697,7 +696,7 @@ public final class ArchiveFileSystem {
             }
             final String split[] = split(entryName);
             final String parentName = split[0];
-            final ArchiveEntry parent = (ArchiveEntry) master.get(parentName);
+            final ArchiveEntry parent = master.get(parentName);
             assert parent != null : "The parent directory of \"" + entryName
                         + "\" is missing - archive file system is corrupted!";
             final boolean ok = parent.getMetaData().children.remove(split[1]);
