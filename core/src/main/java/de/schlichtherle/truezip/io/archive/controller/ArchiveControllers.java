@@ -469,12 +469,14 @@ public final class ArchiveControllers {
                         dstController.autoUmount(dstEntryName);
 
                         // Get source archive entry.
-                        final ArchiveFileSystem srcFileSystem = srcController.autoMount(false);
+                        final ArchiveFileSystem srcFileSystem
+                                = srcController.autoMount(false);
                         srcEntry = srcFileSystem.get(srcEntryName);
 
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
-                        final ArchiveFileSystem dstFileSystem = dstController.autoMount(lenient);
+                        final ArchiveFileSystem dstFileSystem
+                                = dstController.autoMount(lenient);
                         delta = dstFileSystem.link(dstEntryName,
                                 lenient, preserve ? srcEntry : null);
                         dstEntry = delta.getEntry();
@@ -584,7 +586,8 @@ public final class ArchiveControllers {
                     final ArchiveEntry srcEntry = new RfsEntry(src);
 
                     // Get destination archive entry.
-                    final ArchiveFileSystem dstFileSystem = dstController.autoMount(lenient);
+                    final ArchiveFileSystem dstFileSystem
+                            = dstController.autoMount(lenient);
                     final Delta delta = dstFileSystem.link(dstEntryName,
                             lenient, preserve ? srcEntry : null);
                     final ArchiveEntry dstEntry = delta.getEntry();
