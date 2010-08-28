@@ -48,7 +48,7 @@ public interface OutputArchive {
      * This method may be called before the archive is closed and must also
      * reflect entries which have not yet been closed.
      */
-    Enumeration<ArchiveEntry> getArchiveEntries();
+    Enumeration<? extends ArchiveEntry> getArchiveEntries();
 
     /**
      * Returns the {@link ArchiveEntry} for the given entry name or

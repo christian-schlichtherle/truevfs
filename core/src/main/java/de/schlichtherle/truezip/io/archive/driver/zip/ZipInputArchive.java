@@ -60,8 +60,8 @@ public class ZipInputArchive
         return super.size();
     }
 
-    public Enumeration getArchiveEntries() {
-        return super.entries();
+    public Enumeration<? extends ZipEntry> getArchiveEntries() {
+        return (Enumeration<? extends ZipEntry>) super.entries();
     }
 
     public ArchiveEntry getArchiveEntry(final String entryName) {
