@@ -234,6 +234,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                                 srcArchive.getArchiveController(),
                                 srcEntryName,
                                 dst);
+                        return;
                     }
                 }
             } catch (FalsePositiveException isNotArchive) {
@@ -301,6 +302,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                             in,
                             dstArchive.getArchiveController(),
                             dstEntryName);
+                    return;
                 }
             }
         } catch (FalsePositiveException isNotArchive) {
