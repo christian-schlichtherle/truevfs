@@ -20,18 +20,22 @@ import de.schlichtherle.truezip.io.archive.Archive;
 import java.io.FileNotFoundException;
 
 /**
- * Indicates that an <i>archive file</i> (the controller's target file)
- * does not exist or is not accessible.
- * <p>
- * May be thrown by {@link ArchiveController#autoMount(boolean)} if automatic
- * creation of the target file is not allowed.
+ * Indicates that a prospective archive file does not exist
+ * and may not be automatically created when mounting its virtual file system.
+ *
+ * @author Christian Schlichtherle
+ * @version $Id$
  */
-public final class ArchiveFileNotFoundException
+public class ArchiveFileNotFoundException
 extends FileNotFoundException {
 
     private static final long serialVersionUID = 2654293654126325623L;
 
     private String canonicalPath;
+
+    public ArchiveFileNotFoundException(Archive archive) {
+        this(archive, null);
+    }
 
     public ArchiveFileNotFoundException(Archive archive, String msg) {
         //super(archive, msg);
