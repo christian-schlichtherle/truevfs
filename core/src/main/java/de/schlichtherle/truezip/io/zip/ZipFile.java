@@ -307,8 +307,8 @@ public class ZipFile extends BasicZipFile {
     /** Enumerates clones of all entries in this ZIP file. */
     @Override
     public synchronized Enumeration<? extends ZipEntry> entries() {
-        return new Enumeration<ZipEntry>() {
-            Enumeration<? extends ZipEntry> e = ZipFile.super.entries();
+        class CloneEnumeration implements Enumeration<ZipEntry> {
+            final Enumeration<? extends ZipEntry> e = ZipFile.super.entries();
 
             public boolean hasMoreElements() {
                 return e.hasMoreElements();
@@ -317,7 +317,8 @@ public class ZipFile extends BasicZipFile {
             public ZipEntry nextElement() {
                 return e.nextElement().clone();
             }
-        };
+        }
+        return new CloneEnumeration();
     }
 
     /**

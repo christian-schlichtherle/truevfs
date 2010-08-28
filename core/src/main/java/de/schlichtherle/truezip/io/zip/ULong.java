@@ -71,7 +71,7 @@ final class ULong {
         if (MIN_VALUE <= l)
             return;
 
-        final StringBuffer message = new StringBuffer();
+        final StringBuilder message = new StringBuilder();
         if (subject != null) {
             message.append(subject);
             message.append(": ");

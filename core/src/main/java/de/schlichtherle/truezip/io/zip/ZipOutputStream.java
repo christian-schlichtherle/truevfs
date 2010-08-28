@@ -91,19 +91,21 @@ public class ZipOutputStream extends BasicZipOutputStream {
      * enumerated ZIP entries.
      */
     @Override
-    public synchronized Enumeration entries() {
-	return new Enumeration() {
-	    Enumeration e = Collections.enumeration(Collections.list(
-                    ZipOutputStream.super.entries()));
+    public synchronized Enumeration<? extends ZipEntry> entries() {
+        class CloneEnumeration implements Enumeration<ZipEntry> {
+            final Enumeration<? extends ZipEntry> e
+                    = Collections.enumeration(Collections.list(
+                        ZipOutputStream.super.entries()));
 
-	    public boolean hasMoreElements() {
-		return e.hasMoreElements();
-	    }
+            public boolean hasMoreElements() {
+                return e.hasMoreElements();
+            }
 
-	    public Object nextElement() {
-		return ((ZipEntry) e.nextElement()).clone();
-	    }
-        };
+            public ZipEntry nextElement() {
+                return e.nextElement().clone();
+            }
+        }
+        return new CloneEnumeration();
     }
 
     /**

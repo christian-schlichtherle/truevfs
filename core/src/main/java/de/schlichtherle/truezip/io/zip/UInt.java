@@ -71,7 +71,7 @@ final class UInt {
         if (MIN_VALUE <= l && l <= MAX_VALUE)
             return;
 
-        final StringBuffer message = new StringBuffer();
+        final StringBuilder message = new StringBuilder();
         if (subject != null) {
             message.append(subject);
             message.append(": ");
