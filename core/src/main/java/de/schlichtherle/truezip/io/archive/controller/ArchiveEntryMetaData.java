@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,10 +44,11 @@ public class ArchiveEntryMetaData {
      * This thread local variable returns an {@link ArrayList} which is used
      * as a temporary buffer to implement filtered list methods.
      */
-    private static final ThreadLocal threadLocal = new ThreadLocal() {
+    private static final ThreadLocal<List<?>> threadLocal
+            = new ThreadLocal<List<?>>() {
         @Override
-        protected Object initialValue() {
-            return new ArrayList(64);
+        protected List<?> initialValue() {
+            return new ArrayList<Object>(64);
         }
     };
 
@@ -58,14 +58,14 @@ public class ArchiveEntryMetaData {
      * representing the children names.
      * Otherwise this field is initialized with {@code null}.
      */
-    final Set children;
+    final Set<String> children;
 
     /**
      * A package private constructor.
      * Used by the factory in this package only.
      */
     ArchiveEntryMetaData(final ArchiveEntry entry) {
-        this.children = entry.isDirectory() ? new LinkedHashSet() : null;
+        this.children = entry.isDirectory() ? new LinkedHashSet<String>() : null;
     }
 
     /**
@@ -77,10 +77,7 @@ public class ArchiveEntryMetaData {
      *         been created is not a directory.
      */
     String[] list() {
-        final String[] list = new String[children.size()];
-        children.toArray(list);
-
-        return list;
+        return children.toArray(new String[children.size()]);
     }
 
     /**
@@ -98,18 +95,13 @@ public class ArchiveEntryMetaData {
     String[] list(
             final FilenameFilter filenameFilter,
             final File dir) {
-        final List filteredList = (List) threadLocal.get();
+        final List<String> filteredList = (List<String>) threadLocal.get();
         assert filteredList.isEmpty();
         try {
-            for (final Iterator i = children.iterator(); i.hasNext(); ) {
-                final String child = (String) i.next();
+            for (final String child : children)
                 if (filenameFilter.accept(dir, child))
                     filteredList.add(child);
-            }
-            final String[] list = new String[filteredList.size()];
-            filteredList.toArray(list);
-
-            return list;
+            return filteredList.toArray(new String[filteredList.size()]);
         } finally {
             filteredList.clear(); // support garbage collection of zip controllers!
         }
@@ -132,19 +124,13 @@ public class ArchiveEntryMetaData {
             FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory) {
-        final List filteredList = (List) threadLocal.get();
+        final List<File> filteredList = (List<File>) threadLocal.get();
         assert filteredList.isEmpty();
         try {
-            for (final Iterator i = children.iterator(); i.hasNext(); ) {
-                final String child = (String) i.next();
-                if (filenameFilter == null
-                    || filenameFilter.accept(dir, child))
-                    filteredList.add(factory.createFile(dir, child));
-            }
-            final File[] list = new File[filteredList.size()];
-            filteredList.toArray(list);
-
-            return list;
+            for (final String child : children)
+                if (filenameFilter == null || filenameFilter.accept(dir, child))
+                    filteredList.add(factory.newFile(dir, child));
+            return filteredList.toArray(new File[filteredList.size()]);
         } finally {
             filteredList.clear(); // support garbage collection of zip controllers!
         }
@@ -167,19 +153,15 @@ public class ArchiveEntryMetaData {
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory) {
-        final List filteredList = (List) threadLocal.get();
+        final List<File> filteredList = (List<File>) threadLocal.get();
         assert filteredList.isEmpty();
         try {
-            for (final Iterator i = children.iterator(); i.hasNext(); ) {
-                final String child = (String) i.next();
-                final File file = factory.createFile(dir, child);
+            for (final String child : children) {
+                final File file = factory.newFile(dir, child);
                 if (fileFilter == null || fileFilter.accept(file))
                     filteredList.add(file);
             }
-            final File[] list = new File[filteredList.size()];
-            filteredList.toArray(list);
-
-            return list;
+            return filteredList.toArray(new File[filteredList.size()]);
         } finally {
             filteredList.clear(); // support garbage collection of zip controllers!
         }
