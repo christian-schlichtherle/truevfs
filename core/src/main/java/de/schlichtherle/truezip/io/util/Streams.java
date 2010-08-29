@@ -61,16 +61,14 @@ public final class Streams {
     public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
         try {
-            try {
-                Streams.cat(in, out);
-            } finally {
-                out.close();
-            }
+            Streams.cat(in, out);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
                 throw new InputException(ex);
+            } finally {
+                out.close();
             }
         }
     }
