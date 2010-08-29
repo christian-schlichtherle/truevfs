@@ -73,6 +73,8 @@ implements ExceptionBuilder<C, T> {
      * @see #post(Throwable)
      */
     public final T fail(C cause) {
+        if (cause == null)
+            throw new NullPointerException();
         assembly = update(assembly, cause);
         return post(checkout());
     }
@@ -83,6 +85,8 @@ implements ExceptionBuilder<C, T> {
      * @see #update(Throwable, Throwable)
      */
     public final void warn(C cause) {
+        if (cause == null)
+            throw new NullPointerException();
         assembly = update(assembly, cause);
     }
 
