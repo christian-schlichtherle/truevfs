@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class WindowUtils {
+final class Windows {
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";
 
     private static Reference<KeyboardFocusManager> lastFocusManager
@@ -49,11 +49,8 @@ final class WindowUtils {
         }
     };
 
-    /**
-     * You can't instantiate this class.
-     * It's a holder for static methods only.
-     */
-    private WindowUtils() {
+    /** You cannot instantiate this class. */
+    Windows() {
     }
 
     /** @see PromptingKeyManager#getParentWindow */
@@ -77,7 +74,7 @@ final class WindowUtils {
      * If no window received the focus yet or is already made eligible for
      * finalization, {@code null} is returned instead.
      * Note that this is <em>not</em> the same as
-     * {@code WindowUtils.getCurrentKeyboardFocusManager().getFocusedWindow()}:
+     * {@code Windows.getCurrentKeyboardFocusManager().getFocusedWindow()}:
      * The latter may return {@code null} if no window in this JVM has
      * the focus, while this method will return the last window in this JVM
      * which had the focus (unless this is also the first call to this method).

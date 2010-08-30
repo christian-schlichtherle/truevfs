@@ -90,7 +90,7 @@ public class PromptingKeyManager
      * root frame is used.
      */
     public static Window getParentWindow() {
-        return WindowUtils.getParentWindow();
+        return Windows.getParentWindow();
     }
 
     //
