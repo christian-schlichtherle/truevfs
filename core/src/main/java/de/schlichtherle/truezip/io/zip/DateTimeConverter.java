@@ -55,7 +55,7 @@ public abstract class DateTimeConverter {
      * </ul>
      */
     public static final DateTimeConverter JAR = new DateTimeConverter() {
-        protected TimeZone createTimeZone() {
+        protected TimeZone newTimeZone() {
             return TimeZone.getDefault();
         }
 
@@ -78,7 +78,7 @@ public abstract class DateTimeConverter {
      * </ul>
      */
     public static final DateTimeConverter ZIP = new DateTimeConverter() {
-        protected TimeZone createTimeZone() {
+        protected TimeZone newTimeZone() {
             TimeZone tz = TimeZone.getDefault();
             tz = new SimpleTimeZone(
                     tz.getRawOffset() + tz.getDSTSavings(),
@@ -101,7 +101,7 @@ public abstract class DateTimeConverter {
      * <p>
      * This method uses a {@link Calendar} for the date/time conversion
      * which has its timezone set to the return value of
-     * {@link #createTimeZone()}.
+     * {@link #newTimeZone()}.
      *
      * @param jTime The number of milliseconds since midnight, January 1st,
      *        1970 AD UTC (called <i>the epoch</i> alias Java time).
@@ -111,7 +111,7 @@ public abstract class DateTimeConverter {
      * @throws RuntimeException If {@code jTime} is negative
      *         or later than 2107 AD.
      * @see #toJavaTime(long)
-     * @see #createTimeZone()
+     * @see #newTimeZone()
      */
     final long toDosTime(final long jTime) {
         if (jTime < 0)
@@ -144,7 +144,7 @@ public abstract class DateTimeConverter {
      * <p>
      * This method uses a {@link Calendar} for the date/time conversion
      * which has its timezone set to the return value of
-     * {@link #createTimeZone()}.
+     * {@link #newTimeZone()}.
      * <p>
      * If assertions are <em>enabled</em>,
      * {@link Calendar#setLenient(boolean) Calendard.setLenient(false)}
@@ -174,7 +174,7 @@ public abstract class DateTimeConverter {
      *         or holds an illegal DOS date/time field combination
      *         and assertions are enabled.
      * @see #toDosTime(long)
-     * @see #createTimeZone()
+     * @see #newTimeZone()
      */
     final long toJavaTime(final long dTime) {
         if (dTime < MIN_DOS_TIME)
@@ -213,7 +213,7 @@ public abstract class DateTimeConverter {
     /**
      * Returns a <em>thread local</em> {@link Calendar} instance for the
      * date/time conversion which has its timezone set to the return value
-     * of {@link #createTimeZone()}.
+     * of {@link #newTimeZone()}.
      *
      * @return A {@link Calendar} instance.
      */
@@ -225,7 +225,7 @@ public abstract class DateTimeConverter {
     private final ThreadLocal calendar = new ThreadLocal() {
         @Override
         protected Object initialValue() {
-            final Calendar cal = new GregorianCalendar(createTimeZone());
+            final Calendar cal = new GregorianCalendar(newTimeZone());
             boolean ea = false;
             assert ea = true; // NOT ea == true !
             cal.setLenient(!ea);
@@ -240,7 +240,7 @@ public abstract class DateTimeConverter {
      *
      * @return A new timezone for date/time conversion - never {@code null}.
      */
-    protected abstract TimeZone createTimeZone();
+    protected abstract TimeZone newTimeZone();
 
     /**
      * Returns whether a Java time should be rounded up or down to the next
