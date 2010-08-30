@@ -321,7 +321,7 @@ public abstract class BasicZipFile implements Closeable {
             }
 
             // Map the entry using the name that has been determined
-            // by createZipEntry().
+            // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
             // in the ZIP file!
             entries.put(entry.getName(), entry);

@@ -492,9 +492,9 @@ public abstract class BasicZipOutputStream
                 final long expectedCrc = crc.getValue();
                 if (expectedCrc != entry.getCrc()) {
                     throw new ZipException(entry.getName()
-                    + ": bad CRC-32: "
+                    + ": bad CRC-32: 0x"
                     + Long.toHexString(entry.getCrc())
-                    + " expected: "
+                    + " expected: 0x"
                     + Long.toHexString(expectedCrc));
                 }
                 final long written = ((LEDataOutputStream) out).size();
