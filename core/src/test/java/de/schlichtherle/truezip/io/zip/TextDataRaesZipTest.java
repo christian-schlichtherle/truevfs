@@ -37,7 +37,7 @@ public class TextDataRaesZipTest extends RaesZipTestCase {
         logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         final String text = "This is a truly compressible text!\n";
-        final int count = 1024 * 1024 / text.length();
+        final int count = 1024 / text.length();
         final int length = count * text.length(); // rounded down
         StringBuilder buf = new StringBuilder(length);
         for (int i = 0; i < count; i++) {

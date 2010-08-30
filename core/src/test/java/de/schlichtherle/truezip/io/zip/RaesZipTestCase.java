@@ -87,7 +87,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipOutputStream createZipOutputStream(final OutputStream out)
+    protected ZipOutputStream newZipOutputStream(final OutputStream out)
     throws IOException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
                 out, raesParameters);
@@ -100,7 +100,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipOutputStream createZipOutputStream(
+    protected ZipOutputStream newZipOutputStream(
             final OutputStream out, final String encoding)
     throws IOException, UnsupportedEncodingException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
@@ -117,7 +117,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipFile createZipFile(final String name)
+    protected ZipFile newZipFile(final String name)
     throws IOException {
         final RaesReadOnlyFile rof
                 = RaesReadOnlyFile.getInstance(new File(name), raesParameters);
@@ -136,7 +136,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             final String name, final String charset)
     throws IOException, UnsupportedEncodingException {
         if (charset == null)
@@ -158,7 +158,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipFile createZipFile(final File file)
+    protected ZipFile newZipFile(final File file)
     throws IOException {
         final RaesReadOnlyFile rof
                 = RaesReadOnlyFile.getInstance(file, raesParameters);
@@ -177,7 +177,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             final File file, final String charset)
     throws IOException, UnsupportedEncodingException {
         if (charset == null)
@@ -199,7 +199,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipFile createZipFile(final ReadOnlyFile file)
+    protected ZipFile newZipFile(final ReadOnlyFile file)
     throws IOException {
         final RaesReadOnlyFile rof
                 = RaesReadOnlyFile.getInstance(file, raesParameters);
@@ -218,7 +218,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             final ReadOnlyFile file, final String charset)
     throws IOException {
         if (charset == null)

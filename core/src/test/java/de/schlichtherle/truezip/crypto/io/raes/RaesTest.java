@@ -45,7 +45,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
         Type0RaesParameters.KEY_STRENGTH_256
     };
 
-    private static RaesParameters createRaesParameters() {
+    private static RaesParameters newRaesParameters() {
         return new Type0RaesParameters() {
             boolean secondTry;
 
@@ -94,7 +94,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
         try {
             final RaesOutputStream out = RaesOutputStream.getInstance(
                     new FileOutputStream(cipherFile),
-                    createRaesParameters());
+                    newRaesParameters());
             try {
                 // Use Las Vegas algorithm to encrypt the data.
                 int n;
@@ -119,7 +119,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
                     "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
                     new Object[]{ data.length, out.getKeySizeBits() });
             // Open cipherFile for random access decryption.
-            trof = RaesReadOnlyFile.getInstance(cipherFile, createRaesParameters());
+            trof = RaesReadOnlyFile.getInstance(cipherFile, newRaesParameters());
         } catch (IOException ex) {
             if (!cipherFile.delete())
                 cipherFile.deleteOnExit();

@@ -30,7 +30,7 @@ public class RandomDataZipTest extends ZipTestCase {
             = Logger.getLogger(RandomDataZipTest.class.getName());
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    private static final byte[] data = new byte[1024 * 1024];
+    private static final byte[] data = new byte[1024];
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !

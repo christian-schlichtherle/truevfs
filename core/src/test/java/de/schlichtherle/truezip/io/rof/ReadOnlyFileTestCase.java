@@ -73,7 +73,7 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     @Override
     protected void setUp()
     throws IOException {
-        data = new byte[1024 * 1024];
+        data = new byte[1024];
         rnd.nextBytes(data);
         file = File.createTempFile("tmp", null);
         try {

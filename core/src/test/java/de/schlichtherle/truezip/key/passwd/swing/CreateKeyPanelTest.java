@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.util.Arrays;
 import javax.swing.JComponent;
@@ -61,18 +62,32 @@ public class CreateKeyPanelTest extends TestCase {
         errorLabel = findErrorLabel(frame);
     }
 
+    private JFrameOperator showInstanceInFrame() {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                final JFrame frame = new JFrame();
+                frame.getContentPane().add(instance);
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        });
+        return new JFrameOperator();
+    }
+
+    private JLabelOperator findErrorLabel(final JFrameOperator frame) {
+        final String error = "error";
+        instance.setError(error);
+        final JLabelOperator errorLabel = new JLabelOperator(frame, error);
+        ((JFrame) frame.getSource()).pack();
+        instance.setError(null);
+        return errorLabel;
+    }
+
     @Override
     protected void tearDown() throws Exception {
         frame.setVisible(false);
-    }
-
-    private JFrameOperator showInstanceInFrame() {
-        final JFrame frame = new JFrame();
-        frame.getContentPane().add(instance);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        return new JFrameOperator();
+        //frame.dispose();
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -99,15 +114,6 @@ public class CreateKeyPanelTest extends TestCase {
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
         new JFileChooserOperator().chooseFile("file");
         assertTrue(isBlank(errorLabel.getText()));
-    }
-
-    private JLabelOperator findErrorLabel(final JFrameOperator frame) {
-        final String error = "error";
-        instance.setError(error);
-        final JLabelOperator errorLabel = new JLabelOperator(frame, error);
-        ((JFrame) frame.getSource()).pack();
-        instance.setError(null);
-        return errorLabel;
     }
 
     private static boolean isBlank(String s) {

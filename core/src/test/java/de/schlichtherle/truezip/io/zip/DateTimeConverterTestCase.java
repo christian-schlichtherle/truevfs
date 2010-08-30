@@ -45,7 +45,7 @@ public abstract class DateTimeConverterTestCase extends TestCase {
     throws Exception {
         super.setUp();
         instance = getInstance();
-        cal = new GregorianCalendar(instance.createTimeZone());
+        cal = new GregorianCalendar(instance.newTimeZone());
         cal.set(Calendar.MILLISECOND, 0);
     }
 
@@ -123,12 +123,12 @@ public abstract class DateTimeConverterTestCase extends TestCase {
     }
 
     /**
-     * Test of createTimeZone method, of class DateTimeConverter.
+     * Test of newTimeZone method, of class DateTimeConverter.
      */
     public void testCreateTimeZone() {
-        final TimeZone tz1 = instance.createTimeZone();
+        final TimeZone tz1 = instance.newTimeZone();
         assertNotNull(tz1);
-        final TimeZone tz2 = instance.createTimeZone();
+        final TimeZone tz2 = instance.newTimeZone();
         assertNotNull(tz1);
         assertNotSame(tz1, tz2);
         assertTrue(tz1.hasSameRules(tz2));

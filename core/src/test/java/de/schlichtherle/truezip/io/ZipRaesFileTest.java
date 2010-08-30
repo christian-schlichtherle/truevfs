@@ -38,7 +38,7 @@ public class ZipRaesFileTest extends FileTestCase {
     private static final java.io.File _tempDir = new java.io.File(System.getProperty("java.io.tmpdir"));
     private static final java.io.File _baseDir = _tempDir;
 
-    private String oldKeyManager;
+    private KeyManager oldKeyManager;
 
     /** Creates a new instance of {@code ZipRaesFileTest}. */
     public ZipRaesFileTest(String testName) {
@@ -49,21 +49,16 @@ public class ZipRaesFileTest extends FileTestCase {
     protected void setUp() throws Exception {
         suffix = ".tzp";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("tzp"));
-        oldKeyManager = System.setProperty("de.schlichtherle.truezip.key.KeyManager",
-                "de.schlichtherle.truezip.io.ZipRaesFileTest$CustomKeyManager");
+        oldKeyManager = KeyManager.getInstance();
+        KeyManager.setInstance(new CustomKeyManager());
         cancelling = false;
-
         super.setUp();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-
-        System.setProperty("de.schlichtherle.truezip.key.KeyManager",
-                oldKeyManager != null
-                    ? oldKeyManager
-                    : "de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager");
+        KeyManager.setInstance(oldKeyManager);
     }
 
     public void testCancelling()

@@ -54,7 +54,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
     private static final java.io.File _baseDir = tempDir;
 
     /** The data to get compressed. */
-    private static final byte[] _data = new byte[100 * 1024]; // enough to waste some heat on CPU cycles
+    private static final byte[] _data = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
@@ -148,7 +148,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         super.tearDown();
     }
 
-    private static File createNonArchiveFile(File file) {
+    private static File newNonArchiveFile(File file) {
         return ArchiveDetector.NULL.createFile(
                 file.getParentFile(), file.getName());
     }
@@ -341,7 +341,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         testFalsePositive(entry);
         assertTrue(archive.delete());
 
-        assertTrue(createNonArchiveFile(archive).mkdir());
+        assertTrue(newNonArchiveFile(archive).mkdir());
         testFalsePositive(entry);
         assertTrue(archive.delete());
     }
@@ -392,7 +392,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
 
         // Create false positive directory.
 
-        assertTrue(createNonArchiveFile(file).mkdir());
+        assertTrue(newNonArchiveFile(file).mkdir());
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
@@ -416,7 +416,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         // Create regular archive file.
 
         assertTrue(file.mkdir());
-        assertTrue(createNonArchiveFile(file).isFile());
+        assertTrue(newNonArchiveFile(file).isFile());
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
@@ -466,12 +466,12 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         }
         testCreateNewFile(archive, file1, file2);
     }
-    
+
     void createNewSmartFile()
     throws IOException {
         final java.io.File file1 = new File(archive, "test.txt");
         final java.io.File file2 = new File(file1, "test.txt");
-        
+
         File.setLenient(false);
         try {
             file1.createNewFile();
@@ -480,11 +480,11 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
             // This is exactly what we expect here!
         }
         testCreateNewFile(archive, file1, file2);
-        
+
         File.setLenient(true);
         testCreateNewFile(archive, file1, file2);
     }
-    
+
     void testCreateNewFile(
             final java.io.File dir,
             final java.io.File file1,
@@ -531,7 +531,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         };
         File file = archive;
         for (int i = 0; i <= names.length; i++) {
-            final File file2 = createNonArchiveFile(file);
+            final File file2 = newNonArchiveFile(file);
             assertTrue(file2.mkdir());
             testIllegalDirectoryOperations(file2);
             assertTrue(file2.delete());
@@ -679,7 +679,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
-        assertTrue(createNonArchiveFile(archive).delete());
+        assertTrue(newNonArchiveFile(archive).delete());
         // Closing the invalidated stream explicitly should be OK.
         fisA.close();
         
@@ -981,14 +981,14 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         final String[] names = {
             "0" + suffix,
             "1" + suffix,
-            "2" + suffix,
+            //"2" + suffix,
         };
 
         assertTrue(archive.mkdir());
         testCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
 
-        assertTrue(createNonArchiveFile(archive).mkdir());
+        assertTrue(newNonArchiveFile(archive).mkdir());
         testCopyDelete(archive, names, 0);
         assertTrue(archive.delete());
     }
@@ -1005,7 +1005,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         testCopyDelete(dir, names, off + 1); // continue recursion
         assertTrue(dir.delete());
 
-        assertTrue(createNonArchiveFile(dir).mkdir()); // create false positive archive file
+        assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
         testCopyDelete(parent, dir);
         testCopyDelete(dir, names, off + 1); // continue recursion
         assertTrue(dir.delete());
