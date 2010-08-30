@@ -92,45 +92,45 @@ public abstract class ZipTestCase extends TestCase {
         data = null;
     }
 
-    protected ZipOutputStream createZipOutputStream(OutputStream out)
+    protected ZipOutputStream newZipOutputStream(OutputStream out)
     throws IOException {
         return new ZipOutputStream(out);
     }
 
-    protected ZipOutputStream createZipOutputStream(
+    protected ZipOutputStream newZipOutputStream(
             OutputStream out, String encoding)
     throws IOException, UnsupportedEncodingException {
         return new ZipOutputStream(out, encoding);
     }
 
-    protected ZipFile createZipFile(String name)
+    protected ZipFile newZipFile(String name)
     throws IOException {
         return new ZipFile(name);
     }
 
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             String name, String encoding)
     throws IOException, UnsupportedEncodingException {
         return new ZipFile(name, encoding);
     }
 
-    protected ZipFile createZipFile(File file)
+    protected ZipFile newZipFile(File file)
     throws IOException {
         return new ZipFile(file);
     }
 
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             File file, String encoding)
     throws IOException, UnsupportedEncodingException {
         return new ZipFile(file, encoding);
     }
 
-    protected ZipFile createZipFile(ReadOnlyFile file)
+    protected ZipFile newZipFile(ReadOnlyFile file)
     throws IOException {
         return new ZipFile(file);
     }
 
-    protected ZipFile createZipFile(
+    protected ZipFile newZipFile(
             ReadOnlyFile file, String encoding)
     throws IOException, UnsupportedEncodingException {
         return new ZipFile(file, encoding);
@@ -146,133 +146,133 @@ public abstract class ZipTestCase extends TestCase {
         final ReadOnlyFile rof = new SimpleReadOnlyFile(zip);
 
         try {
-            createZipOutputStream(null, null);
+            newZipOutputStream(null, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipOutputStream(new ByteArrayOutputStream(), null);
+            newZipOutputStream(new ByteArrayOutputStream(), null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipOutputStream(null, "UTF-8");
+            newZipOutputStream(null, "UTF-8");
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipOutputStream(new ByteArrayOutputStream(), "unknown");
+            newZipOutputStream(new ByteArrayOutputStream(), "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
         } catch (UnsupportedEncodingException uee) {
         }
 
         try {
-            createZipFile((String) null);
+            newZipFile((String) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((String) null, null);
+            newZipFile((String) null, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((String) null, "UTF-8");
+            newZipFile((String) null, "UTF-8");
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile(zip.getPath(), null);
+            newZipFile(zip.getPath(), null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((File) null);
+            newZipFile((File) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((File) null, null);
+            newZipFile((File) null, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((File) null, "UTF-8");
+            newZipFile((File) null, "UTF-8");
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile(zip, null);
+            newZipFile(zip, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((ReadOnlyFile) null);
+            newZipFile((ReadOnlyFile) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((ReadOnlyFile) null, null);
+            newZipFile((ReadOnlyFile) null, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile((ReadOnlyFile) null, "UTF-8");
+            newZipFile((ReadOnlyFile) null, "UTF-8");
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            createZipFile(rof, null);
+            newZipFile(rof, null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         /*try {
-            createZipFile(zip, "unknown");
+            newZipFile(zip, "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
         } catch (UnsupportedEncodingException uee) {
         }*/
 
         try {
-            createZipFile(zip.getPath());
+            newZipFile(zip.getPath());
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
 
         try {
-            createZipFile(zip);
+            newZipFile(zip);
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
 
         try {
-            createZipFile(rof);
+            newZipFile(rof);
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
 
         try {
-            createZipFile(zip, "UTF-8");
+            newZipFile(zip, "UTF-8");
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
 
         try {
-            createZipFile(rof, "UTF-8");
+            newZipFile(rof, "UTF-8");
             fail("This is not a valid ZIP file!");
         } catch (IOException ioe) {
         }
@@ -283,10 +283,10 @@ public abstract class ZipTestCase extends TestCase {
 
     public void testPreambleOfEmptyZipFile() throws IOException {
         // Create empty ZIP file.
-        createZipOutputStream(new FileOutputStream(zip)).close();
+        newZipOutputStream(new FileOutputStream(zip)).close();
 
         // Assert that the empty ZIP file has no preamble.
-        final ZipFile zipIn = createZipFile(zip);
+        final ZipFile zipIn = newZipFile(zip);
         try {
             assertEquals(0, zipIn.getPreambleLength());
             final InputStream in = zipIn.getPreambleInputStream();
@@ -302,13 +302,13 @@ public abstract class ZipTestCase extends TestCase {
     
     public void testWriteAndReadSingleBytes() throws IOException {
         final ZipOutputStream zipOut
-                = createZipOutputStream(new FileOutputStream(zip));
+                = newZipOutputStream(new FileOutputStream(zip));
         zipOut.putNextEntry(new ZipEntry("file"));
         for (int i = 0; i < data.length; i++)
             zipOut.write(data[i]);
         zipOut.close();
 
-        final ZipFile zipIn = createZipFile(zip);
+        final ZipFile zipIn = newZipFile(zip);
         InputStream in = zipIn.getInputStream("file");
         for (int i = 0, c; (c = in.read()) != -1; i++) {
             assertEquals(data[i] & 0xFF, c);
@@ -334,7 +334,7 @@ public abstract class ZipTestCase extends TestCase {
     throws Exception {
         createTestZipFile(nEntries);
 
-        final ZipFile zipIn = createZipFile(zip);
+        final ZipFile zipIn = newZipFile(zip);
 
         // Define thread class to check all entries.
         class CheckAllEntriesThread extends Thread {
@@ -419,7 +419,7 @@ public abstract class ZipTestCase extends TestCase {
         final HashSet set = new HashSet();
 
         ZipOutputStream zipOut
-                = createZipOutputStream(new FileOutputStream(zip));
+                = newZipOutputStream(new FileOutputStream(zip));
         try {
             for (int i = 0; i < nEntries; i++) {
                 String name = i + ".txt";
@@ -432,7 +432,7 @@ public abstract class ZipTestCase extends TestCase {
         }
         zipOut = null; // allow GC
 
-        ZipFile zipIn = createZipFile(zip);
+        ZipFile zipIn = newZipFile(zip);
         try {
             // Check that zipIn correctly enumerates all entries.
             for (final Enumeration e = zipIn.entries(); e.hasMoreElements(); ) {
@@ -451,12 +451,12 @@ public abstract class ZipTestCase extends TestCase {
         // Create test ZIP file.
         final String name = "entry";
         final ZipOutputStream zipOut
-                = createZipOutputStream(new FileOutputStream(zip));
+                = newZipOutputStream(new FileOutputStream(zip));
         zipOut.putNextEntry(new ZipEntry(name));
         zipOut.write(data);
         zipOut.close();
 
-        final ZipFile zipIn = createZipFile(zip);
+        final ZipFile zipIn = newZipFile(zip);
 
         // Open checked input stream and close immediately.
         InputStream in = zipIn.getCheckedInputStream(name);
@@ -484,7 +484,7 @@ public abstract class ZipTestCase extends TestCase {
             // Create test ZIP file.
             final String name = "entry";
             final ZipOutputStream zipOut
-                    = new ZipOutputStream(new FileOutputStream(zip)); // NOT createZipOutputStream(...) !
+                    = new ZipOutputStream(new FileOutputStream(zip)); // NOT newZipOutputStream(...) !
             zipOut.putNextEntry(new ZipEntry(name));
             zipOut.write(data);
             zipOut.close();
@@ -509,7 +509,7 @@ public abstract class ZipTestCase extends TestCase {
             }
             raf.close();
 
-            final ZipFile zipIn = new ZipFile(zip); // NOT createZipFile(...) !
+            final ZipFile zipIn = new ZipFile(zip); // NOT newZipFile(...) !
 
             try {
                 InputStream in = zipIn.getCheckedInputStream(name);

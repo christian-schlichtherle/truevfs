@@ -174,18 +174,18 @@ public class AbstractArchiveDriverTest extends TestCase {
             super(encoding, ICON, ICON);
         }
 
-        public InputArchive createInputArchive(Archive archive, ReadOnlyFile rof)
+        public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getCanonicalPath() + " (inaccessible archive file)");
         }
 
-        public ArchiveEntry createArchiveEntry(Archive archive, String entryName, ArchiveEntry template)
+        public ArchiveEntry newArchiveEntry(Archive archive, String entryName, ArchiveEntry template)
         throws CharConversionException {
             return new RfsEntry(new File("foo/bar"));
         }
 
-        public OutputArchive createOutputArchive(Archive archive, OutputStream out, InputArchive source)
+        public OutputArchive newOutputArchive(Archive archive, OutputStream out, InputArchive source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getCanonicalPath() + " (inaccessible archive file)");

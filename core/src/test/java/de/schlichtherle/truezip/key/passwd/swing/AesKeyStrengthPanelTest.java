@@ -20,9 +20,7 @@ import de.schlichtherle.truezip.key.AesKeyProvider;
 import java.awt.EventQueue;
 import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.JFrame;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
@@ -65,25 +63,10 @@ public class AesKeyStrengthPanelTest extends TestCase {
     protected void tearDown() throws Exception {
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
-                frame.setVisible(false);
+                //frame.setVisible(false);
                 frame.dispose();
             }
         });
-    }
-
-    public static Test suite() throws Exception {
-        // THIS DOESN'T WORK RELIABLY!
-        // Increase timeout values to see what's going on.
-        // Otherwise everything happens very fast.
-        /*try {
-            JemmyProperties.getCurrentTimeouts().loadDebugTimeouts();
-        } catch (IOException failure) {
-            throw new UndeclaredThrowableException(failure);
-        }*/
-
-        TestSuite suite = new TestSuite(AesKeyStrengthPanelTest.class);
-
-        return suite;
     }
 
     /**

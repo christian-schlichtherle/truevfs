@@ -171,5 +171,7 @@ public class FileComboBoxBrowserTest extends TestCase {
         tc0.pressKey(KeyEvent.VK_DOWN);
         final String child = tc0.getText();
         assertEquals(child, tc1.getText());
+
+        frame.dispose();
     }
 }

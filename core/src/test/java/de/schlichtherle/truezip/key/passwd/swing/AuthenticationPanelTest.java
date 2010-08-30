@@ -43,23 +43,24 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @version $Id$
  */
 public class AuthenticationPanelTest extends TestCase {
+
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private static final Logger logger
-            = Logger.getLogger(AuthenticationPanelTest.class.getName());
+    private static final Logger logger = Logger.getLogger(
+            AuthenticationPanelTest.class.getName());
 
     static final File rootDir;
     static {
-        if (File.separatorChar == '\\')
+        if (File.separatorChar == '\\') {
             rootDir = new File("C:\\");
-        else
+        } else {
             rootDir = new File("/");
+        }
     }
-
     private final ComponentChooser keyFileChooser
-                = new NameComponentChooser("keyFileChooser");
+            = new NameComponentChooser("keyFileChooser");
 
     public AuthenticationPanelTest(String testName) {
         super(testName);
@@ -75,8 +76,8 @@ public class AuthenticationPanelTest extends TestCase {
         byte[] bfo;
         int i = 1;
         while (null == queue.poll()) {
-            // Allocate big fat object in order to cause the internal
-            // cache for the file chooser to be cleared.
+                // Allocate big fat object in order to cause the internal
+                // cache for the file chooser to be cleared.
             try {
                 bfo = new byte[i * 1024 * 1024];
                 i++; // is not reached on OOME!
@@ -158,7 +159,6 @@ public class AuthenticationPanelTest extends TestCase {
                 frame.getContentPane().add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
-                frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 frame.setVisible(true);
             }
         });
@@ -187,6 +187,6 @@ public class AuthenticationPanelTest extends TestCase {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
         new JLabelOperator(frame, text);
 
-        //frame.close();
+        frame.dispose();
     }
 }

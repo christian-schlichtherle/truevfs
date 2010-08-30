@@ -50,6 +50,7 @@ public class PromptingKeyManagerTest extends TestCase {
                         "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
         }
 
+        // FIXME: Fix Jemmy test to work with JRE 5+.
         //TestSuite suite = new TestSuite(PromptingKeyManagerTest.class);
         TestSuite suite = new TestSuite();
         suite.addTest(new PromptingKeyManagerTest("testParentWindow"));
@@ -61,18 +62,16 @@ public class PromptingKeyManagerTest extends TestCase {
         super(testName);
     }
 
-    @Override
     protected void setUp() throws Exception {
         JemmyProperties.setCurrentDispatchingModel(JemmyProperties.getDefaultDispatchingModel());
     }
 
-    @Override
     protected void tearDown() throws Exception {
         PromptingKeyManager.resetAndRemoveKeyProviders();
     }
 
     /**
-     * Test of getParentWindow method, of class de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager.
+     * Test of getParentWindow method, of class de.schlichtherle.key.passwd.swing.PromptingKeyManager.
      */
     public void testParentWindow() {
         Window result = PromptingKeyManager.getParentWindow();
@@ -80,20 +79,23 @@ public class PromptingKeyManagerTest extends TestCase {
         assertFalse(result.isVisible());
 
         final JFrame frame = new JFrame();
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         final JDialog dialog = new JDialog(frame);
-        assertFalse(dialog.isVisible());
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
 
+        assertFalse(dialog.isVisible());
         result = PromptingKeyManager.getParentWindow();
         assertSame(frame, result);
 
         dialog.setVisible(true);
-        assertTrue(dialog.isVisible());
         result = PromptingKeyManager.getParentWindow();
         assertSame(frame, result); // dialog is not a frame!
 
-        dialog.setVisible(false);
-        frame.setVisible(false);
+        dialog.dispose();
+        frame.dispose();
     }
 
     /**

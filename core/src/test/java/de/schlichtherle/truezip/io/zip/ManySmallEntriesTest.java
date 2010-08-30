@@ -16,9 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.ZipFile;
-import de.schlichtherle.truezip.io.zip.ZipOutputStream;
-import de.schlichtherle.truezip.io.zip.ZipEntry;
 import de.schlichtherle.truezip.util.Arrays;
 
 import java.io.File;
@@ -29,8 +26,9 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * Tests compression of data.
@@ -43,6 +41,7 @@ public class ManySmallEntriesTest extends TestCase {
             = Logger.getLogger(ManySmallEntriesTest.class.getName());
 
     private static final byte[] data = "Hello World!".getBytes();
+    private static final long dataCrc = 0x1c291ca3;
 
     public static Test suite() throws Exception {
         TestSuite suite = new TestSuite(ManySmallEntriesTest.class);
@@ -79,7 +78,15 @@ public class ManySmallEntriesTest extends TestCase {
                 = new ZipOutputStream(new FileOutputStream(zip));
         for (int i = 100000; i < 100000 + n; i++) {
             String name = i + ".txt";
-            zipOut.putNextEntry(new ZipEntry(name));
+            final ZipEntry entry = new ZipEntry(name);
+
+            // Speed up the test a bit.
+            entry.setSize(data.length);
+            entry.setCompressedSize(data.length);
+            entry.setCrc(dataCrc);
+            entry.setMethod(ZipEntry.STORED);
+
+            zipOut.putNextEntry(entry);
             zipOut.write(data);
             assertTrue(set.add(name));
         }

@@ -5,7 +5,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.FileTestCase;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
