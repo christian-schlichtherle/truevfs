@@ -111,20 +111,20 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
     /**
      * A factory method to create the Create Protected Resource Key Panel.
      */
-    protected CreateKeyPanel createCreateKeyPanel() {
+    protected CreateKeyPanel newCreateKeyPanel() {
         return new CreateKeyPanel();
     }
 
     /**
      * A factory method to create the Open Protected Resource Key Panel.
      */
-    protected OpenKeyPanel createOpenKeyPanel() {
+    protected OpenKeyPanel newOpenKeyPanel() {
         return new OpenKeyPanel();
     }
 
     protected Feedback getUnknownCreateKeyFeedback() {
         if (unknownCreateKeyFeedback == null)
-            unknownCreateKeyFeedback = createFeedback("UnknownCreateKeyFeedback");
+            unknownCreateKeyFeedback = newFeedback("UnknownCreateKeyFeedback");
         return unknownCreateKeyFeedback;
     }
 
@@ -134,7 +134,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
 
     protected Feedback getInvalidCreateKeyFeedback() {
         if (invalidCreateKeyFeedback == null)
-            invalidCreateKeyFeedback = createFeedback("InvalidCreateKeyFeedback");
+            invalidCreateKeyFeedback = newFeedback("InvalidCreateKeyFeedback");
         return invalidCreateKeyFeedback;
     }
 
@@ -144,7 +144,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
 
     protected Feedback getUnknownOpenKeyFeedback() {
         if (unknownOpenKeyFeedback == null)
-            unknownOpenKeyFeedback = createFeedback("UnknownOpenKeyFeedback");
+            unknownOpenKeyFeedback = newFeedback("UnknownOpenKeyFeedback");
         return unknownOpenKeyFeedback;
     }
 
@@ -154,7 +154,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
 
     protected Feedback getInvalidOpenKeyFeedback() {
         if (invalidOpenKeyFeedback == null)
-            invalidOpenKeyFeedback = createFeedback("InvalidOpenKeyFeedback");
+            invalidOpenKeyFeedback = newFeedback("InvalidOpenKeyFeedback");
         return invalidOpenKeyFeedback;
     }
 
@@ -162,7 +162,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
         this.invalidOpenKeyFeedback = iokf;
     }
 
-    private static Feedback createFeedback(final String type) {
+    private static Feedback newFeedback(final String type) {
         try {
             String n = System.getProperty(
                     PACKAGE_NAME + "." + type,
@@ -225,7 +225,7 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
             final JComponent extraDataUI) {
         assert EventQueue.isDispatchThread();
 
-        final CreateKeyPanel createKeyPanel = createCreateKeyPanel();
+        final CreateKeyPanel createKeyPanel = newCreateKeyPanel();
         createKeyPanel.setExtraDataUI(extraDataUI);
 
         final Window parent = PromptingKeyManager.getParentWindow();
@@ -295,12 +295,12 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
             if (panel != null) {
                 openKeyPanel = panel;
             } else {
-                openKeyPanel = createOpenKeyPanel();
+                openKeyPanel = newOpenKeyPanel();
                 openKeyPanel.setExtraDataUI(extraDataUI);
             }
             openKeyPanel.setError(resources.getString("invalidKey"));
         } else {
-            openKeyPanel = createOpenKeyPanel();
+            openKeyPanel = newOpenKeyPanel();
             openKeyPanel.setExtraDataUI(extraDataUI);
         }
         openKeyPanels.put(provider, openKeyPanel);
