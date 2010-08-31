@@ -66,8 +66,7 @@ final class ULong {
     public static void check(
             final long l,
             final String subject,
-            final String error)
-    throws IllegalArgumentException {
+            final String error) {
         if (MIN_VALUE <= l)
             return;
 
@@ -97,8 +96,7 @@ final class ULong {
      * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(final long l)
-    throws IllegalArgumentException {
+    public static void check(final long l) {
         check(l, "Long integer out of range", null);
     }
 }

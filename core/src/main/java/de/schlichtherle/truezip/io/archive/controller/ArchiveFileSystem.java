@@ -194,7 +194,7 @@ public final class ArchiveFileSystem {
      * newArchiveEntry(path, type, null)}, but throws an
      * {@link AssertionError} instead of a {@link CharConversionException}.
      *
-     * @throws AssertionError If a {@link CharConversionException} occurs.
+     * @throws AssertionError if a {@link CharConversionException} occurs.
      *         The original exception is wrapped as its cause.
      */
     private ArchiveEntry newArchiveEntry(
@@ -208,21 +208,20 @@ public final class ArchiveFileSystem {
     }
 
     /**
-     * Constructs a new archive file system entry for this virtual archive
-     * file system.
-     * The returned entry still needs to be {@link #link}ed into this virtual
+     * Constructs a new archive entry for this archive file system.
+     * The returned archive entry still needs to be {@link #link}ed into this
      * archive file system.
      * The returned entry has properly initialized meta data, but is
      * otherwise left as created by the archive driver.
      *
-     * @param  path The path name of the archive entry to create.
+     * @param  path the path name of the archive entry to create.
      *         This is always a {@link #isLegalPath(String) legal path}.
-     * @param  blueprint If not {@code null}, then the newly created archive
+     * @param  blueprint if not {@code null}, then the newly created archive
      *         entry shall inherit as much properties from this archive entry
      *         as possible (with the exception of its entry name).
      *         This is typically used for copy operations.
      * @return An {@link ArchiveEntry} created by the archive driver.
-     * @throws CharConversionException If {@code path} contains characters
+     * @throws CharConversionException if {@code path} contains characters
      *         which are not supported by the archive file.
      */
     private ArchiveEntry newArchiveEntry(

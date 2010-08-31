@@ -29,7 +29,7 @@ public class Paths {
 
     /**
      * Equivalent to
-     * {@code return new Normalizer(separatorChar).{@link Normalizer#normalize(String)};}.
+     * {@code new Normalizer(separatorChar).}{@link Normalizer#normalize(String)}.
      */
     public static String normalize(String path, char separatorChar) {
         return new Normalizer(separatorChar).normalize(path);
@@ -58,11 +58,11 @@ public class Paths {
          * to indicate a UNC, although this is currently only supported on
          * Windows.
          *
-         * @param path The path name to normalize.
+         * @param  path the path name to normalize.
          * @return {@code path} if it was already in normalized form.
          *         Otherwise, a new String with the normalized form of the
          *         given path name.
-         * @throws NullPointerException If {@code path} is {@code null}.
+         * @throws NullPointerException if {@code path} is {@code null}.
          */
         public String normalize(final String path) {
             final int prefixLength = prefixLength(path, separatorChar);

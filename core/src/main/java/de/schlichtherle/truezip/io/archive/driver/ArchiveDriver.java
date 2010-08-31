@@ -20,9 +20,9 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
-import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,7 +52,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDriver {
+public interface ArchiveDriver extends ArchiveEntryFactory {
 
     /**
      * Creates a new input archive for the given {@code archive} in order to
@@ -112,33 +112,6 @@ public interface ArchiveDriver {
             Archive archive,
             ReadOnlyFile rof)
     throws IOException;
-
-    /**
-     * Creates a new archive entry for {@code entryName}
-     * for use with an {@link OutputArchive}.
-     * 
-     * @param archive The abstract archive representation which TrueZIP's
-     *        internal {@link ArchiveController} is processing
-     *        - never {@code null}.
-     * @param entryName A valid archive entry name  - never {@code null}.
-     * @param template If not {@code null}, then the newly created entry
-     *        shall inherit as much attributes from this object as possible
-     *        (with the exception of the name).
-     *        This is typically used for archive copy operations.
-     *        Note that there is no guarantee on the runtime type of this
-     *        object; it may have been created by other drivers.
-     *        It is safe to ignore the {@code metaData} property when
-     *        copying entries.
-     * @return A new archive entry instance.
-     * @throws CharConversionException If {@code name} contains
-     *         illegal characters.
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
-     */
-    ArchiveEntry newArchiveEntry(
-            Archive archive,
-            String entryName,
-            ArchiveEntry template)
-    throws CharConversionException;
 
     /**
      * Creates a new output archive for {@code archive}

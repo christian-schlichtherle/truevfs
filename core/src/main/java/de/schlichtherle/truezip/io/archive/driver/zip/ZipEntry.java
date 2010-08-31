@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
-import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;

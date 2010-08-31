@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -124,15 +123,7 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(  new ReadOnlyFileSource() {
-                    public ReadOnlyFile fetch() throws IOException {
-                        return new SimpleReadOnlyFile(new File(name));
-                    }
-
-                    public void release(ReadOnlyFile rof) throws IOException {
-                        rof.close();
-                    }
-                },
+        super(  new SimpleReadOnlyFileSource(name),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = name;
@@ -207,15 +198,7 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(  new ReadOnlyFileSource() {
-                    public ReadOnlyFile fetch() throws IOException {
-                        return new SimpleReadOnlyFile(file);
-                    }
-
-                    public void release(ReadOnlyFile rof) throws IOException {
-                        rof.close();
-                    }
-                },
+        super(  new SimpleReadOnlyFileSource(file),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = file.getPath();
@@ -290,9 +273,8 @@ public class ZipFile extends BasicZipFile {
             FileNotFoundException,
             ZipException,
             IOException {
-        super(  rof,
-                charset, DefaultZipEntryFactory.SINGLETON,
-                preambled, postambled);
+        super(  rof, charset, preambled, postambled,
+                DefaultZipEntryFactory.SINGLETON);
         this.name = null;
     }
 

@@ -207,10 +207,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
         setFileSystem(null);
     }
 
-    final ArchiveEntry newArchiveEntry(
-            String entryName,
-            ArchiveEntry blueprint)
+    final ArchiveEntry newArchiveEntry(String name, ArchiveEntry template)
     throws CharConversionException {
-        return getDriver().newArchiveEntry(this, entryName, blueprint);
+        return getDriver().newArchiveEntry(name, template);
     }
 }

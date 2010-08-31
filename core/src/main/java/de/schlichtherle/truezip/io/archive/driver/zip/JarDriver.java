@@ -16,10 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import java.io.IOException;
-
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
@@ -62,30 +58,17 @@ public class JarDriver extends ZipDriver {
     }
 
     /** Constructs a new JAR driver. */
-    public JarDriver(
-            boolean preambled,
-            boolean postambled,
-            final int level) {
+    public JarDriver(boolean preambled, boolean postambled, final int level) {
         super(JAR_CHARSET, preambled, postambled, level);
     }
 
     @Override
-    protected ZipEntry newZipEntry(ZipEntry template) {
+    public ZipEntry newZipEntry(ZipEntry template) {
         return new JarEntry(template);
     }
 
     @Override
-    protected ZipEntry newZipEntry(String entryName) {
-        return new JarEntry(entryName);
-    }
-
-    @Override
-    protected ZipInputArchive newZipInputArchive(
-            Archive archive,
-            ReadOnlyFile rof)
-    throws IOException {
-        return new ZipInputArchive(
-                rof, getCharset(), JarEntryFactory.INSTANCE,
-                getPreambled(), getPostambled());
+    public ZipEntry newZipEntry(String name) {
+        return new JarEntry(name);
     }
 }

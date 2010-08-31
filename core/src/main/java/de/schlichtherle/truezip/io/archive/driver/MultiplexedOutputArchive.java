@@ -118,7 +118,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             final ArchiveEntry srcEntry)
     throws IOException {
         if (srcEntry != null)
-            setSize(entry, srcEntry.getSize()); // data may be compressed!
+            entry.setSize(srcEntry.getSize()); // data may be compressed!
         
         if (isTargetBusy()) {
             final File temp = createTempFile(TEMP_FILE_PREFIX);
@@ -206,7 +206,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             closed = true;
             super.close();
             if (entry.getSize() == ArchiveEntry.UNKNOWN)
-                setSize(entry, temp.length());
+                entry.setSize(temp.length());
             if (entry.getTime() == ArchiveEntry.UNKNOWN)
                 entry.setTime(temp.lastModified());
 
@@ -216,17 +216,6 @@ public class MultiplexedOutputArchive implements OutputArchive {
             storeTempEntries();
         }
     } // class TempEntryOutputStream
-
-    // TODO: Add setSize(long) to ArchiveEntry interface and remove this method!
-    private void setSize(final ArchiveEntry entry, final long size) {
-        if (entry instanceof ZipEntry) {
-            ((ZipEntry) entry).setSize(size);
-        } else if (entry instanceof TarEntry) {
-            ((TarEntry) entry).setSize(size);
-        } else {
-            assert false : "Unknown archive entry type: File.length() may return 0 while the temp file hasn't yet been saved to the output archive.";
-        }
-    }
 
     private void storeTempEntries() throws IOException {
         if (isTargetBusy())

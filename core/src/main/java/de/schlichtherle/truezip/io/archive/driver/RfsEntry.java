@@ -121,5 +121,6 @@ public class RfsEntry implements ArchiveEntry {
     /** A no-op: Does nothing. */
     @Override
     public void setMetaData(ArchiveEntryMetaData metaData) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -181,7 +181,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public ArchiveEntry newArchiveEntry(Archive archive, String entryName, ArchiveEntry template)
+        public ArchiveEntry newArchiveEntry(String name, ArchiveEntry template)
         throws CharConversionException {
             return new RfsEntry(new File("foo/bar"));
         }
