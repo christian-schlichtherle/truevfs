@@ -19,7 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for ZIP files which checks the CRC-32 values for all
@@ -45,38 +46,36 @@ public class CheckedZipDriver extends ZipDriver {
     private static final long serialVersionUID = -4645615422084918979L;
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * this(ZIP_CHARSET, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedZipDriver() {
-        this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL);
+        this(ZIP_CHARSET, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(charset, null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * this(charset, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedZipDriver(String charset) {
-        this(charset, null, null, false, false, DEFAULT_LEVEL);
+        this(charset, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(charset, null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedZipDriver(String, boolean, boolean, int)
+     * this(charset, false, false, level)}.
      */
     public CheckedZipDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, false, level);
+        this(ZIP_CHARSET, false, false, level);
     }
 
     /** Constructs a new checked ZIP driver. */
     public CheckedZipDriver(
             String charset,
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, preambled, postambled, level);
+        super(charset, preambled, postambled, level);
     }
     
     @Override

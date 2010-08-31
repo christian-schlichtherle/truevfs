@@ -53,8 +53,6 @@ public abstract class AbstractArchiveDriver
 
     private final String charset;
 
-    private final Icon openIcon, closedIcon;
-
     /**
      * This field should be considered to be {@code final}!
      *
@@ -68,10 +66,6 @@ public abstract class AbstractArchiveDriver
      * @param charset The name of a character set to use by default for all
      *        entry names and probably other meta data when reading or writing
      *        archive files.
-     * @param openIcon The icon to return by {@link #getOpenIcon}.
-     *        May be {@code null}.
-     * @param closedIcon The icon to return by {@link #getClosedIcon}.
-     *        May be {@code null}.
      * @throws NullPointerException If {@code charset} is
      *         {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not
@@ -80,14 +74,9 @@ public abstract class AbstractArchiveDriver
      *         supported by the JSE 1.1 API, but not the JSE 1.4 API,
      *         or vice versa.
      */
-    protected AbstractArchiveDriver(
-            final String charset,
-            final Icon openIcon,
-            final Icon closedIcon) {
+    protected AbstractArchiveDriver(final String charset) {
         this.charset = charset;
         this.encoder = new ThreadLocalEncoder();
-        this.openIcon = openIcon;
-        this.closedIcon = closedIcon;
 
         // Perform fail fast tests for character set charsets using both
         // JSE 1.1 API and the NIO API.
@@ -199,7 +188,7 @@ public abstract class AbstractArchiveDriver
     }
 
     /**
-     * Returns the value of the property {@code charset} which was 
+     * Returns the value of the property {@code charset} which was
      * provided to the constructor.
      */
     public final String getCharset() {
@@ -207,23 +196,27 @@ public abstract class AbstractArchiveDriver
     }
 
     /**
-     * Returns the value of the property {@code openIcon} which was 
-     * provided to the constructor.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@code AbstractArchiveDriver} simply
+     * returns {@code null}.
      *
      * @param archive Ignored.
      */
-    public final Icon getOpenIcon(Archive archive) {
-        return openIcon;
+    @Override
+    public Icon getOpenIcon(Archive archive) {
+        return null;
     }
 
     /**
-     * Returns the value of the property {@code closedIcon} which was 
-     * provided to the constructor.
-     *
-     * @param archive Ignored.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@code AbstractArchiveDriver} simply
+     * returns {@code null}.
      */
-    public final Icon getClosedIcon(Archive archive) {
-        return closedIcon;
+    @Override
+    public Icon getClosedIcon(Archive archive) {
+        return null;
     }
 
     private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {

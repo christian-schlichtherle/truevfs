@@ -21,7 +21,8 @@ import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which supports building archive files according to
@@ -63,29 +64,27 @@ public class OdfDriver extends JarDriver {
     private static final long serialVersionUID = 1586715698610542033L;
 
     /**
-     * Equivalent to {@link #OdfDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #OdfDriver(boolean, boolean, int)
+     * this(false, false, Deflater.BEST_COMPRESSION)}.
      */
     public OdfDriver() {
-        this(null, null, false, false, DEFAULT_LEVEL);
+        this(false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #OdfDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, level)}.
+     * Equivalent to {@link #OdfDriver(boolean, boolean, int)
+     * this(false, false, level)}.
      */
     public OdfDriver(int level) {
-        this(null, null, false, false, level);
+        this(false, false, level);
     }
 
     /** Constructs a new ODF driver. */
     public OdfDriver(
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level) {
-        super(openIcon, closedIcon, preambled, postambled, level);
+        super(preambled, postambled, level);
     }
 
     @Override

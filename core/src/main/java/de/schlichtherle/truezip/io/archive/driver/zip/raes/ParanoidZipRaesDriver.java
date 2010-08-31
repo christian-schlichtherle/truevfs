@@ -25,7 +25,8 @@ import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * A paranoid archive driver which builds RAES encrypted ZIP files.
@@ -47,32 +48,31 @@ import javax.swing.Icon;
  * @see SafeZipRaesDriver
  */
 public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
+
     private static final long serialVersionUID = 6373537182537867796L;
 
     /**
-     * Equivalent to {@link #ParanoidZipRaesDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ParanoidZipRaesDriver(boolean, boolean, int)
+     * this(false, false, Deflater.BEST_COMPRESSION)}.
      */
     public ParanoidZipRaesDriver() {
-        this(null, null, false, false, DEFAULT_LEVEL);
+        this(false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ParanoidZipRaesDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, level)}.
+     * Equivalent to {@link #ParanoidZipRaesDriver(boolean, boolean, int)
+     * this(false, false, level)}.
      */
     public ParanoidZipRaesDriver(int level) {
-        this(null, null, false, false, level);
+        this(false, false, level);
     }
 
     /** Constructs a new paranoid ZIP.RAES driver. */
     public ParanoidZipRaesDriver(
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level) {
-        super(openIcon, closedIcon, preambled, postambled, level, Long.MAX_VALUE);
+        super(preambled, postambled, level, Long.MAX_VALUE);
     }
 
     /**

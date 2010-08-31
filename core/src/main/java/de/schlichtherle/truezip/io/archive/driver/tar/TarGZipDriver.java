@@ -23,7 +23,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
+import static java.util.zip.Deflater.NO_COMPRESSION;
 
 /**
  * An archive driver which builds TAR files compressed with GZIP.
@@ -38,36 +41,30 @@ public class TarGZipDriver extends TarDriver {
 
     private static final int BUFSIZE = 4096;
 
-    /**
-     * The default compression level to use when writing a GZIP output stream,
-     * which is {@value}.
-     */
-    public static final int DEFAULT_LEVEL = Deflater.BEST_COMPRESSION;
-
     private final int level;
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, Icon, Icon, int)
-     * this(DEFAULT_CHARSET, null, null, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #TarGZipDriver(String, int)
+     * this(TAR_CHARSET, Deflater.BEST_COMPRESSION)}.
      */
     public TarGZipDriver() {
-        this(DEFAULT_CHARSET, null, null, DEFAULT_LEVEL);
+        this(TAR_CHARSET, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, Icon, Icon, int)
-     * this(charset, null, null, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #TarGZipDriver(String, int)
+     * this(charset, Deflater.BEST_COMPRESSION)}.
      */
     public TarGZipDriver(String charset) {
-        this(charset, null, null, DEFAULT_LEVEL);
+        this(charset, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #TarGZipDriver(String, Icon, Icon, int)
-     * this(DEFAULT_CHARSET, null, null, level)}.
+     * Equivalent to {@link #TarGZipDriver(String, int)
+     * this(TAR_CHARSET, level)}.
      */
     public TarGZipDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, level);
+        this(TAR_CHARSET, level);
     }
 
     /**
@@ -76,18 +73,17 @@ public class TarGZipDriver extends TarDriver {
      * @param level The compression level to use when writing a GZIP output
      *        stream.
      * @throws IllegalArgumentException If {@code level} is not in the
-     *         range [{@value java.util.zip.Deflater#BEST_SPEED}..{@value java.util.zip.Deflater#BEST_COMPRESSION}]
+     *         range [{@value java.util.zip.Deflater#NO_COMPRESSION},
+     *         {@value java.util.zip.Deflater#BEST_COMPRESSION}]
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
     public TarGZipDriver(
             final String charset,
-            final Icon openIcon,
-            final Icon closedIcon,
             final int level) {
-        super(charset, null, null);
-        if (    (   level < Deflater.BEST_SPEED
-                 || level > Deflater.BEST_COMPRESSION)
-                && level != Deflater.DEFAULT_COMPRESSION)
+        super(charset);
+        if (    (   level < NO_COMPRESSION
+                 || level > BEST_COMPRESSION)
+                && level != DEFAULT_COMPRESSION)
             throw new IllegalArgumentException();
         this.level = level;
     }

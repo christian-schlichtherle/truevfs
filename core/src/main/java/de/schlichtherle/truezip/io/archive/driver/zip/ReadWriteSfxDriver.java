@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import javax.swing.Icon;
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which reads and writes Self Executable (SFX/EXE) ZIP
@@ -39,39 +39,38 @@ import javax.swing.Icon;
  * @see ReadOnlySfxDriver
  */
 public class ReadWriteSfxDriver extends AbstractSfxDriver {
+
     private static final long serialVersionUID = -937199842631639717L;
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
      */
     public ReadWriteSfxDriver() {
-        this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL);
+        this(DEFAULT_CHARSET, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, Icon, Icon, boolean, int)
-     * this(charset, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * this(charset, false, Deflater.BEST_COMPRESSION)}.
      */
     public ReadWriteSfxDriver(String charset) {
-        this(charset, null, null, false, DEFAULT_LEVEL);
+        this(charset, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ReadWriteSfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, level)}.
+     * Equivalent to {@link #ReadWriteSfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, level)}.
      */
     public ReadWriteSfxDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, level);
+        this(DEFAULT_CHARSET, false, level);
     }
 
     /** Constructs a new read-write SFX/EXE driver. */
     public ReadWriteSfxDriver(
             String charset,
-            Icon openIcon,
-            Icon closedIcon,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, postambled, level);
+        super(charset, postambled, level);
     }
 }

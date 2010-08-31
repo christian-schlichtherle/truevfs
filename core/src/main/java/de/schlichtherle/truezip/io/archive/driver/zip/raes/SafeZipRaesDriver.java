@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import javax.swing.Icon;
 
+import static java.util.zip.Deflater.BEST_COMPRESSION;
+
 /**
  * A safe archive driver which builds RAES encrypted ZIP files.
  * For input archive files up to 512 KB, the cipher text gets authenticated
@@ -51,6 +53,7 @@ import javax.swing.Icon;
  * @see ParanoidZipRaesDriver
  */
 public class SafeZipRaesDriver extends AbstractZipRaesDriver {
+
     private static final long serialVersionUID = 7701862504670759996L;
 
     /**
@@ -62,30 +65,28 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
     public static final long DEFAULT_AUTHENTICATION_TRIGGER = 512 * 1024;
 
     /**
-     * Equivalent to {@link #SafeZipRaesDriver(Icon, Icon, boolean, boolean, int, long)
-     * this(null, null, false, false, DEFAULT_LEVEL, DEFAULT_AUTHENTICATION_TRIGGER)}.
+     * Equivalent to {@link #SafeZipRaesDriver(boolean, boolean, int, long)
+     * this(false, false, Deflater.BEST_COMPRESSION, DEFAULT_AUTHENTICATION_TRIGGER)}.
      */
     public SafeZipRaesDriver() {
-        this(null, null, false, false, DEFAULT_LEVEL, DEFAULT_AUTHENTICATION_TRIGGER);
+        this(false, false, BEST_COMPRESSION, DEFAULT_AUTHENTICATION_TRIGGER);
     }
 
     /**
-     * Equivalent to {@link #SafeZipRaesDriver(Icon, Icon, boolean, boolean, int, long)
+     * Equivalent to {@link #SafeZipRaesDriver(boolean, boolean, int, long)
      * this(null, null, false, false, level, DEFAULT_AUTHENTICATION_TRIGGER)}.
      */
     public SafeZipRaesDriver(int level) {
-        this(null, null, false, false, level, DEFAULT_AUTHENTICATION_TRIGGER);
+        this(false, false, level, DEFAULT_AUTHENTICATION_TRIGGER);
     }
 
     /** Constructs a new safe ZIP.RAES driver. */
     public SafeZipRaesDriver(
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level,
             final long authenticationTrigger) {
-        super(openIcon, closedIcon, preambled, postambled, level, authenticationTrigger);
+        super(preambled, postambled, level, authenticationTrigger);
     }
 
     /**
