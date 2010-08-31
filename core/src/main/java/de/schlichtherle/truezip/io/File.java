@@ -27,7 +27,7 @@ import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -48,7 +48,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.util.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.util.Files.getRealFile;
 import static de.schlichtherle.truezip.io.util.Files.normalize;

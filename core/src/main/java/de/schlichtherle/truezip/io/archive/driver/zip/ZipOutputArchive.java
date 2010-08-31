@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
@@ -34,7 +34,11 @@ import java.util.Enumeration;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
+import static de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
 
 /**
  * An implementation of {@link OutputArchive} to write ZIP archives.
@@ -51,9 +55,6 @@ import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 public class ZipOutputArchive
         extends BasicZipOutputStream
         implements OutputArchive {
-
-    /** Prefix for temporary files created by the multiplexer. */
-    private static final String TEMP_FILE_PREFIX = ZipDriver.TEMP_FILE_PREFIX;
 
     private final ZipInputArchive source;
     private OutputArchiveMetaData metaData;
@@ -126,7 +127,7 @@ public class ZipOutputArchive
             throw new OutputArchiveBusyException(entry);
 
         if (entry.isDirectory()) {
-            entry.setMethod(ZipEntry.STORED);
+            entry.setMethod(STORED);
             entry.setCrc(0);
             entry.setCompressedSize(0);
             entry.setSize(0);
@@ -139,7 +140,7 @@ public class ZipOutputArchive
             // The ZIP.RAES drivers use this feature to enforce deflation
             // for enhanced authentication security.
             final ZipEntry srcZipEntry = (ZipEntry) srcEntry;
-            if (entry.getMethod() == ZipEntry.UNKNOWN)
+            if (entry.getMethod() == UNKNOWN)
                 entry.setMethod(srcZipEntry.getMethod());
             if (entry.getMethod() == srcZipEntry.getMethod())
                 entry.setCompressedSize(srcZipEntry.getCompressedSize());
@@ -153,14 +154,14 @@ public class ZipOutputArchive
             entry.setSize(srcEntry.getSize());
 
         switch (entry.getMethod()) {
-            case ZipEntry.UNKNOWN:
-                entry.setMethod(ZipEntry.DEFLATED);
+            case UNKNOWN:
+                entry.setMethod(DEFLATED);
                 break;
 
-            case ZipEntry.STORED:
-                if (entry.getCrc() == ZipEntry.UNKNOWN
-                        || entry.getCompressedSize() == ZipEntry.UNKNOWN
-                        || entry.getSize() == ZipEntry.UNKNOWN) {
+            case STORED:
+                if (entry.getCrc() == UNKNOWN
+                        || entry.getCompressedSize() == UNKNOWN
+                        || entry.getSize() == UNKNOWN) {
                     if (!(srcEntry instanceof RfsEntry)) {
                         final File temp = createTempFile(TEMP_FILE_PREFIX);
                         return new TempEntryOutputStream(entry, temp);
@@ -179,7 +180,7 @@ public class ZipOutputArchive
                 }
                 break;
 
-            case ZipEntry.DEFLATED:
+            case DEFLATED:
                 break;
 
             default:
@@ -245,7 +246,7 @@ public class ZipOutputArchive
                 final File temp)
         throws IOException {
             super(new java.io.FileOutputStream(temp), new CRC32());
-            assert entry.getMethod() == ZipEntry.STORED;
+            assert entry.getMethod() == STORED;
             this.temp = temp;
             tempEntry = entry;
         }
@@ -279,10 +280,10 @@ public class ZipOutputArchive
             final ZipEntry entry,
             final File temp)
     throws IOException {
-        assert entry.getMethod() == ZipEntry.STORED;
-        assert entry.getCrc() != ZipEntry.UNKNOWN;
-        assert entry.getCompressedSize() != ZipEntry.UNKNOWN;
-        assert entry.getSize() != ZipEntry.UNKNOWN;
+        assert entry.getMethod() == STORED;
+        assert entry.getCrc() != UNKNOWN;
+        assert entry.getCompressedSize() != UNKNOWN;
+        assert entry.getSize() != UNKNOWN;
 
         try {
             final InputStream in = new java.io.FileInputStream(temp);

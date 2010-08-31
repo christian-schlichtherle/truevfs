@@ -16,9 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
 import java.io.File;
-import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SPECIAL;
 
 /**
  * A utility class which adapts a {@link File} instance to an
@@ -28,7 +32,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public class RfsEntry implements ArchiveEntry {
-    private final String entryName;
+    private final String name;
     private final File file;
 
     /**
@@ -53,7 +57,7 @@ public class RfsEntry implements ArchiveEntry {
     public RfsEntry(final File file, final String entryName) {
         if (entryName == null || file == null)
             throw new NullPointerException();
-        this.entryName = entryName;
+        this.name = entryName;
         this.file = file;
     }
 
@@ -71,46 +75,51 @@ public class RfsEntry implements ArchiveEntry {
     }
 
     /** Returns the name provided to the constructor. */
+    @Override
     public String getName() {
-        return entryName;
+        return name;
     }
 
     /** Returns whether the file is a directory or not. */
-    public boolean isDirectory() {
-        return file.isDirectory();
+    @Override
+    public Type getType() {
+        return file.isDirectory() ? DIRECTORY
+                : file.isFile() ? FILE
+                : file.exists() ? SPECIAL
+                : null;
     }
 
     /** Returns the file size. */
+    @Override
     public long getSize() {
         return file.length();
     }
 
+    @Override
+    public void setSize(long size) {
+        throw new UnsupportedOperationException();
+    }
+
     /** Returns the file's last modification time. */
+    @Override
     public long getTime() {
         return file.lastModified();
     }
 
     /** Sets the file's last modification time. */
+    @Override
     public void setTime(long time) {
         file.setLastModified(time);
     }
 
     /** Returns {@code null}. */
-    public Icon getOpenIcon() {
-        return null;
-    }
-
-    /** Returns {@code null}. */
-    public Icon getClosedIcon() {
-        return null;
-    }
-
-    /** Returns {@code null}. */
+    @Override
     public ArchiveEntryMetaData getMetaData() {
         return null;
     }
 
     /** A no-op: Does nothing. */
+    @Override
     public void setMetaData(ArchiveEntryMetaData metaData) {
     }
 }

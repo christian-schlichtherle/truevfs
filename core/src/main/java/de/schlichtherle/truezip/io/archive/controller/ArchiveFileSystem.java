@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.util.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.util.InputException;
@@ -39,12 +39,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.util.Paths.normalize;
 
 /**
@@ -215,18 +215,15 @@ public final class ArchiveFileSystem {
      * The returned entry has properly initialized meta data, but is
      * otherwise left as created by the archive driver.
      *
-     * @param path The path name of the entry to create or replace.
-     *        If the path name ends with a separator, the returned archive
-     *        entry is expected to be a {@link ArchiveEntry#isDirectory()
-     *        directory}.
-     * @param blueprint If not {@code null}, then the newly created entry
-     *        shall inherit as much properties from the given entry as possible
-     *        (with the exception of the name).
-     *        This is typically used for archive copy operations.
-     * @return An {@link ArchiveEntry} created by the archive driver and
-     *         properly initialized with meta data.
-     * @throws CharConversionException If {@code entryName} contains
-     *         characters which are not supported by the archive file.
+     * @param  path The path name of the archive entry to create.
+     *         This is always a {@link #isLegalPath(String) legal path}.
+     * @param  blueprint If not {@code null}, then the newly created archive
+     *         entry shall inherit as much properties from this archive entry
+     *         as possible (with the exception of its entry name).
+     *         This is typically used for copy operations.
+     * @return An {@link ArchiveEntry} created by the archive driver.
+     * @throws CharConversionException If {@code path} contains characters
+     *         which are not supported by the archive file.
      */
     private ArchiveEntry newArchiveEntry(
             String path,
@@ -351,15 +348,15 @@ public final class ArchiveFileSystem {
             assert isLegalPath(path);
 
             split(path);
-            final String parentName = getParentPath();
+            final String parentPath = getParentPath();
             final String baseName = getBaseName();
-            ArchiveEntry parent = master.get(parentName);
+            ArchiveEntry parent = master.get(parentPath);
             if (parent == null) {
-                parent = newArchiveEntry(parentName, DIRECTORY);
-                master.put(parentName, parent);
+                parent = newArchiveEntry(parentPath, DIRECTORY);
+                master.put(parentPath, parent);
             }
             parent.getMetaData().children.add(baseName);
-            fix(parentName);
+            fix(parentPath);
         }
     }
 
@@ -530,7 +527,7 @@ public final class ArchiveFileSystem {
             final ArchiveEntry parentEntry = master.get(parentPath);
             final ArchiveEntry newEntry;
             if (parentEntry != null) {
-                if (!parentEntry.isDirectory())
+                if (parentEntry.getType() != DIRECTORY)
                     throw new ArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
                 final ArchiveEntry oldEntry = master.get(entryPath);
@@ -541,7 +538,7 @@ public final class ArchiveFileSystem {
                     }
                 } else {
                     assert entryType == FILE;
-                    if (oldEntry != null && oldEntry.isDirectory())
+                    if (oldEntry != null && oldEntry.getType() == DIRECTORY)
                         throw new ArchiveFileSystemException(entryPath,
                                 "directory entries cannot get replaced");
                 }
@@ -648,7 +645,7 @@ public final class ArchiveFileSystem {
                 throw new ArchiveFileSystemException(entryPath,
                         "entry does not exist");
             if (entry == root
-                    || entry.isDirectory()
+                    || entry.getType() == DIRECTORY
                         && !entry.getMetaData().children.isEmpty()) {
                 master.put(entryPath, entry); // Restore file system
                 throw new ArchiveFileSystemException(entryPath,
@@ -681,24 +678,12 @@ public final class ArchiveFileSystem {
 
     boolean isFile(final String path) {
         final ArchiveEntry entry = get(path);
-        return entry != null && !entry.isDirectory();
+        return entry != null && entry.getType() == FILE;
     }
     
     boolean isDirectory(final String path) {
         final ArchiveEntry entry = get(path);
-        return entry != null && entry.isDirectory();
-    }
-
-    Icon getOpenIcon(final String path) {
-        assert !isRoot(path);
-        final ArchiveEntry entry = get(path);
-        return entry != null ? entry.getOpenIcon() : null;
-    }
-
-    Icon getClosedIcon(final String path) {
-        assert !isRoot(path);
-        final ArchiveEntry entry = get(path);
-        return entry != null ? entry.getClosedIcon() : null;
+        return entry != null && entry.getType() == DIRECTORY;
     }
     
     boolean canWrite(final String path) {
@@ -711,7 +696,7 @@ public final class ArchiveFileSystem {
     
     long length(final String path) {
         final ArchiveEntry entry = get(path);
-        if (entry == null || entry.isDirectory())
+        if (entry == null || entry.getType() == DIRECTORY)
             return 0;
 
         // TODO: Review: Can we avoid this special case?
@@ -766,7 +751,7 @@ public final class ArchiveFileSystem {
     String[] list(final String path) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(path);
-        if (entry != null && entry.isDirectory())
+        if (entry != null && entry.getType() == DIRECTORY)
             return entry.getMetaData().list();
         return null; // does not exist as a directory
     }
@@ -777,7 +762,7 @@ public final class ArchiveFileSystem {
             final File dir) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(path);
-        if (entry != null && entry.isDirectory())
+        if (entry != null && entry.getType() == DIRECTORY)
             if (filenameFilter != null)
                 return entry.getMetaData().list(filenameFilter, dir);
             else
@@ -792,7 +777,7 @@ public final class ArchiveFileSystem {
             final FileFactory factory) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(path);
-        if (entry != null && entry.isDirectory())
+        if (entry != null && entry.getType() == DIRECTORY)
             return entry.getMetaData().listFiles(filenameFilter, dir, factory);
         return null; // does not exist as a directory
     }
@@ -804,7 +789,7 @@ public final class ArchiveFileSystem {
             final FileFactory factory) {
         // Lookup the entry as a directory.
         final ArchiveEntry entry = get(path);
-        if (entry != null && entry.isDirectory())
+        if (entry != null && entry.getType() == DIRECTORY)
             return entry.getMetaData().listFiles(fileFilter, dir, factory);
         return null; // does not exist as a directory
     }
@@ -832,15 +817,15 @@ public final class ArchiveFileSystem {
             final OutputArchive oa,
             final ExceptionHandler<IOException, T> h)
     throws T {
-        final Enumeration<ArchiveEntry> es
+        final Enumeration<ArchiveEntry> en
                 = Collections.enumeration(master.values());
-        while (es.hasMoreElements()) {
-            final ArchiveEntry e = es.nextElement();
+        while (en.hasMoreElements()) {
+            final ArchiveEntry e = en.nextElement();
             final String n = e.getName();
             if (oa.getArchiveEntry(n) != null)
                 continue; // we have already written this entry
             try {
-                if (e.isDirectory()) {
+                if (e.getType() == DIRECTORY) {
                     if (root == e)
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)

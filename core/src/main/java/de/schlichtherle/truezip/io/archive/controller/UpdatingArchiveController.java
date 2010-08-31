@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -35,8 +35,9 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.util.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
@@ -443,7 +444,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert entry != null;
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
         assert !hasNewData(entry.getName());
-        assert !entry.isDirectory();
+        assert entry.getType() != DIRECTORY;
 
         final InputStream in
                 = inArchive.getMetaData().newInputStream(entry, dstEntry);
@@ -458,7 +459,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert entry != null;
         assert writeLock().isLockedByCurrentThread();
         assert !hasNewData(entry.getName());
-        assert !entry.isDirectory();
+        assert entry.getType() != DIRECTORY;
 
         ensureOutArchive();
         final OutputStream out

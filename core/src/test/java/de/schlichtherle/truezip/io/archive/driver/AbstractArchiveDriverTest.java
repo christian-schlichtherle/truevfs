@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.ByteArrayInputStream;
@@ -106,10 +107,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         assertNotSame(driver, driver2);
         assertNotSame(driver.getCharset(), driver2.getCharset());
         assertEquals(driver.getCharset(), driver2.getCharset());
-        assertNotSame(driver.getOpenIcon(null), driver2.getOpenIcon(null));
-        //assertEquals(driver.getOpenIcon(null), driver2.getOpenIcon(null));
-        assertNotSame(driver.getClosedIcon(null), driver2.getClosedIcon(null));
-        //assertEquals(driver.getClosedIcon(null), driver2.getClosedIcon(null));
+        assertSame(driver.getOpenIcon(null), driver2.getOpenIcon(null)); // static property!
+        assertSame(driver.getClosedIcon(null), driver2.getClosedIcon(null)); // static property!
         driver2.ensureEncodable("foo/bar");
     }
 
@@ -171,24 +170,37 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         private DummyArchiveDriver(final String encoding) {
-            super(encoding, ICON, ICON);
+            super(encoding);
         }
 
+        @Override
         public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getCanonicalPath() + " (inaccessible archive file)");
         }
 
+        @Override
         public ArchiveEntry newArchiveEntry(Archive archive, String entryName, ArchiveEntry template)
         throws CharConversionException {
             return new RfsEntry(new File("foo/bar"));
         }
 
+        @Override
         public OutputArchive newOutputArchive(Archive archive, OutputStream out, InputArchive source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getCanonicalPath() + " (inaccessible archive file)");
+        }
+
+        @Override
+        public Icon getOpenIcon(Archive archive) {
+            return ICON;
+        }
+
+        @Override
+        public Icon getClosedIcon(Archive archive) {
+            return ICON;
         }
     }
 }

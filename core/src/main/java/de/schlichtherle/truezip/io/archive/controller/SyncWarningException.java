@@ -30,23 +30,19 @@ extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    // TODO: Make this constructor package private!
-    public SyncWarningException(Archive archive) {
+    SyncWarningException(Archive archive) {
         super(archive, -1);
     }
 
-    // TODO: Make this constructor package private!
-    public SyncWarningException(Archive archive, String message) {
+    SyncWarningException(Archive archive, String message) {
         super(archive, message, -1);
     }
 
-    // TODO: Make this constructor package private!
-    public SyncWarningException(Archive archive, Throwable cause) {
+    SyncWarningException(Archive archive, Throwable cause) {
         super(archive, cause, -1);
     }
 
-    // TODO: Make this constructor package private!
-    public SyncWarningException(Archive archive, String message, Throwable cause) {
+    SyncWarningException(Archive archive, String message, Throwable cause) {
         super(archive, message, cause, -1);
     }
 }
