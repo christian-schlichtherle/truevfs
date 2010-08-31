@@ -130,12 +130,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ArchiveEntry newArchiveEntry(
-            final Archive archive,
-            final String entryName,
+            final String name,
             final ArchiveEntry template)
     throws CharConversionException {
-        final JarEntry entry = (JarEntry) super.newArchiveEntry(
-                archive, entryName, template);
+        final JarEntry entry = (JarEntry) super.newArchiveEntry(name, template);
         if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);

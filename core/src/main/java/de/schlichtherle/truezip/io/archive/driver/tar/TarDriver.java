@@ -77,8 +77,8 @@ public class TarDriver extends AbstractArchiveDriver {
     // Factory methods:
     //
 
+    @Override
     public ArchiveEntry newArchiveEntry(
-            final Archive archive,
             final String entryName,
             final ArchiveEntry template)
     throws CharConversionException {

@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,7 +44,10 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipDriver extends AbstractArchiveDriver {
+public class ZipDriver
+extends AbstractArchiveDriver
+implements ZipEntryFactory {
+
     private static final long serialVersionUID = -7061546656075796996L;
 
     /** Prefix for temporary files created by this driver. */
@@ -160,36 +164,35 @@ public class ZipDriver extends AbstractArchiveDriver {
     // Factory methods:
     //
 
+    @Override
     public ArchiveEntry newArchiveEntry(
-            final Archive archive,
-            final String entryName,
+            final String name,
             final ArchiveEntry template)
     throws CharConversionException {
-        ensureEncodable(entryName);
-
+        ensureEncodable(name);
         final ZipEntry entry;
         if (template != null) {
             if (template instanceof ZipEntry) {
                 entry = newZipEntry((ZipEntry) template);
-                entry.setName(entryName);
+                entry.setName(name);
             } else {
-                entry = newZipEntry(entryName);
+                entry = newZipEntry(name);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newZipEntry(entryName);
+            entry = newZipEntry(name);
         }
-
         return entry;
     }
 
-    protected ZipEntry newZipEntry(ZipEntry template) {
+    public ZipEntry newZipEntry(ZipEntry template) {
         return new ZipEntry(template);
     }
 
-    protected ZipEntry newZipEntry(String entryName) {
-        return new ZipEntry(entryName);
+    @Override
+    public ZipEntry newZipEntry(String name) {
+        return new ZipEntry(name);
     }
 
     /**
@@ -198,6 +201,7 @@ public class ZipDriver extends AbstractArchiveDriver {
      * The implementation in {@link ZipDriver} simply forwards the call to
      * {@link #newZipInputArchive}.
      */
+    @Override
     public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
     throws IOException {
         return newZipInputArchive(archive, rof);
@@ -208,8 +212,7 @@ public class ZipDriver extends AbstractArchiveDriver {
             ReadOnlyFile rof)
     throws IOException {
         return new ZipInputArchive(
-                rof, getCharset(), ZipEntryFactory.INSTANCE,
-                getPreambled(), getPostambled());
+                rof, getCharset(), getPreambled(), getPostambled(), this);
     }
 
     /**
@@ -219,6 +222,7 @@ public class ZipDriver extends AbstractArchiveDriver {
      * {@link #newZipOutputArchive} and wraps the result in a new
      * {@link MultiplexedOutputArchive}.
      */
+    @Override
     public OutputArchive newOutputArchive(
             Archive archive,
             OutputStream out,

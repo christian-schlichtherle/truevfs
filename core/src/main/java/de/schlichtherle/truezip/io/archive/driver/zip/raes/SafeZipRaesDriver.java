@@ -18,11 +18,9 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputArchive;
-import de.schlichtherle.truezip.io.archive.driver.zip.JarEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import javax.swing.Icon;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
@@ -119,8 +117,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
         // redundant.
         return rof.length() > getAuthenticationTrigger()
                 ? new CheckedZipInputArchive(
-                    rof, getCharset(), JarEntryFactory.INSTANCE,
-                    getPreambled(), getPostambled())
+                    rof, getCharset(), getPreambled(), getPostambled(), this)
                 : super.newZipInputArchive(archive, rof);
     }
 }

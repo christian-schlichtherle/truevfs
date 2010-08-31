@@ -18,7 +18,9 @@ package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -146,23 +148,15 @@ public abstract class BasicZipFile implements Closeable {
     protected BasicZipFile(
             final ReadOnlyFile archive,
             final String charset,
-            final ZipEntryFactory factory,
             boolean preambled,
-            boolean postambled)
+            boolean postambled,
+            final ZipEntryFactory factory)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,
             ZipException,
             IOException {
-        this(   new ReadOnlyFileSource() {
-                    public ReadOnlyFile fetch() {
-                        return archive;
-                    }
-
-                    public void release(ReadOnlyFile rof) {
-                        assert archive == rof;
-                    }
-                },
+        this(   new SingletonReadOnlyFileSource(archive),
                 charset, factory, preambled, postambled);
     }
 
@@ -203,6 +197,42 @@ public abstract class BasicZipFile implements Closeable {
     interface ReadOnlyFileSource {
         ReadOnlyFile fetch() throws IOException;
         void release(ReadOnlyFile rof) throws IOException;
+    }
+
+    static class SimpleReadOnlyFileSource implements ReadOnlyFileSource {
+        final File file;
+
+        public SimpleReadOnlyFileSource(File file) {
+            this.file = file;
+        }
+
+        public SimpleReadOnlyFileSource(String name) {
+            this.file = new File(name);
+        }
+
+        public ReadOnlyFile fetch() throws IOException {
+            return new SimpleReadOnlyFile(file);
+        }
+
+        public void release(ReadOnlyFile rof) throws IOException {
+            rof.close();
+        }
+    }
+
+    static class SingletonReadOnlyFileSource implements ReadOnlyFileSource {
+        final ReadOnlyFile rof;
+
+        public SingletonReadOnlyFileSource(ReadOnlyFile rof) {
+            this.rof = rof;
+        }
+
+        public ReadOnlyFile fetch() {
+            return rof;
+        }
+
+        public void release(ReadOnlyFile rof) {
+            assert this.rof == rof;
+        }
     }
 
     /**

@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,15 +48,15 @@ public class CheckedZipInputArchive extends ZipInputArchive {
     public CheckedZipInputArchive(
             ReadOnlyFile rof,
             String charset,
-            de.schlichtherle.truezip.io.zip.ZipEntryFactory factory,
             boolean preambled,
-            boolean postambled)
+            boolean postambled,
+            ZipEntryFactory factory)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,
             ZipException,
             IOException {
-        super(rof, charset, factory, preambled, postambled);
+        super(rof, charset, preambled, postambled, factory);
     }
 
     /**

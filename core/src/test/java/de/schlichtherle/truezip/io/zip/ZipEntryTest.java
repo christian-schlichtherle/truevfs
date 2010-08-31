@@ -339,8 +339,8 @@ public class ZipEntryTest extends TestCase {
     public void testSize() {
         try {
             entry.setSize(ZipEntry.UNKNOWN - 1);
-            fail("Expected RuntimeException");
-        } catch (RuntimeException ex) {
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
         }
 
         assertEquals(ZipEntry.UNKNOWN, entry.getSize());

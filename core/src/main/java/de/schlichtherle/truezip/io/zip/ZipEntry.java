@@ -236,7 +236,7 @@ public class ZipEntry implements Cloneable {
      *
      * @see #getMethod
      * @see ZipOutputStream#setMethod
-     * @throws RuntimeException If {@code method} is not
+     * @throws IllegalArgumentException If {@code method} is not
      *         {@link #STORED}, {@link #DEFLATED} or {@link #UNKNOWN}.
      */
     public void setMethod(final int method) {
@@ -323,7 +323,7 @@ public class ZipEntry implements Cloneable {
      * Sets the Compressed Size of this entry.
      *
      * @param csize The Compressed Size.
-     * @throws RuntimeException If {@code csize} is not in the
+     * @throws IllegalArgumentException If {@code csize} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.io.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
@@ -363,7 +363,7 @@ public class ZipEntry implements Cloneable {
      * Sets the (Uncompressed) Size of this entry.
      *
      * @param size The (Uncompressed) Size.
-     * @throws RuntimeException If {@code size} is not in the
+     * @throws IllegalArgumentException If {@code size} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
      *         ({@value de.schlichtherle.truezip.io.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize

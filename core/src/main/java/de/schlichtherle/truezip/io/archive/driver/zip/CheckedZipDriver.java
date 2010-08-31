@@ -84,7 +84,6 @@ public class CheckedZipDriver extends ZipDriver {
             ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputArchive(
-                rof, getCharset(), ZipEntryFactory.INSTANCE,
-                getPreambled(), getPostambled());
+                rof, getCharset(), getPreambled(), getPostambled(), this);
     }
 }

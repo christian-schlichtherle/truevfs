@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,10 +70,9 @@ public class TarInputArchive implements InputArchive {
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
-    /**
-     * Maps entry names to tar entries [String -> TarEntry].
-     */
-    private final Map entries = new LinkedHashMap();
+    /** Maps entry names to tar entries [String -> TarEntry]. */
+    private final Map<String, TarEntry> entries
+            = new LinkedHashMap<String, TarEntry>();
 
     private InputArchiveMetaData metaData;
 
@@ -100,7 +100,7 @@ public class TarInputArchive implements InputArchive {
                 } else {
                     final File tmp;
                     try {
-                        entry = (TarEntry) entries.get(name);
+                        entry = entries.get(name);
                         tmp = entry != null
                                 ? entry.getFile()
                                 : createTempFile(TEMP_FILE_PREFIX);
@@ -215,7 +215,7 @@ public class TarInputArchive implements InputArchive {
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
-        return new java.io.FileInputStream(((TarEntry) entry).getFile());
+        return new FileInputStream(((TarEntry) entry).getFile());
     }
 
     public void close() throws IOException {

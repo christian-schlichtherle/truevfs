@@ -26,11 +26,11 @@ package de.schlichtherle.truezip.io.zip;
 public interface ZipEntryFactory {
 
     /**
-     * Creates a new {@link ZipEntry} with the given name.
+     * Creates a new {@link ZipEntry} with the given entry {@code name}.
      *
-     * @param name The entry name.
-     * @return A newly created {@link ZipEntry} with the given name.
-     *         {@code null} is not permitted.
+     * @param  name the entry name.
+     * @return A newly created {@link ZipEntry} with the given entry
+     *         {@code name} - {@code null} is not permitted.
      */
     ZipEntry newZipEntry(String name);
 }

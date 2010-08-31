@@ -17,9 +17,6 @@
 package de.schlichtherle.truezip.io.archive.entry;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
-import de.schlichtherle.truezip.io.swing.FileSystemView;
-import de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer;
-import javax.swing.Icon;
 
 /**
  * Represents an entry in an archive file.
@@ -56,6 +53,8 @@ import javax.swing.Icon;
  * <p>
  * Note that these requirements have been relaxed in contrast to TrueZIP 6 in
  * order to ease the implementation of archive drivers and separate concerns.
+ * The additional restrictions imposed by TrueZIP 6 must now be handled by the
+ * client, which is usually an archive file system object.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -149,16 +148,18 @@ public interface ArchiveEntry {
     long getSize();
 
     /**
-     * Sets the (uncompressed) size of this archive entry.
+     * Sets the (uncompressed) size of this archive entry in bytes.
      *
-     * @param size The (uncompressed) size of this archive entry in bytes.
-     * @see #getSize
+     * @param  size the (uncompressed) size of this archive entry in bytes
+     *         or {@value #UNKNOWN}.
+     * @throws IllegalArgumentException if {@code size} is negative and not
+     *         {@value #UNKNOWN}.
      */
     void setSize(long size);
 
     /**
      * Returns the last modification time of this archive entry since the
-     * epoch, or {@link #UNKNOWN} if not specified.
+     * epoch or {@value #UNKNOWN}.
      *
      * @see #setTime
      */
@@ -167,9 +168,10 @@ public interface ArchiveEntry {
     /**
      * Sets the last modification time of this archive entry.
      *
-     * @param time The last modification time of this archive entry in
-     *             milliseconds since the epoch.
-     * @see #getTime
+     * @param  time the last modification time of this archive entry in
+     *         milliseconds since the epoch or {@value #UNKNOWN}.
+     * @throws IllegalArgumentException if {@code time} is negative and not
+     *         {@value #UNKNOWN}.
      */
     void setTime(long time);
 
@@ -177,7 +179,7 @@ public interface ArchiveEntry {
      * Returns the meta data for this archive entry.
      * The default value is {@code null}.
      *
-     * @deprecated This is not a concern for archive entries!
+     * @deprecated Remove this - it's not a concern of an archive entry!
      */
     ArchiveEntryMetaData getMetaData();
 
@@ -186,7 +188,7 @@ public interface ArchiveEntry {
      *
      * @param metaData The meta data - may be {@code null}.
      *
-     * @deprecated This is not a concern for archive entries!
+     * @deprecated Remove this - it's not a concern of an archive entry!
      */
     void setMetaData(ArchiveEntryMetaData metaData);
 }

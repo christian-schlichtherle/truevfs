@@ -66,8 +66,7 @@ final class UByte {
     public static void check(
             final int i,
             final String subject,
-            final String error)
-    throws IllegalArgumentException {
+            final String error) {
         if (MIN_VALUE <= i && i <= MAX_VALUE)
             return;
 
@@ -97,8 +96,7 @@ final class UByte {
      * @throws IllegalArgumentException If {@code i} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static void check(final int i)
-    throws IllegalArgumentException {
+    public static void check(final int i) {
         check(i, "Integer out of range", null);
     }
 }
