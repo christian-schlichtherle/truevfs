@@ -19,7 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC-32 value for all
@@ -46,37 +47,35 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     private static final long serialVersionUID = -940108057195872802L;
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedReadOnlySfxDriver() {
-        this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL);
+        this(DEFAULT_CHARSET, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(charset, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * this(charset, false, Deflater.BEST_COMPRESSION)}.
      */
     public CheckedReadOnlySfxDriver(String charset) {
-        this(charset, null, null, false, DEFAULT_LEVEL);
+        this(charset, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, level)}.
+     * Equivalent to {@link #CheckedReadOnlySfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, level)}.
      */
     public CheckedReadOnlySfxDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, level);
+        this(DEFAULT_CHARSET, false, level);
     }
 
     /** Constructs a new checked read-only SFX/EXE driver. */
     public CheckedReadOnlySfxDriver(
             String charset,
-            Icon openIcon,
-            Icon closedIcon,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, postambled, level);
+        super(charset, postambled, level);
     }
     
     @Override

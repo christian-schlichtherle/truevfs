@@ -23,7 +23,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.swing.Icon;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
@@ -62,35 +61,27 @@ public class TarBZip2Driver extends TarDriver {
     private final int inBlockSize;
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, Icon, Icon, int)
-     * this(DEFAULT_CHARSET, null, null, DEFAULT_BLOCKSIZE)}.
+     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * this(TAR_CHARSET, DEFAULT_BLOCKSIZE)}.
      */
     public TarBZip2Driver() {
-        this(DEFAULT_CHARSET, null, null, DEFAULT_BLOCKSIZE);
+        this(TAR_CHARSET, DEFAULT_BLOCKSIZE);
     }
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, Icon, Icon, int)
-     * this(charset, null, null, DEFAULT_BLOCKSIZE)}.
+     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * this(charset, DEFAULT_BLOCKSIZE)}.
      */
     public TarBZip2Driver(String charset) {
-        this(charset, null, null, DEFAULT_BLOCKSIZE);
+        this(charset, DEFAULT_BLOCKSIZE);
     }
 
     /**
-     * Equivalent to {@link #TarBZip2Driver(String, Icon, Icon, int)
-     * this(DEFAULT_CHARSET, null, null, inBlockSize)}.
+     * Equivalent to {@link #TarBZip2Driver(String, int)
+     * this(TAR_CHARSET, inBlockSize)}.
      */
     public TarBZip2Driver(int inBlockSize) {
-        this(DEFAULT_CHARSET, null, null,  inBlockSize);
-    }
-
-    /**
-     * Equivalent to {@link #TarBZip2Driver(String, Icon, Icon, int)
-     * this(charset, null, null, inBlockSize)}.
-     */
-    public TarBZip2Driver(String charset, int inBlockSize) {
-        this(charset, null, null, inBlockSize);
+        this(TAR_CHARSET,  inBlockSize);
     }
 
     /**
@@ -101,12 +92,8 @@ public class TarBZip2Driver extends TarDriver {
      * @throws IllegalArgumentException If {@code inBlockSize} is not
      *         in the range [1..9].
      */
-    public TarBZip2Driver(
-            final String charset,
-            final Icon openIcon,
-            final Icon closedIcon,
-            final int inBlockSize) {
-        super(charset, openIcon, closedIcon);
+    public TarBZip2Driver(final String charset, final int inBlockSize) {
+        super(charset);
         if (inBlockSize < MIN_BLOCKSIZE || MAX_BLOCKSIZE < inBlockSize)
             throw new IllegalArgumentException(inBlockSize + "");
         this.inBlockSize = inBlockSize;

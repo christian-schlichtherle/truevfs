@@ -20,7 +20,8 @@ import de.schlichtherle.truezip.io.archive.Archive;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
@@ -38,37 +39,35 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
     private static final long serialVersionUID = -993451557140046215L;
 
     /**
-     * Equivalent to {@link #ReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ReadOnlySfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, Deflater.BEST_COMPRESSION)}.
      */
     public ReadOnlySfxDriver() {
-        this(DEFAULT_CHARSET, null, null, false, DEFAULT_LEVEL);
+        this(DEFAULT_CHARSET, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(charset, null, null, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ReadOnlySfxDriver(String, boolean, int)
+     * this(charset, false, Deflater.BEST_COMPRESSION)}.
      */
     public ReadOnlySfxDriver(String charset) {
-        this(charset, null, null, false, DEFAULT_LEVEL);
+        this(charset, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ReadOnlySfxDriver(String, Icon, Icon, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, level)}.
+     * Equivalent to {@link #ReadOnlySfxDriver(String, boolean, int)
+     * this(DEFAULT_CHARSET, false, level)}.
      */
     public ReadOnlySfxDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, level);
+        this(DEFAULT_CHARSET, false, level);
     }
 
     /** Constructs a new read-only SFX/EXE driver. */
     public ReadOnlySfxDriver(
             String charset,
-            Icon openIcon,
-            Icon closedIcon,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, postambled, level);
+        super(charset, postambled, level);
     }
 
     @Override

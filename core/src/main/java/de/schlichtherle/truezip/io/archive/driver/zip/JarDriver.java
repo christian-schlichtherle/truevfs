@@ -19,11 +19,12 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
  * An archive driver which builds JAR files.
- * JAR files use {@value #DEFAULT_CHARSET} as the character set for
+ * JAR files use {@value #JAR_CHARSET} as the character set for
  * entry names and comments.
  * <p>
  * Other than this, JAR files are treated like regular ZIP files.
@@ -42,32 +43,30 @@ public class JarDriver extends ZipDriver {
      * The default character set for entry names and comments, which is {@value}.
      */
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final String DEFAULT_CHARSET = "UTF-8";
+    public static final String JAR_CHARSET = "UTF-8";
 
     /**
-     * Equivalent to {@link #JarDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #JarDriver(boolean, boolean, int)
+     * this(null, null, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public JarDriver() {
-        this(null, null, false, false, DEFAULT_LEVEL);
+        this(false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #JarDriver(Icon, Icon, boolean, boolean, int)
-     * this(null, null, false, false, level)}.
+     * Equivalent to {@link #JarDriver(boolean, boolean, int)
+     * this(false, false, level)}.
      */
     public JarDriver(int level) {
-        this(null, null, false, false, level);
+        this(false, false, level);
     }
 
     /** Constructs a new JAR driver. */
     public JarDriver(
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level) {
-        super(DEFAULT_CHARSET, openIcon, closedIcon, preambled, postambled, level);
+        super(JAR_CHARSET, preambled, postambled, level);
     }
 
     @Override

@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Icon;
 
 /**
  * An archive driver which builds Self Executable (SFX/EXE) ZIP files.
@@ -52,10 +51,8 @@ abstract public class AbstractSfxDriver extends ZipDriver {
      */
     protected AbstractSfxDriver(
             String charset,
-            Icon openIcon,
-            Icon closedIcon,
             boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon, true, postambled, level);
+        super(charset, true, postambled, level);
     }
 }

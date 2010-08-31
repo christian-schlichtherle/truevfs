@@ -182,8 +182,8 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
                 logger.log(Level.WARNING, "noSuffixes"); // NOI18N
         } else {
             driver = eager ? (Object) newArchiveDriver(driver) : (String) driver; // force cast
-            for (Iterator i = set.iterator(); i.hasNext(); )
-                super.put((String) i.next(), driver);
+            for (String suffix : set)
+                super.put(suffix, driver);
         }
     }
 

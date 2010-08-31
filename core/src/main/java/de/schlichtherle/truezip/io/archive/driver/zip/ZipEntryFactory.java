@@ -16,15 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import static de.schlichtherle.truezip.io.util.Paths.normalize;
-
 /**
  * A factory for {@link ZipEntry}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipEntryFactory implements de.schlichtherle.truezip.io.zip.ZipEntryFactory {
+public class ZipEntryFactory
+implements de.schlichtherle.truezip.io.zip.ZipEntryFactory {
     
     public static final ZipEntryFactory INSTANCE = new ZipEntryFactory();
 
