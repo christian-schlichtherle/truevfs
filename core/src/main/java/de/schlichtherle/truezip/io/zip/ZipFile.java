@@ -354,13 +354,10 @@ public class ZipFile extends BasicZipFile {
 
     @Override
     protected synchronized InputStream getInputStream(
-            final String name,
-            final boolean check,
-            final boolean inflate)
+            String name, boolean check, boolean inflate)
     throws  IOException {
-        return new SynchronizedInputStream(
-                super.getInputStream(name, check, inflate),
-                this);
+        final InputStream in = super.getInputStream(name, check, inflate);
+        return in != null ? new SynchronizedInputStream(in, this) : null;
     }
 
     @Override

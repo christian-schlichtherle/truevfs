@@ -299,7 +299,25 @@ public abstract class ZipTestCase extends TestCase {
             zipIn.close();
         }
     }
-    
+
+    public void testGetInputStream() throws IOException {
+        final ZipOutputStream zipOut
+                = newZipOutputStream(new FileOutputStream(zip));
+        try {
+            zipOut.putNextEntry(new ZipEntry("foo"));
+        } finally {
+            zipOut.close();
+        }
+
+        final ZipFile zipIn = newZipFile(zip);
+        try {
+            zipIn.getInputStream("foo").close();
+            assertNull(zipIn.getInputStream("bar"));
+        } finally {
+            zipIn.close();;
+        }
+    }
+
     public void testWriteAndReadSingleBytes() throws IOException {
         final ZipOutputStream zipOut
                 = newZipOutputStream(new FileOutputStream(zip));
