@@ -564,7 +564,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     public void sync(final SyncConfiguration config)
-    throws ArchiveFileException {
+    throws SyncException {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
         assert !config.getUmount() || config.getReassemble(); // sync => reassemble
         assert writeLock().isLockedByCurrentThread();
@@ -585,7 +585,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         logger.log(Level.FINER, "umount.entering", stats); // NOI18N
         try {
             sync0(config);
-        } catch (ArchiveFileException ex) {
+        } catch (SyncException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
         }
@@ -593,9 +593,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void sync0(final SyncConfiguration config)
-    throws ArchiveFileException {
-        final ArchiveFileExceptionBuilder builder
-                = config.getArchiveFileExceptionBuilder();
+    throws SyncException {
+        final SyncExceptionBuilder builder
+                = config.getSyncExceptionBuilder();
 
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
@@ -607,9 +607,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     config.getWaitForOutputStreams() ? 0 : 50);
             if (outStreams > 0) {
                 if (!config.getCloseOutputStreams())
-                    throw builder.fail(new ArchiveFileOutputBusyException(
+                    throw builder.fail(new ArchiveOutputBusyException(
                             this, outStreams));
-                builder.warn(new ArchiveFileOutputBusyWarningException(
+                builder.warn(new ArchiveOutputBusyWarningException(
                         this, outStreams));
             }
         }
@@ -619,9 +619,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     config.getWaitForInputStreams() ? 0 : 50);
             if (inStreams > 0) {
                 if (!config.getCloseInputStreams())
-                    throw builder.fail(new ArchiveFileInputBusyException(
+                    throw builder.fail(new ArchiveInputBusyException(
                             this, inStreams));
-                builder.warn(new ArchiveFileInputBusyWarningException(
+                builder.warn(new ArchiveInputBusyWarningException(
                         this, inStreams));
             }
         }
@@ -677,10 +677,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
             }
-        } catch (ArchiveFileException ex) {
+        } catch (SyncException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw builder.fail(new ArchiveFileException(this, ex));
+            throw builder.fail(new SyncException(this, ex));
         } finally {
             setTouched(needsReassembly);
         }
@@ -707,42 +707,42 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void update(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    private void update(final SyncExceptionHandler handler)
+    throws SyncException {
         assert writeLock().isLockedByCurrentThread();
         assert isTouched();
         assert outArchive != null;
         assert checkNoDeletedEntriesWithNewData(handler);
 
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, ArchiveFileException> {
+        implements ExceptionHandler<IOException, SyncException> {
 
-            final ArchiveFileExceptionHandler delegate;
+            final SyncExceptionHandler delegate;
             IOException last;
 
-            FilterExceptionHandler(final ArchiveFileExceptionHandler delegate) {
+            FilterExceptionHandler(final SyncExceptionHandler delegate) {
                 if (delegate == null)
                     throw new NullPointerException();
                 this.delegate = delegate;
             }
 
-            public ArchiveFileException fail(final IOException cannotHappen) {
+            public SyncException fail(final IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
-            public void warn(final IOException cause) throws ArchiveFileException {
+            public void warn(final IOException cause) throws SyncException {
                 if (cause == null)
                     throw new NullPointerException();
                 final IOException old = last;
                 last = cause;
                 if (!(cause instanceof InputException))
-                    throw handler.fail(new ArchiveFileException(
+                    throw handler.fail(new SyncException(
                             UpdatingArchiveController.this, cause));
                 if (old == null)
-                    delegate.warn(new ArchiveFileWarningException(
+                    delegate.warn(new SyncWarningException(
                             UpdatingArchiveController.this, cause));
             }
         } // class FilterExceptionHandler
@@ -763,9 +763,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // output archive there is no way to recover from it.
                 shutdownStep2(handler);
             }
-        } catch (ArchiveFileWarningException ex) {
+        } catch (SyncWarningException ex) {
             throw ex;
-        } catch (ArchiveFileException ex) {
+        } catch (SyncException ex) {
             // The output file is corrupted! We must remove it now to
             // prevent it from being reused as the input file.
             // We do this even if the output file is the target file, i.e.
@@ -785,13 +785,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // to the last modification time of the virtual root directory,
         // hence preserving it.
         if (!outFile.setLastModified(rootTime))
-            handler.warn(new ArchiveFileWarningException(
+            handler.warn(new SyncWarningException(
                     this, "couldn't preserve last modification time"));
     }
 
     private boolean checkNoDeletedEntriesWithNewData(
-            final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+            final SyncExceptionHandler handler)
+    throws SyncException {
         assert isTouched();
         assert getFileSystem() != null;
 
@@ -809,7 +809,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
-                handler.warn(new ArchiveFileWarningException(
+                handler.warn(new SyncWarningException(
                         this, "couldn't remove archive entry '" + entryName + "'"));
             }
         }
@@ -824,11 +824,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reassemble(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    private void reassemble(final SyncExceptionHandler handler)
+    throws SyncException {
         assert writeLock().isLockedByCurrentThread();
 
         if (isRfsEntryTarget()) {
@@ -852,7 +852,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     }
                     Streams.cp(in , out); // always closes in and out
                 } catch (IOException cause) {
-                    throw handler.fail(new ArchiveFileException(
+                    throw handler.fail(new SyncException(
                             this,
                             "could not reassemble archive file - all changes are lost",
                             cause));
@@ -864,7 +864,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // directory during update(...).
                 final long time = outFile.lastModified();
                 if (time != 0 && !getTarget().setLastModified(time)) {
-                    handler.warn(new ArchiveFileWarningException(
+                    handler.warn(new SyncWarningException(
                             this,
                             "couldn't preserve last modification time"));
                 }
@@ -875,7 +875,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 wrap(getEnclController(), getEnclEntryName());
             } catch (IOException cause) {
-                throw handler.fail(new ArchiveFileException(
+                throw handler.fail(new SyncException(
                         getEnclController(),
                         "could not update archive entry '" + getEnclEntryName() + "' - all changes are lost",
                         cause));
@@ -934,12 +934,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * the virtual file system from the archive file again.
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     @Override
-    void reset(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    void reset(final SyncExceptionHandler handler)
+    throws SyncException {
         assert writeLock().isLockedByCurrentThread();
 
         try {
@@ -967,8 +967,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // logging.
             if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
                 logger.log(Level.SEVERE, "finalize.invalidState", getCanonicalPath());
-            final ArchiveFileExceptionBuilder handler
-                    = new DefaultArchiveFileExceptionBuilder();
+            final SyncExceptionBuilder handler
+                    = new DefaultSyncExceptionBuilder();
             shutdownStep1(handler);
             shutdownStep2(handler);
             shutdownStep3(true);
@@ -982,21 +982,21 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep1(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    private void shutdownStep1(final SyncExceptionHandler handler)
+    throws SyncException {
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, ArchiveFileException> {
-            public ArchiveFileException fail(IOException cannotHappen) {
+        implements ExceptionHandler<IOException, SyncException> {
+            public SyncException fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
-            public void warn(IOException cause) throws ArchiveFileException {
+            public void warn(IOException cause) throws SyncException {
                 if (cause == null)
                     throw new NullPointerException();
-                handler.warn(new ArchiveFileWarningException(
+                handler.warn(new SyncWarningException(
                         UpdatingArchiveController.this, cause));
             }
         }
@@ -1012,11 +1012,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Discards the file system and closes the output and input archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep2(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    private void shutdownStep2(final SyncExceptionHandler handler)
+    throws SyncException {
         super.reset(handler); // discard file system
 
         // The output archive must be closed BEFORE the input archive is
@@ -1031,7 +1031,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     outArchive.close();
                 } catch (IOException ioe) {
-                    handler.warn(new ArchiveFileException(this, ioe));
+                    handler.warn(new SyncException(this, ioe));
                 } finally {
                     outArchive = null;
                 }
@@ -1041,7 +1041,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     inArchive.close();
                 } catch (IOException ioe) {
-                    handler.warn(new ArchiveFileWarningException(this, ioe));
+                    handler.warn(new SyncWarningException(this, ioe));
                 } finally {
                     inArchive = null;
                 }

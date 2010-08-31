@@ -19,18 +19,18 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.Archive;
 
 /**
- * Like its super class, but indicates the existance of open output streams.
+ * Like its super class, but indicates the existance of open input streams.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileOutputBusyException
-extends ArchiveFileBusyException {
+public class ArchiveInputBusyWarningException
+extends ArchiveBusyWarningException {
 
-    private static final long serialVersionUID = 4652936465192837172L;
+    private static final long serialVersionUID = 965098472652287563L;
 
     // TODO: Make this package private!
-    public ArchiveFileOutputBusyException(Archive archive, int numStreams) {
+    public ArchiveInputBusyWarningException(Archive archive, int numStreams) {
         super(archive, numStreams);
     }
 }

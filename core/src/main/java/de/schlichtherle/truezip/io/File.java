@@ -23,9 +23,9 @@ import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
+import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -1112,14 +1112,14 @@ public class File extends java.io.File {
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultArchiveFileExceptionBuilder} and <em>only</em>
+     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultArchiveFileExceptionBuilder} and any error
+     *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException If {@code config} is {@code null}.
@@ -1129,7 +1129,7 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
     public static void sync(SyncConfiguration config)
-    throws ArchiveFileException {
+    throws SyncException {
         ArchiveControllers.sync("", config);
     }
 
@@ -1146,7 +1146,7 @@ public class File extends java.io.File {
      * @see #sync(SyncConfiguration)
      */
     public static void umount()
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
@@ -1168,7 +1168,7 @@ public class File extends java.io.File {
      * @see #sync(SyncConfiguration)
      */
     public static void umount(boolean closeStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
@@ -1192,7 +1192,7 @@ public class File extends java.io.File {
     public static void umount(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
@@ -1223,7 +1223,7 @@ public class File extends java.io.File {
      * @see #sync(SyncConfiguration)
      */
     public static void sync(File archive, SyncConfiguration config)
-    throws ArchiveFileException {
+    throws SyncException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
@@ -1244,7 +1244,7 @@ public class File extends java.io.File {
      * @see #sync(File, SyncConfiguration)
      */
     public static void umount(File archive)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
@@ -1266,7 +1266,7 @@ public class File extends java.io.File {
      * @see #sync(File, SyncConfiguration)
      */
     public static void umount(File archive, boolean closeStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
@@ -1290,7 +1290,7 @@ public class File extends java.io.File {
     public static void umount(File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
@@ -1312,7 +1312,7 @@ public class File extends java.io.File {
      * @see #sync(SyncConfiguration)
      */
     public static void update()
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
@@ -1334,7 +1334,7 @@ public class File extends java.io.File {
      * @see #sync(SyncConfiguration)
      */
     public static void update(boolean closeStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
@@ -1358,7 +1358,7 @@ public class File extends java.io.File {
     public static void update(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
@@ -1380,7 +1380,7 @@ public class File extends java.io.File {
      * @see #sync(File, SyncConfiguration)
      */
     public static void update(File archive)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
@@ -1402,7 +1402,7 @@ public class File extends java.io.File {
      * @see #sync(File, SyncConfiguration)
      */
     public static void update(File archive, boolean closeStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
@@ -1427,7 +1427,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveFileException {
+    throws SyncException {
         sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
@@ -2907,7 +2907,7 @@ public class File extends java.io.File {
                 try {
                     sync(this);
                     sync((File) dst);
-                } catch (ArchiveException ex) {
+                } catch (SyncException ex) {
                     return false;
                 }
                 return delegate.renameTo(dst);

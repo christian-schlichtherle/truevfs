@@ -25,8 +25,8 @@ import java.io.InputStream;
  * @version $Id$
  */
 public final class SyncConfiguration implements Cloneable {
-    private ArchiveFileExceptionBuilder archiveFileExceptionBuilder
-            = new DefaultArchiveFileExceptionBuilder();
+    private SyncExceptionBuilder syncExceptionBuilder
+            = new DefaultSyncExceptionBuilder();
     private boolean waitForInputStreams = false;
     private boolean closeInputStreams = true;
     private boolean waitForOutputStreams = false;
@@ -48,17 +48,17 @@ public final class SyncConfiguration implements Cloneable {
      * The handler to use to process archive exceptions.
      * <p>
      * The default value for this property is
-     * a {@code new} {@link DefaultArchiveFileExceptionBuilder}{@code ()}.
+     * a {@code new} {@link DefaultSyncExceptionBuilder}{@code ()}.
      */
-    public ArchiveFileExceptionBuilder getArchiveFileExceptionBuilder() {
-        return archiveFileExceptionBuilder;
+    public SyncExceptionBuilder getSyncExceptionBuilder() {
+        return syncExceptionBuilder;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public SyncConfiguration setArchiveFileExceptionBuilder(
-            final ArchiveFileExceptionBuilder archiveFileExceptionBuilder) {
+    public SyncConfiguration setSyncExceptionBuilder(
+            final SyncExceptionBuilder archiveFileExceptionBuilder) {
         final SyncConfiguration clone = clone();
-        clone.archiveFileExceptionBuilder = archiveFileExceptionBuilder;
+        clone.syncExceptionBuilder = archiveFileExceptionBuilder;
         return clone;
     }
 
@@ -102,13 +102,13 @@ public final class SyncConfiguration implements Cloneable {
      * thread is still busy doing I/O on the archive file.
      * Then if this property is {@code true}, the respective archive
      * controller will proceed to update the archive file anyway and
-     * finally throw an {@link ArchiveFileBusyWarningException} to indicate
+     * finally throw an {@link ArchiveBusyWarningException} to indicate
      * that any subsequent operations on these streams will fail with an
      * {@link ArchiveEntryStreamClosedException} because they have been
      * forced to close.
      * <p>
      * If this property is {@code false}, the archive file is <em>not</em>
-     * updated and an {@link ArchiveFileBusyException} is thrown to
+     * updated and an {@link ArchiveBusyException} is thrown to
      * indicate that the application must close all entry input streams
      * first.
      * <p>

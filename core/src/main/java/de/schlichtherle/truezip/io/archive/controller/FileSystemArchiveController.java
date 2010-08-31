@@ -202,8 +202,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
     abstract void mount(boolean create)
     throws FalsePositiveException, IOException;
 
-    void reset(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException {
+    void reset(final SyncExceptionHandler handler)
+    throws SyncException {
         setFileSystem(null);
     }
 

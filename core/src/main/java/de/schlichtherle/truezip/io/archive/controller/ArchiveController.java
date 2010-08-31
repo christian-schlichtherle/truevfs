@@ -397,11 +397,11 @@ public abstract class ArchiveController implements Archive {
      * of the archive (unless the archive type doesn't support this).
      * 
      * @see #sync(SyncConfiguration)
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     public final void autoUmount(final String entryName)
-    throws ArchiveFileException {
+    throws SyncException {
         assert writeLock().isLockedByCurrentThread();
         if (hasNewData(entryName)) {
             sync(new SyncConfiguration()
@@ -425,12 +425,12 @@ public abstract class ArchiveController implements Archive {
      * @param config The parameters for processing - {@code null} is not
      *        permitted.
      * @throws NullPointerException if {@code config} is {@code null}.
-     * @throws ArchiveFileException if any exceptional condition occurs
+     * @throws SyncException if any exceptional condition occurs
      *         throughout the processing of the target archive file.
      * @see ArchiveControllers#sync(String, SyncConfiguration)
      */
     public abstract void sync(SyncConfiguration config)
-    throws ArchiveFileException;
+    throws SyncException;
 
     // TODO: Document this!
     abstract int waitAllInputStreamsByOtherThreads(long timeout);
@@ -445,9 +445,9 @@ public abstract class ArchiveController implements Archive {
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
      */
-    final void reset() throws ArchiveFileException {
-        final ArchiveFileExceptionBuilder builder
-                = new DefaultArchiveFileExceptionBuilder();
+    final void reset() throws SyncException {
+        final SyncExceptionBuilder builder
+                = new DefaultSyncExceptionBuilder();
         reset(builder);
         builder.check();
     }
@@ -462,8 +462,8 @@ public abstract class ArchiveController implements Archive {
      * This method should be overridden by subclasses, but must still be
      * called when doing so.
      */
-    abstract void reset(final ArchiveFileExceptionHandler handler)
-    throws ArchiveFileException;
+    abstract void reset(final SyncExceptionHandler handler)
+    throws SyncException;
 
     @Override
     public String toString() {
@@ -1162,7 +1162,7 @@ public abstract class ArchiveController implements Archive {
                     // anyway, so we need to reset now.
                     try {
                         reset();
-                    } catch (ArchiveFileException cannotHappen) {
+                    } catch (SyncException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
                     throw ex;
