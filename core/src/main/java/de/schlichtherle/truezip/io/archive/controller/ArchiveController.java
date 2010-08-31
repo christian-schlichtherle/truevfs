@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Action;
@@ -37,8 +37,9 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -527,7 +528,7 @@ public abstract class ArchiveController implements Archive {
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
-                if (entry.isDirectory())
+                if (entry.getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "cannot read from directory entry");
                 return newInputStream(entry, null);
@@ -738,10 +739,10 @@ public abstract class ArchiveController implements Archive {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
+            autoMount(false); // detect false positives!
             return isRoot(path)
                     ? getDriver().getOpenIcon(this)
-                    : fileSystem.getOpenIcon(path);
+                    : null;
         } finally {
             readLock().unlock();
         }
@@ -752,7 +753,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return getClosedIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getOpenIcon(enclEntryName(path));
+            return enclController.getClosedIcon(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -764,10 +765,10 @@ public abstract class ArchiveController implements Archive {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
+            autoMount(false); // detect false positives!
             return isRoot(path)
                     ? getDriver().getClosedIcon(this)
-                    : fileSystem.getClosedIcon(path);
+                    : null;
         } finally {
             readLock().unlock();
         }

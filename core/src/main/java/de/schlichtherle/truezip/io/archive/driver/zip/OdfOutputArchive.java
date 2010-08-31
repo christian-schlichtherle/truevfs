@@ -16,11 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of
@@ -51,8 +54,8 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
 
         if (MIMETYPE.equals(zipEntry.getName())) {
             mimetype = true;
-            if (zipEntry.getMethod() == ZipEntry.UNKNOWN)
-                zipEntry.setMethod(ZipEntry.STORED);
+            if (zipEntry.getMethod() == UNKNOWN)
+                zipEntry.setMethod(STORED);
         }
         return super.newOutputStream(zipEntry, srcEntry);
     }

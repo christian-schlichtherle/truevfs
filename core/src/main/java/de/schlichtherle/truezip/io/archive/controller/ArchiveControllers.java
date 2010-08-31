@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -41,7 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.util.Files.getRealFile;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.

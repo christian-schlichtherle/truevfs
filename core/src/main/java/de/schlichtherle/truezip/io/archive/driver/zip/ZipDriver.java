@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
@@ -27,7 +27,10 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
-import javax.swing.Icon;
+
+import static java.util.zip.Deflater.BEST_COMPRESSION;
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
+import static java.util.zip.Deflater.NO_COMPRESSION;
 
 /**
  * An archive driver which builds ZIP files.
@@ -50,48 +53,33 @@ public class ZipDriver extends AbstractArchiveDriver {
      * The default character set to use for entry names and comments,
      * which is {@value}.
      */
-    public static final String DEFAULT_CHARSET = "IBM437";
-
-    /**
-     * The default compression level to use when writing a ZIP output stream,
-     * which is {@value}.
-     */
-    public static final int DEFAULT_LEVEL = Deflater.BEST_COMPRESSION;
+    public static final String ZIP_CHARSET = "IBM437";
 
     private final boolean preambled, postambled;
     private final int level;
 
     /**
-     * Equivalent to {@link #ZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * this(ZIP_CHARSET, null, null, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public ZipDriver() {
-        this(DEFAULT_CHARSET, null, null, false, false, DEFAULT_LEVEL);
+        this(ZIP_CHARSET, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(charset, null, null, false, false, DEFAULT_LEVEL)}.
+     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * this(charset, null, null, false, false, Deflater.BEST_COMPRESSION)}.
      */
     public ZipDriver(String charset) {
-        this(charset, null, null, false, false, DEFAULT_LEVEL);
+        this(charset, false, false, BEST_COMPRESSION);
     }
 
     /**
-     * Equivalent to {@link #ZipDriver(String, Icon, Icon, boolean, boolean, int)
-     * this(DEFAULT_CHARSET, null, null, false, false, level)}.
+     * Equivalent to {@link #ZipDriver(String, boolean, boolean, int)
+     * this(ZIP_CHARSET, null, null, false, false, level)}.
      */
     public ZipDriver(int level) {
-        this(DEFAULT_CHARSET, null, null, false, false, level);
-    }
-
-    public ZipDriver(
-            final String charset,
-            final boolean preambled,
-            final boolean postambled,
-            final Icon openIcon,
-            final Icon closedIcon) {
-        this(charset, openIcon, closedIcon, preambled, postambled, DEFAULT_LEVEL);
+        this(ZIP_CHARSET, false, false, level);
     }
 
     /**
@@ -121,20 +109,19 @@ public class ZipDriver extends AbstractArchiveDriver {
      * @param level The compression level to use when deflating an entry to
      *        a ZIP output stream.
      * @throws IllegalArgumentException If {@code level} is not in the
-     *         range [{@value java.util.zip.Deflater#NO_COMPRESSION}, {@value java.util.zip.Deflater#BEST_COMPRESSION}]
+     *         range [{@value java.util.zip.Deflater#NO_COMPRESSION},
+     *         {@value java.util.zip.Deflater#BEST_COMPRESSION}]
      *         and is not {@value java.util.zip.Deflater#DEFAULT_COMPRESSION}.
      */
     public ZipDriver(
             final String charset,
-            final Icon openIcon,
-            final Icon closedIcon,
             final boolean preambled,
             final boolean postambled,
             final int level) {
-        super(charset, openIcon, closedIcon);
-        if (    (   level < Deflater.NO_COMPRESSION
-                 || level > Deflater.BEST_COMPRESSION)
-                && level != Deflater.DEFAULT_COMPRESSION)
+        super(charset);
+        if (    (   level < NO_COMPRESSION
+                 || level > BEST_COMPRESSION)
+                && level != DEFAULT_COMPRESSION)
             throw new IllegalArgumentException();
         this.preambled = preambled;
         this.postambled = postambled;

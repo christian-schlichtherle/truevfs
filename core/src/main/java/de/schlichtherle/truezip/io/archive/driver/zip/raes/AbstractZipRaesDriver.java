@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -32,7 +32,9 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 
 /**
  * An abstract archive driver which builds RAES encrypted ZIP files
@@ -72,13 +74,11 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *        
      */
     protected AbstractZipRaesDriver(
-            Icon openIcon,
-            Icon closedIcon,
             boolean preambled,
             boolean postambled,
             final int level,
             final long authenticationTrigger) {
-        super(openIcon, closedIcon, preambled, postambled, level);
+        super(preambled, postambled, level);
         this.authenticationTrigger = authenticationTrigger;
     }
 
@@ -136,10 +136,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     throws CharConversionException {
         final JarEntry entry = (JarEntry) super.newArchiveEntry(
                 archive, entryName, template);
-        if (entry.getMethod() != JarEntry.DEFLATED) {
+        if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
-            entry.setMethod(JarEntry.DEFLATED);
-            entry.setCompressedSize(JarEntry.UNKNOWN);
+            entry.setMethod(DEFLATED);
+            entry.setCompressedSize(UNKNOWN);
         }
         return entry;
     }

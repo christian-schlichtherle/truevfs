@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
@@ -174,51 +175,28 @@ public interface ArchiveDriver {
     throws IOException;
     
     /**
-     * Returns the icon that {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
-     * should display for the given archive.
+     * Returns the icon that
+     * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
+     * should display for the given archive file.
      *
-     * @param archive The abstract archive representation which TrueZIP's
-     *        internal {@link ArchiveController} is processing
-     *        - never {@code null}.
-     * @return The icon that should be displayed for the given archive if is
-     *         is open/expanded in the view.
+     * @param archive The archive file to display - never {@code null}.
+     * @return The icon that should be displayed for the given archive file
+     *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
     Icon getOpenIcon(Archive archive);
 
     /**
-     * Returns the icon that {@link de.schlichtherle.truezip.io.swing.FileSystemView}
-     * and {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer} should
-     * display for the given archive.
+     * Returns the icon that
+     * {@link de.schlichtherle.truezip.io.swing.FileSystemView}
+     * and
+     * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
+     * should display for the given archive file.
      *
-     * @param archive The abstract archive representation which TrueZIP's
-     *        internal {@link ArchiveController} is processing
-     *        - never {@code null}.
-     * @return The icon that should be displayed for the given archive if is
-     *         is closed/collapsed in the view.
+     * @param archive The archive file to display - never {@code null}.
+     * @return The icon that should be displayed for the given archive file
+     *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
     Icon getClosedIcon(Archive archive);
-
-    /**
-     * Archive drivers will be put into hash maps as keys,
-     * so be sure to implement this properly.
-     * Note that this is just a reinforcement of the general contract for
-     * {@link Object#equals} and the best possible implementation is the
-     * default implementation in {@code Object} which is most
-     * discriminating.
-     */
-    @Override
-    boolean equals(Object o);
-
-    /**
-     * Archive drivers will be put into hash maps as keys,
-     * so be sure to implement this properly.
-     * Note that this is just a reinforcement of the general contract for
-     * {@link Object#hashCode} and the best possible implementation is the
-     * default implementation in {@code Object} which is most
-     * discriminating.
-     */
-    @Override
-    int hashCode();
 }

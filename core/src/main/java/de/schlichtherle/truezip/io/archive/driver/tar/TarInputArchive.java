@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
 import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -39,6 +39,7 @@ import org.apache.tools.tar.TarBuffer;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
+import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
@@ -67,9 +68,6 @@ public class TarInputArchive implements InputArchive {
 
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
-
-    /** Prefix for temporary files created by the multiplexer. */
-    private static final String TEMP_FILE_PREFIX = TarDriver.TEMP_FILE_PREFIX;
 
     /**
      * Maps entry names to tar entries [String -> TarEntry].

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
@@ -28,7 +28,6 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.swing.Icon;
 
 /**
  * An archive driver which builds TAR files.
@@ -51,22 +50,14 @@ public class TarDriver extends AbstractArchiveDriver {
      * set charset. However, the low level TAR code as of Ant 1.6.5 doesn't
      * support that, hence this constraint.
      */
-    public static final String DEFAULT_CHARSET = "US-ASCII";
+    public static final String TAR_CHARSET = "US-ASCII";
 
     /**
-     * Equivalent to {@link #TarDriver(String, Icon, Icon)
-     * this(DEFAULT_CHARSET, null, null)}.
+     * Equivalent to {@link #TarDriver(String)
+     * this(TAR_CHARSET)}.
      */
     public TarDriver() {
-        this(DEFAULT_CHARSET, null, null);
-    }
-
-    /**
-     * Equivalent to {@link #TarDriver(String, Icon, Icon)
-     * this(charset, null, null)}.
-     */
-    public TarDriver(String charset) {
-        this(charset, null, null);
+        this(TAR_CHARSET);
     }
 
     /**
@@ -75,14 +66,11 @@ public class TarDriver extends AbstractArchiveDriver {
      * @param charset The name of a character set to use for all entry names
      *        when reading or writing TAR files.
      *        <b>Warning:</b> Due to limitations in Apache's Ant code, using
-     *        anything else than {@value #DEFAULT_CHARSET} is currently not
+     *        anything else than {@value #TAR_CHARSET} is currently not
      *        supported!
      */
-    public TarDriver(
-            String charset,
-            Icon openIcon,
-            Icon closedIcon) {
-        super(charset, openIcon, closedIcon);
+    public TarDriver(String charset) {
+        super(charset);
     }
 
     //

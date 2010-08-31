@@ -17,9 +17,12 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 
 /**
  * An adapter class to make the {@link ZipEntry} class implement the
@@ -35,12 +38,9 @@ public class ZipEntry
         implements ArchiveEntry {
 
     static {
-        assert de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN == ArchiveEntry.UNKNOWN;
+        assert de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN
+                == ArchiveEntry.UNKNOWN;
     }
-
-    /** The unknown value for numeric properties. */
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
-    public static final byte UNKNOWN = de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
 
     private ArchiveEntryMetaData metaData;
 
@@ -71,12 +71,9 @@ public class ZipEntry
         super.setName(name);
     }
 
-    public Icon getOpenIcon() {
-        return null;
-    }
-
-    public Icon getClosedIcon() {
-        return null;
+    @Override
+    public Type getType() {
+        return isDirectory() ? DIRECTORY : FILE;
     }
 
     @Override
@@ -84,14 +81,12 @@ public class ZipEntry
         return DateTimeConverter.ZIP;
     }
 
-    //
-    // Metadata implementation.
-    //
-
+    @Override
     public ArchiveEntryMetaData getMetaData() {
         return metaData;
     }
 
+    @Override
     public void setMetaData(ArchiveEntryMetaData metaData) {
         this.metaData = metaData;
     }

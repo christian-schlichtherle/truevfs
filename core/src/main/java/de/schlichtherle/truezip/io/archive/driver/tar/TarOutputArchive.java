@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
 
+import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
@@ -57,9 +58,6 @@ import static de.schlichtherle.truezip.io.util.Files.createTempFile;
  * @version $Id$
  */
 public class TarOutputArchive extends TarOutputStream implements OutputArchive {
-
-    /** Prefix for temporary files created by the multiplexer. */
-    private static final String TEMP_FILE_PREFIX = TarDriver.TEMP_FILE_PREFIX;
 
     /** Maps entry names to tar entries [String -> TarEntry]. */
     private final Map entries = new LinkedHashMap();
