@@ -44,9 +44,9 @@ import static de.schlichtherle.truezip.io.util.Files.contains;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class Files extends de.schlichtherle.truezip.io.util.Files {
+final class Files {
 
-    /** This class cannot get instantiated. */
+    /** You cannot instantiate this class. */
     private Files() {
     }
 
@@ -228,11 +228,11 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                     srcFile.ensureNotVirtualRoot("cannot read");
                     final File srcArchive = srcFile.getEnclArchive();
                     if (srcArchive != null) {
-                        final String srcEntryName = srcFile.getEnclEntryName();
-                        assert srcEntryName != null;
+                        final String srcPath = srcFile.getEnclEntryName();
+                        assert srcPath != null;
                         cp0(    preserve,
                                 srcArchive.getArchiveController(),
-                                srcEntryName,
+                                srcPath,
                                 dst);
                         return;
                     }
@@ -294,14 +294,14 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                 dstFile.ensureNotVirtualRoot("cannot write");
                 final File dstArchive = dstFile.getEnclArchive();
                 if (dstArchive != null) {
-                    final String dstEntryName = dstFile.getEnclEntryName();
-                    assert dstEntryName != null;
+                    final String dstPath = dstFile.getEnclEntryName();
+                    assert dstPath != null;
                     ArchiveControllers.cp(
                             preserve,
                             src,
                             in,
                             dstArchive.getArchiveController(),
-                            dstEntryName);
+                            dstPath);
                     return;
                 }
             }
@@ -344,7 +344,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
     private static void cp0(
             final boolean preserve,
             final ArchiveController srcController,
-            final String srcEntryName,
+            final String srcPath,
             final java.io.File dst)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
@@ -359,14 +359,14 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
                     dstFile.ensureNotVirtualRoot("cannot write");
                     final File dstArchive = dstFile.getEnclArchive();
                     if (dstArchive != null) {
-                        final String dstEntryName = dstFile.getEnclEntryName();
-                        assert dstEntryName != null;
+                        final String dstPath = dstFile.getEnclEntryName();
+                        assert dstPath != null;
                         ArchiveControllers.cp(
                                 preserve,
                                 srcController,
-                                srcEntryName,
+                                srcPath,
                                 dstArchive.getArchiveController(),
-                                dstEntryName);
+                                dstPath);
                         return;
                     }
                 }
@@ -384,8 +384,8 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             final long time;
             srcController.readLock().lock();
             try {
-                in = srcController.createInputStream0(srcEntryName); // detects false positives!
-                time = srcController.lastModified(srcEntryName);
+                in = srcController.newInputStream0(srcPath); // detects false positives!
+                time = srcController.lastModified(srcPath);
             } finally {
                 srcController.readLock().unlock();
             }
@@ -412,7 +412,7 @@ final class Files extends de.schlichtherle.truezip.io.util.Files {
             // Reroute call to the source's enclosing archive controller.
             cp0(    preserve,
                     srcController.getEnclController(),
-                    srcController.enclEntryName(srcEntryName),
+                    srcController.enclEntryName(srcPath),
                     dst);
         }
     }

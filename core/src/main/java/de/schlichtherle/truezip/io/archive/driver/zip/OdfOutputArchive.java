@@ -43,7 +43,7 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
     }
 
     @Override
-    public OutputStream getOutputStream(
+    public OutputStream newOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -54,7 +54,7 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
             if (zipEntry.getMethod() == ZipEntry.UNKNOWN)
                 zipEntry.setMethod(ZipEntry.STORED);
         }
-        return super.getOutputStream(zipEntry, srcEntry);
+        return super.newOutputStream(zipEntry, srcEntry);
     }
 
     @Override

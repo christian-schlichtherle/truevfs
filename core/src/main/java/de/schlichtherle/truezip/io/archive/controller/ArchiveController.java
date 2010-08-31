@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
@@ -38,6 +38,7 @@ import java.lang.ref.WeakReference;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -92,18 +93,15 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
  */
 public abstract class ArchiveController implements Archive {
 
-    // TODO: Harmonize the notation of the root directory!
-    static final String ROOT = "";
-
     /**
      * A weak reference to this archive controller.
-     * This field is for exclusive use by {@link #setScheduled(boolean)}.
+     * This field is for exclusive use by {@link #setTouched(boolean)}.
      */
     private final WeakReference weakThis = new WeakReference(this);
 
     /**
      * The canonicalized or at least normalized absolute path name
-     * representation of the target file.
+     * representation of the target archive file.
      */
     private final java.io.File target;
 
@@ -135,13 +133,13 @@ public abstract class ArchiveController implements Archive {
      * The subclass must update this schedule according to the controller's
      * state.
      * For example, if the controller has started to update some entry data,
-     * it must call {@link #setScheduled(boolean)} in order to force the
+     * it must call {@link #setTouched(boolean)} in order to force the
      * controller to be updated on the next call to
-     * {@link ArchiveControllers#umount(String, UmountConfiguration)}
+     * {@link ArchiveControllers#sync(String, SyncConfiguration)}
      * even if the client application holds no more references to it.
      * Otherwise, all changes may get lost!
      * 
-     * @see #setScheduled(boolean)
+     * @see #setTouched(boolean)
      */
     ArchiveController(
             final java.io.File target,
@@ -162,7 +160,7 @@ public abstract class ArchiveController implements Archive {
         this.readLock  = rwl.readLock();
         this.writeLock = rwl.writeLock();
 
-        setScheduled(false);
+        setTouched(false);
     }
 
     //
@@ -221,7 +219,7 @@ public abstract class ArchiveController implements Archive {
 
     /**
      * Returns the canonical or at least normalized absolute
-     * {@code java.io.File} object for the archive file to control.
+     * {@code java.io.File} object for the target archive file.
      */
     final java.io.File getTarget() {
         return target;
@@ -240,7 +238,11 @@ public abstract class ArchiveController implements Archive {
      * virtual root directory within this controller.
      */
     static boolean isRoot(String entryName) {
-        return ROOT == entryName; // possibly assigned by File.init(...), so using == is OK!
+        return ArchiveFileSystem.isRoot(entryName);
+    }
+
+    boolean isLenient() {
+        return ArchiveControllers.isLenient();
     }
 
     /**
@@ -314,44 +316,45 @@ public abstract class ArchiveController implements Archive {
     }
 
     /**
-     * Returns {@code true} if and only if the file system has been
-     * touched.
+     * Returns {@code true} if and only if the file system has been touched,
+     * i.e. if an operation changed its state.
      */
     abstract boolean isTouched();
 
     /**
-     * (Re)schedules this archive controller for the next call to
-     * {@link ArchiveControllers#umount(String, UmountConfiguration)}.
-     * 
-     * @param scheduled If set to {@code true}, this controller and hence
-     *        its target archive file is guaranteed to get updated during the
-     *        next call to {@code ArchiveControllers.umount()} even if
-     *        there are no more {@link File} instances referring to it
-     *        meanwhile.
-     *        Call this method with this parameter value whenever the virtual
-     *        file system has been touched, i.e. modified.
-     *        <p>
-     *        If set to {@code false}, this controller is conditionally
-     *        scheduled to get updated.
-     *        In this case, the controller gets automatically removed from
-     *        the controllers weak hash map and discarded once the last file
-     *        object directly or indirectly referring to it has been discarded
-     *        unless {@code setScheduled(true)} has been called meanwhile.
-     *        Call this method if the archive controller has been newly created
-     *        or successfully updated.
+     * Sets the <i>touch status</i> of the virtual file system and
+     * (re)schedules this archive controller for the synchronization of its
+     * archive contents to the target archive file in the real file system
+     * upon the next call to
+     * {@link ArchiveControllers#sync(String, SyncConfiguration)}
+     * according to the given touch status:
+     * <p>
+     * If set to {@code true}, the archive contents of this controller are
+     * guaranteed to get synced to the target archive file in the real file
+     * system even if there are no other objects referring to it.
+     * <p>
+     * If set to {@code false}, this controller is only conditionally
+     * scheduled to get synced, i.e. it gets automatically removed from the
+     * controllers weak hash map and discarded once the last file object
+     * directly or indirectly referring to it has been discarded unless
+     * {@code setTouched(true)} has been called again meanwhile.
+     * <p>
+     * Call this method if the archive controller has been newly created or
+     * successfully updated.
+     *
+     * @param touched The touch status of the virtual file system.
+     * @see #isTouched
      */
-    final void setScheduled(final boolean scheduled) {
-        assert weakThis.get() != null || !scheduled; // (garbage collected => no scheduling) == (scheduling => not garbage collected)
-
-        ArchiveControllers.set( getTarget(),
-                                scheduled ? (Object) this : weakThis);
+    final void setTouched(final boolean touched) {
+        assert weakThis.get() != null || !touched; // (garbage collected => no scheduling) == (scheduling => not garbage collected)
+        ArchiveControllers.set( getTarget(), touched ? this : weakThis);
     }
 
     /**
      * Tests if the archive entry with the given name has received or is
      * currently receiving new data via an output stream.
      * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #umount}.
+     * output stream before the next call to {@link #sync}.
      * Note that for directories this method will always return
      * {@code false}!
      */
@@ -393,7 +396,7 @@ public abstract class ArchiveController implements Archive {
      * only the last written entry would be added to the central directory
      * of the archive (unless the archive type doesn't support this).
      * 
-     * @see #umount(UmountConfiguration)
+     * @see #sync(SyncConfiguration)
      * @throws ArchiveFileException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
@@ -401,33 +404,32 @@ public abstract class ArchiveController implements Archive {
     throws ArchiveFileException {
         assert writeLock().isLockedByCurrentThread();
         if (hasNewData(entryName)) {
-            umount(new UmountConfiguration()
-                    .setArchiveFileExceptionBuilder(new DefaultArchiveFileExceptionBuilder())
+            sync(new SyncConfiguration()
                     .setWaitForInputStreams(true)
                     .setCloseInputStreams(false)
                     .setWaitForOutputStreams(true)
                     .setCloseOutputStreams(false)
-                    .setRelease(false)
+                    .setUmount(false)
                     .setReassemble(false));
         }
     }
 
     /**
-     * Updates the contents of the target archive file managed by this
-     * archive controller to the real file system.
-     * <p>
-     * <b>Warning:</b> As a side effect, all data structures returned by this
-     * controller get reset (filesystem, entries, streams, etc.)!
-     * As an implication, this method requires external synchronization on
-     * this controller's write lock!
+     * Writes all changes to the contents of the target archive file to the
+     * underlying file system.
+     * As a side effect, all data structures returned by this controller get
+     * reset (filesystem, entries, streams etc.)!
+     * This method requires external synchronization on this controller's write
+     * lock!
      *
      * @param config The parameters for processing - {@code null} is not
      *        permitted.
-     * @throws NullPointerException If {@code config} is {@code null}.
-     * @throws ArchiveFileException If any exceptional condition occurs
+     * @throws NullPointerException if {@code config} is {@code null}.
+     * @throws ArchiveFileException if any exceptional condition occurs
      *         throughout the processing of the target archive file.
+     * @see ArchiveControllers#sync(String, SyncConfiguration)
      */
-    abstract void umount(UmountConfiguration config)
+    public abstract void sync(SyncConfiguration config)
     throws ArchiveFileException;
 
     // TODO: Document this!
@@ -477,55 +479,58 @@ public abstract class ArchiveController implements Archive {
      * A factory method returning an input stream which is positioned
      * at the beginning of the given entry in the target archive file.
      * 
-     * @param entryName An entry in the virtual archive file system
+     * @param path An entry in the virtual archive file system
      *        - {@code null} or {@code ""} is not permitted.
      * @return A valid {@code InputStream} object
      *         - {@code null} is never returned.
      */
-    public final InputStream createInputStream(final String entryName)
+    public final InputStream newInputStream(final String path)
     throws FalsePositiveException, IOException {
-        assert entryName != null;
+        assert path != null;
 
         try {
-            return createInputStream0(entryName);
+            return newInputStream0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.createInputStream(enclEntryName(entryName));
+            return enclController.newInputStream(enclEntryName(path));
         }
     }
 
     // TODO: Make this private!
-    public InputStream createInputStream0(final String entryName)
+    public InputStream newInputStream0(final String path)
     throws FalsePositiveException, IOException {
-        assert entryName != null;
+        assert path != null;
 
         readLock().lock();
         try {
-            if (isRoot(entryName)) {
+            if (isRoot(path)) {
                 try {
-                    final boolean directory = isDirectory0(entryName); // detects false positives
+                    final boolean directory = isDirectory0(path); // detects false positives
                     assert directory : "The root entry must be a directory!";
                 } catch (EnclosedArchiveFileNotFoundException ex) {
-                    return enclController.createInputStream0(enclEntryName(entryName));
+                    return enclController.newInputStream0(enclEntryName(path));
                 } catch (ArchiveFileNotFoundException ex) {
                     throw new FalsePositiveException(this, ex);
                 }
-                throw new ArchiveEntryNotFoundException(this, entryName,
-                        "cannot read from (virtual root) directories");
+                throw new ArchiveEntryNotFoundException(this, path,
+                        "cannot read from (virtual root) directory entry");
             } else {
-                if (hasNewData(entryName)) {
+                if (hasNewData(path)) {
                     class AutoUmount4CreateInputStream
-                    implements Action<IOException> {
+                    implements IOOperation {
                         public void run() throws IOException {
-                            autoUmount(entryName);
+                            autoUmount(path);
                         }
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final ArchiveEntry entry = autoMount(false).get(entryName); // looks up file entries only!
+                final ArchiveEntry entry = autoMount(false).get(path);
                 if (entry == null)
-                    throw new ArchiveEntryNotFoundException(this, entryName,
+                    throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
-                return createInputStream(entry, null);
+                if (entry.isDirectory())
+                    throw new ArchiveEntryNotFoundException(this, path,
+                            "cannot read from directory entry");
+                return newInputStream(entry, null);
             }
         } finally {
             readLock().unlock();
@@ -540,7 +545,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream createInputStream(
+    abstract InputStream newInputStream(
             ArchiveEntry entry,
             ArchiveEntry dstEntry)
     throws IOException;
@@ -549,61 +554,61 @@ public abstract class ArchiveController implements Archive {
      * A factory method returning an {@code OutputStream} allowing to
      * (re)write the given entry in the target archive file.
      * 
-     * @param entryName An entry in the virtual archive file system
+     * @param path An entry in the virtual archive file system
      *        - {@code null} or {@code ""} is not permitted.
      * @return A valid {@code OutputStream} object
      *         - {@code null} is never returned.
      */
-    public final OutputStream createOutputStream(
-            final String entryName,
+    public final OutputStream newOutputStream(
+            final String path,
             final boolean append)
     throws FalsePositiveException, IOException {
-        assert entryName != null;
+        assert path != null;
 
         try {
-            return createOutputStream0(entryName, append);
+            return newOutputStream0(path, append);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.createOutputStream(enclEntryName(entryName),
+            return enclController.newOutputStream(enclEntryName(path),
                     append);
         }
     }
 
-    private OutputStream createOutputStream0(
-            final String entryName,
+    private OutputStream newOutputStream0(
+            final String path,
             final boolean append)
     throws FalsePositiveException, IOException {
-        assert entryName != null;
+        assert path != null;
 
         final InputStream in;
         final OutputStream out;
         writeLock().lock();
         try {
-            if (isRoot(entryName)) {
+            if (isRoot(path)) {
                 try {
-                    final boolean directory = isDirectory0(entryName); // detects false positives
+                    final boolean directory = isDirectory0(path); // detects false positives
                     assert directory : "The root entry must be a directory!";
                 } catch (EnclosedArchiveFileNotFoundException ex) {
-                    return enclController.createOutputStream0(enclEntryName(entryName), append);
+                    return enclController.newOutputStream0(enclEntryName(path), append);
                 } catch (ArchiveFileNotFoundException ex) {
                     throw new FalsePositiveException(this, ex);
                 }
-                throw new ArchiveEntryNotFoundException(this, entryName,
-                        "cannot write to (virtual root) directories");
+                throw new ArchiveEntryNotFoundException(this, path,
+                        "cannot write to (virtual root) directory entry");
             } else {
-                autoUmount(entryName);
-                final boolean lenient = ArchiveControllers.isLenient();
+                autoUmount(path);
+                final boolean lenient = isLenient();
                 final ArchiveFileSystem fileSystem = autoMount(lenient);
-                in = append && fileSystem.isFile(entryName)
-                        ? createInputStream0(entryName)
+                in = append && fileSystem.isFile(path)
+                        ? newInputStream0(path)
                         : null;
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already exists as a
                 // directory.
-                final Delta delta = fileSystem.link(entryName, lenient);
+                final LinkTransaction link = fileSystem.link(path, FILE, lenient);
                 // Create output stream.
-                out = createOutputStream(delta.getEntry(), null);
+                out = newOutputStream(link.getEntry(), null);
                 // Now link the entry into the file system.
-                delta.commit();
+                link.run();
             }
         } finally {
             writeLock().unlock();
@@ -626,7 +631,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream createOutputStream(
+    abstract OutputStream newOutputStream(
             ArchiveEntry entry,
             ArchiveEntry srcEntry)
     throws IOException;
@@ -636,12 +641,12 @@ public abstract class ArchiveController implements Archive {
     // Read only operations:
     //
 
-    public final boolean exists(final String entryName)
+    public final boolean exists(final String path)
     throws FalsePositiveException {
         try {
-            return exists0(entryName);
+            return exists0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.exists(enclEntryName(entryName));
+            return enclController.exists(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -649,29 +654,29 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean exists0(final String entryName)
+    private boolean exists0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.exists(entryName);
+            return fileSystem.exists(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final boolean isFile(final String entryName)
+    public final boolean isFile(final String path)
     throws FalsePositiveException {
         try {
-            return isFile0(entryName);
+            return isFile0(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // TODO: Document this!
-            if (isRoot(entryName)
+            if (isRoot(path)
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return enclController.isFile(enclEntryName(entryName));
+            return enclController.isFile(enclEntryName(path));
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.isFile(enclEntryName(entryName));
+            return enclController.isFile(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -679,25 +684,25 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean isFile0(final String entryName)
+    private boolean isFile0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isFile(entryName);
+            return fileSystem.isFile(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final boolean isDirectory(final String entryName)
+    public final boolean isDirectory(final String path)
     throws FalsePositiveException {
         try {
-            return isDirectory0(entryName);
+            return isDirectory0(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
             return false;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.isDirectory(enclEntryName(entryName));
+            return enclController.isDirectory(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -705,23 +710,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean isDirectory0(final String entryName)
+    private boolean isDirectory0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isDirectory(entryName);
+            return fileSystem.isDirectory(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final Icon getOpenIcon(final String entryName)
+    public final Icon getOpenIcon(final String path)
     throws FalsePositiveException {
         try {
-            return getOpenIcon0(entryName);
+            return getOpenIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getOpenIcon(enclEntryName(entryName));
+            return enclController.getOpenIcon(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -729,25 +734,25 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private Icon getOpenIcon0(final String entryName)
+    private Icon getOpenIcon0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
-            return isRoot(entryName)
+            return isRoot(path)
                     ? getDriver().getOpenIcon(this)
-                    : fileSystem.getOpenIcon(entryName);
+                    : fileSystem.getOpenIcon(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final Icon getClosedIcon(final String entryName)
+    public final Icon getClosedIcon(final String path)
     throws FalsePositiveException {
         try {
-            return getClosedIcon0(entryName);
+            return getClosedIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getOpenIcon(enclEntryName(entryName));
+            return enclController.getOpenIcon(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -755,25 +760,25 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private Icon getClosedIcon0(final String entryName)
+    private Icon getClosedIcon0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false); // detect false positives!
-            return isRoot(entryName)
+            return isRoot(path)
                     ? getDriver().getClosedIcon(this)
-                    : fileSystem.getClosedIcon(entryName);
+                    : fileSystem.getClosedIcon(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final boolean canRead(final String entryName)
+    public final boolean canRead(final String path)
     throws FalsePositiveException {
         try {
-            return canRead0(entryName);
+            return canRead0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.canRead(enclEntryName(entryName));
+            return enclController.canRead(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -781,23 +786,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean canRead0(final String entryName)
+    private boolean canRead0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.exists(entryName);
+            return fileSystem.exists(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final boolean canWrite(final String entryName)
+    public final boolean canWrite(final String path)
     throws FalsePositiveException {
         try {
-            return canWrite0(entryName);
+            return canWrite0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.canWrite(enclEntryName(entryName));
+            return enclController.canWrite(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -805,23 +810,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean canWrite0(final String entryName)
+    private boolean canWrite0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.canWrite(entryName);
+            return fileSystem.canWrite(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final long length(final String entryName)
+    public final long length(final String path)
     throws FalsePositiveException {
         try {
-            return length0(entryName);
+            return length0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.length(enclEntryName(entryName));
+            return enclController.length(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -829,23 +834,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private long length0(final String entryName)
+    private long length0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.length(entryName);
+            return fileSystem.length(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final long lastModified(final String entryName)
+    public final long lastModified(final String path)
     throws FalsePositiveException {
         try {
-            return lastModified0(entryName);
+            return lastModified0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.lastModified(enclEntryName(entryName));
+            return enclController.lastModified(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -853,23 +858,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private long lastModified0(final String entryName)
+    private long lastModified0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.lastModified(entryName);
+            return fileSystem.lastModified(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final String[] list(final String entryName)
+    public final String[] list(final String path)
     throws FalsePositiveException {
         try {
-            return list0(entryName);
+            return list0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.list(enclEntryName(entryName));
+            return enclController.list(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -877,26 +882,26 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private String[] list0(final String entryName)
+    private String[] list0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.list(entryName);
+            return fileSystem.list(path);
         } finally {
             readLock().unlock();
         }
     }
 
     public final String[] list(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir)
     throws FalsePositiveException {
         try {
-            return list0(entryName, filenameFilter, dir);
+            return list0(path, filenameFilter, dir);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.list(enclEntryName(entryName),
+            return enclController.list(enclEntryName(path),
                     filenameFilter, dir);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -906,29 +911,29 @@ public abstract class ArchiveController implements Archive {
     }
 
     private String[] list0(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.list(entryName, filenameFilter, dir);
+            return fileSystem.list(path, filenameFilter, dir);
         } finally {
             readLock().unlock();
         }
     }
 
     public final File[] listFiles(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory)
     throws FalsePositiveException {
         try {
-            return listFiles0(entryName, filenameFilter, dir, factory);
+            return listFiles0(path, filenameFilter, dir, factory);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.listFiles(enclEntryName(entryName),
+            return enclController.listFiles(enclEntryName(path),
                     filenameFilter, dir, factory);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -938,7 +943,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private File[] listFiles0(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory)
@@ -946,22 +951,22 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.listFiles(entryName, filenameFilter, dir, factory);
+            return fileSystem.listFiles(path, filenameFilter, dir, factory);
         } finally {
             readLock().unlock();
         }
     }
 
     public final File[] listFiles(
-            final String entryName,
+            final String path,
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory)
     throws FalsePositiveException {
         try {
-            return listFiles0(entryName, fileFilter, dir, factory);
+            return listFiles0(path, fileFilter, dir, factory);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.listFiles(enclEntryName(entryName),
+            return enclController.listFiles(enclEntryName(path),
                     fileFilter, dir, factory);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -971,7 +976,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     private File[] listFiles0(
-            final String entryName,
+            final String path,
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory)
@@ -979,7 +984,7 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.listFiles(entryName, fileFilter, dir, factory);
+            return fileSystem.listFiles(path, fileFilter, dir, factory);
         } finally {
             readLock().unlock();
         }
@@ -990,12 +995,12 @@ public abstract class ArchiveController implements Archive {
     // Write operations:
     //
 
-    public final boolean setReadOnly(final String entryName)
+    public final boolean setReadOnly(final String path)
     throws FalsePositiveException {
         try {
-            return setReadOnly0(entryName);
+            return setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.setReadOnly(enclEntryName(entryName));
+            return enclController.setReadOnly(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1003,25 +1008,25 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean setReadOnly0(final String entryName)
+    private boolean setReadOnly0(final String path)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.setReadOnly(entryName);
+            return fileSystem.setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
     }
 
     public final boolean setLastModified(
-            final String entryName,
+            final String path,
             final long time)
     throws FalsePositiveException {
         try {
-            return setLastModified0(entryName, time);
+            return setLastModified0(path, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.setLastModified(enclEntryName(entryName),
+            return enclController.setLastModified(enclEntryName(path),
                     time);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -1031,46 +1036,46 @@ public abstract class ArchiveController implements Archive {
     }
 
     private boolean setLastModified0(
-            final String entryName,
+            final String path,
             final long time)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            autoUmount(entryName);
+            autoUmount(path);
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.setLastModified(entryName, time);
+            return fileSystem.setLastModified(path, time);
         } finally {
             writeLock().unlock();
         }
     }
 
     public final boolean createNewFile(
-            final String entryName,
+            final String path,
             final boolean autoCreate)
     throws FalsePositiveException, IOException {
         try {
-            return createNewFile0(entryName, autoCreate);
+            return createNewFile0(path, autoCreate);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.createNewFile(enclEntryName(entryName),
+            return enclController.createNewFile(enclEntryName(path),
                     autoCreate);
         }
     }
 
     private boolean createNewFile0(
-            final String entryName,
+            final String path,
             final boolean autoCreate)
     throws FalsePositiveException, IOException {
-        assert !isRoot(entryName);
+        assert !isRoot(path);
 
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-            if (fileSystem.exists(entryName))
+            if (fileSystem.exists(path))
                 return false;
 
             // If we got until here without an exception,
             // write an empty file now.
-            createOutputStream0(entryName, false).close();
+            newOutputStream0(path, false).close();
 
             return true;
         } finally {
@@ -1079,14 +1084,14 @@ public abstract class ArchiveController implements Archive {
     }
 
     public final boolean mkdir(
-            final String entryName,
+            final String path,
             final boolean autoCreate)
     throws FalsePositiveException {
         try {
-            mkdir0(entryName, autoCreate);
+            mkdir0(path, autoCreate);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.mkdir(enclEntryName(entryName), autoCreate);
+            return enclController.mkdir(enclEntryName(path), autoCreate);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1094,11 +1099,11 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private void mkdir0(final String entryName, final boolean autoCreate)
+    private void mkdir0(final String path, final boolean autoCreate)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            if (isRoot(entryName)) {
+            if (isRoot(path)) {
                 // This is the virtual root of an archive file system, so we
                 // are actually working on the controller's target file.
                 if (isRfsEntryTarget()) {
@@ -1113,27 +1118,27 @@ public abstract class ArchiveController implements Archive {
             } else { // !isRoot(entryName)
                 // This file is a regular archive entry.
                 final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-                fileSystem.mkdir(entryName, autoCreate);
+                fileSystem.mkdir(path, autoCreate);
             }
         } finally {
             writeLock().unlock();
         }
     }
 
-    public final boolean delete(final String entryName)
+    public final boolean delete(final String path)
     throws FalsePositiveException {
         try {
-            delete0(entryName);
+            delete0(path);
             return true;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.delete(enclEntryName(entryName));
+            return enclController.delete(enclEntryName(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // TODO: Document this!
-            if (isRoot(entryName)
-            && !enclController.isDirectory(enclEntryName(entryName))
+            if (isRoot(path)
+            && !enclController.isDirectory(enclEntryName(path))
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return enclController.delete(enclEntryName(entryName));
+            return enclController.delete(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1141,13 +1146,13 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private void delete0(final String entryName)
+    private void delete0(final String path)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            autoUmount(entryName);
+            autoUmount(path);
 
-            if (isRoot(entryName)) {
+            if (isRoot(path)) {
                 // Get the file system or die trying!
                 final ArchiveFileSystem fileSystem;
                 try {
@@ -1167,7 +1172,7 @@ public abstract class ArchiveController implements Archive {
                 // Do not use the number of entries in the file system
                 // for the following test - it's size would count absolute
                 // pathnames as well!
-                final String[] members = fileSystem.list(entryName);
+                final String[] members = fileSystem.list(path);
                 if (members != null && members.length != 0)
                     throw new IOException("archive file system not empty!");
                 final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
@@ -1195,11 +1200,11 @@ public abstract class ArchiveController implements Archive {
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    enclController.delete0(enclEntryName(entryName));
+                    enclController.delete0(enclEntryName(path));
                 }
             } else { // !isRoot(entryName)
                 final ArchiveFileSystem fileSystem = autoMount(false);
-                fileSystem.delete(entryName);
+                fileSystem.delete(path);
             }
         } finally {
             writeLock().unlock();

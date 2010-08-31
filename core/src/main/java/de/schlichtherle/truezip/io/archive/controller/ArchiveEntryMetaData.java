@@ -129,7 +129,7 @@ public class ArchiveEntryMetaData {
         try {
             for (final String child : children)
                 if (filenameFilter == null || filenameFilter.accept(dir, child))
-                    filteredList.add(factory.newFile(dir, child));
+                    filteredList.add(factory.createFile(dir, child));
             return filteredList.toArray(new File[filteredList.size()]);
         } finally {
             filteredList.clear(); // support garbage collection of zip controllers!
@@ -157,7 +157,7 @@ public class ArchiveEntryMetaData {
         assert filteredList.isEmpty();
         try {
             for (final String child : children) {
-                final File file = factory.newFile(dir, child);
+                final File file = factory.createFile(dir, child);
                 if (fileFilter == null || fileFilter.accept(file))
                     filteredList.add(file);
             }

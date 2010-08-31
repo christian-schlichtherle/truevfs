@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
-import de.schlichtherle.truezip.io.util.Files;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -32,6 +32,8 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
+
+import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
  * An implementation of {@link OutputArchive} to write TAR archives.
@@ -82,7 +84,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
         return (TarEntry) entries.get(entryName);
     }
 
-    public OutputStream getOutputStream(
+    public OutputStream newOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -105,7 +107,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
         // to the destination entry.
         // So we need to buffer the output in a temporary file and write
         // it upon close().
-        final java.io.File temp = Files.createTempFile(TEMP_FILE_PREFIX);
+        final File temp = createTempFile(TEMP_FILE_PREFIX);
         return new TempEntryOutputStream(tarEntry, temp);
     }
 
@@ -122,7 +124,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputStream}.
+     * These preconditions are checked by {@link #newOutputStream}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
@@ -164,12 +166,12 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
      */
     private class TempEntryOutputStream extends java.io.FileOutputStream {
         private final TarEntry entry;
-        private final java.io.File temp;
+        private final File temp;
         private boolean closed;
 
         public TempEntryOutputStream(
                 final TarEntry entry,
-                final java.io.File temp)
+                final File temp)
         throws IOException {
             super(temp);
             this.entry = entry;
@@ -197,7 +199,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
 
     private void storeTempEntry(
             final TarEntry entry,
-            final java.io.File temp)
+            final File temp)
     throws IOException {
         try {
             final InputStream in = new java.io.FileInputStream(temp);

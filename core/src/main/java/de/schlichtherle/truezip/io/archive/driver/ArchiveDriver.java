@@ -107,7 +107,7 @@ public interface ArchiveDriver {
      *         written or deleted.
      * @see InputArchive
      */
-    InputArchive createInputArchive(
+    InputArchive newInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException;
@@ -133,7 +133,7 @@ public interface ArchiveDriver {
      *         illegal characters.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
      */
-    ArchiveEntry createArchiveEntry(
+    ArchiveEntry newArchiveEntry(
             Archive archive,
             String entryName,
             ArchiveEntry template)
@@ -151,7 +151,7 @@ public interface ArchiveDriver {
      * @param source The source {@link InputArchive} if
      *        {@code archive} is going to get updated.
      *        If not {@code null}, this is guaranteed to be a product
-     *        of this driver's {@link #createInputArchive} method.
+     *        of this driver's {@link #newInputArchive} method.
      *        This may be used to copy some meta data which is specific to
      *        the type of archive this driver supports.
      *        For example, this could be used to copy the comment of a ZIP
@@ -167,7 +167,7 @@ public interface ArchiveDriver {
      *         when writing the output archive.
      * @see OutputArchive
      */
-    OutputArchive createOutputArchive(
+    OutputArchive newOutputArchive(
             Archive archive,
             OutputStream out,
             InputArchive source)

@@ -19,8 +19,9 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.FileBusyException;
 
 /**
- * Thrown to indicate that the {@link OutputArchive#getOutputStream} method
- * failed because the archive is already busy on output.
+ * Thrown to indicate that the
+ * {@link OutputArchive#newOutputStream(ArchiveEntry, ArchiveEntry)}
+ * method failed because the archive is already busy on output.
  * This exception is guaranteed to be recoverable,
  * meaning it must be possible to write the same entry again as soon as the
  * archive is not busy on output anymore, unless another exceptional condition

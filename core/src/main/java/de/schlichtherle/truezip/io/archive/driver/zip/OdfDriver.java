@@ -89,12 +89,12 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public OutputArchive createOutputArchive(
+    public OutputArchive newOutputArchive(
             Archive archive,
             OutputStream out,
             InputArchive source)
     throws IOException {
-        return new OdfOutputArchive(createZipOutputArchive(
+        return new OdfOutputArchive(newZipOutputArchive(
                 archive, out, (ZipInputArchive) source));
     }
 }

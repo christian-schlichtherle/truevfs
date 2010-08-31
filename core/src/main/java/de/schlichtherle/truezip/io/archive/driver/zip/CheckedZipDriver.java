@@ -80,7 +80,7 @@ public class CheckedZipDriver extends ZipDriver {
     }
     
     @Override
-    protected ZipInputArchive createZipInputArchive(
+    protected ZipInputArchive newZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {

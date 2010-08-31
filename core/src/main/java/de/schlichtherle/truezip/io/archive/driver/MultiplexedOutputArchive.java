@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +35,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
  * A decorator for output archives which allows to write an unlimited number
@@ -111,7 +112,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
         return tempOut != null ? tempOut.entry : null;
     }
 
-    public OutputStream getOutputStream(
+    public OutputStream newOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -119,7 +120,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
             setSize(entry, srcEntry.getSize()); // data may be compressed!
         
         if (isTargetBusy()) {
-            final File temp = Files.createTempFile(TEMP_FILE_PREFIX);
+            final File temp = createTempFile(TEMP_FILE_PREFIX);
             return new TempEntryOutputStream(entry, srcEntry, temp);
         }
         return new EntryOutputStream(entry, srcEntry);
@@ -143,7 +144,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 final ArchiveEntry entry,
                 final ArchiveEntry srcEntry)
         throws IOException {
-            super(target.getOutputStream(entry, srcEntry));
+            super(target.newOutputStream(entry, srcEntry));
             targetBusy = true;
         }
 
@@ -244,7 +245,7 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 try {
                     final InputStream in = new FileInputStream(temp);
                     try {
-                        final OutputStream out = target.getOutputStream(
+                        final OutputStream out = target.newOutputStream(
                                 entry, srcEntry);
                         try {
                             Streams.cat(in, out);

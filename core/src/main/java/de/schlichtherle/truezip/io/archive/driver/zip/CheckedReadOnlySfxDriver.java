@@ -80,7 +80,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     }
     
     @Override
-    protected ZipInputArchive createZipInputArchive(
+    protected ZipInputArchive newZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {

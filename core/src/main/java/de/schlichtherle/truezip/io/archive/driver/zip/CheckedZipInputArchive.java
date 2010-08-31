@@ -62,7 +62,7 @@ public class CheckedZipInputArchive extends ZipInputArchive {
      * Overridden to read from a checked input stream.
      */
     @Override
-    public InputStream getInputStream(
+    public InputStream newInputStream(
             ArchiveEntry entry,
             ArchiveEntry dstEntry)
     throws  IOException {

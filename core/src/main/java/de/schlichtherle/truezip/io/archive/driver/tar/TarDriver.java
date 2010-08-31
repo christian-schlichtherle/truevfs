@@ -89,7 +89,7 @@ public class TarDriver extends AbstractArchiveDriver {
     // Factory methods:
     //
 
-    public ArchiveEntry createArchiveEntry(
+    public ArchiveEntry newArchiveEntry(
             final Archive archive,
             final String entryName,
             final ArchiveEntry template)
@@ -116,17 +116,17 @@ public class TarDriver extends AbstractArchiveDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation calls {@link #createInputStream(Archive, ReadOnlyFile)
-     * createInputStream(archive, rof)} and passes the resulting stream to
-     * {@link #createTarInputArchive(Archive, InputStream)}.
+     * This implementation calls {@link #newInputStream(Archive, ReadOnlyFile)
+     * newInputStream(archive, rof)} and passes the resulting stream to
+     * {@link #newTarInputArchive(Archive, InputStream)}.
      */
-    public InputArchive createInputArchive(
+    public InputArchive newInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {
-        final InputStream in = createInputStream(archive, rof);
+        final InputStream in = newInputStream(archive, rof);
         try {
-            return createTarInputArchive(archive, in);
+            return newTarInputArchive(archive, in);
         } finally {
             in.close();
         }
@@ -141,9 +141,9 @@ public class TarDriver extends AbstractArchiveDriver {
      * <p>
      * Note that the returned stream should support marking for best
      * performance and will <em>always</em> be closed early by
-     * {@link #createInputArchive(Archive, ReadOnlyFile)}.
+     * {@link #newInputArchive(Archive, ReadOnlyFile)}.
      */
-    protected InputStream createInputStream(
+    protected InputStream newInputStream(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -156,7 +156,7 @@ public class TarDriver extends AbstractArchiveDriver {
      * The implementation in this class simply returns
      * {@code new TarInputArchive(in)}.
      */
-    protected TarInputArchive createTarInputArchive(
+    protected TarInputArchive newTarInputArchive(
             Archive archive,
             InputStream in)
     throws IOException {
@@ -166,19 +166,19 @@ public class TarDriver extends AbstractArchiveDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation forwards the call to {@link #createTarOutputArchive}
+     * This implementation forwards the call to {@link #newTarOutputArchive}
      * and wraps the result in a new {@link MultiplexedOutputArchive}.
      */
-    public OutputArchive createOutputArchive(
+    public OutputArchive newOutputArchive(
             Archive archive,
             OutputStream out,
             InputArchive source)
     throws IOException {
-        return new MultiplexedOutputArchive(createTarOutputArchive(
+        return new MultiplexedOutputArchive(newTarOutputArchive(
                 archive, out, (TarInputArchive) source));
     }
 
-    protected TarOutputArchive createTarOutputArchive(
+    protected TarOutputArchive newTarOutputArchive(
             Archive archive,
             OutputStream out,
             TarInputArchive source)

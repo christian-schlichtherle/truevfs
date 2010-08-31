@@ -116,10 +116,10 @@ final class FileView extends FilterFileView {
 
     private static boolean isValidArchive(File file) {
         return file.isArchive() && file.isDirectory()
-                && !createNonArchiveFile(file).isDirectory();
+                && !newNonArchiveFile(file).isDirectory();
     }
 
-    private static File createNonArchiveFile(File file) {
+    private static File newNonArchiveFile(File file) {
         return ArchiveDetector.NULL.createFile(
                 file .getParentFile(), file.getName());
     }

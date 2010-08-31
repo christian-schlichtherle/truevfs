@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import static de.schlichtherle.truezip.io.util.Files.normalize;
+import static de.schlichtherle.truezip.io.util.Paths.normalize;
 
 /**
  * A factory for {@link JarEntry}s.
@@ -32,6 +32,6 @@ public class JarEntryFactory implements de.schlichtherle.truezip.io.zip.ZipEntry
     }
 
     public ZipEntry newZipEntry(String entryName) {
-        return new JarEntry(normalize(entryName, '/'));
+        return new JarEntry(entryName);
     }
 }

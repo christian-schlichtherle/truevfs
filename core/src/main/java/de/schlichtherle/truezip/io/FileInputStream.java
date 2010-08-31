@@ -75,7 +75,7 @@ import java.io.InputStream;
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see FileBusyException
  * @see File#cat
- * @see File#umount
+ * @see File#sync
  * @see File#update
  * @author Christian Schlichtherle
  * @version $Id$
@@ -93,7 +93,7 @@ public class FileInputStream extends FilterInputStream {
      */
     public FileInputStream(String name)
     throws FileNotFoundException {
-        super(createInputStream(File.getDefaultArchiveDetector().createFile(name)));
+        super(newInputStream(File.getDefaultArchiveDetector().createFile(name)));
     }
 
     /**
@@ -107,24 +107,24 @@ public class FileInputStream extends FilterInputStream {
      */
     public FileInputStream(java.io.File file)
     throws FileNotFoundException {
-        super(createInputStream(file));
+        super(newInputStream(file));
     }
 
     public FileInputStream(FileDescriptor fd) {
         super(new java.io.FileInputStream(fd));
     }
 
-    private static InputStream createInputStream(final java.io.File src)
+    private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
         try {
             if (src instanceof File) {
                 final File file = (File) src;
                 final File archive = file.getInnerArchive();
                 if (archive != null) {
-                    final String entryName = file.getInnerEntryName();
-                    assert entryName != null;
+                    final String path = file.getInnerEntryName();
+                    assert path != null;
                     return archive.getArchiveController()
-                            .createInputStream(entryName);
+                            .newInputStream(path);
                 }
             }
         } catch (FalsePositiveException isNotArchive) {

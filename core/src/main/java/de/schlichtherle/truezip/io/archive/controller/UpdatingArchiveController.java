@@ -25,8 +25,6 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.io.util.Files;
-import de.schlichtherle.truezip.util.Action;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.locks.ReentrantLock;
 import java.io.FileNotFoundException;
@@ -36,6 +34,11 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.util.Files.isWritableOrCreatable;
+import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -59,10 +62,6 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * - should <em>not</em> be {@code null} for enhanced unit tests.
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
-
-    //
-    // Instance fields.
-    //
 
     /**
      * The actual archive file as a plain {@code java.io.File} object
@@ -97,10 +96,6 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private boolean needsReassembly;
 
-    //
-    // Constructors.
-    //
-
     UpdatingArchiveController(
             java.io.File target,
             ArchiveController enclController,
@@ -108,10 +103,6 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             ArchiveDriver driver) {
         super(target, enclController, enclEntryName, driver);
     }
-
-    //
-    // Methods.
-    //
 
     void mount(final boolean autoCreate)
     throws FalsePositiveException, IOException {
@@ -164,7 +155,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // The archive file exists.
                 // Thoroughly test read-only status BEFORE opening
                 // the device file!
-                final boolean isReadOnly = !Files.isWritableOrCreatable(inFile);
+                final boolean isReadOnly = !isWritableOrCreatable(inFile);
                 try {
                     initInArchive(inFile);
                 } catch (IOException ex) {
@@ -185,8 +176,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // This may fail e.g. if the target file is a RAES
                 // encrypted ZIP file and the user cancels password
                 // prompting.
-                ensureOutArchive(); // required!
-                setFileSystem(new ArchiveFileSystem(this));
+                final ArchiveFileSystem fileSystem
+                        = new ArchiveFileSystem(this);
+                touch(); // required!
+                setFileSystem(fileSystem);
             }
         } else {
             // The target file of this controller IS (or appears to be)
@@ -245,7 +238,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
         assert entryName != null;
-        assert !ROOT.equals(entryName);
+        assert !isRoot(entryName);
         assert inFile == null;
 
         try {
@@ -258,11 +251,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             controller.readLock().lock();
             if (controller.hasNewData(entryName) || autoCreate) {
                 controller.readLock().unlock();
-                class Locker implements Action<IOException> {
+                class Locker implements IOOperation {
                     public void run() throws IOException {
                         // Update controller if the entry already has new data.
                         // This needs to be done first before we can access the
-                        // file system since controller.createInputStream(entryName)
+                        // file system since controller.newInputStream(entryName)
                         // would do the same and controller.update() would
                         // invalidate the file system reference.
                         controller.autoUmount(entryName);
@@ -307,23 +300,23 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     private void unwrapFromLockedController(
             final ArchiveController controller,
-            final String entryName,
+            final String path,
             final boolean autoCreate)
     throws FalsePositiveException, IOException {
         assert controller != null;
         assert controller.readLock().isLockedByCurrentThread() || controller.writeLock().isLockedByCurrentThread();
-        assert entryName != null;
-        assert !ROOT.equals(entryName);
+        assert path != null;
+        assert !isRoot(path);
         assert inFile == null;
 
         final ArchiveFileSystem controllerFileSystem;
         controllerFileSystem = controller.autoMount(
                 autoCreate && ArchiveControllers.isLenient());
-        if (controllerFileSystem.isFile(entryName)) {
+        if (controllerFileSystem.isFile(path)) {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
             // archive file entry.
-            final java.io.File tmp = Files.createTempFile(
+            final java.io.File tmp = createTempFile(
                     TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
             // We do properly delete our temps, so this is not required.
             // In addition, this would be dangerous as the deletion
@@ -332,7 +325,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.cp( controller.createInputStream0(entryName),
+                Streams.cp( controller.newInputStream0(path),
                             new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
@@ -340,10 +333,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     initInArchive(tmp);
                 } catch (IOException ex) {
                     throw new FileArchiveEntryFalsePositiveException(
-                            this, controller, entryName, ex);
+                            this, controller, path, ex);
                 }
                 setFileSystem(new ArchiveFileSystem(this, inArchive,
-                        controllerFileSystem.lastModified(entryName),
+                        controllerFileSystem.lastModified(path),
                         controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
@@ -354,9 +347,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (inFile == null && !tmp.delete())
                     throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)");
             }
-        } else if (controllerFileSystem.isDirectory(entryName)) {
+        } else if (controllerFileSystem.isDirectory(path)) {
             throw new DirectoryArchiveEntryFalsePositiveException(
-                    this, controller, entryName,
+                    this, controller, path,
                     new FileNotFoundException("cannot read directories"), this);
         } else if (!autoCreate) {
             // The entry does NOT exist in the enclosing archive
@@ -370,9 +363,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // file, but we may create it automatically.
             // TODO: Document this: Why do we need to pass File.isLenient()
             // instead of just true?
-            final ArchiveFileSystem.Delta delta
-                    = controllerFileSystem.link(
-                        entryName, ArchiveControllers.isLenient());
+            final IOOperation link = controllerFileSystem.link(
+                    path, FILE, ArchiveControllers.isLenient());
 
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -381,7 +373,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
             // Now try to create the entry in the enclosing controller.
             try {
-                delta.commit();
+                link.run();
             } catch (IOException ex) {
                 // The delta on the *enclosing* controller failed.
                 // Hence, we need to revert our state changes.
@@ -400,7 +392,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 throw ex;
             }
 
-            setFileSystem(new ArchiveFileSystem(this));
+            final ArchiveFileSystem fileSystem = new ArchiveFileSystem(this);
+            touch(); // required!
+            setFileSystem(fileSystem);
         }
     }
 
@@ -421,7 +415,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 if (isRfsEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                inArchive = getDriver().createInputArchive(this, rof);
+                inArchive = getDriver().newInputArchive(this, rof);
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -442,7 +436,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inArchive != null;
     }
 
-    InputStream createInputStream(
+    InputStream newInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
@@ -452,12 +446,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert !entry.isDirectory();
 
         final InputStream in
-                = inArchive.getMetaData().createInputStream(entry, dstEntry);
+                = inArchive.getMetaData().newInputStream(entry, dstEntry);
         assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + entry.getName() + '"';
         return in;
     }
 
-    OutputStream createOutputStream(
+    OutputStream newOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -468,16 +462,23 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
         ensureOutArchive();
         final OutputStream out
-                = outArchive.getMetaData().createOutputStream(entry, srcEntry);
+                = outArchive.getMetaData().newOutputStream(entry, srcEntry);
         assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + entry.getName() + '"';
         return out;
     }
 
-    @Override
+    /**
+     * Ensures the output archive is set up and sets the touch status to
+     * {@code true}.
+     * <p>
+     * <b>Warning:</b> The write lock of this controller must be acquired
+     * while this method is called!
+     */
+    // TODO: Make this private!
     void touch() throws IOException {
         assert writeLock().isLockedByCurrentThread();
         ensureOutArchive();
-        super.touch();
+        setTouched(true);
     }
 
     private void ensureOutArchive()
@@ -493,7 +494,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 tmp = getTarget();
             } else {
                 // Use a new temporary file as the output archive file.
-                tmp = Files.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+                tmp = createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
                 // We do properly delete our temps, so this is not required.
                 // In addition, this would be dangerous as the deletion
                 // could happen before our shutdown hook has a chance to
@@ -528,7 +529,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    outArchive = getDriver().createOutputArchive(this, out, inArchive);
+                    outArchive = getDriver().newOutputArchive(this, out, inArchive);
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -562,10 +563,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         return outArchive != null && outArchive.getArchiveEntry(entryName) != null;
     }
 
-    void umount(final UmountConfiguration config)
+    public void sync(final SyncConfiguration config)
     throws ArchiveFileException {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
-        assert !config.getRelease() || config.getReassemble(); // umount => reassemble
+        assert !config.getUmount() || config.getReassemble(); // sync => reassemble
         assert writeLock().isLockedByCurrentThread();
         assert inArchive == null || inFile != null; // input archive => input file
         assert !isTouched() || outArchive != null; // file system touched => output archive
@@ -578,12 +579,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             Boolean.valueOf(config.getCloseInputStreams()),
             Boolean.valueOf(config.getWaitForOutputStreams()),
             Boolean.valueOf(config.getCloseOutputStreams()),
-            Boolean.valueOf(config.getRelease()),
+            Boolean.valueOf(config.getUmount()),
             Boolean.valueOf(config.getReassemble()),
         };
         logger.log(Level.FINER, "umount.entering", stats); // NOI18N
         try {
-            umount0(config);
+            sync0(config);
         } catch (ArchiveFileException ex) {
             logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
             throw ex;
@@ -591,7 +592,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         logger.log(Level.FINER, "umount.exiting", stats); // NOI18N
     }
 
-    private void umount0(final UmountConfiguration config)
+    private void sync0(final SyncConfiguration config)
     throws ArchiveFileException {
         final ArchiveFileExceptionBuilder builder
                 = config.getArchiveFileExceptionBuilder();
@@ -626,10 +627,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         }
 
         // Delete all entries which have been marked for deletion.
-        /*super.umount(newExceptionChain,
+        /*super.sync(newExceptionChain,
                      waitInputStreams, closeInputStreams,
                      waitOutputStreams, closeOutputStreams,
-                     umount, reassemble);*/
+                     sync, reassemble);*/
 
         // Now update the archive.
         try {
@@ -648,7 +649,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         needsReassembly = false;
                     }
                 } finally {
-                    shutdownStep3(config.getRelease() && !needsReassembly);
+                    shutdownStep3(config.getUmount() && !needsReassembly);
                 }
             } else if (config.getReassemble() && needsReassembly) {
                 // Nesting this archive file to its enclosing archive file
@@ -663,15 +664,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     reassemble(builder);
                     needsReassembly = false;
                 } finally {
-                    shutdownStep3(config.getRelease() && !needsReassembly);
+                    shutdownStep3(config.getUmount() && !needsReassembly);
                 }
-            } else if (config.getRelease()) {
+            } else if (config.getUmount()) {
                 assert config.getReassemble();
                 assert !needsReassembly;
                 shutdownStep2(builder);
                 shutdownStep3(true);
             } else {
-                // This may happen if File.update() or File.umount() has
+                // This may happen if File.update() or File.sync() has
                 // been called and no modifications have been applied to
                 // this ArchiveController since its creation or last update.
                 assert outArchive == null;
@@ -681,7 +682,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         } catch (IOException ex) {
             throw builder.fail(new ArchiveFileException(this, ex));
         } finally {
-            setScheduled(needsReassembly);
+            setTouched(needsReassembly);
         }
 
         builder.check();
@@ -716,133 +717,76 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert outArchive != null;
         assert checkNoDeletedEntriesWithNewData(handler);
 
+        class FilterExceptionHandler
+        implements ExceptionHandler<IOException, ArchiveFileException> {
+
+            final ArchiveFileExceptionHandler delegate;
+            IOException last;
+
+            FilterExceptionHandler(final ArchiveFileExceptionHandler delegate) {
+                if (delegate == null)
+                    throw new NullPointerException();
+                this.delegate = delegate;
+            }
+
+            public ArchiveFileException fail(final IOException cannotHappen) {
+                throw new AssertionError(cannotHappen);
+            }
+
+            public void warn(final IOException cause) throws ArchiveFileException {
+                if (cause == null)
+                    throw new NullPointerException();
+                final IOException old = last;
+                last = cause;
+                if (!(cause instanceof InputException))
+                    throw handler.fail(new ArchiveFileException(
+                            UpdatingArchiveController.this, cause));
+                if (old == null)
+                    delegate.warn(new ArchiveFileWarningException(
+                            UpdatingArchiveController.this, cause));
+            }
+        } // class FilterExceptionHandler
+
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final ArchiveEntry root = fileSystem.getRoot();
+        final long rootTime = fileSystem.get(ROOT).getTime();
         try {
             try {
-                try {
-                    shutdownStep1(handler);
-
-                    ArchiveFileWarningException inputEntryCorrupted = null;
-                    ArchiveFileWarningException outputEntryCorrupted = null;
-
-                    final Enumeration e = fileSystem.getArchiveEntries();
-                    while (e.hasMoreElements()) {
-                        final ArchiveEntry entry = (ArchiveEntry) e.nextElement();
-                        final String entryName = entry.getName();
-                        if (hasNewData(entryName))
-                            continue; // we have already written this entry
-                        if (entry.isDirectory()) {
-                            if (root == entry)
-                                continue; // never write the virtual root directory
-                            if (entry.getTime() < 0)
-                                continue; // never write ghost directories
-                            // 'entry' will never be used again, so it is safe
-                            // to hand over this entry from the InputArchive
-                            // to the OutputArchive.
-                            outArchive.getOutputStream(entry, null).close();
-                        } else if (inArchive != null && inArchive.getArchiveEntry(entryName) != null) {
-                            assert entry == inArchive.getArchiveEntry(entryName);
-                            InputStream in;
-                            try {
-                                in = inArchive.getInputStream(entry, entry);
-                                assert in != null;
-                            } catch (IOException ex) {
-                                if (inputEntryCorrupted == null) {
-                                    inputEntryCorrupted
-                                            = new ArchiveFileWarningException(
-                                            this,
-                                            "skipped one or more corrupted archive entries in the input",
-                                            ex);
-                                    handler.warn(inputEntryCorrupted);
-                                }
-                                continue;
-                            }
-                            try {
-                                // 'entry' will never be used again, so it is
-                                // safe to hand over this entry from the
-                                // InputArchive to the OutputArchive.
-                                final OutputStream out = outArchive
-                                        .getOutputStream(entry, entry);
-                                try {
-                                    Streams.cat(in, out);
-                                } catch (InputException ex) {
-                                    if (outputEntryCorrupted == null) {
-                                        outputEntryCorrupted
-                                                = new ArchiveFileWarningException(
-                                                this,
-                                                "one or more archive entries in the output are corrupted",
-                                                ex);
-                                        handler.warn(outputEntryCorrupted);
-                                    }
-                                } finally {
-                                    out.close();
-                                }
-                            } finally {
-                                try {
-                                    in.close();
-                                } catch (IOException ex) {
-                                    if (inputEntryCorrupted == null) {
-                                        inputEntryCorrupted
-                                                = new ArchiveFileWarningException(
-                                                this,
-                                                "one or more archive entries in the input are corrupted",
-                                                ex);
-                                        handler.warn(inputEntryCorrupted);
-                                    }
-                                    throw ex;
-                                }
-                            }
-                        } else {
-                            // The entry is an archive file which has been
-                            // newly created and not yet been reassembled
-                            // into this (potentially new) archive file.
-                            // Write an empty entry now as a marker in order to
-                            // recreate the entry when the file system gets
-                            // remounted from the archive file.
-                            outArchive.getOutputStream(entry, null).close();
-                        }
-                    } // while (e.hasMoreElements())
-                } finally {
-                    // We MUST do cleanup here because (1) any entries in the
-                    // filesystem which were successfully written (this is the
-                    // normal case) have been modified by the OutputArchive
-                    // and thus cannot get used anymore to access the input;
-                    // and (2) if there has been any IOException on the
-                    // output archive there is no way to recover from it.
-                    shutdownStep2(handler);
-                }
-            } catch (IOException ex) {
-                // The output file is corrupted! We must remove it now to
-                // prevent it from being reused as the input file.
-                // We do this even if the output file is the target file, i.e.
-                // the archive file has just been created, because it
-                // doesn't make any sense to keep a corrupted archive file:
-                // There is no way to recover it and it could spoil any
-                // attempts to redo the file operations, because TrueZIP would
-                // normaly correctly identify it as a false positive archive
-                // file and would not allow to treat it like a directory again.
-                boolean deleted = outFile.delete();
-                outFile = null;
-                assert deleted;
-                throw ex;
+                shutdownStep1(handler);
+                fileSystem.copy(inArchive, outArchive,
+                        new FilterExceptionHandler(handler));
+            } finally {
+                // We MUST do cleanup here because (1) any entries in the
+                // filesystem which were successfully written (this is the
+                // normal case) have been modified by the OutputArchive
+                // and thus cannot get used anymore to access the input;
+                // and (2) if there has been any IOException on the
+                // output archive there is no way to recover from it.
+                shutdownStep2(handler);
             }
+        } catch (ArchiveFileWarningException ex) {
+            throw ex;
         } catch (ArchiveFileException ex) {
-            throw handler.fail(ex);
-        } catch (IOException ex) {
-            throw handler.fail(new ArchiveFileException(
-                    this,
-                    "could not update archive file - all changes are lost",
-                    ex));
+            // The output file is corrupted! We must remove it now to
+            // prevent it from being reused as the input file.
+            // We do this even if the output file is the target file, i.e.
+            // the archive file has just been created, because it
+            // doesn't make any sense to keep a corrupted archive file:
+            // There is no way to recover it and it could spoil any
+            // attempts to redo the file operations, because TrueZIP would
+            // normaly correctly identify it as a false positive archive
+            // file and would not allow to treat it like a directory again.
+            boolean deleted = outFile.delete();
+            outFile = null;
+            assert deleted;
+            throw ex;
         }
 
         // Set the last modification time of the output archive file
         // to the last modification time of the virtual root directory,
         // hence preserving it.
-        if (!outFile.setLastModified(root.getTime()))
+        if (!outFile.setLastModified(rootTime))
             handler.warn(new ArchiveFileWarningException(
-                    this,
-                    "couldn't preserve last modification time"));
+                    this, "couldn't preserve last modification time"));
     }
 
     private boolean checkNoDeletedEntriesWithNewData(
@@ -866,8 +810,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
                 handler.warn(new ArchiveFileWarningException(
-                        this,
-                        "couldn't remove archive entry '" + entryName + "'"));
+                        this, "couldn't remove archive entry '" + entryName + "'"));
             }
         }
         return true;
@@ -949,13 +892,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
         assert entryName != null;
-        assert !ROOT.equals(entryName);
+        assert !isRoot(entryName);
 
-        controller.runWriteLocked(new Action<IOException>() {
+        class Wrapper implements IOOperation {
             public void run() throws IOException {
                 wrapToWriteLockedController(controller, entryName);
             }
-        });
+        }
+        controller.runWriteLocked(new Wrapper());
     }
 
     private void wrapToWriteLockedController(
@@ -965,7 +909,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert controller != null;
         assert controller.writeLock().isLockedByCurrentThread();
         assert entryName != null;
-        assert !ROOT.equals(entryName);
+        assert !isRoot(entryName);
 
         // Write the updated output archive file as an entry
         // to its enclosing archive file, preserving the
@@ -1004,7 +948,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             shutdownStep2(handler);
         }
         shutdownStep3(true);
-        setScheduled(false);
+        setTouched(false);
     }
 
     @Override
@@ -1043,19 +987,21 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private void shutdownStep1(final ArchiveFileExceptionHandler handler)
     throws ArchiveFileException {
-        class DecoratedHandler
+        class FilterExceptionHandler
         implements ExceptionHandler<IOException, ArchiveFileException> {
-            public ArchiveFileException fail(IOException cause) {
-                throw new AssertionError(cause);
+            public ArchiveFileException fail(IOException cannotHappen) {
+                throw new AssertionError(cannotHappen);
             }
 
-            public void warn(IOException ioe) throws ArchiveFileException {
+            public void warn(IOException cause) throws ArchiveFileException {
+                if (cause == null)
+                    throw new NullPointerException();
                 handler.warn(new ArchiveFileWarningException(
-                        UpdatingArchiveController.this, ioe));
+                        UpdatingArchiveController.this, cause));
             }
         }
 
-        final DecoratedHandler decoratedHandler = new DecoratedHandler();
+        final FilterExceptionHandler decoratedHandler = new FilterExceptionHandler();
         if (outArchive != null)
             outArchive.getMetaData().closeAllOutputStreams(decoratedHandler);
         if (inArchive != null)

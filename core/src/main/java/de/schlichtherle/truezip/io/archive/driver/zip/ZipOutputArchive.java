@@ -21,9 +21,9 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
-import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.util.JointEnumeration;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
+import java.io.File;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
+
+import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
  * An implementation of {@link OutputArchive} to write ZIP archives.
@@ -114,7 +116,7 @@ public class ZipOutputArchive
         return e != null && entryName.equals(e.getName()) ? e : null;
     }
 
-    public OutputStream getOutputStream(
+    public OutputStream newOutputStream(
             final ArchiveEntry dstEntry,
             final ArchiveEntry srcEntry)
     throws IOException {
@@ -160,11 +162,10 @@ public class ZipOutputArchive
                         || entry.getCompressedSize() == ZipEntry.UNKNOWN
                         || entry.getSize() == ZipEntry.UNKNOWN) {
                     if (!(srcEntry instanceof RfsEntry)) {
-                        final java.io.File temp = Files.createTempFile(
-                                TEMP_FILE_PREFIX);
+                        final File temp = createTempFile(TEMP_FILE_PREFIX);
                         return new TempEntryOutputStream(entry, temp);
                     }
-                    final java.io.File file = ((RfsEntry) srcEntry).getFile();
+                    final File file = ((RfsEntry) srcEntry).getFile();
                     final long length = file.length();
                     // No longer needed with ZIP64 support:
                     /*if (length > Integer.MAX_VALUE)
@@ -201,7 +202,7 @@ public class ZipOutputArchive
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputStream}.
+     * These preconditions are checked by {@link #newOutputStream}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private EntryOutputStream(ZipEntry entry) throws IOException {
@@ -236,12 +237,12 @@ public class ZipOutputArchive
      * output stream and finally deleted.
      */
     private class TempEntryOutputStream extends CheckedOutputStream {
-        private final java.io.File temp;
+        private final File temp;
         private boolean closed;
 
         public TempEntryOutputStream(
                 final ZipEntry entry,
-                final java.io.File temp)
+                final File temp)
         throws IOException {
             super(new java.io.FileOutputStream(temp), new CRC32());
             assert entry.getMethod() == ZipEntry.STORED;
@@ -276,7 +277,7 @@ public class ZipOutputArchive
 
     private void storeTempEntry(
             final ZipEntry entry,
-            final java.io.File temp)
+            final File temp)
     throws IOException {
         assert entry.getMethod() == ZipEntry.STORED;
         assert entry.getCrc() != ZipEntry.UNKNOWN;

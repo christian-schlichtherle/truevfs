@@ -6,7 +6,8 @@ import java.io.InputStream;
 
 /**
  * Holds the configuration parameters for
- * {@link ArchiveController#umount(UmountConfiguration)}.
+ * {@link ArchiveControllers#sync(String, SyncConfiguration)} and
+ * {@link ArchiveController#sync(SyncConfiguration)}.
  * Note that this class is immutable and declared final.
  * Using any setter method returns a {@link #clone()} which has the respective
  * property set as specified.
@@ -14,7 +15,7 @@ import java.io.InputStream;
  * you need to use the following idiom:
  * <p>
  * <pre>{@code
- * UmountConfiguration config = new UmountConfiguration()
+ * SyncConfiguration config = new SyncConfiguration()
  *      .setProperty1(property1)
  *      .setProperty2(property2)
  *      .setProperty3(property3);
@@ -23,21 +24,21 @@ import java.io.InputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class UmountConfiguration implements Cloneable {
+public final class SyncConfiguration implements Cloneable {
     private ArchiveFileExceptionBuilder archiveFileExceptionBuilder
             = new DefaultArchiveFileExceptionBuilder();
-    private boolean waitForInputStreams;
-    private boolean closeInputStreams;
-    private boolean waitForOutputStreams;
-    private boolean closeOutputStreams;
-    private boolean release;
-    private boolean reassemble;
+    private boolean waitForInputStreams = false;
+    private boolean closeInputStreams = true;
+    private boolean waitForOutputStreams = false;
+    private boolean closeOutputStreams = true;
+    private boolean umount = true;
+    private boolean reassemble = true;
 
     /** Returns a <em>shallow</em> clone of this instance. */
     @Override
-    public UmountConfiguration clone() {
+    public SyncConfiguration clone() {
         try {
-            return (UmountConfiguration) super.clone();
+            return (SyncConfiguration) super.clone();
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
@@ -45,16 +46,18 @@ public final class UmountConfiguration implements Cloneable {
 
     /**
      * The handler to use to process archive exceptions.
-     * This defaults to a {@code new {@link DefaultArchiveFileExceptionBuilder}()}.
+     * <p>
+     * The default value for this property is
+     * a {@code new} {@link DefaultArchiveFileExceptionBuilder}{@code ()}.
      */
     public ArchiveFileExceptionBuilder getArchiveFileExceptionBuilder() {
         return archiveFileExceptionBuilder;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setArchiveFileExceptionBuilder(
+    public SyncConfiguration setArchiveFileExceptionBuilder(
             final ArchiveFileExceptionBuilder archiveFileExceptionBuilder) {
-        final UmountConfiguration clone = clone();
+        final SyncConfiguration clone = clone();
         clone.archiveFileExceptionBuilder = archiveFileExceptionBuilder;
         return clone;
     }
@@ -77,15 +80,17 @@ public final class UmountConfiguration implements Cloneable {
      * {@link IOException} (which is a typical bug in many Java
      * applications), then the respective archive controller will not
      * return from the update until the current thread gets interrupted!
+     * <p>
+     * The default value for this property is {@code false}.
      */
     public boolean getWaitForInputStreams() {
         return waitForInputStreams;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setWaitForInputStreams(
+    public SyncConfiguration setWaitForInputStreams(
             final boolean waitForInputStreams) {
-        final UmountConfiguration clone = clone();
+        final SyncConfiguration clone = clone();
         clone.waitForInputStreams = waitForInputStreams;
         return clone;
     }
@@ -106,15 +111,17 @@ public final class UmountConfiguration implements Cloneable {
      * updated and an {@link ArchiveFileBusyException} is thrown to
      * indicate that the application must close all entry input streams
      * first.
+     * <p>
+     * The default value for this property is {@code true}.
      */
     public boolean getCloseInputStreams() {
         return closeInputStreams;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setCloseInputStreams(
+    public SyncConfiguration setCloseInputStreams(
             final boolean closeInputStreams) {
-        final UmountConfiguration clone = clone();
+        final SyncConfiguration clone = clone();
         clone.closeInputStreams = closeInputStreams;
         return clone;
     }
@@ -122,15 +129,17 @@ public final class UmountConfiguration implements Cloneable {
     /**
      * Similar to {@code waitInputStreams},
      * but applies to archive entry output streams instead.
+     * <p>
+     * The default value for this property is {@code false}.
      */
     public boolean getWaitForOutputStreams() {
         return waitForOutputStreams;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setWaitForOutputStreams(
+    public SyncConfiguration setWaitForOutputStreams(
             final boolean waitForOutputStreams) {
-        final UmountConfiguration clone = clone();
+        final SyncConfiguration clone = clone();
         clone.waitForOutputStreams = waitForOutputStreams;
         return clone;
     }
@@ -142,15 +151,17 @@ public final class UmountConfiguration implements Cloneable {
      * If this parameter is {@code true}, then
      * {@code closeInputStreams} must be {@code true}, too.
      * Otherwise, an {@code IllegalArgumentException} is thrown.
+     * <p>
+     * The default value for this property is {@code true}.
      */
     public boolean getCloseOutputStreams() {
         return closeOutputStreams;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setCloseOutputStreams(
+    public SyncConfiguration setCloseOutputStreams(
             final boolean closeOutputStreams) {
-        final UmountConfiguration clone = clone();
+        final SyncConfiguration clone = clone();
         clone.closeOutputStreams = closeOutputStreams;
         return clone;
     }
@@ -169,15 +180,17 @@ public final class UmountConfiguration implements Cloneable {
      * Note that temporary files are always deleted by TrueZIP unless the JVM
      * is terminated unexpectedly. This property solely exists to control
      * cooperation with third parties or enabling faster access.
+     * <p>
+     * The default value for this property is {@code true}.
      */
-    public boolean getRelease() {
-        return release;
+    public boolean getUmount() {
+        return umount;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setRelease(final boolean release) {
-        final UmountConfiguration clone = clone();
-        clone.release = release;
+    public SyncConfiguration setUmount(final boolean umount) {
+        final SyncConfiguration clone = clone();
+        clone.umount = umount;
         return clone;
     }
 
@@ -189,14 +202,16 @@ public final class UmountConfiguration implements Cloneable {
      * property {@code umount} is set to {@code true} as well.
      * Failing to comply to this requirement may throw an
      * {@link AssertionError} and will incur loss of data!
+     * <p>
+     * The default value for this property is {@code true}.
      */
     public boolean getReassemble() {
         return reassemble;
     }
 
     /** Returns a clone of this instance with the property set as specified. */
-    public UmountConfiguration setReassemble(final boolean reassemble) {
-        final UmountConfiguration clone = clone();
+    public SyncConfiguration setReassemble(final boolean reassemble) {
+        final SyncConfiguration clone = clone();
         clone.reassemble = reassemble;
         return clone;
     }

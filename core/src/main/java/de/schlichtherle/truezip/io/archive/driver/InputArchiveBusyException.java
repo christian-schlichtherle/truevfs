@@ -19,8 +19,9 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.FileBusyException;
 
 /**
- * Thrown to indicate that the {@link InputArchive#getInputStream} method
- * failed because the archive is already busy on input.
+ * Thrown to indicate that the
+ * {@link InputArchive#newInputStream(ArchiveEntry, ArchiveEntry)}
+ * method failed because the archive is already busy on input.
  * This exception is guaranteed to be recoverable,
  * meaning it must be possible to read the same entry again as soon as the
  * archive is not busy on input anymore, unless another exceptional condition

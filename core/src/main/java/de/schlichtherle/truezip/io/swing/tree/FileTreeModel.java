@@ -231,8 +231,8 @@ public class FileTreeModel implements TreeModel {
      * {@code null} if {@code node} is not part of this file tree or
      * is {@code null}.
      */
-    public TreePath createTreePath(final java.io.File node) {
-        java.io.File[] elements = createPath(node);
+    public TreePath newTreePath(final java.io.File node) {
+        java.io.File[] elements = newPath(node);
         return elements != null ? new TreePath(elements) : null;
     }
 
@@ -246,7 +246,7 @@ public class FileTreeModel implements TreeModel {
      *         {@code node} is not part of this file tree or is
      *         {@code null}.
      */
-    private java.io.File[] createPath(final java.io.File node) {
+    private java.io.File[] newPath(final java.io.File node) {
         if (root == null /*|| !de.schlichtherle.truezip.io.File.contains(root, node)*/)
             return null;
         // Do not apply the filter here! The filter could depend on the file's
@@ -254,17 +254,17 @@ public class FileTreeModel implements TreeModel {
         // to a state which would be accepted by the filter.
         /*if (filter != null && !((FileFilter) filter).accept(node))
             return null;*/
-        return createPath(node, 1);
+        return newPath(node, 1);
     }
 
-    private java.io.File[] createPath(final java.io.File node, int level) {
+    private java.io.File[] newPath(final java.io.File node, int level) {
         assert root != null; // FindBugs
         final java.io.File[] path;
         if (root.equals(node)) {
             path = new java.io.File[level];
             path[0] = root;
         } else if (node != null) {
-            path = createPath(node.getParentFile(), level + 1);
+            path = newPath(node.getParentFile(), level + 1);
             if (path != null)
                 path[path.length - level] = node;
         } else {
@@ -478,7 +478,7 @@ public class FileTreeModel implements TreeModel {
         if (index == -1)
             return;
         fireTreeNodesInserted(new TreeModelEvent(
-                this, createTreePath(parent),
+                this, newTreePath(parent),
                 new int[] { index }, new java.io.File[] { node }));
     }
 
@@ -493,7 +493,7 @@ public class FileTreeModel implements TreeModel {
         if (index == -1)
             return;
         fireTreeNodesChanged(new TreeModelEvent(
-                this, createTreePath(parent),
+                this, newTreePath(parent),
                 new int[] { index }, new java.io.File[] { node }));
     }
 
@@ -513,7 +513,7 @@ public class FileTreeModel implements TreeModel {
         // Otherwise, the display wouldn't mirror the cache anymore.
         getChildren(parent);
         fireTreeNodesRemoved(new TreeModelEvent(
-                this, createTreePath(parent),
+                this, newTreePath(parent),
                 new int[] { index }, new java.io.File[] { node }));
     }
 
@@ -526,7 +526,7 @@ public class FileTreeModel implements TreeModel {
         cache.clear();
         if (root != null)
             fireTreeStructureChanged(
-                    new TreeModelEvent(this, createTreePath(root), null, null));
+                    new TreeModelEvent(this, newTreePath(root), null, null));
     }
 
     /** Alias for {@link #structureChanged(java.io.File)}. */
@@ -544,7 +544,7 @@ public class FileTreeModel implements TreeModel {
             throw new NullPointerException();
         forget(node);
         fireTreeStructureChanged(
-                new TreeModelEvent(this, createTreePath(node), null, null));
+                new TreeModelEvent(this, newTreePath(node), null, null));
     }
 
     /**

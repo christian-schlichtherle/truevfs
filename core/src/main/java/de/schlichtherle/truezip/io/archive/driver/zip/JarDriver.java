@@ -71,17 +71,17 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    protected ZipEntry createZipEntry(ZipEntry template) {
+    protected ZipEntry newZipEntry(ZipEntry template) {
         return new JarEntry(template);
     }
 
     @Override
-    protected ZipEntry createZipEntry(String entryName) {
+    protected ZipEntry newZipEntry(String entryName) {
         return new JarEntry(entryName);
     }
 
     @Override
-    protected ZipInputArchive createZipInputArchive(
+    protected ZipInputArchive newZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {

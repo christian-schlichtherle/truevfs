@@ -68,7 +68,7 @@ public class ZipInputArchive
         return (ZipEntry) super.getEntry(entryName);
     }
 
-    public InputStream getInputStream(
+    public InputStream newInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {

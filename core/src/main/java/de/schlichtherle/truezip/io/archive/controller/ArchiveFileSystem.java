@@ -16,22 +16,36 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.util.Paths.Normalizer;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.util.InputException;
+import de.schlichtherle.truezip.io.util.Paths;
+import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.util.Paths.normalize;
 
 /**
  * This class implements a virtual file system of archive entries for use
@@ -46,22 +60,19 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  */
 public final class ArchiveFileSystem {
 
-    // TODO: Harmonize the notation of the root directory!
-    private static final String ROOT = SEPARATOR;
-
     /** The controller that this filesystem belongs to. */
-    private final FileSystemArchiveController controller;
+    private final UpdatingArchiveController controller;
 
     /** The read only status of this file system. */
     private final boolean readOnly;
 
     /**
-     * The map of ArchiveEntries in this file system.
+     * The map of archive entries in this file system.
      * If this is a read-only file system, this is actually an unmodifiable
      * map.
      * This field should be considered final!
      * <p>
-     * Note that the ArchiveEntries in this map are shared with the 
+     * Note that the archive entries in this map are shared with the
      * {@link InputArchive} object provided to this class' constructor.
      */
     private Map<String, ArchiveEntry> master;
@@ -72,9 +83,6 @@ public final class ArchiveFileSystem {
     /** The number of times this file system has been modified (touched). */
     private long touched;
 
-    /** For use by {@link #split} only! */
-    private final String[] split = new String[2];
-
     /**
      * Creates a new archive file system and ensures its integrity.
      * The root directory is created with its last modification time set to
@@ -82,27 +90,31 @@ public final class ArchiveFileSystem {
      * The file system is modifiable and marked as touched!
      * 
      * @param controller The controller which will use this file system.
-     *        This constructor will finally call
-     *        {@link FileSystemArchiveController#touch} once it has fully
-     *        initialized this instance.
+     *        This implementation will solely use the controller as a factory
+     *        to create missing archive entries using
+     *        {@link FileSystemArchiveController#newArchiveEntry}.
+     * @throws NullPointerException If {@code controller} or {@code archive}
+     *         is {@code null}.
      */
-    ArchiveFileSystem(final FileSystemArchiveController controller)
+    // TODO: Replace controller with factory!
+    ArchiveFileSystem(final UpdatingArchiveController controller)
     throws IOException {
+        assert controller != null;
+
         this.controller = controller;
         touched = 1;
         master = new LinkedHashMap<String, ArchiveEntry>(64);
 
         // Setup root.
-        root = createArchiveEntry(ROOT);
+        root = newArchiveEntry(ROOT, DIRECTORY);
         root.setTime(System.currentTimeMillis());
         master.put(ROOT, root);
 
         readOnly = false;
-        controller.touch();
     }
 
     /**
-     * Mounts the archive file system from {@code archive} and ensures its
+     * Populates this file system from <code>archive</code> and ensures its
      * integrity.
      * First, a root directory with the given last modification time is
      * created - it's never loaded from the archive!
@@ -112,106 +124,179 @@ public final class ArchiveFileSystem {
      * time as their last modification time - existing directories will never
      * be replaced.
      * <p>
-     * Note that the entries in this file system are shared with
+     * Note that the entries in this file system are shared with the given
      * {@code archive}.
      * 
      * @param controller The controller which will use this file system.
-     *        This constructor will solely use the controller as a factory
+     *        This implementation will solely use the controller as a factory
      *        to create missing archive entries using
-     *        {@link FileSystemArchiveController#createArchiveEntry}.
-     * @param archive The archive to mount the file system from.
-     * @param rootTime The last modification time of the root of the mounted
+     *        {@link FileSystemArchiveController#newArchiveEntry}.
+     * @param archive The input archive to read the entries for the population
+     *        of this file system.
+     * @param rootTime The last modification time of the root of the populated
      *        file system in milliseconds since the epoch.
      * @param readOnly If and only if {@code true}, any subsequent
-     *        modifying operation will result in a
+     *        modifying operation on this file system will result in a
      *        {@link ReadOnlyArchiveFileSystemException}.
+     * @throws NullPointerException If {@code controller} or {@code archive}
+     *         is {@code null}.
      */
+    // TODO: Replace controller with factory!
     ArchiveFileSystem(
-            final FileSystemArchiveController controller,
+            final UpdatingArchiveController controller,
             final InputArchive archive,
             final long rootTime,
             final boolean readOnly) {
         this.controller = controller;
+        master = new LinkedHashMap<String, ArchiveEntry>(
+                (int) (archive.getNumArchiveEntries() / 0.75f) + 1);
 
-        final int iniCap = (int) (archive.getNumArchiveEntries() / 0.75f) + 1;
-        master = new LinkedHashMap<String, ArchiveEntry>(iniCap);
+        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
+        // Load entries from input archive.
+        Enumeration<? extends ArchiveEntry> entries
+                = archive.getArchiveEntries();
+        while (entries.hasMoreElements()) {
+            final ArchiveEntry entry = entries.nextElement();
+            final String path = normalizer.normalize(entry.getName());
+            master.put(path, entry);
+            entry.setMetaData(new ArchiveEntryMetaData(entry));
+        }
 
-        // Setup root.
-        root = createArchiveEntry(ROOT);
+        // Setup root entry, potentially replacing its definition from the
+        // input archive.
+        root = newArchiveEntry(ROOT, DIRECTORY);
         root.setTime(rootTime); // do NOT yet touch the file system!
         master.put(ROOT, root);
 
-        Enumeration<? extends ArchiveEntry> entries = archive.getArchiveEntries();
-        while (entries.hasMoreElements()) {
-            final ArchiveEntry entry = entries.nextElement();
-            final String entryName = entry.getName();
-            // Map entry if it doesn't address the virtual root directory.
-            if (!ROOT.equals(entryName)
-                    && !("." + SEPARATOR).equals(entryName)) {
-                entry.setMetaData(new ArchiveEntryMetaData(entry));
-                master.put(entryName, entry);
-            }
-        }
-
-        // Now perform a file system check to fix missing parent directories.
-        // This needs to be done separately!
-        //entries = Collections.enumeration(master.values()); // concurrent modification!
+        // Now perform a file system check to create missing parent directories
+        // and populate directories with their children - this needs to be done
+        // separately!
+        // entries = Collections.enumeration(master.values()); // concurrent modification!
+        final PopulatePostfix fsck = new PopulatePostfix();
         entries = archive.getArchiveEntries();
         while (entries.hasMoreElements()) {
             final ArchiveEntry entry = entries.nextElement();
-            if (isLegalEntryName(entry.getName()))
-                fixParents(entry);
+            final String path = normalizer.normalize(entry.getName());
+            if (isLegalPath(path))
+                fsck.fix(path);
         }
 
-        // Reset master map to be unmodifiable if this is a readonly file system
+        // Make master map unmodifiable if this is a readonly file system
         this.readOnly = readOnly;
         if (readOnly)
             master = Collections.unmodifiableMap(master);
 
-        assert touched == 0; // don't call !isTouched() - preconditions not met yet!
+        assert !isTouched();
     }
 
     /**
-     * Checks whether the given entry entryName is a legal entry name.
-     * A legal entry name does not denote the virtual root directory, the dot
-     * directory ({@code "."}) or the dot-dot directory ({@code ".."}) or any
-     * of their descendants.
+     * Like {@link #newArchiveEntry(String, ArchiveEntry.Type, ArchiveEntry)
+     * newArchiveEntry(path, type, null)}, but throws an
+     * {@link AssertionError} instead of a {@link CharConversionException}.
+     *
+     * @throws AssertionError If a {@link CharConversionException} occurs.
+     *         The original exception is wrapped as its cause.
      */
-    private static boolean isLegalEntryName(final String entryName) {
-        final int l = entryName.length();
+    private ArchiveEntry newArchiveEntry(
+            final String path,
+            final Type type) {
+        try {
+            return newArchiveEntry(path, type, null);
+        } catch (CharConversionException ex) {
+            throw new AssertionError(ex);
+        }
+    }
 
-        if (l <= 0)
-            return false; // never fix empty pathnames
+    /**
+     * Constructs a new archive file system entry for this virtual archive
+     * file system.
+     * The returned entry still needs to be {@link #link}ed into this virtual
+     * archive file system.
+     * The returned entry has properly initialized meta data, but is
+     * otherwise left as created by the archive driver.
+     *
+     * @param path The path name of the entry to create or replace.
+     *        If the path name ends with a separator, the returned archive
+     *        entry is expected to be a {@link ArchiveEntry#isDirectory()
+     *        directory}.
+     * @param blueprint If not {@code null}, then the newly created entry
+     *        shall inherit as much properties from the given entry as possible
+     *        (with the exception of the name).
+     *        This is typically used for archive copy operations.
+     * @return An {@link ArchiveEntry} created by the archive driver and
+     *         properly initialized with meta data.
+     * @throws CharConversionException If {@code entryName} contains
+     *         characters which are not supported by the archive file.
+     */
+    private ArchiveEntry newArchiveEntry(
+            String path,
+            final Type type,
+            final ArchiveEntry blueprint)
+    throws CharConversionException {
+        assert !isRoot(path) || type == DIRECTORY;
+        assert isLegalPath(path);
+        assert type == FILE || type == DIRECTORY : "Only FILE and DIRECTORY entries are currently supported!";
 
-        switch (entryName.charAt(0)) {
+        if (type == DIRECTORY)
+            path += SEPARATOR_CHAR;
+        final ArchiveEntry entry = controller.newArchiveEntry(path, blueprint);
+        entry.setMetaData(new ArchiveEntryMetaData(entry));
+        return entry;
+    }
+
+    /**
+     * Returns {@code true} iff the given entry name refers to the
+     * virtual root directory of this file system.
+     */
+    static boolean isRoot(String path) {
+        assert ROOT.isEmpty();
+        return path.isEmpty();
+    }
+
+    /**
+     * Checks whether the given entry entryName is a legal path name.
+     * A legal path name is in {@link Paths#normalize(String, char) normal form},
+     * is not absolute, does not identify the dot directory ({@code "."}) or
+     * the dot-dot directory ({@code ".."}) or any of their descendants.
+     */
+    private static boolean isLegalPath(final String path) {
+        if (isRoot(path))
+            return true;
+
+        if (path != normalize(path, SEPARATOR_CHAR)) // mind contract!
+            return false;
+
+        final int length = path.length();
+        assert length > 0 || isRoot(path) : "Definition of ROOT changed!?";
+        switch (path.charAt(0)) {
         case SEPARATOR_CHAR:
-            return false; // never fix root or absolute pathnames
+            return false; // never fix absolute path names
 
         case '.':
-            if (l >= 2) {
-                switch (entryName.charAt(1)) {
+            if (length >= 2) {
+                switch (path.charAt(1)) {
                 case '.':
-                    if (l >= 3) {
-                        if (entryName.charAt(2) == SEPARATOR_CHAR) {
-                            assert entryName.startsWith(".." + SEPARATOR);
+                    if (length >= 3) {
+                        if (path.charAt(2) == SEPARATOR_CHAR) {
+                            assert path.startsWith(".." + SEPARATOR);
                             return false;
                         }
                         // Fall through.
                     } else {
-                        assert "..".equals(entryName);
+                        assert "..".equals(path);
                         return false;
                     }
                     break;
 
                 case SEPARATOR_CHAR:
-                    assert entryName.startsWith("." + SEPARATOR);
+                    assert path.startsWith("." + SEPARATOR);
                     return false;
 
                 default:
                     // Fall through.
                 }
             } else {
-                assert ".".equals(entryName);
+                assert ".".equals(path);
                 return false;
             }
             break;
@@ -223,95 +308,59 @@ public final class ArchiveFileSystem {
         return true;
     }
 
-    /**
-     * Called from a constructor to fix the parent directories of
-     * {@code entry}, ensuring that all parent directories of the entry
-     * exist and that they contain the respective child.
-     * If a parent directory does not exist, it is created using an
-     * unkown time as the last modification time - this is defined to be a
-     * <i>ghost<i> directory.
-     * If a parent directory does exist, the respective child is added
-     * (possibly yet again) and the process is continued.
-     */
-    private void fixParents(final ArchiveEntry entry) {
-        final String entryName = entry.getName();
-        // When recursing into this method, it may be called with the root
-        // directory as its parameter, so we may NOT skip the following test.
-        if (isRoot(entryName) || entryName.charAt(0) == SEPARATOR_CHAR)
-            return; // never fix root or empty or absolute pathnames
-        assert isLegalEntryName(entryName);
-
-        final String split[] = split(entryName);
-        final String parentName = split[0];
-        final String baseName = split[1];
-
-        ArchiveEntry parent = master.get(parentName);
-        if (parent == null) {
-            parent = createArchiveEntry(parentName);
-            master.put(parentName, parent);
+    private static class Splitter
+    extends de.schlichtherle.truezip.io.util.Paths.Splitter {
+        Splitter() {
+            super(SEPARATOR_CHAR);
         }
 
-        fixParents(parent);
-        parent.getMetaData().children.add(baseName);
+        /**
+         * Splits the given entry name in a parent entry name and a base name.
+         * Iff the given entry name does not name a parent directory, then
+         * {@link ArchiveEntry#ROOT} is set at index zero of the returned array.
+         *
+         * @param path The name of the entry which's parent entry name and
+         *        base name are to be returned.
+         * @throws NullPointerException If {@code entryName} is {@code null}.
+         */
+        @Override
+        public String[] split(String path) {
+            final String split[] = super.split(path);
+            if (split[0] == null)
+                split[0] = ROOT; // postfix
+            return split;
+        }
     }
 
-    /**
-     * Splits the given entry name in a parent entry name and a base name.
-     * 
-     * @param entryName The name of the entry which's parent entry name and
-     *        base name are to be returned.
-     * @return The {@link #split} array, which will hold at least two strings:
-     *         <ul>
-     *         <li>Index 0 holds the parent entry name.
-     *             If {@code entryName} is empty or equals
-     *             {@code SEPARATOR}, this is {@code null}.
-     *             Otherwise, this contains the parent name of the entry and
-     *             <em>always</em> ends with an {@code SEPARATOR}.
-     *         <li>Index 1 holds the base name.
-     *             If {@code entryName} is empty or equals
-     *             {@code SEPARATOR}, this is an empty string.
-     *             Otherwise, this contains the base name of the entry and
-     *             <em>never</em> contains an {@code SEPARATOR}.
-     *         </ul>
-     * @throws NullPointerException If {@code entryName} is
-     *         {@code null}.
-     */
-    private String[] split(final String entryName) {
-        //return Paths.split(entryName, SEPARATOR_CHAR, split);
-        return split(entryName, split);
-    }
+    private class PopulatePostfix extends Splitter {
+        /**
+         * Called from a constructor to fix the parent directories of the entry
+         * identified by {@code path}, ensuring that all parent directories of
+         * the entry exist and that they contain the respective child.
+         * If a parent directory does not exist, it is created using an
+         * unkown time as the last modification time - this is defined to be a
+         * <i>ghost directory<i>.
+         * If a parent directory does exist, the respective child is added
+         * (possibly yet again) and the process is continued.
+         */
+        void fix(final String path) {
+            // When recursing into this method, it may be called with the root
+            // directory as its parameter, so we may NOT skip the following test.
+            if (isRoot(path))
+                return; // never fix root or empty or absolute pathnames
+            assert isLegalPath(path);
 
-    // This method is package private only to enable unit tests!
-    static String[] split(final String entryName, final String[] result) {
-        assert entryName != null;
-        assert result != null;
-        assert result.length >= 2;
-
-        // Calculate index of last character, ignoring trailing entry separator.
-        int end = entryName.length();
-        if (0 <= --end)
-            if (entryName.charAt(end) == SEPARATOR_CHAR)
-                end--;
-
-        // Now look for the separator.
-        int base = entryName.lastIndexOf(SEPARATOR_CHAR, end);
-        end++; // convert end index to interval boundary
-
-        // Finally split according to our findings.
-        if (base != -1) { // found slash?
-            base++;
-            result[0] = entryName.substring(0, base); // include separator, may produce only separator!
-            result[1] = entryName.substring(base, end); // between separator and trailing separator
-        } else { // no slash
-            if (end > 0) { // At least one character exists, excluding a trailing separator?
-                result[0] = ROOT;
-            } else {
-                result[0] = null; // no parent
+            split(path);
+            final String parentName = getParentPath();
+            final String baseName = getBaseName();
+            ArchiveEntry parent = master.get(parentName);
+            if (parent == null) {
+                parent = newArchiveEntry(parentName, DIRECTORY);
+                master.put(parentName, parent);
             }
-            result[1] = entryName.substring(0, end); // between prefix and trailing separator
+            parent.getMetaData().children.add(baseName);
+            fix(parentName);
         }
-
-        return result;
     }
 
     /**
@@ -327,7 +376,6 @@ public final class ArchiveFileSystem {
      * its time of creation or the last call to {@code resetTouched()}.
      */
     boolean isTouched() {
-        assert controller.getFileSystem() == this;
         return touched != 0;
     }
 
@@ -352,65 +400,38 @@ public final class ArchiveFileSystem {
     }
 
     /**
-     * Returns an enumeration of all {@code ArchiveEntry} instances
-     * in this file system.
-     */
-    Enumeration<ArchiveEntry> getArchiveEntries() {
-        assert controller.getFileSystem() == this;
-        return Collections.enumeration(master.values());
-    }
-    
-    /**
-     * Returns the virtual root directory of this file system.
-     * This archive entry always exists.
-     * It's name may depend on the archive type.
-     * It's last modification time is guaranteed to be non-negative, so it's
-     * <em>not</em> a ghost directory!
-     */
-    ArchiveEntry getRoot() {
-        assert controller.getFileSystem() == this;
-        return root;
-    }
-
-    /**
-     * Returns {@code true} iff the given entry name refers to the
-     * virtual root directory within this controller.
-     */
-    private static boolean isRoot(String entryName) {
-        return ROOT == entryName; // possibly assigned by File.init(...)
-    }
-
-    /**
      * Looks up the specified entry in the file system and returns it or
      * {@code null} if not existent.
      */
-    public ArchiveEntry get(String entryName) {
-        assert entryName != null;
-        assert controller.getFileSystem() == this;
-        return master.get(entryName);
+    // TODO: Introduce sockets and make this private!
+    public ArchiveEntry get(String path) {
+        return master.get(path);
     }
 
     /**
-     * Equivalent to {@link #link(String, boolean, ArchiveEntry)
-     * link(entryName, createParents, null)}.
+     * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
+     * link(path, type, createParents, null)}.
      */
-    Delta link(final String entryName, final boolean createParents)
+    LinkTransaction link(
+            final String path,
+            final Type type,
+            final boolean createParents)
     throws ArchiveFileSystemException {
-        return link(entryName, createParents, null);
+        return new LinkTransaction(path, type, createParents, null);
     }
 
     /**
-     * Begins a &quot;create and link entry&quot; transaction to ensure that either a
-     * new entry for the given {@code entryName} will be created or an
-     * existing entry is replaced within this virtual archive file system.
+     * Begins a &quot;create and link entry&quot; transaction to ensure that
+     * either a new entry for the given {@code path} will be created or an
+     * existing entry is replaced within this archive file system.
      * <p>
      * This is the first step of a two-step process to create an archive entry
      * and link it into this virtual archive file system.
-     * To commit the transaction, call {@link Delta#commit} on the returned object
-     * after you have successfully conducted the operations which compose the
-     * transaction.
+     * To commit the transaction, call {@link IOOperation#run} on the
+     * returned object after you have successfully conducted the operations
+     * which compose the transaction.
      * <p>
-     * Upon a {@code commit} operation, the last modification time of
+     * Upon a {@code run} operation, the last modification time of
      * the newly created and linked entries will be set to the system's
      * current time at the moment the transaction has begun and the file
      * system will be marked as touched at the moment the transaction has
@@ -422,7 +443,7 @@ public final class ArchiveFileSystem {
      * Hence, if the operations which compose the transaction fails, the
      * returned object may be safely collected by the garbage collector,
      * 
-     * @param entryName The relative path name of the entry to create or replace.
+     * @param path The relative path name of the entry to create or replace.
      * @param createParents If {@code true}, any non-existing parent
      *        directory will be created in this file system with its last
      *        modification time set to the system's current time.
@@ -431,10 +452,9 @@ public final class ArchiveFileSystem {
      *        instance as possible (with the exception of the name).
      *        This is typically used for archive copy operations and requires
      *        some support by the archive driver.
-     * @return A transaction object. You must call its
-     *         {@link Delta#commit} method in order to commit
-     *         link the newly created entry into this virtual archive file
-     *         system.
+     * @return An I/O operation. You must call its {@link IOOperation#run}
+     *         method in order to link the newly created entry into this
+     *         archive file system.
      * @throws ArchiveReadOnlyExceptionn If this virtual archive file system
      *         is read only.
      * @throws ArchiveFileSystemException If one of the following is true:
@@ -450,105 +470,100 @@ public final class ArchiveFileSystem {
      *         <li>One of the entry's parents denotes a file.
      *         </ul>
      */
-    public Delta link(
-            final String entryName,
+    public LinkTransaction link(
+            final String path,
+            final Type type,
             final boolean createParents,
             final ArchiveEntry template)
     throws ArchiveFileSystemException {
-        assert isRoot(entryName) || entryName.charAt(0) != SEPARATOR_CHAR;
-        assert controller.getFileSystem() == this;
-
-        if (isRoot(entryName))
-            throw new ArchiveFileSystemException(entryName,
-                    "virtual root directory cannot get replaced");
-
-        return new LinkDelta(entryName, createParents, template);
+        return new LinkTransaction(path, type, createParents, template);
     }
 
     /**
      * A simple transaction for creating (and hence probably replacing) and
-     * linking an entry in this virtual archive file system.
+     * linking an entry in this archive file system.
      * 
      * @see #link
      */
-    private final class LinkDelta extends AbstractDelta {
-        final Element[] elements;
+    final class LinkTransaction implements IOOperation {
+        final Splitter splitter = new Splitter();
+        final PathNameElement[] elements;
 
-        private LinkDelta(
-                final String entryName,
+        private LinkTransaction(
+                final String entryPath,
+                final Type entryType,
                 final boolean createParents,
                 final ArchiveEntry template)
         throws ArchiveFileSystemException {
             if (isReadOnly())
                 throw new ReadOnlyArchiveFileSystemException();
+            if (isRoot(entryPath))
+                throw new ArchiveFileSystemException(entryPath,
+                        "cannot replace root directory entry");
+            if (!isLegalPath(entryPath))
+                throw new ArchiveFileSystemException(entryPath,
+                        "is not a legal path name");
+            if (entryType != FILE && entryType != DIRECTORY)
+                throw new ArchiveFileSystemException(entryPath,
+                        "only FILE and DIRECTORY entries are currently supported");
             try {
-                elements = createElements(entryName, createParents, template, 1);
-            } catch (CharConversionException cce) {
-                final ArchiveFileSystemException afse
-                        = new ArchiveFileSystemException(cce.toString());
-                afse.initCause(cce);
-                throw afse;
+                elements = newPathNameElements(
+                        entryPath, entryType, createParents, template, 1);
+            } catch (CharConversionException ex) {
+                throw new ArchiveFileSystemException(entryPath, ex);
             }
         }
 
-        private Element[] createElements(
-                final String entryName,
+        private PathNameElement[] newPathNameElements(
+                final String entryPath,
+                final Type entryType,
                 final boolean createParents,
                 final ArchiveEntry template,
                 final int level)
         throws ArchiveFileSystemException, CharConversionException {
-            final String split[] = split(entryName);
-            final String parentName = split[0]; // could be separator only to indicate root
+            final String split[] = splitter.split(entryPath);
+            final String parentPath = split[0]; // could equal ROOT
             final String baseName = split[1];
-
-            final Element[] elements;
+            final PathNameElement[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final ArchiveEntry parent = master.get(parentName);
-            final ArchiveEntry entry;
-            if (parent != null) {
-                final ArchiveEntry oldEntry = master.get(entryName);
-                ensureMayBeReplaced(entryName, oldEntry);
-                elements = new Element[level + 1];
-                elements[0] = new Element(parentName, parent);
-                entry = createArchiveEntry(entryName, template);
-                elements[1] = new Element(baseName, entry);
+            final ArchiveEntry parentEntry = master.get(parentPath);
+            final ArchiveEntry newEntry;
+            if (parentEntry != null) {
+                if (!parentEntry.isDirectory())
+                    throw new ArchiveFileSystemException(entryPath,
+                            "parent entry must be a directory");
+                final ArchiveEntry oldEntry = master.get(entryPath);
+                if (entryType == DIRECTORY) {
+                    if (oldEntry != null) {
+                        throw new ArchiveFileSystemException(entryPath,
+                                "directory entries cannot replace existing entries");
+                    }
+                } else {
+                    assert entryType == FILE;
+                    if (oldEntry != null && oldEntry.isDirectory())
+                        throw new ArchiveFileSystemException(entryPath,
+                                "directory entries cannot get replaced");
+                }
+                elements = new PathNameElement[level + 1];
+                elements[0] = new PathNameElement(parentPath, parentEntry, null);
+                newEntry = newArchiveEntry(entryPath, entryType, template);
+                elements[1] = new PathNameElement(entryPath, newEntry, baseName);
             } else if (createParents) {
-                elements = createElements(
-                        parentName, createParents, null, level + 1);
-                entry = createArchiveEntry(entryName, template);
+                elements = newPathNameElements(
+                        parentPath, DIRECTORY, createParents, null, level + 1);
+                newEntry = newArchiveEntry(entryPath, entryType, template);
                 elements[elements.length - level]
-                        = new Element(baseName, entry);
+                        = new PathNameElement(entryPath, newEntry, baseName);
             } else {
-                throw new ArchiveFileSystemException(entryName,
-                        "missing parent directory");
+                throw new ArchiveFileSystemException(entryPath,
+                        "missing parent directory entry");
             }
-
             return elements;
         }
 
-        private void ensureMayBeReplaced(
-                final String entryName,
-                final ArchiveEntry oldEntry)
-        throws ArchiveFileSystemException {
-            final int end = entryName.length() - 1;
-            if (entryName.charAt(end) == SEPARATOR_CHAR) { // entryName indicates directory
-                if (oldEntry != null)
-                    throw new ArchiveFileSystemException(entryName,
-                            "directories cannot get replaced");
-                if (master.get(entryName.substring(0, end)) != null)
-                    throw new ArchiveFileSystemException(entryName,
-                            "directories cannot replace files");
-            } else { // entryName indicates file
-                if (master.get(entryName + SEPARATOR) != null)
-                    throw new ArchiveFileSystemException(entryName,
-                            "files cannot replace directories");
-            }
-        }
-
         /** Links the entries into this virtual archive file system. */
-        public void commit() throws IOException {
-            assert controller.getFileSystem() == ArchiveFileSystem.this;
+        public void run() throws IOException {
             assert elements.length >= 2;
 
             touch();
@@ -558,152 +573,98 @@ public final class ArchiveFileSystem {
 
             ArchiveEntry parent = elements[0].entry;
             for (int i = 1; i < l ; i++) {
-                final Element element = elements[i];
-                final String baseName = element.baseName;
+                final PathNameElement element = elements[i];
+                final String path = element.path;
                 final ArchiveEntry entry = element.entry;
-                if (parent.getMetaData().children.add(baseName)
-                        && parent.getTime() != ArchiveEntry.UNKNOWN) // never touch ghosts!
+                final String base = element.base;
+                if (parent.getMetaData().children.add(base)
+                        && parent.getTime() != UNKNOWN) // never touch ghosts!
                     parent.setTime(time);
-                master.put(entry.getName(), entry);
+                master.put(path, entry);
                 parent = entry;
             }
 
             final ArchiveEntry entry = elements[l - 1].entry;
-            if (entry.getTime() == ArchiveEntry.UNKNOWN)
+            if (entry.getTime() == UNKNOWN)
                 entry.setTime(time);
         }
 
         public ArchiveEntry getEntry() {
             assert controller.getFileSystem() == ArchiveFileSystem.this;
-
             return elements[elements.length - 1].entry;
         }
-    } // class LinkDelta
-
-    private static abstract class AbstractDelta implements Delta {
-        /** A data class for use by subclasses. */
-        static class Element {
-            final String baseName;
-            final ArchiveEntry entry;
-
-            // This constructor is provided for convenience only.
-            Element(String baseName, ArchiveEntry entry) {
-                assert entry != null;
-                this.baseName = baseName; // may be null!
-                this.entry = entry;
-            }
-        }
-    } // class AbstractDelta
+    } // class LinkTransaction
 
     /**
-     * This interface encapsulates the methods required to begin and commit
-     * a simplified transaction (a delta) on this virtual archive file system.
-     * <p>
-     * Note that there is no {@code begin} or {@code rollback}
-     * method in this class.
-     * Instead, {@code begin} is expected to be implemented by the
-     * constructor of the implementation and must not modify the file system,
-     * so that an explicit {@code rollback} is not required.
+     * A data class which represents a path name base for use by
+     * {@link LinkTransaction}.
      */
-    public interface Delta {
+    private static class PathNameElement {
+        final String path;
+        final ArchiveEntry entry;
+        final String base;
 
         /**
-         * Returns the entry operated by this file system delta.
-         */
-        ArchiveEntry getEntry();
-
-        /**
-         * Commits the simplified transaction, possibly modifying the
-         * enclosing virtual archive file system.
+         * Constructs a new {@code LinkStep}.
          *
-         * @throws IOException If the commit operation fails for any I/O
-         *         related reason.
+         * @param path The normalized path name of the archive entry.
+         *        - {@code null} is not permitted.
+         * @param entry The archive entry for the path name
+         *        - {@code null} is not permitted.
+         * @param base The base name of the path name
+         *        - may be {@code null}.
          */
-        void commit() throws IOException;
-    } // interface Delta
-
-    /**
-     * Creates an archive entry which is going to be linked into this virtual
-     * archive file system in the near future.
-     * The returned entry has properly initialized meta data, but is
-     * otherwise left as created by the archive driver.
-     * 
-     * @param entryName The path name of the entry to create or replace.
-     *        This must be a relative path name.
-     * @param blueprint If not {@code null}, then the newly created entry
-     *        shall inherit as much attributes from this object as possible
-     *        (with the exception of the name).
-     *        This is typically used for archive copy operations and requires
-     *        some support by the archive driver.
-     * @return An {@link ArchiveEntry} created by the archive driver and
-     *         properly initialized with meta data.
-     * @throws CharConversionException If {@code entryName} contains
-     *         characters which are not supported by the archive file.
-     */
-    private ArchiveEntry createArchiveEntry(
-            final String entryName,
-            final ArchiveEntry blueprint)
-    throws CharConversionException {
-        final ArchiveEntry entry = controller.createArchiveEntry(
-                entryName, blueprint);
-        entry.setMetaData(new ArchiveEntryMetaData(entry));
-        return entry;
-    }
-
-    /**
-     * Like {@link #createArchiveEntry}, but throws an
-     * {@code AssertionError} instead of
-     * {@code CharConversionException}.
-     *
-     * @throws AssertionError If a {@link CharConversionException} occurs.
-     */
-    private ArchiveEntry createArchiveEntry(final String entryName) {
-        try {
-            return createArchiveEntry(entryName, null);
-        } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
+        PathNameElement(
+                final String path,
+                final ArchiveEntry entry,
+                final String base) {
+            assert path != null;
+            assert entry != null;
+            this.path = path;
+            this.entry = entry;
+            this.base = base; // may be null!
         }
     }
 
     /**
      * If this method returns, the entry identified by the given
-     * {@code entryName} has been successfully deleted from the virtual
-     * archive file system.
+     * {@code entryName} has been successfully deleted from this archive file
+     * system.
      * If the entry is a directory, it must be empty for successful deletion.
      * 
      * @throws ArchiveReadOnlyExceptionn If the virtual archive file system is
      *         read only.
-     * @throws ArchiveIllegalOperationException If the operation failed for
+     * @throws ArchiveFileSystemException If the operation fails for
      *         any other reason.
      */
-    private void unlink(final String entryName)
+    private void unlink(final String entryPath)
     throws IOException {
-        if (isRoot(entryName))
-            throw new ArchiveFileSystemException(entryName,
+        if (isRoot(entryPath))
+            throw new ArchiveFileSystemException(entryPath,
                     "virtual root directory cannot get unlinked");
-
         try {
-            final ArchiveEntry entry = master.remove(entryName);
+            final ArchiveEntry entry = master.remove(entryPath);
             if (entry == null)
-                throw new ArchiveFileSystemException(entryName,
+                throw new ArchiveFileSystemException(entryPath,
                         "entry does not exist");
             if (entry == root
                     || entry.isDirectory()
                         && !entry.getMetaData().children.isEmpty()) {
-                master.put(entryName, entry); // Restore file system
-                throw new ArchiveFileSystemException(entryName,
+                master.put(entryPath, entry); // Restore file system
+                throw new ArchiveFileSystemException(entryPath,
                         "directory is not empty");
             }
-            final String split[] = split(entryName);
-            final String parentName = split[0];
-            final ArchiveEntry parent = master.get(parentName);
-            assert parent != null : "The parent directory of \"" + entryName
+            final Splitter splitter = new Splitter();
+            splitter.split(entryPath);
+            final String parentPath = splitter.getParentPath();
+            final ArchiveEntry parent = master.get(parentPath);
+            assert parent != null : "The parent directory of \"" + entryPath
                         + "\" is missing - archive file system is corrupted!";
-            final boolean ok = parent.getMetaData().children.remove(split[1]);
-            assert ok : "The parent directory of \"" + entryName
+            final boolean ok = parent.getMetaData().children.remove(splitter.getBaseName());
+            assert ok : "The parent directory of \"" + entryPath
                         + "\" does not contain this entry - archive file system is corrupted!";
             touch();
-            if (parent.getTime() != ArchiveEntry.UNKNOWN) // never touch ghosts!
+            if (parent.getTime() != UNKNOWN) // never touch ghosts!
                 parent.setTime(System.currentTimeMillis());
         } catch (UnsupportedOperationException unmodifiableMap) {
             throw new ReadOnlyArchiveFileSystemException();
@@ -714,75 +675,60 @@ public final class ArchiveFileSystem {
     // File system operations used by the ArchiveController class:
     //
     
-    boolean exists(final String entryName) {
-        return get(entryName) != null
-            || get(entryName + SEPARATOR) != null;
-    }
-    
-    boolean isFile(final String entryName) {
-        /*ArchiveEntry entry = get(entryName);
-        if (entry == null)
-            entry = get(entryName + SEPARATOR);
-        return entry != null && !entry.isDirectory();*/
-        return get(entryName) != null;
-    }
-    
-    boolean isDirectory(final String entryName) {
-        /*ArchiveEntry entry = get(entryName + SEPARATOR);
-        if (entry == null)
-            entry = get(entryName);
-        return entry != null && entry.isDirectory();*/
-        return get(entryName + SEPARATOR) != null;
+    boolean exists(final String path) {
+        return get(path) != null;
     }
 
-    Icon getOpenIcon(final String entryName) {
-        assert !isRoot(entryName);
+    boolean isFile(final String path) {
+        final ArchiveEntry entry = get(path);
+        return entry != null && !entry.isDirectory();
+    }
+    
+    boolean isDirectory(final String path) {
+        final ArchiveEntry entry = get(path);
+        return entry != null && entry.isDirectory();
+    }
 
-        ArchiveEntry entry = get(entryName);
-        if (entry == null)
-            entry = get(entryName + SEPARATOR);
+    Icon getOpenIcon(final String path) {
+        assert !isRoot(path);
+        final ArchiveEntry entry = get(path);
         return entry != null ? entry.getOpenIcon() : null;
     }
 
-    Icon getClosedIcon(final String entryName) {
-        assert !isRoot(entryName);
-
-        ArchiveEntry entry = get(entryName);
-        if (entry == null)
-            entry = get(entryName + SEPARATOR);
+    Icon getClosedIcon(final String path) {
+        assert !isRoot(path);
+        final ArchiveEntry entry = get(path);
         return entry != null ? entry.getClosedIcon() : null;
     }
     
-    boolean canWrite(final String entryName) {
-        return !isReadOnly() && exists(entryName);
+    boolean canWrite(final String path) {
+        return !isReadOnly() && isFile(path);
     }
 
-    boolean setReadOnly(final String entryName) {
-        return isReadOnly() && exists(entryName);
+    boolean setReadOnly(final String path) {
+        return isReadOnly() && isFile(path);
     }
     
-    long length(final String entryName) {
-        final ArchiveEntry entry = get(entryName);
+    long length(final String path) {
+        final ArchiveEntry entry = get(path);
         if (entry == null || entry.isDirectory())
             return 0;
 
         // TODO: Review: Can we avoid this special case?
         // It's probably ZipDriver specific!
         // This entry is a plain file in the file system.
-        // If entry.getSize() returns ArchiveEntry.UNKNOWN, the length is yet unknown.
+        // If entry.getSize() returns UNKNOWN, the length is yet unknown.
         // This may happen if e.g. a ZIP entry has only been partially
         // written, i.e. not yet closed by another thread, or if this is a
         // ghost directory.
         // As this is not specified in the contract of the File class, return
         // 0 in this case instead.
         final long length = entry.getSize();
-        return length != ArchiveEntry.UNKNOWN ? length : 0;
+        return length != UNKNOWN ? length : 0;
     }
 
-    long lastModified(final String entryName) {
-        ArchiveEntry entry = get(entryName);
-        if (entry == null)
-            entry = get(entryName + SEPARATOR);
+    long lastModified(final String path) {
+        final ArchiveEntry entry = get(path);
         if (entry != null) {
             // Depending on the driver type, entry.getTime() could return
             // a negative value. E.g. this is the default value that the
@@ -797,23 +743,18 @@ public final class ArchiveFileSystem {
         return 0;
     }
 
-    boolean setLastModified(final String entryName, final long time)
+    boolean setLastModified(final String path, final long time)
     throws IOException {
         if (time < 0)
-            throw new IllegalArgumentException(entryName +
+            throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
 
         if (isReadOnly())
             return false;
 
-        ArchiveEntry entry = get(entryName);
-        if (entry == null) {
-            entry = get(entryName + SEPARATOR);
-            if (entry == null) {
-                // This entry does not exist.
-                return false;
-            }
-        }
+        final ArchiveEntry entry = get(path);
+        if (entry == null)
+            return false;
 
         // Order is important here!
         touch();
@@ -822,77 +763,115 @@ public final class ArchiveFileSystem {
         return true;
     }
     
-    String[] list(final String entryName) {
+    String[] list(final String path) {
         // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(entryName + SEPARATOR);
-        if (entry != null)
+        final ArchiveEntry entry = get(path);
+        if (entry != null && entry.isDirectory())
             return entry.getMetaData().list();
-        else
-            return null; // does not exist as a directory
+        return null; // does not exist as a directory
     }
     
     String[] list(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir) {
         // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(entryName + SEPARATOR);
-        if (entry != null)
+        final ArchiveEntry entry = get(path);
+        if (entry != null && entry.isDirectory())
             if (filenameFilter != null)
                 return entry.getMetaData().list(filenameFilter, dir);
             else
                 return entry.getMetaData().list(); // most efficient
-        else
-            return null; // does not exist as directory
+        return null; // does not exist as directory
     }
 
     File[] listFiles(
-            final String entryName,
+            final String path,
             final FilenameFilter filenameFilter,
             final File dir,
             final FileFactory factory) {
         // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(entryName + SEPARATOR);
-        if (entry != null)
+        final ArchiveEntry entry = get(path);
+        if (entry != null && entry.isDirectory())
             return entry.getMetaData().listFiles(filenameFilter, dir, factory);
-        else
-            return null; // does not exist as a directory
+        return null; // does not exist as a directory
     }
     
     File[] listFiles(
-            final String entryName,
+            final String path,
             final FileFilter fileFilter,
             final File dir,
             final FileFactory factory) {
         // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(entryName + SEPARATOR);
-        if (entry != null)
+        final ArchiveEntry entry = get(path);
+        if (entry != null && entry.isDirectory())
             return entry.getMetaData().listFiles(fileFilter, dir, factory);
-        else
-            return null; // does not exist as a directory
+        return null; // does not exist as a directory
     }
 
-    void mkdir(String entryName, boolean createParents)
+    void mkdir(String path, boolean createParents)
     throws IOException {
-        link(entryName + SEPARATOR, createParents).commit();
+        link(path, DIRECTORY, createParents).run();
     }
-    
-    void delete(final String entryName)
+
+    void delete(final String path)
     throws IOException {
-        assert isRoot(entryName) || entryName.charAt(0) != SEPARATOR_CHAR;
+        assert isRoot(path) || path.charAt(0) != SEPARATOR_CHAR;
 
-        if (get(entryName) != null) {
-            unlink(entryName);
+        if (get(path) != null) {
+            unlink(path);
             return;
         }
-
-        final String dirEntryName = entryName + SEPARATOR;
-        if (get(dirEntryName) != null) {
-            unlink(dirEntryName);
-            return;
-        }
-
-        throw new ArchiveFileSystemException(entryName,
+        throw new ArchiveFileSystemException(path,
                 "archive entry does not exist");
+    }
+
+    <T extends Throwable>
+    void copy(
+            final InputArchive ia,
+            final OutputArchive oa,
+            final ExceptionHandler<IOException, T> h)
+    throws T {
+        final Enumeration<ArchiveEntry> es
+                = Collections.enumeration(master.values());
+        while (es.hasMoreElements()) {
+            final ArchiveEntry e = es.nextElement();
+            final String n = e.getName();
+            if (oa.getArchiveEntry(n) != null)
+                continue; // we have already written this entry
+            try {
+                if (e.isDirectory()) {
+                    if (root == e)
+                        continue; // never write the virtual root directory
+                    if (e.getTime() < 0)
+                        continue; // never write ghost directories
+                    oa.newOutputStream(e, null).close();
+                } else if (ia != null && ia.getArchiveEntry(n) != null) {
+                    assert e == ia.getArchiveEntry(n);
+                    InputStream in;
+                    try {
+                        in = ia.newInputStream(e, e);
+                        assert in != null;
+                    } catch (IOException ex) {
+                        throw new InputException(ex);
+                    }
+                    // 'entry' will never be used again, so it is
+                    // safe to hand over this entry from the
+                    // InputArchive to the OutputArchive.
+                    final OutputStream out = oa.newOutputStream(e, e);
+                    Streams.cp(in, out);
+                } else {
+                    // The entry is an archive file which has been
+                    // newly created and not yet been reassembled
+                    // into this (potentially new) archive file.
+                    // Write an empty entry now as a marker in order to
+                    // recreate the entry when the file system gets
+                    // remounted from the archive file.
+                    oa.newOutputStream(e, null).close();
+                }
+            } catch (IOException ex) {
+                h.warn(ex);
+            }
+        }
     }
 }

@@ -132,9 +132,9 @@ public class TarBZip2Driver extends TarDriver {
      * unfortunately does not do sufficient verification!
      */
     @Override
-    protected InputStream createInputStream(Archive archive, ReadOnlyFile rof)
+    protected InputStream newInputStream(Archive archive, ReadOnlyFile rof)
     throws IOException {
-        final InputStream in = super.createInputStream(archive, rof);
+        final InputStream in = super.newInputStream(archive, rof);
         // Consume and check the first two magic bytes. This is required for
         // the CBZip2InputStream class. Bad design, I think...
         if (in.read() != 'B' || in.read() != 'Z')
@@ -147,7 +147,7 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected TarOutputArchive createTarOutputArchive(
+    protected TarOutputArchive newTarOutputArchive(
             final Archive archive,
             final OutputStream out,
             final TarInputArchive source)
@@ -155,7 +155,7 @@ public class TarBZip2Driver extends TarDriver {
         // Produce the first two magic bytes. This is required for the
         // CBZip2OutputStream class.
         out.write(new byte[] { 'B', 'Z' });
-        return super.createTarOutputArchive(
+        return super.newTarOutputArchive(
                 archive,
                 new CBZip2OutputStream(
                     new BufferedOutputStream(out, BUFSIZE),

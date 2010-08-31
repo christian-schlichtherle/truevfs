@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Provides static utility methods for {@link InputStream}s and
@@ -37,13 +38,23 @@ import java.util.concurrent.Future;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class Streams {
-
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
+public class Streams {
 
     /** You cannot instantiate this class. */
-    private Streams() {
+    Streams() {
     }
+
+    private static class InputStreamReaderThreadFactory
+    implements ThreadFactory {
+        public Thread newThread(Runnable r) {
+            final Thread t = new Thread(r, "TrueZIP InputStream Reader");
+            //t.setDaemon(true);
+            return t;
+        }
+    }
+
+    private static final ExecutorService executor
+            = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
 
     /**
      * Copies the input stream {@code in} to the output stream {@code out}.

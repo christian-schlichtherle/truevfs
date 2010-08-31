@@ -105,20 +105,20 @@ public class TarGZipDriver extends TarDriver {
     //
 
     @Override
-    protected InputStream createInputStream(Archive archive, ReadOnlyFile rof)
+    protected InputStream newInputStream(Archive archive, ReadOnlyFile rof)
     throws IOException {
         return new GZIPInputStream(
-                super.createInputStream(archive, rof),
+                super.newInputStream(archive, rof),
                 BUFSIZE);
     }
 
     @Override
-    protected TarOutputArchive createTarOutputArchive(
+    protected TarOutputArchive newTarOutputArchive(
             final Archive archive,
             final OutputStream out,
             final TarInputArchive source)
     throws IOException {
-        return super.createTarOutputArchive(
+        return super.newTarOutputArchive(
                 archive,
                 new GZIPOutputStream(out, BUFSIZE, level),
                 source);

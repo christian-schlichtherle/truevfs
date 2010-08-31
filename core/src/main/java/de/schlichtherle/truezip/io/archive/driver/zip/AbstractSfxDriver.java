@@ -31,8 +31,7 @@ import javax.swing.Icon;
 abstract public class AbstractSfxDriver extends ZipDriver {
     private static final long serialVersionUID = -656184651651654635L;
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.io.archive.zip.AbstractSfxDriver";
+    private static final String CLASS_NAME = AbstractSfxDriver.class.getName();
 
     /**
      * The character set used in SFX archives by default, which is determined

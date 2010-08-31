@@ -51,20 +51,6 @@ abstract class FileSystemArchiveController extends ArchiveController {
         return fileSystem != null && fileSystem.isTouched();
     }
 
-    /**
-     * Called by this controller's {@link ArchiveFileSystem} to notify it
-     * that the file system has been touched.
-     * A file system is touched if an operation has been performed on it
-     * which modifies it.
-     * <p>
-     * <b>Warning:</b> The write lock of this controller must
-     * be acquired while this method is called!
-     */
-    void touch() throws IOException {
-        assert writeLock().isLockedByCurrentThread();
-        setScheduled(true);
-    }
-
     public final ArchiveFileSystem autoMount(final boolean create)
     throws FalsePositiveException, IOException {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
@@ -117,7 +103,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
             } catch (FalsePositiveException fpe) {
                 // Catch and cache exceptions for uncacheable false positives.
                 // The state is reset when File.delete() is called on the false
-                // positive archive file or File.update() or File.umount().
+                // positive archive file or File.update() or File.sync().
                 //   This is an important optimization: When hitting a false
                 // positive archive file, a client application might perform
                 // a lot of tests on it (isDirectory(), isFile(), exists(),
@@ -221,10 +207,10 @@ abstract class FileSystemArchiveController extends ArchiveController {
         setFileSystem(null);
     }
 
-    final ArchiveEntry createArchiveEntry(
+    final ArchiveEntry newArchiveEntry(
             String entryName,
             ArchiveEntry blueprint)
     throws CharConversionException {
-        return getDriver().createArchiveEntry(this, entryName, blueprint);
+        return getDriver().newArchiveEntry(this, entryName, blueprint);
     }
 }

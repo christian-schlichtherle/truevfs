@@ -94,7 +94,7 @@ public class NZip extends CommandLineUtility {
      * in this class uses some archive drivers which may be pretty slow due to
      * some extra compatibility tests which they perform on every archive.
      */
-    protected DefaultArchiveDetector createDefaultArchiveDetector() {
+    protected DefaultArchiveDetector newDefaultArchiveDetector() {
         return new DefaultArchiveDetector(ArchiveDetector.ALL,
             new Object[] {
                 "ear|jar|war", new CheckedJarDriver(), // check CRC-32
@@ -113,7 +113,7 @@ public class NZip extends CommandLineUtility {
      * in this class uses some archive drivers which may be pretty slow due to
      * some extra compatibility tests which they perform on every archive.
      */
-    protected DefaultArchiveDetector createDefaultArchiveDetector(
+    protected DefaultArchiveDetector newDefaultArchiveDetector(
             final String charset) {
         assert charset != null;
         return new DefaultArchiveDetector(ArchiveDetector.ALL,
@@ -167,7 +167,7 @@ public class NZip extends CommandLineUtility {
             // recommended).
             // Finally, for regular ZIP files we want to check the CRC32 value
             // when an entry input stream is closed.
-            File.setDefaultArchiveDetector(createDefaultArchiveDetector());
+            File.setDefaultArchiveDetector(newDefaultArchiveDetector());
 
             if ("ls".equals(cmd)) {
                 ls(args, false, false);
@@ -354,9 +354,9 @@ public class NZip extends CommandLineUtility {
 
         final ArchiveDetector srcDetector;
         if (cp437in)
-            srcDetector = createDefaultArchiveDetector("IBM437");
+            srcDetector = newDefaultArchiveDetector("IBM437");
         else if (utf8in)
-            srcDetector = createDefaultArchiveDetector("UTF-8");
+            srcDetector = newDefaultArchiveDetector("UTF-8");
         else
             srcDetector = File.getDefaultArchiveDetector();
 
@@ -364,9 +364,9 @@ public class NZip extends CommandLineUtility {
         if (unzip)
             dstDetector = ArchiveDetector.NULL;
         else if (cp437out)
-            dstDetector = createDefaultArchiveDetector("IBM437");
+            dstDetector = newDefaultArchiveDetector("IBM437");
         else if (utf8out)
-            dstDetector = createDefaultArchiveDetector("UTF-8");
+            dstDetector = newDefaultArchiveDetector("UTF-8");
         else
             dstDetector = File.getDefaultArchiveDetector();
 
