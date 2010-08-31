@@ -102,14 +102,14 @@ public final class OutputArchiveMetaData {
         this.outArchive = outArchive;
     }
 
-    synchronized OutputStream createOutputStream(
+    synchronized OutputStream newOutputStream(
             final ArchiveEntry entry,
             final ArchiveEntry srcEntry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
-        final OutputStream out = outArchive.getOutputStream(entry, srcEntry);
+        final OutputStream out = outArchive.newOutputStream(entry, srcEntry);
         return out != null ? new EntryOutputStream(out) : null;
     }
 
@@ -175,8 +175,8 @@ public final class OutputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized <T extends Throwable> void closeAllOutputStreams(
-            ExceptionHandler<IOException, T> handler)
+    synchronized <T extends Throwable>
+    void closeAllOutputStreams(final ExceptionHandler<IOException, T> handler)
     throws T {
         assert !stopped;
         stopped = true;

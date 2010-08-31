@@ -133,7 +133,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
             logger.log(Level.WARNING, "{0} (could not delete)", archive);
         archive = null;
 
-        // umount now to delete temps and free memory.
+        // sync now to delete temps and free memory.
         // This prevents subsequent warnings about left over temporary files
         // and removes cached data from the memory, so it helps to start on a
         // clean sheet of paper with subsequent tests.
@@ -1145,7 +1145,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
             }
         } catch (Throwable failure) {
             // This could be an OOME with CBZip2OutputStream from Ant 1.7.0RC1!
-            File.umount(); // exceptions thrown here take precedence!
+            File.sync(); // exceptions thrown here take precedence!
             throw failure;
         }
         // Note that though the file chain is now eligible for garbage
@@ -1160,7 +1160,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         byte[] buf1 = new byte[10 * 1024 * 1024];
         System.gc();
         byte[] buf2 = new byte[10 * 1024 * 1024];
-        File.umount(); // allow external modifications!
+        File.sync(); // allow external modifications!
         byte[] buf3 = new byte[10 * 1024 * 1024];
         System.gc();
         byte[] buf4 = new byte[10 * 1024 * 1024];

@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
 import de.schlichtherle.truezip.io.swing.FileSystemView;
 import de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer;
-import de.schlichtherle.truezip.io.util.Files;
+import de.schlichtherle.truezip.io.util.Paths;
 
 import javax.swing.Icon;
 
@@ -60,7 +60,7 @@ import javax.swing.Icon;
  * For example, the ZIP and TAR file formats conform to all but the second
  * requirement.
  * So the driver implementations for these archive types use
- * {@link Files#normalize(String, char)} to remove any redundant elements from
+ * {@link Paths#normalize(String, char)} to remove any redundant elements from
  * the path.
  *
  * @author Christian Schlichtherle
@@ -69,21 +69,63 @@ import javax.swing.Icon;
 public interface ArchiveEntry {
 
     /**
-     * The entry name separator as a string.
+     * The relative path name of the virtual root directory, which is {@value}.
+     * Note that this name is empty and hence does not contain a separator
+     * character.
+     */
+    String ROOT = "";
+
+    /**
+     * The name separator as a character, which is {@value}.
+     *
+     * @see #SEPARATOR
+     */
+    char SEPARATOR_CHAR = '/';
+
+    /**
+     * The name separator as a string, which is {@value}.
      *
      * @see #SEPARATOR_CHAR
      */
     String SEPARATOR = "/";
 
     /**
-     * The entry name separator as a character.
-     *
-     * @see #SEPARATOR
+     * The unknown value for numeric properties, which is {@value}.
      */
-    char SEPARATOR_CHAR = '/';
-
-    /** The unknown value for numeric properties. */
     byte UNKNOWN = -1;
+
+    /**
+     * Defines the type of archive entry.
+     */
+    // TODO: Provide getter!
+    public enum Type {
+        /**
+         * Regular file.
+         * A file usually has some content associated to it which can be read
+         * and written using a stream.
+         */
+        FILE,
+
+        /**
+         * Regular directory.
+         * A directory can have other archive entries as children.
+         */
+        DIRECTORY,
+
+        /**
+         * Symbolic (named) link.
+         * A symbolic link refers to another file system node which could even
+         * be located outside the current archive file.
+         */
+        SYMLINK,
+
+        /**
+         * Special file.
+         * A special file is a byte or block oriented interface to an arbitrary
+         * resource, e.g. a hard disk or a network service.
+         */
+        SPECIAL
+    }
     
     /**
      * Returns the archive entry name.

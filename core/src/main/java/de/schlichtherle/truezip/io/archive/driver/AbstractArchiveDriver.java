@@ -43,6 +43,7 @@ import javax.swing.Icon;
  */
 public abstract class AbstractArchiveDriver
         implements ArchiveDriver, Serializable {
+
     private static final long serialVersionUID = 6546816846546846516L;
 
     private static final String CLASS_NAME
@@ -181,7 +182,7 @@ public abstract class AbstractArchiveDriver
      * Ensures that the given entry name is representable in this driver's
      * character set charset.
      * Should be called by sub classes in their implementation of the method
-     * {@link ArchiveDriver#createArchiveEntry}.
+     * {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}.
      * 
      * @param entryName A valid archive entry name - {@code null} is not
      *        permissible.
@@ -225,14 +226,14 @@ public abstract class AbstractArchiveDriver
         return closedIcon;
     }
 
-    private final class ThreadLocalEncoder extends ThreadLocal {
+    private final class ThreadLocalEncoder extends ThreadLocal<CharsetEncoder> {
         @Override
-        protected Object initialValue() {
+        protected CharsetEncoder initialValue() {
             return Charset.forName(charset).newEncoder();
         }
 
         boolean canEncode(CharSequence cs) {
-            return ((CharsetEncoder) get()).canEncode(cs);
+            return get().canEncode(cs);
         }
     }
 
@@ -280,8 +281,6 @@ public abstract class AbstractArchiveDriver
      * <p>
      * This error class has protected visibility solely for the purpose of
      * documenting it in the Javadoc.
-     * In order to prevent you from catching or throwing it, the class
-     * is final and its constructor is private.
      */
     protected static final class InconsistentCharsetSupportError extends Error {
         private static final long serialVersionUID = 5976345821010992606L;

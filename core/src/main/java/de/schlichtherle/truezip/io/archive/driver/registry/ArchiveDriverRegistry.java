@@ -181,7 +181,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
             else
                 logger.log(Level.WARNING, "noSuffixes"); // NOI18N
         } else {
-            driver = eager ? (Object) createArchiveDriver(driver) : (String) driver; // force cast
+            driver = eager ? (Object) newArchiveDriver(driver) : (String) driver; // force cast
             for (Iterator i = set.iterator(); i.hasNext(); )
                 super.put((String) i.next(), driver);
         }
@@ -230,7 +230,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
                 // We have found an entry in the drivers map, but it isn't
                 // an ArchiveDriver, so we probably need to load its class
                 // first and instantiate it.
-                driver = createArchiveDriver(driver);
+                driver = newArchiveDriver(driver);
                 logger.log(Level.FINE, "installed", // NOI18N
                         new Object[] { suffix, driver });
             }
@@ -240,7 +240,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
     }
 
     /**
-     * Creates an archive driver from the given blueprint.
+     * Creates a new archive driver from the given blueprint.
      *
      * @param driver A string with the fully qualified class name of an archive
      *        driver implementation, a class instance for an archive driver
@@ -251,7 +251,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      *         returned.
      *         The cause is wrapped in the exception.
      */
-    private static ArchiveDriver createArchiveDriver(Object driver) {
+    private static ArchiveDriver newArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
                 driver = loadClass((String) driver, ArchiveDriverRegistry.class);

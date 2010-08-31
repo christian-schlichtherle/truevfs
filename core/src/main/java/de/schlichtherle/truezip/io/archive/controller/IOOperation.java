@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Schlichtherle IT Services
+ * Copyright 2007-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.driver.zip;
+package de.schlichtherle.truezip.io.archive.controller;
 
-import static de.schlichtherle.truezip.io.util.Paths.normalize;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.util.Action;
+import java.io.IOException;
 
 /**
- * A factory for {@link ZipEntry}s.
+ * Represents an arbitrary I/O operation which may throw an {@link IOException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipEntryFactory implements de.schlichtherle.truezip.io.zip.ZipEntryFactory {
-    
-    public static final ZipEntryFactory INSTANCE = new ZipEntryFactory();
-
-    private ZipEntryFactory() {
-    }
-
-    public ZipEntry newZipEntry(String entryName) {
-        return new ZipEntry(entryName);
-    }
+public interface IOOperation extends Action<IOException> {
+    /**
+     * Runs this I/O operation.
+     *
+     * @throws IOException If the I/O operation fails for some reason.
+     */
+    @Override
+    void run() throws IOException;
 }

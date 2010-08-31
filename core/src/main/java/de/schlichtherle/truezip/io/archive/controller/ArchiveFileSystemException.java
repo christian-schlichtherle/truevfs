@@ -37,9 +37,15 @@ extends IOException {
         this.entryName = null;
     }
 
-    ArchiveFileSystemException(String entryName, String message) {
+    ArchiveFileSystemException(String path, String message) {
         super(message);
-        this.entryName = entryName;
+        this.entryName = path;
+    }
+
+    ArchiveFileSystemException(String path, IOException cause) {
+        super(cause.toString());
+        this.entryName = path;
+        super.initCause(cause);
     }
 
     @Override

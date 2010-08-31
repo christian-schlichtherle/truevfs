@@ -89,8 +89,8 @@ public interface InputArchive {
      *         is not accessible for some reason.
      * @throws IOException On any other exceptional condition.
      */
-    InputStream getInputStream(ArchiveEntry entry, ArchiveEntry dstEntry)
-    throws InputArchiveBusyException, FileNotFoundException, IOException;
+    InputStream newInputStream(ArchiveEntry entry, ArchiveEntry dstEntry)
+    throws IOException;
 
     /**
      * Closes this input archive and releases any system resources

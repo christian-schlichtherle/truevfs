@@ -173,7 +173,7 @@ public class ZipDriver extends AbstractArchiveDriver {
     // Factory methods:
     //
 
-    public ArchiveEntry createArchiveEntry(
+    public ArchiveEntry newArchiveEntry(
             final Archive archive,
             final String entryName,
             final ArchiveEntry template)
@@ -183,25 +183,25 @@ public class ZipDriver extends AbstractArchiveDriver {
         final ZipEntry entry;
         if (template != null) {
             if (template instanceof ZipEntry) {
-                entry = createZipEntry((ZipEntry) template);
+                entry = newZipEntry((ZipEntry) template);
                 entry.setName(entryName);
             } else {
-                entry = createZipEntry(entryName);
+                entry = newZipEntry(entryName);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = createZipEntry(entryName);
+            entry = newZipEntry(entryName);
         }
 
         return entry;
     }
 
-    protected ZipEntry createZipEntry(ZipEntry template) {
+    protected ZipEntry newZipEntry(ZipEntry template) {
         return new ZipEntry(template);
     }
 
-    protected ZipEntry createZipEntry(String entryName) {
+    protected ZipEntry newZipEntry(String entryName) {
         return new ZipEntry(entryName);
     }
 
@@ -209,14 +209,14 @@ public class ZipDriver extends AbstractArchiveDriver {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #createZipInputArchive}.
+     * {@link #newZipInputArchive}.
      */
-    public InputArchive createInputArchive(Archive archive, ReadOnlyFile rof)
+    public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
     throws IOException {
-        return createZipInputArchive(archive, rof);
+        return newZipInputArchive(archive, rof);
     }
 
-    protected ZipInputArchive createZipInputArchive(
+    protected ZipInputArchive newZipInputArchive(
             Archive archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -229,20 +229,20 @@ public class ZipDriver extends AbstractArchiveDriver {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #createZipOutputArchive} and wraps the result in a new
+     * {@link #newZipOutputArchive} and wraps the result in a new
      * {@link MultiplexedOutputArchive}.
      */
-    public OutputArchive createOutputArchive(
+    public OutputArchive newOutputArchive(
             Archive archive,
             OutputStream out,
             InputArchive source)
     throws IOException {
-        return new MultiplexedOutputArchive(createZipOutputArchive(
+        return new MultiplexedOutputArchive(newZipOutputArchive(
                 archive, out, (ZipInputArchive) source));
-        //return createZipOutputArchive(archive, out, (ZipInputArchive) source);
+        //return newZipOutputArchive(archive, out, (ZipInputArchive) source);
     }
 
-    protected ZipOutputArchive createZipOutputArchive(
+    protected ZipOutputArchive newZipOutputArchive(
             Archive archive,
             OutputStream out,
             ZipInputArchive source)

@@ -25,8 +25,8 @@ import java.io.FileNotFoundException;
  * Indicates that an <i>archive entry</i>
  * does not exist or is not accessible.
  * <p>
- * May be thrown by {@link ArchiveController#createInputStream} or
- * {@link ArchiveController#createOutputStream}.
+ * May be thrown by {@link ArchiveController#newInputStream} or
+ * {@link ArchiveController#newOutputStream}.
  */
 public final class ArchiveEntryNotFoundException
 extends FileNotFoundException {

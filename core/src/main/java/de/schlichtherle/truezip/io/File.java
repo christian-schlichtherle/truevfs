@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.util.Paths.Splitter;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.util.InputException;
@@ -25,7 +26,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveFileExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.UmountConfiguration;
+import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
 import java.io.FileFilter;
@@ -47,7 +48,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.util.Files.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.util.Files.getRealFile;
 import static de.schlichtherle.truezip.io.util.Files.normalize;
 import static de.schlichtherle.truezip.io.util.Files.split;
 
@@ -113,7 +116,7 @@ import static de.schlichtherle.truezip.io.util.Files.split;
  * additional temporary file, but shows no impact otherwise - TAR doesn't
  * support compression.
  *
- * <h3><a name="false_positives">Identifying Archive Files and False Positives</a></h3>
+ * <h3><a name="false_positives">Identifying Archive Paths and False Positives</a></h3>
  * <p>
  * Whenever an archive file suffix is recognized in a path, TrueZIP treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
@@ -338,9 +341,6 @@ public class File extends java.io.File {
     //
 
     private static final long serialVersionUID = 3617072883686191745L;
-
-    // TODO: Harmonize the notation of the root directory!
-    private static final String ROOT = "";
 
     /** The filesystem roots. */
     private static final Set roots = new TreeSet(Arrays.asList(listRoots()));
@@ -729,7 +729,7 @@ public class File extends java.io.File {
         assert !(delegate instanceof File) : "delegate must not be a de.schlichtherle.truezip.io.File!";
         if (innerArchive != null) {
             assert innerArchive.isArchive() : "innerArchive must be an archive!";
-            assert Files.contains(innerArchive.getPath(), delegate.getPath()) : "innerArchive must contain delegate!";
+            assert contains(innerArchive.getPath(), delegate.getPath()) : "innerArchive must contain delegate!";
         }
         assert detector != null : "detector is null!";
 
@@ -824,7 +824,7 @@ public class File extends java.io.File {
         assert detector != null;
 
         final StringBuffer enclEntryNameBuf = new StringBuffer(path.length());
-        init(ancestor, detector, 0, path, enclEntryNameBuf, new String[2]);
+        init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = enclEntryNameBuf.length() > 0 ? enclEntryNameBuf.toString() : null;
 
         if (innerArchive == this) {
@@ -844,16 +844,16 @@ public class File extends java.io.File {
             int skip,
             final String path,
             final StringBuffer enclEntryNameBuf,
-            final String[] split) {
+            final Splitter splitter) {
         if (path == null) {
             assert enclArchive == null;
             enclEntryNameBuf.setLength(0);
             return;
         }
 
-        split(path, separatorChar, split);
-        final String parent = split[0];
-        final String base = split[1];
+        splitter.split(path);
+        final String parent = splitter.getParentPath();
+        final String base = splitter.getBaseName();
 
         if (base.length() == 0 || ".".equals(base)) {
             // Fall through.
@@ -923,7 +923,7 @@ public class File extends java.io.File {
             }
         }
 
-        init(ancestor, detector, skip, parent, enclEntryNameBuf, split);
+        init(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
     }
 
     /**
@@ -940,7 +940,7 @@ public class File extends java.io.File {
 
         init(uri, 0,
                 cutTrailingSeparators(uri.getSchemeSpecificPart(), '/'),
-                new String[2]);
+                new Splitter('/'));
 
         if (innerArchive == this) {
             // controller init has been deferred until now in
@@ -958,7 +958,7 @@ public class File extends java.io.File {
             URI uri,
             int skip,
             final String path,
-            final String[] split) {
+            final Splitter splitter) {
         String scheme = uri.getScheme();
         if (path == null || !"jar".equalsIgnoreCase(scheme)) {
             assert enclArchive == null;
@@ -966,9 +966,9 @@ public class File extends java.io.File {
             return;
         }
 
-        split(path, '/', split);
-        String parent = split[0];
-        final String base = split[1];
+        splitter.split(path);
+        String parent = splitter.getParentPath();
+        final String base = splitter.getBaseName();
 
         if (base.length() == 0 || ".".equals(base)) {
             // Fall through.
@@ -981,7 +981,7 @@ public class File extends java.io.File {
             final boolean isArchive = base.charAt(baseEnd) == '!';
             if (enclEntryName != null) {
                 if (isArchive) {
-                    enclArchive = detector.createFile(createURI(scheme, path)); // use the same detector for the parent directory
+                    enclArchive = detector.createFile(newURI(scheme, path)); // use the same detector for the parent directory
                     if (innerArchive != this) {
                         innerArchive = enclArchive;
                         innerEntryName = enclEntryName;
@@ -999,7 +999,7 @@ public class File extends java.io.File {
                     assert scheme.matches("[a-zA-Z]+");
                     if (i == parent.length() - 1) // scheme only?
                         return;
-                    uri = createURI(parent.substring(0, i), parent.substring(i + 1));
+                    uri = newURI(parent.substring(0, i), parent.substring(i + 1));
                     enclEntryName = base.substring(0, baseEnd); // cut off trailing '!'!
                     parent = uri.getSchemeSpecificPart();
                 } else {
@@ -1008,14 +1008,14 @@ public class File extends java.io.File {
             }
         }
 
-        init(uri, skip, parent, split);
+        init(uri, skip, parent, splitter);
     }
 
     /**
      * Creates a URI from a scheme and a scheme specific part.
      * Note that the scheme specific part may contain whitespace.
      */
-    private static URI createURI(String scheme, String ssp)
+    private static URI newURI(String scheme, String ssp)
     throws IllegalArgumentException {
         try {
             return new URI(scheme, ssp, null);
@@ -1092,7 +1092,7 @@ public class File extends java.io.File {
                     && controller == null)))
             throw new AssertionError();
         if (!(enclArchive == null
-                || Files.contains(enclArchive.getPath(), delegate.getParentFile().getPath())
+                || contains(enclArchive.getPath(), delegate.getParentFile().getPath())
                     && enclEntryName.length() > 0
                     && (separatorChar == '/'
                         || enclEntryName.indexOf(separatorChar) == -1)))
@@ -1106,10 +1106,9 @@ public class File extends java.io.File {
     //
 
     /**
-     * Updates the real file system with all changes to all accessed archive
-     * files.
-     * This will reset the state of the respective archive controller and
-     * delete all temporary files held for the selected archive files.
+     * Writes all changes to the contents of all target archive files to the
+     * underlying file system.
+     * This will reset the state of the respective archive controllers.
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
@@ -1129,81 +1128,91 @@ public class File extends java.io.File {
      *         {@code closeOutputStreams} is {@code true}.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void umount(UmountConfiguration config)
+    public static void sync(SyncConfiguration config)
     throws ArchiveFileException {
-        ArchiveControllers.umount("", config);
+        ArchiveControllers.sync("", config);
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void umount()
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void umount(boolean closeStreams)
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void umount(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Similar to {@link #umount(UmountConfiguration) umount(config)},
+     * Similar to {@link #sync(SyncConfiguration) sync(config)},
      * but will only update the given {@code archive} and all its enclosed
      * (nested) archives.
      * <p>
      * If a client application needs to unmount an individual archive file,
      * the following idiom can be used:
-     * <pre><code>if (file.{@link #isArchive()} && file.{@link #getEnclArchive()} == null) // filter top level archive<br>    if (file.{@link #isDirectory()}) // ignore false positives<br>        File.{@link #umount(File)}; // update archive and all enclosed archives</code></pre>
+     * <pre>{@code
+     * if (file.isArchive() && file.getEnclArchive() == null) // filter top level archive
+     *   if (file.isDirectory()) // ignore false positives
+     *     File.umount(File); // update archive and all enclosed archives
+     * }</pre>
      * Again, this will also unmount all archive files which are located
      * within the archive file referred to by the {@code file} instance.
      *
@@ -1211,202 +1220,220 @@ public class File extends java.io.File {
      * @throws NullPointerException If {@code archive} is {@code null}.
      * @throws IllegalArgumentException If {@code archive} is not an
      *         archive or is enclosed in another archive (is not top level).
-     * @see #umount(UmountConfiguration)
+     * @see #sync(SyncConfiguration)
      */
-    public static void umount(File archive, UmountConfiguration config)
+    public static void sync(File archive, SyncConfiguration config)
     throws ArchiveFileException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.umount(archive.getCanOrAbsPath(), config);
+        ArchiveControllers.sync(archive.getCanOrAbsPath(), config);
     }
 
     /**
-     * Equivalent to {@link #umount(File, UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void umount(File archive)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Equivalent to {@link #umount(File, UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void umount(File archive, boolean closeStreams)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Equivalent to {@link #umount(File, UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(true));
+                .setUmount(true));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void umount(File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(true));
+                .setUmount(true));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void update()
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void update(boolean closeStreams)
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(new UmountConfiguration()
+     * Equivalent to {@code
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(SyncConfiguration)
      */
     public static void update(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        umount(new UmountConfiguration()
+        sync(new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void update(File archive)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(true)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(true)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void update(File archive, boolean closeStreams)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(false)
                 .setCloseInputStreams(closeStreams)
                 .setWaitForOutputStreams(false)
                 .setCloseOutputStreams(closeStreams)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
-     * Equivalent to {@link #umount(UmountConfiguration)
-        umount(archive, new UmountConfiguration()
+     * Equivalent to {@code
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(false));
+                .setUmount(false));
      * }.
+     *
+     * @see #sync(File, SyncConfiguration)
      */
     public static void update(
             File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveFileException {
-        umount(archive, new UmountConfiguration()
+        sync(archive, new SyncConfiguration()
                 .setWaitForInputStreams(waitForInputStreams)
                 .setCloseInputStreams(closeInputStreams)
                 .setWaitForOutputStreams(waitForOutputStreams)
                 .setCloseOutputStreams(closeOutputStreams)
-                .setRelease(false));
+                .setUmount(false));
     }
 
     /**
@@ -1633,8 +1660,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Similar to {@link #getAbsolutePath()}, but removes any {@code "."} and
-     * {@code ".."} directories from the path name wherever possible.
+     * Similar to {@link #getAbsolutePath()}, but removes any redundant
+     * {@code "."} and {@code ".."} directories from the path name.
      * The result is similar to {@link #getCanonicalPath()}, but symbolic
      * links are not resolved.
      * This may be useful if {@code getCanonicalPath()} throws an
@@ -1665,8 +1692,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Removes any {@code "."}, {@code ".."} directories from the path name
-     * wherever possible.
+     * Removes any redundant {@code "."}, {@code ".."} directories from the
+     * path name.
      *
      * @return The normalized path of this file as a {@link String}.
      */
@@ -1695,8 +1722,7 @@ public class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = enclArchive.getCanOrAbsFile();
-        return detector.createFile(
-                this, de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(delegate), enclArchive);
+        return detector.createFile(this, getRealFile(delegate), enclArchive);
     }
 
     /**
@@ -1728,7 +1754,7 @@ public class File extends java.io.File {
      * This will automount the virtual file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
-     * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
+     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
      * @see #isDirectory
      * @see #isEntry
      */
@@ -1897,9 +1923,9 @@ public class File extends java.io.File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean isParentOf(final java.io.File file) {
-        final String a = de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(this).getPath();
-        final String b = de.schlichtherle.truezip.io.util.Files.getCanOrAbsFile(file).getParent();
-        return b != null ? Files.contains(a, b) : false;
+        final String a = getRealFile(this).getPath();
+        final String b = getRealFile(file).getParent();
+        return b != null ? contains(a, b) : false;
     }
 
     /**
@@ -1923,7 +1949,7 @@ public class File extends java.io.File {
      * @throws NullPointerException If the parameter is {@code null}.
      */
     public boolean contains(java.io.File file) {
-        return Files.contains(this, file);
+        return contains(this, file);
     }
 
     /**
@@ -1946,7 +1972,11 @@ public class File extends java.io.File {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(java.io.File a, java.io.File b) {
-        return Files.contains(a, b);
+        return de.schlichtherle.truezip.io.util.Files.contains(a, b);
+    }
+
+    private static boolean contains(String a, String b) {
+        return de.schlichtherle.truezip.io.util.Files.contains(a, b);
     }
 
     /**
@@ -2238,7 +2268,7 @@ public class File extends java.io.File {
     /**
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
+     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean exists() {
@@ -2260,7 +2290,7 @@ public class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
+     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean isFile() {
@@ -2294,7 +2324,7 @@ public class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
+     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public boolean isDirectory() {
@@ -2413,7 +2443,7 @@ public class File extends java.io.File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @see <a href="#false_positives">Identifying Archive Files and False Positives</a>
+     * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
      */
     @Override
     public long length() {
@@ -2875,8 +2905,8 @@ public class File extends java.io.File {
         /*if (enclArchive == null) {
             if (!(dst instanceof File) || ((File) dst).enclArchive == null) {
                 try {
-                    umount(this);
-                    umount((File) dst);
+                    sync(this);
+                    sync((File) dst);
                 } catch (ArchiveException ex) {
                     return false;
                 }

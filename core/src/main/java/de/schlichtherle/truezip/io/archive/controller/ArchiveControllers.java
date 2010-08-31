@@ -16,12 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.Delta;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
-import de.schlichtherle.truezip.io.util.Files;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
@@ -40,6 +39,9 @@ import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.schlichtherle.truezip.io.util.Files.getRealFile;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.
@@ -103,7 +105,7 @@ public final class ArchiveControllers {
         assert file != null;
         assert file.isArchive();
 
-        final java.io.File target = Files.getCanOrAbsFile(file.getDelegate());
+        final java.io.File target = getRealFile(file.getDelegate());
         final ArchiveDriver driver = file.getArchiveDetector()
                 .getArchiveDriver(target.getPath());
         assert driver != null : "Not an archive file: " + file.getPath();
@@ -129,11 +131,11 @@ public final class ArchiveControllers {
                     // ArchiveDetector: This controller is touched, i.e. it
                     // most probably has mounted the virtual file system and
                     // using another ArchiveDetector could potentially break
-                    // the umount process.
+                    // the sync process.
                     // In effect, for an application this means that the
                     // reconfiguration of a previously used ArchiveController
                     // is only guaranteed to happen if
-                    // (1) File.umount() or File.umount() has been called and
+                    // (1) File.sync() or File.sync() has been called and
                     // (2) a new File instance referring to the previously used
                     // archive file as either the file itself or one
                     // of its ancestors is created with a different
@@ -153,7 +155,7 @@ public final class ArchiveControllers {
                 }
 
                 // TODO: Refactor this to a more flexible design which supports
-                // different umount strategies, like update or append.
+                // different sync strategies, like update or append.
                 controller = new UpdatingArchiveController(
                         target, enclController, enclEntryName, driver);
             }
@@ -191,33 +193,34 @@ public final class ArchiveControllers {
     }
 
     /**
-     * Updates the real file system with all changes to archive files which's
-     * canonical path name start with {@code prefix}.
-     * This will reset the state of the respective archive controller and
-     * delete all temporary files held for the selected archive files.
+     * Writes all changes to the contents of the target archive files who's
+     * canonical path name starts with the given {@code prefix} to the
+     * underlying file system.
+     * This will reset the state of the respective archive controllers.
      * This method is thread-safe.
      *
      * @param prefix The prefix of the canonical path name of the archive files
      *        which shall get synchronized to the real file system.
      *        This may be {@code null} or empty in order to select all accessed
      *        archive files.
-     * @throws ArchiveWarningException If the configuration uses the
+     * @throws ArchiveWarningException if the configuration uses the
      *         {@link DefaultArchiveFileExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
-     * @throws ArchiveWarningException If the configuration uses the
+     * @throws ArchiveWarningException if the configuration uses the
      *         {@link DefaultArchiveFileExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
-     * @throws NullPointerException If {@code config} is {@code null}.
-     * @throws IllegalArgumentException If the configuration property
+     * @throws NullPointerException if {@code config} is {@code null}.
+     * @throws IllegalArgumentException if the configuration property
      *         {@code closeInputStreams} is {@code false} and
      *         {@code closeOutputStreams} is {@code true}.
+     * @see ArchiveController#sync(SyncConfiguration)
      */
-    public static void umount(final String prefix, UmountConfiguration config)
+    public static void sync(final String prefix, SyncConfiguration config)
     throws ArchiveFileException {
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
             throw new IllegalArgumentException();
@@ -231,7 +234,7 @@ public final class ArchiveControllers {
             config.getCloseInputStreams(),
             config.getWaitForOutputStreams(),
             config.getCloseOutputStreams(),
-            config.getRelease(),
+            config.getUmount(),
         });
         try {
             // Reset statistics if it hasn't happened yet.
@@ -243,7 +246,7 @@ public final class ArchiveControllers {
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
-                // call the umount() method on each respective archive controller.
+                // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
                 for (final ArchiveController controller
@@ -256,7 +259,7 @@ public final class ArchiveControllers {
                             // Upon return, some new ArchiveWarningException's may
                             // have been generated. We need to remember them for
                             // later throwing.
-                            controller.umount(config);
+                            controller.sync(config);
                         } catch (ArchiveFileException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
@@ -400,13 +403,7 @@ public final class ArchiveControllers {
                     }
                 } finally {
                     try {
-                        ArchiveControllers.umount("",
-                                new UmountConfiguration()
-                                .setWaitForInputStreams(false)
-                                .setCloseInputStreams(true)
-                                .setWaitForOutputStreams(false)
-                                .setCloseOutputStreams(true)
-                                .setRelease(true));
+                        ArchiveControllers.sync("", new SyncConfiguration());
                     } catch (ArchiveFileException ouch) {
                         ouch.printStackTrace();
                     }
@@ -454,8 +451,7 @@ public final class ArchiveControllers {
                     // This may invalidate the file system object, so it must be
                     // done first in case srcController and dstController are the
                     // same!
-                    class SrcControllerUpdater implements Action<IOException> {
-
+                    class SrcControllerUpdater implements IOOperation {
                         public void run() throws IOException {
                             srcController.autoUmount(srcEntryName);
                             srcController.readLock().lock(); // downgrade to read lock upon return
@@ -463,7 +459,7 @@ public final class ArchiveControllers {
                     } // class SrcControllerUpdater
 
                     final ArchiveEntry srcEntry, dstEntry;
-                    final Delta delta;
+                    final LinkTransaction link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoUmount(dstEntryName);
@@ -477,23 +473,24 @@ public final class ArchiveControllers {
                         final boolean lenient = isLenient();
                         final ArchiveFileSystem dstFileSystem
                                 = dstController.autoMount(lenient);
-                        delta = dstFileSystem.link(dstEntryName,
-                                lenient, preserve ? srcEntry : null);
-                        dstEntry = delta.getEntry();
+                        link = dstFileSystem.link(
+                                dstEntryName, FILE, lenient,
+                                preserve ? srcEntry : null);
+                        dstEntry = link.getEntry();
 
                         // Create input stream.
-                        in = srcController.createInputStream(srcEntry, dstEntry);
+                        in = srcController.newInputStream(srcEntry, dstEntry);
                     } finally {
                         srcController.readLock().unlock();
                     }
 
                     try {
                         // Create output stream.
-                        out = dstController.createOutputStream(dstEntry, srcEntry);
+                        out = dstController.newOutputStream(dstEntry, srcEntry);
 
                         try {
                             // Now link the destination entry into the file system.
-                            delta.commit();
+                            link.run();
                         } catch (IOException ex) {
                             out.close();
                             throw ex;
@@ -581,22 +578,21 @@ public final class ArchiveControllers {
                     dstController.autoUmount(dstEntryName);
 
                     final boolean lenient = isLenient();
-
                     // Get source archive entry.
                     final ArchiveEntry srcEntry = new RfsEntry(src);
-
                     // Get destination archive entry.
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
-                    final Delta delta = dstFileSystem.link(dstEntryName,
-                            lenient, preserve ? srcEntry : null);
-                    final ArchiveEntry dstEntry = delta.getEntry();
+                    final LinkTransaction link = dstFileSystem.link(
+                            dstEntryName, FILE, lenient,
+                            preserve ? srcEntry : null);
+                    final ArchiveEntry dstEntry = link.getEntry();
 
                     // Create output stream.
-                    out = dstController.createOutputStream(dstEntry, srcEntry);
+                    out = dstController.newOutputStream(dstEntry, srcEntry);
 
                     // Now link the destination entry into the file system.
-                    delta.commit();
+                    link.run();
                 }
             }
 
@@ -710,14 +706,14 @@ public final class ArchiveControllers {
      * <p>
      * Likewise, in TrueZIP an unclosed archive entry stream may result in an
      * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
-     * {@link #umount} is called.
+     * {@link #sync} is called.
      * In order to prevent this, TrueZIP's archive entry streams have a
      * {@link Object#finalize()} method which closes an archive entry stream
      * if its garbage collected.
      * <p>
      * Now if this class property is set to {@code false}, then
      * TrueZIP maintains a hard reference to all archive entry streams
-     * until {@link #umount} is called, which will deal
+     * until {@link #sync} is called, which will deal
      * with them: If they are not closed, an
      * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
      * the boolean parameters to these methods.
@@ -728,18 +724,18 @@ public final class ArchiveControllers {
      * If this class property is set to {@code true} however, then
      * TrueZIP maintains only a weak reference to all archive entry streams.
      * This allows the garbage collector to finalize them before
-     * {@link #umount} is called.
+     * {@link #sync} is called.
      * The finalize() method will then close these archive entry streams,
      * which exempts them, from triggering an
      * {@code ArchiveBusy(Warning)?Exception} on the next call to
-     * {@link #umount}.
+     * {@link #sync}.
      * However, closing an archive entry output stream this way may result
      * in loss of buffered data, so it's only a workaround for this issue.
      * <p>
      * Note that for the setting of this class property to take effect, any
      * change must be made before an archive is first accessed.
      * The setting will then persist until the archive is reset by the next
-     * call to {@link #umount}.
+     * call to {@link #sync}.
      * </li>
      * </ol>
      *

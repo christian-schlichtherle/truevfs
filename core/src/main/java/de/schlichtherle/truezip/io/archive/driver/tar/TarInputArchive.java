@@ -22,8 +22,8 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.io.util.Files;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import org.apache.tools.tar.TarBuffer;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarUtils;
 
-import static de.schlichtherle.truezip.io.util.Files.normalize;
+import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 import static org.apache.tools.tar.TarConstants.GIDLEN;
 import static org.apache.tools.tar.TarConstants.MODELEN;
 import static org.apache.tools.tar.TarConstants.MODTIMELEN;
@@ -91,21 +91,21 @@ public class TarInputArchive implements InputArchive {
      */
     public TarInputArchive(final InputStream in)
     throws IOException {
-        final TarInputStream tin = createValidatedTarInputStream(in);
+        final TarInputStream tin = newValidatedTarInputStream(in);
         try {
             org.apache.tools.tar.TarEntry tinEntry;
             while ((tinEntry = tin.getNextEntry()) != null) {
-                final String name = normalize(tinEntry.getName(), '/');
+                final String name = tinEntry.getName();
                 TarEntry entry;
                 if (tinEntry.isDirectory()) {
                     entry = new TarEntry(tinEntry);
                 } else {
-                    final java.io.File tmp;
+                    final File tmp;
                     try {
                         entry = (TarEntry) entries.get(name);
                         tmp = entry != null
                                 ? entry.getFile()
-                                : Files.createTempFile(TEMP_FILE_PREFIX);
+                                : createTempFile(TEMP_FILE_PREFIX);
                         try {
                             final java.io.FileOutputStream out
                                     = new java.io.FileOutputStream(tmp);
@@ -143,7 +143,7 @@ public class TarInputArchive implements InputArchive {
      * This method is required because the {@code TarInputStream}
      * unfortunately does not do any validation!
      */
-    private static TarInputStream createValidatedTarInputStream(
+    private static TarInputStream newValidatedTarInputStream(
             final InputStream in)
     throws IOException {
         final byte[] buf = new byte[TarBuffer.DEFAULT_RCDSIZE];
@@ -213,7 +213,7 @@ public class TarInputArchive implements InputArchive {
         return (TarEntry) entries.get(entryName);
     }
 
-    public InputStream getInputStream(
+    public InputStream newInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
@@ -228,7 +228,7 @@ public class TarInputArchive implements InputArchive {
         final Collection values = entries.values();
         for (final Iterator i = values.iterator(); i.hasNext(); i.remove()) {
             final TarEntry entry = (TarEntry) i.next();
-            final java.io.File file = entry.getFile();
+            final File file = entry.getFile();
             if (file == null) {
                 assert entry.isDirectory();
                 continue;

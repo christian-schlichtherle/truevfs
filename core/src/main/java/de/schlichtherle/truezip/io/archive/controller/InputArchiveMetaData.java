@@ -102,14 +102,14 @@ public final class InputArchiveMetaData {
         this.inArchive = inArchive;
     }
 
-    synchronized InputStream createInputStream(
+    synchronized InputStream newInputStream(
             final ArchiveEntry entry,
             final ArchiveEntry dstEntry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
-        final InputStream in = inArchive.getInputStream(entry, dstEntry);
+        final InputStream in = inArchive.newInputStream(entry, dstEntry);
         return in != null ? new EntryInputStream(in) : null;
     }
 
@@ -175,8 +175,8 @@ public final class InputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized <T extends Throwable> void closeAllInputStreams(
-            ExceptionHandler<IOException, T> handler)
+    synchronized <T extends Throwable>
+    void closeAllInputStreams(final ExceptionHandler<IOException, T> handler)
     throws T {
         assert !stopped;
         stopped = true;

@@ -78,7 +78,7 @@ public interface OutputArchive {
      * @param entry A valid reference to an archive entry.
      *        The runtime class of this entry is the same as the runtime class
      *        of the entries returned by
-     *        {@link ArchiveDriver#createArchiveEntry}.
+     *        {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}.
      * @param srcEntry If not {@code null}, this identifies the entry
      *        from which TrueZIP is actually copying data from and should be
      *        used to implement the Direct Data Copying (DDC) feature.
@@ -87,7 +87,7 @@ public interface OutputArchive {
      *        Furthermore, this <em>not</em> exclusively used for archive
      *        copies, so you should <em>not</em> simply copy all properties
      *        of the source entry to the entry (see
-     *        {@link ArchiveDriver#createArchiveEntry(Archive, String, ArchiveEntry)}
+     *        {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}
      *        for comparison).
      *        <p>
      *        For example, the ZIP driver family uses this to copy the
@@ -108,8 +108,8 @@ public interface OutputArchive {
      *         for some reason.
      * @throws IOException On any other exceptional condition.
      */
-    OutputStream getOutputStream(ArchiveEntry entry, ArchiveEntry srcEntry)
-    throws OutputArchiveBusyException, FileNotFoundException, IOException;
+    OutputStream newOutputStream(ArchiveEntry entry, ArchiveEntry srcEntry)
+    throws IOException;
     
     /**
      * Closes this output archive and releases any system resources

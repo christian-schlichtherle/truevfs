@@ -76,7 +76,7 @@ import java.io.OutputStream;
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
  * @see FileBusyException
  * @see File#cat
- * @see File#umount
+ * @see File#sync
  * @see File#update
  * @see File#setLenient
  * @author Christian Schlichtherle
@@ -95,7 +95,7 @@ public class FileOutputStream extends FilterOutputStream {
      */
     public FileOutputStream(String name)
     throws FileNotFoundException {
-        super(createOutputStream(
+        super(newOutputStream(
                 File.getDefaultArchiveDetector().createFile(name), false));
     }
 
@@ -110,7 +110,7 @@ public class FileOutputStream extends FilterOutputStream {
      */
     public FileOutputStream(String name, boolean append)
     throws FileNotFoundException {
-        super(createOutputStream(
+        super(newOutputStream(
                 File.getDefaultArchiveDetector().createFile(name), append));
     }
 
@@ -125,7 +125,7 @@ public class FileOutputStream extends FilterOutputStream {
      */
     public FileOutputStream(java.io.File file)
     throws FileNotFoundException {
-        super(createOutputStream(file, false));
+        super(newOutputStream(file, false));
     }
 
     /**
@@ -139,14 +139,14 @@ public class FileOutputStream extends FilterOutputStream {
      */
     public FileOutputStream(java.io.File file, boolean append)
     throws FileNotFoundException {
-        super(createOutputStream(file, append));
+        super(newOutputStream(file, append));
     }
 
     public FileOutputStream(FileDescriptor fd) {
         super(new java.io.FileOutputStream(fd));
     }
 
-    private static OutputStream createOutputStream(
+    private static OutputStream newOutputStream(
             final java.io.File dst,
             final boolean append)
     throws FileNotFoundException {
@@ -155,10 +155,10 @@ public class FileOutputStream extends FilterOutputStream {
                 final File dstFile = (File) dst;
                 final File archive = dstFile.getInnerArchive();
                 if (archive != null) {
-                    final String entryName = dstFile.getInnerEntryName();
-                    assert entryName != null;
+                    final String path = dstFile.getInnerEntryName();
+                    assert path != null;
                     return archive.getArchiveController()
-                            .createOutputStream(entryName, append);
+                            .newOutputStream(path, append);
                 }
             }
         } catch (FalsePositiveException isNotArchive) {
