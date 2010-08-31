@@ -618,8 +618,8 @@ public abstract class BasicZipFile implements Closeable {
      * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
      * {@code ReadOnlyFile}) without cooperation of the returned
-     * streams, which is important if the application wants to work on the
-     * underlying file again (e.g. update or delete it).
+     * streams, which is important if the client application wants to work on
+     * the underlying file again (e.g. update or delete it).
      *
      * @throws ZipException If this ZIP file has been closed.
      */
@@ -648,8 +648,8 @@ public abstract class BasicZipFile implements Closeable {
      * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
      * {@code ReadOnlyFile}) without cooperation of the returned
-     * streams, which is important if the application wants to work on the
-     * underlying file again (e.g. update or delete it).
+     * streams, which is important if the client application wants to work on
+     * the underlying file again (e.g. update or delete it).
      *
      * @throws ZipException If this ZIP file has been closed.
      */
