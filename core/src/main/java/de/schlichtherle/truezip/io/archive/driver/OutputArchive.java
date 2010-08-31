@@ -79,7 +79,7 @@ public interface OutputArchive {
      * @param entry A valid reference to an archive entry.
      *        The runtime class of this entry is the same as the runtime class
      *        of the entries returned by
-     *        {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}.
+     *        {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}.
      * @param srcEntry If not {@code null}, this identifies the entry
      *        from which TrueZIP is actually copying data from and should be
      *        used to implement the Direct Data Copying (DDC) feature.
@@ -88,15 +88,14 @@ public interface OutputArchive {
      *        Furthermore, this <em>not</em> exclusively used for archive
      *        copies, so you should <em>not</em> simply copy all properties
      *        of the source entry to the entry (see
-     *        {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}
+     *        {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}
      *        for comparison).
      *        <p>
-     *        For example, the ZIP driver family uses this to copy the
-     *        already deflated data if the source entry is another
-     *        ZIP file entry.
-     *        As another example, the {@link de.schlichtherle.truezip.io.archive.driver.tar.TarDriver}
-     *        uses this to determine the size of the input file, thereby
-     *        removing the need to create (yet another) temporary file.
+     *        For example, the ZIP driver family uses this to copy the already
+     *        deflated data if the source entry is another ZIP file entry.
+     *        As another example, the TAR driver family uses this to determine
+     *        the size of the input file, thereby removing the need to create
+     *        (yet another) temporary file.
      * @return A (preferrably unbuffered) {@link OutputStream} to write the
      *         archive entry data to.
      *         {@code null} is not allowed!

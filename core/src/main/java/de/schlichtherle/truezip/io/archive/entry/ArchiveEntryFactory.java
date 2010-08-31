@@ -23,7 +23,6 @@ import java.io.CharConversionException;
  *
  * @author Christian Schlichtherle
  * @version $Id$
- * @param <AE> The type of the instances returned by {@link #newEntry}.
  */
 public interface ArchiveEntryFactory {
 
