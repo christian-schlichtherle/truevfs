@@ -22,6 +22,6 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileExceptionHandler
-extends ExceptionHandler<ArchiveFileException, ArchiveFileException> {
+public interface SyncExceptionHandler
+extends ExceptionHandler<SyncException, SyncException> {
 }

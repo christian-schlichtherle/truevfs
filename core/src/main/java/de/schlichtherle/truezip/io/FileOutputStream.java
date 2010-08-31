@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import java.io.FileDescriptor;
@@ -167,7 +167,7 @@ public class FileOutputStream extends FilterOutputStream {
             // Fall through!
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (ArchiveFileBusyException ex) {
+        } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe

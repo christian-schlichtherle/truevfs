@@ -24,13 +24,13 @@ import de.schlichtherle.truezip.io.archive.Archive;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileInputBusyWarningException
-extends ArchiveFileBusyWarningException {
-
-    private static final long serialVersionUID = 965098472652287563L;
+public class ArchiveInputBusyException
+extends ArchiveBusyException {
+    
+    private static final long serialVersionUID = 4560238423870456234L;
 
     // TODO: Make this package private!
-    public ArchiveFileInputBusyWarningException(Archive archive, int numStreams) {
+    public ArchiveInputBusyException(Archive archive, int numStreams) {
         super(archive, numStreams);
     }
 }

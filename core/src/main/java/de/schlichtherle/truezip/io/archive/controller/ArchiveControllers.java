@@ -204,14 +204,14 @@ public final class ArchiveControllers {
      *        This may be {@code null} or empty in order to select all accessed
      *        archive files.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultArchiveFileExceptionBuilder} and <em>only</em>
+     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultArchiveFileExceptionBuilder} and any error
+     *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException if {@code config} is {@code null}.
@@ -221,7 +221,7 @@ public final class ArchiveControllers {
      * @see ArchiveController#sync(SyncConfiguration)
      */
     public static void sync(final String prefix, SyncConfiguration config)
-    throws ArchiveFileException {
+    throws SyncException {
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
             throw new IllegalArgumentException();
         config = config.setReassemble(true);
@@ -241,8 +241,8 @@ public final class ArchiveControllers {
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
-                final ArchiveFileExceptionBuilder builder
-                        = config.getArchiveFileExceptionBuilder();
+                final SyncExceptionBuilder builder
+                        = config.getSyncExceptionBuilder();
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
@@ -260,7 +260,7 @@ public final class ArchiveControllers {
                             // have been generated. We need to remember them for
                             // later throwing.
                             controller.sync(config);
-                        } catch (ArchiveFileException exception) {
+                        } catch (SyncException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
@@ -278,7 +278,7 @@ public final class ArchiveControllers {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (ArchiveFileException chain) {
+        } catch (SyncException chain) {
             logger.log(Level.FINE, "update.throwing", chain);// NOI18N
             throw chain;
         }
@@ -404,7 +404,7 @@ public final class ArchiveControllers {
                 } finally {
                     try {
                         ArchiveControllers.sync("", new SyncConfiguration());
-                    } catch (ArchiveFileException ouch) {
+                    } catch (SyncException ouch) {
                         ouch.printStackTrace();
                     }
                 }
