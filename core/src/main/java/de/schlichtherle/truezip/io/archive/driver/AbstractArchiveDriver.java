@@ -171,7 +171,7 @@ public abstract class AbstractArchiveDriver
      * Ensures that the given entry name is representable in this driver's
      * character set charset.
      * Should be called by sub classes in their implementation of the method
-     * {@link ArchiveDriver#newArchiveEntry(Archive, String, ArchiveEntry)}.
+     * {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}.
      * 
      * @param entryName A valid archive entry name - {@code null} is not
      *        permissible.
