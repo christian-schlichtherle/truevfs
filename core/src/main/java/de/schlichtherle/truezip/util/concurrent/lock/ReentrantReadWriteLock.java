@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.util.concurrent.locks;
+package de.schlichtherle.truezip.util.concurrent.lock;
 
 import de.schlichtherle.truezip.util.Action;
 import java.util.logging.Level;

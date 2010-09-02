@@ -26,15 +26,6 @@ package de.schlichtherle.truezip.io.zip;
  */
 interface ZIP {
 
-    /** Local File Header signature. */
-    int LFH_SIG = 0x04034B50;
-    
-    /** Data Descriptor signature. */
-    int DD_SIG = 0x08074B50;
-    
-    /** Central File Header signature. */
-    int CFH_SIG = 0x02014B50;
-
     /**
      * This boolean field is set by the system property
      * {@code de.schlichtherle.truezip.io.zip.zip64ext}.
@@ -50,14 +41,23 @@ interface ZIP {
     boolean ZIP64_EXT
             = Boolean.getBoolean("de.schlichtherle.truezip.io.zip.zip64ext");
 
+    /** Local File Header signature. */
+    int LFH_SIG = 0x04034B50;
+    
+    /** Data Descriptor signature. */
+    int DD_SIG = 0x08074B50;
+    
+    /** Central File Header signature. */
+    int CFH_SIG = 0x02014B50;
+
+    /** End Of Central Directory Record signature. */
+    int EOCD_SIG = 0x06054B50;
+
     /** Zip64 End Of Central Directory Record. */
-    int ZIP64_EOCDR_SIG = 0x06064b50;
+    int ZIP64_EOCD_SIG = 0x06064b50;
 
     /** Zip64 End Of Central Directory Locator. */
     int ZIP64_EOCDL_SIG = 0x07064b50;
-
-    /** End Of Central Directory Record signature. */
-    int EOCDR_SIG = 0x06054B50;
 
     /** The minimum length of the Local File Header record. */
     int LFH_MIN_LEN =
@@ -93,8 +93,24 @@ interface ZIP {
             /* external file attributes        */ 4 +
             /* relative offset of local header */ 4;
 
-    /** The minimum length of the Zip64 End Of Central Directory Record. */
-    int ZIP64_EOCDR_MIN_LEN =
+    /** The minimum length of the End Of Central Directory record. */
+    int EOCD_MIN_LEN =
+            /* end of central dir signature    */ 4 +
+            /* number of this disk             */ 2 +
+            /* number of the disk with the     */
+            /* start of the central directory  */ 2 +
+            /* total number of entries in the  */
+            /* central directory on this disk  */ 2 +
+            /* total number of entries in      */
+            /* the central directory           */ 2 +
+            /* size of the central directory   */ 4 +
+            /* offset of start of central      */
+            /* directory with respect to       */
+            /* the starting disk number        */ 4 +
+            /* zipfile comment length          */ 2;
+
+    /** The minimum length of the Zip64 End Of Central Directory record. */
+    int ZIP64_EOCD_MIN_LEN =
             /* zip64 end of central dir        */
             /* signature                       */ 4 +
             /* size of zip64 end of central    */
@@ -124,22 +140,6 @@ interface ZIP {
             /* end of central directory record */ 8 +
             /* total number of disks           */ 4;
 
-    /** The minimum length of the End Of Central Directory record. */
-    int EOCDR_MIN_LEN =
-            /* end of central dir signature    */ 4 +
-            /* number of this disk             */ 2 +
-            /* number of the disk with the     */
-            /* start of the central directory  */ 2 +
-            /* total number of entries in the  */
-            /* central directory on this disk  */ 2 +
-            /* total number of entries in      */
-            /* the central directory           */ 2 +
-            /* size of the central directory   */ 4 +
-            /* offset of start of central      */
-            /* directory with respect to       */
-            /* the starting disk number        */ 4 +
-            /* zipfile comment length          */ 2;
-
     String UTF8 = "UTF-8";
 
     /**
@@ -156,18 +156,6 @@ interface ZIP {
      * Optimized for reading and writing flash memory media.
      */
     int FLATER_BUF_LENGTH = 64 * 1024;
-
-    /** Windows/DOS/FAT platform. */
-    short PLATFORM_FAT  = 0;
-
-    /** Unix platform. */
-    short PLATFORM_UNIX = 3;
-
-    /** Compression method for uncompressed (<i>stored</i>) entries. */
-    int STORED = 0;
-
-    /** Compression method for compressed (<i>deflated</i>) entries. */
-    int DEFLATED = 8;
 
     /** An empty byte array. */
     byte[] EMPTY = new byte[0];

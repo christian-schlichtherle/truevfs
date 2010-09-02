@@ -16,15 +16,16 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import javax.swing.Icon;
@@ -49,10 +50,15 @@ import javax.swing.Icon;
  *     it can be serialized.
  * </ul>
  *
+ * @param <AE> The type of the archive entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDriver extends ArchiveEntryFactory {
+public interface ArchiveDriver<
+        AE extends ArchiveEntry,
+        IA extends InputArchive<AE>,
+        OA extends OutputArchive<AE>>
+extends ArchiveEntryFactory<AE> {
 
     /**
      * Creates a new input archive for the given {@code archive} in order to
@@ -85,15 +91,16 @@ public interface ArchiveDriver extends ArchiveEntryFactory {
      * </tr>
      * </table>
      * 
-     * @param archive The abstract archive representation which TrueZIP's
-     *        internal {@link ArchiveController} is processing
-     *        - never {@code null}.
-     * @param rof The {@link ReadOnlyFile} to read the
-     *        actual archive contents from - never {@code null}.
-     *        Hint: If you'ld prefer to have an {@code InputStream},
-     *        you could decorate this parameter with a
-     *        {@link ReadOnlyFileInputStream}.
-     * @return A new input archive instance.
+     * @param  archive the abstract archive representation which TrueZIP's
+     *         internal {@link ArchiveController} is processing
+     *         - {@code null} is not permitted.
+     * @param  rof the {@link ReadOnlyFile} to read the actual archive contents
+     *         from
+     *         - {@code null} is not permitted.
+     *         Hint: If you'ld prefer to have an {@link InputStream},
+     *         you could decorate this parameter with a
+     *         {@link ReadOnlyFileInputStream}.
+     * @return A non-{@code null} reference to a new input archive object.
      * @throws TransientIOException If calling this method for the same
      *         archive file again could possibly succeed.
      *         This exception is associated with another {@link IOException}
@@ -106,31 +113,29 @@ public interface ArchiveDriver extends ArchiveEntryFactory {
      *         when reading the input archive and the implementation would like
      *         to treat the archive file like a regular file which may be read,
      *         written or deleted.
-     * @see InputArchive
+     * @see    InputArchive
      */
-    InputArchive newInputArchive(
-            Archive archive,
-            ReadOnlyFile rof)
+    IA newInputArchive(Archive archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
      * Creates a new output archive for {@code archive}
      * from the given output stream.
      * 
-     * @param archive The abstract archive representation which TrueZIP's
-     *        internal {@link ArchiveController} is processing
-     *        - never {@code null}.
-     * @param out The {@link OutputStream} to write the archive entries to
-     *        - never {@code null}.
-     * @param source The source {@link InputArchive} if
-     *        {@code archive} is going to get updated.
-     *        If not {@code null}, this is guaranteed to be a product
-     *        of this driver's {@link #newInputArchive} method.
-     *        This may be used to copy some meta data which is specific to
-     *        the type of archive this driver supports.
-     *        For example, this could be used to copy the comment of a ZIP
-     *        file.
-     * @return A new output archive instance.
+     * @param  archive the abstract archive representation which TrueZIP's
+     *         internal {@link ArchiveController} is processing
+     *         - {@code null} is not permitted.
+     * @param  out the {@link OutputStream} to write the archive entries to
+     *         - {@code null} is not permitted.
+     * @param  source the source {@link InputArchive} if
+     *         {@code archive} is going to get updated.
+     *         If not {@code null}, this is guaranteed to be a product
+     *         of this driver's {@link #newInputArchive} method.
+     *         This may be used to copy some meta data which is specific to
+     *         the type of archive this driver supports.
+     *         For example, this could be used to copy the comment of a ZIP
+     *         file.
+     * @return A non-{@code null} reference to a new output archive object.
      * @throws TransientIOException If calling this method for the same
      *         archive file again could possibly succeed.
      *         This exception is associated with another {@code IOException}
@@ -139,20 +144,17 @@ public interface ArchiveDriver extends ArchiveEntryFactory {
      *         for any reason.
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
-     * @see OutputArchive
+     * @see    OutputArchive
      */
-    OutputArchive newOutputArchive(
-            Archive archive,
-            OutputStream out,
-            InputArchive source)
+    OA newOutputArchive(Archive archive, OutputStream out, IA source)
     throws IOException;
-    
+
     /**
      * Returns the icon that
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param archive The archive file to display - never {@code null}.
+     * @param  archive the archive file to display - never {@code null}.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be used.
@@ -166,7 +168,7 @@ public interface ArchiveDriver extends ArchiveEntryFactory {
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param archive The archive file to display - never {@code null}.
+     * @param  archive the archive file to display - never {@code null}.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be used.

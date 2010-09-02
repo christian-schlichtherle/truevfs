@@ -18,118 +18,97 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import java.io.Closeable;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
- * Defines the interface used to write entries to an archive file.
+ * A container which supports writing archive entries to an arbitrary output
+ * destination.
  * <p>
- * Implementations do <em>not</em> need to be thread safe:
- * Multithreading must be addressed by the client classes.
+ * Implementations do <em>not</em> need to be thread-safe:
+ * Multithreading needs to be addressed by client applications.
  *
+ * @see InputArchive
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputArchive {
+public interface OutputArchive<AE extends ArchiveEntry>
+extends ArchiveEntryContainer<AE>, Closeable {
 
     /**
-     * Returns the number of {@link ArchiveEntry} instances in this archive.
+     * {@inheritDoc}
      * <p>
      * This method may be called before the archive is closed and must also
-     * reflect entries which have not yet been closed.
+     * reflect entries which have merely been started to be written by
+     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * closed yet.
      */
-    int getNumArchiveEntries();
+    @Override
+    int size();
 
     /**
-     * Returns an enumeration of the {@link ArchiveEntry} instances in this
-     * archive (i.e. written so far).
+     * {@inheritDoc}
      * <p>
      * This method may be called before the archive is closed and must also
-     * reflect entries which have not yet been closed.
+     * reflect entries which have merely been started to be written by
+     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * closed yet.
      */
-    Enumeration<? extends ArchiveEntry> getArchiveEntries();
+    @Override
+    Iterator<AE> iterator();
 
     /**
-     * Returns the {@link ArchiveEntry} for the given entry name or
-     * {@code null} if no entry with this name has been written
-     * or started to be written.
+     * {@inheritDoc}
      * <p>
      * This method may be called before the archive is closed and must also
-     * reflect entries which have not yet been closed.
-     * 
-     * @param entryName A valid archive entry name - never {@code null}.
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
+     * reflect entries which have merely been started to be written by
+     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * closed yet.
      */
-    ArchiveEntry getArchiveEntry(String entryName);
+    @Override
+    AE getEntry(String name);
 
     /**
-     * Returns a new {@code OutputStream} for writing the contents of the
-     * given archive entry.
+     * Returns a non-{@code null} reference to an output stream socket for
+     * writing the given archive entry to this output archive.
      * <p>
-     * The returned stream should preferrably be unbuffered, as buffering is
-     * usually done in higher layers (all copy routines in TrueZIP do this
-     * and most client applications do it, too).
-     * Buffering twice does not increase, but decrease performance.
+     * The implementation must not assume that the returned output stream
+     * socket will ever be used and must tolerate changes to all settable
+     * properties of the {@link ArchiveEntry} interface.
+     * In other words, writing an archive entry header or adding the archive
+     * entry to this container merely upon the call to this method is an error.
      * <p>
-     * Note that the stream is guaranteed to be closed before the
-     * {@link #close()} method of this archive is called!
-     * 
+     * Multiple invocations with the same parameter may return the same
+     * object again.
+     *
+     * @param entry a non-{@code null} reference to an output stream socket
+     *        for writing the given archive entry to this output archive.
+     * @return A non-{@code null} reference to an output stream socket for
+     *         writing the archive entry data.
+     * @throws FileNotFoundException If the archive entry is not accessible.
      * @param entry A valid reference to an archive entry.
      *        The runtime class of this entry is the same as the runtime class
-     *        of the entries returned by
-     *        {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}.
-     * @param srcEntry If not {@code null}, this identifies the entry
-     *        from which TrueZIP is actually copying data from and should be
-     *        used to implement the Direct Data Copying (DDC) feature.
-     *        Note that there is no guarantee on the runtime type of this
-     *        object; it may have been created by other drivers.
-     *        Furthermore, this <em>not</em> exclusively used for archive
-     *        copies, so you should <em>not</em> simply copy all properties
-     *        of the source entry to the entry (see
-     *        {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}
-     *        for comparison).
-     *        <p>
-     *        For example, the ZIP driver family uses this to copy the already
-     *        deflated data if the source entry is another ZIP file entry.
-     *        As another example, the TAR driver family uses this to determine
-     *        the size of the input file, thereby removing the need to create
-     *        (yet another) temporary file.
-     * @return A (preferrably unbuffered) {@link OutputStream} to write the
-     *         archive entry data to.
-     *         {@code null} is not allowed!
-     * @throws OutputArchiveBusyException If the archive is currently busy
-     *         on output for another entry.
-     *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to write the same entry again as soon as
-     *         the archive is not busy on output anymore.
-     * @throws FileNotFoundException If the archive entry is not accessible
-     *         for some reason.
-     * @throws IOException On any other exceptional condition.
+     *        of the entries returned by {@link ArchiveEntryFactory#newEntry}.
      */
-    OutputStream newOutputStream(ArchiveEntry entry, ArchiveEntry srcEntry)
-    throws IOException;
-    
-    /**
-     * Closes this output archive and releases any system resources
-     * associated with it.
-     * 
-     * @throws IOException On any I/O related issue.
-     */
-    void close()
-    throws IOException;
+    ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
+    throws FileNotFoundException;
 
     /**
-     * Returns the meta data for this input archive.
+     * Returns the meta data for this output archive.
      * The default value is {@code null}.
+     *
+     * @deprecated
      */
     OutputArchiveMetaData getMetaData();
 
     /**
-     * Sets the meta data for this input archive.
+     * Sets the meta data for this output archive.
      *
      * @param metaData The meta data - may not be {@code null}.
+     * @deprecated
      */
     void setMetaData(OutputArchiveMetaData metaData);
 }

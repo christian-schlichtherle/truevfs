@@ -28,7 +28,6 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
  * {@link ArchiveEntry} interface.
  *
  * @see ZipDriver
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -43,13 +42,11 @@ public class ZipEntry
 
     private ArchiveEntryMetaData metaData;
 
-    // TODO: Constructor should be protected!
-    public ZipEntry(String entryName) {
+    ZipEntry(String entryName) {
         super(entryName);
     }
 
-    // TODO: Constructor should be protected!
-    public ZipEntry(ZipEntry blueprint) {
+    ZipEntry(ZipEntry blueprint) {
         super(blueprint);
     }
 

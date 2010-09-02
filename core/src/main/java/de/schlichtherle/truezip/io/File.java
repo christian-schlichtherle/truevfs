@@ -78,12 +78,12 @@ import static de.schlichtherle.truezip.io.util.Files.split;
  *     simply return a boolean value indicating success or failure.
  *     Though this is suboptimal, this is consistent with most methods in
  *     the super class.
- * <li>The cp(_p)? methods return void and throw an {@code IOException}
+ * <li>The copy(_p)? methods return void and throw an {@code IOException}
  *     on failure.
  *     The exception hierarchy is fine grained enough to let a client
  *     application differentiate between access restrictions, input exceptions
  *     and output exceptions.
- *     The method names have been modelled after the Unix &quot;cp -p&quot;
+ *     The method names have been modelled after the Unix &quot;copy -p&quot;
  *     utility.
  *     None of these methods does recursive copying, however.
  * <li>The cat(To|From) methods return a boolean value. In contrast to the
@@ -2849,7 +2849,7 @@ public class File extends java.io.File {
      *         deleted.
      */
     public boolean deleteAll() {
-        return Files.rm_r(this);
+        return Files.deleteAll(this);
     }
 
     @Override
@@ -2918,7 +2918,7 @@ public class File extends java.io.File {
             if (!(dst instanceof File) || ((File) dst).innerArchive == null)
                 return delegate.renameTo(dst);
 
-        return !dst.exists() && Files.mv(this, dst, detector);
+        return !dst.exists() && Files.move(this, dst, detector);
     }
 
     /**
@@ -3094,7 +3094,7 @@ public class File extends java.io.File {
      */
     public boolean copyAllFrom(final java.io.File src) {
         try {
-            Files.cp_r(false, src, this, detector, detector);
+            Files.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3160,7 +3160,7 @@ public class File extends java.io.File {
             final java.io.File src,
             final ArchiveDetector detector) {
         try {
-            Files.cp_r(false, src, this, detector, detector);
+            Files.copyAll(false, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3235,7 +3235,7 @@ public class File extends java.io.File {
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector) {
         try {
-            Files.cp_r(false, src, this, srcDetector, dstDetector);
+            Files.copyAll(false, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3411,7 +3411,7 @@ public class File extends java.io.File {
      */
     public boolean copyAllTo(final java.io.File dst) {
         try {
-            Files.cp_r(false, this, dst, detector, detector);
+            Files.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3478,7 +3478,7 @@ public class File extends java.io.File {
             final java.io.File dst,
             final ArchiveDetector detector) {
         try {
-            Files.cp_r(false, this, dst, detector, detector);
+            Files.copyAll(false, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3553,7 +3553,7 @@ public class File extends java.io.File {
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector) {
         try {
-            Files.cp_r(false, this, dst, srcDetector, dstDetector);
+            Files.copyAll(false, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3680,7 +3680,7 @@ public class File extends java.io.File {
      */
     public boolean archiveCopyAllFrom(final java.io.File src) {
         try {
-            Files.cp_r(true, src, this, detector, detector);
+            Files.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3751,7 +3751,7 @@ public class File extends java.io.File {
             final java.io.File src,
             final ArchiveDetector detector) {
         try {
-            Files.cp_r(true, src, this, detector, detector);
+            Files.copyAll(true, src, this, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3830,7 +3830,7 @@ public class File extends java.io.File {
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector) {
         try {
-            Files.cp_r(true, src, this, srcDetector, dstDetector);
+            Files.copyAll(true, src, this, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -3958,7 +3958,7 @@ public class File extends java.io.File {
      */
     public boolean archiveCopyAllTo(final java.io.File dst) {
         try {
-            Files.cp_r(true, this, dst, detector, detector);
+            Files.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -4031,7 +4031,7 @@ public class File extends java.io.File {
             final java.io.File dst,
             final ArchiveDetector detector) {
         try {
-            Files.cp_r(true, this, dst, detector, detector);
+            Files.copyAll(true, this, dst, detector, detector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -4110,7 +4110,7 @@ public class File extends java.io.File {
             final ArchiveDetector srcDetector,
             final ArchiveDetector dstDetector) {
         try {
-            Files.cp_r(true, this, dst, srcDetector, dstDetector);
+            Files.copyAll(true, this, dst, srcDetector, dstDetector);
             return true;
         } catch (IOException ex) {
             return false;
@@ -4171,7 +4171,7 @@ public class File extends java.io.File {
      */
     public static void cp(final InputStream in, final OutputStream out)
     throws IOException {
-        Streams.cp(in, out);
+        Streams.copy(in, out);
     }
 
     /**
@@ -4241,7 +4241,7 @@ public class File extends java.io.File {
      */
     public static void cp(java.io.File src, java.io.File dst)
     throws IOException {
-        Files.cp(false, src, dst);
+        Files.copy(false, src, dst);
     }
 
     /**
@@ -4313,7 +4313,7 @@ public class File extends java.io.File {
      */
     public static void cp_p(java.io.File src, java.io.File dst)
     throws IOException {
-        Files.cp(true, src, dst);
+        Files.copy(true, src, dst);
     }
 
     /**

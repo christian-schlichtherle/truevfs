@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,8 +48,8 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * ODF file appropriately.
  * <p>
  * If it's a JAR file however, the method
- * {@link de.schlichtherle.truezip.io.File#isDirectory} returns {@code true} and
- * this driver is used to access the file.
+ * {@link de.schlichtherle.truezip.io.File#isDirectory} returns {@code true}
+ * and this driver is used to access the file.
  * The client application can then access the ODF file transparently as if it
  * were a directory in a path.
  * If a <i>mimetype</i> entry is to be created or modified, this should be
@@ -88,12 +87,12 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public OutputArchive newOutputArchive(
+    public OutputArchive<ZipEntry> newOutputArchive(
             Archive archive,
             OutputStream out,
-            InputArchive source)
+            ZipInputArchive source)
     throws IOException {
         return new OdfOutputArchive(newZipOutputArchive(
-                archive, out, (ZipInputArchive) source));
+                archive, out, source));
     }
 }

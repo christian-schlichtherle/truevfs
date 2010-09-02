@@ -66,11 +66,11 @@ extends FileNotFoundException {
     }
 
     @Override
-    public String getMessage() {
+    public String getLocalizedMessage() {
         final StringBuilder result = new StringBuilder(getCanonicalPath());
         if (!ArchiveController.isRoot(entryName))
             result.append(File.separator).append(entryName.replace(ArchiveEntry.SEPARATOR_CHAR, File.separatorChar));
-        final String msg = super.getMessage();
+        final String msg = getMessage();
         if (msg != null)
             result.append(" (").append(msg).append(")");
         return result.toString();

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.Sockets;
 import de.schlichtherle.truezip.io.util.Paths.Normalizer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.FileFactory;
@@ -144,19 +145,16 @@ public final class ArchiveFileSystem {
     // TODO: Replace controller with factory!
     ArchiveFileSystem(
             final UpdatingArchiveController controller,
-            final InputArchive archive,
+            final InputArchive<?> archive,
             final long rootTime,
             final boolean readOnly) {
         this.controller = controller;
         master = new LinkedHashMap<String, ArchiveEntry>(
-                (int) (archive.getNumArchiveEntries() / 0.75f) + 1);
+                (int) (archive.size() / 0.75f) + 1);
 
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         // Load entries from input archive.
-        Enumeration<? extends ArchiveEntry> entries
-                = archive.getArchiveEntries();
-        while (entries.hasMoreElements()) {
-            final ArchiveEntry entry = entries.nextElement();
+        for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
             master.put(path, entry);
             entry.setMetaData(new ArchiveEntryMetaData(entry));
@@ -173,9 +171,7 @@ public final class ArchiveFileSystem {
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final PopulatePostfix fsck = new PopulatePostfix();
-        entries = archive.getArchiveEntries();
-        while (entries.hasMoreElements()) {
-            final ArchiveEntry entry = entries.nextElement();
+        for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
             if (isLegalPath(path))
                 fsck.fix(path);
@@ -821,7 +817,7 @@ public final class ArchiveFileSystem {
         while (en.hasMoreElements()) {
             final ArchiveEntry e = en.nextElement();
             final String n = e.getName();
-            if (oa.getArchiveEntry(n) != null)
+            if (oa.getEntry(n) != null)
                 continue; // we have already written this entry
             try {
                 if (e.getType() == DIRECTORY) {
@@ -829,21 +825,11 @@ public final class ArchiveFileSystem {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    oa.newOutputStream(e, null).close();
-                } else if (ia != null && ia.getArchiveEntry(n) != null) {
-                    assert e == ia.getArchiveEntry(n);
-                    InputStream in;
-                    try {
-                        in = ia.newInputStream(e, e);
-                        assert in != null;
-                    } catch (IOException ex) {
-                        throw new InputException(ex);
-                    }
-                    // 'entry' will never be used again, so it is
-                    // safe to hand over this entry from the
-                    // InputArchive to the OutputArchive.
-                    final OutputStream out = oa.newOutputStream(e, e);
-                    Streams.cp(in, out);
+                    oa.getOutputStreamSocket(e).newOutputStream(null).close();
+                } else if (ia != null && ia.getEntry(n) != null) {
+                    assert e == ia.getEntry(n);
+                    Sockets.copy(   ia.getInputStreamSocket(e),
+                                    oa.getOutputStreamSocket(e));
                 } else {
                     // The entry is an archive file which has been
                     // newly created and not yet been reassembled
@@ -851,7 +837,7 @@ public final class ArchiveFileSystem {
                     // Write an empty entry now as a marker in order to
                     // recreate the entry when the file system gets
                     // remounted from the archive file.
-                    oa.newOutputStream(e, null).close();
+                    oa.getOutputStreamSocket(e).newOutputStream(null).close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);

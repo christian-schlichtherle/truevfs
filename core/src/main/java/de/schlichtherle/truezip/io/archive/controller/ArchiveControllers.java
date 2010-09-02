@@ -426,7 +426,7 @@ public final class ArchiveControllers {
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
      */
-    public static void cp(
+    public static void copy(
             final boolean preserve,
             final ArchiveController srcController,
             final String srcEntryName,
@@ -520,7 +520,7 @@ public final class ArchiveControllers {
             }
 
             // Finally copy the entry data.
-            Streams.cp(streams.in, streams.out);
+            Streams.copy(streams.in, streams.out);
         } catch (ArchiveEntryFalsePositiveException ex) {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
@@ -528,7 +528,7 @@ public final class ArchiveControllers {
             if (!dstController.getCanonicalPath().equals(ex.getCanonicalPath())) {
                 throw ex; // not my job - pass on!
             }      // Reroute call to the destination's enclosing archive controller.
-            cp(preserve, srcController, srcEntryName,
+            copy(preserve, srcController, srcEntryName,
                     dstController.getEnclController(),
                     dstController.enclEntryName(dstEntryName));
         }

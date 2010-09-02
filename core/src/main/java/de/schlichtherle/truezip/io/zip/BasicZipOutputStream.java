@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.io.util.LEDataOutputStream;
 import java.io.Closeable;
 import java.io.FilterOutputStream;
@@ -31,6 +32,10 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 
+import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.PLATFORM_FAT;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
+
 /**
  * Provides unsafe access to a ZIP file using unsynchronized methods and shared
  * {@link ZipEntry} instances.
@@ -41,16 +46,14 @@ import java.util.zip.ZipException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicZipOutputStream
-        extends FilterOutputStream
-        implements Closeable, Flushable {
+public abstract class BasicZipOutputStream<E extends ZipEntry>
+extends FilterOutputStream
+implements Iterable<E>, Closeable, Flushable {
 
     /**
      * The default character set used for entry names and comments in ZIP
      * compatible files.
      * This is {@value} for compatibility with Sun's JDK implementation.
-     * Note that you should use &quot;IBM437&quot; for ordinary ZIP files
-     * instead.
      */
     public static final String DEFAULT_CHARSET = ZIP.DEFAULT_CHARSET;
 
@@ -72,14 +75,13 @@ public abstract class BasicZipOutputStream
     private String comment = "";
 
     /** Default compression method for next entry. */
-    private short method = ZIP.DEFLATED;
+    private short method = DEFLATED;
 
     /**
      * The list of ZIP entries started to be written so far.
      * Maps entry names to zip entries.
      */
-    private final Map<String, ZipEntry> entries
-            = new LinkedHashMap<String, ZipEntry>();
+    private final Map<String, E> entries = new LinkedHashMap<String, E>();
 
     /** Start of entry data. */
     private long dataStart;
@@ -92,7 +94,7 @@ public abstract class BasicZipOutputStream
     private boolean closed;
 
     /** Current entry. */
-    private ZipEntry entry;
+    private E entry;
 
     /**
      * Whether or not we need to deflate the current entry.
@@ -110,11 +112,8 @@ public abstract class BasicZipOutputStream
     protected BasicZipOutputStream(final OutputStream out)
     throws NullPointerException {
         super(toLEDataOutputStream(out));
-
-        // Check parameters (fail fast).
         if (out == null)
             throw new NullPointerException();
-
         this.charset = DEFAULT_CHARSET;
     }
 
@@ -132,12 +131,9 @@ public abstract class BasicZipOutputStream
     throws  NullPointerException,
             UnsupportedEncodingException {
         super(toLEDataOutputStream(out));
-
-        // Check parameters (fail fast).
         if (out == null || charset == null)
             throw new NullPointerException();
         "".getBytes(charset); // may throw UnsupportedEncodingException!
-
         this.charset = charset;
     }
 
@@ -147,10 +143,8 @@ public abstract class BasicZipOutputStream
                 : new LEDataOutputStream(out);
     }
 
-    /**
-     * Returns the charset to use for filenames and the file comment.
-     */
-    public String getEncoding() {
+    /** Returns the charset to use for entry names and the file comment. */
+    public String getCharset() {
         return charset;
     }
 
@@ -162,24 +156,38 @@ public abstract class BasicZipOutputStream
     }
 
     /**
-     * Returns an enumeration of the ZIP entries written so far.
+     * Returns an enumeration of all entries written to this ZIP file so far.
      * Note that the enumerated entries are shared with this class.
      * It is illegal to put more entries into this ZIP output stream
      * concurrently or modify the state of the enumerated entries.
+     *
+     * @deprecated Use {@link #iterator()} instead.
      */
     public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 
     /**
-     * Returns the {@link ZipEntry} for the given name or
-     * {@code null} if no entry with that name exists.
-     * Note that the returned entry is shared with this class.
+     * Returns an iteration of all entries written to this ZIP file so far.
+     * Note that the iteration supports element removal and the returned
+     * entries are shared with this instance.
+     * It is illegal to put more entries into this ZIP output stream
+     * concurrently or modify the state of the iterated entries.
+     */
+    @Override
+    public Iterator<E> iterator() {
+        return entries.values().iterator();
+    }
+
+    /**
+     * Returns the entry for the given name or {@code null} if no entry with
+     * this name exists.
+     * Note that the returned entry is shared with this instance.
      * It is illegal to change its state!
      *
-     * @param name Name of the ZIP entry.
+     * @param name the name of the ZIP entry.
      */
-    public ZipEntry getEntry(String name) {
+    public E getEntry(String name) {
         return entries.get(name);
     }
 
@@ -236,7 +244,7 @@ public abstract class BasicZipOutputStream
      * @see ZipEntry#setMethod
      */
     public void setMethod(int method) {
-	if (method != ZIP.STORED && method != ZIP.DEFLATED)
+	if (method != STORED && method != DEFLATED)
 	    throw new IllegalArgumentException(
                     "Invalid compression method: " + method);
         this.method = (short) method;
@@ -262,7 +270,7 @@ public abstract class BasicZipOutputStream
      * Equivalent to
      * {@link #putNextEntry(ZipEntry, boolean) putNextEntry(entry, true)}.
      */
-    public final void putNextEntry(final ZipEntry entry)
+    public final void putNextEntry(final E entry)
     throws IOException {
         putNextEntry(entry, true);
     }
@@ -290,7 +298,7 @@ public abstract class BasicZipOutputStream
      *         format specification.
      * @throws IOException On any I/O related issue.
      */
-    public void putNextEntry(final ZipEntry entry, final boolean deflate)
+    public void putNextEntry(final E entry, final boolean deflate)
     throws IOException {
         closeEntry();
 
@@ -311,12 +319,12 @@ public abstract class BasicZipOutputStream
         if (method == ZipEntry.UNKNOWN)
             method = getMethod();
         switch (method) {
-            case ZIP.STORED:
+            case STORED:
                 checkLocalFileHeaderData(entry);
                 this.deflate = false;
                 break;
 
-            case ZIP.DEFLATED:
+            case DEFLATED:
                 if (!deflate)
                     checkLocalFileHeaderData(entry);
                 this.deflate = deflate;
@@ -328,7 +336,7 @@ public abstract class BasicZipOutputStream
         }
 
         if (entry.getPlatform() == ZipEntry.UNKNOWN)
-            entry.setPlatform(ZIP.PLATFORM_FAT);
+            entry.setPlatform(PLATFORM_FAT);
         if (entry.getMethod()   == ZipEntry.UNKNOWN)
             entry.setMethod(method);
         if (entry.getTime()     == ZipEntry.UNKNOWN)
@@ -461,7 +469,7 @@ public abstract class BasicZipOutputStream
                 crc.update(b, off, len);
             } else {
                 out.write(b, off, len);
-                if (entry.getMethod() != ZIP.DEFLATED)
+                if (entry.getMethod() != DEFLATED)
                     crc.update(b, off, len);
             }
         } else {
@@ -488,7 +496,7 @@ public abstract class BasicZipOutputStream
             return;
 
         switch (entry.getMethod()) {
-            case ZIP.STORED:
+            case STORED:
                 final long expectedCrc = crc.getValue();
                 if (expectedCrc != entry.getCrc()) {
                     throw new ZipException(entry.getName()
@@ -508,7 +516,7 @@ public abstract class BasicZipOutputStream
                 }
                 break;
 
-            case ZIP.DEFLATED:
+            case DEFLATED:
                 if (deflate) {
                     assert !def.finished();
                     def.finish();
@@ -715,14 +723,14 @@ public abstract class BasicZipOutputStream
                 || cdOffsetZip64;
 
         if (zip64) {
-            final long zip64eocdrOffset // relative offset of the zip64 end of central directory record
+            final long zip64eocdOffset // relative offset of the zip64 end of central directory record
                     = dos.size();
 
-            // ZIP64 End Of Central Directory Record Signature.
-            dos.writeInt(ZIP.ZIP64_EOCDR_SIG);
+            // ZIP64 End Of Central Directory record signature.
+            dos.writeInt(ZIP.ZIP64_EOCD_SIG);
 
-            // Size Of ZIP64 End Of Central Directory Record.
-            dos.writeLong(ZIP.ZIP64_EOCDR_MIN_LEN - 12);
+            // Size Of ZIP64 End Of Central Directory record.
+            dos.writeLong(ZIP.ZIP64_EOCD_MIN_LEN - 12);
 
             // Version Made By.
             dos.writeShort(63);
@@ -749,21 +757,21 @@ public abstract class BasicZipOutputStream
             // Starting Disk Number.
             dos.writeLong(cdOffset);
 
-            // ZIP64 End Of Central Directory Locator Signature.
+            // ZIP64 End Of Central Directory Locator signature.
             dos.writeInt(ZIP.ZIP64_EOCDL_SIG);
 
             // Number Of The Disk With The Start Of The ZIP64 End Of Central Directory.
             dos.writeInt(0);
 
-            // Relative Offset Of The ZIP64 End Of Central Directory Record.
-            dos.writeLong(zip64eocdrOffset);
+            // Relative Offset Of The ZIP64 End Of Central Directory record.
+            dos.writeLong(zip64eocdOffset);
 
             // Total Number Of Disks.
             dos.writeInt(1);
         }
 
-        // End Of Central Directory Record Signature.
-        dos.writeInt(ZIP.EOCDR_SIG);
+        // End Of Central Directory record signature.
+        dos.writeInt(ZIP.EOCD_SIG);
 
         // Disk numbers.
         dos.writeShort(0);

@@ -23,6 +23,7 @@ import java.util.*;
  *
  * @author Christian Schlichtherle
  * @version $Id$
+ * @deprecated Use {@link JointIterator} instead.
  */
 public final class JointEnumeration<E> implements Enumeration<E> {
     private Enumeration<? extends E> e1;

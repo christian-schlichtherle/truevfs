@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -41,10 +42,13 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractArchiveDriver
-        implements ArchiveDriver, Serializable {
+public abstract class AbstractArchiveDriver<
+        AE extends ArchiveEntry,
+        IA extends InputArchive<AE>,
+        OA extends OutputArchive<AE>>
+implements ArchiveDriver<AE, IA, OA>, Serializable {
 
-    private static final long serialVersionUID = 6546816846546846516L;
+    private static final long serialVersionUID = 6546816446546846516L;
 
     private static final String CLASS_NAME
             = AbstractArchiveDriver.class.getName();

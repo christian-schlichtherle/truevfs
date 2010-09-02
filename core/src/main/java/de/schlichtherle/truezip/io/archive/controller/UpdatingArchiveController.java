@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import de.schlichtherle.truezip.util.concurrent.locks.ReentrantLock;
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,7 +77,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * An {@link InputArchive} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private InputArchive inArchive;
+    private InputArchive<?> inArchive;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -89,7 +89,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * The (possibly temporary) {@link OutputArchive} we are writing newly
      * created or modified entries to.
      */
-    private OutputArchive outArchive;
+    private OutputArchive<?> outArchive;
 
     /**
      * Whether or not nesting this archive file to its enclosing
@@ -326,7 +326,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.cp( controller.newInputStream0(path),
+                Streams.copy( controller.newInputStream0(path),
                             new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
@@ -431,8 +431,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             logger.log(Level.FINEST, "initInArchive.throwing", ex); // NOI18N
             throw ex;
         }
-        logger.log(Level.FINEST, "initInArchive.exiting", // NOI18N
-                new Integer(inArchive.getNumArchiveEntries()));
+        logger.log(Level.FINEST, "initInArchive.exiting", inArchive.size()); // NOI18N
 
         assert inArchive != null;
     }
@@ -561,7 +560,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     boolean hasNewData(String entryName) {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
-        return outArchive != null && outArchive.getArchiveEntry(entryName) != null;
+        return outArchive != null && outArchive.getEntry(entryName) != null;
     }
 
     public void sync(final SyncConfiguration config)
@@ -759,7 +758,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
                 // normal case) have been modified by the OutputArchive
-                // and thus cannot get used anymore to access the input;
+                // and thus cannot getEntry used anymore to access the input;
                 // and (2) if there has been any IOException on the
                 // output archive there is no way to recover from it.
                 shutdownStep2(handler);
@@ -800,9 +799,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // deleted from the master directory meanwhile and prepare
         // to throw a warn exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final Enumeration<? extends ArchiveEntry> e = outArchive.getArchiveEntries();
-        while (e.hasMoreElements()) {
-            final ArchiveEntry entry = e.nextElement();
+        for (final ArchiveEntry entry : outArchive) {
             final String entryName = entry.getName();
             /*final String entryName
                     = Paths.normalize(entry.getName(), ENTRY_SEPARATOR_CHAR);*/
@@ -851,7 +848,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         out.close();
                         throw ex;
                     }
-                    Streams.cp(in , out); // always closes in and out
+                    Streams.copy(in , out); // always closes in and out
                 } catch (IOException cause) {
                     throw handler.fail(new SyncException(
                             this,
@@ -928,7 +925,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     /**
      * Resets the archive controller to its initial state - all changes to the
-     * archive file which have not yet been updated get lost!
+     * archive file which have not yet been updated getEntry lost!
      * <p>
      * Thereafter, the archive controller will behave as if it has just been
      * created and any subsequent operations on its entries will remount

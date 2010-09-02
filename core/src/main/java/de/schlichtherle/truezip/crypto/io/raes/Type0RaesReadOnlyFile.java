@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
-import de.schlichtherle.truezip.crypto.modes.SICSeekableBlockCipher;
+import de.schlichtherle.truezip.crypto.mode.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Arrays;
 import java.io.FileNotFoundException;

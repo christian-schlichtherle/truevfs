@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.samples;
+package de.schlichtherle.truezip.io.sample;
 
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.RaesFiles;

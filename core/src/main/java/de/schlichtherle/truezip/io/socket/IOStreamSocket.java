@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 Schlichtherle IT Services
+ * Copyright 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.driver.zip;
-
-import de.schlichtherle.truezip.io.zip.DateTimeConverter;
+package de.schlichtherle.truezip.io.socket;
 
 /**
- * Respects the different date/time conversion in JAR files.
+ * Creates input and output streams for reading and writing bytes from and to
+ * its target.
  *
- * @see JarDriver
+ * @param   <T> The type of the {@link #getTarget() target} of this instance.
+ * @param   <O> The minimum required type of the <i>peer</i> targets for
+ *          reading and writing from and to the target of this instance.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class JarEntry extends ZipEntry {
-
-    JarEntry(String entryName) {
-        super(entryName);
-    }
-
-    JarEntry(ZipEntry blueprint) {
-        super(blueprint);
-    }
-
-    @Override
-    protected DateTimeConverter getDateTimeConverter() {
-        return DateTimeConverter.JAR;
-    }
+public interface IOStreamSocket<T, O>
+extends InputStreamSocket<T, O>, OutputStreamSocket<O, T> {
 }

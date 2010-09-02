@@ -19,11 +19,12 @@ package de.schlichtherle.truezip.io.zip;
 /**
  * A factory for {@link ZipEntry}s.
  *
+ * @param <E> The type of the created ZIP entries.
  * @author Christian Schlichtherle
  * @version $Id$
  * @see BasicZipFile
  */
-public interface ZipEntryFactory {
+public interface ZipEntryFactory<E extends ZipEntry> {
 
     /**
      * Creates a new {@link ZipEntry} with the given entry {@code name}.
@@ -32,5 +33,5 @@ public interface ZipEntryFactory {
      * @return A newly created {@link ZipEntry} with the given entry
      *         {@code name} - {@code null} is not permitted.
      */
-    ZipEntry newZipEntry(String name);
+    E newZipEntry(String name);
 }

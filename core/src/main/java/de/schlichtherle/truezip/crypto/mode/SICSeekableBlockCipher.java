@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.crypto.modes;
+package de.schlichtherle.truezip.crypto.mode;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.BlockCipher;

@@ -64,8 +64,8 @@ extends FileNotFoundException {
     }
 
     @Override
-    public String getMessage() {
-        final String msg = super.getMessage();
+    public String getLocalizedMessage() {
+        final String msg = getMessage();
         if (msg != null)
             return new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString();
         return getCanonicalPath();

@@ -16,11 +16,10 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -36,6 +35,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipException;
+
+import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
  * Provides unsafe access to a ZIP file using unsynchronized methods and shared
@@ -57,7 +59,8 @@ import java.util.zip.ZipException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicZipFile implements Closeable {
+public abstract class BasicZipFile<E extends ZipEntry>
+implements Iterable<E>, Closeable {
 
     private static final long LONG_MSB = 0x8000000000000000L;
 
@@ -88,8 +91,7 @@ public abstract class BasicZipFile implements Closeable {
     private String comment;
 
     /** Maps entry names to zip entries. */
-    private final Map<String, ZipEntry> entries
-            = new LinkedHashMap<String, ZipEntry>();
+    private final Map<String, E> entries = new LinkedHashMap<String, E>();
 
     /** The actual data source. */
     private ReadOnlyFile archive;
@@ -106,7 +108,7 @@ public abstract class BasicZipFile implements Closeable {
     /** Maps offsets specified in the ZIP file to real offsets in the file. */
     private OffsetMapper mapper;
 
-    private final ZipEntryFactory factory;
+    private final ZipEntryFactory<? extends E> factory;
 
     /**
      * Reads the given {@code archive} in order to provide random access
@@ -163,7 +165,7 @@ public abstract class BasicZipFile implements Closeable {
     BasicZipFile(
             final ReadOnlyFileSource source,
             final String charset,
-            final ZipEntryFactory zipEntryFactory,
+            final ZipEntryFactory<? extends E> zipEntryFactory,
             boolean preambled,
             boolean postambled)
     throws IOException {
@@ -199,27 +201,8 @@ public abstract class BasicZipFile implements Closeable {
         void release(ReadOnlyFile rof) throws IOException;
     }
 
-    static class SimpleReadOnlyFileSource implements ReadOnlyFileSource {
-        final File file;
-
-        public SimpleReadOnlyFileSource(File file) {
-            this.file = file;
-        }
-
-        public SimpleReadOnlyFileSource(String name) {
-            this.file = new File(name);
-        }
-
-        public ReadOnlyFile fetch() throws IOException {
-            return new SimpleReadOnlyFile(file);
-        }
-
-        public void release(ReadOnlyFile rof) throws IOException {
-            rof.close();
-        }
-    }
-
-    static class SingletonReadOnlyFileSource implements ReadOnlyFileSource {
+    private static class SingletonReadOnlyFileSource
+    implements ReadOnlyFileSource {
         final ReadOnlyFile rof;
 
         public SingletonReadOnlyFileSource(ReadOnlyFile rof) {
@@ -272,7 +255,7 @@ public abstract class BasicZipFile implements Closeable {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
             final String charset = utf8 ? ZIP.UTF8 : this.charset;
-            final ZipEntry entry = factory.newZipEntry(new String(name, charset));
+            final E entry = factory.newZipEntry(new String(name, charset));
             try {
                 int off = 0;
 
@@ -288,7 +271,7 @@ public abstract class BasicZipFile implements Closeable {
 
                 final int method = LittleEndian.readUShort(cfh, off);
                 off += 2;
-                if (method != ZIP.STORED && method != ZIP.DEFLATED)
+                if (method != STORED && method != DEFLATED)
                     throw new ZipException(entry.getName()
                     + ": unsupported compression method: " + method);
                 entry.setMethod(method);
@@ -402,17 +385,17 @@ public abstract class BasicZipFile implements Closeable {
             // Constraint: A ZIP file must start with a Local File Header
             // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
             preambled = signature == ZIP.LFH_SIG
-                      || signature == ZIP.ZIP64_EOCDR_SIG
-                      || signature == ZIP.EOCDR_SIG;
+                      || signature == ZIP.ZIP64_EOCD_SIG
+                      || signature == ZIP.EOCD_SIG;
         }
         if (preambled) {
             final long length = rof.length();
-            final long max = length - ZIP.EOCDR_MIN_LEN;
+            final long max = length - ZIP.EOCD_MIN_LEN;
             final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
                 rof.seek(eocdrOffset);
                 rof.readFully(sig);
-                if (LittleEndian.readUInt(sig, 0) != ZIP.EOCDR_SIG)
+                if (LittleEndian.readUInt(sig, 0) != ZIP.EOCD_SIG)
                     continue;
 
                 long diskNo;        // number of this disk
@@ -426,7 +409,7 @@ public abstract class BasicZipFile implements Closeable {
                 int off = 0;
 
                 // Process EOCDR.
-                final byte[] eocdr = new byte[ZIP.EOCDR_MIN_LEN - sig.length];
+                final byte[] eocdr = new byte[ZIP.EOCD_MIN_LEN - sig.length];
                 rof.readFully(eocdr);
 
                 diskNo = LittleEndian.readUShort(eocdr, off);
@@ -494,14 +477,14 @@ public abstract class BasicZipFile implements Closeable {
                                 "ZIP file spanning/splitting is not supported!");
 
                     // Read Zip64 End Of Central Directory Record.
-                    final byte[] zip64eocdr = new byte[ZIP.ZIP64_EOCDR_MIN_LEN];
+                    final byte[] zip64eocdr = new byte[ZIP.ZIP64_EOCD_MIN_LEN];
                     rof.seek(zip64eocdrOffset);
                     rof.readFully(zip64eocdr);
                     off = 0; // reuse
 
                     final long zip64eocdrSig = LittleEndian.readUInt(zip64eocdr, off);
                     off += 4;
-                    if (zip64eocdrSig != ZIP.ZIP64_EOCDR_SIG)
+                    if (zip64eocdrSig != ZIP.ZIP64_EOCD_SIG)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
                                 "Expected ZIP64 End Of Central Directory Record signature!");
 
@@ -586,30 +569,9 @@ public abstract class BasicZipFile implements Closeable {
         return openStreams > 0;
     }
 
-    /** Returns the charset to use for entry names and comments. */
+    /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
         return charset;
-    }
-
-    /**
-     * Returns an enumeration of the ZIP entries in this ZIP file.
-     * Note that the enumerated entries are shared with this class.
-     * It is illegal to change their state!
-     */
-    public Enumeration<? extends ZipEntry> entries() {
-        return Collections.enumeration(entries.values());
-    }
-
-    /**
-     * Returns the {@link ZipEntry} for the given name or
-     * {@code null} if no entry with that name exists.
-     * Note that the returned entry is shared with this class.
-     * It is illegal to change its state!
-     *
-     * @param name Name of the ZIP entry.
-     */
-    public ZipEntry getEntry(String name) {
-        return entries.get(name);
     }
 
     /**
@@ -617,6 +579,40 @@ public abstract class BasicZipFile implements Closeable {
      */
     public int size() {
         return entries.size();
+    }
+
+    /**
+     * Returns an enumeration of all entries in this ZIP file.
+     * Note that the enumerated entries are shared with this instance.
+     * It is illegal to change their state!
+     *
+     * @deprecated Use {@link #iterator()} instead.
+     */
+    public Enumeration<? extends ZipEntry> entries() {
+        return Collections.enumeration(entries.values());
+    }
+
+    /**
+     * Returns an iteration of all entries in this ZIP file.
+     * Note that the iteration supports element removal and the returned
+     * entries are shared with this instance.
+     * It is illegal to change their state!
+     */
+    @Override
+    public Iterator<E> iterator() {
+        return entries.values().iterator();
+    }
+
+    /**
+     * Returns the entry for the given name or {@code null} if no entry with
+     * this name exists.
+     * Note that the returned entry is shared with this instance.
+     * It is illegal to change its state!
+     *
+     * @param name the name of the ZIP entry.
+     */
+    public E getEntry(String name) {
+        return entries.get(name);
     }
 
     /**
@@ -832,7 +828,7 @@ public abstract class BasicZipFile implements Closeable {
         final int bufSize = getBufferSize(entry);
         InputStream in = iis;
         switch (entry.getMethod()) {
-            case ZIP.DEFLATED:
+            case DEFLATED:
                 if (inflate) {
                     iis.addDummy();
                     in = new PooledInflaterInputStream(in, bufSize);
@@ -845,7 +841,7 @@ public abstract class BasicZipFile implements Closeable {
                 }
                 break;
 
-            case ZIP.STORED:
+            case STORED:
                 if (check)
                     in = new CheckedInputStream(in, entry, bufSize);
                 break;

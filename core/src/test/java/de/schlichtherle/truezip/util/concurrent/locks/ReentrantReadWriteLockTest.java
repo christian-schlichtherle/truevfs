@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.util.concurrent.locks;
 
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.Action;
 import junit.framework.TestCase;
 

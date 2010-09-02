@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.util.concurrent.locks;
+package de.schlichtherle.truezip.util.concurrent.lock;
 
 /**
  * Similar to {@link java.util.concurrent.locks.ReadWriteLock},

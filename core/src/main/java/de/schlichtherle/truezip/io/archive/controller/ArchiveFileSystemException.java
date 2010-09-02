@@ -49,9 +49,9 @@ extends IOException {
     }
 
     @Override
-    public String getMessage() {
+    public String getLocalizedMessage() {
         if (entryName != null)
-            return new StringBuilder(entryName).append(" (").append(super.getMessage()).append(")").toString();
-        return super.getMessage();
+            return new StringBuilder(entryName).append(" (").append(getMessage()).append(")").toString();
+        return getMessage();
     }
 }

@@ -18,47 +18,48 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.ChainableIOException;
-import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.driver.tar.TarEntry;
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
-import de.schlichtherle.truezip.io.util.Streams;
-import de.schlichtherle.truezip.util.JointEnumeration;
+import de.schlichtherle.truezip.io.util.InputException;
+import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.Sockets;
+import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
 /**
  * A decorator for output archives which allows to write an unlimited number
- * of entries concurrently while actually only one entry is written at a time
- * to the target output archive.
+ * of entries concurrently while at most one entry is actually concurrently
+ * written to the target output archive.
  * If there is more than one entry to be written concurrently, the additional
  * entries are actually written to temp files and copied to the target
- * output archive upon a call to their {@link OutputStream#close} method.
+ * output archive upon a call to their {@link OutputStream#close()} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe:
+ * Multithreading needs to be addressed by client applications.
  *
- * @author Christian Schlichtherle
+ * @param   <AE> The run time type of the archive entries in this container.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class MultiplexedOutputArchive implements OutputArchive {
+public class MultiplexedOutputArchive<AE extends ArchiveEntry>
+extends FilterOutputArchive<AE> {
 
     /** Prefix for temporary files created by the multiplexer. */
     static final String TEMP_FILE_PREFIX = "tzp-mux";
-
-    /** The decorated output archive. */
-    private final OutputArchive target;
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -73,58 +74,86 @@ public class MultiplexedOutputArchive implements OutputArchive {
     /**
      * Constructs a new {@code MultiplexedOutputArchive}.
      * 
-     * @param target The decorated output archive.
-     * @throws NullPointerException Iff {@code target} is {@code null}.
+     * @param target the decorated output archive.
+     * @throws NullPointerException iff {@code target} is {@code null}.
      */
-    public MultiplexedOutputArchive(final OutputArchive target) {
+    public MultiplexedOutputArchive(final OutputArchive<AE> target) {
+        super(target);
         if (target == null)
             throw new NullPointerException();
-        this.target = target;
-        
     }
 
-    public int getNumArchiveEntries() {
-        return target.getNumArchiveEntries() + temps.size();
+    @Override
+    public int size() {
+        return target.size() + temps.size();
     }
 
-    public Enumeration<ArchiveEntry> getArchiveEntries() {
-        return new JointEnumeration(target.getArchiveEntries(),
-                                    new TempEntriesEnumeration());
+    @Override
+    public Iterator<AE> iterator() {
+        return new JointIterator<AE>(target.iterator(), new TempEntriesIterator());
     }
 
-    private class TempEntriesEnumeration implements Enumeration<ArchiveEntry> {
+    private class TempEntriesIterator implements Iterator<AE> {
         private final Iterator<TempEntryOutputStream> i
                 = temps.values().iterator();
 
-        public boolean hasMoreElements() {
+        @Override
+        public boolean hasNext() {
             return i.hasNext();
         }
 
-        public ArchiveEntry nextElement() {
-            return i.next().entry;
+        @Override
+        public AE next() {
+            return i.next().getTarget();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("entry removal");
         }
     }
 
-    public ArchiveEntry getArchiveEntry(String entryName) {
-        ArchiveEntry entry = target.getArchiveEntry(entryName);
+    @Override
+    public AE getEntry(String name) {
+        AE entry = target.getEntry(name);
         if (entry != null)
             return entry;
-        final TempEntryOutputStream tempOut = temps.get(entryName);
-        return tempOut != null ? tempOut.entry : null;
+        final TempEntryOutputStream out = temps.get(name);
+        return out != null ? out.getTarget() : null;
     }
 
-    public OutputStream newOutputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry srcEntry)
+    @Override
+    public ArchiveOutputStreamSocket<AE> getOutputStreamSocket(final AE entry)
+    throws FileNotFoundException {
+        final ArchiveOutputStreamSocket<AE> dst
+                = super.getOutputStreamSocket(entry);
+        class OutputProxy implements ArchiveOutputStreamSocket<AE> {
+            @Override
+            public AE getTarget() {
+                return entry;
+            }
+
+            @Override
+            public OutputStream newOutputStream(
+                    final IORef<? extends ArchiveEntry> src)
+            throws IOException {
+                return MultiplexedOutputArchive.this.newOutputStream(dst, src);
+            }
+        } // class OutputProxy
+        return new OutputProxy();
+    }
+
+    protected OutputStream newOutputStream(
+            final ArchiveOutputStreamSocket<AE> dst,
+            final IORef<? extends ArchiveEntry> src)
     throws IOException {
-        if (srcEntry != null)
-            entry.setSize(srcEntry.getSize()); // data may be compressed!
-        
-        if (isTargetBusy()) {
-            final File temp = createTempFile(TEMP_FILE_PREFIX);
-            return new TempEntryOutputStream(entry, srcEntry, temp);
-        }
-        return new EntryOutputStream(entry, srcEntry);
+        final ArchiveEntry entry = dst.getTarget();
+        if (src != null)
+            entry.setSize(src.getTarget().getSize()); // data may be compressed!
+        return isTargetBusy()
+                ? new TempEntryOutputStream(
+                    createTempFile(TEMP_FILE_PREFIX), dst, src)
+                : new EntryOutputStream(dst.newOutputStream(src));
     }
 
     /**
@@ -141,11 +170,9 @@ public class MultiplexedOutputArchive implements OutputArchive {
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
 
-        private EntryOutputStream(
-                final ArchiveEntry entry,
-                final ArchiveEntry srcEntry)
+        EntryOutputStream(final OutputStream out)
         throws IOException {
-            super(target.newOutputStream(entry, srcEntry));
+            super(out);
             targetBusy = true;
         }
 
@@ -168,33 +195,58 @@ public class MultiplexedOutputArchive implements OutputArchive {
             closed = true;
             targetBusy = false;
             super.close();
-
-            storeTempEntries();
+            storeTemps();
         }
     } // class EntryOutputStream
 
     /**
-     * This entry output stream writes the entry to a temporary file.
+     * This entry output stream writes the archive entry to a temporary file.
      * When the stream is closed, the temporary file is then copied to the
-     * target output archive and finally deleted unless the target is still
-     * busy.
+     * target output archive and finally deleted unless the target output
+     * archive is still busy.
      */
-    private class TempEntryOutputStream extends java.io.FileOutputStream {
-        private final ArchiveEntry entry, srcEntry;
+    private class TempEntryOutputStream
+    extends FileOutputStream
+    implements IORef<AE> {
         private final File temp;
+        private final ArchiveOutputStreamSocket<AE> dst;
+        private final ArchiveInputStreamSocket<ArchiveEntry> src;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        private TempEntryOutputStream(
-                final ArchiveEntry entry,
-                final ArchiveEntry srcEntry,
-                final File temp)
+        TempEntryOutputStream(
+                final File temp,
+                final ArchiveOutputStreamSocket<AE> dst,
+                final IORef<? extends ArchiveEntry> src)
         throws IOException {
             super(temp);
-            this.entry = entry;
-            this.srcEntry = srcEntry != null ? srcEntry : new RfsEntry(temp);
             this.temp = temp;
-            temps.put(entry.getName(), this);
+            this.dst = dst;
+            this.src = src instanceof ArchiveInputStreamSocket
+                    ? (ArchiveInputStreamSocket) src
+                    : new TempInputStreamSocket();
+            temps.put(dst.getTarget().getName(), this);
+        }
+
+        class TempInputStreamSocket
+        implements ArchiveInputStreamSocket<ArchiveEntry> {
+            private final ArchiveEntry entry = new RfsEntry(temp);
+
+            @Override
+            public ArchiveEntry getTarget() {
+                return entry;
+            }
+
+            @Override
+            public InputStream newInputStream(IORef<? extends ArchiveEntry> destination)
+            throws IOException {
+                return new FileInputStream(temp);
+            }
+        } // class TempInputStreamSocket
+
+        @Override
+        public AE getTarget() {
+            return dst.getTarget();
         }
 
         @Override
@@ -203,55 +255,61 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 return;
 
             // Order is important here!
+            // Note that this must be guarded by the closed flag:
+            // close() gets called from the finalize() method in the
+            // subclass, which may cause a ConcurrentModificationException
+            // in this method.
             closed = true;
-            super.close();
-            if (entry.getSize() == ArchiveEntry.UNKNOWN)
-                entry.setSize(temp.length());
-            if (entry.getTime() == ArchiveEntry.UNKNOWN)
-                entry.setTime(temp.lastModified());
+            try {
+                super.close();
+            } finally {
+                final AE entry = dst.getTarget();
+                final ArchiveEntry srcEntry = src.getTarget();
+                if (entry.getSize() == UNKNOWN)
+                    entry.setSize(srcEntry.getSize());
+                if (entry.getTime() == UNKNOWN)
+                    entry.setTime(srcEntry.getTime());
+                storeTemps();
+            }
+        }
 
-            // Note that this must be guarded by the closed flag: close() gets
-            // called from the finalize() method in the super class, which
-            // may cause a ConcurrentModificationException in this method.
-            storeTempEntries();
+        boolean store() throws IOException {
+            if (!closed || isTargetBusy())
+                return false;
+
+            try {
+                Sockets.copy(src, dst);
+            } finally {
+                if (!temp.delete()) // may fail on Windoze if in.close() failed!
+                    temp.deleteOnExit(); // be bullish never to leavy any temps!
+            }
+            return true;
         }
     } // class TempEntryOutputStream
 
-    private void storeTempEntries() throws IOException {
+    @Override
+    public void close() throws IOException {
+        assert !isTargetBusy();
+        try {
+            storeTemps();
+            assert temps.isEmpty();
+        } finally {
+            target.close();
+        }
+    }
+
+    private void storeTemps() throws IOException {
         if (isTargetBusy())
             return;
 
         final ChainableIOExceptionBuilder<ChainableIOException> builder
                 = new ChainableIOExceptionBuilder<ChainableIOException>();
-        for (final Iterator i = temps.values().iterator(); i.hasNext(); ) {
-            final TempEntryOutputStream tempOut
-                    = (TempEntryOutputStream) i.next();
-            if (!tempOut.closed)
-                continue;
+        final Iterator<TempEntryOutputStream> i = temps.values().iterator();
+        while (i.hasNext()) {
+            final TempEntryOutputStream out = i.next();
+            boolean remove = true;
             try {
-                final ArchiveEntry entry = tempOut.entry;
-                final ArchiveEntry srcEntry = tempOut.srcEntry;
-                final File temp = tempOut.temp;
-                try {
-                    final InputStream in = new FileInputStream(temp);
-                    try {
-                        final OutputStream out = target.newOutputStream(
-                                entry, srcEntry);
-                        try {
-                            Streams.cat(in, out);
-                        } finally {
-                            out.close();
-                        }
-                    } finally {
-                        in.close();
-                    }
-                } finally {
-                    if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                        temp.deleteOnExit(); // be bullish never to leavy any temps!
-                }
-            } catch (FileNotFoundException ex) {
-                // Input exception - let's continue!
-                builder.warn(new ChainableIOException(ex));
+                remove = out.store();
             } catch (InputException ex) {
                 // Input exception - let's continue!
                 builder.warn(new ChainableIOException(ex));
@@ -259,27 +317,10 @@ public class MultiplexedOutputArchive implements OutputArchive {
                 // Something's wrong writing this MultiplexedOutputStream!
                 throw builder.fail(new ChainableIOException(ex));
             } finally {
-                i.remove();
+                if (remove)
+                    i.remove();
             }
         }
         builder.check();
-    }
-
-    public void close() throws IOException {
-        assert !isTargetBusy();
-        try {
-            storeTempEntries();
-            assert temps.isEmpty();
-        } finally {
-            target.close();
-        }
-    }
-
-    public OutputArchiveMetaData getMetaData() {
-        return target.getMetaData();
-    }
-
-    public void setMetaData(OutputArchiveMetaData metaData) {
-        target.setMetaData(metaData);
     }
 }
