@@ -17,29 +17,29 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.zip.BasicZipFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
 import java.util.zip.ZipException;
 
 /**
  * An implementation of {@link InputArchive} to read ZIP archives.
  *
  * @see ZipDriver
- * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class ZipInputArchive
-        extends BasicZipFile
-        implements InputArchive {
+extends BasicZipFile<ZipEntry>
+implements InputArchive<ZipEntry> {
 
     private InputArchiveMetaData metaData;
 
@@ -57,29 +57,34 @@ public class ZipInputArchive
         super(rof, charset, preambled, postambled, factory);
     }
 
-    public int getNumArchiveEntries() {
-        return super.size();
+    @Override
+    public ArchiveInputStreamSocket<ZipEntry> getInputStreamSocket(
+            final ZipEntry entry)
+    throws FileNotFoundException {
+        assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
+
+        class InputStreamProxy implements ArchiveInputStreamSocket<ZipEntry> {
+            @Override
+            public ZipEntry getTarget() {
+                return entry;
+            }
+
+            @Override
+            public InputStream newInputStream(
+                    final IORef<? extends ArchiveEntry> dst)
+            throws IOException {
+                final ArchiveEntry dstEntry = dst != null ? dst.getTarget() : null;
+                return ZipInputArchive.this.newInputStream(entry, dstEntry);
+            }
+        } // class InputStreamProxy
+        return new InputStreamProxy();
     }
 
-    public Enumeration<? extends ZipEntry> getArchiveEntries() {
-        return (Enumeration<? extends ZipEntry>) super.entries();
-    }
-
-    public ArchiveEntry getArchiveEntry(final String entryName) {
-        return (ZipEntry) super.getEntry(entryName);
-    }
-
-    public InputStream newInputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry entry, ArchiveEntry dstEntry)
     throws IOException {
-        return super.getInputStream(
-                entry.getName(), false, !(dstEntry instanceof ZipEntry));
+        return super.getInputStream(    entry.getName(), false,
+                                        !(dstEntry instanceof ZipEntry));
     }
-
-    //
-    // Metadata implementation.
-    //
 
     public InputArchiveMetaData getMetaData() {
         return metaData;

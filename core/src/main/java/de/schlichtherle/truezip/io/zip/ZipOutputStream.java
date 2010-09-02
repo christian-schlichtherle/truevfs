@@ -19,8 +19,11 @@ package de.schlichtherle.truezip.io.zip;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Drop-in replacement for
@@ -48,7 +51,7 @@ import java.util.Enumeration;
  * @version $Id$
  * @see ZipFile
  */
-public class ZipOutputStream extends BasicZipOutputStream {
+public class ZipOutputStream extends BasicZipOutputStream<ZipEntry> {
     
     /**
      * Creates a new ZIP output stream decorating the given output stream,
@@ -84,11 +87,13 @@ public class ZipOutputStream extends BasicZipOutputStream {
     }
 
     /**
-     * Returns a safe enumeration of clones of the ZIP entries written so far.
+     * Returns a safe enumeration of clones for all entries written so far.
      * This method takes a snapshot of the collection of all entries and
      * enumerates their clones, so concurrent modifications or state changes
      * do not affect this instance, the returned enumeration or the
      * enumerated ZIP entries.
+     *
+     * @deprecated Use {@link #iterator()} instead.
      */
     @Override
     public synchronized Enumeration<? extends ZipEntry> entries() {
@@ -109,15 +114,52 @@ public class ZipOutputStream extends BasicZipOutputStream {
     }
 
     /**
-     * Returns a clone of the {@link ZipEntry} for the given name or
-     * {@code null} if no entry with that name exists.
+     * Returns a safe iteration of clones for all entries written to this ZIP
+     * file so far.
+     * This method takes a snapshot of the collection of all entries and
+     * clones them while iterating, so concurrent modifications or state
+     * changes do not affect this instance, the returned enumeration or the
+     * enumerated ZIP entries.
+     * The iteration does not support element removal.
+     */
+    @Override
+    public synchronized Iterator<ZipEntry> iterator() {
+        class EntryIterator implements Iterator<ZipEntry> {
+            private final Iterator<ZipEntry> i;
+
+            private EntryIterator() {
+                List<ZipEntry> l = new ArrayList<ZipEntry>(ZipOutputStream.super.size());
+                Iterator<ZipEntry> si = ZipOutputStream.super.iterator();
+                while (si.hasNext())
+                    l.add(si.next());
+                i = l.iterator();
+            }
+
+            public boolean hasNext() {
+                return i.hasNext();
+            }
+
+            public ZipEntry next() {
+                return i.next().clone();
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("read-only iterator");
+            }
+        }
+        return new EntryIterator();
+    }
+
+    /**
+     * Returns a clone of the entry for the given name or {@code null} if no
+     * entry with this name exists.
      *
-     * @param name Name of the ZIP entry.
+     * @param name the name of the ZIP entry.
      */
     @Override
     public synchronized ZipEntry getEntry(String name) {
-        ZipEntry entry = super.getEntry(name);
-        return entry != null ? (ZipEntry) entry.clone() : null;
+        final ZipEntry entry = super.getEntry(name);
+        return entry != null ? entry.clone() : null;
     }
 
     @Override
@@ -132,7 +174,7 @@ public class ZipOutputStream extends BasicZipOutputStream {
     
     @Override
     public synchronized void setLevel(int level) {
-	super.setLevel(level);
+        super.setLevel(level);
     }
 
     @Override

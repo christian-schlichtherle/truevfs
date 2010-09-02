@@ -21,10 +21,11 @@ import java.io.CharConversionException;
 /**
  * An immutable, thread-safe factory for archive entries.
  *
+ * @param <AE> The type of the created archive entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveEntryFactory {
+public interface ArchiveEntryFactory<AE extends ArchiveEntry> {
 
     /**
      * Creates a new archive entry with the given entry {@code name}.
@@ -39,6 +40,6 @@ public interface ArchiveEntryFactory {
      *         characters.
      * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
      */
-    ArchiveEntry newArchiveEntry(String name, ArchiveEntry template)
+    AE newArchiveEntry(String name, ArchiveEntry template)
     throws CharConversionException;
 }

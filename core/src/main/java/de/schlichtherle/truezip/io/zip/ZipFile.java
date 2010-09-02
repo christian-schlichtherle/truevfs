@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.zip.ZipException;
 
 /**
@@ -49,7 +51,7 @@ import java.util.zip.ZipException;
  * @version $Id$
  * @see ZipOutputStream
  */
-public class ZipFile extends BasicZipFile {
+public class ZipFile extends BasicZipFile<ZipEntry> {
 
     private final String name;
 
@@ -278,6 +280,27 @@ public class ZipFile extends BasicZipFile {
         this.name = null;
     }
 
+    private static class SimpleReadOnlyFileSource
+    implements ReadOnlyFileSource {
+        final File file;
+
+        public SimpleReadOnlyFileSource(File file) {
+            this.file = file;
+        }
+
+        public SimpleReadOnlyFileSource(String name) {
+            this.file = new File(name);
+        }
+
+        public ReadOnlyFile fetch() throws IOException {
+            return new SimpleReadOnlyFile(file);
+        }
+
+        public void release(ReadOnlyFile rof) throws IOException {
+            rof.close();
+        }
+    }
+
     /**
      * Returns the path name of the ZIP file or {@code null} if this object
      * was created with a {@link ReadOnlyFile}.
@@ -286,7 +309,11 @@ public class ZipFile extends BasicZipFile {
         return name;
     }
 
-    /** Enumerates clones of all entries in this ZIP file. */
+    /**
+     * Enumerates clones of all entries in this ZIP file.
+     *
+     * @deprecated Use {@link #iterator()} instead.
+     */
     @Override
     public synchronized Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
@@ -304,15 +331,39 @@ public class ZipFile extends BasicZipFile {
     }
 
     /**
-     * Returns a clone of the {@link ZipEntry} for the given name or
-     * {@code null} if no entry with that name exists.
+     * Iterates through clones for all entries in this ZIP file.
+     * The iteration does not support element removal.
+     */
+    @Override
+    public synchronized Iterator<ZipEntry> iterator() {
+        class EntryIterator implements Iterator<ZipEntry> {
+            private final Iterator<ZipEntry> i = ZipFile.super.iterator();
+
+            public boolean hasNext() {
+                return i.hasNext();
+            }
+
+            public ZipEntry next() {
+                return i.next().clone();
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("read-only iterator");
+            }
+        }
+        return new EntryIterator();
+    }
+
+    /**
+     * Returns a clone of the entry for the given name or {@code null} if no
+     * entry with this name exists.
      *
-     * @param name Name of the ZIP entry.
+     * @param name the name of the ZIP entry.
      */
     @Override
     public synchronized ZipEntry getEntry(String name) {
-        ZipEntry ze = super.getEntry(name);
-        return ze != null ? (ZipEntry) ze.clone() : null;
+        final ZipEntry ze = super.getEntry(name);
+        return ze != null ? ze.clone() : null;
     }
 
     @Override

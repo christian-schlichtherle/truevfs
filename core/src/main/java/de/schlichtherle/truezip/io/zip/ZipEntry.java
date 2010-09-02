@@ -45,17 +45,17 @@ public class ZipEntry implements Cloneable {
     /** The unknown value for numeric properties. */
     public static final byte UNKNOWN = -1;
 
-    /** Windows/DOS/FAT platform. */
-    public static final short PLATFORM_FAT  = ZIP.PLATFORM_FAT;
+    /** Windows platform. */
+    public static final short PLATFORM_FAT  = 0;
 
     /** Unix platform. */
-    public static final short PLATFORM_UNIX = ZIP.PLATFORM_UNIX;
+    public static final short PLATFORM_UNIX = 3;
 
     /** Compression method for uncompressed (<em>stored</em>) entries. */
-    public static final int STORED = ZIP.STORED;
+    public static final int STORED = 0;
 
     /** Compression method for compressed (<em>deflated</em>) entries. */
-    public static final int DEFLATED = ZIP.DEFLATED;
+    public static final int DEFLATED = 8;
 
     /**
      * Smallest supported DOS date/time value in a ZIP file,
@@ -87,29 +87,37 @@ public class ZipEntry implements Cloneable {
     private String comment;
 
     /**
-     * Creates a new zip entry with the specified name.
+     * Constructs a new zip entry with the specified name.
      */
     public ZipEntry(final String name) {
         setName0(name);
     }
 
     /**
-     * Creates a new zip blueprint with fields taken from the specified
-     * blueprint.
+     * Constructs a new zip entry which has all properties copied from the
+     * given template.
      */
-    public ZipEntry(final ZipEntry blueprint) {
-        init = blueprint.init;
-        name = blueprint.name;
-        platform = blueprint.platform;
-        general = blueprint.general;
-        method = blueprint.method;
-        jTime = blueprint.jTime;
-        crc = blueprint.crc;
-        csize = blueprint.csize;
-        size = blueprint.size;
-        offset = blueprint.offset;
-        setExtra0(blueprint.getExtra());
-        comment = blueprint.comment;
+    public ZipEntry(final ZipEntry template) {
+        this(template.getName(), template);
+    }
+
+    /**
+     * Constructs a new zip entry with the given name which has all other
+     * properties copied from the given template.
+     */
+    private ZipEntry(final String name, final ZipEntry template) {
+        this.init = template.init;
+        this.name = name;
+        this.platform = template.platform;
+        this.general = template.general;
+        this.method = template.method;
+        this.jTime = template.jTime;
+        this.crc = template.crc;
+        this.csize = template.csize;
+        this.size = template.size;
+        this.offset = template.offset;
+        setExtra0(template.getExtra());
+        this.comment = template.comment;
         setInit(NAME, false); // unlock name
     }
 
@@ -406,7 +414,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Returns a protective copy of the serialized Extra Fields.
-     * Note that unlike its blueprint {@link java.util.zip.ZipEntry#getExtra},
+     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra},
      * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized Extra Fields.

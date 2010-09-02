@@ -16,11 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.ZipFile;
-import de.schlichtherle.truezip.io.zip.ZipOutputStream;
-import de.schlichtherle.truezip.io.zip.ZIP;
-import de.schlichtherle.truezip.io.zip.ZipEntry;
-import de.schlichtherle.truezip.io.zip.CRC32Exception;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.ByteArrayOutputStream;

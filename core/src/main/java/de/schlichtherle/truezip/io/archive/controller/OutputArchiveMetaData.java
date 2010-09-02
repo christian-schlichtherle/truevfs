@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
+import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -38,9 +39,10 @@ import java.util.logging.Logger;
  * of the streams between multiple threads.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * It's only public for technical reasons and may get renamed or entirely
+ * It's only public for technical reasons and may getEntry renamed or entirely
  * disappear without notice.
  *
+ * @see InputArchiveMetaData
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -109,8 +111,17 @@ public final class OutputArchiveMetaData {
         assert !stopped;
         assert entry != null;
 
-        final OutputStream out = outArchive.newOutputStream(entry, srcEntry);
-        return out != null ? new EntryOutputStream(out) : null;
+        final IORef<ArchiveEntry> ref = srcEntry == null ? null :
+        new IORef<ArchiveEntry>() {
+            @Override
+            public ArchiveEntry getTarget() {
+                return srcEntry;
+            }
+        };
+        final OutputStream out = outArchive
+                .getOutputStreamSocket(entry)
+                .newOutputStream(ref);
+        return new EntryOutputStream(out);
     }
 
     /**

@@ -100,8 +100,8 @@ public class SyncException extends ChainableIOException {
     }
 
     @Override
-    public String getMessage() {
-        final String msg = super.getMessage();
+    public String getLocalizedMessage() {
+        final String msg = getMessage();
         if (msg != null)
             return new StringBuilder(getCanonicalPath())
                     .append(" (")

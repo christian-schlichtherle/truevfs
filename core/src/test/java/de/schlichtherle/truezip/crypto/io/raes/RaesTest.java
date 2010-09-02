@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.crypto.io.raes;
 
-import de.schlichtherle.truezip.crypto.generators.DigestRandom;
+import de.schlichtherle.truezip.crypto.generator.DigestRandom;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileTestCase;
 import java.io.File;
 import java.io.FileOutputStream;

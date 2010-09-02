@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
+import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -31,8 +33,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,7 +63,8 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarInputArchive implements InputArchive {
+public class TarInputArchive
+implements InputArchive<TarEntry> {
 
     private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
 
@@ -169,7 +170,7 @@ public class TarInputArchive implements InputArchive {
      * @param in The stream to read from. May <em>not</em> be {@code null}.
      * @param buf The buffer to fill entirely with data.
      * @return A stream which holds all the data {@code in} did.
-     * @throws IOException If {@code buf} couldn't get filled entirely.
+     * @throws IOException If {@code buf} couldn't getEntry filled entirely.
      */
     static InputStream readAhead(final InputStream in, final byte[] buf)
     throws IOException {
@@ -199,25 +200,50 @@ public class TarInputArchive implements InputArchive {
         } while (n < l);
     }
 
-    public int getNumArchiveEntries() {
+    @Override
+    public int size() {
         return entries.size();
     }
 
-    public Enumeration getArchiveEntries() {
-        return Collections.enumeration(entries.values());
+    @Override
+    public Iterator<TarEntry> iterator() {
+        return entries.values().iterator();
     }
 
-    public ArchiveEntry getArchiveEntry(String entryName) {
-        return (TarEntry) entries.get(entryName);
+    @Override
+    public TarEntry getEntry(String name) {
+        return entries.get(name);
     }
 
-    public InputStream newInputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry dstEntry)
+    @Override
+    public ArchiveInputStreamSocket<TarEntry> getInputStreamSocket(
+            final TarEntry entry)
+    throws FileNotFoundException {
+        assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
+
+        class InputStreamProxy implements ArchiveInputStreamSocket<TarEntry> {
+            @Override
+            public TarEntry getTarget() {
+                return entry;
+            }
+
+            @Override
+            public InputStream newInputStream(
+                    final IORef<? extends ArchiveEntry> dst)
+            throws IOException {
+                final ArchiveEntry dstEntry = dst != null ? dst.getTarget() : null;
+                return TarInputArchive.this.newInputStream(entry, dstEntry);
+            }
+        } // class InputStreamProxy
+        return new InputStreamProxy();
+    }
+
+    protected InputStream newInputStream(TarEntry entry, ArchiveEntry dstEntry)
     throws IOException {
-        return new FileInputStream(((TarEntry) entry).getFile());
+        return new FileInputStream(entry.getFile());
     }
 
+    @Override
     public void close() throws IOException {
         close0();
     }
@@ -240,10 +266,6 @@ public class TarInputArchive implements InputArchive {
         }
     }
 
-    //
-    // Metadata stuff.
-    //
-
     public InputArchiveMetaData getMetaData() {
         return metaData;
     }
@@ -251,10 +273,6 @@ public class TarInputArchive implements InputArchive {
     public void setMetaData(InputArchiveMetaData metaData) {
         this.metaData = metaData;
     }
-
-    //
-    // Member class.
-    //
 
     /**
      * This needs to be a {@link FileNotFoundException} in order to signal that

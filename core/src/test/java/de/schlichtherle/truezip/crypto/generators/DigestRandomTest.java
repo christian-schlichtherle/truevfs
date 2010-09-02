@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.crypto.generators;
 
+import de.schlichtherle.truezip.crypto.generator.DigestRandom;
 import de.schlichtherle.truezip.util.Arrays;
 import java.util.Random;
 import junit.framework.Test;

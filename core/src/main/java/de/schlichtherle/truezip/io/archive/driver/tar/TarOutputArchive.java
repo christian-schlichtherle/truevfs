@@ -16,19 +16,23 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
+import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
@@ -47,20 +51,23 @@ import static de.schlichtherle.truezip.io.util.Files.createTempFile;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  * <p>
- * Entries which's size is known in advance are directly written to the
+ * If the size of an entry is known in advance it's directly written to the
  * underlying {@link TarOutputStream} instead.
  * <p>
- * This output archive can only write one entry at a time.
+ * This output archive can only write one entry concurrently.
  * Archive drivers may wrap this class in a {@link MultiplexedOutputArchive}
  * to overcome this limitation.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarOutputArchive extends TarOutputStream implements OutputArchive {
+public class TarOutputArchive
+extends TarOutputStream
+implements OutputArchive<TarEntry> {
 
     /** Maps entry names to tar entries [String -> TarEntry]. */
-    private final Map entries = new LinkedHashMap();
+    private final Map<String, TarEntry> entries
+            = new LinkedHashMap<String, TarEntry>();
 
     private OutputArchiveMetaData metaData;
     private boolean busy;
@@ -70,43 +77,62 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
         super.setLongFileMode(LONGFILE_GNU);
     }
 
-    public int getNumArchiveEntries() {
+    @Override
+    public int size() {
         return entries.size();
     }
 
-    public Enumeration getArchiveEntries() {
-        return Collections.enumeration(entries.values());
+    @Override
+    public Iterator<TarEntry> iterator() {
+        return entries.values().iterator();
     }
 
-    public ArchiveEntry getArchiveEntry(String entryName) {
-        return (TarEntry) entries.get(entryName);
+    @Override
+    public TarEntry getEntry(String name) {
+        return entries.get(name);
     }
 
-    public OutputStream newOutputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry srcEntry)
+    @Override
+    public ArchiveOutputStreamSocket<TarEntry> getOutputStreamSocket(
+            final TarEntry entry)
+    throws FileNotFoundException {
+        class OutputProxy implements ArchiveOutputStreamSocket<TarEntry> {
+            @Override
+            public TarEntry getTarget() {
+                return entry;
+            }
+
+            public OutputStream newOutputStream(
+                    final IORef<? extends ArchiveEntry> src)
+            throws IOException {
+                final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
+                return TarOutputArchive.this.newOutputStream(entry, src);
+            }
+        } // class OutputProxy
+        return new OutputProxy();
+    }
+
+    protected OutputStream newOutputStream(
+            final TarEntry entry,
+            final IORef<? extends ArchiveEntry> src)
     throws IOException {
         if (isBusy())
             throw new OutputArchiveBusyException(entry);
-
-        final TarEntry tarEntry = (TarEntry) entry;
-
-        if (tarEntry.isDirectory()) {
-            tarEntry.setSize(0);
-            return new EntryOutputStream(tarEntry);
+        if (entry.isDirectory()) {
+            entry.setSize(0);
+            return new EntryOutputStream(entry);
         }
-
+        final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
         if (srcEntry != null) {
-            tarEntry.setSize(srcEntry.getSize());
-            return new EntryOutputStream(tarEntry);
+            entry.setSize(srcEntry.getSize());
+            return new EntryOutputStream(entry);
         }
-
         // The source entry does not exist or cannot support DDC
         // to the destination entry.
         // So we need to buffer the output in a temporary file and write
         // it upon close().
-        final File temp = createTempFile(TEMP_FILE_PREFIX);
-        return new TempEntryOutputStream(tarEntry, temp);
+        return new TempEntryOutputStream(
+                createTempFile(TEMP_FILE_PREFIX), entry);
     }
 
     /**
@@ -127,7 +153,7 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
 
-        private EntryOutputStream(final TarEntry entry)
+        EntryOutputStream(final TarEntry entry)
         throws IOException {
             super(TarOutputArchive.this);
             putNextEntry(entry);
@@ -162,18 +188,16 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends java.io.FileOutputStream {
-        private final TarEntry entry;
+    private class TempEntryOutputStream extends FileOutputStream {
         private final File temp;
+        private final TarEntry entry;
         private boolean closed;
 
-        public TempEntryOutputStream(
-                final TarEntry entry,
-                final File temp)
+        TempEntryOutputStream(final File temp, final TarEntry entry)
         throws IOException {
             super(temp);
-            this.entry = entry;
             this.temp = temp;
+            this.entry = entry;
             entries.put(entry.getName(), entry);
             busy = true;
         }
@@ -190,32 +214,29 @@ public class TarOutputArchive extends TarOutputStream implements OutputArchive {
                 super.close();
             } finally {
                 entry.setSize(temp.length());
-                storeTempEntry(entry, temp);
+                store();
+            }
+        }
+
+        void store() throws IOException {
+            try {
+                final InputStream in = new FileInputStream(temp);
+                try {
+                    putNextEntry(entry);
+                    try {
+                        Streams.cat(in, TarOutputArchive.this);
+                    } finally {
+                        closeEntry();
+                    }
+                } finally {
+                    in.close();
+                }
+            } finally {
+                if (!temp.delete()) // may fail on Windoze if in.close() failed!
+                    temp.deleteOnExit(); // we're bullish never to leavy any temps!
             }
         }
     } // class TempEntryOutputStream
-
-    private void storeTempEntry(
-            final TarEntry entry,
-            final File temp)
-    throws IOException {
-        try {
-            final InputStream in = new java.io.FileInputStream(temp);
-            try {
-                putNextEntry(entry);
-                try {
-                    de.schlichtherle.truezip.io.File.cat(in, this);
-                } finally {
-                    closeEntry();
-                }
-            } finally {
-                in.close();
-            }
-        } finally {
-            if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                temp.deleteOnExit(); // we're bullish never to leavy any temps!
-        }
-    }
 
     //
     // Metadata stuff.

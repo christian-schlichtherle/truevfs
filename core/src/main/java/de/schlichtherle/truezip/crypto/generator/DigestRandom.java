@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.crypto.generators;
+package de.schlichtherle.truezip.crypto.generator;
 
 import java.security.SecureRandom;
 import java.util.Random;

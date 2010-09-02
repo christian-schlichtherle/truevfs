@@ -50,18 +50,11 @@ final class Files {
     private Files() {
     }
 
-    //
-    // Move, copy and remove methods:
-    //
     /**
      * Moves the source to the destination by recursively copying and deleting
      * its files and directories.
      * Hence, this file system operation works even with archive files or
      * entries within archive files, but is <em>not</em> atomic.
-     * <p>
-     * The name of this method is inspired by the Unix command line utility
-     * {@code mv} although in most cases it performs a plain rename
-     * operation rather than a copy-and-delete operation.
      *
      * @param src The source file or directory.
      *            This must exist.
@@ -78,14 +71,14 @@ final class Files {
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
-    static boolean mv(
+    static boolean move(
             final java.io.File src,
             final java.io.File dst,
             final ArchiveDetector detector) {
-        return !contains(src, dst) && mv0(src, dst, detector);
+        return !contains(src, dst) && move0(src, dst, detector);
     }
 
-    private static boolean mv0(
+    private static boolean move0(
             final java.io.File src,
             final java.io.File dst,
             final ArchiveDetector detector) {
@@ -108,7 +101,7 @@ final class Files {
             }
             for (int i = 0, l = members.length; i < l; i++) {
                 final String member = members[i];
-                ok &= mv0(  detector.createFile(src, member),
+                ok &= move0(  detector.createFile(src, member),
                             detector.createFile(dst,  member),
                             detector);
             }
@@ -116,7 +109,7 @@ final class Files {
                 ok &= dst.setLastModified(srcLastModified);
         } else if (src.isFile()) { // !isDirectory()
             try {
-                cp(true, src, dst);
+                copy(true, src, dst);
             } catch (IOException ex) {
                 ok = false;
             }
@@ -127,15 +120,14 @@ final class Files {
     }
 
     /**
-     * The name of this method is inspired by the Unix command line utility
-     * {@code cp} with the {@code -r} option to operate recursively.
+     * Performs a recursive copy operation.
      *
      * @see File#copyAllTo(java.io.File, ArchiveDetector, ArchiveDetector)
      * @see File#archiveCopyAllTo(java.io.File, ArchiveDetector, ArchiveDetector)
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
-    static void cp_r(
+    static void copyAll(
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst,
@@ -144,13 +136,13 @@ final class Files {
     throws IOException {
         if (contains(src, dst))
             throw new ContainsFileException(src, dst);
-        cp_r0(preserve, src, dst, srcDetector, dstDetector);
+        copyAll0(preserve, src, dst, srcDetector, dstDetector);
     }
 
     /**
      * Unchecked parameters version.
      */
-    private static void cp_r0(
+    private static void copyAll0(
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst,
@@ -176,7 +168,7 @@ final class Files {
             }
             for (int i = 0, l = members.length; i < l; i++) {
                 final String member = members[i];
-                cp_r0(  preserve,
+                copyAll0(  preserve,
                         srcDetector.createFile(src, member),
                         dstDetector.createFile(dst, member),
                         srcDetector, dstDetector);
@@ -185,7 +177,7 @@ final class Files {
                 if (!dst.setLastModified(srcLastModified))
                     throw new IOException("cannot set last modification time");
         } else if (src.isFile() && (!dst.exists() || dst.isFile())) {
-            cp0(preserve, src, dst);
+            copy0(preserve, src, dst);
         } else {
             throw new IOException("cannot copy non-existent or special files");
         }
@@ -193,27 +185,27 @@ final class Files {
 
     /**
      * The name of this method is inspired by the Unix command line utility
-     * {@code cp}.
+     * {@code copy}.
      *
-     * @see File#cp(java.io.File, java.io.File)
+     * @see File#copy(java.io.File, java.io.File)
      * @see File#cp_p(java.io.File, java.io.File)
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
-    static void cp(
+    static void copy(
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst)
     throws IOException {
         if (contains(src, dst))
             throw new ContainsFileException(src, dst);
-        cp0(preserve, src, dst);
+        copy0(preserve, src, dst);
     }
 
     /**
      * Unchecked parameters version.
      */
-    private static void cp0(
+    private static void copy0(
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst)
@@ -230,7 +222,7 @@ final class Files {
                     if (srcArchive != null) {
                         final String srcPath = srcFile.getEnclEntryName();
                         assert srcPath != null;
-                        cp0(    preserve,
+                        copy0(    preserve,
                                 srcArchive.getArchiveController(),
                                 srcPath,
                                 dst);
@@ -246,7 +238,7 @@ final class Files {
             // Treat the source like a regular file.
             final InputStream in = new java.io.FileInputStream(src);
             try {
-                cp0(preserve, src, in, dst);
+                copy0(preserve, src, in, dst);
             } finally {
                 try {
                     in.close();
@@ -282,7 +274,7 @@ final class Files {
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
      */
-    private static void cp0(
+    private static void copy0(
             final boolean preserve,
             final java.io.File src,
             final InputStream in,
@@ -341,7 +333,7 @@ final class Files {
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
      */
-    private static void cp0(
+    private static void copy0(
             final boolean preserve,
             final ArchiveController srcController,
             final String srcPath,
@@ -361,7 +353,7 @@ final class Files {
                     if (dstArchive != null) {
                         final String dstPath = dstFile.getEnclEntryName();
                         assert dstPath != null;
-                        ArchiveControllers.cp(
+                        ArchiveControllers.copy(
                                 preserve,
                                 srcController,
                                 srcPath,
@@ -403,14 +395,14 @@ final class Files {
                 throw ex;
             }
 
-            Streams.cp(in, out);
+            Streams.copy(in, out);
             if (preserve && !dst.setLastModified(time))
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {
             assert srcController.getCanonicalPath().equals(ex.getCanonicalPath());
             // Reroute call to the source's enclosing archive controller.
-            cp0(    preserve,
+            copy0(    preserve,
                     srcController.getEnclController(),
                     srcController.enclEntryName(srcPath),
                     dst);
@@ -418,19 +410,16 @@ final class Files {
     }
 
     /**
-     * Removes the entire directory tree represented by the parameter,
+     * Deletes the entire directory tree represented by the parameter,
      * regardless whether it's a file or directory, whether the directory
      * is empty.
-     * <p>
-     * The name of this method is inspired by the Unix command line utility
-     * {@code rm} with the {@code -r} option to operate recursively.
      * <p>
      * This file system operation is <em>not</em> atomic.
      *
      * @return Whether or not the entire directory tree was successfully
      *         removed.
      */
-    static boolean rm_r(final java.io.File file) {
+    static boolean deleteAll(final java.io.File file) {
         boolean ok = true;
         if (file.isDirectory()) {
             // Note that listing the directory this way will cause a recursive
@@ -441,7 +430,7 @@ final class Files {
             // and hence prevents a potential bug.
             java.io.File[] members = file.listFiles();
             for (int i = members.length; --i >= 0;)
-                ok &= rm_r(members[i]);
+                ok &= deleteAll(members[i]);
         }
         return ok && file.delete();
     }

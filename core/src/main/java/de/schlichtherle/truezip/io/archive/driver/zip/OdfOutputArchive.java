@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
@@ -32,7 +34,8 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class OdfOutputArchive extends MultiplexedOutputArchive {
+public class OdfOutputArchive
+extends MultiplexedOutputArchive<ZipEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -46,18 +49,17 @@ public class OdfOutputArchive extends MultiplexedOutputArchive {
     }
 
     @Override
-    public OutputStream newOutputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry srcEntry)
+    protected OutputStream newOutputStream(
+            final ArchiveOutputStreamSocket<ZipEntry> dst,
+            final IORef<? extends ArchiveEntry> src)
     throws IOException {
-        final ZipEntry zipEntry = (ZipEntry) entry;
-
-        if (MIMETYPE.equals(zipEntry.getName())) {
+        final ZipEntry entry = dst.getTarget();
+        if (MIMETYPE.equals(entry.getName())) {
             mimetype = true;
-            if (zipEntry.getMethod() == UNKNOWN)
-                zipEntry.setMethod(STORED);
+            if (entry.getMethod() == UNKNOWN)
+                entry.setMethod(STORED);
         }
-        return super.newOutputStream(zipEntry, srcEntry);
+        return super.newOutputStream(dst, src);
     }
 
     @Override

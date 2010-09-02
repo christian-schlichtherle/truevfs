@@ -16,13 +16,8 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.UInt;
-import de.schlichtherle.truezip.io.zip.DateTimeConverter;
-import de.schlichtherle.truezip.io.zip.ZipEntry;
-import de.schlichtherle.truezip.io.zip.ZIP;
-import java.util.*;
-
-import junit.framework.*;
+import java.util.Arrays;
+import junit.framework.TestCase;
 
 /**
  * @author Christian Schlichtherle
@@ -47,6 +42,12 @@ public class ZipEntryTest extends TestCase {
     protected void tearDown() throws Exception {
         entry = null;
         super.tearDown();
+    }
+
+    public void testClone() {
+        // TODO: Complete this test!
+        ZipEntry clone = entry.clone();
+        assertNotSame(clone, entry);
     }
 
     public void testName() {

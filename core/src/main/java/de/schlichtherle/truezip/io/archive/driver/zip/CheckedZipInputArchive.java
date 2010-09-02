@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.zip.CRC32Exception;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,17 +32,15 @@ import java.util.zip.ZipException;
  * class.
  * <p>
  * If there is a mismatch of the CRC-32 values for a ZIP entry in an input
- * archive, the {@link java.io.InputStream#close} method of the corresponding
- * stream for the archive entry will throw a
- * {@link de.schlichtherle.truezip.io.zip.CRC32Exception}.
+ * archive, the {@link InputStream#close()} method of the corresponding stream
+ * for the archive entry will throw a {@link CRC32Exception}.
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
  * 
- * @see ZipInputArchive
- * @see CheckedZipDriver
  * @author Christian Schlichtherle
  * @version $Id$
+ * @see CheckedZipDriver
  */
 public class CheckedZipInputArchive extends ZipInputArchive {
     
@@ -59,15 +58,11 @@ public class CheckedZipInputArchive extends ZipInputArchive {
         super(rof, charset, preambled, postambled, factory);
     }
 
-    /**
-     * Overridden to read from a checked input stream.
-     */
+    /** Overridden to read from a checked input stream. */
     @Override
-    public InputStream newInputStream(
-            ArchiveEntry entry,
-            ArchiveEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry entry, ArchiveEntry dstEntry)
     throws  IOException {
-        return super.getInputStream(
-                entry.getName(), true, !(dstEntry instanceof ZipEntry));
+        return super.getInputStream(    entry.getName(), true,
+                                        !(dstEntry instanceof ZipEntry));
     }
 }

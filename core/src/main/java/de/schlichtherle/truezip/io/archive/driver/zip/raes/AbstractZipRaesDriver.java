@@ -23,11 +23,12 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -100,7 +101,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public InputArchive newInputArchive(
+    public ZipInputArchive newInputArchive(
             final Archive archive,
             final ReadOnlyFile rof)
     throws IOException {
@@ -110,7 +111,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
         } catch (RaesKeyException failure) {
             throw new TransientIOException(failure);
         }
-
         if (rof.length() <= getAuthenticationTrigger()) { // intentionally compares rof, not rrof!
             // Note: If authentication fails, this is reported through some
             // sort of IOException, not a FileNotFoundException!
@@ -118,7 +118,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             // ordinary file which may be read, written or deleted.
             rrof.authenticate();
         }
-
         return super.newInputArchive(archive, rrof);
     }
 
@@ -129,7 +128,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public ArchiveEntry newArchiveEntry(
+    public ZipEntry newArchiveEntry(
             final String name,
             final ArchiveEntry template)
     throws CharConversionException {
@@ -158,7 +157,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     public OutputArchive newOutputArchive(
             final Archive archive,
             final OutputStream out,
-            final InputArchive source)
+            final ZipInputArchive source)
     throws IOException {
         final RaesOutputStream ros;
         try {
@@ -166,7 +165,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
         } catch (RaesKeyException failure) {
             throw new TransientIOException(failure);
         }
-
         return super.newOutputArchive(archive, ros, source);
     }
 

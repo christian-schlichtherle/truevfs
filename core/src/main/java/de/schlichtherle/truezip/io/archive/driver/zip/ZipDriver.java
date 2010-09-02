@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -45,8 +44,11 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver
-implements ZipEntryFactory {
+extends AbstractArchiveDriver<
+        ZipEntry,
+        ZipInputArchive,
+        OutputArchive<ZipEntry>>
+implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
 
@@ -160,12 +162,8 @@ implements ZipEntryFactory {
         return level;
     }
 
-    //
-    // Factory methods:
-    //
-
     @Override
-    public ArchiveEntry newArchiveEntry(
+    public ZipEntry newArchiveEntry(
             final String name,
             final ArchiveEntry template)
     throws CharConversionException {
@@ -202,7 +200,7 @@ implements ZipEntryFactory {
      * {@link #newZipInputArchive}.
      */
     @Override
-    public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
+    public ZipInputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
     throws IOException {
         return newZipInputArchive(archive, rof);
     }
@@ -223,20 +221,16 @@ implements ZipEntryFactory {
      * {@link MultiplexedOutputArchive}.
      */
     @Override
-    public OutputArchive newOutputArchive(
-            Archive archive,
-            OutputStream out,
-            InputArchive source)
+    public OutputArchive<ZipEntry> newOutputArchive(
+            Archive archive, OutputStream out, ZipInputArchive source)
     throws IOException {
-        return new MultiplexedOutputArchive(newZipOutputArchive(
-                archive, out, (ZipInputArchive) source));
+        return new MultiplexedOutputArchive(
+                newZipOutputArchive(archive, out, source));
         //return newZipOutputArchive(archive, out, (ZipInputArchive) source);
     }
 
     protected ZipOutputArchive newZipOutputArchive(
-            Archive archive,
-            OutputStream out,
-            ZipInputArchive source)
+            Archive archive, OutputStream out, ZipInputArchive source)
     throws IOException {
         return new ZipOutputArchive(out, getCharset(), level, source);
     }

@@ -16,21 +16,27 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.driver.RfsEntry;
-import de.schlichtherle.truezip.util.JointEnumeration;
+import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.socket.InputStreamSocket;
+import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
+import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
@@ -45,16 +51,16 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link de.schlichtherle.truezip.io.archive.driver.MultiplexedOutputArchive}
+ * {@link MultiplexedOutputArchive}
  * to overcome this limitation.
  * 
+ * @see ZipDriver
  * @author Christian Schlichtherle
  * @version $Id$
- * @see ZipDriver
  */
 public class ZipOutputArchive
-        extends BasicZipOutputStream
-        implements OutputArchive {
+extends BasicZipOutputStream<ZipEntry>
+implements OutputArchive<ZipEntry> {
 
     private final ZipInputArchive source;
     private OutputArchiveMetaData metaData;
@@ -96,33 +102,54 @@ public class ZipOutputArchive
         }
     }
 
-    public int getNumArchiveEntries() {
+    @Override
+    public int size() {
         return size() + (tempEntry != null ? 1 : 0);
     }
 
-    public Enumeration<? extends ZipEntry> getArchiveEntries() {
+    @Override
+    public Iterator<ZipEntry> iterator() {
         if (tempEntry == null)
-            return (Enumeration<? extends ZipEntry>) super.entries();
-        return new JointEnumeration<ZipEntry>(
-                (Enumeration<? extends ZipEntry>) super.entries(),
-                Collections.enumeration(
-                    Collections.singletonList(tempEntry)));
+            return super.iterator();
+        return new JointIterator<ZipEntry>(
+                super.iterator(),
+                Collections.singletonList(tempEntry).iterator());
     }
 
-    public ArchiveEntry getArchiveEntry(final String entryName) {
-        ZipEntry e = (ZipEntry) getEntry(entryName);
+    @Override
+    public ZipEntry getEntry(final String entryName) {
+        ZipEntry e = super.getEntry(entryName);
         if (e != null)
             return e;
         e = tempEntry;
         return e != null && entryName.equals(e.getName()) ? e : null;
     }
 
-    public OutputStream newOutputStream(
-            final ArchiveEntry dstEntry,
-            final ArchiveEntry srcEntry)
-    throws IOException {
-        final ZipEntry entry = (ZipEntry) dstEntry;
+    @Override
+    public ArchiveOutputStreamSocket<ZipEntry> getOutputStreamSocket(
+            final ZipEntry entry)
+    throws FileNotFoundException {
+        class OutputProxy implements ArchiveOutputStreamSocket<ZipEntry> {
+            @Override
+            public ZipEntry getTarget() {
+                return entry;
+            }
 
+            @Override
+            public OutputStream newOutputStream(
+                    final IORef<? extends ArchiveEntry> src)
+            throws IOException {
+                return ZipOutputArchive.this.newOutputStream(entry, src);
+            }
+        } // class OutputProxy
+
+        return new OutputProxy();
+    }
+
+    protected OutputStream newOutputStream(
+            final ZipEntry entry,
+            final IORef<? extends ArchiveEntry> src)
+    throws IOException {
         if (isBusy())
             throw new OutputArchiveBusyException(entry);
 
@@ -134,24 +161,24 @@ public class ZipOutputArchive
             return new EntryOutputStream(entry);
         }
 
-        if (srcEntry instanceof ZipEntry) {
-            // Set up entry attributes for Direct Data Copying (DDC).
-            // A preset method in the entry takes priority.
-            // The ZIP.RAES drivers use this feature to enforce deflation
-            // for enhanced authentication security.
-            final ZipEntry srcZipEntry = (ZipEntry) srcEntry;
-            if (entry.getMethod() == UNKNOWN)
-                entry.setMethod(srcZipEntry.getMethod());
-            if (entry.getMethod() == srcZipEntry.getMethod())
-                entry.setCompressedSize(srcZipEntry.getCompressedSize());
-            entry.setCrc(srcZipEntry.getCrc());
-            entry.setSize(srcZipEntry.getSize());
-            return new EntryOutputStream(
-                    entry, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
-        }
-
-        if (srcEntry != null)
+        final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
+        if (srcEntry != null) {
             entry.setSize(srcEntry.getSize());
+            if (srcEntry instanceof ZipEntry) {
+                // Set up entry attributes for Direct Data Copying (DDC).
+                // A preset method in the entry takes priority.
+                // The ZIP.RAES drivers use this feature to enforce deflation
+                // for enhanced authentication security.
+                final ZipEntry srcZipEntry = (ZipEntry) srcEntry;
+                if (entry.getMethod() == UNKNOWN)
+                    entry.setMethod(srcZipEntry.getMethod());
+                if (entry.getMethod() == srcZipEntry.getMethod())
+                    entry.setCompressedSize(srcZipEntry.getCompressedSize());
+                entry.setCrc(srcZipEntry.getCrc());
+                return new EntryOutputStream(
+                        entry, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
+            }
+        }
 
         switch (entry.getMethod()) {
             case UNKNOWN:
@@ -162,21 +189,15 @@ public class ZipOutputArchive
                 if (entry.getCrc() == UNKNOWN
                         || entry.getCompressedSize() == UNKNOWN
                         || entry.getSize() == UNKNOWN) {
-                    if (!(srcEntry instanceof RfsEntry)) {
-                        final File temp = createTempFile(TEMP_FILE_PREFIX);
-                        return new TempEntryOutputStream(entry, temp);
-                    }
-                    final File file = ((RfsEntry) srcEntry).getFile();
-                    final long length = file.length();
-                    // No longer needed with ZIP64 support:
-                    /*if (length > Integer.MAX_VALUE)
-                        throw new IOException("file too large");*/
-                    final InputStream in = new java.io.FileInputStream(file);
+                    if (!(src instanceof InputStreamSocket))
+                        return new TempEntryOutputStream(
+                                createTempFile(TEMP_FILE_PREFIX), entry);
+                    final InputStream in = ((InputStreamSocket) src).newInputStream(null);
                     final Crc32OutputStream out = new Crc32OutputStream();
-                    de.schlichtherle.truezip.io.File.cp(in, out);
+                    Streams.copy(in, out);
                     entry.setCrc(out.crc.getValue());
-                    entry.setCompressedSize(length);
-                    entry.setSize(length);
+                    entry.setCompressedSize(srcEntry.getSize()); // STORED!
+                    entry.setSize(srcEntry.getSize());
                 }
                 break;
 
@@ -206,11 +227,11 @@ public class ZipOutputArchive
      * These preconditions are checked by {@link #newOutputStream}.
      */
     private class EntryOutputStream extends FilterOutputStream {
-        private EntryOutputStream(ZipEntry entry) throws IOException {
+        EntryOutputStream(ZipEntry entry) throws IOException {
             this(entry, true);
         }
 
-        private EntryOutputStream(ZipEntry entry, boolean deflate)
+        EntryOutputStream(ZipEntry entry, boolean deflate)
         throws IOException {
             super(ZipOutputArchive.this);
             putNextEntry(entry, deflate);
@@ -241,9 +262,7 @@ public class ZipOutputArchive
         private final File temp;
         private boolean closed;
 
-        public TempEntryOutputStream(
-                final ZipEntry entry,
-                final File temp)
+        TempEntryOutputStream(final File temp, final ZipEntry entry)
         throws IOException {
             super(new java.io.FileOutputStream(temp), new CRC32());
             assert entry.getMethod() == STORED;
@@ -268,40 +287,38 @@ public class ZipOutputArchive
                     tempEntry.setCrc(getChecksum().getValue());
                     tempEntry.setCompressedSize(length);
                     tempEntry.setSize(length);
-                    storeTempEntry(tempEntry, temp);
+                    store();
                 }
             } finally {
                 tempEntry = null;
             }
         }
-    } // class TempEntryOutputStream
 
-    private void storeTempEntry(
-            final ZipEntry entry,
-            final File temp)
-    throws IOException {
-        assert entry.getMethod() == STORED;
-        assert entry.getCrc() != UNKNOWN;
-        assert entry.getCompressedSize() != UNKNOWN;
-        assert entry.getSize() != UNKNOWN;
+        void store()
+        throws IOException {
+            assert tempEntry.getMethod() == STORED;
+            assert tempEntry.getCrc() != UNKNOWN;
+            assert tempEntry.getCompressedSize() != UNKNOWN;
+            assert tempEntry.getSize() != UNKNOWN;
 
-        try {
-            final InputStream in = new java.io.FileInputStream(temp);
             try {
-                putNextEntry(entry);
+                final InputStream in = new FileInputStream(temp);
                 try {
-                    de.schlichtherle.truezip.io.File.cat(in, this);
+                    putNextEntry(tempEntry);
+                    try {
+                        Streams.cat(in, this);
+                    } finally {
+                        closeEntry();
+                    }
                 } finally {
-                    closeEntry();
+                    in.close();
                 }
             } finally {
-                in.close();
+                if (!temp.delete()) // may fail on Windoze if in.close() failed!
+                    temp.deleteOnExit(); // we're bullish never to leavy any temps!
             }
-        } finally {
-            if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                temp.deleteOnExit(); // we're bullish never to leavy any temps!
         }
-    }
+    } // class TempEntryOutputStream
 
     private static class Crc32OutputStream extends OutputStream {
         private final CRC32 crc = new CRC32();
@@ -344,15 +361,11 @@ public class ZipOutputArchive
                 write(new byte[(int) (ol % 4)]);
 
             // Finally, write the postamble.
-            de.schlichtherle.truezip.io.File.cat(in, this);
+            Streams.cat(in, this);
         } finally {
             in.close();
         }
     }
-
-    //
-    // Metadata implementation.
-    //
 
     public OutputArchiveMetaData getMetaData() {
         return metaData;

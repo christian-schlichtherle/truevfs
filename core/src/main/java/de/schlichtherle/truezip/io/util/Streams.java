@@ -40,9 +40,8 @@ import java.util.concurrent.ThreadFactory;
  */
 public class Streams {
 
-    /** You cannot instantiate this class. */
-    Streams() {
-    }
+    private static final ExecutorService executor
+            = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
 
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
@@ -53,23 +52,24 @@ public class Streams {
         }
     }
 
-    private static final ExecutorService executor
-            = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
+    /** You cannot instantiate this class. */
+    Streams() {
+    }
 
     /**
      * Copies the input stream {@code in} to the output stream {@code out}.
      * This method <em>always</em> closes <em>both</em> streams - even if an
      * exception occurs.
      *
-     * @param in The input stream.
-     * @param out The output stream.
-     * @throws InputException If copying the data fails because of an
+     * @param  in the input stream.
+     * @param  out the output stream.
+     * @throws InputException if copying the data fails because of an
      *         {@code IOException} in the <em>input</em> stream.
-     * @throws IOException If copying the data fails because of an
+     * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
-     * @throws NullPointerException If any parameter is {@code null}.
+     * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static void cp(final InputStream in, final OutputStream out)
+    public static void copy(final InputStream in, final OutputStream out)
     throws IOException {
         try {
             Streams.cat(in, out);
@@ -85,8 +85,20 @@ public class Streams {
     }
 
     /**
+     * Copies the data from the given input stream to the given output stream.
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of data buffers which is concurrently flushed by
+     * the current thread.
      * The name of this method is inspired by the Unix command line utility
      * {@code cat}.
+     *
+     * @param  in the input stream.
+     * @param  out the output stream.
+     * @throws InputException if copying the data fails because of an
+     *         {@code IOException} in the <em>input</em> stream.
+     * @throws IOException if copying the data fails because of an
+     *         {@code IOException} in the <em>output</em> stream.
+     * @throws NullPointerException if any parameter is {@code null}.
      */
     public static void cat(final InputStream in, final OutputStream out)
     throws IOException {
@@ -272,10 +284,6 @@ public class Streams {
             Buffer.list.add(new SoftReference(buffers));
         }
     }
-
-    //
-    // Static member classes and interfaces.
-    //
 
     private static class Buffer {
         /**
