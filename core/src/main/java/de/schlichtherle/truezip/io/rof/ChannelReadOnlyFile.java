@@ -61,7 +61,7 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
     public int read() throws IOException {
         singleByteBuffer.position(0);
         if (channel.read(singleByteBuffer) == 1)
-            return singleByteBuffer.array()[0] & 0xff;
+            return singleByteBuffer.get(0) & 0xff;
         else
             return -1;
     }
