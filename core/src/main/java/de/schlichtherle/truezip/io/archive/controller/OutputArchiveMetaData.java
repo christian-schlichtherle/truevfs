@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
@@ -111,13 +111,16 @@ public final class OutputArchiveMetaData {
         assert !stopped;
         assert entry != null;
 
-        final IORef<ArchiveEntry> ref = srcEntry == null ? null :
-        new IORef<ArchiveEntry>() {
+        class SourceRef implements IORef<ArchiveEntry> {
             @Override
             public ArchiveEntry getTarget() {
                 return srcEntry;
             }
-        };
+        }
+        final IORef<ArchiveEntry> ref
+                = srcEntry != null
+                ? new SourceRef()
+                : null;
         final OutputStream out = outArchive
                 .getOutputStreamSocket(entry)
                 .newOutputStream(ref);

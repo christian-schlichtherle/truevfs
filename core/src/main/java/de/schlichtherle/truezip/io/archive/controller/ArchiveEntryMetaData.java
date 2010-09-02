@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 //import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.FileFactory;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 
 /**
  * Annotates an {@link ArchiveEntry} with the fields and methods required to

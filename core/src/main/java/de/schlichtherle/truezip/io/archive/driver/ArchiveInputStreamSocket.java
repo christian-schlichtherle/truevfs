@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IORef;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
 import java.io.IOException;
@@ -28,7 +27,7 @@ import java.io.InputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param   <AE> The type of the {@link #get() target} input archive
+ * @param   <AE> The type of the {@link #getTarget() target} input archive
  *          entry.
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -42,7 +41,7 @@ extends InputStreamSocket<AE, ArchiveEntry> {
      * @param  destination if not {@code null}, this references the target
      *         output archive entry in an {@link OutputArchive output archive}
      *         which is going to be written in order to copy the data from the
-     *         {@link #get() target} input archive entry of this
+     *         {@link #getTarget() target} input archive entry of this
      *         instance.
      *         <p>
      *         Implementations may test the runtime type of this object in

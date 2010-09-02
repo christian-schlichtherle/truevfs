@@ -16,10 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
@@ -43,7 +41,7 @@ extends ArchiveEntryContainer<AE>, Closeable {
      * <p>
      * This method may be called before the archive is closed and must also
      * reflect entries which have merely been started to be written by
-     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
      * closed yet.
      */
     @Override
@@ -54,7 +52,7 @@ extends ArchiveEntryContainer<AE>, Closeable {
      * <p>
      * This method may be called before the archive is closed and must also
      * reflect entries which have merely been started to be written by
-     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
      * closed yet.
      */
     @Override
@@ -65,7 +63,7 @@ extends ArchiveEntryContainer<AE>, Closeable {
      * <p>
      * This method may be called before the archive is closed and must also
      * reflect entries which have merely been started to be written by
-     * calling {@link OutputSocket#newOutputStream}, but may not have been
+     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
      * closed yet.
      */
     @Override
@@ -89,9 +87,6 @@ extends ArchiveEntryContainer<AE>, Closeable {
      * @return A non-{@code null} reference to an output stream socket for
      *         writing the archive entry data.
      * @throws FileNotFoundException If the archive entry is not accessible.
-     * @param entry A valid reference to an archive entry.
-     *        The runtime class of this entry is the same as the runtime class
-     *        of the entries returned by {@link ArchiveEntryFactory#newEntry}.
      */
     ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
     throws FileNotFoundException;

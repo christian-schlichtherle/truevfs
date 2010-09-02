@@ -187,7 +187,7 @@ final class Files {
      * The name of this method is inspired by the Unix command line utility
      * {@code copy}.
      *
-     * @see File#copy(java.io.File, java.io.File)
+     * @see File#cp(java.io.File, java.io.File)
      * @see File#cp_p(java.io.File, java.io.File)
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
