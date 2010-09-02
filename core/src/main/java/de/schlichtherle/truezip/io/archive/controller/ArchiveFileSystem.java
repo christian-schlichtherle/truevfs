@@ -18,10 +18,10 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.Sockets;
 import de.schlichtherle.truezip.io.util.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.util.InputException;
@@ -40,12 +40,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.util.Paths.normalize;
 
 /**

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.archive.driver.tar.TarBZip2Driver;
+import de.schlichtherle.truezip.io.archive.driver.impl.tar.TarBZip2Driver;
 
 /**
  * Tests the TrueZIP API in de.schlichtherle.truezip.io with the TAR.BZ2 driver.

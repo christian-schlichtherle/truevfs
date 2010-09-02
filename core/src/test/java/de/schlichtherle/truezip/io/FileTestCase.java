@@ -922,7 +922,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         }
         assertTrue(Arrays.equals(data, out.toByteArray()));
     }
-    
+
     public void testCopyContainingOrSameFiles() throws IOException {
         assert !archive.exists();
         

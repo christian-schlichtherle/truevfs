@@ -16,9 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 

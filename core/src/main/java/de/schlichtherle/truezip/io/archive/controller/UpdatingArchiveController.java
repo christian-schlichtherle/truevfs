@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -35,9 +35,9 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.util.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.util.Files.createTempFile;
 
@@ -997,8 +997,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 handler.warn(new SyncWarningException(
                         UpdatingArchiveController.this, cause));
             }
-        }
-
+        } // class FilterExceptionHandler
         final FilterExceptionHandler decoratedHandler = new FilterExceptionHandler();
         if (outArchive != null)
             outArchive.getMetaData().closeAllOutputStreams(decoratedHandler);
