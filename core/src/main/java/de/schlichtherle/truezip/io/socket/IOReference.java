@@ -17,16 +17,18 @@
 package de.schlichtherle.truezip.io.socket;
 
 /**
- * Creates input and output streams for reading and writing bytes from and to
- * its target.
+ * References the target of I/O operations.
  *
- * @param   <TT> The type of <i>this target</i>,
- *          i.e. the {@link #getTarget() target} of this instance.
- * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          reading and writing from and to this target.
- * @author Christian Schlichtherle
+ * @param   <T> The type of the target of I/O operations.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOStreamSocket<TT, PT>
-extends InputStreamSocket<TT, PT>, OutputStreamSocket<TT, PT> {
+public interface IOReference<T> {
+
+    /**
+     * Returns a non-{@code null} reference to the target of I/O operations.
+     * 
+     * @return A non-{@code null} reference to the target of I/O operations.
+     */
+    T getTarget();
 }

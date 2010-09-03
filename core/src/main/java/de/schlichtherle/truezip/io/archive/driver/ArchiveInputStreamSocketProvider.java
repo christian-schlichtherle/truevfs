@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.archive.driver;
 
-/**
- * References the target of I/O operations.
- *
- * @param   <T> The type of the target of I/O operations.
- * @author  Christian Schlichtherle
- * @version $Id$
- */
-public interface IORef<T> {
+import de.schlichtherle.truezip.io.socket.InputStreamSocketProvider;
+import java.io.FileNotFoundException;
+
+public interface ArchiveInputStreamSocketProvider<AE extends ArchiveEntry>
+extends InputStreamSocketProvider<AE, ArchiveEntry> {
 
     /**
-     * Returns a non-{@code null} reference to the target of I/O operations.
+     * {@inheritDoc}
+     * <p>
+     * The diven archive entry is guaranteed to be one of the entries in this
+     * container.
+     *
+     * @param entry a non-{@code null} reference to an archive entry.
      */
-    T getTarget();
+    @Override
+    ArchiveInputStreamSocket<AE> getInputStreamSocket(AE entry)
+    throws FileNotFoundException;
 }

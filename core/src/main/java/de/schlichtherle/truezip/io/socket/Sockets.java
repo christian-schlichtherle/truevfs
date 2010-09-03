@@ -54,7 +54,7 @@ public class Sockets {
      */
     public static <T> void copy(
             final InputStreamSocket<? extends T, ? super T> iss,
-            final OutputStreamSocket<? super T, ? extends T> oss)
+            final OutputStreamSocket<? extends T, ? super T> oss)
             throws IOException {
         final InputStream is;
         final OutputStream os;
@@ -76,52 +76,66 @@ public class Sockets {
     }
 
     /**
-     * Returns a non-{@code null} reference to an I/O stream socket for
-     * accesing the given file.
+     * Returns a non-{@code null} reference to an I/O reference to the given
+     * target of I/O operations.
+     *
+     * @param  <T> The type of the target of I/O operations.
+     * @throws NullPointerException if {@code target} is {@code null}.
      */
-    public static <O> IOStreamSocket<File, O> get(final File file) {
-        return new FileStreamSocket<O>(file);
+    public static <T> IOReference<T> getReference(final T target) {
+        if (target == null)
+            throw new NullPointerException();
+        class TargetIOReference implements IOReference<T> {
+            @Override
+            public T getTarget() {
+                return target;
+            }
+        } // class Reference
+        return new TargetIOReference();
     }
 
-    private static class FileStreamSocket<O>
-    implements IOStreamSocket<File, O> {
+    /**
+     * Returns a non-{@code null} reference to an I/O stream socket for
+     * accesing the given file.
+     * 
+     * @param  <PT> The minimum required type of the <i>peer targets</i> for
+     *         reading and writing from and to the given file target.
+     * @throws NullPointerException if {@code file} is {@code null}.
+     */
+    public static <PT> IOStreamSocket<File, PT> getSocket(final File file) {
+        if (file == null)
+            throw new NullPointerException();
+        class FileIOStreamSocket<O> implements IOStreamSocket<File, O> {
+            @Override
+            public File getTarget() {
+                return file;
+            }
 
-        private final File file;
+            @Override
+            public InputStream newInputStream(final IOReference<? extends O> dst)
+            throws IOException {
+                return new FileInputStream(file);
+            }
 
-        FileStreamSocket(final File file) {
-            this.file = file;
-        }
+            @Override
+            public OutputStream newOutputStream(final IOReference<? extends O> src)
+            throws IOException {
+                class FileOutputStreamDecorator extends FileOutputStream {
+                    public FileOutputStreamDecorator() throws FileNotFoundException {
+                        super(file);
+                    }
 
-        @Override
-        public File getTarget() {
-            return file;
-        }
-
-        @Override
-        public InputStream newInputStream(final IORef<? extends O> dst)
-                throws IOException {
-            return new FileInputStream(file);
-        }
-
-        @Override
-        public OutputStream newOutputStream(final IORef<? extends O> src)
-                throws IOException {
-            class SocketFileOutputStream extends FileOutputStream {
-                public SocketFileOutputStream() throws FileNotFoundException {
-                    super(file);
-                }
-
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    final Object target = src.getTarget();
-                    if (target instanceof File) {
-                        final File source = (File) target;
-                        file.setLastModified(source.lastModified());
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        final Object srcTarget = src != null ? src.getTarget() : null;
+                        if (srcTarget instanceof File)
+                            file.setLastModified(((File) srcTarget).lastModified());
                     }
                 }
+                return new FileOutputStreamDecorator();
             }
-            return new SocketFileOutputStream();
-        }
+        } // class FileStreamSocket
+        return new FileIOStreamSocket<PT>();
     }
 }

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +63,6 @@ extends InputStreamSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    InputStream newInputStream(IORef<? extends ArchiveEntry> destination)
+    InputStream newInputStream(IOReference<? extends ArchiveEntry> destination)
     throws IOException;
 }

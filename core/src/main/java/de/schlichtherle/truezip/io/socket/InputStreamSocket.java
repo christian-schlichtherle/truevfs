@@ -22,17 +22,18 @@ import java.io.InputStream;
 /**
  * Creates input streams for reading bytes from its target.
  * 
- * @param   <S> The type of the {@link #getTarget() target} of this instance.
- * @param   <D> The minimum required type of the output <i>peer</i> targets for
- *          reading from the target of this instance.
+ * @param   <TT> The type of <i>this target</i>,
+ *          i.e. the {@link #getTarget() target} of this instance.
+ * @param   <PT> The minimum required type of the <i>peer targets</i> for
+ *          reading from this target.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputStreamSocket<S, D> extends IORef<S> {
+public interface InputStreamSocket<TT, PT> extends IOReference<TT> {
 
     /**
      * Returns a non-{@code null} reference to a new {@code InputStream} for
-     * reading bytes from the input {@link #getTarget() target}.
+     * reading bytes from {@link #getTarget() this target}.
      * <p>
      * The returned stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
@@ -41,6 +42,6 @@ public interface InputStreamSocket<S, D> extends IORef<S> {
      *         If {@code null}, the output peer target is unknown.
      * @return A non-{@code null} reference to a new {@code InputStream}.
      */
-    InputStream newInputStream(IORef<? extends D> destination)
+    InputStream newInputStream(IOReference<? extends PT> destination)
     throws IOException;
 }

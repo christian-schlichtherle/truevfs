@@ -20,7 +20,8 @@ import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.socket.Sockets;
 import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  * of the streams between multiple threads.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * It's only public for technical reasons and may get renamed or entirely
+ * It's only public for technical reasons and may getSocket renamed or entirely
  * disappear without notice.
  *
  * @see OutputArchiveMetaData
@@ -111,15 +112,9 @@ public final class InputArchiveMetaData {
         assert !stopped;
         assert entry != null;
 
-        class DestinationRef implements IORef<ArchiveEntry> {
-            @Override
-            public ArchiveEntry getTarget() {
-                return dstEntry;
-            }
-        }
-        final IORef<ArchiveEntry> ref
+        final IOReference<ArchiveEntry> ref
                 = dstEntry != null
-                ? new DestinationRef()
+                ? Sockets.getReference(dstEntry)
                 : null;
         final InputStream in = inArchive
                 .getInputStreamSocket(entry)
