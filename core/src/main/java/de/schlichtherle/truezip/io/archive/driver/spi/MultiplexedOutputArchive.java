@@ -151,9 +151,11 @@ extends FilterOutputArchive<AE> {
             final ArchiveOutputStreamSocket<AE> dst,
             final IOReference<? extends ArchiveEntry> src)
     throws IOException {
-        final ArchiveEntry entry = dst.getTarget();
-        if (src != null)
-            entry.setSize(src.getTarget().getSize()); // data may be compressed!
+        final ArchiveEntry srcEntry = src.getTarget();
+        if (srcEntry != null) {
+            final ArchiveEntry dstEntry = dst.getTarget();
+            dstEntry.setSize(srcEntry.getSize()); // data may be compressed!
+        }
         return isTargetBusy()
                 ? new TempEntryOutputStream(
                     createTempFile(TEMP_FILE_PREFIX), dst, src)
@@ -226,10 +228,12 @@ extends FilterOutputArchive<AE> {
             super(temp);
             class TempInputStreamSocket
             implements ArchiveInputStreamSocket<ArchiveEntry> {
-                private final ArchiveEntry entry
-                        = src != null
-                        ? src.getTarget()
-                        : new FileEntry(temp);
+                private final ArchiveEntry entry;
+
+                TempInputStreamSocket() {
+                    final ArchiveEntry srcEntry = src.getTarget();
+                    this.entry = srcEntry != null ? srcEntry : new FileEntry(temp);
+                }
 
                 @Override
                 public ArchiveEntry getTarget() {
@@ -269,12 +273,12 @@ extends FilterOutputArchive<AE> {
             try {
                 super.close();
             } finally {
-                final AE entry = dst.getTarget();
+                final AE dstEntry = dst.getTarget();
                 final ArchiveEntry srcEntry = src.getTarget();
-                if (entry.getSize() == UNKNOWN)
-                    entry.setSize(srcEntry.getSize());
-                if (entry.getTime() == UNKNOWN)
-                    entry.setTime(srcEntry.getTime());
+                if (dstEntry.getSize() == UNKNOWN)
+                    dstEntry.setSize(srcEntry.getSize());
+                if (dstEntry.getTime() == UNKNOWN)
+                    dstEntry.setTime(srcEntry.getTime());
                 storeTemps();
             }
         }

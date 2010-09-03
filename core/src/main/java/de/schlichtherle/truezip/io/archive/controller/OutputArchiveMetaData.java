@@ -112,14 +112,10 @@ public final class OutputArchiveMetaData {
         assert !stopped;
         assert entry != null;
 
-        final IOReference<ArchiveEntry> ref
-                = srcEntry != null
-                ? Sockets.getReference(srcEntry)
-                : null;
-        final OutputStream out = outArchive
+        return new EntryOutputStream(
+                outArchive
                 .getOutputStreamSocket(entry)
-                .newOutputStream(ref);
-        return new EntryOutputStream(out);
+                .newOutputStream(Sockets.getReference(srcEntry)));
     }
 
     /**

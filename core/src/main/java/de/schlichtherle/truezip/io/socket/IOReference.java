@@ -26,9 +26,10 @@ package de.schlichtherle.truezip.io.socket;
 public interface IOReference<T> {
 
     /**
-     * Returns a non-{@code null} reference to the target of I/O operations.
+     * Returns a nullable reference to the target of I/O operations.
+     * If {@code null} is returned, the target is undefined.
      * 
-     * @return A non-{@code null} reference to the target of I/O operations.
+     * @return A nullable reference to the target of I/O operations.
      */
     T getTarget();
 }
