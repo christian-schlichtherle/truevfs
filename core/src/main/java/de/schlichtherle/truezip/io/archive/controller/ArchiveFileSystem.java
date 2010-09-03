@@ -825,7 +825,9 @@ public final class ArchiveFileSystem {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    oa.getOutputStreamSocket(e).newOutputStream(null).close();
+                    oa.getOutputStreamSocket(e)
+                            .newOutputStream(Sockets.getReference(null))
+                            .close();
                 } else if (ia != null && ia.getEntry(n) != null) {
                     assert e == ia.getEntry(n);
                     Sockets.copy(   ia.getInputStreamSocket(e),
@@ -837,7 +839,9 @@ public final class ArchiveFileSystem {
                     // Write an empty entry now as a marker in order to
                     // recreate the entry when the file system gets
                     // remounted from the archive file.
-                    oa.getOutputStreamSocket(e).newOutputStream(null).close();
+                    oa.getOutputStreamSocket(e)
+                            .newOutputStream(Sockets.getReference(null))
+                            .close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);

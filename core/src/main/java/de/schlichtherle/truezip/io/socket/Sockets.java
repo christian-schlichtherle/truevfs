@@ -39,8 +39,10 @@ public class Sockets {
     }
 
     /**
-     * Copies an input stream created by the input stream socket {@code iss}
-     * to an output stream created by the output stream socket {@code oss}.
+     * Copies an input stream {@link InputStreamSocket#newInputStream created}
+     * by the input stream socket {@code iss} to an output stream
+     * {@link OutputStreamSocket#newOutputStream created} by the output stream
+     * socket {@code oss}.
      * This method <em>always</em> closes the acquired input stream and
      * output stream.
      *
@@ -80,45 +82,57 @@ public class Sockets {
      * target of I/O operations.
      *
      * @param  <T> The type of the target of I/O operations.
-     * @throws NullPointerException if {@code target} is {@code null}.
+     * @param  target a nullable reference to the target of I/O operations.
+     * @return A non-{@code null} reference to an I/O reference to the given
+     *         target of I/O operations.
      */
     public static <T> IOReference<T> getReference(final T target) {
-        if (target == null)
-            throw new NullPointerException();
-        class TargetIOReference implements IOReference<T> {
-            @Override
-            public T getTarget() {
-                return target;
-            }
-        } // class Reference
-        return new TargetIOReference();
+        return target != null
+                ? new TargetIOReference<T>(target)
+                : TargetIOReference.NULL;
     }
+
+    private static class TargetIOReference<T> implements IOReference<T> {
+        static TargetIOReference NULL = new TargetIOReference<Object>(null);
+        final T target;
+
+        TargetIOReference(final T target) {
+            this.target = target;
+        }
+
+        @Override
+        public T getTarget() {
+            return target;
+        }
+    } // class TargetIOReference
 
     /**
      * Returns a non-{@code null} reference to an I/O stream socket for
-     * accesing the given file.
+     * accessing the given file.
      * 
      * @param  <PT> The minimum required type of the <i>peer targets</i> for
      *         reading and writing from and to the given file target.
      * @throws NullPointerException if {@code file} is {@code null}.
+     * @return A non-{@code null} reference to an I/O stream socket for
+     *         accessing the given file.
      */
     public static <PT> IOStreamSocket<File, PT> getSocket(final File file) {
         if (file == null)
             throw new NullPointerException();
-        class FileIOStreamSocket<O> implements IOStreamSocket<File, O> {
+        class FileIOStreamSocket<PT> implements IOStreamSocket<File, PT> {
             @Override
             public File getTarget() {
                 return file;
             }
 
             @Override
-            public InputStream newInputStream(final IOReference<? extends O> dst)
+            public InputStream newInputStream(final IOReference<? extends PT> dst)
             throws IOException {
                 return new FileInputStream(file);
             }
 
             @Override
-            public OutputStream newOutputStream(final IOReference<? extends O> src)
+            public OutputStream newOutputStream(final IOReference<? extends PT> src)
             throws IOException {
                 class FileOutputStreamDecorator extends FileOutputStream {
                     public FileOutputStreamDecorator() throws FileNotFoundException {
@@ -128,7 +142,7 @@ public class Sockets {
                     @Override
                     public void close() throws IOException {
                         super.close();
-                        final Object srcTarget = src != null ? src.getTarget() : null;
+                        final Object srcTarget = src.getTarget();
                         if (srcTarget instanceof File)
                             file.setLastModified(((File) srcTarget).lastModified());
                     }

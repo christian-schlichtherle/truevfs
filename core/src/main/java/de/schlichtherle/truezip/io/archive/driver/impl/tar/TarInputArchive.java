@@ -230,7 +230,7 @@ implements InputArchive<TarEntry> {
             public InputStream newInputStream(
                     final IOReference<? extends ArchiveEntry> dst)
             throws IOException {
-                final ArchiveEntry dstEntry = dst != null ? dst.getTarget() : null;
+                final ArchiveEntry dstEntry = dst.getTarget();
                 return TarInputArchive.this.newInputStream(entry, dstEntry);
             }
         } // class InputStreamProxy

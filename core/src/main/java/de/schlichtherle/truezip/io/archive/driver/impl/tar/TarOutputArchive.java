@@ -105,7 +105,6 @@ implements OutputArchive<TarEntry> {
             public OutputStream newOutputStream(
                     final IOReference<? extends ArchiveEntry> src)
             throws IOException {
-                final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
                 return TarOutputArchive.this.newOutputStream(entry, src);
             }
         } // class OutputProxy
@@ -122,7 +121,7 @@ implements OutputArchive<TarEntry> {
             entry.setSize(0);
             return new EntryOutputStream(entry);
         }
-        final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
+        final ArchiveEntry srcEntry = src.getTarget();
         if (srcEntry != null) {
             entry.setSize(srcEntry.getSize());
             return new EntryOutputStream(entry);

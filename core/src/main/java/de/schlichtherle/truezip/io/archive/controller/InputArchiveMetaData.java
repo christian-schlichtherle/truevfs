@@ -112,14 +112,10 @@ public final class InputArchiveMetaData {
         assert !stopped;
         assert entry != null;
 
-        final IOReference<ArchiveEntry> ref
-                = dstEntry != null
-                ? Sockets.getReference(dstEntry)
-                : null;
-        final InputStream in = inArchive
+        return new EntryInputStream(
+                inArchive
                 .getInputStreamSocket(entry)
-                .newInputStream(ref);
-        return new EntryInputStream(in);
+                .newInputStream(Sockets.getReference(dstEntry)));
     }
 
     /**

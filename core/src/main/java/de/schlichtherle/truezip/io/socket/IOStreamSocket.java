@@ -20,13 +20,13 @@ package de.schlichtherle.truezip.io.socket;
  * Creates input and output streams for reading and writing bytes from and to
  * its target.
  *
- * @param   <TT> The type of <i>this target</i>,
+ * @param   <LT> The type of the <i>local target</i>,
  *          i.e. the {@link #getTarget() target} of this instance.
  * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          reading and writing from and to this target.
+ *          reading and writing from and to the local target.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface IOStreamSocket<TT, PT>
-extends InputStreamSocket<TT, PT>, OutputStreamSocket<TT, PT> {
+public interface IOStreamSocket<LT, PT>
+extends InputStreamSocket<LT, PT>, OutputStreamSocket<LT, PT> {
 }
