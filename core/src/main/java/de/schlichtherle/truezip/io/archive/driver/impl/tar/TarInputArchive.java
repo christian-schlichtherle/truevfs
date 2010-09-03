@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
 import de.schlichtherle.truezip.io.util.InputException;
@@ -228,7 +228,7 @@ implements InputArchive<TarEntry> {
 
             @Override
             public InputStream newInputStream(
-                    final IORef<? extends ArchiveEntry> dst)
+                    final IOReference<? extends ArchiveEntry> dst)
             throws IOException {
                 final ArchiveEntry dstEntry = dst != null ? dst.getTarget() : null;
                 return TarInputArchive.this.newInputStream(entry, dstEntry);

@@ -17,14 +17,15 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
-import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.util.Iterator;
 
 /**
  * A container which supports writing archive entries to an arbitrary output
  * destination.
+ * <p>
+ * All methods of this interface must reflect all entries, including those
+ * which have just been partially written yet, i.e. which have not already
+ * received a call to their {@code close()} method.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -34,62 +35,9 @@ import java.util.Iterator;
  * @version $Id$
  */
 public interface OutputArchive<AE extends ArchiveEntry>
-extends ArchiveEntryContainer<AE>, Closeable {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This method may be called before the archive is closed and must also
-     * reflect entries which have merely been started to be written by
-     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
-     * closed yet.
-     */
-    @Override
-    int size();
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This method may be called before the archive is closed and must also
-     * reflect entries which have merely been started to be written by
-     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
-     * closed yet.
-     */
-    @Override
-    Iterator<AE> iterator();
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This method may be called before the archive is closed and must also
-     * reflect entries which have merely been started to be written by
-     * calling {@link OutputStreamSocket#newOutputStream}, but may not have been
-     * closed yet.
-     */
-    @Override
-    AE getEntry(String name);
-
-    /**
-     * Returns a non-{@code null} reference to an output stream socket for
-     * writing the given archive entry to this output archive.
-     * <p>
-     * The implementation must not assume that the returned output stream
-     * socket will ever be used and must tolerate changes to all settable
-     * properties of the {@link ArchiveEntry} interface.
-     * In other words, writing an archive entry header or adding the archive
-     * entry to this container merely upon the call to this method is an error.
-     * <p>
-     * Multiple invocations with the same parameter may return the same
-     * object again.
-     *
-     * @param entry a non-{@code null} reference to an output stream socket
-     *        for writing the given archive entry to this output archive.
-     * @return A non-{@code null} reference to an output stream socket for
-     *         writing the archive entry data.
-     * @throws FileNotFoundException If the archive entry is not accessible.
-     */
-    ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
-    throws FileNotFoundException;
+extends ArchiveEntryContainer<AE>,
+        ArchiveOutputStreamSocketProvider<AE>,
+        Closeable {
 
     /**
      * Returns the meta data for this output archive.

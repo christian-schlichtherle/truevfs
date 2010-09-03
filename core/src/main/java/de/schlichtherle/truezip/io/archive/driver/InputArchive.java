@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 
 /**
  * A container which supports reading archive entries from an arbitrary input
@@ -32,31 +31,9 @@ import java.io.FileNotFoundException;
  * @version $Id$
  */
 public interface InputArchive<AE extends ArchiveEntry>
-extends ArchiveEntryContainer<AE>, Closeable {
-
-    /**
-     * Returns a non-{@code null} reference to an input stream socket for
-     * reading the given archive entry from this input archive.
-     * The archive entry is guaranteed to be one of the entries in this
-     * container.
-     * <p>
-     * The implementation must not assume that the returned input stream
-     * socket will ever be used and must tolerate changes to all settable
-     * properties of the {@link ArchiveEntry} interface since it has loaded
-     * the entries from its input source.
-     * <p>
-     * Multiple invocations with the same parameter may return the same
-     * object again.
-     *
-     * @param entry a non-{@code null} reference to an input stream socket
-     *        for reading the given archive entry from this input archive.
-     * @return A non-{@code null} reference to an input stream socket for
-     *         reading the archive entry data.
-     * @throws FileNotFoundException If the archive entry does not exist or is
-     *         not accessible.
-     */
-    ArchiveInputStreamSocket<AE> getInputStreamSocket(AE entry)
-    throws FileNotFoundException;
+extends ArchiveEntryContainer<AE>,
+        ArchiveInputStreamSocketProvider<AE>,
+        Closeable {
 
     /**
      * Returns the meta data for this input archive.
@@ -70,7 +47,6 @@ extends ArchiveEntryContainer<AE>, Closeable {
      * Sets the meta data for this input archive.
      *
      * @param metaData the meta data - may not be {@code null}.
-     *
      * @deprecated
      */
     void setMetaData(InputArchiveMetaData metaData);

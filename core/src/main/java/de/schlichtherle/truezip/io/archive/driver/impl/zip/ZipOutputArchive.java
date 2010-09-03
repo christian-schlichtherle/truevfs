@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -137,7 +137,7 @@ implements OutputArchive<ZipEntry> {
 
             @Override
             public OutputStream newOutputStream(
-                    final IORef<? extends ArchiveEntry> src)
+                    final IOReference<? extends ArchiveEntry> src)
             throws IOException {
                 return ZipOutputArchive.this.newOutputStream(entry, src);
             }
@@ -147,7 +147,7 @@ implements OutputArchive<ZipEntry> {
 
     protected OutputStream newOutputStream(
             final ZipEntry entry,
-            final IORef<? extends ArchiveEntry> src)
+            final IOReference<? extends ArchiveEntry> src)
     throws IOException {
         if (isBusy())
             throw new OutputArchiveBusyException(entry);

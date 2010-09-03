@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
@@ -103,7 +103,7 @@ implements OutputArchive<TarEntry> {
             }
 
             public OutputStream newOutputStream(
-                    final IORef<? extends ArchiveEntry> src)
+                    final IOReference<? extends ArchiveEntry> src)
             throws IOException {
                 final ArchiveEntry srcEntry = src != null ? src.getTarget() : null;
                 return TarOutputArchive.this.newOutputStream(entry, src);
@@ -114,7 +114,7 @@ implements OutputArchive<TarEntry> {
 
     protected OutputStream newOutputStream(
             final TarEntry entry,
-            final IORef<? extends ArchiveEntry> src)
+            final IOReference<? extends ArchiveEntry> src)
     throws IOException {
         if (isBusy())
             throw new OutputArchiveBusyException(entry);

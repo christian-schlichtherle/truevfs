@@ -22,17 +22,18 @@ import java.io.OutputStream;
 /**
  * Creates output streams for writing bytes to its target.
  *
- * @param   <S> The minimum required type of the input <i>peer</i> targets for
- *          writing to the target of this instance.
- * @param   <D> The type of the {@link #getTarget() target} of this instance.
+ * @param   <TT> The type of <i>this target</i>,
+ *          i.e. the {@link #getTarget() target} of this instance.
+ * @param   <PT> The minimum required type of the <i>peer targets</i> for
+ *          writing to this target.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputStreamSocket<S, D> extends IORef<D> {
+public interface OutputStreamSocket<TT, PT> extends IOReference<TT> {
 
     /**
      * Returns a non-{@code null} reference to a new {@code OutputStream} for
-     * writing bytes to the output {@link #getTarget() target}.
+     * writing bytes to the {@link #getTarget() this target}.
      * <p>
      * The returned stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
@@ -41,6 +42,6 @@ public interface OutputStreamSocket<S, D> extends IORef<D> {
      *         If {@code null}, the input peer target is unknown.
      * @return A non-{@code null} reference to a new {@code OutputStream}.
      */
-    OutputStream newOutputStream(IORef<? extends S> source)
+    OutputStream newOutputStream(IOReference<? extends PT> source)
     throws IOException;
 }

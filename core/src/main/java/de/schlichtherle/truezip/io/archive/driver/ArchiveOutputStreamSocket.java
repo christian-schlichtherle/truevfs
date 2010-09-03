@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public interface ArchiveOutputStreamSocket<AE extends ArchiveEntry>
-extends OutputStreamSocket<ArchiveEntry, AE> {
+extends OutputStreamSocket<AE, ArchiveEntry> {
 
     /**
      * {@inheritDoc}
@@ -65,6 +65,6 @@ extends OutputStreamSocket<ArchiveEntry, AE> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    OutputStream newOutputStream(IORef<? extends ArchiveEntry> source)
+    OutputStream newOutputStream(IOReference<? extends ArchiveEntry> source)
     throws IOException;
 }

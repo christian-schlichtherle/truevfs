@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.ChainableIOException;
 import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.socket.IORef;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.Sockets;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -139,7 +139,7 @@ extends FilterOutputArchive<AE> {
 
             @Override
             public OutputStream newOutputStream(
-                    final IORef<? extends ArchiveEntry> src)
+                    final IOReference<? extends ArchiveEntry> src)
             throws IOException {
                 return MultiplexedOutputArchive.this.newOutputStream(dst, src);
             }
@@ -149,7 +149,7 @@ extends FilterOutputArchive<AE> {
 
     protected OutputStream newOutputStream(
             final ArchiveOutputStreamSocket<AE> dst,
-            final IORef<? extends ArchiveEntry> src)
+            final IOReference<? extends ArchiveEntry> src)
     throws IOException {
         final ArchiveEntry entry = dst.getTarget();
         if (src != null)
@@ -211,7 +211,7 @@ extends FilterOutputArchive<AE> {
      */
     private class TempEntryOutputStream
     extends FileOutputStream
-    implements IORef<AE> {
+    implements IOReference<AE> {
         private final File temp;
         private final ArchiveOutputStreamSocket<AE> dst;
         private final InputStreamSocket<? extends ArchiveEntry, ArchiveEntry> src;
@@ -221,7 +221,7 @@ extends FilterOutputArchive<AE> {
         TempEntryOutputStream(
                 final File temp,
                 final ArchiveOutputStreamSocket<AE> dst,
-                final IORef<? extends ArchiveEntry> src)
+                final IOReference<? extends ArchiveEntry> src)
         throws IOException {
             super(temp);
             class TempInputStreamSocket
@@ -237,7 +237,7 @@ extends FilterOutputArchive<AE> {
                 }
 
                 @Override
-                public InputStream newInputStream(IORef<? extends ArchiveEntry> destination)
+                public InputStream newInputStream(IOReference<? extends ArchiveEntry> destination)
                         throws IOException {
                     return new FileInputStream(temp);
                 }
