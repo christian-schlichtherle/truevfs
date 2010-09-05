@@ -189,12 +189,8 @@ limitations under the License.
                             <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
                         </group>
                         <group>
-                            <title>SPI With Implementations For Pluggable Archive Drivers</title>
-                            <packages>de.schlichtherle.truezip.io.archive.*</packages>
-                        </group>
-                        <group>
-                            <title>Packages &lt;em&gt;NOT&lt;/em&gt; Intended For Public Use!</title>
-                            <packages>de.schlichtherle.truezip.io.archive</packages>
+                            <title>SPI And Implementations For Pluggable Archive Drivers</title>
+                            <packages>de.schlichtherle.truezip.io.archive*</packages>
                         </group>
                     </groups>
                     <links>
