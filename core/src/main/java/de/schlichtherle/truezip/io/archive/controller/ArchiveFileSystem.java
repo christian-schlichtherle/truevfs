@@ -18,15 +18,15 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.IOOperations;
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.util.IOOperation;
-import de.schlichtherle.truezip.io.util.Paths.Normalizer;
+import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.Paths.Normalizer;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.FileFactory;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.FileFactory;
+import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
-import de.schlichtherle.truezip.io.util.Paths;
+import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.FileFilter;
@@ -43,7 +43,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.util.Paths.normalize;
+import static de.schlichtherle.truezip.io.Paths.normalize;
 
 /**
  * This class implements a virtual file system of archive entries for use
@@ -298,7 +298,7 @@ public final class ArchiveFileSystem {
     }
 
     private static class Splitter
-    extends de.schlichtherle.truezip.io.util.Paths.Splitter {
+    extends de.schlichtherle.truezip.io.Paths.Splitter {
         Splitter() {
             super(SEPARATOR_CHAR);
         }

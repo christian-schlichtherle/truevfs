@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -95,7 +95,7 @@ public class FileSystemView extends FilterFileSystemView {
      * Returns a valid archive detector to use with this class.
      * If no archive detector has been explicitly set for this file system
      * view or the archive detector has been set to {@code null},
-     * then {@link de.schlichtherle.truezip.io.File#getDefaultArchiveDetector} is
+     * then {@link de.schlichtherle.truezip.io.file.File#getDefaultArchiveDetector} is
      * returned.
      */
     public ArchiveDetector getArchiveDetector() {
@@ -109,7 +109,7 @@ public class FileSystemView extends FilterFileSystemView {
      *
      * @param archiveDetector The archive detector to use.
      *        May be {@code null} to indicate that
-     *        {@link de.schlichtherle.truezip.io.File#getDefaultArchiveDetector}
+     *        {@link de.schlichtherle.truezip.io.file.File#getDefaultArchiveDetector}
      *        should be used.
      */
     public void setArchiveDetector(ArchiveDetector archiveDetector) {

@@ -16,14 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.util.IOOperation;
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
-import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.util.Files.getRealFile;
+import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 
 /**

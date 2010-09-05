@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.io.sample;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
-import de.schlichtherle.truezip.io.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.FileInputStream;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
+import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.io.file.FileInputStream;
 import de.schlichtherle.truezip.io.archive.driver.impl.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.io.archive.driver.impl.tar.TarDriver;
 import de.schlichtherle.truezip.io.archive.driver.impl.tar.TarGZipDriver;
@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
  * However, this utility features some optional archive drivers which
  * provide additional safety or otherwise unavailable features.
  * Some of these drivers are not used in their default configuration -
- * see {@link de.schlichtherle.truezip.io.DefaultArchiveDetector} for more
+ * see {@link de.schlichtherle.truezip.io.file.DefaultArchiveDetector} for more
  * information.
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.

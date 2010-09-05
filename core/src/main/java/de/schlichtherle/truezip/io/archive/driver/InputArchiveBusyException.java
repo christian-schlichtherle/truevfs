@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.file.FileBusyException;
 
 /**
  * Thrown to indicate that the

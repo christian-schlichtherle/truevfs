@@ -18,24 +18,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head/>
     <body>
-        <p>
-            The Service Provider Interface (SPI) for pluggable
-            {@code ArchiveDriver}s.
-            The interfaces and classes in this package are used by some package
-            private classes in the package {@code de.schlichtherle.truezip.io} in order
-            to access archive files without requiring to know the archive type.
-        </p>
-        <p>
-            To implement support for a custom archive type, developers must
+        <p>The interface for pluggable {@link de.schlichtherle.truezip.io.archive.driver.ArchiveDriver}s.
+            The interfaces and classes in this package are used by some client
+            classes in order to access archive files without requiring to know
+            the archive type.</p>
+        <p>To implement support for a custom archive type, developers must
             implement the interfaces in this package and either provide a
             custom implementation of the
-            {@link de.schlichtherle.truezip.io.ArchiveDetector} interface or register
-            the driver class with the
-            {@link de.schlichtherle.truezip.io.DefaultArchiveDetector} class.
-        </p>
-        <p>
-            Some classes in this package are provided to ease the task of
-            implementing an archive driver.
-        </p>
+            {@link de.schlichtherle.truezip.io.archive.detector.ArchiveDetector}
+            interface or preferrably register their driver classes with the
+            {@link de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry}
+            class.</p>
     </body>
 </html>

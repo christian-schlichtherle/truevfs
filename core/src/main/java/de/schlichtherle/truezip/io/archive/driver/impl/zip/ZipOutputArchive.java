@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException;
-import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
@@ -43,7 +43,7 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.impl.zip.ZipDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.util.Files.createTempFile;
+import static de.schlichtherle.truezip.io.Files.createTempFile;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
@@ -95,7 +95,7 @@ implements OutputArchive<ZipEntry> {
             if (source.getPreambleLength() > 0) {
                 final InputStream in = source.getPreambleInputStream();
                 try {
-                    de.schlichtherle.truezip.io.File.cat(
+                    de.schlichtherle.truezip.io.file.File.cat(
                             in, source.offsetsConsiderPreamble() ? this : out);
                 } finally {
                     in.close();

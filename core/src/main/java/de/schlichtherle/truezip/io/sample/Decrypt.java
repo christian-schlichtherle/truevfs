@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.sample;
 
-import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.RaesFiles;
+import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.io.file.RaesFiles;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ResourceBundle;

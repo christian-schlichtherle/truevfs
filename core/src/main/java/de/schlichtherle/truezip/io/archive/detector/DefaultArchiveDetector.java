@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.detector;
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.util.SuffixSet;
+import de.schlichtherle.truezip.io.SuffixSet;
 import de.schlichtherle.truezip.util.regex.ThreadLocalMatcher;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -64,7 +64,8 @@ import java.util.regex.Matcher;
  * <p>
  * This implementation is (virtually) immutable and thread safe.
  * <p>
- * This class is serializable in order to meet the requirements of some classes.
+ * This class is serializable in order to meet the requirements of some client
+ * classes.
  * However, it's not recommended to serialize instances of this class:
  * Together with the instance, all associated archive drivers are serialized
  * too, which is pretty inefficient.

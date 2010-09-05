@@ -37,23 +37,11 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * In particular, this class does <em>not</em> check an ODF file for the
  * existance of the <i>META-INF/manifest.xml</i> entry or any other entry.
  * <p>
+ * When using this driver to create or modify an ODF file, then in order to
+ * achieve best performance, the <i>mimetype</i> entry should be created or
+ * modified first in order to avoid temp file buffering of any other entries.
+ * <p>
  * Instances of this class are immutable.
- *
- * <h3>How to use this driver</h3>
- * An ODF file is either a plain XML file or a JAR file (called <i>package</i>).
- * <p>
- * If it's an XML file, the method {@link de.schlichtherle.truezip.io.File#isFile}
- * returns {@code true} and this driver is actually never used.
- * It's up to the client application to recognize this and deal with the
- * ODF file appropriately.
- * <p>
- * If it's a JAR file however, the method
- * {@link de.schlichtherle.truezip.io.File#isDirectory} returns {@code true}
- * and this driver is used to access the file.
- * The client application can then access the ODF file transparently as if it
- * were a directory in a path.
- * If a <i>mimetype</i> entry is to be created or modified, this should be
- * done first in order to provide best performance.
  *
  * @see OdfOutputArchive
  * @author Christian Schlichtherle

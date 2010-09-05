@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.zip;
 
 import java.util.Iterator;
-import de.schlichtherle.truezip.io.util.LEDataOutputStream;
+import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.Closeable;
 import java.io.FilterOutputStream;
 import java.io.Flushable;
