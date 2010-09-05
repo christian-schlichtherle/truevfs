@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.util.concurrent.locks;
 
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import junit.framework.TestCase;
 
 /**
@@ -52,7 +52,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
 
         rl.lock();
         try {
-            runWithTimeout(1000, new Action<InterruptedException>() {
+            runWithTimeout(1000, new Operation<InterruptedException>() {
                 public void run() throws InterruptedException {
                     ReentrantLock wl = instance.writeLock();
                     // Upgrading a read lock blocks until interrupted.
@@ -72,7 +72,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
         assertNotNull(wl);
 
         wl.lock();
-        runWithTimeout(1000, new Action<InterruptedException>() {
+        runWithTimeout(1000, new Operation<InterruptedException>() {
             public void run() throws InterruptedException {
                 ReentrantLock rl = instance.readLock();
                 // Downgrading a write lock returns immediately.
@@ -83,7 +83,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
 
     private <T extends Throwable> void runWithTimeout(
             final long timeout,
-            final Action<T> action)
+            final Operation<T> action)
     throws T {
         final Thread target = Thread.currentThread();
         final Thread observer = new Thread(new Runnable() {

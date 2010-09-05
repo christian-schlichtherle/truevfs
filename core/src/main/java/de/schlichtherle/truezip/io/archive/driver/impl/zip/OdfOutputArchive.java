@@ -53,7 +53,7 @@ extends MultiplexedOutputArchive<ZipEntry> {
             final ArchiveOutputStreamSocket<ZipEntry> dst,
             final IOReference<? extends ArchiveEntry> src)
     throws IOException {
-        final ZipEntry dstEntry = dst.getTarget();
+        final ZipEntry dstEntry = dst.get();
         if (MIMETYPE.equals(dstEntry.getName())) {
             mimetype = true;
             if (dstEntry.getMethod() == UNKNOWN)

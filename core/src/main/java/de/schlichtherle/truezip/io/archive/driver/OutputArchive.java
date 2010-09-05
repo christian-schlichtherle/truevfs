@@ -17,7 +17,9 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
+import de.schlichtherle.truezip.io.socket.OutputStreamSocketProvider;
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 
 /**
  * A container which supports writing archive entries to an arbitrary output
@@ -30,14 +32,26 @@ import java.io.Closeable;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @see InputArchive
- * @author Christian Schlichtherle
+ * @see     InputArchive
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface OutputArchive<AE extends ArchiveEntry>
 extends ArchiveEntryContainer<AE>,
-        ArchiveOutputStreamSocketProvider<AE>,
+        OutputStreamSocketProvider<AE, ArchiveEntry>,
         Closeable {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * It is an error to write an archive entry header or adding the archive
+     * entry merely upon the call to this method.
+     *
+     * @param entry a non-{@code null} archive entry.
+     */
+    @Override
+    ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
+    throws FileNotFoundException;
 
     /**
      * Returns the meta data for this output archive.

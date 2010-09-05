@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import java.io.CharConversionException;
 import java.io.IOException;
 
@@ -84,7 +84,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         ArchiveFileSystem autoMount(final boolean create)
         throws FalsePositiveException, IOException {
             try {
-                class Mounter implements Action<Exception> {
+                class Mounter implements Operation<Exception> {
                     public void run() throws FalsePositiveException, IOException {
                         // Check state again: Another thread may have changed
                         // it while we released all read locks in order to

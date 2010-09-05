@@ -16,7 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.Sockets;
+import de.schlichtherle.truezip.io.socket.IOOperations;
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.util.IOOperation;
 import de.schlichtherle.truezip.io.util.Paths.Normalizer;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.FileFactory;
@@ -24,21 +26,16 @@ import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
-import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Paths;
-import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
@@ -826,12 +823,12 @@ public final class ArchiveFileSystem {
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
                     oa.getOutputStreamSocket(e)
-                            .newOutputStream(Sockets.getReference(null))
+                            .newOutputStream(IOReferences.ref(null))
                             .close();
                 } else if (ia != null && ia.getEntry(n) != null) {
                     assert e == ia.getEntry(n);
-                    Sockets.copy(   ia.getInputStreamSocket(e),
-                                    oa.getOutputStreamSocket(e));
+                    IOOperations.copy(  ia.getInputStreamSocket(e),
+                                        oa.getOutputStreamSocket(e));
                 } else {
                     // The entry is an archive file which has been
                     // newly created and not yet been reassembled
@@ -840,7 +837,7 @@ public final class ArchiveFileSystem {
                     // recreate the entry when the file system gets
                     // remounted from the archive file.
                     oa.getOutputStreamSocket(e)
-                            .newOutputStream(Sockets.getReference(null))
+                            .newOutputStream(IOReferences.ref(null))
                             .close();
                 }
             } catch (IOException ex) {

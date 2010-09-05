@@ -16,7 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
-import de.schlichtherle.truezip.io.socket.Sockets;
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.socket.IOStreamSockets;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
@@ -132,7 +133,7 @@ implements OutputArchive<ZipEntry> {
     throws FileNotFoundException {
         class OutputStreamProxy implements ArchiveOutputStreamSocket<ZipEntry> {
             @Override
-            public ZipEntry getTarget() {
+            public ZipEntry get() {
                 return entry;
             }
 
@@ -161,7 +162,7 @@ implements OutputArchive<ZipEntry> {
             return new EntryOutputStream(entry);
         }
 
-        final ArchiveEntry srcEntry = src.getTarget();
+        final ArchiveEntry srcEntry = IOReferences.deref(src);
         if (srcEntry != null) {
             entry.setSize(srcEntry.getSize());
             if (srcEntry instanceof ZipEntry) {
@@ -193,7 +194,7 @@ implements OutputArchive<ZipEntry> {
                         return new TempEntryOutputStream(
                                 createTempFile(TEMP_FILE_PREFIX), entry);
                     final InputStream in = ((InputStreamSocket) src)
-                            .newInputStream(Sockets.getReference(null));
+                            .newInputStream(IOReferences.ref(null));
                     final Crc32OutputStream out = new Crc32OutputStream();
                     Streams.copy(in, out);
                     entry.setCrc(out.crc.getValue());

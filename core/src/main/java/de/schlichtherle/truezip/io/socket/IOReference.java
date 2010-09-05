@@ -17,19 +17,27 @@
 package de.schlichtherle.truezip.io.socket;
 
 /**
- * References the target of I/O operations.
+ * References a target for I/O operations.
  *
- * @param   <T> The type of the target of I/O operations.
+ * @param   <T> The type of the target for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface IOReference<T> {
 
     /**
-     * Returns a nullable reference to the target of I/O operations.
-     * If {@code null} is returned, the target is undefined.
+     * Returns the target for I/O operations.
+     * <p>
+     * The returned object reference may be {@code null}.
+     * However, this term may be overridden by sub-interfaces or
+     * implementations.
+     * <p>
+     * The result of changing the state of the returned object is undefined.
+     * However, this term may be overridden by sub-interfaces or
+     * implementations.
+     *
      * 
-     * @return A nullable reference to the target of I/O operations.
+     * @return The target for I/O operations.
      */
-    T getTarget();
+    T get();
 }

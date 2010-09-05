@@ -22,28 +22,44 @@ import java.io.InputStream;
 /**
  * Creates input streams for reading bytes from its target.
  * 
- * @param   <LT> The type of the <i>local target</i>,
- *          i.e. the {@link #getTarget() target} of this instance.
+ * @param   <LT> The type of the <i>local target</i> for I/O operations,
+ *          i.e. the {@link #get() target} of this instance.
  * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          reading from the local target.
- * @see InputStreamSocketProvider
- * @see OutputStreamSocket
+ *          for I/O operations.
+ * @see     InputStreamSocketProvider
+ * @see     OutputStreamSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
 
     /**
-     * Returns a non-{@code null} reference to a new {@code InputStream} for
-     * reading bytes from the {@link #getTarget() local target}.
+     * Returns the non-{@code null} local target for I/O operations.
      * <p>
-     * The returned stream should <em>not</em> be buffered.
+     * The result of changing the state of the returned object is undefined.
+     * In particular, a subsequent call to {@link #newInputStream(IOReference)}
+     * may not reflect any changes or may even fail.
+     * However, this term may be overridden by sub-interfaces or
+     * implementations.
+     *
+     * @return The non-{@code null} local target for I/O operations.
+     */
+    @Override
+    LT get();
+
+    /**
+     * Returns a new {@code InputStream} for reading bytes from the
+     * {@link #get() local target}.
+     * <p>
+     * Implementations must support calling this method any number of times.
+     * Furthermore, the returned stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @param  destination a non-{@code null} reference to the output peer
-     *         target.
-     * @return A non-{@code null} reference to a new {@code InputStream}.
+     * @param  peer the nullable peer target.
+     *         If this is {@code null}, then there is no peer target.
+     * @return A new {@code InputStream}.
+     * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
      */
-    InputStream newInputStream(IOReference<? extends PT> destination)
+    InputStream newInputStream(IOReference<? extends PT> peer)
     throws IOException;
 }
