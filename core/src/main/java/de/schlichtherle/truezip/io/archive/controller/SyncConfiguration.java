@@ -1,6 +1,5 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 import java.io.IOException;
 import java.io.InputStream;
 
