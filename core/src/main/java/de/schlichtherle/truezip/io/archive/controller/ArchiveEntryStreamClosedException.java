@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.metadata;
+package de.schlichtherle.truezip.io.archive.controller;
 
 import java.io.IOException;
 

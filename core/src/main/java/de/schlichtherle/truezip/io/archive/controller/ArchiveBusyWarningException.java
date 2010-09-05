@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
 
 /**
  * Indicates that an archive file has been successfully updated, but some

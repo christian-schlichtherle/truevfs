@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
-import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import java.io.FileNotFoundException;
 
 /**
