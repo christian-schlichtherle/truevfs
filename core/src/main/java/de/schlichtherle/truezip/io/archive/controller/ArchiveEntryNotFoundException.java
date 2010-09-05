@@ -34,19 +34,19 @@ extends FileNotFoundException {
     private static final long serialVersionUID = 2972350932856838564L;
 
     private final String canonicalPath;
-    private final String entryName;
 
-    ArchiveEntryNotFoundException(Archive archive, final String entryName, final String msg) {
+    ArchiveEntryNotFoundException(Archive archive, final String path, final String msg) {
         //super(archive, msg);
         //super.initPredecessor(null);
-        canonicalPath = archive.getCanonicalPath();
-        assert entryName != null;
         assert msg != null;
-        this.entryName = entryName;
+        final StringBuilder result = new StringBuilder(archive.getCanonicalPath());
+        if (!ArchiveController.isRoot(path))
+            result.append(File.separator).append(path.replace(ArchiveEntry.SEPARATOR_CHAR, File.separatorChar));
+        canonicalPath = result.toString();
     }
 
     /**
-     * Returns the <em>canonical</em> path name of the archive file which's
+     * Returns the <em>canonical</em> path name of the archive entry which's
      * processing caused this exception to be created.
      * A canonical path is both absolute and unique within the virtual file
      * system.
@@ -56,23 +56,21 @@ extends FileNotFoundException {
      * This property may be used to determine some archive file specific
      * parameters, such as passwords or similar.
      * However, implementations must not assume that the file denoted by the
-     * path actually exists as a file in the real file system!
+     * path actually isExisting as a file in the real file system!
      *
      * @return A string representing the canonical path of this archive
      *         - never {@code null}.
      */
+    // TODO: Change to URIs.
     public final String getCanonicalPath() {
         return canonicalPath;
     }
 
     @Override
     public String getLocalizedMessage() {
-        final StringBuilder result = new StringBuilder(getCanonicalPath());
-        if (!ArchiveController.isRoot(entryName))
-            result.append(File.separator).append(entryName.replace(ArchiveEntry.SEPARATOR_CHAR, File.separatorChar));
         final String msg = getMessage();
-        if (msg != null)
-            result.append(" (").append(msg).append(")");
-        return result.toString();
+        return msg != null
+                ? new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString()
+                : getCanonicalPath();
     }
 }

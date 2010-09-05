@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.File;
 import junit.framework.TestCase;
 

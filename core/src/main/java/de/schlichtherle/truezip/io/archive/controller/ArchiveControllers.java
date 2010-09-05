@@ -667,7 +667,7 @@ public final class ArchiveControllers {
      * <ol>
      * <li>
      * Consider the following path: &quot;a/outer.zip/b/inner.zip/c&quot;.
-     * Now let's assume that &quot;a&quot; exists as a directory in the real file
+     * Now let's assume that &quot;a&quot; isExisting as a directory in the real file
      * system, while all other parts of this path don't, and that TrueZIP's
      * default configuration is used which would recognize &quot;outer.zip&quot; and
      * &quot;inner.zip&quot; as ZIP files.

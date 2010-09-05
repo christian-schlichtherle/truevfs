@@ -46,6 +46,7 @@ public interface Archive {
      *         - never {@code null}.
      * @see #getEnclArchive
      */
+    // TODO: Change to URIs.
     String getCanonicalPath();
 
     /**

@@ -81,4 +81,16 @@ extends Exception {
     public final String getCanonicalPath() {
         return canonicalPath;
     }
+
+    @Override
+    public String getLocalizedMessage() {
+        final String msg = getMessage();
+        if (msg != null)
+            return new StringBuilder(getCanonicalPath())
+                    .append(" (")
+                    .append(msg)
+                    .append(")")
+                    .toString();
+        return getCanonicalPath();
+    }
 }

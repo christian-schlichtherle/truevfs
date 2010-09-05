@@ -16,21 +16,20 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.IOOperations;
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
+import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
+import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.file.FileFactory;
-import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
-import de.schlichtherle.truezip.io.Paths;
+import de.schlichtherle.truezip.io.socket.IOOperations;
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -46,12 +45,10 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Paths.normalize;
 
 /**
- * This class implements a virtual file system of archive entries for use
- * by the archive controller provided to the constructor.
+ * This class implements a virtual file system of archive entries.
  * <p>
- * <b>WARNING:</b>This class is <em>not</em> thread safe!
- * All calls to non-static methods <em>must</em> be synchronized on the
- * respective {@code ArchiveController} object!
+ * This class is <em>not</em> thread-safe!
+ * Multithreading needs to be addressed by client classes.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -59,7 +56,7 @@ import static de.schlichtherle.truezip.io.Paths.normalize;
 public final class ArchiveFileSystem {
 
     /** The controller that this filesystem belongs to. */
-    private final UpdatingArchiveController controller;
+    private final ArchiveEntryFactory factory;
 
     /** The read only status of this file system. */
     private final boolean readOnly;
@@ -81,26 +78,28 @@ public final class ArchiveFileSystem {
     /** The number of times this file system has been modified (touched). */
     private long touched;
 
+    private final VetoableTouchListener vetoableTouchListener;
+
     /**
      * Creates a new archive file system and ensures its integrity.
      * The root directory is created with its last modification time set to
      * the system's current time.
      * The file system is modifiable and marked as touched!
      * 
-     * @param controller The controller which will use this file system.
-     *        This implementation will solely use the controller as a factory
-     *        to create missing archive entries using
-     *        {@link FileSystemArchiveController#newArchiveEntry}.
-     * @throws NullPointerException If {@code controller} or {@code archive}
-     *         is {@code null}.
+     * @param factory the archive entry factory to use.
+     * @param vetoableTouchListener the nullable listener for touch events.
+     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *        method will be called at the end of this constructor and whenever
+     *        a client class changes the state of this archive file system.
+     * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    // TODO: Replace controller with factory!
-    ArchiveFileSystem(final UpdatingArchiveController controller)
+    ArchiveFileSystem(
+            final ArchiveEntryFactory factory,
+            final VetoableTouchListener vetoableTouchListener)
     throws IOException {
-        assert controller != null;
+        assert factory != null;
 
-        this.controller = controller;
-        touched = 1;
+        this.factory = factory;
         master = new LinkedHashMap<String, ArchiveEntry>(64);
 
         // Setup root.
@@ -109,26 +108,33 @@ public final class ArchiveFileSystem {
         master.put(ROOT, root);
 
         readOnly = false;
+
+        this.vetoableTouchListener = vetoableTouchListener;
+        touch();
     }
 
     /**
-     * Populates this file system from <code>archive</code> and ensures its
-     * integrity.
-     * First, a root directory with the given last modification time is
-     * created - it's never loaded from the archive!
-     * Then the entries from the archive are loaded into the file system and
-     * its integrity is checked:
-     * Any missing parent directories are created using the system's current
-     * time as their last modification time - existing directories will never
-     * be replaced.
+     * Populates this file system from the given {@code archive} and ensures
+     * its integrity.
+     * <p>
+     * First, the entries from the archive are loaded into the file system.
+     * <p>
+     * Second, a root directory with the given last modification time is
+     * created and linked into the filesystem (so it's never loaded from the
+     * archive).
+     * <p>
+     * Finally, the file system integrity is checked and fixed: Any missing
+     * parent directories are created using the system's current time as their
+     * last modification time - existing directories will never be replaced.
      * <p>
      * Note that the entries in this file system are shared with the given
      * {@code archive}.
      * 
-     * @param controller The controller which will use this file system.
-     *        This implementation will solely use the controller as a factory
-     *        to create missing archive entries using
-     *        {@link FileSystemArchiveController#newArchiveEntry}.
+     * @param factory the archive entry factory to use.
+     * @param vetoableTouchListener the nullable listener for touch events.
+     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *        method will be called whenever a client class changes the state
+     *        of this archive file system.
      * @param archive The input archive to read the entries for the population
      *        of this file system.
      * @param rootTime The last modification time of the root of the populated
@@ -136,16 +142,16 @@ public final class ArchiveFileSystem {
      * @param readOnly If and only if {@code true}, any subsequent
      *        modifying operation on this file system will result in a
      *        {@link ReadOnlyArchiveFileSystemException}.
-     * @throws NullPointerException If {@code controller} or {@code archive}
+     * @throws NullPointerException If {@code factory} or {@code archive}
      *         is {@code null}.
      */
-    // TODO: Replace controller with factory!
     ArchiveFileSystem(
-            final UpdatingArchiveController controller,
+            final ArchiveEntryFactory factory,
+            final VetoableTouchListener vetoableTouchListener,
             final InputArchive<?> archive,
             final long rootTime,
             final boolean readOnly) {
-        this.controller = controller;
+        this.factory = factory;
         master = new LinkedHashMap<String, ArchiveEntry>(
                 (int) (archive.size() / 0.75f) + 1);
 
@@ -157,8 +163,8 @@ public final class ArchiveFileSystem {
             entry.setMetaData(new ArchiveEntryMetaData(entry));
         }
 
-        // Setup root entry, potentially replacing its definition from the
-        // input archive.
+        // Setup root entry, potentially replacing its previous mapping from
+        // the input archive.
         root = newArchiveEntry(ROOT, DIRECTORY);
         root.setTime(rootTime); // do NOT yet touch the file system!
         master.put(ROOT, root);
@@ -180,6 +186,7 @@ public final class ArchiveFileSystem {
             master = Collections.unmodifiableMap(master);
 
         assert !isTouched();
+        this.vetoableTouchListener = vetoableTouchListener;
     }
 
     /**
@@ -228,7 +235,7 @@ public final class ArchiveFileSystem {
 
         if (type == DIRECTORY)
             path += SEPARATOR_CHAR;
-        final ArchiveEntry entry = controller.newArchiveEntry(path, blueprint);
+        final ArchiveEntry entry = factory.newArchiveEntry(path, blueprint);
         entry.setMetaData(new ArchiveEntryMetaData(entry));
         return entry;
     }
@@ -383,8 +390,8 @@ public final class ArchiveFileSystem {
             throw new ReadOnlyArchiveFileSystemException();
 
         // Order is important here because of exceptions!
-        if (touched == 0)
-            controller.touch();
+        if (touched == 0 && vetoableTouchListener != null)
+            vetoableTouchListener.touch();
         touched++;
     }
 
@@ -579,7 +586,6 @@ public final class ArchiveFileSystem {
         }
 
         public ArchiveEntry getEntry() {
-            assert controller.getFileSystem() == ArchiveFileSystem.this;
             return elements[elements.length - 1].entry;
         }
     } // class LinkTransaction
@@ -664,29 +670,29 @@ public final class ArchiveFileSystem {
     // File system operations used by the ArchiveController class:
     //
     
-    boolean exists(final String path) {
+    public boolean isExisting(final String path) {
         return get(path) != null;
     }
 
-    boolean isFile(final String path) {
+    public boolean isFile(final String path) {
         final ArchiveEntry entry = get(path);
         return entry != null && entry.getType() == FILE;
     }
     
-    boolean isDirectory(final String path) {
+    public boolean isDirectory(final String path) {
         final ArchiveEntry entry = get(path);
         return entry != null && entry.getType() == DIRECTORY;
     }
     
-    boolean canWrite(final String path) {
+    public boolean isWritable(final String path) {
         return !isReadOnly() && isFile(path);
     }
 
-    boolean setReadOnly(final String path) {
+    public boolean setReadOnly(final String path) {
         return isReadOnly() && isFile(path);
     }
     
-    long length(final String path) {
+    public long getLength(final String path) {
         final ArchiveEntry entry = get(path);
         if (entry == null || entry.getType() == DIRECTORY)
             return 0;
@@ -694,24 +700,24 @@ public final class ArchiveFileSystem {
         // TODO: Review: Can we avoid this special case?
         // It's probably ZipDriver specific!
         // This entry is a plain file in the file system.
-        // If entry.getSize() returns UNKNOWN, the length is yet unknown.
+        // If entry.getSize() returns UNKNOWN, the getLength is yet unknown.
         // This may happen if e.g. a ZIP entry has only been partially
         // written, i.e. not yet closed by another thread, or if this is a
         // ghost directory.
-        // As this is not specified in the contract of the File class, return
-        // 0 in this case instead.
+        // As this is not specified in the contract of this class,
+        // return 0 in this case instead.
         final long length = entry.getSize();
-        return length != UNKNOWN ? length : 0;
+        return length >= 0 ? length : 0;
     }
 
-    long lastModified(final String path) {
+    public long getLastModified(final String path) {
         final ArchiveEntry entry = get(path);
         if (entry != null) {
             // Depending on the driver type, entry.getTime() could return
             // a negative value. E.g. this is the default value that the
             // ArchiveDriver uses for newly created entries in order to
             // indicate an unknown time.
-            // As this is not specified in the contract of the File class,
+            // As this is not specified in the contract of this class,
             // 0 is returned in this case instead.
             final long time = entry.getTime();
             return time >= 0 ? time : 0;
@@ -720,7 +726,7 @@ public final class ArchiveFileSystem {
         return 0;
     }
 
-    boolean setLastModified(final String path, final long time)
+    public boolean setLastModified(final String path, final long time)
     throws IOException {
         if (time < 0)
             throw new IllegalArgumentException(path +
@@ -739,53 +745,20 @@ public final class ArchiveFileSystem {
 
         return true;
     }
-    
-    String[] list(final String path) {
-        // Lookup the entry as a directory.
+
+    public int getNumChildren(final String path) {
         final ArchiveEntry entry = get(path);
-        if (entry != null && entry.getType() == DIRECTORY)
-            return entry.getMetaData().list();
-        return null; // does not exist as a directory
-    }
-    
-    String[] list(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir) {
-        // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(path);
-        if (entry != null && entry.getType() == DIRECTORY)
-            if (filenameFilter != null)
-                return entry.getMetaData().list(filenameFilter, dir);
-            else
-                return entry.getMetaData().list(); // most efficient
-        return null; // does not exist as directory
+        return entry != null && entry.getType() == DIRECTORY
+                ? entry.getMetaData().size()
+                : 0; // does not exist as a directory
     }
 
-    File[] listFiles(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir,
-            final FileFactory factory) {
-        // Lookup the entry as a directory.
+    void list(final String path, final ChildVisitor visitor) {
         final ArchiveEntry entry = get(path);
         if (entry != null && entry.getType() == DIRECTORY)
-            return entry.getMetaData().listFiles(filenameFilter, dir, factory);
-        return null; // does not exist as a directory
+            entry.getMetaData().list(visitor);
     }
     
-    File[] listFiles(
-            final String path,
-            final FileFilter fileFilter,
-            final File dir,
-            final FileFactory factory) {
-        // Lookup the entry as a directory.
-        final ArchiveEntry entry = get(path);
-        if (entry != null && entry.getType() == DIRECTORY)
-            return entry.getMetaData().listFiles(fileFilter, dir, factory);
-        return null; // does not exist as a directory
-    }
-
     void mkdir(String path, boolean createParents)
     throws IOException {
         link(path, DIRECTORY, createParents).run();

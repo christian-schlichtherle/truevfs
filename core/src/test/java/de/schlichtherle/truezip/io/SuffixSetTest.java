@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.SuffixSet;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import junit.framework.TestCase;

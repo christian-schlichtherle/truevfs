@@ -377,7 +377,7 @@ final class Files {
             srcController.readLock().lock();
             try {
                 in = srcController.newInputStream0(srcPath); // detects false positives!
-                time = srcController.lastModified(srcPath);
+                time = srcController.getLastModified(srcPath);
             } finally {
                 srcController.readLock().unlock();
             }

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
@@ -29,6 +30,7 @@ import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilde
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -42,7 +44,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +53,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.Files.split;
+import static de.schlichtherle.truezip.util.Arrays.copyOf;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -67,7 +68,7 @@ import static de.schlichtherle.truezip.io.Files.split;
  * &quot;<a href="package-summary.html#state">Managing Archive File State</a>&quot;
  * in the package summary.
  *
- * <h3><a name="copy_methods">Copy methods</a></h3>
+ * <h4><a name="copy_methods">Copy methods</a></h4>
  * <p>
  * This class provides a bunch of convenient copy methods which work much
  * faster and more reliable than the usual read-write-in-a-loop approach for
@@ -116,7 +117,7 @@ import static de.schlichtherle.truezip.io.Files.split;
  * additional temporary file, but shows no impact otherwise - TAR doesn't
  * support compression.
  *
- * <h3><a name="false_positives">Identifying Archive Paths and False Positives</a></h3>
+ * <h4><a name="false_positives">Identifying Archive Paths and False Positives</a></h4>
  * <p>
  * Whenever an archive file suffix is recognized in a path, TrueZIP treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
@@ -311,7 +312,7 @@ import static de.schlichtherle.truezip.io.Files.split;
  *    {@code true}.</li>
  * </ol>
  *
- * <h3><a name="miscellaneous">Miscellaneous</a></h3>
+ * <h4><a name="miscellaneous">Miscellaneous</a></h4>
  * <ol>
  * <li>Since TrueZIP 6.4, this class is serializable in order to meet the
  *     requirements of its super class.
@@ -871,7 +872,7 @@ public class File extends java.io.File {
                     // indeed be null if the full path ends with just
                     // a single dot after the last separator, i.e. the base
                     // name is ".", indicating the current directory.
-                    // assert enclEntryNameBuf.length() > 0;
+                    // assert enclEntryNameBuf.getLength() > 0;
                     enclArchive = ancestor.innerArchive;
                     if (!ancestor.isArchive()) {
                         if (ancestor.isEntry()) {
@@ -1477,7 +1478,7 @@ public class File extends java.io.File {
      * <ol>
      * <li>
      * Consider the following path: &quot;a/outer.zip/b/inner.zip/c&quot;.
-     * Now let's assume that &quot;a&quot; exists as a directory in the real file
+     * Now let's assume that &quot;a&quot; isExisting as a directory in the real file
      * system, while all other parts of this path don't, and that TrueZIP's
      * default configuration is used which would recognize &quot;outer.zip&quot; and
      * &quot;inner.zip&quot; as ZIP files.
@@ -1747,7 +1748,7 @@ public class File extends java.io.File {
      * {@link #getDefaultArchiveDetector()} is used.
      * <p>
      * Please note that no file system tests are performed!
-     * If a client application needs to know whether this file really exists
+     * If a client application needs to know whether this file really isExisting
      * as an archive file in the file system (and the correct password has
      * been entered in case it's a RAES encrypted ZIP file), it should
      * subsequently call {@link #isDirectory}, too.
@@ -2275,7 +2276,7 @@ public class File extends java.io.File {
         try {
             if (enclArchive != null)
                 return enclArchive.getArchiveController()
-                        .exists(enclEntryName);
+                        .isExisting(enclEntryName);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2378,11 +2379,11 @@ public class File extends java.io.File {
 
     @Override
     public boolean canRead() {
-        // More thorough test than exists
+        // More thorough test than isExisting
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .canRead(innerEntryName);
+                        .isReadable(innerEntryName);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2396,7 +2397,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .canWrite(innerEntryName);
+                        .isWritable(innerEntryName);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2409,7 +2410,7 @@ public class File extends java.io.File {
      * Like the super class implementation, but is aware of archive
      * files in its path.
      * For entries in a archive file, this is effectively a no-op:
-     * The method will only return {@code true} if the entry exists and the
+     * The method will only return {@code true} if the entry isExisting and the
      * archive file was mounted read only.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
@@ -2429,8 +2430,8 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns the (uncompressed) length of the file.
-     * The length returned of a valid archive file is {@code 0} in order
+     * Returns the (uncompressed) getLength of the file.
+     * The getLength returned of a valid archive file is {@code 0} in order
      * to correctly emulate virtual directories across all platforms.
      * <p>
      * In case a RAES encrypted ZIP file is tested which is accessed for the
@@ -2450,7 +2451,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .length(innerEntryName);
+                        .getLength(innerEntryName);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2475,7 +2476,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .lastModified(innerEntryName);
+                        .getLastModified(innerEntryName);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2530,10 +2531,27 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list() {
+        class Visitor implements ChildVisitor {
+            String children[];
+            int i;
+
+            @Override
+            public void init(final int numChildren) {
+                children = new String[numChildren];
+            }
+
+            @Override
+            public void visit(final String child) {
+                children[i++] = child;
+            }
+        }
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .list(innerEntryName);
+            if (innerArchive != null) {
+                final Visitor visitor = new Visitor();
+                innerArchive.getArchiveController()
+                        .list(innerEntryName, visitor);
+                return visitor.children;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2556,17 +2574,37 @@ public class File extends java.io.File {
      *         a valid (but maybe empty) array otherwise.
      */
     @Override
-    public String[] list(final FilenameFilter filenameFilter) {
+    public String[] list(final FilenameFilter filter) {
+        class Visitor implements ChildVisitor {
+            String children[];
+            int i;
+
+            @Override
+            public void init(final int numChildren) {
+                children = new String[numChildren];
+            }
+
+            @Override
+            public void visit(final String child) {
+                if (filter == null || filter.accept(File.this, child))
+                    children[i++] = child;
+            }
+        }
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .list(innerEntryName, filenameFilter, this);
+            if (innerArchive != null) {
+                final Visitor visitor = new Visitor();
+                innerArchive.getArchiveController()
+                        .list(innerEntryName, visitor);
+                return visitor.children != null
+                        ? copyOf(visitor.children, visitor.i)
+                        : null;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
-        return delegate.list(filenameFilter);
+        return delegate.list(filter);
     }
 
     /**
@@ -2629,18 +2667,38 @@ public class File extends java.io.File {
      *      Access using different Archive Detectors</a>
      */
     public File[] listFiles(
-            final FilenameFilter filenameFilter,
+            final FilenameFilter filter,
             final FileFactory factory) {
+        class Visitor implements ChildVisitor {
+            File children[];
+            int i;
+
+            @Override
+            public void init(final int numChildren) {
+                children = new File[numChildren];
+            }
+
+            @Override
+            public void visit(final String child) {
+                if (filter == null || filter.accept(File.this, child))
+                    children[i++] = factory.createFile(File.this, child);
+            }
+        }
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .listFiles(innerEntryName, filenameFilter, this, factory);
+            if (innerArchive != null) {
+                final Visitor visitor = new Visitor();
+                innerArchive.getArchiveController()
+                        .list(innerEntryName, visitor);
+                return visitor.children != null
+                        ? copyOf(visitor.children, visitor.i)
+                        : null;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
-        return convert(delegate.listFiles(filenameFilter), factory);
+        return convert(delegate.listFiles(filter), factory);
     }
 
     private static File[] convert(
@@ -2685,22 +2743,43 @@ public class File extends java.io.File {
      *      Access using different Archive Detectors</a>
      */
     public File[] listFiles(
-            final FileFilter fileFilter,
+            final FileFilter filter,
             final FileFactory factory) {
+        class Visitor implements ChildVisitor {
+            File children[];
+            int i;
+
+            @Override
+            public void init(final int numChildren) {
+                children = new File[numChildren];
+            }
+
+            @Override
+            public void visit(final String child) {
+                final File file = factory.createFile(File.this, child);
+                if (filter == null || filter.accept(file))
+                    children[i++] = file;
+            }
+        }
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .listFiles(innerEntryName, fileFilter, this, factory);
+            if (innerArchive != null) {
+                final Visitor visitor = new Visitor();
+                innerArchive.getArchiveController()
+                        .list(innerEntryName, visitor);
+                return visitor.children != null
+                        ? copyOf(visitor.children, visitor.i)
+                        : null;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
-        return delegateListFiles(fileFilter, factory);
+        return delegateListFiles(filter, factory);
     }
 
     private File[] delegateListFiles(
-            final FileFilter fileFilter,
+            final FileFilter filter,
             final FileFactory factory) {
         // When filtering, we want to pass in {@code de.schlichtherle.truezip.io.File}
         // objects rather than {@code java.io.File} objects, so we cannot
@@ -2718,7 +2797,7 @@ public class File extends java.io.File {
         for (int i = 0, l = children.length; i < l; i++) {
             final String child = children[i];
             final File file = factory.createFile(this, child);
-            if (fileFilter == null || fileFilter.accept(file))
+            if (filter == null || filter.accept(file))
                 filteredList.add(file);
         }
         final File[] list = new File[filteredList.size()];

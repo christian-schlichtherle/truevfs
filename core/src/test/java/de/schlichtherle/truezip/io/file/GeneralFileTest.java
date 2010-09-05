@@ -37,11 +37,11 @@ public class GeneralFileTest extends TestCase {
 
     public GeneralFileTest(String testName) {
         super(testName);
+        File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
     }
 
     @Override
     protected void setUp() throws Exception {
-        File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
         suffix = ".zip";
     }
 

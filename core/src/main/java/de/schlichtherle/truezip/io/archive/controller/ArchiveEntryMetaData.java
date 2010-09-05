@@ -20,6 +20,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.file.FileFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -72,102 +73,18 @@ public class ArchiveEntryMetaData {
                 : null;
     }
 
-    /**
-     * Returns the names of the members in this directory in a newly
-     * created array. The returned array is <em>not</em> sorted.
-     * This is the most efficient list method.
-     *
-     * @throws NullPointerException If the entry from which this object has
-     *         been created is not a directory.
-     */
-    String[] list() {
-        return children.toArray(new String[children.size()]);
+    int size() {
+        return children.size();
     }
 
     /**
-     * Returns the names of the members in this directory which are
-     * accepted by {@code filenameFilter} in a newly created array.
-     * {@code dir} is used as the directory argument for the
-     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
+     * Visits the children of this directory in arbitrary order.
      *
-     * @param filenameFilter a valid object - must not be {@code null}.
-     * @param dir the directory represented as a File object.
-     *
-     * @throws NullPointerException If the entry from which this object has
-     *         been created is not a directory.
+     * @throws NullPointerException If {@code visitor} is {@code null}.
      */
-    String[] list(
-            final FilenameFilter filenameFilter,
-            final File dir) {
-        final List<String> filteredList = (List<String>) threadLocal.get();
-        assert filteredList.isEmpty();
-        try {
-            for (final String child : children)
-                if (filenameFilter.accept(dir, child))
-                    filteredList.add(child);
-            return filteredList.toArray(new String[filteredList.size()]);
-        } finally {
-            filteredList.clear(); // support garbage collection of zip controllers!
-        }
-    }
-
-    /**
-     * Returns {@code File} objects for the members in this directory
-     * which are accepted by {@code filenameFilter} in a newly created
-     * array.
-     * {@code dir} is used as the directory argument for the
-     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
-     *
-     * @param filenameFilter may be {@code null} to accept all members.
-     * @param dir the directory represented as a File object.
-     *
-     * @throws NullPointerException If the entry from which this object has
-     *         been created is not a directory.
-     */
-    File[] listFiles(
-            FilenameFilter filenameFilter,
-            final File dir,
-            final FileFactory factory) {
-        final List<File> filteredList = (List<File>) threadLocal.get();
-        assert filteredList.isEmpty();
-        try {
-            for (final String child : children)
-                if (filenameFilter == null || filenameFilter.accept(dir, child))
-                    filteredList.add(factory.createFile(dir, child));
-            return filteredList.toArray(new File[filteredList.size()]);
-        } finally {
-            filteredList.clear(); // support garbage collection of zip controllers!
-        }
-    }
-
-    /**
-     * Returns {@code File} objects for the members in this directory
-     * which are accepted by {@code filenameFilter} in a newly created
-     * array.
-     * {@code dir} is used as the directory argument for the
-     * {@code filenameFilter}. The returned array is <em>not</em> sorted.
-     *
-     * @param fileFilter may be {@code null} to accept all members.
-     * @param dir the directory represented as a File object.
-     *
-     * @throws NullPointerException If the entry from which this object has
-     *         been created is not a directory.
-     */
-    File[] listFiles(
-            final FileFilter fileFilter,
-            final File dir,
-            final FileFactory factory) {
-        final List<File> filteredList = (List<File>) threadLocal.get();
-        assert filteredList.isEmpty();
-        try {
-            for (final String child : children) {
-                final File file = factory.createFile(dir, child);
-                if (fileFilter == null || fileFilter.accept(file))
-                    filteredList.add(file);
-            }
-            return filteredList.toArray(new File[filteredList.size()]);
-        } finally {
-            filteredList.clear(); // support garbage collection of zip controllers!
-        }
+    void list(final ChildVisitor visitor) {
+        visitor.init(children.size());
+        for (final String child : children)
+            visitor.visit(child);
     }
 }

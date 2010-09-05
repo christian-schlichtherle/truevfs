@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
  * source.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
+ * Multithreading needs to be addressed by client classes.
  *
  * @see     OutputArchive
  * @author  Christian Schlichtherle
