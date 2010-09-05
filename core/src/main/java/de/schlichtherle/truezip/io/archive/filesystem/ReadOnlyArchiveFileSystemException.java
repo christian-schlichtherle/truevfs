@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.filesystem;
 
 /**
  * This exception is thrown when a client tries to modify a read only

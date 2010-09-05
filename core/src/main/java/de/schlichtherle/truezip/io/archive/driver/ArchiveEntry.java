@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 
 /**
  * Represents an entry in an archive file.

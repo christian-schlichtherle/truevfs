@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -93,7 +91,7 @@ public final class ArchiveFileSystem {
      *        a client class changes the state of this archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    ArchiveFileSystem(
+    public ArchiveFileSystem(
             final ArchiveEntryFactory factory,
             final VetoableTouchListener vetoableTouchListener)
     throws IOException {
@@ -145,7 +143,7 @@ public final class ArchiveFileSystem {
      * @throws NullPointerException If {@code factory} or {@code archive}
      *         is {@code null}.
      */
-    ArchiveFileSystem(
+    public ArchiveFileSystem(
             final ArchiveEntryFactory factory,
             final VetoableTouchListener vetoableTouchListener,
             final InputArchive<?> archive,
@@ -244,7 +242,7 @@ public final class ArchiveFileSystem {
      * Returns {@code true} iff the given entry name refers to the
      * virtual root directory of this file system.
      */
-    static boolean isRoot(String path) {
+    public static boolean isRoot(String path) {
         assert ROOT.isEmpty();
         return path.isEmpty();
     }
@@ -363,7 +361,7 @@ public final class ArchiveFileSystem {
      * Indicates whether this file system is read only or not.
      * The default is {@code false}.
      */
-    boolean isReadOnly() {
+    public boolean isReadOnly() {
         return readOnly;
     }
 
@@ -371,7 +369,7 @@ public final class ArchiveFileSystem {
      * Indicates whether this file system has been modified since
      * its time of creation or the last call to {@code resetTouched()}.
      */
-    boolean isTouched() {
+    public boolean isTouched() {
         return touched != 0;
     }
 
@@ -408,7 +406,7 @@ public final class ArchiveFileSystem {
      * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
      * link(path, type, createParents, null)}.
      */
-    LinkTransaction link(
+    public LinkTransaction link(
             final String path,
             final Type type,
             final boolean createParents)
@@ -481,7 +479,8 @@ public final class ArchiveFileSystem {
      * 
      * @see #link
      */
-    final class LinkTransaction implements IOOperation {
+    // TODO: Introduce sockets and make this private!
+    public class LinkTransaction implements IOOperation {
         final Splitter splitter = new Splitter();
         final PathNameElement[] elements;
 
@@ -753,18 +752,18 @@ public final class ArchiveFileSystem {
                 : 0; // does not exist as a directory
     }
 
-    void list(final String path, final ChildVisitor visitor) {
+    public void list(final String path, final ChildVisitor visitor) {
         final ArchiveEntry entry = get(path);
         if (entry != null && entry.getType() == DIRECTORY)
             entry.getMetaData().list(visitor);
     }
     
-    void mkdir(String path, boolean createParents)
+    public void mkdir(String path, boolean createParents)
     throws IOException {
         link(path, DIRECTORY, createParents).run();
     }
 
-    void delete(final String path)
+    public void delete(final String path)
     throws IOException {
         assert isRoot(path) || path.charAt(0) != SEPARATOR_CHAR;
 
@@ -776,7 +775,7 @@ public final class ArchiveFileSystem {
                 "archive entry does not exist");
     }
 
-    <T extends Throwable>
+    public <T extends Throwable>
     void copy(
             final InputArchive ia,
             final OutputArchive oa,

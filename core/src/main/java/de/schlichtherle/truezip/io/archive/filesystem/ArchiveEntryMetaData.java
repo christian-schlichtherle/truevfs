@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.filesystem;
 
 //import de.schlichtherle.truezip.io.File;
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.FileFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
