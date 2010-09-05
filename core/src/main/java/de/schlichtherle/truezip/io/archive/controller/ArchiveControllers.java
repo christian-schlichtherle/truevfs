@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.util.IOOperation;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveFileSystem.LinkTransaction;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -24,7 +25,7 @@ import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -441,7 +442,7 @@ public final class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class IOStreamCreator implements Action<Exception> {
+            class IOStreamCreator implements Operation<Exception> {
 
                 InputStream in;
                 OutputStream out;
@@ -566,7 +567,7 @@ public final class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class OStreamCreator implements Action<Exception> {
+            class OStreamCreator implements Operation<Exception> {
 
                 OutputStream out; // = null;
 

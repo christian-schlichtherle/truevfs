@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.util;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
 
 /**
- * Represents an arbitrary I/O operation which may throw an {@link IOException}.
+ * Represents an I/O operation which may throw an {@link IOException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface IOOperation extends Action<IOException> {
+public interface IOOperation extends Operation<IOException> {
+
     /**
      * Runs this I/O operation.
      *

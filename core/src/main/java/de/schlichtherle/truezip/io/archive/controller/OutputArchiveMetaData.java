@@ -21,7 +21,8 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.Sockets;
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.socket.IOStreamSockets;
 import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -115,7 +116,7 @@ public final class OutputArchiveMetaData {
         return new EntryOutputStream(
                 outArchive
                 .getOutputStreamSocket(entry)
-                .newOutputStream(Sockets.getReference(srcEntry)));
+                .newOutputStream(IOReferences.ref(srcEntry)));
     }
 
     /**

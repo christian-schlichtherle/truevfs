@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.util.IOOperation;
 import de.schlichtherle.truezip.io.FileFactory;
 import de.schlichtherle.truezip.io.File;
 import de.schlichtherle.truezip.io.archive.Archive;
@@ -24,7 +25,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.util.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -177,7 +178,7 @@ public abstract class ArchiveController implements Archive {
     }
 
     /**
-     * Runs the given {@link Action} while this controller has
+     * Runs the given {@link Operation} while this controller has
      * acquired its write lock regardless of the state of its read lock.
      * You must use this method if this controller may have acquired a
      * read lock in order to prevent a dead lock.
@@ -187,11 +188,11 @@ public abstract class ArchiveController implements Archive {
      * Hence, the runnable should recheck the state of the controller
      * before it proceeds with any write operations.
      *
-     * @param runnable The {@link Action} to run while the write lock is
+     * @param runnable The {@link Operation} to run while the write lock is
      *        acquired.
      *        No read lock is acquired while it's running.
      */
-    final <T extends Throwable> void runWriteLocked(Action<T> runnable)
+    final <T extends Throwable> void runWriteLocked(Operation<T> runnable)
     throws T {
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.

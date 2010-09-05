@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.zip.BasicZipFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
@@ -64,7 +65,7 @@ implements InputArchive<ZipEntry> {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
         class InputStreamProxy implements ArchiveInputStreamSocket<ZipEntry> {
             @Override
-            public ZipEntry getTarget() {
+            public ZipEntry get() {
                 return entry;
             }
 
@@ -72,7 +73,7 @@ implements InputArchive<ZipEntry> {
             public InputStream newInputStream(
                     final IOReference<? extends ArchiveEntry> dst)
             throws IOException {
-                final ArchiveEntry dstEntry = dst.getTarget();
+                final ArchiveEntry dstEntry = IOReferences.deref(dst);
                 return ZipInputArchive.this.newInputStream(entry, dstEntry);
             }
         } // class InputStreamProxy

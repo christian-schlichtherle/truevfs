@@ -16,16 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.driver.spi;
 
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.IOOperations;
 import de.schlichtherle.truezip.io.util.ChainableIOException;
 import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.util.InputException;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.Sockets;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,7 +109,7 @@ extends FilterOutputArchive<AE> {
 
         @Override
         public AE next() {
-            return i.next().getTarget();
+            return i.next().get();
         }
 
         @Override
@@ -123,7 +124,7 @@ extends FilterOutputArchive<AE> {
         if (entry != null)
             return entry;
         final TempEntryOutputStream out = temps.get(name);
-        return out != null ? out.getTarget() : null;
+        return out != null ? out.get() : null;
     }
 
     @Override
@@ -133,7 +134,7 @@ extends FilterOutputArchive<AE> {
                 = super.getOutputStreamSocket(entry);
         class OutputStreamProxy implements ArchiveOutputStreamSocket<AE> {
             @Override
-            public AE getTarget() {
+            public AE get() {
                 return entry;
             }
 
@@ -151,9 +152,9 @@ extends FilterOutputArchive<AE> {
             final ArchiveOutputStreamSocket<AE> dst,
             final IOReference<? extends ArchiveEntry> src)
     throws IOException {
-        final ArchiveEntry srcEntry = src.getTarget();
+        final ArchiveEntry srcEntry = IOReferences.deref(src);
         if (srcEntry != null) {
-            final ArchiveEntry dstEntry = dst.getTarget();
+            final ArchiveEntry dstEntry = dst.get();
             dstEntry.setSize(srcEntry.getSize()); // data may be compressed!
         }
         return isTargetBusy()
@@ -231,17 +232,17 @@ extends FilterOutputArchive<AE> {
                 private final ArchiveEntry entry;
 
                 TempInputStreamSocket() {
-                    final ArchiveEntry srcEntry = src.getTarget();
-                    this.entry = srcEntry != null ? srcEntry : new FileEntry(temp);
+                    final ArchiveEntry e = IOReferences.deref(src);
+                    this.entry = e != null ? e : new FileEntry(temp);
                 }
 
                 @Override
-                public ArchiveEntry getTarget() {
+                public ArchiveEntry get() {
                     return entry;
                 }
 
                 @Override
-                public InputStream newInputStream(IOReference<? extends ArchiveEntry> destination)
+                public InputStream newInputStream(IOReference<? extends ArchiveEntry> dst)
                         throws IOException {
                     return new FileInputStream(temp);
                 }
@@ -251,12 +252,12 @@ extends FilterOutputArchive<AE> {
             this.src = src instanceof InputStreamSocket
                     ? (InputStreamSocket) src
                     : new TempInputStreamSocket();
-            temps.put(dst.getTarget().getName(), this);
+            temps.put(dst.get().getName(), this);
         }
 
         @Override
-        public AE getTarget() {
-            return dst.getTarget();
+        public AE get() {
+            return dst.get();
         }
 
         @Override
@@ -273,8 +274,8 @@ extends FilterOutputArchive<AE> {
             try {
                 super.close();
             } finally {
-                final AE dstEntry = dst.getTarget();
-                final ArchiveEntry srcEntry = src.getTarget();
+                final AE dstEntry = dst.get();
+                final ArchiveEntry srcEntry = src.get();
                 if (dstEntry.getSize() == UNKNOWN)
                     dstEntry.setSize(srcEntry.getSize());
                 if (dstEntry.getTime() == UNKNOWN)
@@ -288,7 +289,7 @@ extends FilterOutputArchive<AE> {
                 return false;
 
             try {
-                Sockets.copy(src, dst);
+                IOOperations.copy(src, dst);
             } finally {
                 if (!temp.delete()) // may fail on Windoze if in.close() failed!
                     temp.deleteOnExit(); // be bullish never to leavy any temps!

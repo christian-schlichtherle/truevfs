@@ -21,7 +21,8 @@ import de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedExce
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.Sockets;
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.socket.IOStreamSockets;
 import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  * of the streams between multiple threads.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * It's only public for technical reasons and may getSocket renamed or entirely
+ * It's only public for technical reasons and may get renamed or entirely
  * disappear without notice.
  *
  * @see OutputArchiveMetaData
@@ -115,7 +116,7 @@ public final class InputArchiveMetaData {
         return new EntryInputStream(
                 inArchive
                 .getInputStreamSocket(entry)
-                .newInputStream(Sockets.getReference(dstEntry)));
+                .newInputStream(IOReferences.ref(dstEntry)));
     }
 
     /**

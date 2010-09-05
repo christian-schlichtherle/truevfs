@@ -18,11 +18,22 @@ package de.schlichtherle.truezip.io.socket;
 
 import java.io.FileNotFoundException;
 
-public interface OutputStreamSocketProvider<TT, PT> {
+/**
+ * Provides {@link OutputStreamSocket}s for accessing targets for I/O
+ * operations.
+ *
+ * @param   <LT> The type of the <i>local target</i> for I/O operations.
+ * @param   <PT> The minimum required type of the <i>peer targets</i> for
+ *          for I/O operations.
+ * @see     InputStreamSocketProvider
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+public interface OutputStreamSocketProvider<LT, PT> {
 
     /**
-     * Returns a non-{@code null} reference to an output stream socket for
-     * writing to the given target of I/O operations.
+     * Returns a non-{@code null} output stream socket for writing to the
+     * given target for I/O operations.
      * <p>
      * The implementation must not assume that the returned output stream
      * socket will ever be used and must tolerate changes to all settable
@@ -32,11 +43,11 @@ public interface OutputStreamSocketProvider<TT, PT> {
      * object again.
      *
      * @param  target a non-{@code null} reference to the target object.
-     * @return A non-{@code null} reference to an output stream socket for
-     *         writing to the given target of I/O operations.
+     * @return A non-{@code null} output stream socket for writing to the
+     *         given target for I/O operations.
      * @throws FileNotFoundException If the target is not accessible for some
      *         reason.
      */
-    OutputStreamSocket<TT, PT> getOutputStreamSocket(TT target)
+    OutputStreamSocket<LT, PT> getOutputStreamSocket(LT target)
     throws FileNotFoundException;
 }

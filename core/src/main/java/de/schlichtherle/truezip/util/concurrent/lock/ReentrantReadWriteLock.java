@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.util.concurrent.lock;
 
-import de.schlichtherle.truezip.util.Action;
+import de.schlichtherle.truezip.util.Operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,7 +98,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      * @throws NullPointerException If {@code action} is {@code null}.
      * @throws Throwable Upon the discretion of {@code action}.
      */
-    public <T extends Throwable> void runWriteLocked(final Action<T> action)
+    public <T extends Throwable> void runWriteLocked(final Operation<T> action)
     throws T {
         if (action == null)
             throw new NullPointerException();

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
@@ -222,7 +223,7 @@ implements InputArchive<TarEntry> {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
         class InputStreamProxy implements ArchiveInputStreamSocket<TarEntry> {
             @Override
-            public TarEntry getTarget() {
+            public TarEntry get() {
                 return entry;
             }
 
@@ -230,16 +231,16 @@ implements InputArchive<TarEntry> {
             public InputStream newInputStream(
                     final IOReference<? extends ArchiveEntry> dst)
             throws IOException {
-                final ArchiveEntry dstEntry = dst.getTarget();
+                final ArchiveEntry dstEntry = IOReferences.deref(dst);
                 return TarInputArchive.this.newInputStream(entry, dstEntry);
             }
         } // class InputStreamProxy
         return new InputStreamProxy();
     }
 
-    protected InputStream newInputStream(TarEntry entry, ArchiveEntry dstEntry)
+    protected InputStream newInputStream(TarEntry src, ArchiveEntry dst)
     throws IOException {
-        return new FileInputStream(entry.getFile());
+        return new FileInputStream(src.getFile());
     }
 
     @Override

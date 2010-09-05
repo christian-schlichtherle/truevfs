@@ -28,8 +28,9 @@ import java.io.OutputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param   <AE> The type of the {@link #getTarget() target} output archive
- *          entry.
+ * @param   <AE> The type of the {@link #get() target} output archive entry.
+ * @see     ArchiveInputStreamSocket
+ * @see     OutputArchive
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -37,13 +38,25 @@ public interface ArchiveOutputStreamSocket<AE extends ArchiveEntry>
 extends OutputStreamSocket<AE, ArchiveEntry> {
 
     /**
+     * Returns the non-{@code null} local target archive entry.
+     * <p>
+     * Implementations must reflect any changes to the state of the returned
+     * archive entry by the client applications before a call to the method
+     * {@link #newOutputStream(IOReference)}.
+     * The effect of any subsequent changes to the state of the returned
+     * archive entry is undefined.
+     *
+     * @return The non-{@code null} local archive entry target.
+     */
+    @Override
+    AE get();
+
+    /**
      * {@inheritDoc}
      *
-     * @param  source if not {@code null}, this references the target
-     *         input archive entry in an {@link InputArchive input archive}
-     *         which is going to be read in order to copy its data to the
-     *         {@link #getTarget() target} output archive entry of this
-     *         instance.
+     * @param  source a nullable peer archive entry which is going to be
+     *         read in order to copy its data to the {@link #get() target}
+     *         archive entry.
      *         <p>
      *         Implementations may test the runtime type of this object in
      *         order to check if they should copy some class-specific

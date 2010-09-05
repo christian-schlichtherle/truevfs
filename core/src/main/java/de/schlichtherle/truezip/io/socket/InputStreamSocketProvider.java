@@ -18,25 +18,36 @@ package de.schlichtherle.truezip.io.socket;
 
 import java.io.FileNotFoundException;
 
-public interface InputStreamSocketProvider<TT, PT> {
+/**
+ * Provides {@link InputStreamSocket}s for accessing targets for I/O
+ * operations.
+ *
+ * @param   <LT> The type of the <i>local target</i> for I/O operations.
+ * @param   <PT> The minimum required type of the <i>peer targets</i> for
+ *          for I/O operations.
+ * @see     OutputStreamSocketProvider
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+public interface InputStreamSocketProvider<LT, PT> {
 
     /**
-     * Returns a non-{@code null} reference to an input stream socket for
-     * reading from the given target of I/O operations.
-     * <p>
-     * The implementation must not assume that the returned input stream
-     * socket will ever be used and must tolerate changes to all settable
-     * properties of the target object.
-     * <p>
+     * Returns a non-{@code null} input stream socket for reading from the
+     * given target for I/O operations.
      * Multiple invocations with the same parameter may return the same
      * object again.
+     * <p>
+     * The method {@link InputStreamSocket#get()} must return an object which
+     * {@link Object#equals(Object) compares equal} to the given target for
+     * I/O operations when called on the returned input stream socket.
      *
-     * @param  target a non-{@code null} reference to the target object.
-     * @return A non-{@code null} reference to an input stream socket for
-     *         reading from the given target of I/O operations.
+     * @param  target a non-{@code null} target for I/O operations.
+     * @return A non-{@code null} input stream socket for reading from the
+     *         given target for I/O operations.
      * @throws FileNotFoundException If the target does not exist or is
      *         not accessible for some reason.
+     * @throws NullPointerException if {@code target} is {@code null}.
      */
-    InputStreamSocket<TT, PT> getInputStreamSocket(TT target)
+    InputStreamSocket<LT, PT> getInputStreamSocket(LT target)
     throws FileNotFoundException;
 }

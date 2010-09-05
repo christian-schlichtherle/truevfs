@@ -27,8 +27,9 @@ import java.io.InputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param   <AE> The type of the {@link #getTarget() target} input archive
- *          entry.
+ * @param   <AE> The type of the {@link #get() target} input archive entry.
+ * @see     ArchiveOutputStreamSocket
+ * @see     InputArchive
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -36,13 +37,22 @@ public interface ArchiveInputStreamSocket<AE extends ArchiveEntry>
 extends InputStreamSocket<AE, ArchiveEntry> {
 
     /**
+     * Returns the non-{@code null} local target archive entry.
+     * <p>
+     * Client applications must not change the state of the returned archive
+     * entry.
+     *
+     * @return The non-{@code null} local archive entry target.
+     */
+    @Override
+    AE get();
+
+    /**
      * {@inheritDoc}
      *
-     * @param  destination if not {@code null}, this references the target
-     *         output archive entry in an {@link OutputArchive output archive}
-     *         which is going to be written in order to copy the data from the
-     *         {@link #getTarget() target} input archive entry of this
-     *         instance.
+     * @param  destination a nullable peer archive entry which is going to be
+     *         written in order to copy the data from the {@link #get() target}
+     *         archive entry.
      *         <p>
      *         Implementations may test the runtime type of this object in
      *         order to check if they should set up the returned input stream
