@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.spi;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryMetaData;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
