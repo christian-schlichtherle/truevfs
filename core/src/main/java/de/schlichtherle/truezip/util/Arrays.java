@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.util;
 
+import java.lang.reflect.Array;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$
@@ -67,5 +69,22 @@ public final class Arrays {
                 return false;
 
         return true;
+    }
+
+    /**
+     * Returns a copy of the given array, truncated to the given size or
+     * padded with zeros.
+     *
+     * @param <T> the type of the objects in the array.
+     * @param array the array to copy.
+     * @param size the size of the copied array.
+     * @return The copied array.
+     * @throws NullPointerException if {@code array} is {@code null}.
+     */
+    public static <T> T[] copyOf(T[] array, int size) {
+        final T[] copy = (T[]) Array.newInstance(
+                array.getClass().getComponentType(), size);
+        System.arraycopy(array, 0, copy, 0, Math.min(array.length, size));
+        return copy;
     }
 }
