@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.file.FileFactory;
 import de.schlichtherle.truezip.io.file.File;
@@ -227,10 +228,12 @@ public abstract class ArchiveController implements Archive {
         return target;
     }
 
+    @Override
     public final String getCanonicalPath() {
         return target.getPath();
     }
 
+    @Override
     public final Archive getEnclArchive() {
         return enclController;
     }
@@ -519,6 +522,7 @@ public abstract class ArchiveController implements Archive {
                 if (hasNewData(path)) {
                     class AutoUmount4CreateInputStream
                     implements IOOperation {
+                        @Override
                         public void run() throws IOException {
                             autoUmount(path);
                         }
@@ -604,7 +608,7 @@ public abstract class ArchiveController implements Archive {
                         ? newInputStream0(path)
                         : null;
                 // Start creating or overwriting the archive entry.
-                // Note that this will fail if the entry already exists as a
+                // Note that this will fail if the entry already isExisting as a
                 // directory.
                 final LinkTransaction link = fileSystem.link(path, FILE, lenient);
                 // Create output stream.
@@ -638,17 +642,12 @@ public abstract class ArchiveController implements Archive {
             ArchiveEntry srcEntry)
     throws IOException;
 
-    //
-    // File system operations used by the File class.
-    // Read only operations:
-    //
-
-    public final boolean exists(final String path)
+    public final boolean isExisting(final String path)
     throws FalsePositiveException {
         try {
-            return exists0(path);
+            return isExisting0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.exists(enclEntryName(path));
+            return enclController.isExisting(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -656,12 +655,12 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean exists0(final String path)
+    private boolean isExisting0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.exists(path);
+            return fileSystem.isExisting(path);
         } finally {
             readLock().unlock();
         }
@@ -775,12 +774,12 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    public final boolean canRead(final String path)
+    public final boolean isReadable(final String path)
     throws FalsePositiveException {
         try {
-            return canRead0(path);
+            return isReadable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.canRead(enclEntryName(path));
+            return enclController.isReadable(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -788,23 +787,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean canRead0(final String path)
+    private boolean isReadable0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.exists(path);
+            return fileSystem.isExisting(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final boolean canWrite(final String path)
+    public final boolean isWritable(final String path)
     throws FalsePositiveException {
         try {
-            return canWrite0(path);
+            return isWritable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.canWrite(enclEntryName(path));
+            return enclController.isWritable(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -812,23 +811,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private boolean canWrite0(final String path)
+    private boolean isWritable0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.canWrite(path);
+            return fileSystem.isWritable(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final long length(final String path)
+    public final long getLength(final String path)
     throws FalsePositiveException {
         try {
-            return length0(path);
+            return getLength0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.length(enclEntryName(path));
+            return enclController.getLength(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -836,23 +835,23 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private long length0(final String path)
+    private long getLength0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.length(path);
+            return fileSystem.getLength(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final long lastModified(final String path)
+    public final long getLastModified(final String path)
     throws FalsePositiveException {
         try {
-            return lastModified0(path);
+            return getLastModified0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.lastModified(enclEntryName(path));
+            return enclController.getLastModified(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -860,142 +859,40 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private long lastModified0(final String path)
+    private long getLastModified0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.lastModified(path);
+            return fileSystem.getLastModified(path);
         } finally {
             readLock().unlock();
         }
     }
 
-    public final String[] list(final String path)
+    public final void list(final String path, final ChildVisitor visitor)
     throws FalsePositiveException {
         try {
-            return list0(path);
+            list0(path, visitor);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.list(enclEntryName(path));
+            enclController.list(enclEntryName(path), visitor);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
-            return null;
+            return; // could not create temp file or something like this
         }
     }
 
-    private String[] list0(final String path)
+    private void list0(final String path, final ChildVisitor visitor)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.list(path);
+            fileSystem.list(path, visitor);
         } finally {
             readLock().unlock();
         }
     }
-
-    public final String[] list(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir)
-    throws FalsePositiveException {
-        try {
-            return list0(path, filenameFilter, dir);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.list(enclEntryName(path),
-                    filenameFilter, dir);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private String[] list0(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.list(path, filenameFilter, dir);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    public final File[] listFiles(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir,
-            final FileFactory factory)
-    throws FalsePositiveException {
-        try {
-            return listFiles0(path, filenameFilter, dir, factory);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.listFiles(enclEntryName(path),
-                    filenameFilter, dir, factory);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private File[] listFiles0(
-            final String path,
-            final FilenameFilter filenameFilter,
-            final File dir,
-            final FileFactory factory)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.listFiles(path, filenameFilter, dir, factory);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    public final File[] listFiles(
-            final String path,
-            final FileFilter fileFilter,
-            final File dir,
-            final FileFactory factory)
-    throws FalsePositiveException {
-        try {
-            return listFiles0(path, fileFilter, dir, factory);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.listFiles(enclEntryName(path),
-                    fileFilter, dir, factory);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private File[] listFiles0(
-            final String path,
-            final FileFilter fileFilter,
-            final File dir,
-            final FileFactory factory)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.listFiles(path, fileFilter, dir, factory);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    //
-    // File system operations used by the File class.
-    // Write operations:
-    //
 
     public final boolean setReadOnly(final String path)
     throws FalsePositiveException {
@@ -1072,7 +969,7 @@ public abstract class ArchiveController implements Archive {
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-            if (fileSystem.exists(path))
+            if (fileSystem.isExisting(path))
                 return false;
 
             // If we got until here without an exception,
@@ -1112,7 +1009,7 @@ public abstract class ArchiveController implements Archive {
                     if (target.exists())
                         throw new IOException("target file exists already!");
                 } else {
-                    if (enclController.exists(enclEntryName))
+                    if (enclController.isExisting(enclEntryName))
                         throw new IOException("target file exists already!");
                 }
                 // Ensure file system existence.
@@ -1171,11 +1068,7 @@ public abstract class ArchiveController implements Archive {
                 }
 
                 // We are actually working on the controller's target file.
-                // Do not use the number of entries in the file system
-                // for the following test - it's size would count absolute
-                // pathnames as well!
-                final String[] members = fileSystem.list(path);
-                if (members != null && members.length != 0)
+                if (fileSystem.getNumChildren(path) > 0)
                     throw new IOException("archive file system not empty!");
                 final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
                 // TODO: Review: This policy may be changed - see method start.

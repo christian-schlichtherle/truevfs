@@ -402,7 +402,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
-        //assertEquals(0, file.length());
+        //assertEquals(0, file.getLength());
         assertTrue(file.lastModified() > 0);
 
         try {
@@ -426,7 +426,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
-        //assertEquals(0, file.length());
+        //assertEquals(0, file.getLength());
         assertTrue(file.lastModified() > 0);
 
         try {
@@ -792,12 +792,12 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         
         assertTrue(dir6.mkdir()); // create all at once! note archive is in current directory!
         
-        assertFalse(dir6.mkdir()); // exists already!
-        assertFalse(dir5.mkdir()); // exists already!
-        assertFalse(dir4.mkdir()); // exists already!
-        assertFalse(dir3.mkdir()); // exists already!
-        assertFalse(dir2.mkdir()); // exists already!
-        assertFalse(dir1.mkdir()); // exists already!
+        assertFalse(dir6.mkdir()); // isExisting already!
+        assertFalse(dir5.mkdir()); // isExisting already!
+        assertFalse(dir4.mkdir()); // isExisting already!
+        assertFalse(dir3.mkdir()); // isExisting already!
+        assertFalse(dir2.mkdir()); // isExisting already!
+        assertFalse(dir1.mkdir()); // isExisting already!
         
         assertTrue(dir6.delete());
         assertTrue(dir5.delete());
@@ -866,7 +866,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
             assertEquals(0, member.length());
         }
     }
-    
+
     void testListFiles(File dir, String entry) {
         java.io.File[] files = dir.listFiles();
         assertTrue(files instanceof File[]);
@@ -880,7 +880,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         if (!found)
             fail("No such entry: " + entry);
     }
-    
+
     public void testCat()
     throws IOException {
         try {
@@ -1354,29 +1354,48 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         "Yet another directory member",
     };
     
-    public void testListFiles() throws IOException {
-        java.io.File dir = createTempFile(prefix, suffix);
-        File dir2 = new File(dir);
-        
+    public void testList() throws IOException {
+        final java.io.File dir = createTempFile(prefix, suffix);
+        final File dir2 = new File(dir);
+
         assertTrue(dir.delete());
+
+        // Create regular directory for testing.
         assertTrue(dir.mkdir());
-        
-        for (int i = members.length; --i >= 0; ) {
+        for (int i = members.length; --i >= 0; )
             assertTrue(new java.io.File(dir, members[i]).createNewFile());
-        }
-        
         java.io.File[] files = dir.listFiles();
-        java.io.File[] files2 = dir2.listFiles();
-        
-        assertEquals(files.length, files2.length);
-        
-        for (int i = 0, l = files.length; i < l; i++) {
-            assertTrue(!(files[i] instanceof File));
-            assertTrue(files2[i] instanceof File);
-            assertEquals(files[i].getPath(), files2[i].getPath());
-        }
-        
+        Arrays.sort(files);
+        testList(files, dir2);
         assertTrue(dir2.deleteAll());
+
+        // Repeat test with regular archive file.
+        assertTrue(dir2.mkdir());
+        for (int i = members.length; --i >= 0; )
+            assertTrue(new File(dir2, members[i]).createNewFile());
+        testList(files, dir2);
+        assertTrue(dir2.deleteAll());
+    }
+
+    private void testList(final java.io.File[] refs, final File dir) {
+        final File[] files = dir.listFiles();
+        Arrays.sort(files);
+        assertEquals(refs.length, files.length);
+        for (int i = 0, l = refs.length; i < l; i++) {
+            final java.io.File ref = refs[i];
+            final File file2 = files[i];
+            assertTrue(!(ref instanceof File));
+            assertTrue(file2 instanceof File);
+            assertEquals(ref.getPath(), file2.getPath());
+            assertNull(file2.list());
+            assertNull(file2.list(null));
+            assertNull(file2.listFiles());
+            assertNull(file2.listFiles(file2.getArchiveDetector()));
+            assertNull(file2.listFiles((FileFilter) null));
+            assertNull(file2.listFiles((FilenameFilter) null));
+            assertNull(file2.listFiles((FileFilter) null, file2.getArchiveDetector()));
+            assertNull(file2.listFiles((FilenameFilter) null, file2.getArchiveDetector()));
+        }
     }
     
     public void testMultithreadedSingleArchiveMultipleEntriesReading()

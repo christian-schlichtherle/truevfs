@@ -25,7 +25,7 @@ import java.io.InputStream;
  * Creates input streams for reading bytes from its target archive entry.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
+ * Multithreading needs to be addressed by client classes.
  *
  * @param   <AE> The type of the {@link #get() target} input archive entry.
  * @see     ArchiveOutputStreamSocket

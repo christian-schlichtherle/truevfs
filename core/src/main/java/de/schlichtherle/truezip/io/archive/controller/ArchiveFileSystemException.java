@@ -21,9 +21,6 @@ import java.io.IOException;
 /**
  * This exception is thrown when a client application tries to perform an
  * illegal operation on an archive file system.
- * <p>
- * This exception is private by intention: Clients applications should not
- * even know about the existence of virtual archive file systems.
  */
 public class ArchiveFileSystemException
 extends IOException {

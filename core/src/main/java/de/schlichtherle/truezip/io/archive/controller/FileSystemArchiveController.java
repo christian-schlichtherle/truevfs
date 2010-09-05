@@ -17,9 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.util.Operation;
-import java.io.CharConversionException;
 import java.io.IOException;
 
 /**
@@ -46,11 +44,13 @@ abstract class FileSystemArchiveController extends ArchiveController {
         super(target, enclController, enclEntryName, driver);
     }
 
+    @Override
     final boolean isTouched() {
         ArchiveFileSystem fileSystem = getFileSystem();
         return fileSystem != null && fileSystem.isTouched();
     }
 
+    @Override
     public final ArchiveFileSystem autoMount(final boolean create)
     throws FalsePositiveException, IOException {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
@@ -81,10 +81,12 @@ abstract class FileSystemArchiveController extends ArchiveController {
     } // class AutoMounter
 
     private class ResetFileSystem extends AutoMounter {
+        @Override
         ArchiveFileSystem autoMount(final boolean create)
         throws FalsePositiveException, IOException {
             try {
                 class Mounter implements Operation<Exception> {
+                    @Override
                     public void run() throws FalsePositiveException, IOException {
                         // Check state again: Another thread may have changed
                         // it while we released all read locks in order to
@@ -106,8 +108,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 // positive archive file or File.update() or File.sync().
                 //   This is an important optimization: When hitting a false
                 // positive archive file, a client application might perform
-                // a lot of tests on it (isDirectory(), isFile(), exists(),
-                // length(), etc). If the exception were not cached, each call
+                // a lot of tests on it (isDirectory(), isFile(), isExisting(),
+                // getLength(), etc). If the exception were not cached, each call
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
                 //   Note that it is important to cache the exceptions for
@@ -129,6 +131,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
             return autoMounter.autoMount(create);
         }
 
+        @Override
         void setFileSystem(ArchiveFileSystem fileSystem) {
             // Passing in null may happen by reset().
             if (fileSystem != null)
@@ -144,6 +147,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
             this.fileSystem = fileSystem;
         }
 
+        @Override
         ArchiveFileSystem autoMount(boolean create)
         throws IOException {
             return fileSystem;
@@ -154,6 +158,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
             return fileSystem;
         }
 
+        @Override
         void setFileSystem(ArchiveFileSystem fileSystem) {
             assert fileSystem == null : "It's illegal to assign a file system to an archive controller which already has its file system mounted!";
             autoMounter = new ResetFileSystem();
@@ -168,11 +173,13 @@ abstract class FileSystemArchiveController extends ArchiveController {
             this.exception = exception;
         }
 
+        @Override
         ArchiveFileSystem autoMount(boolean create)
         throws FalsePositiveException {
             throw exception;
         }
 
+        @Override
         void setFileSystem(ArchiveFileSystem fileSystem) {
             assert fileSystem == null : "It's illegal to assign a file system to an archive controller for a false positive archive file!";
             autoMounter = new ResetFileSystem();
@@ -202,13 +209,9 @@ abstract class FileSystemArchiveController extends ArchiveController {
     abstract void mount(boolean create)
     throws FalsePositiveException, IOException;
 
+    @Override
     void reset(final SyncExceptionHandler handler)
     throws SyncException {
         setFileSystem(null);
-    }
-
-    final ArchiveEntry newArchiveEntry(String name, ArchiveEntry template)
-    throws CharConversionException {
-        return getDriver().newArchiveEntry(name, template);
     }
 }

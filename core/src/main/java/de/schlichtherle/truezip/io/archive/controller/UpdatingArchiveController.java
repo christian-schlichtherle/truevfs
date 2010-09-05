@@ -16,23 +16,23 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +64,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * - should <em>not</em> be {@code null} for enhanced unit tests.
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
+
+    private class TouchListener implements VetoableTouchListener {
+        @Override
+        public void touch() throws IOException {
+            UpdatingArchiveController.this.touch();
+        }
+    }
+
+    private final VetoableTouchListener vetoableTouchListener
+            = new TouchListener();
 
     /**
      * The actual archive file as a plain {@code java.io.File} object
@@ -106,6 +116,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         super(target, enclController, enclEntryName, driver);
     }
 
+    @Override
     void mount(final boolean autoCreate)
     throws FalsePositiveException, IOException {
         assert writeLock().isLockedByCurrentThread();
@@ -154,7 +165,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 inFile = getTarget();
             final long time = inFile.lastModified();
             if (time != 0) {
-                // The archive file exists.
+                // The archive file isExisting.
                 // Thoroughly test read-only status BEFORE opening
                 // the device file!
                 final boolean isReadOnly = !isWritableOrCreatable(inFile);
@@ -166,7 +177,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     throw new FalsePositiveException(this, ex);
                 }
                 setFileSystem(new ArchiveFileSystem(
-                        this, inArchive, time, isReadOnly));
+                        getDriver(), vetoableTouchListener, inArchive,
+                        time, isReadOnly));
             } else if (!autoCreate) {
                 // The archive file does not exist and we may not create it
                 // automatically.
@@ -178,10 +190,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // This may fail e.g. if the target file is a RAES
                 // encrypted ZIP file and the user cancels password
                 // prompting.
-                final ArchiveFileSystem fileSystem
-                        = new ArchiveFileSystem(this);
-                touch(); // required!
-                setFileSystem(fileSystem);
+                setFileSystem(new ArchiveFileSystem(
+                        getDriver(), vetoableTouchListener));
             }
         } else {
             // The target file of this controller IS (or appears to be)
@@ -226,7 +236,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // its virtual root directory.
                 // Nice trick, isn't it?!
                 setFileSystem(new ArchiveFileSystem(
-                        this, inArchive, inFile.lastModified(), false));
+                        getDriver(), vetoableTouchListener, inArchive,
+                        inFile.lastModified(), false));
             }
         }
     }
@@ -337,8 +348,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     throw new FileArchiveEntryFalsePositiveException(
                             this, controller, path, ex);
                 }
-                setFileSystem(new ArchiveFileSystem(this, inArchive,
-                        controllerFileSystem.lastModified(path),
+                setFileSystem(new ArchiveFileSystem(
+                        getDriver(), vetoableTouchListener, inArchive,
+                        controllerFileSystem.getLastModified(path),
                         controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
@@ -394,9 +406,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 throw ex;
             }
 
-            final ArchiveFileSystem fileSystem = new ArchiveFileSystem(this);
-            touch(); // required!
-            setFileSystem(fileSystem);
+            setFileSystem(new ArchiveFileSystem(
+                    getDriver(), vetoableTouchListener));
         }
     }
 
@@ -475,8 +486,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * <b>Warning:</b> The write lock of this controller must be acquired
      * while this method is called!
      */
-    // TODO: Make this private!
-    void touch() throws IOException {
+    private void touch() throws IOException {
         assert writeLock().isLockedByCurrentThread();
         ensureOutArchive();
         setTouched(true);

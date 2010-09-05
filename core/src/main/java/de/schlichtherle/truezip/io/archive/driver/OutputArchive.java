@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
  * received a call to their {@code close()} method.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
+ * Multithreading needs to be addressed by client classes.
  *
  * @see     InputArchive
  * @author  Christian Schlichtherle

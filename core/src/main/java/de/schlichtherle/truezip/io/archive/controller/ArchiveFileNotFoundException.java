@@ -59,6 +59,7 @@ extends FileNotFoundException {
      * @return A string representing the canonical path of this archive
      *         - never {@code null}.
      */
+    // TODO: Change to URIs.
     public final String getCanonicalPath() {
         return canonicalPath;
     }
@@ -66,8 +67,8 @@ extends FileNotFoundException {
     @Override
     public String getLocalizedMessage() {
         final String msg = getMessage();
-        if (msg != null)
-            return new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString();
-        return getCanonicalPath();
+        return msg != null
+                ? new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString()
+                : getCanonicalPath();
     }
 }

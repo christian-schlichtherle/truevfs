@@ -70,7 +70,7 @@ extends ArchiveEntryFactory<AE> {
      *   <th>Exception type</td>
      *   <th>{@link ArchiveController#isFile}</th>
      *   <th>{@link ArchiveController#isDirectory}</th>
-     *   <th>{@link ArchiveController#exists}</th>
+     *   <th>{@link ArchiveController#isExisting}</th>
      *   <th>{@link ArchiveController#delete}</th>
      * </tr>
      * <tr>
