@@ -184,13 +184,13 @@ implements ZipEntryFactory<ZipEntry> {
         return entry;
     }
 
-    public ZipEntry newZipEntry(ZipEntry template) {
-        return new ZipEntry(template);
-    }
-
     @Override
     public ZipEntry newZipEntry(String name) {
         return new ZipEntry(name);
+    }
+
+    public ZipEntry newZipEntry(ZipEntry template) {
+        return new ZipEntry(template);
     }
 
     /**
