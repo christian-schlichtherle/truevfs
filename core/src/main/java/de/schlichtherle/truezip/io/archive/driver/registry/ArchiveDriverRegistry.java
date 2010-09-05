@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.util.SuffixSet;
+import de.schlichtherle.truezip.io.SuffixSet;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;

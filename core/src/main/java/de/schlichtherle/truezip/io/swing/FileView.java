@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.File;
 import java.util.ResourceBundle;
 import javax.swing.Icon;
 import javax.swing.UIManager;

@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.junit.runner;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.File;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;

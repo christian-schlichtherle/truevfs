@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2010 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <style type="text/css">
+            <!--
+            pre {
+                border-style: solid;
+                border-width: 1px;
+                padding-left: 4px;
+                padding-right: 4px;
+                padding-top: 1px;
+                padding-bottom: 1px
+            }
+            -->
+        </style>
+    </head>
+    <body>
+        <p>Provides transparent, multi-threaded read/write access to archive
+            files (ZIP, TAR, etc) and their entries as if they were (virtual)
+            directories and files.
+            Archive files may be arbitrarily nested and the nesting level is
+            only limited by heap and file system size.</p>
+        <hr/>
+        <h3>Contents</h3>
+        <ol>
+            <li><a href="#basics">Basic Operations</a></li>
+            <li><a href="#atomicity">Atomicity of File System Operations</a></li>
+            <li><a href="#updating">Updating Archive Files</a></li>
+            <li><a href="#miscellaneous">Miscellaneous</a></li>
+        </ol>
+        <hr/>
+        <h3><a name="basics">Basic Operations</a></h3>
+        <p>In order to create a new archive file, the client application can simply use
+            {@link de.schlichtherle.truezip.io.file.File#mkdir()}.</p>
+        <p>In order to delete it, {@link de.schlichtherle.truezip.io.file.File#delete()} can be used.
+            Similar to a regular directory this is only possible if the archive file is empty.
+            Alternatively, the client application could use {@link de.schlichtherle.truezip.io.file.File#deleteAll()}
+            in order to delete the virtual directory in one go, regardless of its contents.</p>
+        <p>To read an archive entry, the client application can simply create a {@link de.schlichtherle.truezip.io.file.FileInputStream}
+            or a {@link de.schlichtherle.truezip.io.file.FileReader} with the path or a {@link de.schlichtherle.truezip.io.file.File}
+            instance as its constructor parameter. Note that you cannot create a {@code FileInputStream}
+            or a {@code FileReader} to read an archive file itself (unless it&#39;s a false
+            positive, i.e. a regular file or directory with an archive file suffix).</p>
+        <p>Likewise, to write an archive entry, the client application can simply create
+            a {@link de.schlichtherle.truezip.io.file.FileOutputStream} or a {@link de.schlichtherle.truezip.io.file.FileWriter}
+            with the path or a {@link de.schlichtherle.truezip.io.file.File} instance as its constructor
+            parameter. Note that you cannot create a {@code FileOutputStream} or a
+            {@code FileWriter} to write an archive file itself (unless it&#39;s a false positive,
+            i.e. a regular file or directory with an archive file suffix).</p>
+        <p>If the client application just needs to copy data however, using one of the
+            <a href="File.html#copy_methods">copy methods</a> in the {@code File} class
+            is highly recommended instead of using {@code File(In|Out)putStream} directly.
+            These methods use asynchronous I/O (though they return synchronously), pooled big
+            buffers, pooled threads (on JSE 5 and later) and do not need to decompress/recompress
+            archive entry data when copying from one archive file to another for supported archive
+            types. In addition, they are guaranteed to fail gracefully, while many Java apps
+            fail to close their streams if an {@code IOException} occurs.</p>
+        <p>Note that there is no eqivalent to {@code java.io.RandomAccessFile} in this
+            package because it&#39;s impossible to seek within compressed archive entry data.</p>
+        <h4><a name="streams">Using Archive Entry Streams</a></h4>
+        <p>When using streams, the client application should always close them in a
+            {@code finally}-block like this:</p>
+        <blockquote>
+            <pre><code>FileOutputStream out = <b><font color="#000080">new</font></b> <b>FileOutputStream</b>(file);
+<b><font color="#000080">try</font></b> {
+<font color="#808080">    // Do I/O here...</font>
+} <b><font color="#000080">finally</font></b> {
+    out.<b>close</b>(); <font color="#808080">// ALWAYS close the stream!</font>
+}</code></pre>
+        </blockquote>
+        <p>This ensures that the stream is closed even if an exception occurs.</p>
+        <p>Note that for various (mostly archive driver specific) reasons, the {@code close()}
+            method may throw an {@code IOException}, too. The client application needs
+            to deal with this appropriately, for example by enclosing the entire block with
+            another {@code try-catch}-block like this:</p>
+        <blockquote>
+            <pre><code><b><font color="#000080">try</font></b> {
+    FileOutputStream out = <b><font color="#000080">new</font></b> <b>FileOutputStream</b>(file);
+    <b><font color="#000080">try</font></b> {
+<font color="#808080">        // Do I/O here...</font>
+    } <b><font color="#000080">finally</font></b> {
+        out.<b>close</b>(); <font color="#808080">// ALWAYS close the stream!</font>
+    }
+} <b><font color="#000080">catch</font></b> (IOException ex) {
+    ex.<b>printStackTrace</b>();
+}</code></pre>
+        </blockquote>
+        <p>This idiom is not at all specific to TrueZIP: Streams often utilize OS resources
+            such as file descriptors, database or network connections. All OS resources are
+            limited however and sometimes they are even exclusively allocated for a stream,
+            so the stream should always be closed as soon as possible again, especially in long
+            running server applications (relying on {@code finalize()} to do this during
+            garbage collection is unsafe). Unfortunately, many Java applications and libraries
+            fail in this respect.</p>
+        <p>TrueZIP is affected by open archive entry streams in the following ways:</p>
+        <ul>
+            <li>Archive drivers provided by third parties may restrict the number of open
+	input or output entry streams for an archive file. If this is exceeded, any 
+	attempt to open another entry stream results in a {@link de.schlichtherle.truezip.io.file.FileBusyException}.</li>
+            <li>When unmounting an archive file (see <a href="#updating">below</a>), depending
+	on the parameters, TrueZIP may choose to force the closing of any open entry 
+	streams or not. If the entry streams are <em>not</em> forced to close, the archive 
+	file cannot get unmounted and an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException}
+	is thrown. If the entry streams are forced to close however, the archive file 
+	is unmounted and an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException}
+	is thrown to indicate that subsequent I/O operations on these entry streams 
+	(other than {@code close()}) will fail with an {@link de.schlichtherle.truezip.io.archive.metadata.ArchiveEntryStreamClosedException}.
+	Neither solution is optimal.</li>
+        </ul>
+        <p>In order to prevent these exceptions, TrueZIP automatically closes entry streams
+            when they are garbage collected. However, the client application should never rely
+            on this because the delay and order in which streams are processed by the finalizer
+            thread is not specified and any unwritten data gets lost in output streams.</p>
+        <hr/>
+        <h3><a name="atomicity">Atomicity of File System Operations</a></h3>
+        <p>In general, a file system operation is either <i>atomic</i> or not. In its strict
+            sense, an atomic operation meets the following conditions: </p>
+        <ol>
+            <li>The operation either completely succeeds or completely fails. If it fails,
+	the state of the file system is not changed. </li>
+            <li><a href="#third_parties">Third parties</a> can&#39;t monitor or influence the
+	changes as they are in progress. They can only see the result. </li>
+        </ol>
+        <p>All reliable file system implementations meet the first condition and so does
+            TrueZIP. However, the situation is different for the second condition: </p>
+        <ul>
+            <li>TrueZIP&#39;s virtual file system implementation is running in a JVM process,
+	so other processes could monitor and influence changes in progress. </li>
+            <li>TrueZIP&#39;s recognition of archive files is configurable, so other {@code File}
+	instances could monitor and influence changes in progress. </li>
+            <li>TrueZIP caches state information about archive files on the heap and in
+	temporary files, so other definitions of the classes in this package which have 
+	been loaded by other class loaders could monitor and influence changes in progress.
+            </li>
+        </ul>
+        <p>This implies that TrueZIP cannot provide any operations which are atomic in its
+            strict sense. However, many file system operations in this package are declared
+            to be <i>virtually atomic</i> according to their Javadoc. A virtually atomic operation
+            meets the following conditions: </p>
+        <ol>
+            <li>The operation either completely succeeds or completely fails. If it fails,
+	the state of the (virtual) file system is not changed. </li>
+            <li>If the path does not contain any archive files, the operation is always
+	delegated to the real file system and third parties can&#39;t monitor or influence 
+	the changes as they are in progress. They can only see the result. </li>
+            <li>Otherwise, all {@code File} instances which recognize the same set
+	of archive files in the path and share the same definition of classes in this 
+	package can&#39;t monitor or influence the changes as they are in progress. They 
+	can only see the result. </li>
+        </ol>
+        <p>These conditions apply regardless of whether the {@code File} instances
+            are used by different threads or not. In other words, TrueZIP is thread safe as
+            much as you could expect from a real file system.</p>
+        <hr/>
+        <h3><a name="updating">Updating Archive Files</a></h3>
+        <p>To provide random read/write access to archive files, TrueZIP needs to associate
+            some state for every recognized archive file on the heap and in the folder for temporary
+            files while the client application is operating on the VFS.</p>
+        <p>TrueZIP automatically <i>mounts</i> the VFS from an archive file on the first
+            access. The client application can then operate on the VFS in an arbitrary manner.
+            Finally, an archive file must get <i>unmounted</i> in order to update it with the
+            cumulated modifications. Note that an archive entry gets modified by any operation
+            which creates, modifies or deletes it.</p>
+        <h4><a name="unmounting">Explicit vs. Implicit Unmounting</a></h4>
+        <p>Archive file unmounting is performed semi-automatic:</p>
+        <ul>
+            <li><i>Explicit unmounting</i> happens when the client application calls {@link
+	de.schlichtherle.truezip.io.file.File#umount} or {@link de.schlichtherle.truezip.io.file.File#update}.</li>
+            <li><i>Implicit unmounting</i> happens when the JVM terminates (by a JVM shutdown
+	hook) or when the client application modifies an archive entry more than once. 
+	The latter case is also called <i>implicit remounting</i>, because the VFS is 
+	immediately mounted again in order to continue the operation.</li>
+        </ul>
+        <p>Explicit unmounting is required to support third-party access to an archive file
+            (see <a href="#third_parties">below</a>) or to monitor progress (see
+            <a href="#monitoring">below</a>). It also allows some control over any exceptions
+            thrown: Both {@code umount()} and {@code update()} may throw an {@link
+            de.schlichtherle.truezip.io.archive.controller.SyncWarningException} or an {@link de.schlichtherle.truezip.io.archive.controller.SyncException}.
+            The client application may catch these exceptions and act on them individually (see
+            <a href="#SyncException">below</a>).</p>
+        <p>However, calling {@code umount()} or {@code update()} too often may
+            increase the overall runtime: On each call, all remaining entries in the archive
+            file are copied to the archive file again if the archive file did already exist.
+            If the client application is explicitly unmounting the archive file after each modification,
+            this may lead to an overall runtime of {@code O(s*s)}, where {@code s}
+            is the size of the archive file in bytes (see <a href="#performance">below</a>).</p>
+        <p>In comparison, implicit unmounting provides best performance because archive
+            files are only updated if there&#39;s really a need to. It also works reliably: The
+            JVM shutdown hook is always run unless the JVM <em style="font-style: normal">crashes
+                (</em><span style="font-style: normal"><em style="font-style: normal">n</em></span>ote
+            that an uncatched throwable <em>terminates</em> the JVM, but does not <i>crash</i>
+            it - a JVM crash is an extremely rare situation which indicates a bug in the JVM
+            implementation, not a bug in the JRE or the application). Furthermore, it omits
+            the need to introduce a call to {@code umount()} or {@code update()} in
+            legacy applications.</p>
+        <p>The disadvantage is that the client application cannot easily detect
+            and deal with any exceptions thrown as a result of updating an
+            archive file:
+            Depending on where the implicit unmount happens, either an
+            arbitrary {@link java.io.IOException} is thrown, a boolean value
+            is returned, or - when called from the JVM shutdown hook - just a
+            stack trace is printed.
+            In addition, updating an existing archive file takes linear runtime
+            (see <a href="#performance">below</a>). However, using long running
+            JVM shutdown hooks is generally discouraged: They can&#39;t use
+            {@link java.util.logging}, they can&#39;t use a GUI to monitor
+            progress (see <a href="#monitoring">below</a>) and they can only
+            get debugged on JSE 5 or later.</p>
+        <h4><a name="third_parties">Third Party Access</a></h4>
+        <p>Because TrueZIP associates some state with any archive file which is read and/or
+            write accessed by the client application, it requires exclusive access to these
+            archive files until they get unmounted again.</p>
+        <blockquote>
+            <p><em>Third parties must not concurrently access these archive
+                    files nor their	entries unless the precautions outlined
+                    below have been taken!</em></p>
+        </blockquote>
+        <p>In this context, third parties are:</p>
+        <ol>
+            <li>Instances of the class {@code java.io.File} which are not instances
+	of the class {@code de.schlichtherle.truezip.io.file.File}.</li>
+            <li>Instances of the class {@code de.schlichtherle.truezip.io.file.File} which do not
+	recognize the same set of archive files in the path due to the use of a differently 
+	working {@link de.schlichtherle.truezip.io.file.ArchiveDetector}.</li>
+            <li>Other definitions of the classes in this package which have been loaded
+	by different class loaders.</li>
+            <li>Other system processes.</li>
+        </ol>
+        <p>As a rule of thumb, the same archive file or entry within an archive file should
+            not be accessed by different {@code File} classes ({@code java.io.File}
+            versus {@code de.schlichtherle.truezip.io.file.File}) or {@code File} instances with
+            different {@code ArchiveDetector} parameters. This ensures that the state associated
+            to an archive file is not shadowed or bypassed.</p>
+        <p>To ensure that all {@code File} instances recognize the same set of archive
+            files in a path, it&#39;s recommended <em>not</em> to use constructors or methods of
+            the {@code File} class with explicit {@code ArchiveDetector} parameters
+            unless there is good reason to.</p>
+        <p>To ensure that all {@code File} instances share the same definition of classes
+            in this package, it&#39;s recommended to add TrueZIP&#39;s JAR to the boot class path or
+            the extension class path.</p>
+        <p>If the prerequisites for these recommendations don&#39;t apply or if the recommendations
+            can&#39;t be followed, the client application may call {@link de.schlichtherle.truezip.io.file.File#umount}
+            ({@link de.schlichtherle.truezip.io.file.File#update} will <i>not</i> work) to perform an explicit
+            unmount. This clears all state information so that the third party can then safely
+            access any archive file. In addition, the client application must make sure not
+            to access the same archive file or any of its entries in any way while the third
+            party is still accessing it.</p>
+        <p></p>
+        <blockquote>
+            <p><em>Failure to comply to these guidelines may result in
+                    unpredictable behavior and may even cause <b>loss of data</b>!</em></p>
+        </blockquote>
+        <h4><a name="SyncException">Exception Handling</a></h4>
+        <p>{@code umount()} and {@code update()} are guaranteed to process <em>
+                all</em> archive files which are in use or have been touched by the client application.
+            However, processing some of these archive files may fail for a number of I/O related
+            reasons. Hence, during processing, a <em>sequential chain</em> of archive exceptions
+            is constructed and thrown upon termination unless its empty. Note that sequential
+            exception chaining is a concept which is completely orthogonal to Java&#39;s general
+            exception cause chaining: In a sequential archive exception chain, each archive
+            exception may still have a chain of other exceptions as its cause (most likely
+            {@code IOException}s).</p>
+        <p>Archive exceptions fall into two categories:</p>
+        <ol>
+            <li>The class {@link de.schlichtherle.truezip.io.archive.controller.SyncWarningException} is the root
+	of all warning exception types. These exceptions are thrown if an archive file 
+	has been completely updated, but some warning conditions apply. No data has 
+	been lost.</li>
+            <li>Its super class {@link de.schlichtherle.truezip.io.archive.controller.SyncException} is the root
+	of all other exception types (unless it&#39;s an {@link de.schlichtherle.truezip.io.archive.controller.SyncWarningException}
+	again). These exceptions are thrown if an archive file could not get updated 
+	completely. This implies loss of some or all data in the respective archive 
+	file.</li>
+        </ol>
+        <p>Note that the effect which is indicated by an archive exception is local: An
+            exception thrown when processing an archive file does not imply an archive exception
+            or loss of data when processing another archive file.</p>
+        <p>When the archive exception chain is thrown by this method, it&#39;s first sorted
+            according to (1) descending order of priority and (2) ascending order of appearance,
+            and the resulting head exception is then thrown. Since {@link de.schlichtherle.truezip.io.archive.controller.SyncWarningException}s
+            have a lower priority than {@link de.schlichtherle.truezip.io.archive.controller.SyncException}s, they are always pushed
+            back to the end of the chain, so that an application can use the following simple
+            idiom to detect if only some warnings or at least one severe error has occured:</p>
+        <blockquote>
+            <pre><code><b><font color="#000080">try</font></b> {
+    File.<b>umount</b>(); <font color="#808080">// with or without parameters</font>
+} <b><font color="#000080">catch</font></b> (SyncWarningException oops) {
+<font color="#808080">    // Only instances of the class SyncWarningException exist in
+    // the sequential chain of exceptions. We decide to ignore this.
+</font>} <b><font color="#000080">catch</font></b> (SyncException ouch) {
+<font color="#808080">    // At least one exception occured which is not just an
+    // SyncWarningException. This is a severe situation that
+    // needs to be handled.
+
+    // Print the sequential chain of exceptions in order of
+    // descending priority and ascending appearance.
+    //ouch.printStackTrace();
+
+    // Print the sequential chain of exceptions in order of
+    // appearance instead.
+</font>    ouch.<b>sortAppearance</b>().<b>printStackTrace</b>();
+}</code></pre>
+        </blockquote>
+        <p>Note that the {@link java.lang.Throwable#getMessage()} method (and hence {@link
+            java.lang.Throwable#printStackTrace()} will concatenate the detail messages of the
+            exceptions in the sequential chain in the given order.</p>
+        <h4><a name="performance">Performance Considerations</a></h4>
+        <p>Unmounting a modified archive file is a linear runtime operation: If the size
+            of the resulting archive file is <dfn>s</dfn> bytes, the operation always completes
+            in <dfn>O(s)</dfn>, even if only a single, small archive entry has been modified
+            within a very large archive file. Unmounting an unmodified or newly created archive
+            file is a constant runtime operation: It always completes in <dfn>O(1)</dfn>. These
+            magnitudes are independent of whether unmounting was performed explicitly or implicitly.</p>
+        <p>Now if the client application modifies each entry in a loop and accidentally
+            triggers unmounting the archive file on each iteration, then the overall runtime
+            increases to <dfn>O(s*s)</dfn>! Here&#39;s an example:</p>
+        <blockquote>
+            <pre><code>String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800080">&quot;b&quot;</font>, <font color="#800080">&quot;c&quot;</font> };
+<b><font color="#000080">int</font></b> n = names.length;
+<b><font color="#000080">for</font></b> (<b><font color="#000080">int</font></b> i = 0; i &lt; n; i++) { <font color="#808080">// n * ...</font>
+    File entry = <b><font color="#000080">new</font></b> <b>File</b>(<font color="#800080">&quot;archive.zip&quot;</font>, names[i]); <font color="#808080">// O(1)</font>
+    entry.<b>createNewFile</b>(); <font color="#808080">// O(1)</font>
+    File.<b>umount</b>(); <font color="#808080">// O(i + 1) !!</font>
+}
+<font color="#808080">// Overall: O(n*n) !!!</font></code></pre>
+        </blockquote>
+        <p>The bad runtime is because {@code umount()} is called within the loop. Moving
+            it out of the loop fixes the issue:</p>
+        <blockquote>
+            <pre><code>String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800080">&quot;b&quot;</font>, <font color="#800080">&quot;c&quot;</font> };
+<b><font color="#000080">int</font></b> n = names.length;
+<b><font color="#000080">for</font></b> (<b><font color="#000080">int</font></b> i = 0; i &lt; n; i++) { <font color="#808080">// n * ...</font>
+    File entry = <b><font color="#000080">new</font></b> <b>File</b>(<font color="#800080">&quot;archive.zip&quot;</font>, names[i]); <font color="#808080">// O(1)</font>
+    entry.<b>createNewFile</b>(); <font color="#808080">// O(1)</font>
+}
+File.<b>umount</b>(); <font color="#808080">// new file: O(1); modified: O(n)</font>
+<font color="#808080">// Overall: O(n)</font></code></pre>
+        </blockquote>
+        <p>In essence: If at all, the client application should never call {@code umount()}
+            or {@code update()} in a loop which modifies an archive file.</p>
+        <p>The situation gets more complicated with implicit remounting: If a file entry
+            shall get modified which already has been modified before, TrueZIP implicitly remounts
+            the archive file in order to avoid writing duplicated entries to it (which would
+            waste space and may even confuse other utilities). Here&#39;s an example:</p>
+        <blockquote>
+            <pre><code>String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800080">&quot;b&quot;</font>, <font color="#800080">&quot;c&quot;</font> };
+<b><font color="#000080">int</font></b> n = names.length;
+<b><font color="#000080">for</font></b> (<b><font color="#000080">int</font></b> i = 0; i &lt; n; i++) { <font color="#808080">// n * ...</font>
+    File entry = <b><font color="#000080">new</font></b> <b>File</b>(<font color="#800080">&quot;archive.zip&quot;</font>, names[i]); <font color="#808080">// O(1)</font>
+    entry.<b>createNewFile</b>(); <font color="#808080">// First modification: O(1)</font>
+    entry.<b>createNewFile</b>(); <font color="#808080">// Second modification triggers remount: O(i + 1) !!</font>
+}
+<font color="#808080">// Overall: O(n*n) !!!</font></code></pre>
+        </blockquote>
+        <p>Each call to {@code createNewFile()} is a modification operation. Hence,
+            on the second call to this method, TrueZIP needs to do an implicit remount which
+            writes all entries in the archive file created so far to disk again.</p>
+        <p>Unfortunately, a modification operation is not always so easy to spot. Consider
+            the following example to create an archive file with empty entries which all share
+            the same last modification time:</p>
+        <blockquote>
+            <pre><code><b><font color="#000080">long</font></b> time = System.<b>currentTimeMillis</b>();
+String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800080">&quot;b&quot;</font>, <font color="#800080">&quot;c&quot;</font> };
+<b><font color="#000080">int</font></b> n = names.length;
+<b><font color="#000080">for</font></b> (<b><font color="#000080">int</font></b> i = 0; i &lt; n; i++) { <font color="#808080">// n * ...</font>
+    File entry = <b><font color="#000080">new</font></b> <b>File</b>(<font color="#800080">&quot;archive.zip&quot;</font>, names[i]); <font color="#808080">// O(1)</font>
+    entry.<b>createNewFile</b>(); <font color="#808080">// First modification: O(1)</font>
+    entry.<b>setLastModified</b>(time); <font color="#808080">// Second modification triggers remount: O(i + 1) !!</font>
+}
+<font color="#808080">// Overall: O(n*n) !!!</font></code></pre>
+        </blockquote>
+        <p>When {@code setLastModified()} gets called, the entry has already been written
+            and so an implicit remount is triggered, which writes all entries in the archive
+            file created so far to disk again.</p>
+        <p><b>Detail:</b> This deficiency is caused by archive file formats: All currently
+            supported archive types require to write an entry&#39;s meta data (including the last
+            modification time) before its content to the archive file. So if the meta data is
+            to be modified, the archive entry and hence the whole archive file needs to get
+            rewritten, which is what the implicit remount is doing.</p>
+        <p>To avoid accidental remounting when copying data, you should consider using the
+            advanced <a href="File.html#copy_methods">copy methods</a> instead. These methods
+            are easy to use, work reliably and provide superior performance.</p>
+        <h4><a name="monitoring">Monitoring Progress</a></h4>
+        <p>When unmounting, the client application can monitor the progress by another thread
+            using {@link de.schlichtherle.truezip.io.file.File#getLiveArchiveStatistics()}. The returned
+            instance is a proxy which returns live statistics about the updating process.</p>
+        <p>Here&#39;s an example how to monitor unmounting progress on standard error output
+            after an initial delay of two seconds:</p>
+        <blockquote>
+            <pre><code><b><font color="#000080">class</font></b> ProgressMonitor <b><font color="#000080">extends</font></b> Thread {
+    Long[] args = <b><font color="#000080">new</font></b> Long[<font color="#800080">2</font>];
+    ArchiveStatistics liveStats = File.<b>getLiveArchiveStatistics</b>();
+
+    <b>ProgressMonitor</b>() {
+        <b>setPriority</b>(Thread.MAX_PRIORITY);
+        <b>setDaemon</b>(<b><font color="#000080">true</font></b>);
+    }
+
+    <b><font color="#000080">public</font></b> <b><font color="#000080">void</font></b> <b>run</b>() {
+        <b><font color="#000080">boolean</font></b> run = <b><font color="#000080">false</font></b>;
+        <b><font color="#000080">for</font></b> (<b><font color="#000080">long</font></b> sleep = <font color="#800080">2000</font>; ; sleep = <font color="#800080">200</font>, run = <b><font color="#000080">true</font></b>) {
+            <b><font color="#000080">try</font></b> {
+                Thread.<b>sleep</b>(sleep);
+            } <b><font color="#000080">catch</font></b> (InterruptedException shutdown) {
+                <b><font color="#000080">break</font></b>;
+            }
+            <b>showProgress</b>();
+        }
+        <b><font color="#000080">if</font></b> (run) {
+            <b>showProgress</b>();
+            System.err.<b>println</b>();
+        }
+    }
+
+    <b><font color="#000080">void</font></b> <b>showProgress</b>() {
+<font color="#808080">        // Round up to kilobytes.
+</font>        args[0] = <b><font color="#000080">new</font></b> <b>Long</b>(
+                (liveStats.<b>getUpdateTotalByteCountRead</b>() + <font color="#800080">1023</font>) / <font color="#800080">1024</font>);
+        args[1] = <b><font color="#000080">new</font></b> <b>Long</b>(
+                (liveStats.<b>getUpdateTotalByteCountWritten</b>() + <font color="#800080">1023</font>) / <font color="#800080">1024</font>);
+        System.err.<b>print</b>(MessageFormat.<b>format</b>(
+                <font color="#800080">&quot;Top level archive IO: {0} / {1} KB        \r&quot;</font>, args));
+    }
+
+    <b><font color="#000080">void</font></b> <b>shutdown</b>() {
+        <b>interrupt</b>();
+        <b><font color="#000080">try</font></b> {
+            <b>join</b>();
+        } <b><font color="#000080">catch</font></b> (InterruptedException interrupted) {
+            interrupted.<b>printStackTrace</b>();
+        }
+    }
+}
+
+<font color="#808080">// ...
+</font>
+ProgressMonitor monitor = new <b>ProgressMonitor</b>();
+monitor.<b>start</b>();
+<b><font color="#000080">try</font></b> {
+    File.<b>umount</b>();
+} <b><font color="#000080">finally</font></b> {
+    monitor.<b>shutdown</b>();
+}</code></pre>
+        </blockquote>
+        <h4><a name="conclusions">Conclusions</a></h4>
+        <p>Here are some guidelines to find the right balance between performance and control:</p>
+        <ol>
+            <li>When the <a href="#unmounting">JVM terminates</a>, calling {@code umount()}
+	is recommended in order to handle exceptions explicitly, but not required because 
+	TrueZIP&#39;s JVM shutdown hook takes care of unmounting anyway and prints the stacktrace 
+	of any exceptions on the standard error output.</li>
+            <li>Otherwise, in order to achieve best performance, {@code umount()} or
+	{@code update()} should not get called unless either
+                <a href="#third_parties">third party access</a> or explicit
+                <a href="#SyncException">exception handling</a> is required.</li>
+            <li>For the same reason, these methods should never get called in a
+                <a href="#performance">loop</a> which modifies an archive file.</li>
+            <li>{@code umount()} is generally preferred over {@code update()}
+	for <a href="#third_parties">safety reasons</a>.</li>
+        </ol>
+        <hr/>
+        <h3><a name="miscellaneous">Miscellaneous</a></h3>
+        <h4><a name="virtual_directories">Virtual Directories in Archive Files</a></h4>
+        <p>The top level entries in an archive file build its <i>root directory</i>. The
+            root directory is never written to the output when an archive file is modified.</p>
+        <p>To the client application, the root directory behaves like any other directory
+            and is addressed by naming the archive file in a path: For example, the client application
+            may list its contents by calling {@link de.schlichtherle.truezip.io.file.File#list()} or {@link
+            de.schlichtherle.truezip.io.file.File#listFiles()}. </p>
+        <p>The root directory receives its last modification time from the archive file
+            whenever it&#39;s read. Likewise, the archive file will receive the root directory&#39;s
+            last modification time whenever it&#39;s written. </p>
+        <p>While this is a proper emulation of the behavior of real file systems, it may
+            confuse users if only entries which are located one level or more below the root
+            directory have been changed in an existing archive file: In this case, the last
+            modification time of the root directory is not updated and hence the archive file&#39;s
+            last modification time will not reflect the changes in the deeper directory levels.
+        </p>
+        <p>As a workaround, the client application can use the idiom {@code {@link de.schlichtherle.truezip.io.file.File#isArchive()}
+            &amp;&amp; {@link de.schlichtherle.truezip.io.file.File#isDirectory()}} to detect an archive file
+            and explicitly change the last modification time of its root directory by calling
+            {@link de.schlichtherle.truezip.io.file.File#setLastModified(long)}. </p>
+        <p>An archive may contain directories for which no entry is present in the file
+            although they contain at least one member in their directory tree for which an entry
+            is actually present in the file. Similarly, if {@link de.schlichtherle.truezip.io.file.File#isLenient}
+            returns {@code true} (which is the default), an archive entry may be created
+            in an archive file although its parent directory hasn&#39;t been explicitly created
+            by calling {@link de.schlichtherle.truezip.io.file.File#mkdir} before. </p>
+        <p>Such a directory is called a <i>ghost directory</i>: Like the root directory,
+            a ghost directory is not written to the output whenever an archive file is modified.
+            This is to mimic the behavior of most archive utilities which do not create archive
+            entries for directories. </p>
+        <p>To the client application, a ghost directory behaves like a regular directory
+            with the exception that its last modification time returned by {@link de.schlichtherle.truezip.io.file.File#lastModified()}
+            is {@code 0L}. If the client application sets the last modification time explicitly
+            using {@link de.schlichtherle.truezip.io.file.File#setLastModified(long)}, then the ghost directory
+            reincarnates as a regular directory and will be output to the archive file. </p>
+        <p>Mind that a ghost directory can only exist within an archive file, but not every
+            directory within an archive file is actually a ghost directory. </p>
+        <h4><a name="entry_names">Entry Names in Archive Files</a></h4>
+        <p>File paths may be composed of elements which either refer to regular nodes in
+            the real file system (directories, files or special files), including top level
+            archive files, or refer to entries within an archive file. </p>
+        <p>As usual in Java, elements in a path which refer to regular nodes may be case
+            sensitive or not in TrueZIP&#39;s VFS, depending on the real file system and/or the
+            platform. </p>
+        <p>However, elements in a path which refer to archive entries are always case sensitive.
+            This enables the client application to address all files in existing archive files,
+            regardless of the operating system they&#39;ve been created on. </p>
+        <p>For existing archive files, redundant elements in entry names such
+            as the empty string ({@code ""}), the dot ({@code "."}) directory,
+            or the dot-dot ({@code ".."}) directory are removed from the path
+            name when the archive file is read and <em>not</em> retained when
+            the archive file is updated.</p>
+        <p>If an entry name contains characters which have no representation in the character
+            set of the corresponding archive file type, then all file operations to
+            create the archive entry will fail gracefully according to the documented contract
+            of the respective operation. This is to protect the client application from creating
+            archive entries which cannot get encoded and decoded again correctly. For example,
+            the Euro sign (&#8364;) does not have a representation in the IBM437 character set and
+            hence cannot be used for entries in ordinary ZIP files unless TrueZIP&#39;s configuration
+            is customized to use another charset. </p>
+        <p>If an archive file contains entries with absolute entry names, such as <i>/readme.txt</i>
+            rather than <i>readme.txt</i>, the client application cannot address these entries
+            using the VFS in this package. However, these entries are retained like any other
+            entry whenever the client application modifies the archive file. This should not
+            impose problems as absolute entry names should never be used anyway and I&#39;m not
+            aware of any recent tools which would allow to create these. </p>
+        <p>If an archive file contains both a file and a directory entry with the same name
+            it&#39;s up to the individual methods how they behave in this case. This could happen
+            with archive files created by external tools only. Both {@link de.schlichtherle.truezip.io.file.File#isDirectory()}
+            and {@link de.schlichtherle.truezip.io.file.File#isFile()} will return {@code true} in this
+            case and in fact they are the only methods the client application can rely upon
+            to act properly in this situation: Many other methods use a combination of {@code
+            isDirectory()} and {@code isFile()} calls and will show an undefined
+            behavior. </p>
+        <p>The good news is that both the file and the directory coexist in the virtual
+            archive file system implemented by this package. Thus, whenever the archive file
+            is modified, both entries will be retained and no data gets lost. This allows you
+            to use another tool to fix the issue in the archive file. TrueZIP never allows the
+            client application to create such an archive file, however. </p>
+    </body>
+</html>

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.File;
 import java.awt.event.KeyEvent;
 import java.io.FilenameFilter;
 import java.io.IOException;

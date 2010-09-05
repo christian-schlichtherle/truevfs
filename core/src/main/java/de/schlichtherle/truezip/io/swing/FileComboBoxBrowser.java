@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
-import de.schlichtherle.truezip.io.File;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
 import java.io.FilenameFilter;

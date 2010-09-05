@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.util.IOOperation;
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.FileNotFoundException;
@@ -39,8 +39,8 @@ import java.util.logging.Logger;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.util.Files.isWritableOrCreatable;
-import static de.schlichtherle.truezip.io.util.Files.createTempFile;
+import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
+import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
  * This archive controller implements the mounting/unmounting strategy

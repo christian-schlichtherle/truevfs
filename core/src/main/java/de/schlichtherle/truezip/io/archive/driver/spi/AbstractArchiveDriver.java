@@ -39,8 +39,8 @@ import javax.swing.Icon;
  * an archive driver.
  * It provides default implementations for character sets and icon handling.
  * <p>
- * Since TrueZIP 6.4, this class is serializable in order to meet the
- * requirements of the {@link de.schlichtherle.truezip.io.File} class.
+ * This class is serializable in order to meet the requirements of some client
+ * classes.
  * 
  * @author Christian Schlichtherle
  * @version $Id$

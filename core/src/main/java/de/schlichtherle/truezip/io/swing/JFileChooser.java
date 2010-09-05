@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.swing;
 
-import de.schlichtherle.truezip.io.ArchiveDetector;
+import de.schlichtherle.truezip.io.file.ArchiveDetector;
 import java.awt.Graphics;
 import javax.swing.Icon;
 
@@ -45,7 +45,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
     }
 
     /**
-     * Returns a {@link de.schlichtherle.truezip.io.File de.schlichtherle.truezip.io.File}
+     * Returns a {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}
      * instead of {@link java.io.File java.io.File}.
      *
      * @see javax.swing.JFileChooser#getSelectedFile()
@@ -58,7 +58,7 @@ public class JFileChooser extends javax.swing.JFileChooser {
 
     /**
      * Returns an array of
-     * {@link de.schlichtherle.truezip.io.File de.schlichtherle.truezip.io.File}
+     * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}
      * objects instead of {@link java.io.File java.io.File} objects.
      *
      * @see javax.swing.JFileChooser#getSelectedFiles()

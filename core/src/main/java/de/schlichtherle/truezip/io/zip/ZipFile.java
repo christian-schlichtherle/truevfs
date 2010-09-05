@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.util.SynchronizedInputStream;
+import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

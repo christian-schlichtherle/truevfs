@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.IOStreamSockets;
-import de.schlichtherle.truezip.io.util.SynchronizedOutputStream;
+import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.OutputStream;

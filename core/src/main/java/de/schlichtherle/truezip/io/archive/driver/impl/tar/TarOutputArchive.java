@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
-import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
@@ -39,7 +39,7 @@ import java.util.Map;
 import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.impl.tar.TarDriver.TEMP_FILE_PREFIX;
-import static de.schlichtherle.truezip.io.util.Files.createTempFile;
+import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
  * An implementation of {@link OutputArchive} to write TAR archives.

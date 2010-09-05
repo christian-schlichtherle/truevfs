@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.util.ChainableIOException;
+import de.schlichtherle.truezip.io.ChainableIOException;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes for an archive file to the underlying file system.

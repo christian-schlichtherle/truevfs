@@ -35,8 +35,9 @@ import javax.swing.tree.TreePath;
  * A {@link TreeModel} which traverses {@link java.io.File java.io.File}
  * instances.
  * If the root of this tree model is actually an instance of
- * {@link de.schlichtherle.truezip.io.File de.schlichtherle.truezip.io.File}, its archive
- * detector is used to detect any archive files in the directory tree.
+ * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File},
+ * its archive detector is used to detect any archive files in the directory
+ * tree.
  * This allows you to traverse archive files just like directories.
  *
  * @author Christian Schlichtherle
@@ -120,7 +121,7 @@ public class FileTreeModel implements TreeModel {
     /**
      * Creates a new {@code FileTreeModel} which browses the specified
      * {@code root} file.
-     * If {@code file} is an instance of {@link de.schlichtherle.truezip.io.File},
+     * If {@code file} is an instance of {@link de.schlichtherle.truezip.io.file.File},
      * its archive detector is used to detect any archive files in the
      * directory tree.
      *
@@ -162,7 +163,7 @@ public class FileTreeModel implements TreeModel {
      * Returns the root of this tree model.
      * This is actually an instance of {@link java.io.File java.io.File} or
      * a subclass, like
-     * {@link de.schlichtherle.truezip.io.File de.schlichtherle.truezip.io.File}.
+     * {@link de.schlichtherle.truezip.io.file.File de.schlichtherle.truezip.io.file.File}.
      *
      * @return A {@code File} object or {@code null} if this tree
      *         model has not been created with a {@code File} object.
@@ -247,7 +248,7 @@ public class FileTreeModel implements TreeModel {
      *         {@code null}.
      */
     private java.io.File[] newPath(final java.io.File node) {
-        if (root == null /*|| !de.schlichtherle.truezip.io.File.contains(root, node)*/)
+        if (root == null /*|| !de.schlichtherle.truezip.io.file.File.contains(root, node)*/)
             return null;
         // Do not apply the filter here! The filter could depend on the file's
         // state and this method may get called before the node is initialized
@@ -282,7 +283,7 @@ public class FileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * However, the current selection may get lost.
      * If you would like to create a new file with initial content, please
-     * use {@link #copyFrom(de.schlichtherle.truezip.io.File, InputStream)}.
+     * use {@link #copyFrom(de.schlichtherle.truezip.io.file.File, InputStream)}.
      *
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.
@@ -334,7 +335,7 @@ public class FileTreeModel implements TreeModel {
      * @return Whether or not the file has been newly created.
      * @throws IOException If an I/O error occurs.
      */
-    public boolean copyFrom(final de.schlichtherle.truezip.io.File node, final InputStream in) {
+    public boolean copyFrom(final de.schlichtherle.truezip.io.file.File node, final InputStream in) {
         if (!node.copyFrom(in))
             return false;
         nodeInsertedOrStructureChanged(node);
@@ -348,7 +349,7 @@ public class FileTreeModel implements TreeModel {
      *
      * @return Whether or not the file has been successfully renamed.
      */
-    public boolean copyTo(final de.schlichtherle.truezip.io.File oldNode, final java.io.File node) {
+    public boolean copyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
         if (!oldNode.copyTo(node))
             return false;
         nodeInsertedOrStructureChanged(node);
@@ -362,7 +363,7 @@ public class FileTreeModel implements TreeModel {
      *
      * @return Whether or not the file has been successfully renamed.
      */
-    public boolean copyAllTo(final de.schlichtherle.truezip.io.File oldNode, final java.io.File node) {
+    public boolean copyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
         final boolean ok = oldNode.copyAllTo(node);
         nodeInsertedOrStructureChanged(node);
         return ok;
@@ -376,7 +377,7 @@ public class FileTreeModel implements TreeModel {
      *
      * @return Whether or not the file has been successfully renamed.
      */
-    public boolean archiveCopyTo(final de.schlichtherle.truezip.io.File oldNode, final java.io.File node) {
+    public boolean archiveCopyTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
         if (!oldNode.archiveCopyTo(node))
             return false;
         nodeInsertedOrStructureChanged(node);
@@ -391,7 +392,7 @@ public class FileTreeModel implements TreeModel {
      *
      * @return Whether or not the file has been successfully renamed.
      */
-    public boolean archiveCopyAllTo(final de.schlichtherle.truezip.io.File oldNode, final java.io.File node) {
+    public boolean archiveCopyAllTo(final de.schlichtherle.truezip.io.file.File oldNode, final java.io.File node) {
         final boolean ok = oldNode.archiveCopyAllTo(node);
         nodeInsertedOrStructureChanged(node);
         return ok;
@@ -437,7 +438,7 @@ public class FileTreeModel implements TreeModel {
      * @return Whether or not the file or directory has been successfully deleted.
      * @throws IOException If an I/O error occurs.
      */
-    public boolean deleteAll(final de.schlichtherle.truezip.io.File node) {
+    public boolean deleteAll(final de.schlichtherle.truezip.io.file.File node) {
         if (!node.deleteAll())
             return false;
         nodeRemoved(node);

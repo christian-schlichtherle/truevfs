@@ -23,9 +23,9 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOOperations;
-import de.schlichtherle.truezip.io.util.ChainableIOException;
-import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
-import de.schlichtherle.truezip.io.util.InputException;
+import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -41,7 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.util.Files.createTempFile;
+import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
  * A decorator for output archives which allows to write an unlimited number

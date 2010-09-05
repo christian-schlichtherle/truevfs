@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.util.InputException;
-import de.schlichtherle.truezip.io.util.Streams;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

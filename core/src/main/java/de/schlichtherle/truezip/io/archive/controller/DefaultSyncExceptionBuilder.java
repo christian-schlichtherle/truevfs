@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.util.ChainableIOExceptionBuilder;
+import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 
 /**
  * @author Christian Schlichtherle

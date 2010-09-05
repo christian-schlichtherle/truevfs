@@ -174,7 +174,7 @@ limitations under the License.
                     <groups>
                         <group>
                             <title>High Level API For Accessing Archive Files Of Any Supported Type</title>
-                            <packages>de.schlichtherle.truezip.io:de.schlichtherle.truezip.io.samples</packages>
+                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample</packages>
                         </group>
                         <group>
                             <title>Low Level API For Accessing ZIP Files</title>

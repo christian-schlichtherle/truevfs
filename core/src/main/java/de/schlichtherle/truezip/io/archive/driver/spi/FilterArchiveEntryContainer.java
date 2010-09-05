@@ -33,7 +33,7 @@ import java.util.Iterator;
 public abstract class FilterArchiveEntryContainer<AE extends ArchiveEntry>
 implements ArchiveEntryContainer<AE> {
 
-    /** Returns the target archive entry container. */
+    /** Returns the decorated archive entry container. */
     protected abstract ArchiveEntryContainer<AE> getTarget();
 
     @Override
