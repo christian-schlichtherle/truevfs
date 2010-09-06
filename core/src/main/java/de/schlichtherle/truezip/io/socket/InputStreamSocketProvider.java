@@ -48,6 +48,6 @@ public interface InputStreamSocketProvider<LT, PT> {
      *         not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    InputStreamSocket<LT, PT> getInputStreamSocket(LT target)
+    InputStreamSocket<? extends LT, ? super PT> getInputStreamSocket(LT target)
     throws FileNotFoundException;
 }

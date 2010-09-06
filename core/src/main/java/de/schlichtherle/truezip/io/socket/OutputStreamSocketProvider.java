@@ -48,6 +48,6 @@ public interface OutputStreamSocketProvider<LT, PT> {
      * @throws FileNotFoundException If the target is not accessible for some
      *         reason.
      */
-    OutputStreamSocket<LT, PT> getOutputStreamSocket(LT target)
+    OutputStreamSocket<? extends LT, ? super PT> getOutputStreamSocket(LT target)
     throws FileNotFoundException;
 }

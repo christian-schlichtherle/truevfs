@@ -35,15 +35,26 @@ public class IOOperations {
     }
 
     /**
+     * @deprecated This method is clearly experimental!
+     */
+    public static <IT extends T, OT extends T, T> void copy(
+            final InputStreamSocketProvider<IT, T> input,
+            final IT source,
+            final OutputStreamSocketProvider<OT, T> output,
+            final OT destination)
+    throws IOException {
+        copy(   input.getInputStreamSocket(source),
+                output.getOutputStreamSocket(destination));
+    }
+
+    /**
      * Copies an input stream {@link InputStreamSocket#newInputStream created}
      * by the input stream socket {@code input} to an output stream
      * {@link OutputStreamSocket#newOutputStream created} by the output stream
      * socket {@code output}.
      *
-     * @param  input a non-{@code null} reference to the stream socket of the
-     *         input target.
-     * @param  output a non-{@code null} reference to the stream socket of the
-     *         output target.
+     * @param  input a non-{@code null} stream socket for the input target.
+     * @param  output a non-{@code null} stream socket for the output target.
      * @throws InputException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
