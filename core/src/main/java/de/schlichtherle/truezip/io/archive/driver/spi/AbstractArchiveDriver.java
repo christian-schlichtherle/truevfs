@@ -21,6 +21,8 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -33,6 +35,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * An abstract archive driver implementation to ease the task of developing
@@ -175,22 +179,48 @@ implements ArchiveDriver<AE, IA, OA>, Serializable {
     }
 
     /**
-     * Ensures that the given entry name is representable in this driver's
-     * character set charset.
+     * Maps the given <i>path name</i> to an <i>entry name</i> for ZIP or TAR
+     * files by ensuring that the returned entry name ends with the separator
+     * character {@code '/'} if and only if {@code type} is {@code DIRECTORY}.
+     * <p>
+     * First, {@link #ensureEncodable(String) ensureEncodable(path)} is called.
+     *
+     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @param  path a non-{@code null} <i>path name</i>.
+     * @param  type a non-{@code null} entry type.
+     * @return A non-{@code null} <i>entry name</i>.
+     */
+    protected final String toZipOrTarEntryName(
+            final String path,
+            final Type type)
+    throws CharConversionException {
+        ensureEncodable(path);
+        switch (type) {
+            case DIRECTORY:
+                return path.endsWith(ArchiveEntry.SEPARATOR)
+                        ? path
+                        : path + ArchiveEntry.SEPARATOR_CHAR;
+            default:
+                return cutTrailingSeparators(path, ArchiveEntry.SEPARATOR_CHAR);
+        }
+    }
+
+    /**
+     * Ensures that the given path name can be encoded by this driver's
+     * character set.
      * Should be called by sub classes in their implementation of the method
-     * {@link ArchiveDriver#newArchiveEntry(String, ArchiveEntry)}.
+     * {@link ArchiveEntryFactory#newArchiveEntry}.
      * 
-     * @param entryName A valid archive entry name - {@code null} is not
-     *        permissible.
-     * @see #getCharset
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
-     * @throws CharConversionException If the entry name contains characters
+     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @param  path a non-{@code null} path name.
+     * @see    #getCharset
+     * @throws CharConversionException If the path name contains characters
      *         which cannot get encoded.
      */
-    protected final void ensureEncodable(String entryName)
+    protected final void ensureEncodable(String path)
     throws CharConversionException {
-        if (!encoder.canEncode(entryName))
-            throw new CharConversionException(entryName +
+        if (!encoder.canEncode(path))
+            throw new CharConversionException(path +
                     " (illegal characters in entry name)");
     }
 

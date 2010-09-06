@@ -18,15 +18,15 @@ package de.schlichtherle.truezip.util;
 
 /**
  * Abstract implementation of exception builder.
- * Subclasses must implement {@link #update(Throwable, Throwable)} and may
- * override {@link #post(Throwable)}.
+ * Subclasses must implement {@link #update(Exception, Exception)} and may
+ * override {@link #post(Exception)}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  * @param <C> The type of the cause exception.
  * @param <E> The type of the assembled exception.
  */
-public abstract class AbstractExceptionBuilder<C extends Throwable, E extends Exception>
+public abstract class AbstractExceptionBuilder<C extends Exception, E extends Exception>
 implements ExceptionBuilder<C, E> {
 
     private E assembly;
@@ -69,8 +69,8 @@ implements ExceptionBuilder<C, E> {
     /**
      * {@inheritDoc}
      *
-     * @see #update(Throwable, Throwable)
-     * @see #post(Throwable)
+     * @see #update(Exception, Exception)
+     * @see #post(Exception)
      */
     public final E fail(C cause) {
         if (cause == null)
@@ -82,7 +82,7 @@ implements ExceptionBuilder<C, E> {
     /**
      * {@inheritDoc}
      *
-     * @see #update(Throwable, Throwable)
+     * @see #update(Exception, Exception)
      */
     public final void warn(C cause) {
         if (cause == null)
@@ -93,7 +93,7 @@ implements ExceptionBuilder<C, E> {
     /**
      * {@inheritDoc}
      *
-     * @see #post(Throwable)
+     * @see #post(Exception)
      */
     public final void check() throws E {
         E t = post(checkout());

@@ -29,32 +29,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
- *
- * <h3><a name="entryName">Requirements for Archive Entry Names</a></h3>
- * <p>
- * Implementations must meet the following requirements for archive entry
- * names:
- * <ol>
- * <li>An entry name is a sequence of file or directory entity
- *     <i>base names</i> which are separated by one or more <i>separator
- *     characters</i> ({@link #SEPARATOR_CHAR}).
- *     This implies that a base name cannot contain separator characters.
- * <li>An entry name may contain one or more dot ({@code "."}) or dot-dot
- *     ({@code ".."}) base names which represent the current or parent
- *     directory respectively.
- * <li>An entry name may start with one or more separator characters
- *     - this is called an <i>absolute entry name</i>.
- * <li>An entry name may end with one or more separator characters,
- *     e.g. to identify a directory entry.
- * </ol>
- * For example, {@code "foo/bar"} and {@code "./abc/../foo/./def/./../bar/./"}
- * are both valid entry names which refer to the same entity in the archive
- * file.
- * <p>
- * Note that these requirements have been relaxed in contrast to TrueZIP 6 in
- * order to ease the implementation of archive drivers and separate concerns.
- * The additional restrictions imposed by TrueZIP 6 must now be handled by the
- * client, which is usually an archive file system object.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -125,10 +99,12 @@ public interface ArchiveEntry {
     }
     
     /**
-     * Returns the archive entry name.
+     * Returns the non-{@code null} <i>entry name</i>.
+     * An entry name is a <i>path name</i> which meets all additional
+     * requirements which may be defined by their particular archive type.
      *
-     * @return A non-null reference.
-     * @see <a href="#entryName">Requirements for Archive Entry Names</a>
+     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @return The non-{@code null} <i>entry name</i>.
      */
     String getName();
 

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -164,22 +165,23 @@ implements ZipEntryFactory<ZipEntry> {
 
     @Override
     public ZipEntry newArchiveEntry(
-            final String name,
+            String path,
+            final Type type,
             final ArchiveEntry template)
     throws CharConversionException {
-        ensureEncodable(name);
+        path = toZipOrTarEntryName(path, type);
         final ZipEntry entry;
         if (template != null) {
             if (template instanceof ZipEntry) {
                 entry = newZipEntry((ZipEntry) template);
-                entry.setName(name);
+                entry.setName(path);
             } else {
-                entry = newZipEntry(name);
+                entry = newZipEntry(path);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newZipEntry(name);
+            entry = newZipEntry(path);
         }
         return entry;
     }

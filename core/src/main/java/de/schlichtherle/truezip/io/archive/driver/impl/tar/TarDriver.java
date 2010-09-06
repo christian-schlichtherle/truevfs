@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
@@ -78,27 +79,35 @@ public class TarDriver extends AbstractArchiveDriver {
     //
 
     @Override
-    public ArchiveEntry newArchiveEntry(
-            final String entryName,
+    public TarEntry newArchiveEntry(
+            String path,
+            final Type type,
             final ArchiveEntry template)
     throws CharConversionException {
-        ensureEncodable(entryName);
-
+        path = toZipOrTarEntryName(path, type);
         final TarEntry entry;
         if (template != null) {
             if (template instanceof TarEntry) {
-                entry = new TarEntry((TarEntry) template);
-                entry.setName(entryName);
+                entry = newTarEntry((TarEntry) template);
+                entry.setName(path);
             } else {
-                entry = new TarEntry(entryName);
+                entry = newTarEntry(path);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = new TarEntry(entryName);
+            entry = newTarEntry(path);
         }
 
         return entry;
+    }
+
+    public TarEntry newTarEntry(String name) {
+        return new TarEntry(name);
+    }
+
+    public TarEntry newTarEntry(TarEntry template) {
+        return new TarEntry(template);
     }
 
     /**
