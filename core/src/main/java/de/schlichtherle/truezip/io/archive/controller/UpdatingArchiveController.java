@@ -89,7 +89,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * An {@link InputArchive} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private InputArchive<?> inArchive;
+    private InputArchive<ArchiveEntry> inArchive;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -101,7 +101,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * The (possibly temporary) {@link OutputArchive} we are writing newly
      * created or modified entries to.
      */
-    private OutputArchive<?> outArchive;
+    private OutputArchive<ArchiveEntry> outArchive;
 
     /**
      * Whether or not nesting this archive file to its enclosing
@@ -764,11 +764,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         try {
             try {
                 shutdownStep1(handler);
-                // FIXME: Fix this mess!
-                ((ArchiveFileSystem<ArchiveEntry>) fileSystem)
-                        .copy(  (InputArchive<ArchiveEntry>) inArchive,
-                                (OutputArchive<ArchiveEntry>) outArchive,
-                                new FilterExceptionHandler(handler));
+                fileSystem.copy(inArchive, outArchive,
+                        new FilterExceptionHandler(handler));
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
