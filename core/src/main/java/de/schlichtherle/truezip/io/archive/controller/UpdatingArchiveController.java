@@ -764,8 +764,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         try {
             try {
                 shutdownStep1(handler);
-                fileSystem.copy(inArchive, outArchive,
-                        new FilterExceptionHandler(handler));
+                // FIXME: Fix this mess!
+                ((ArchiveFileSystem<ArchiveEntry>) fileSystem)
+                        .copy(  (InputArchive<ArchiveEntry>) inArchive,
+                                (OutputArchive<ArchiveEntry>) outArchive,
+                                new FilterExceptionHandler(handler));
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
