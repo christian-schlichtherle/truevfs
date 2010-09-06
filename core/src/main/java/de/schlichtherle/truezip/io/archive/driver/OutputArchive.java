@@ -50,7 +50,7 @@ extends ArchiveEntryContainer<AE>,
      * @param entry a non-{@code null} archive entry.
      */
     @Override
-    ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
+    ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(AE entry)
     throws FileNotFoundException;
 
     /**

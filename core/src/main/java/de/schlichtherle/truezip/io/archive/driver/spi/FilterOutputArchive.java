@@ -39,7 +39,7 @@ implements OutputArchive<AE> {
 
     protected OutputArchive<AE> target;
 
-    public FilterOutputArchive(OutputArchive<AE> target) {
+    public FilterOutputArchive(final OutputArchive<AE> target) {
         this.target = target;
     }
 
@@ -49,7 +49,8 @@ implements OutputArchive<AE> {
     }
 
     @Override
-    public ArchiveOutputStreamSocket<AE> getOutputStreamSocket(AE entry)
+    public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
+            final AE entry)
     throws FileNotFoundException {
         return getTarget().getOutputStreamSocket(entry);
     }
@@ -60,7 +61,7 @@ implements OutputArchive<AE> {
     }
 
     @Override
-    public void setMetaData(OutputArchiveMetaData metaData) {
+    public void setMetaData(final OutputArchiveMetaData metaData) {
         getTarget().setMetaData(metaData);
     }
 
