@@ -24,12 +24,12 @@ package de.schlichtherle.truezip.util;
  * @author Christian Schlichtherle
  * @version $Id$
  * @param <C> The type of the cause exception.
- * @param <T> The type of the assembled exception.
+ * @param <E> The type of the assembled exception.
  */
-public abstract class AbstractExceptionBuilder<C extends Throwable, T extends Throwable>
-implements ExceptionBuilder<C, T> {
+public abstract class AbstractExceptionBuilder<C extends Throwable, E extends Exception>
+implements ExceptionBuilder<C, E> {
 
-    private T assembly;
+    private E assembly;
 
     /**
      * This method is called to update the given {@code previous} result of
@@ -42,7 +42,7 @@ implements ExceptionBuilder<C, T> {
      *        last assembly has been checked out.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract T update(T previous, C cause);
+    protected abstract E update(E previous, C cause);
 
     /**
      * This method is called to post-process the given result of the assembly
@@ -56,12 +56,12 @@ implements ExceptionBuilder<C, T> {
      * @return The post-processed checked out result of the exception assembly
      *         - may be {@code null}.
      */
-    protected T post(T assembly) {
+    protected E post(E assembly) {
         return assembly;
     }
 
-    private T checkout() {
-        T t = assembly;
+    private E checkout() {
+        E t = assembly;
         assembly = null;
         return t;
     }
@@ -72,7 +72,7 @@ implements ExceptionBuilder<C, T> {
      * @see #update(Throwable, Throwable)
      * @see #post(Throwable)
      */
-    public final T fail(C cause) {
+    public final E fail(C cause) {
         if (cause == null)
             throw new NullPointerException();
         assembly = update(assembly, cause);
@@ -95,8 +95,8 @@ implements ExceptionBuilder<C, T> {
      *
      * @see #post(Throwable)
      */
-    public final void check() throws T {
-        T t = post(checkout());
+    public final void check() throws E {
+        E t = post(checkout());
         if (t != null)
             throw t;
     }

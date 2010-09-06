@@ -88,11 +88,11 @@ package de.schlichtherle.truezip.util;
  * thrown by the exception handlers themselves and is freely selectable.
  *
  * @param <C> The type of the cause exception.
- * @param <T> The type of the thrown exception.
+ * @param <E> The type of the thrown exception.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
+public interface ExceptionHandler<C extends Throwable, E extends Exception> {
 
     /**
      * Called to handle an exceptional condition which
@@ -106,7 +106,7 @@ public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
      * @param cause The exception to handle - {@code null} is not permitted.
      * @return The exception to throw - {@code null} is not permitted.
      */
-    T fail(C cause);
+    E fail(C cause);
 
     /**
      * Called to handle an exceptional condition which
@@ -120,5 +120,5 @@ public interface ExceptionHandler<C extends Throwable, T extends Throwable> {
      * @param cause The exception to handle - {@code null} is not permitted.
      * @throws T If the implementation wants the caller to abort its task.
      */
-    void warn(C cause) throws T;
+    void warn(C cause) throws E;
 }

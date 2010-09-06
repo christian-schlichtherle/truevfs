@@ -775,12 +775,12 @@ public final class ArchiveFileSystem {
                 "archive entry does not exist");
     }
 
-    public <T extends Throwable>
+    public <E extends Exception>
     void copy(
             final InputArchive ia,
             final OutputArchive oa,
-            final ExceptionHandler<IOException, T> h)
-    throws T {
+            final ExceptionHandler<IOException, E> h)
+    throws E {
         final Enumeration<ArchiveEntry> en
                 = Collections.enumeration(master.values());
         while (en.hasMoreElements()) {
