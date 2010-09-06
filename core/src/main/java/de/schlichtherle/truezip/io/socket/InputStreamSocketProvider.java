@@ -16,15 +16,13 @@
 
 package de.schlichtherle.truezip.io.socket;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * Provides {@link InputStreamSocket}s for accessing targets for I/O
- * operations.
+ * Provides {@link InputStreamSocket}s for read access to local targets.
  *
- * @param   <LT> The type of the <i>local target</i> for I/O operations.
- * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          for I/O operations.
+ * @param   <LT> The type of the <i>local targets</i> for I/O operations.
+ * @param   <PT> The minimum required type of the <i>peer targets</i>.
  * @see     OutputStreamSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -32,22 +30,22 @@ import java.io.FileNotFoundException;
 public interface InputStreamSocketProvider<LT, PT> {
 
     /**
-     * Returns a non-{@code null} input stream socket for reading from the
-     * given target for I/O operations.
+     * Returns a non-{@code null} input stream socket for read access to the
+     * given local target.
      * Multiple invocations with the same parameter may return the same
      * object again.
      * <p>
      * The method {@link InputStreamSocket#get()} must return an object which
-     * {@link Object#equals(Object) compares equal} to the given target for
-     * I/O operations when called on the returned input stream socket.
+     * {@link Object#equals(Object) compares equal} to the given local target
+     * when called on the returned input stream socket.
      *
-     * @param  target a non-{@code null} target for I/O operations.
+     * @param  target the non-{@code null} local target.
      * @return A non-{@code null} input stream socket for reading from the
-     *         given target for I/O operations.
-     * @throws FileNotFoundException If the target does not exist or is
-     *         not accessible for some reason.
+     *         local target.
+     * @throws IOException If the local target does not exist or
+     *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
     InputStreamSocket<? extends LT, ? super PT> getInputStreamSocket(LT target)
-    throws FileNotFoundException;
+    throws IOException;
 }

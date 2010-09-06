@@ -43,8 +43,15 @@ public class IOOperations {
             final OutputStreamSocketProvider<OT, T> output,
             final OT destination)
     throws IOException {
-        copy(   input.getInputStreamSocket(source),
-                output.getOutputStreamSocket(destination));
+        final InputStreamSocket<? extends IT, ? super T> iss;
+        try {
+            iss = input.getInputStreamSocket(source);
+        } catch (IOException ex) {
+            throw new InputException(ex);
+        }
+        final OutputStreamSocket<? extends OT, ? super T> oss;
+        oss = output.getOutputStreamSocket(destination);
+        copy(iss, oss);
     }
 
     /**
@@ -66,19 +73,21 @@ public class IOOperations {
             final OutputStreamSocket<? extends T, ? super T> output)
     throws IOException {
         final InputStream is;
-        final OutputStream os;
         try {
             is = input.newInputStream(output);
         } catch (IOException ex) {
             throw new InputException(ex);
         }
+        OutputStream os = null;
         try {
             os = output.newOutputStream(input);
-        } catch (IOException ex) {
-            try {
-                is.close(); // ignore any exception! // FIXME: Not executed on RuntimeException or Error!!!
-            } finally {
-                throw ex;
+        } finally {
+            if (os == null) { // exception?
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                    throw new InputException(ex);
+                }
             }
         }
         Streams.copy(is, os);

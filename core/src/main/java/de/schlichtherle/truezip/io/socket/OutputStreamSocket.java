@@ -20,12 +20,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Creates output streams for writing bytes to its target.
+ * Creates output streams for writing bytes to its local target.
  *
  * @param   <LT> The type of the <i>local target</i> for I/O operations,
  *          i.e. the {@link #get() target} of this instance.
- * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          for I/O operations.
+ * @param   <PT> The minimum required type of the <i>peer targets</i>.
  * @see     OutputStreamSocketProvider
  * @see     InputStreamSocket
  * @author  Christian Schlichtherle

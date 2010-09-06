@@ -20,12 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates input streams for reading bytes from its target.
+ * Creates input streams for reading bytes from its local target.
  * 
  * @param   <LT> The type of the <i>local target</i> for I/O operations,
  *          i.e. the {@link #get() target} of this instance.
- * @param   <PT> The minimum required type of the <i>peer targets</i> for
- *          for I/O operations.
+ * @param   <PT> The minimum required type of the <i>peer targets</i>.
  * @see     InputStreamSocketProvider
  * @see     OutputStreamSocket
  * @author  Christian Schlichtherle
