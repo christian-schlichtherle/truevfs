@@ -194,8 +194,8 @@ public abstract class ArchiveController implements Archive {
      *        acquired.
      *        No read lock is acquired while it's running.
      */
-    final <T extends Throwable> void runWriteLocked(Operation<T> runnable)
-    throws T {
+    final <E extends Exception> void runWriteLocked(Operation<E> runnable)
+    throws E {
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.
         // Note that this is not just a limitation of the current

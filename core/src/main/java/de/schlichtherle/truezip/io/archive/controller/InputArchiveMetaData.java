@@ -19,9 +19,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.IOStreamSockets;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -180,9 +178,9 @@ public final class InputArchiveMetaData {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized <T extends Throwable>
-    void closeAllInputStreams(final ExceptionHandler<IOException, T> handler)
-    throws T {
+    synchronized <E extends Exception>
+    void closeAllInputStreams(final ExceptionHandler<IOException, E> handler)
+    throws E {
         assert !stopped;
         stopped = true;
         for (final Iterator<EntryInputStream> it = streams.keySet().iterator();

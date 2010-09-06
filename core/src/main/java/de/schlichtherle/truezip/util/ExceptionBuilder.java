@@ -28,12 +28,12 @@ package de.schlichtherle.truezip.util;
  * {@link #check()}.
  *
  * @param <C> The type of the cause exception.
- * @param <T> The type of the assembled exception.
+ * @param <E> The type of the assembled exception.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ExceptionBuilder<C extends Throwable, T extends Throwable>
-extends ExceptionHandler<C, T> {
+public interface ExceptionBuilder<C extends Throwable, E extends Exception>
+extends ExceptionHandler<C, E> {
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -45,7 +45,7 @@ extends ExceptionHandler<C, T> {
      *
      * @return The assembled exception to throw - {@code null} is not permitted.
      */
-    T fail(C cause);
+    E fail(C cause);
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -58,7 +58,7 @@ extends ExceptionHandler<C, T> {
      * @throws T The assembled exception if the implementation wants the caller
      *         to abort its task.
      */
-    void warn(C cause) throws T;
+    void warn(C cause) throws E;
 
     /**
      * Either returns or checks out and throws
@@ -68,5 +68,5 @@ extends ExceptionHandler<C, T> {
      * @throws T The assembled exception if the implementation wants the caller
      *         to abort its task.
      */
-    void check() throws T;
+    void check() throws E;
 }
