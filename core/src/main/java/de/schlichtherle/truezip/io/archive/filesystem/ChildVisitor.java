@@ -25,7 +25,9 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 public interface ChildVisitor {
 
     /**
-     * Called to initialize the implementation before any childre are visited.
+     * Called to initialize the implementation before any children are visited.
+     * Note that this method is called exactly once if and only if the
+     * directory is accessible.
      * 
      * @param numChildren the number of children which are going to be visited.
      */
@@ -33,6 +35,8 @@ public interface ChildVisitor {
 
     /**
      * Called to visit the child of a directory.
+     * Note that this method is called for each child if and only if the
+     * directory is accessible.
      *
      * @param child the base name of the child.
      */
