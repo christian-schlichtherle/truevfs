@@ -133,7 +133,7 @@ extends FilterOutputArchive<AE> {
     throws FileNotFoundException {
         final ArchiveOutputStreamSocket<? extends AE> dst
                 = super.getOutputStreamSocket(entry);
-        class OutputStreamProxy implements ArchiveOutputStreamSocket<AE> {
+        class OutputStreamSocket implements ArchiveOutputStreamSocket<AE> {
             @Override
             public AE get() {
                 return entry;
@@ -146,7 +146,7 @@ extends FilterOutputArchive<AE> {
                 return MultiplexedOutputArchive.this.newOutputStream(dst, src);
             }
         } // class OutputStreamProxy
-        return new OutputStreamProxy();
+        return new OutputStreamSocket();
     }
 
     protected OutputStream newOutputStream(

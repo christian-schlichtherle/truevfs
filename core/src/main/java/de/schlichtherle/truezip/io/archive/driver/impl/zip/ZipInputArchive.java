@@ -63,7 +63,7 @@ implements InputArchive<ZipEntry> {
             final ZipEntry entry)
     throws FileNotFoundException {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
-        class InputStreamProxy implements ArchiveInputStreamSocket<ZipEntry> {
+        class InputStreamSocket implements ArchiveInputStreamSocket<ZipEntry> {
             @Override
             public ZipEntry get() {
                 return entry;
@@ -76,8 +76,8 @@ implements InputArchive<ZipEntry> {
                 final ArchiveEntry dstEntry = IOReferences.deref(dst);
                 return ZipInputArchive.this.newInputStream(entry, dstEntry);
             }
-        } // class InputStreamProxy
-        return new InputStreamProxy();
+        }
+        return new InputStreamSocket();
     }
 
     protected InputStream newInputStream(ZipEntry entry, ArchiveEntry dstEntry)

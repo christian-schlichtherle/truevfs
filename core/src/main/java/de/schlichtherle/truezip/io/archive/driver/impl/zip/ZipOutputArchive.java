@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.IOStreamSockets;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.OutputArchiveMetaData;
 import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
@@ -131,7 +130,7 @@ implements OutputArchive<ZipEntry> {
     public ArchiveOutputStreamSocket<ZipEntry> getOutputStreamSocket(
             final ZipEntry entry)
     throws FileNotFoundException {
-        class OutputStreamProxy implements ArchiveOutputStreamSocket<ZipEntry> {
+        class OutputStreamSocket implements ArchiveOutputStreamSocket<ZipEntry> {
             @Override
             public ZipEntry get() {
                 return entry;
@@ -144,7 +143,7 @@ implements OutputArchive<ZipEntry> {
                 return ZipOutputArchive.this.newOutputStream(entry, src);
             }
         } // class OutputStreamProxy
-        return new OutputStreamProxy();
+        return new OutputStreamSocket();
     }
 
     protected OutputStream newOutputStream(
