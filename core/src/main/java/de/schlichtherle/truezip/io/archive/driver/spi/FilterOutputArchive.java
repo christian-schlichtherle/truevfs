@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * A decorator for output archives.
