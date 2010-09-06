@@ -51,10 +51,10 @@ import static de.schlichtherle.truezip.io.Paths.normalize;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveFileSystem<AE extends ArchiveEntry> {
+public final class ArchiveFileSystem {
 
     /** The controller that this filesystem belongs to. */
-    private final ArchiveEntryFactory<AE> factory;
+    private final ArchiveEntryFactory factory;
 
     /** The read only status of this file system. */
     private final boolean readOnly;
@@ -68,10 +68,10 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * Note that the archive entries in this map are shared with the
      * {@link InputArchive} object provided to this class' constructor.
      */
-    private Map<String, AE> master;
+    private Map<String, ArchiveEntry> master;
 
     /** The archive entry for the virtual root of this file system. */
-    private final AE root;
+    private final ArchiveEntry root;
 
     /** The number of times this file system has been modified (touched). */
     private long touched;
@@ -92,13 +92,13 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
     public ArchiveFileSystem(
-            final ArchiveEntryFactory<AE> factory,
+            final ArchiveEntryFactory factory,
             final VetoableTouchListener vetoableTouchListener)
     throws IOException {
         assert factory != null;
 
         this.factory = factory;
-        master = new LinkedHashMap<String, AE>(64);
+        master = new LinkedHashMap<String, ArchiveEntry>(64);
 
         // Setup root.
         root = newArchiveEntry(ROOT, DIRECTORY);
@@ -144,18 +144,18 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      *         is {@code null}.
      */
     public ArchiveFileSystem(
-            final ArchiveEntryFactory<AE> factory,
+            final ArchiveEntryFactory factory,
             final VetoableTouchListener vetoableTouchListener,
-            final InputArchive<AE> archive,
+            final InputArchive<?> archive,
             final long rootTime,
             final boolean readOnly) {
         this.factory = factory;
-        master = new LinkedHashMap<String, AE>(
+        master = new LinkedHashMap<String, ArchiveEntry>(
                 (int) (archive.size() / 0.75f) + 1);
 
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         // Load entries from input archive.
-        for (final AE entry : archive) {
+        for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
             master.put(path, entry);
             entry.setMetaData(new ArchiveEntryMetaData(entry));
@@ -172,7 +172,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Check fsck = new Check();
-        for (final AE entry : archive) {
+        for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
             if (isValidPath(path))
                 fsck.fix(path);
@@ -195,7 +195,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * @throws AssertionError if a {@link CharConversionException} occurs.
      *         The original exception is wrapped as its cause.
      */
-    private AE newArchiveEntry(
+    private ArchiveEntry newArchiveEntry(
             final String path,
             final Type type) {
         try {
@@ -223,7 +223,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * @throws CharConversionException if {@code path} contains characters
      *         which are not supported by the archive file.
      */
-    private AE newArchiveEntry(
+    private ArchiveEntry newArchiveEntry(
             final String path,
             final Type type,
             final ArchiveEntry template)
@@ -233,7 +233,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
         assert !isRoot(path) || type == DIRECTORY;
         assert template == null || type == template.getType();
 
-        final AE entry = factory.newArchiveEntry(path, type, template);
+        final ArchiveEntry entry = factory.newArchiveEntry(path, type, template);
         entry.setMetaData(new ArchiveEntryMetaData(entry));
         return entry;
     }
@@ -351,7 +351,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
             split(path);
             final String parentPath = getParentPath();
             final String baseName = getBaseName();
-            AE parent = master.get(parentPath);
+            ArchiveEntry parent = master.get(parentPath);
             if (parent == null) {
                 parent = newArchiveEntry(parentPath, DIRECTORY);
                 master.put(parentPath, parent);
@@ -402,7 +402,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * {@code null} if not existent.
      */
     // TODO: Introduce sockets and make this private!
-    public AE get(String path) {
+    public ArchiveEntry get(String path) {
         return master.get(path);
     }
 
@@ -486,7 +486,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
     // TODO: Introduce sockets and make this private!
     public class LinkTransaction implements IOOperation {
         final Splitter splitter = new Splitter();
-        final PathNameElement<AE>[] elements;
+        final PathNameElement[] elements;
 
         private LinkTransaction(
                 final String entryPath,
@@ -526,13 +526,13 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
             final PathNameElement[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
-            final AE parentEntry = master.get(parentPath);
-            final AE newEntry;
+            final ArchiveEntry parentEntry = master.get(parentPath);
+            final ArchiveEntry newEntry;
             if (parentEntry != null) {
                 if (parentEntry.getType() != DIRECTORY)
                     throw new ArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
-                final AE oldEntry = master.get(entryPath);
+                final ArchiveEntry oldEntry = master.get(entryPath);
                 if (entryType == DIRECTORY) {
                     if (oldEntry != null) {
                         throw new ArchiveFileSystemException(entryPath,
@@ -570,11 +570,11 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
             final long time = System.currentTimeMillis();
             final int l = elements.length;
 
-            AE parent = elements[0].entry;
+            ArchiveEntry parent = elements[0].entry;
             for (int i = 1; i < l ; i++) {
-                final PathNameElement<AE> element = elements[i];
+                final PathNameElement element = elements[i];
                 final String path = element.path;
-                final AE entry = element.entry;
+                final ArchiveEntry entry = element.entry;
                 final String base = element.base;
                 if (parent.getMetaData().children.add(base)
                         && parent.getTime() != UNKNOWN) // never touch ghosts!
@@ -597,9 +597,9 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
      * A data class which represents a path name base for use by
      * {@link LinkTransaction}.
      */
-    private static class PathNameElement<AE extends ArchiveEntry> {
+    private static class PathNameElement {
         final String path;
-        final AE entry;
+        final ArchiveEntry entry;
         final String base;
 
         /**
@@ -614,7 +614,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
          */
         PathNameElement(
                 final String path,
-                final AE entry,
+                final ArchiveEntry entry,
                 final String base) {
             assert path != null;
             assert entry != null;
@@ -641,7 +641,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
             throw new ArchiveFileSystemException(entryPath,
                     "virtual root directory cannot get unlinked");
         try {
-            final AE entry = master.remove(entryPath);
+            final ArchiveEntry entry = master.remove(entryPath);
             if (entry == null)
                 throw new ArchiveFileSystemException(entryPath,
                         "entry does not exist");
@@ -678,12 +678,12 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
     }
 
     public boolean isFile(final String path) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         return entry != null && entry.getType() == FILE;
     }
     
     public boolean isDirectory(final String path) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         return entry != null && entry.getType() == DIRECTORY;
     }
     
@@ -696,7 +696,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
     }
     
     public long getLength(final String path) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         if (entry == null || entry.getType() == DIRECTORY)
             return 0;
 
@@ -714,7 +714,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
     }
 
     public long getLastModified(final String path) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         if (entry != null) {
             // Depending on the driver type, entry.getTime() could return
             // a negative value. E.g. this is the default value that the
@@ -738,7 +738,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
         if (isReadOnly())
             return false;
 
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         if (entry == null)
             return false;
 
@@ -750,14 +750,14 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
     }
 
     public int getNumChildren(final String path) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         return entry != null && entry.getType() == DIRECTORY
                 ? entry.getMetaData().size()
                 : 0; // does not exist as a directory
     }
 
     public void list(final String path, final ChildVisitor visitor) {
-        final AE entry = get(path);
+        final ArchiveEntry entry = get(path);
         if (entry != null && entry.getType() == DIRECTORY)
             entry.getMetaData().list(visitor);
     }
@@ -781,14 +781,14 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
 
     public <E extends Exception>
     void copy(
-            final InputArchive<AE> ia,
-            final OutputArchive<AE> oa,
+            final InputArchive<ArchiveEntry> ia,
+            final OutputArchive<ArchiveEntry> oa,
             final ExceptionHandler<IOException, E> h)
     throws E {
-        final Enumeration<AE> en
+        final Enumeration<ArchiveEntry> en
                 = Collections.enumeration(master.values());
         while (en.hasMoreElements()) {
-            final AE e = en.nextElement();
+            final ArchiveEntry e = en.nextElement();
             final String n = e.getName();
             if (oa.getEntry(n) != null)
                 continue; // we have already written this entry
@@ -799,7 +799,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
                     oa.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((AE) null))
+                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
                             .close();
                 } else if (ia != null && ia.getEntry(n) != null) {
                     assert e == ia.getEntry(n);
@@ -813,7 +813,7 @@ public final class ArchiveFileSystem<AE extends ArchiveEntry> {
                     // recreate the entry when the file system gets
                     // remounted from the archive file.
                     oa.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((AE) null))
+                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
                             .close();
                 }
             } catch (IOException ex) {
