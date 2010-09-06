@@ -97,7 +97,7 @@ implements OutputArchive<TarEntry> {
     public ArchiveOutputStreamSocket<TarEntry> getOutputStreamSocket(
             final TarEntry entry)
     throws FileNotFoundException {
-        class OutputStreamProxy implements ArchiveOutputStreamSocket<TarEntry> {
+        class OutputStreamSocket implements ArchiveOutputStreamSocket<TarEntry> {
             @Override
             public TarEntry get() {
                 return entry;
@@ -109,7 +109,7 @@ implements OutputArchive<TarEntry> {
                 return TarOutputArchive.this.newOutputStream(entry, src);
             }
         } // class OutputProxy
-        return new OutputStreamProxy();
+        return new OutputStreamSocket();
     }
 
     protected OutputStream newOutputStream(

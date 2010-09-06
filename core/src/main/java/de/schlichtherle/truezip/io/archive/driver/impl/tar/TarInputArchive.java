@@ -221,7 +221,7 @@ implements InputArchive<TarEntry> {
             final TarEntry entry)
     throws FileNotFoundException {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
-        class InputStreamProxy implements ArchiveInputStreamSocket<TarEntry> {
+        class InputStreamSocket implements ArchiveInputStreamSocket<TarEntry> {
             @Override
             public TarEntry get() {
                 return entry;
@@ -235,7 +235,7 @@ implements InputArchive<TarEntry> {
                 return TarInputArchive.this.newInputStream(entry, dstEntry);
             }
         } // class InputStreamProxy
-        return new InputStreamProxy();
+        return new InputStreamSocket();
     }
 
     protected InputStream newInputStream(TarEntry src, ArchiveEntry dst)
