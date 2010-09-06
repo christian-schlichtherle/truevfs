@@ -50,7 +50,7 @@ extends MultiplexedOutputArchive<ZipEntry> {
 
     @Override
     protected OutputStream newOutputStream(
-            final ArchiveOutputStreamSocket<ZipEntry> dst,
+            final ArchiveOutputStreamSocket<? extends ZipEntry> dst,
             final IOReference<? extends ArchiveEntry> src)
     throws IOException {
         final ZipEntry dstEntry = dst.get();

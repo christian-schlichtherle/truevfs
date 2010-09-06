@@ -128,9 +128,10 @@ extends FilterOutputArchive<AE> {
     }
 
     @Override
-    public ArchiveOutputStreamSocket<AE> getOutputStreamSocket(final AE entry)
+    public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
+            final AE entry)
     throws FileNotFoundException {
-        final ArchiveOutputStreamSocket<AE> dst
+        final ArchiveOutputStreamSocket<? extends AE> dst
                 = super.getOutputStreamSocket(entry);
         class OutputStreamProxy implements ArchiveOutputStreamSocket<AE> {
             @Override
@@ -149,7 +150,7 @@ extends FilterOutputArchive<AE> {
     }
 
     protected OutputStream newOutputStream(
-            final ArchiveOutputStreamSocket<AE> dst,
+            final ArchiveOutputStreamSocket<? extends AE> dst,
             final IOReference<? extends ArchiveEntry> src)
     throws IOException {
         final ArchiveEntry srcEntry = IOReferences.deref(src);
@@ -216,14 +217,14 @@ extends FilterOutputArchive<AE> {
     extends FileOutputStream
     implements IOReference<AE> {
         private final File temp;
-        private final ArchiveOutputStreamSocket<AE> dst;
+        private final ArchiveOutputStreamSocket<? extends AE> dst;
         private final InputStreamSocket<? extends ArchiveEntry, ArchiveEntry> src;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
-                final ArchiveOutputStreamSocket<AE> dst,
+                final ArchiveOutputStreamSocket<? extends AE> dst,
                 final IOReference<? extends ArchiveEntry> src)
         throws IOException {
             super(temp);
