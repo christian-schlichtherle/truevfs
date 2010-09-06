@@ -17,9 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.controller.InputArchiveMetaData;
-import de.schlichtherle.truezip.io.socket.InputStreamSocketProvider;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 
 /**
  * A container which supports reading archive entries from an arbitrary input
@@ -28,26 +26,15 @@ import java.io.FileNotFoundException;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
+ * @param   <AE> The type of the archive entries.
  * @see     OutputArchive
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface InputArchive<AE extends ArchiveEntry>
 extends ArchiveEntryContainer<AE>,
-        InputStreamSocketProvider<AE, ArchiveEntry>,
+        ArchiveInputStreamSocketProvider<AE>,
         Closeable {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The given archive entry is guaranteed to be one of the entries in this
-     * container.
-     *
-     * @param entry a non-{@code null} archive entry.
-     */
-    @Override
-    ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(AE entry)
-    throws FileNotFoundException;
 
     /**
      * Returns the meta data for this input archive.
