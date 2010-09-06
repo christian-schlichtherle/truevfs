@@ -23,12 +23,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Creates output streams for writing bytes to its target archive entry.
+ * Creates output streams for writing bytes to its <i>local target</i>
+ * archive entry.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <AE> The type of the {@link #get() target} output archive entry.
+ * @param   <AE> The type of the {@link #get() local target} archive entry.
  * @see     ArchiveInputStreamSocket
  * @see     OutputArchive
  * @author  Christian Schlichtherle
