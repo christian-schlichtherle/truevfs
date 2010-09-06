@@ -55,15 +55,17 @@ extends Iterable<AE> {
     Iterator<AE> iterator();
 
     /**
-     * Returns the archive entry for the given archive entry name or
-     * {@code null} if no archive entry with this entry name exists in this
-     * archive entry container.
+     * Returns the archive entry for the given <i>entry name</i> or
+     * {@code null} if no archive entry with this entry name exists in
+     * this archive entry container.
+     * An entry name is a <i>path name</i> which meets all additional
+     * requirements which may be defined by their particular archive type.
      *
-     * @param  name a valid archive entry name - never {@code null}.
-     * @return The archive entry for the given entry name or {@code null} if
-     *         no archive entry with this entry name exists in this archive
-     *         entry container.
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
+     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @param  name a non-{@code null} <i>entry name</i>.
+     * @return The archive entry for the given <i>entry name</i> or
+     *         {@code null} if no archive entry with this entry name exists in
+     *         this archive entry container.
      */
     AE getEntry(String name);
 }

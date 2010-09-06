@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -185,7 +186,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public ArchiveEntry newArchiveEntry(String name, ArchiveEntry template)
+        public ArchiveEntry newArchiveEntry(String name, Type type, ArchiveEntry template)
         throws CharConversionException {
             return new FileEntry(new File("foo/bar"));
         }

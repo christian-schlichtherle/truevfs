@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip.raes;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
@@ -129,10 +130,11 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipEntry newArchiveEntry(
-            final String name,
+            final String path,
+            final Type type,
             final ArchiveEntry template)
     throws CharConversionException {
-        final JarEntry entry = (JarEntry) super.newArchiveEntry(name, template);
+        final JarEntry entry = (JarEntry) super.newArchiveEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);

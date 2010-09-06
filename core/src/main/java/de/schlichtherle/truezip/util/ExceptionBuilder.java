@@ -23,8 +23,8 @@ package de.schlichtherle.truezip.util;
  * This may be used in scenarios where a cooperative algorithm needs to
  * continue its task even if one or more exceptional conditions occur.
  * This interface would then allow to collect all cause exceptions during
- * the processing by calling {@link #warn(Throwable)} and later check out the
- * assembled exception by calling {@link #fail(Throwable)} or
+ * the processing by calling {@link #warn(Exception)} and later check out the
+ * assembled exception by calling {@link #fail(Exception)} or
  * {@link #check()}.
  *
  * @param <C> The type of the cause exception.
@@ -32,7 +32,7 @@ package de.schlichtherle.truezip.util;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ExceptionBuilder<C extends Throwable, E extends Exception>
+public interface ExceptionBuilder<C extends Exception, E extends Exception>
 extends ExceptionHandler<C, E> {
 
     /**

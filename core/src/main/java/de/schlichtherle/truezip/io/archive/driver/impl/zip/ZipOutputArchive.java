@@ -119,12 +119,12 @@ implements OutputArchive<ZipEntry> {
     }
 
     @Override
-    public ZipEntry getEntry(final String entryName) {
-        ZipEntry e = super.getEntry(entryName);
-        if (e != null)
-            return e;
-        e = tempEntry;
-        return e != null && entryName.equals(e.getName()) ? e : null;
+    public ZipEntry getEntry(final String name) {
+        ZipEntry entry = super.getEntry(name);
+        if (entry != null)
+            return entry;
+        entry = tempEntry;
+        return entry != null && name.equals(entry.getName()) ? entry : null;
     }
 
     @Override

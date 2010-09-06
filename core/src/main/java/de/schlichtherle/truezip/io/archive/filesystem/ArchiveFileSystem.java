@@ -171,10 +171,10 @@ public final class ArchiveFileSystem {
         // and populate directories with their children - this needs to be done
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
-        final PopulatePostfix fsck = new PopulatePostfix();
+        final Check fsck = new Check();
         for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
-            if (isLegalPath(path))
+            if (isValidPath(path))
                 fsck.fix(path);
         }
 
@@ -206,34 +206,34 @@ public final class ArchiveFileSystem {
     }
 
     /**
-     * Constructs a new archive entry for this archive file system.
-     * The returned archive entry still needs to be {@link #link}ed into this
-     * archive file system.
+     * Returns a new archive entry for this archive file system.
      * The returned entry has properly initialized meta data, but is
-     * otherwise left as created by the archive driver.
+     * otherwise left as created by the archive entry factory.
+     * Furthermore, it's not linked into this archive file system yet.
      *
-     * @param  path the path name of the archive entry to create.
-     *         This is always a {@link #isLegalPath(String) legal path}.
-     * @param  blueprint if not {@code null}, then the newly created archive
+     * @see    #link
+     * @param  path the non-{@code null} path name of the new archive entry.
+     *         This is always a {@link #isValidPath(String) valid path name}.
+     * @param  type the non-{@code null} type of the new archive entry.
+     * @param  template if not {@code null}, then the newly created archive
      *         entry shall inherit as much properties from this archive entry
      *         as possible (with the exception of its entry name).
      *         This is typically used for copy operations.
-     * @return An {@link ArchiveEntry} created by the archive driver.
+     * @return A non-{@code null} archive entry.
      * @throws CharConversionException if {@code path} contains characters
      *         which are not supported by the archive file.
      */
     private ArchiveEntry newArchiveEntry(
-            String path,
+            final String path,
             final Type type,
-            final ArchiveEntry blueprint)
+            final ArchiveEntry template)
     throws CharConversionException {
+        assert isValidPath(path);
+        assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
-        assert isLegalPath(path);
-        assert type == FILE || type == DIRECTORY : "Only FILE and DIRECTORY entries are currently supported!";
+        assert template == null || type == template.getType();
 
-        if (type == DIRECTORY)
-            path += SEPARATOR_CHAR;
-        final ArchiveEntry entry = factory.newArchiveEntry(path, blueprint);
+        final ArchiveEntry entry = factory.newArchiveEntry(path, type, template);
         entry.setMetaData(new ArchiveEntryMetaData(entry));
         return entry;
     }
@@ -248,49 +248,53 @@ public final class ArchiveFileSystem {
     }
 
     /**
-     * Checks whether the given entry entryName is a legal path name.
-     * A legal path name is in {@link Paths#normalize(String, char) normal form},
-     * is not absolute, does not identify the dot directory ({@code "."}) or
+     * Checks whether the given entry name is a <i>valid path name</i>.
+     * A valid path name is in
+     * {@link Paths#normalize(String, char) normal form},
+     * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
+     *
+     * @see ArchiveEntry#getName() General requirements for entry names.
+     * @param name a non-{@code null} entry name.
      */
-    private static boolean isLegalPath(final String path) {
-        if (isRoot(path))
+    private static boolean isValidPath(final String name) {
+        if (isRoot(name))
             return true;
 
-        if (path != normalize(path, SEPARATOR_CHAR)) // mind contract!
+        if (name != normalize(name, SEPARATOR_CHAR)) // mind contract!
             return false;
 
-        final int length = path.length();
-        assert length > 0 || isRoot(path) : "Definition of ROOT changed!?";
-        switch (path.charAt(0)) {
+        final int length = name.length();
+        assert length > 0 || isRoot(name) : "Definition of ROOT changed!?";
+        switch (name.charAt(0)) {
         case SEPARATOR_CHAR:
-            return false; // never fix absolute path names
+            return false; // not a relative path name
 
         case '.':
             if (length >= 2) {
-                switch (path.charAt(1)) {
+                switch (name.charAt(1)) {
                 case '.':
                     if (length >= 3) {
-                        if (path.charAt(2) == SEPARATOR_CHAR) {
-                            assert path.startsWith(".." + SEPARATOR);
+                        if (name.charAt(2) == SEPARATOR_CHAR) {
+                            assert name.startsWith(".." + SEPARATOR);
                             return false;
                         }
                         // Fall through.
                     } else {
-                        assert "..".equals(path);
+                        assert "..".equals(name);
                         return false;
                     }
                     break;
 
                 case SEPARATOR_CHAR:
-                    assert path.startsWith("." + SEPARATOR);
+                    assert name.startsWith("." + SEPARATOR);
                     return false;
 
                 default:
                     // Fall through.
                 }
             } else {
-                assert ".".equals(path);
+                assert ".".equals(name);
                 return false;
             }
             break;
@@ -326,7 +330,7 @@ public final class ArchiveFileSystem {
         }
     }
 
-    private class PopulatePostfix extends Splitter {
+    private class Check extends Splitter {
         /**
          * Called from a constructor to fix the parent directories of the entry
          * identified by {@code path}, ensuring that all parent directories of
@@ -342,7 +346,7 @@ public final class ArchiveFileSystem {
             // directory as its parameter, so we may NOT skip the following test.
             if (isRoot(path))
                 return; // never fix root or empty or absolute pathnames
-            assert isLegalPath(path);
+            assert isValidPath(path);
 
             split(path);
             final String parentPath = getParentPath();
@@ -495,9 +499,9 @@ public final class ArchiveFileSystem {
             if (isRoot(entryPath))
                 throw new ArchiveFileSystemException(entryPath,
                         "cannot replace root directory entry");
-            if (!isLegalPath(entryPath))
+            if (!isValidPath(entryPath))
                 throw new ArchiveFileSystemException(entryPath,
-                        "is not a legal path name");
+                        "is not a valid path name");
             if (entryType != FILE && entryType != DIRECTORY)
                 throw new ArchiveFileSystemException(entryPath,
                         "only FILE and DIRECTORY entries are currently supported");

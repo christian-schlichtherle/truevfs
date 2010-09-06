@@ -74,7 +74,7 @@ package de.schlichtherle.truezip.util;
  * <p>
  * Here's how a generic method declaration for a copy algorithm could look like:
  * <pre>{@code
- * public <IE extends Throwable, OE extends Throwable>
+ * public <IE extends Exception, OE extends Exception>
  * copy(   File src, ExceptionHandler<IOException, IE> inputHandler,
  *         File dst, ExceptionHandler<IOException, OE> outputHandler)
  * throws IE, OE {
@@ -92,7 +92,7 @@ package de.schlichtherle.truezip.util;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ExceptionHandler<C extends Throwable, E extends Exception> {
+public interface ExceptionHandler<C extends Exception, E extends Exception> {
 
     /**
      * Called to handle an exceptional condition which

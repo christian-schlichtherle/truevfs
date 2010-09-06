@@ -99,6 +99,7 @@ public class ZipEntry implements Cloneable {
      */
     public ZipEntry(final ZipEntry template) {
         this(template.getName(), template);
+        setInit(NAME, false); // unlock name
     }
 
     /**
@@ -118,19 +119,19 @@ public class ZipEntry implements Cloneable {
         this.offset = template.offset;
         setExtra0(template.getExtra());
         this.comment = template.comment;
-        setInit(NAME, false); // unlock name
     }
 
     @Override
     public ZipEntry clone() {
+        final ZipEntry entry;
         try {
-            final ZipEntry entry = (ZipEntry) super.clone();
-            entry.setExtra(getExtra());
-            entry.setInit(NAME, false); // unlock name
-            return entry;
+            entry = (ZipEntry) super.clone();
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
+        entry.setExtra(getExtra());
+        entry.setInit(NAME, false); // unlock name
+        return entry;
     }
 
     private boolean isInit(final int index) {
