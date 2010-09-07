@@ -256,6 +256,7 @@ public class GeneralFileTest extends TestCase {
         
         testNormalizedAbsoluteFile("a", "a");
         testNormalizedAbsoluteFile("a", "a/.");
+        testNormalizedAbsoluteFile("a b", "a b"); // test issue #38 on truezip.dev.java.net
         testNormalizedAbsoluteFile(".", "a/..");
         testNormalizedAbsoluteFile("b", "a/../b");
         testNormalizedAbsoluteFile("b", "a/../b/.");
