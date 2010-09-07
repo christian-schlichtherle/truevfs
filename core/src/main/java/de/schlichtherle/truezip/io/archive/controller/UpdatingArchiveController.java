@@ -927,7 +927,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // modification time of the entry.
         final InputStream in = new java.io.FileInputStream(outFile);
         try {
-            ArchiveControllers.cp(true, outFile, in, controller, entryName);
+            ArchiveControllers.copy(true, outFile, in, controller, entryName);
         } catch (FalsePositiveException cannotHappen) {
             throw new AssertionError(cannotHappen);
         } finally {

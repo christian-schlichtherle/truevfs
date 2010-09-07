@@ -417,8 +417,8 @@ public final class ArchiveControllers {
     /**
      * Copies a source file to a destination file, optionally preserving the
      * source's last modification time.
-     * We know that the source and destination files both appear to be entries
-     * in an archive file.
+     * We know that the source and destination both appear to be entries in an
+     * archive file.
      *
      * @throws FalsePositiveException If the source or the destination is a
      *         false positive and the exception for the destination
@@ -555,7 +555,7 @@ public final class ArchiveControllers {
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
      */
-    public static void cp(
+    public static void copy(
             final boolean preserve,
             final java.io.File src,
             final InputStream in,
@@ -621,15 +621,12 @@ public final class ArchiveControllers {
         } catch (ArchiveEntryFalsePositiveException ex) {
             assert dstController.getCanonicalPath().equals(ex.getCanonicalPath());
             // Reroute call to the destination's enclosing ArchiveController.
-            cp(preserve, src, in,
+            copy(   preserve, src, in,
                     dstController.getEnclController(),
                     dstController.enclEntryName(dstEntryName));
         }
     }
 
-    //
-    // Static member classes and interfaces.
-    //
     /**
      * A lock used when copying data from one archive to another.
      * This lock must be acquired before any other locks on the controllers
@@ -637,6 +634,7 @@ public final class ArchiveControllers {
      */
     private static class CopyLock {
     }
+
     /**
      * A lock used when copying data from one archive file to another.
      * This lock must be acquired before any other locks on the controllers
