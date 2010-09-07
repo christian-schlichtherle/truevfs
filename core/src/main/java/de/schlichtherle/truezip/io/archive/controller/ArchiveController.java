@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.LinkTransaction;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.LinkOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
@@ -608,9 +608,9 @@ public abstract class ArchiveController implements Archive {
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final LinkTransaction link = fileSystem.link(path, FILE, lenient);
+                final LinkOperation link = fileSystem.link(path, FILE, lenient);
                 // Create output stream.
-                out = newOutputStream(link.getEntry(), null);
+                out = newOutputStream(link.get(), null);
                 // Now link the entry into the file system.
                 link.run();
             }
