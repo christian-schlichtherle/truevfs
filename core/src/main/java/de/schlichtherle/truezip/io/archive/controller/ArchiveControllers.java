@@ -288,11 +288,11 @@ public final class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<ArchiveController> get() {
+    static Iterable<? extends ArchiveController> get() {
         return get(null, null);
     }
 
-    static Iterable<ArchiveController> get(String prefix, final Comparator c) {
+    static Iterable<? extends ArchiveController> get(String prefix, final Comparator c) {
         if (prefix == null)
             prefix = "";
 
