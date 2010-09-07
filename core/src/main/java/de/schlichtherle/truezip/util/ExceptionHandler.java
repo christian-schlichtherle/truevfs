@@ -103,8 +103,8 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * Finally, if the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions!
      *
-     * @param cause The exception to handle - {@code null} is not permitted.
-     * @return The exception to throw - {@code null} is not permitted.
+     * @param   cause the exception to handle - {@code null} is not permitted.
+     * @return  The exception to throw - {@code null} is not permitted.
      */
     E fail(C cause);
 
@@ -117,8 +117,9 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * If the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions.
      *
-     * @param cause The exception to handle - {@code null} is not permitted.
-     * @throws T If the implementation wants the caller to abort its task.
+     * @param   cause the exception to handle - {@code null} is not permitted.
+     * @throws Exception if the implementation wants the caller to abort its
+     *         task.
      */
     void warn(C cause) throws E;
 }

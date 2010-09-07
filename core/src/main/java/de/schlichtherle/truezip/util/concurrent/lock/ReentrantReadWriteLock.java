@@ -83,29 +83,31 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     }
 
     /**
-     * Runs the given action while the write lock is temporarily acquired
+     * Runs the given operation while the write lock is temporarily acquired
      * even if the read lock is already acquired by the current thread.
      * <p>
      * <b>Warning:</b> This method temporarily releases the read lock
-     * before the write lock is temporarily acquired and the action is run!
-     * Hence, the action must recheck the preconditions for running it
-     * before it proceeds with the operations which require the write lock.
+     * before the write lock is temporarily acquired and the operation is run!
+     * Hence, the operation must recheck the preconditions for running it
+     * before it proceeds with the tasks which require the write lock.
      * <p>
      * Upon return, the hold count of the read and write lock for the current
-     * thread is fully restored, even if the action throws a throwable.
+     * thread is fully restored, even if the operation throws an exception.
      *
-     * @param action The action to run while the write lock is acquired.
-     * @throws NullPointerException If {@code action} is {@code null}.
-     * @throws Throwable Upon the discretion of {@code action}.
+     * @param  operation a non-{@code null} operation to run while the write
+     *         lock is acquired.
+     * @throws NullPointerException If {@code operation} is {@code null}.
+     * @throws Exception upon the discretion of {@code operation}.
      */
-    public <T extends Throwable> void runWriteLocked(final Operation<T> action)
-    throws T {
-        if (action == null)
+    public <E extends Exception> void runWriteLocked(
+            final Operation<E> operation)
+    throws E {
+        if (operation == null)
             throw new NullPointerException();
 
         if (writeLock.isLockedByCurrentThread()) {
             // Calls to *.unlock/lock() are redundant.
-            action.run();
+            operation.run();
         } else {
             // A read lock cannot get upgraded to a write lock.
             // Hence the following mess is required.
@@ -123,7 +125,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             try {
                 for (int c = readHoldCount; c > 0; c--)
                     readLock.lock();
-                action.run(); // beware of side effects on locks!
+                operation.run(); // beware of side effects on locks!
             } finally {
                 writeLock.unlock();
             }

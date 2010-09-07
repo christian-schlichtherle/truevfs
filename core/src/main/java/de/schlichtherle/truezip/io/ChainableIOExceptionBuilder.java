@@ -39,10 +39,12 @@ extends AbstractExceptionBuilder<E, E> {
      * return (E) cause.initPredecessor(previous);
      * }</pre>
      *
-     * @throws IllegalStateException If {@code cause.}{@link ChainableIOException#getPredecessor()}
-     *         is already initialized by a previous call to
+     * @throws IllegalStateException if
+     *         {@code cause.}{@link ChainableIOException#getPredecessor()} is
+     *         already initialized by a previous call to
      *         {@link ChainableIOException#initPredecessor(ChainableIOException)}.
      */
+    @Override
     protected final E update(E previous, E cause) {
         try {
             return (E) cause.initPredecessor(previous);
