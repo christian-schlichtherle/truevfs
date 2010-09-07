@@ -17,18 +17,19 @@
 package de.schlichtherle.truezip.util;
 
 /**
- * Encapsulates an operation which may throw a throwable.
+ * Encapsulates an operation which may throw an exception.
  * This interface may be used to implement closures.
  *
+ * @param <E> The type of exception which may be thrown by this operation.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface Operation<T extends Throwable> {
+public interface Operation<E extends Exception> {
 
     /**
      * Runs this operation.
      *
-     * @throws T If the operation fails.
+     * @throws Exception if the operation fails.
      */
-    void run() throws T;
+    void run() throws E;
 }

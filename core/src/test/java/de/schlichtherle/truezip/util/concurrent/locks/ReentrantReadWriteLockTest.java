@@ -81,7 +81,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
         });
     }
 
-    private <T extends Throwable> void runWithTimeout(
+    private <T extends Exception> void runWithTimeout(
             final long timeout,
             final Operation<T> action)
     throws T {

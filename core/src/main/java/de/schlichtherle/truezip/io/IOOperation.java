@@ -30,7 +30,8 @@ public interface IOOperation extends Operation<IOException> {
     /**
      * Runs this I/O operation.
      *
-     * @throws IOException If the I/O operation fails for some reason.
+     * @throws IOException If the I/O operation fails for some I/O related
+     *         reason.
      */
     @Override
     void run() throws IOException;

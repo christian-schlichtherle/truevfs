@@ -55,8 +55,8 @@ extends ExceptionHandler<C, E> {
      * <p>
      * {@inheritDoc}
      *
-     * @throws T The assembled exception if the implementation wants the caller
-     *         to abort its task.
+     * @throws Exception the assembled exception if the implementation wants
+     *         the caller to abort its task.
      */
     void warn(C cause) throws E;
 
@@ -65,8 +65,8 @@ extends ExceptionHandler<C, E> {
      * the result of the assembly
      * in order to enable the assembly of another exception.
      *
-     * @throws T The assembled exception if the implementation wants the caller
-     *         to abort its task.
+     * @throws Exception the assembled exception if the implementation wants
+     *         the caller to abort its task.
      */
     void check() throws E;
 }
