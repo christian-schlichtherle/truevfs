@@ -16,16 +16,27 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import java.io.OutputStream;
+import de.schlichtherle.truezip.io.socket.IOReference;
+import java.io.InputStream;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.socket.OutputStreamSocketProvider;
+import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
+import de.schlichtherle.truezip.io.socket.InputStreamSocket;
+import java.io.FileNotFoundException;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.socket.IOOperations;
 import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.socket.InputStreamSocketProvider;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -401,7 +412,6 @@ public final class ArchiveFileSystem {
      * Looks up the specified entry in the file system and returns it or
      * {@code null} if not existent.
      */
-    // TODO: Introduce sockets and make this private!
     public ArchiveEntry get(String path) {
         return master.get(path);
     }
@@ -672,7 +682,7 @@ public final class ArchiveFileSystem {
     //
     // File system operations used by the ArchiveController class:
     //
-    
+
     public boolean isExisting(final String path) {
         return get(path) != null;
     }
