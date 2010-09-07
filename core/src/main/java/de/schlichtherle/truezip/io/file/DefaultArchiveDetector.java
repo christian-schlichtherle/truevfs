@@ -92,8 +92,9 @@ import java.util.Map;
  * @see ArchiveDetector#ALL
  */
 public class DefaultArchiveDetector
-        extends de.schlichtherle.truezip.io.archive.detector.DefaultArchiveDetector
-        implements ArchiveDetector {
+extends de.schlichtherle.truezip.io.archive.detector.DefaultArchiveDetector
+implements ArchiveDetector {
+
     private static final long serialVersionUID = 848158760326123684L;
 
     /**
@@ -211,50 +212,53 @@ public class DefaultArchiveDetector
         super(delegate, config);
     }
 
+    @Override
     public File createFile(java.io.File blueprint) {
         return new File(blueprint, this);
     }
 
-
+    @Override
+    @SuppressWarnings("deprecation")
     public File createFile(java.io.File delegate, File innerArchive) {
         return new File(delegate, innerArchive, this);
     }
 
-
+    @Override
+    @SuppressWarnings("deprecation")
     public File createFile(
-            File blueprint,
+            File template,
             java.io.File delegate,
             File enclArchive) {
-        return new File(blueprint, delegate, enclArchive);
+        return new File(template, delegate, enclArchive);
     }
 
-
+    @Override
     public File createFile(java.io.File parent, String child) {
         return new File(parent, child, this);
     }
 
-
+    @Override
     public File createFile(String pathName) {
         return new File(pathName, this);
     }
 
-
+    @Override
     public File createFile(String parent, String child) {
         return new File(parent, child, this);
     }
 
-
+    @Override
     public File createFile(URI uri) {
         return new File(uri, this);
     }
 
-
+    @Override
     public FileInputStream createFileInputStream(java.io.File file)
     throws FileNotFoundException {
         return new FileInputStream(file);
     }
 
-
+    @Override
     public FileOutputStream createFileOutputStream(
             java.io.File file,
             boolean append)

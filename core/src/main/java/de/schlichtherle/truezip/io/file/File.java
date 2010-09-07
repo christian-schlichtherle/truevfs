@@ -676,8 +676,7 @@ public class File extends java.io.File {
     }
 
     /**
-     * <b>Warning:</b> This constructor is <em>not</em> intended for public use!
-     *
+     * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
     public File(
@@ -726,23 +725,21 @@ public class File extends java.io.File {
             final File innerArchive,
             final ArchiveDetector detector)
     throws AssertionError {
-        assert delegate != null : "delegate is null!";
-        assert !(delegate instanceof File) : "delegate must not be a de.schlichtherle.truezip.io.File!";
+        assert delegate != null;
+        assert !(delegate instanceof File);
         if (innerArchive != null) {
-            assert innerArchive.isArchive() : "innerArchive must be an archive!";
-            assert contains(innerArchive.getPath(), delegate.getPath()) : "innerArchive must contain delegate!";
+            assert innerArchive.isArchive();
+            assert contains(innerArchive.getPath(), delegate.getPath());
         }
-        assert detector != null : "detector is null!";
+        assert detector != null;
 
         return true;
     }
 
     /**
-     * <b>Warning:</b> This constructor is <em>not</em> intended for public use!
-     *
+     * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    // TODO: Review: Should this have protected access?
     public File(
             final File template,
             final java.io.File delegate,
@@ -773,10 +770,9 @@ public class File extends java.io.File {
             final java.io.File delegate,
             final File enclArchive)
     throws AssertionError {
-        assert delegate != null : "delegate is null!";
-        assert !(delegate instanceof File)
-                : "delegate must not be a de.schlichtherle.truezip.io.File!";
-        assert template != null : "template is null!";
+        assert delegate != null;
+        assert !(delegate instanceof File);
+        assert template != null;
 
         String delegatePath = delegate.getPath();
         final java.io.File normalizedTemplate = normalize(template);
@@ -798,12 +794,10 @@ public class File extends java.io.File {
             && !normalizedTemplatePath.startsWith("." + separator)
             && !normalizedTemplatePath.startsWith(".." + separator)) {
             assert delegatePath.endsWith(normalizedTemplatePath)
-                    : "delegate and template must identify the same directory!";
+                    : "delegate and template must identify the same file or directory!";
             if (enclArchive != null) {
-                assert enclArchive.isArchive()
-                        : "enclArchive must be an archive file!";
-                assert enclArchive.isParentOf(delegate)
-                        : "enclArchive must be an ancestor of delegate!";
+                assert enclArchive.isArchive();
+                assert enclArchive.isParentOf(delegate);
             }
         }
 

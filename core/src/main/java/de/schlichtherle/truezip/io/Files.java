@@ -83,7 +83,7 @@ public class Files extends Paths {
 
     /**
      * Returns the canonical path of the given file or the normalized absolute
-     * path if resolving the prior fails.
+     * path if canonicalizing the path fails due to an {@code IOException}.
      *
      * @return The canonical or absolute path of this file as a
      *         {@code File} instance.
