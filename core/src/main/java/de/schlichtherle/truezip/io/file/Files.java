@@ -222,7 +222,7 @@ final class Files {
                     if (srcArchive != null) {
                         final String srcPath = srcFile.getEnclEntryName();
                         assert srcPath != null;
-                        copy0(    preserve,
+                        copy0(  preserve,
                                 srcArchive.getArchiveController(),
                                 srcPath,
                                 dst);
@@ -288,7 +288,7 @@ final class Files {
                 if (dstArchive != null) {
                     final String dstPath = dstFile.getEnclEntryName();
                     assert dstPath != null;
-                    ArchiveControllers.cp(
+                    ArchiveControllers.copy(
                             preserve,
                             src,
                             in,
