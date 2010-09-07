@@ -57,13 +57,13 @@ public class IOStreamSockets {
 
             @Override
             public InputStream newInputStream(IOReference<? extends PT> dst)
-            throws IOException {
+            throws FileNotFoundException {
                 return new FileInputStream(file);
             }
 
             @Override
             public OutputStream newOutputStream(final IOReference<? extends PT> src)
-            throws IOException {
+            throws FileNotFoundException {
                 class FileOutputStreamDecorator extends FileOutputStream {
                     public FileOutputStreamDecorator() throws FileNotFoundException {
                         super(file);
