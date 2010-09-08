@@ -612,7 +612,7 @@ public abstract class ArchiveController implements Archive {
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final Link link = fileSystem.link(path, FILE, lenient);
+                final Link link = fileSystem.link(path, FILE, lenient, null);
                 // Create output stream.
                 out = newOutputStream(link, null);
                 // Now link the entry into the file system.

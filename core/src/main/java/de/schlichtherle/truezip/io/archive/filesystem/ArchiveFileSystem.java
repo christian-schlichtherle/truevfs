@@ -583,18 +583,6 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     } // class DirectoryEntry
 
     /**
-     * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
-     * link(path, type, createParents, null)}.
-     */
-    public Link link(
-            final String path,
-            final Type type,
-            final boolean createParents)
-    throws ArchiveFileSystemException {
-        return new Operation(path, type, createParents, null);
-    }
-
-    /**
      * Begins a &quot;create and link target&quot; transaction to ensure that
      * either a new target for the given {@code path} will be created or an
      * existing target is replaced within this archive file system.
@@ -940,7 +928,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
 
     public void mkdir(String path, boolean createParents)
     throws IOException {
-        link(path, DIRECTORY, createParents).run();
+        link(path, DIRECTORY, createParents, null).run();
     }
 
     public void delete(final String path)
