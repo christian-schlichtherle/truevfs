@@ -82,7 +82,7 @@ public final class ArchiveFileSystem {
     private final VetoableTouchListener vetoableTouchListener;
 
     /**
-     * Creates a new archive file system and ensures its integrity.
+     * Constructs a new archive file system and ensures its integrity.
      * The root directory is created with its last modification time set to
      * the system's current time.
      * The file system is modifiable and marked as touched!
@@ -94,7 +94,7 @@ public final class ArchiveFileSystem {
      *        a client class changes the state of this archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    public ArchiveFileSystem(
+    ArchiveFileSystem(
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener)
     throws IOException {
@@ -115,8 +115,8 @@ public final class ArchiveFileSystem {
     }
 
     /**
-     * Populates this file system from the given {@code archive} and ensures
-     * its integrity.
+     * Constructs a new archive file system which populates its entries from
+     * the given {@code archive} and ensures its integrity.
      * <p>
      * First, the entries from the archive are loaded into the file system.
      * <p>
@@ -146,7 +146,7 @@ public final class ArchiveFileSystem {
      * @throws NullPointerException If {@code factory} or {@code archive}
      *         is {@code null}.
      */
-    public ArchiveFileSystem(
+    ArchiveFileSystem(
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener,
             final InputArchive<? extends ArchiveEntry> archive,

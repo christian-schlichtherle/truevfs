@@ -16,14 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.FileEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.DirectoryEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
-
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import java.io.IOException;
 
 /**
+ * Provides static utility methods for archive file systems.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -33,4 +33,64 @@ public class ArchiveFileSystems {
     ArchiveFileSystems() {
     }
 
+    /**
+     * Returns a new archive file system and ensures its integrity.
+     * The root directory is created with its last modification time set to
+     * the system's current time.
+     * The file system is modifiable and marked as touched!
+     *
+     * @param factory the archive entry factory to use.
+     * @param vetoableTouchListener the nullable listener for touch events.
+     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *        method will be called at the end of this constructor and whenever
+     *        a client class changes the state of this archive file system.
+     * @throws NullPointerException If {@code factory} is {@code null}.
+     */
+    public static ArchiveFileSystem newArchiveFileSystem(
+            ArchiveEntryFactory<? extends ArchiveEntry> factory,
+            VetoableTouchListener vetoableTouchListener)
+    throws IOException {
+        return new ArchiveFileSystem(factory, vetoableTouchListener);
+    }
+    /**
+     * Returns a new archive file system which populates its entries from
+     * the given {@code archive} and ensures its integrity.
+     * <p>
+     * First, the entries from the archive are loaded into the file system.
+     * <p>
+     * Second, a root directory with the given last modification time is
+     * created and linked into the filesystem (so it's never loaded from the
+     * archive).
+     * <p>
+     * Finally, the file system integrity is checked and fixed: Any missing
+     * parent directories are created using the system's current time as their
+     * last modification time - existing directories will never be replaced.
+     * <p>
+     * Note that the entries in this file system are shared with the given
+     * {@code archive}.
+     *
+     * @param factory the archive entry factory to use.
+     * @param vetoableTouchListener the nullable listener for touch events.
+     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *        method will be called whenever a client class changes the state
+     *        of this archive file system.
+     * @param archive The input archive to read the entries for the population
+     *        of this file system.
+     * @param rootTime The last modification time of the root of the populated
+     *        file system in milliseconds since the epoch.
+     * @param readOnly If and only if {@code true}, any subsequent
+     *        modifying operation on this file system will result in a
+     *        {@link ReadOnlyArchiveFileSystemException}.
+     * @throws NullPointerException If {@code factory} or {@code archive}
+     *         is {@code null}.
+     */
+    public static ArchiveFileSystem newArchiveFileSystem(
+            ArchiveEntryFactory<? extends ArchiveEntry> factory,
+            VetoableTouchListener vetoableTouchListener,
+            InputArchive<? extends ArchiveEntry> archive,
+            long rootTime,
+            boolean readOnly) {
+        return new ArchiveFileSystem(
+                factory, vetoableTouchListener, archive, rootTime, readOnly);
+    }
 }
