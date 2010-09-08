@@ -386,14 +386,23 @@ public final class ArchiveFileSystem {
             vetoableTouchListener.touch();
         touched++;
     }
-
     /**
      * Looks up the file system entry with the given path name and returns it
      * or {@code null} if not existent.
      */
-    public Entry getEntry(String path) {
-        assert path != null;
+    private Entry getEntry(final String path) {
+        if (path == null)
+            throw new NullPointerException();
         return master.get(path);
+    }
+
+    /**
+     * Looks up the archive entry with the given path name in this virtual
+     * archive file system and returns a reference to it or {@code null} if not
+     * existent.
+     */
+    public IOReference<? extends ArchiveEntry> getReference(String path) {
+        return getEntry(path);
     }
 
     /**
@@ -835,6 +844,7 @@ public final class ArchiveFileSystem {
     // File system operations used by the ArchiveController class:
     //
 
+/*
     public boolean isExisting(final String path) {
         return getEntry(path) != null;
     }
@@ -848,13 +858,19 @@ public final class ArchiveFileSystem {
         final ArchiveEntry entry = getEntry(path);
         return entry != null && entry.getType() == DIRECTORY;
     }
-    
+*/
+
+    public Type getType(final String path) {
+        final ArchiveEntry entry = getEntry(path);
+        return entry != null ? entry.getType() : null;
+    }
+
     public boolean isWritable(final String path) {
-        return !isReadOnly() && isFile(path);
+        return !isReadOnly() && getType(path) == FILE;
     }
 
     public boolean setReadOnly(final String path) {
-        return isReadOnly() && isFile(path);
+        return isReadOnly() && getType(path) == FILE;
     }
     
     public long getLength(final String path) {
@@ -911,11 +927,9 @@ public final class ArchiveFileSystem {
         return true;
     }
 
-    public int getNumChildren(final String path) {
+    public int getNumMembers(final String path) {
         final Entry entry = getEntry(path);
-        return entry != null && entry.getType() == DIRECTORY
-                ? entry.size()
-                : 0; // does not exist as a directory
+        return entry != null && entry.getType() == DIRECTORY ? entry.size() : 0;
     }
 
     public void list(final String path, final MemberVisitor visitor) {
@@ -923,7 +937,7 @@ public final class ArchiveFileSystem {
         if (entry != null && entry.getType() == DIRECTORY)
             entry.list(visitor);
     }
-    
+
     public void mkdir(String path, boolean createParents)
     throws IOException {
         link(path, DIRECTORY, createParents).run();

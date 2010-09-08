@@ -470,17 +470,14 @@ public final class ArchiveControllers {
                         dstController.autoUmount(dstEntryName);
 
                         // Get source archive entry.
-                        final ArchiveFileSystem srcFileSystem
-                                = srcController.autoMount(false);
-                        srcRef = srcFileSystem.getEntry(srcEntryName);
+                        srcRef = srcController.autoMount(false)
+                                .getReference(srcEntryName);
 
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
-                        final ArchiveFileSystem dstFileSystem
-                                = dstController.autoMount(lenient);
-                        dstLink = dstFileSystem.link(
-                                dstEntryName, FILE, lenient,
-                                preserve ? srcRef.get() : null);
+                        dstLink = dstController.autoMount(lenient)
+                                .link(  dstEntryName, FILE, lenient,
+                                        preserve ? srcRef.get() : null);
 
                         // Create input stream.
                         in = srcController.newInputStream(srcRef, dstLink);

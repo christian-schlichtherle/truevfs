@@ -39,11 +39,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
+import static de.schlichtherle.truezip.io.Paths.normalize;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -328,7 +330,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         final ArchiveFileSystem controllerFileSystem;
         controllerFileSystem = controller.autoMount(
                 autoCreate && ArchiveControllers.isLenient());
-        if (controllerFileSystem.isFile(path)) {
+        if (controllerFileSystem.getType(path) == FILE) {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
             // archive file entry.
@@ -364,7 +366,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (inFile == null && !tmp.delete())
                     throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)");
             }
-        } else if (controllerFileSystem.isDirectory(path)) {
+        } else if (controllerFileSystem.getType(path) == DIRECTORY) {
             throw new DirectoryArchiveEntryFalsePositiveException(
                     this, controller, path,
                     new FileNotFoundException("cannot read directories"), this);
@@ -764,7 +766,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         } // class FilterExceptionHandler
 
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final long rootTime = fileSystem.getEntry(ROOT).getTime();
+        final long rootTime = fileSystem.getLastModified(ROOT);
         try {
             try {
                 shutdownStep1(handler);
@@ -812,19 +814,22 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert getFileSystem() != null;
 
         // Check if we have written out any entries that have been
-        // deleted from the master directory meanwhile and prepare
-        // to throw a warn exception.
+        // deleted from the archive file system meanwhile and prepare
+        // to throw a warning exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
         for (final ArchiveEntry entry : outArchive) {
-            final String entryName = entry.getName();
-            /*final String entryName
-                    = Paths.normalize(entry.getName(), ENTRY_SEPARATOR_CHAR);*/
-            if (fileSystem.getEntry(entryName) == null) {
+            assert entry.getType() != DIRECTORY;
+            // At this point in time we could have written only file archive
+            // entries with valid path names, so the following test should be
+            // enough:
+            final String path = entry.getName();
+            //final String path = normalize(entry.getName(), SEPARATOR_CHAR);
+            if (fileSystem.getType(path) == null) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
                 handler.warn(new SyncWarningException(
-                        this, "couldn't remove archive entry '" + entryName + "'"));
+                        this, "couldn't remove archive entry '" + path + "'"));
             }
         }
         return true;
