@@ -26,6 +26,6 @@ extends ArchiveFileSystemException {
     private static final long serialVersionUID = 987645923519873262L;
 
     ReadOnlyArchiveFileSystemException() {
-        super("Archive file is read-only!");
+        super(null, "read-only archive file system");
     }
 }
