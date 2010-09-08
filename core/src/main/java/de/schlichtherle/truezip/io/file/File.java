@@ -2412,13 +2412,17 @@ public class File extends java.io.File {
     @Override
     public boolean setReadOnly() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
+            if (innerArchive != null) {
+                innerArchive.getArchiveController()
                         .setReadOnly(innerEntryName);
+                return true;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
+        } catch (IOException ex) {
+            return false;
         }
         return delegate.setReadOnly();
     }
