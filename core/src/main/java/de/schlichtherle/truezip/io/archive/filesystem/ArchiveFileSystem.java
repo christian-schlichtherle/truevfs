@@ -581,12 +581,12 @@ public final class ArchiveFileSystem {
      * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
      * link(path, type, createParents, null)}.
      */
-    public LinkOperation link(
+    public Link link(
             final String path,
             final Type type,
             final boolean createParents)
     throws ArchiveFileSystemException {
-        return new LinkOperation(path, type, createParents, null);
+        return new Operation(path, type, createParents, null);
     }
 
     /**
@@ -639,26 +639,35 @@ public final class ArchiveFileSystem {
      *         <li>One of the target's parents denotes a file.
      *         </ul>
      */
-    public LinkOperation link(
+    public Link link(
             final String path,
             final Type type,
             final boolean createParents,
             final ArchiveEntry template)
     throws ArchiveFileSystemException {
-        return new LinkOperation(path, type, createParents, template);
+        return new Operation(path, type, createParents, template);
     }
 
     /**
-     * A simple transaction for creating (and hence probably replacing) and
-     * linking an target in this archive file system.
-     * 
+     * An I/O operation for creating (and hence probably replacing) and
+     * linking file system entries into this virtual archive file system.
+     *
      * @see #link
      */
-    public class LinkOperation implements IOOperation, IOReference<ArchiveEntry> {
+    public interface Link extends IOOperation, IOReference<ArchiveEntry> {
+
+        /**
+         * Links the file system entries into this virtual archive file system.
+         */
+        @Override
+        void run() throws IOException;
+    }
+
+    private class Operation implements Link {
         final Splitter splitter = new Splitter();
         final PathNameElement[] elements;
 
-        private LinkOperation(
+        Operation(
                 final String entryPath,
                 final Type entryType,
                 final boolean createParents,
@@ -683,7 +692,7 @@ public final class ArchiveFileSystem {
             }
         }
 
-        private PathNameElement[] newPathNameElements(
+        PathNameElement[] newPathNameElements(
                 final String entryPath,
                 final Type entryType,
                 final boolean createParents,
@@ -731,7 +740,6 @@ public final class ArchiveFileSystem {
             return elements;
         }
 
-        /** Links the entries into this virtual archive file system. */
         @Override
         public void run() throws IOException {
             assert elements.length >= 2;
@@ -763,7 +771,7 @@ public final class ArchiveFileSystem {
         public ArchiveEntry get() {
             return elements[elements.length - 1].entry.get();
         }
-    } // class LinkOperation
+    } // class Operation
 
     /**
      * A data class which represents a path name element for use by
