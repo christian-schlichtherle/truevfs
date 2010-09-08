@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
+import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.Archive;
@@ -864,7 +864,7 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    public final void list(final String path, final ChildVisitor visitor)
+    public final void list(final String path, final MemberVisitor visitor)
     throws FalsePositiveException {
         try {
             list0(path, visitor);
@@ -877,7 +877,7 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    private void list0(final String path, final ChildVisitor visitor)
+    private void list0(final String path, final MemberVisitor visitor)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {

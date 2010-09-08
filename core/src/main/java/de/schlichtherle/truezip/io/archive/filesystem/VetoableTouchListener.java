@@ -19,9 +19,19 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import java.io.IOException;
 
 /**
+ * Used to notify the implementation that an archive file system has been
+ * <i>touched</i>, i.e. modified.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface VetoableTouchListener {
+
+    /**
+     * Called whenever an archive file system has been <i>touched</i>,
+     * i.e. modified.
+     *
+     * @throws IOException at the discretion of the implementation.
+     */
     void touch() throws IOException;
 }
