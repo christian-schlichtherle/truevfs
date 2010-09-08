@@ -30,7 +30,7 @@ import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilde
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
+import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -2525,18 +2525,18 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list() {
-        class Visitor implements ChildVisitor {
+        class Visitor implements MemberVisitor {
             String children[];
             int i;
 
             @Override
-            public void init(final int numChildren) {
-                children = new String[numChildren];
+            public void init(final int numMembers) {
+                children = new String[numMembers];
             }
 
             @Override
-            public void visit(final String child) {
-                children[i++] = child;
+            public void visit(final String member) {
+                children[i++] = member;
             }
         }
         try {
@@ -2569,19 +2569,19 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list(final FilenameFilter filter) {
-        class Visitor implements ChildVisitor {
+        class Visitor implements MemberVisitor {
             String children[];
             int i;
 
             @Override
-            public void init(final int numChildren) {
-                children = new String[numChildren];
+            public void init(final int numMembers) {
+                children = new String[numMembers];
             }
 
             @Override
-            public void visit(final String child) {
-                if (filter == null || filter.accept(File.this, child))
-                    children[i++] = child;
+            public void visit(final String member) {
+                if (filter == null || filter.accept(File.this, member))
+                    children[i++] = member;
             }
         }
         try {
@@ -2663,19 +2663,19 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FilenameFilter filter,
             final FileFactory factory) {
-        class Visitor implements ChildVisitor {
+        class Visitor implements MemberVisitor {
             File children[];
             int i;
 
             @Override
-            public void init(final int numChildren) {
-                children = new File[numChildren];
+            public void init(final int numMembers) {
+                children = new File[numMembers];
             }
 
             @Override
-            public void visit(final String child) {
-                if (filter == null || filter.accept(File.this, child))
-                    children[i++] = factory.createFile(File.this, child);
+            public void visit(final String member) {
+                if (filter == null || filter.accept(File.this, member))
+                    children[i++] = factory.createFile(File.this, member);
             }
         }
         try {
@@ -2739,18 +2739,18 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FileFilter filter,
             final FileFactory factory) {
-        class Visitor implements ChildVisitor {
+        class Visitor implements MemberVisitor {
             File children[];
             int i;
 
             @Override
-            public void init(final int numChildren) {
-                children = new File[numChildren];
+            public void init(final int numMembers) {
+                children = new File[numMembers];
             }
 
             @Override
-            public void visit(final String child) {
-                final File file = factory.createFile(File.this, child);
+            public void visit(final String member) {
+                final File file = factory.createFile(File.this, member);
                 if (filter == null || filter.accept(file))
                     children[i++] = file;
             }

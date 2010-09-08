@@ -475,16 +475,16 @@ public final class ArchiveFileSystem {
         /**
          * Visits the members of this directory in arbitrary order
          * if and only if this file system target is a directory.
-         * First, {@link ChildVisitor#init} is called in order to initialize
+         * First, {@link MemberVisitor#init} is called in order to initialize
          * the visitor.
-         * Then {@link ChildVisitor#visit} is called for every member of this
+         * Then {@link MemberVisitor#visit} is called for every member of this
          * directory.
          *
          * @throws UnsupportedOperationException if this file system target is
          *         not a directory.
          * @throws NullPointerException If {@code visitor} is {@code null}.
          */
-        public void list(final ChildVisitor visitor) {
+        public void list(final MemberVisitor visitor) {
             throw new UnsupportedOperationException();
         }
 
@@ -524,7 +524,7 @@ public final class ArchiveFileSystem {
                 super(entry);
                 assert entry.getType() != DIRECTORY;
             }
-        } // class FileEntry
+        } // class File
 
         private static final class Directory extends Entry {
             final Set<String> members = new LinkedHashSet<String>();
@@ -541,7 +541,7 @@ public final class ArchiveFileSystem {
             }
 
             @Override
-            public void list(final ChildVisitor visitor) {
+            public void list(final MemberVisitor visitor) {
                 visitor.init(members.size());
                 for (final String member : members)
                     visitor.visit(member);
@@ -556,7 +556,7 @@ public final class ArchiveFileSystem {
             boolean remove(final String member) {
                 return members.remove(member);
             }
-        } // class DirectoryEntry
+        } // class Directory
     } // interface Entry
 
     /**
@@ -748,7 +748,7 @@ public final class ArchiveFileSystem {
     } // class LinkOperation
 
     /**
-     * A data class which represents a path name base for use by
+     * A data class which represents a path name element for use by
      * {@link LinkOperation}.
      */
     private static class PathNameElement {
@@ -909,7 +909,7 @@ public final class ArchiveFileSystem {
                 : 0; // does not exist as a directory
     }
 
-    public void list(final String path, final ChildVisitor visitor) {
+    public void list(final String path, final MemberVisitor visitor) {
         final Entry entry = get(path);
         if (entry != null && entry.getType() == DIRECTORY)
             entry.list(visitor);

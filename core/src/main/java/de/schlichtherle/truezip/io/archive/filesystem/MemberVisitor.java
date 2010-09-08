@@ -17,28 +17,28 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 /**
- * Visits the children of a directory.
+ * Visits the members of a directory.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ChildVisitor {
+public interface MemberVisitor {
 
     /**
-     * Called to initialize the implementation before any children are visited.
+     * Called to initialize the implementation before any members are visited.
      * Note that this method is called exactly once if and only if the
      * directory is accessible.
      * 
-     * @param numChildren the number of children which are going to be visited.
+     * @param numMembers the number of members which are going to be visited.
      */
-    public void init(int numChildren);
+    public void init(int numMembers);
 
     /**
-     * Called to visit the child of a directory.
-     * Note that this method is called for each child if and only if the
+     * Called to visit the member of a directory.
+     * Note that this method is called for each member if and only if the
      * directory is accessible.
      *
-     * @param child the base name of the child.
+     * @param member the base name of the directory member.
      */
-    public void visit(String child);
+    public void visit(String member);
 }
