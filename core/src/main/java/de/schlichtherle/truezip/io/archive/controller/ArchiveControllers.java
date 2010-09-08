@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -25,6 +27,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
@@ -469,7 +472,7 @@ public final class ArchiveControllers {
                         // Get source archive entry.
                         final ArchiveFileSystem srcFileSystem
                                 = srcController.autoMount(false);
-                        srcEntry = srcFileSystem.get(srcEntryName);
+                        srcEntry = srcFileSystem.getEntry(srcEntryName);
 
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
@@ -579,18 +582,18 @@ public final class ArchiveControllers {
                     // same!
                     dstController.autoUmount(dstEntryName);
 
-                    final Entry srcEntry, dstEntry;
+                    final IOReference<? extends ArchiveEntry> srcEntry, dstEntry;
 
-                    // Get source archive entry.
-                    srcEntry = Entry.wrap(new FileEntry(src)); // TODO: Change this!
+                    // Get source archive entry reference.
+                    srcEntry = IOReferences.ref(new FileEntry(src));
 
-                    // Get destination archive entry.
+                    // Get destination archive entry reference.
                     final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
                     final LinkOperation link = dstFileSystem.link(
                             dstEntryName, FILE, lenient,
-                            preserve ? srcEntry : null);
+                            preserve ? srcEntry.get() : null);
                     dstEntry = link.get();
 
                     // Create output stream.

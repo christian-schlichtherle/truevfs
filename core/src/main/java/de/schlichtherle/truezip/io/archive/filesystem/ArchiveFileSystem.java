@@ -71,10 +71,10 @@ public final class ArchiveFileSystem {
      * Note that the archive entries in this map are shared with the
      * {@link InputArchive} object provided to this class' constructor.
      */
-    private Map<String, Entry> master;
+    private Map<String, CommonEntry> master;
 
     /** The file system entry for the virtual root of this file system. */
-    private final Entry root;
+    private final CommonEntry root;
 
     /** The number of times this file system has been modified (touched). */
     private long touched;
@@ -101,7 +101,7 @@ public final class ArchiveFileSystem {
         assert factory != null;
 
         this.factory = factory;
-        master = new LinkedHashMap<String, Entry>(64);
+        master = new LinkedHashMap<String, CommonEntry>(64);
 
         // Setup root.
         root = newEntry(ROOT, DIRECTORY);
@@ -153,14 +153,14 @@ public final class ArchiveFileSystem {
             final long rootTime,
             final boolean readOnly) {
         this.factory = factory;
-        master = new LinkedHashMap<String, Entry>(
+        master = new LinkedHashMap<String, CommonEntry>(
                 (int) (archive.size() / 0.75f) + 1);
 
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         // Load entries from input archive.
         for (final ArchiveEntry entry : archive) {
             final String path = normalizer.normalize(entry.getName());
-            master.put(path, Entry.wrap(entry));
+            master.put(path, wrap(entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -197,7 +197,7 @@ public final class ArchiveFileSystem {
      * @throws AssertionError if a {@link CharConversionException} occurs.
      *         The original exception is wrapped as its cause.
      */
-    private Entry newEntry(final String path, final Type type) {
+    private CommonEntry newEntry(final String path, final Type type) {
         try {
             return newEntry(path, type, null);
         } catch (CharConversionException ex) {
@@ -222,7 +222,7 @@ public final class ArchiveFileSystem {
      * @throws CharConversionException if {@code path} contains characters
      *         which are not supported by the archive file.
      */
-    private Entry newEntry(
+    private CommonEntry newEntry(
             final String path,
             final Type type,
             final ArchiveEntry template)
@@ -232,8 +232,7 @@ public final class ArchiveFileSystem {
         assert !isRoot(path) || type == DIRECTORY;
         assert template == null || type == template.getType();
 
-        return Entry.wrap(factory.newArchiveEntry(
-                path, type, Entry.unwrap(template)));
+        return wrap(factory.newArchiveEntry(path, type, unwrap(template)));
     }
 
     /**
@@ -350,7 +349,7 @@ public final class ArchiveFileSystem {
             split(path);
             final String parentPath = getParentPath();
             final String baseName = getBaseName();
-            Entry parent = master.get(parentPath);
+            CommonEntry parent = master.get(parentPath);
             if (parent == null) {
                 parent = newEntry(parentPath, DIRECTORY);
                 master.put(parentPath, parent);
@@ -400,66 +399,21 @@ public final class ArchiveFileSystem {
      * Looks up the file system entry with the given path name and returns it
      * or {@code null} if not existent.
      */
-    public Entry get(String path) {
+    public Entry getEntry(String path) {
         assert path != null;
         return master.get(path);
     }
 
     /**
-     * This class defines the capabilities of the elements which are actually
-     * put into the archive file system.
-     * It's implemented as a decorator for {@link ArchiveEntry}s which
-     * adds the methods required to implement the concept of a directory.
+     * Defines the features of the file system entries in this archive file
+     * system.
      */
-    public abstract static class Entry
-    extends FilterArchiveEntry<ArchiveEntry> {
-
-        /**
-         * Constructs a new instance of {@code Entry}
-         * which decorates (wraps) the given archive entry.
-         *
-         * @throws NullPointerException If {@code entry} is {@code null}.
-         */
-        // TODO: Make this private!
-        public static Entry wrap(final ArchiveEntry entry) {
-            return entry instanceof Entry
-                    ? (Entry) entry
-                    : entry.getType() == DIRECTORY
-                        ? new Directory(entry)
-                        : new      File(entry);
-        }
-
-        /**
-         * Returns the decorated target archive entry if and only if
-         * {@code wrapper} is non-{@code null}.
-         * Otherwise, {@code null} is returned.
-         */
-        // TODO: Make this private!
-        public static ArchiveEntry unwrap(final Entry wrapper) {
-            return wrapper != null ? wrapper.target : null;
-        }
-
-        /**
-         * Returns the decorated target archive entry if and only if
-         * {@code entry} is an instance of {@code Entry}.
-         * Otherwise, {@code entry} is returned.
-         */
-        // TODO: Make this private!
-        public static ArchiveEntry unwrap(final ArchiveEntry entry) {
-            return entry instanceof Entry ? ((Entry) entry).target : entry;
-        }
-
-        /** Constructs a new instance of {@code Entry}. */
-        private Entry(final ArchiveEntry entry) {
-            super(entry);
-            assert entry != null;
-        }
+    public interface Entry
+    extends ArchiveEntry, IOReference<ArchiveEntry> {
 
         /** @throws UnsupportedOperationException */
         @Override
-        public final void setSize(final long size) {
-            throw new UnsupportedOperationException();
-        }
+        void setSize(long size);
 
         /**
          * Returns the number of members of this file system entry
@@ -468,9 +422,7 @@ public final class ArchiveFileSystem {
          * @throws UnsupportedOperationException if this file system entry is
          *         not a directory.
          */
-        public int size() {
-            throw new UnsupportedOperationException();
-        }
+        int size();
 
         /**
          * Visits the members of this directory in arbitrary order
@@ -484,6 +436,66 @@ public final class ArchiveFileSystem {
          *         not a directory.
          * @throws NullPointerException If {@code visitor} is {@code null}.
          */
+        void list(MemberVisitor visitor);
+    } // interface Entry
+
+    /**
+     * Constructs a new instance of {@code Entry}
+     * which decorates (wraps) the given archive entry.
+     *
+     * @throws NullPointerException If {@code entry} is {@code null}.
+     */
+    private static CommonEntry wrap(final ArchiveEntry entry) {
+        return entry instanceof CommonEntry
+                ? (CommonEntry) entry
+                : entry.getType() == DIRECTORY
+                    ? new DirectoryEntry(entry)
+                    : new      FileEntry(entry);
+    }
+
+    /**
+     * Returns the decorated target archive entry if and only if
+     * {@code wrapper} is non-{@code null}.
+     * Otherwise, {@code null} is returned.
+     */
+    private static ArchiveEntry unwrap(final Entry wrapper) {
+        return wrapper != null ? wrapper.get() : null;
+    }
+
+    /**
+     * Returns the decorated target archive entry if and only if
+     * {@code entry} is an instance of {@code Entry}.
+     * Otherwise, {@code entry} is returned.
+     */
+    private static ArchiveEntry unwrap(final ArchiveEntry entry) {
+        return entry instanceof Entry ? ((Entry) entry).get() : entry;
+    }
+
+    /**
+     * This class defines the capabilities of the elements which are actually
+     * put into the archive file system.
+     * It's implemented as a decorator for {@link ArchiveEntry}s which
+     * adds the methods required to implement the concept of a directory.
+     */
+    private abstract static class CommonEntry
+    extends FilterArchiveEntry<ArchiveEntry>
+    implements Entry {
+
+        /** Constructs a new instance of {@code Entry}. */
+        private CommonEntry(final ArchiveEntry entry) {
+            super(entry);
+            assert entry != null;
+        }
+
+        @Override
+        public final void setSize(final long size) {
+            throw new UnsupportedOperationException();
+        }
+
+        public int size() {
+            throw new UnsupportedOperationException();
+        }
+
         public void list(final MemberVisitor visitor) {
             throw new UnsupportedOperationException();
         }
@@ -518,46 +530,51 @@ public final class ArchiveFileSystem {
             throw new UnsupportedOperationException();
         }
 
-        private static final class File extends Entry {
-            /** Constructs a new instance of {@code FileEntry}. */
-            private File(final ArchiveEntry entry) {
-                super(entry);
-                assert entry.getType() != DIRECTORY;
-            }
-        } // class File
-
-        private static final class Directory extends Entry {
-            final Set<String> members = new LinkedHashSet<String>();
-
-            /** Constructs a new instance of {@code DirectoryEntry}. */
-            private Directory(final ArchiveEntry entry) {
-                super(entry);
-                assert entry.getType() == DIRECTORY;
-            }
-
-            @Override
-            public int size() {
-                return members.size();
-            }
-
-            @Override
-            public void list(final MemberVisitor visitor) {
-                visitor.init(members.size());
-                for (final String member : members)
-                    visitor.visit(member);
-            }
-
-            @Override
-            boolean add(final String member) {
-                return members.add(member);
-            }
-
-            @Override
-            boolean remove(final String member) {
-                return members.remove(member);
-            }
-        } // class Directory
+        @Override
+        public final ArchiveEntry get() {
+            return target;
+        }
     } // interface Entry
+
+    static final class FileEntry extends CommonEntry {
+        /** Constructs a new instance of {@code FileEntry}. */
+        FileEntry(final ArchiveEntry entry) {
+            super(entry);
+            assert entry.getType() != DIRECTORY;
+        }
+    } // class File
+
+    static final class DirectoryEntry extends CommonEntry {
+        final Set<String> members = new LinkedHashSet<String>();
+
+        /** Constructs a new instance of {@code DirectoryEntry}. */
+        DirectoryEntry(final ArchiveEntry entry) {
+            super(entry);
+            assert entry.getType() == DIRECTORY;
+        }
+
+        @Override
+        public int size() {
+            return members.size();
+        }
+
+        @Override
+        public void list(final MemberVisitor visitor) {
+            visitor.init(members.size());
+            for (final String member : members)
+                visitor.visit(member);
+        }
+
+        @Override
+        boolean add(final String member) {
+            return members.add(member);
+        }
+
+        @Override
+        boolean remove(final String member) {
+            return members.remove(member);
+        }
+    } // class Directory
 
     /**
      * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
@@ -678,8 +695,8 @@ public final class ArchiveFileSystem {
             final PathNameElement[] elements;
 
             // Lookup parent target, creating it where necessary and allowed.
-            final Entry parentEntry = master.get(parentPath);
-            final Entry newEntry;
+            final CommonEntry parentEntry = master.get(parentPath);
+            final CommonEntry newEntry;
             if (parentEntry != null) {
                 if (parentEntry.getType() != DIRECTORY)
                     throw new ArchiveFileSystemException(entryPath,
@@ -723,11 +740,11 @@ public final class ArchiveFileSystem {
             final long time = System.currentTimeMillis();
             final int l = elements.length;
 
-            Entry parent = elements[0].entry;
+            CommonEntry parent = elements[0].entry;
             for (int i = 1; i < l ; i++) {
                 final PathNameElement element = elements[i];
                 final String path = element.path;
-                final Entry entry = element.entry;
+                final CommonEntry entry = element.entry;
                 final String base = element.base;
                 assert parent.getType() == DIRECTORY;
                 if (parent.add(base) && parent.getTime() != UNKNOWN) // never touch ghosts!
@@ -753,7 +770,7 @@ public final class ArchiveFileSystem {
      */
     private static class PathNameElement {
         final String path;
-        final Entry entry;
+        final CommonEntry entry;
         final String base;
 
         /**
@@ -767,7 +784,7 @@ public final class ArchiveFileSystem {
          */
         PathNameElement(
                 final String path,
-                final Entry entry,
+                final CommonEntry entry,
                 final String base) {
             assert path != null;
             assert entry != null;
@@ -795,7 +812,7 @@ public final class ArchiveFileSystem {
             throw new ArchiveFileSystemException(path,
                     "virtual root directory cannot get unlinked");
         try {
-            final Entry entry = master.remove(path);
+            final CommonEntry entry = master.remove(path);
             if (entry == null)
                 throw new ArchiveFileSystemException(path,
                         "entry does not exist");
@@ -808,7 +825,7 @@ public final class ArchiveFileSystem {
             final Splitter splitter = new Splitter();
             splitter.split(path);
             final String parentPath = splitter.getParentPath();
-            final Entry parent = master.get(parentPath);
+            final CommonEntry parent = master.get(parentPath);
             assert parent != null : "The parent directory of \"" + path
                         + "\" is missing - archive file system is corrupted!";
             final boolean ok = parent.remove(splitter.getBaseName());
@@ -827,16 +844,16 @@ public final class ArchiveFileSystem {
     //
 
     public boolean isExisting(final String path) {
-        return get(path) != null;
+        return getEntry(path) != null;
     }
 
     public boolean isFile(final String path) {
-        final ArchiveEntry entry = get(path);
+        final ArchiveEntry entry = getEntry(path);
         return entry != null && entry.getType() == FILE;
     }
     
     public boolean isDirectory(final String path) {
-        final ArchiveEntry entry = get(path);
+        final ArchiveEntry entry = getEntry(path);
         return entry != null && entry.getType() == DIRECTORY;
     }
     
@@ -849,7 +866,7 @@ public final class ArchiveFileSystem {
     }
     
     public long getLength(final String path) {
-        final Entry entry = get(path);
+        final Entry entry = getEntry(path);
         if (entry == null || entry.getType() == DIRECTORY)
             return 0;
 
@@ -867,7 +884,7 @@ public final class ArchiveFileSystem {
     }
 
     public long getLastModified(final String path) {
-        final Entry entry = get(path);
+        final Entry entry = getEntry(path);
         if (entry != null) {
             // Depending on the driver type, target.getTime() could return
             // a negative value. E.g. this is the default value that the
@@ -891,7 +908,7 @@ public final class ArchiveFileSystem {
         if (isReadOnly())
             return false;
 
-        final Entry entry = get(path);
+        final Entry entry = getEntry(path);
         if (entry == null)
             return false;
 
@@ -903,14 +920,14 @@ public final class ArchiveFileSystem {
     }
 
     public int getNumChildren(final String path) {
-        final Entry entry = get(path);
+        final Entry entry = getEntry(path);
         return entry != null && entry.getType() == DIRECTORY
                 ? entry.size()
                 : 0; // does not exist as a directory
     }
 
     public void list(final String path, final MemberVisitor visitor) {
-        final Entry entry = get(path);
+        final Entry entry = getEntry(path);
         if (entry != null && entry.getType() == DIRECTORY)
             entry.list(visitor);
     }
@@ -924,7 +941,7 @@ public final class ArchiveFileSystem {
     throws IOException {
         assert isRoot(path) || path.charAt(0) != SEPARATOR_CHAR;
 
-        if (get(path) != null) {
+        if (getEntry(path) != null) {
             unlink(path);
             return;
         }
@@ -938,10 +955,10 @@ public final class ArchiveFileSystem {
             final OutputArchive<ArchiveEntry> oa,
             final ExceptionHandler<IOException, E> h)
     throws E {
-        final ArchiveEntry root = Entry.unwrap(this.root);
+        final ArchiveEntry root = unwrap(this.root);
         assert root != null;
         for (final Entry v : master.values()) {
-            final ArchiveEntry e = Entry.unwrap(v);
+            final ArchiveEntry e = unwrap(v);
             final String n = e.getName();
             if (oa.getEntry(n) != null)
                 continue; // we have already written this target

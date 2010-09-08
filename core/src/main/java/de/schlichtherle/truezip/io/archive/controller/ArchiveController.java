@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
@@ -527,7 +529,7 @@ public abstract class ArchiveController implements Archive {
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final Entry entry = autoMount(false).get(path);
+                final Entry entry = autoMount(false).getEntry(path);
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
@@ -549,7 +551,9 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream newInputStream(Entry entry, Entry dstEntry)
+    abstract InputStream newInputStream(
+            IOReference<? extends ArchiveEntry> entry,
+            IOReference<? extends ArchiveEntry> dstEntry)
     throws IOException;
 
     /**
@@ -633,7 +637,9 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream newOutputStream(Entry entry, Entry srcEntry)
+    abstract OutputStream newOutputStream(
+            IOReference<? extends ArchiveEntry> entry,
+            IOReference<? extends ArchiveEntry> srcEntry)
     throws IOException;
 
     public final boolean isExisting(final String path)

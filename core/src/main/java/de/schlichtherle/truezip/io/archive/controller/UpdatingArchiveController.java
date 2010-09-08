@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -452,34 +452,34 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     @Override
     InputStream newInputStream(
-            final Entry entry,
-            final Entry dstEntry)
+            final IOReference<? extends ArchiveEntry> entry,
+            final IOReference<? extends ArchiveEntry> dstEntry)
     throws IOException {
         assert entry != null;
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
-        assert !hasNewData(entry.getName());
-        assert entry.getType() != DIRECTORY;
+        assert !hasNewData(entry.get().getName());
+        assert entry.get().getType() != DIRECTORY;
 
         final InputStream in
                 = inArchive.getMetaData().newInputStream(entry, dstEntry);
-        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + entry.getName() + '"';
+        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + entry.get().getName() + '"';
         return in;
     }
 
     @Override
     OutputStream newOutputStream(
-            final Entry entry,
-            final Entry srcEntry)
+            final IOReference<? extends ArchiveEntry> entry,
+            final IOReference<? extends ArchiveEntry> srcEntry)
     throws IOException {
         assert entry != null;
         assert writeLock().isLockedByCurrentThread();
-        assert !hasNewData(entry.getName());
-        assert entry.getType() != DIRECTORY;
+        assert !hasNewData(entry.get().getName());
+        assert entry.get().getType() != DIRECTORY;
 
         ensureOutArchive();
         final OutputStream out
                 = outArchive.getMetaData().newOutputStream(entry, srcEntry);
-        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + entry.getName() + '"';
+        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + entry.get().getName() + '"';
         return out;
     }
 
@@ -763,7 +763,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         } // class FilterExceptionHandler
 
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final long rootTime = fileSystem.get(ROOT).getTime();
+        final long rootTime = fileSystem.getEntry(ROOT).getTime();
         try {
             try {
                 shutdownStep1(handler);
@@ -773,7 +773,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
                 // normal case) have been modified by the OutputArchive
-                // and thus cannot getEntry used anymore to access the input;
+                // and thus cannot get used anymore to access the input;
                 // and (2) if there has been any IOException on the
                 // output archive there is no way to recover from it.
                 shutdownStep2(handler);
@@ -818,7 +818,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final String entryName = entry.getName();
             /*final String entryName
                     = Paths.normalize(entry.getName(), ENTRY_SEPARATOR_CHAR);*/
-            if (fileSystem.get(entryName) == null) {
+            if (fileSystem.getEntry(entryName) == null) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
@@ -940,7 +940,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     /**
      * Resets the archive controller to its initial state - all changes to the
-     * archive file which have not yet been updated getEntry lost!
+     * archive file which have not yet been updated get lost!
      * <p>
      * Thereafter, the archive controller will behave as if it has just been
      * created and any subsequent operations on its entries will remount

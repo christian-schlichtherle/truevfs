@@ -171,7 +171,7 @@ implements InputArchive<TarEntry> {
      * @param in The stream to read from. May <em>not</em> be {@code null}.
      * @param buf The buffer to fill entirely with data.
      * @return A stream which holds all the data {@code in} did.
-     * @throws IOException If {@code buf} couldn't getEntry filled entirely.
+     * @throws IOException If {@code buf} couldn't get filled entirely.
      */
     static InputStream readAhead(final InputStream in, final byte[] buf)
     throws IOException {
