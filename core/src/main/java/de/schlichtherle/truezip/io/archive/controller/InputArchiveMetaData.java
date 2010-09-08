@@ -17,11 +17,11 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,16 +105,16 @@ public final class InputArchiveMetaData {
     }
 
     synchronized InputStream newInputStream(
-            final Entry entry,
-            final Entry dstEntry)
+            final IOReference<? extends ArchiveEntry> entry,
+            final IOReference<? extends ArchiveEntry> dstEntry)
             throws IOException {
         assert !stopped;
         assert entry != null;
 
         return new EntryInputStream(
                 inArchive
-                .getInputStreamSocket(Entry.unwrap(entry))
-                .newInputStream(IOReferences.ref(Entry.unwrap(dstEntry))));
+                .getInputStreamSocket(IOReferences.deref(entry))
+                .newInputStream(IOReferences.ref(IOReferences.deref(dstEntry))));
     }
 
     /**
