@@ -105,16 +105,16 @@ public final class InputArchiveMetaData {
     }
 
     synchronized InputStream newInputStream(
-            final IOReference<? extends ArchiveEntry> entry,
-            final IOReference<? extends ArchiveEntry> dstEntry)
+            final IOReference<? extends ArchiveEntry> targetRef,
+            final IOReference<? extends ArchiveEntry> peerRef)
             throws IOException {
         assert !stopped;
-        assert entry != null;
+        assert targetRef != null;
 
         return new EntryInputStream(
                 inArchive
-                .getInputStreamSocket(IOReferences.deref(entry))
-                .newInputStream(IOReferences.ref(IOReferences.deref(dstEntry))));
+                .getInputStreamSocket(IOReferences.deref(targetRef))
+                .newInputStream(peerRef));
     }
 
     /**

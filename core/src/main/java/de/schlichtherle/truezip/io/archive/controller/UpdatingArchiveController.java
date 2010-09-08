@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.IOOperations;
+import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
@@ -770,8 +772,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         try {
             try {
                 shutdownStep1(handler);
-                fileSystem.copy(inArchive, outArchive,
-                        new FilterExceptionHandler(handler));
+                copy(new FilterExceptionHandler(handler));
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
@@ -833,6 +834,47 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
         }
         return true;
+    }
+
+    public <E extends Exception>
+    void copy(final ExceptionHandler<IOException, E> h)
+    throws E {
+        final ArchiveFileSystem fileSystem = getFileSystem();
+        final ArchiveEntry root = fileSystem.getReference(ROOT).get();
+        assert root != null;
+        for (final IOReference<? extends ArchiveEntry> v : fileSystem) {
+            final ArchiveEntry e = v.get();
+            final String n = e.getName();
+            if (outArchive.getEntry(n) != null)
+                continue; // we have already written this target
+            try {
+                if (e.getType() == DIRECTORY) {
+                    if (root == e)
+                        continue; // never write the virtual root directory
+                    if (e.getTime() < 0)
+                        continue; // never write ghost directories
+                    outArchive.getOutputStreamSocket(e)
+                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
+                            .close();
+                } else if (inArchive != null && inArchive.getEntry(n) != null) {
+                    assert e == inArchive.getEntry(n);
+                    IOOperations.copy(  inArchive.getInputStreamSocket(e),
+                                        outArchive.getOutputStreamSocket(e));
+                } else {
+                    // The file system entry is an archive file which has been
+                    // newly created and not yet been reassembled
+                    // into this (potentially new) archive file.
+                    // Write an empty file system entry now as a marker in
+                    // order to recreate the file system entry when the file
+                    // system gets remounted from the archive file.
+                    outArchive.getOutputStreamSocket(e)
+                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
+                            .close();
+                }
+            } catch (IOException ex) {
+                h.warn(ex);
+            }
+        }
     }
 
     /**

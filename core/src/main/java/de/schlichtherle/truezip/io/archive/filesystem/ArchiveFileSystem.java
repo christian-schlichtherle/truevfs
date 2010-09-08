@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.io.archive.driver.spi.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -25,10 +26,6 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
-import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
-import de.schlichtherle.truezip.io.socket.IOOperations;
-import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
@@ -55,7 +52,7 @@ import static de.schlichtherle.truezip.io.Paths.normalize;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveFileSystem {
+public final class ArchiveFileSystem implements Iterable<IOReference<? extends ArchiveEntry>> {
 
     /** The controller that this filesystem belongs to. */
     private final ArchiveEntryFactory<? extends ArchiveEntry> factory;
@@ -386,6 +383,12 @@ public final class ArchiveFileSystem {
             vetoableTouchListener.touch();
         touched++;
     }
+
+    @Override
+    public Iterator<IOReference<? extends ArchiveEntry>> iterator() {
+        return (Iterator) master.values().iterator(); // FIXME: Make this typesafe!
+    }
+
     /**
      * Looks up the file system entry with the given path name and returns it
      * or {@code null} if not existent.
@@ -409,7 +412,7 @@ public final class ArchiveFileSystem {
      * Defines the features of the file system entries in this archive file
      * system.
      */
-    public interface Entry
+    private interface Entry
     extends ArchiveEntry, IOReference<ArchiveEntry> {
 
         /** @throws UnsupportedOperationException */
@@ -483,7 +486,7 @@ public final class ArchiveFileSystem {
     implements Entry {
 
         /** Constructs a new instance of {@code Entry}. */
-        private CommonEntry(final ArchiveEntry entry) {
+        CommonEntry(final ArchiveEntry entry) {
             super(entry);
             assert entry != null;
         }
@@ -493,10 +496,12 @@ public final class ArchiveFileSystem {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int size() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public void list(final MemberVisitor visitor) {
             throw new UnsupportedOperationException();
         }
@@ -535,7 +540,7 @@ public final class ArchiveFileSystem {
         public final ArchiveEntry get() {
             return target;
         }
-    } // interface Entry
+    } // class CommonEntry
 
     static final class FileEntry extends CommonEntry {
         /** Constructs a new instance of {@code FileEntry}. */
@@ -543,7 +548,7 @@ public final class ArchiveFileSystem {
             super(entry);
             assert entry.getType() != DIRECTORY;
         }
-    } // class File
+    } // class FileEntry
 
     static final class DirectoryEntry extends CommonEntry {
         final Set<String> members = new LinkedHashSet<String>();
@@ -575,7 +580,7 @@ public final class ArchiveFileSystem {
         boolean remove(final String member) {
             return members.remove(member);
         }
-    } // class Directory
+    } // class DirectoryEntry
 
     /**
      * Equivalent to {@link #link(String, ArchiveEntry.Type, boolean, ArchiveEntry)
@@ -961,48 +966,5 @@ public final class ArchiveFileSystem {
         }
         throw new ArchiveFileSystemException(path,
                 "archive entry does not exist");
-    }
-
-    public <E extends Exception>
-    void copy(
-            final InputArchive<ArchiveEntry> ia,
-            final OutputArchive<ArchiveEntry> oa,
-            final ExceptionHandler<IOException, E> h)
-    throws E {
-        final ArchiveEntry root = unwrap(this.root);
-        assert root != null;
-        for (final Entry v : master.values()) {
-            final ArchiveEntry e = unwrap(v);
-            final String n = e.getName();
-            if (oa.getEntry(n) != null)
-                continue; // we have already written this target
-            try {
-                if (e.getType() == DIRECTORY) {
-                    if (root == e)
-                        continue; // never write the virtual root directory
-                    if (e.getTime() < 0)
-                        continue; // never write ghost directories
-                    oa.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
-                            .close();
-                } else if (ia != null && ia.getEntry(n) != null) {
-                    assert e == ia.getEntry(n);
-                    IOOperations.copy(  ia.getInputStreamSocket(e),
-                                        oa.getOutputStreamSocket(e));
-                } else {
-                    // The file system entry is an archive file which has been
-                    // newly created and not yet been reassembled
-                    // into this (potentially new) archive file.
-                    // Write an empty file system entry now as a marker in
-                    // order to recreate the file system entry when the file
-                    // system gets remounted from the archive file.
-                    oa.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
-                            .close();
-                }
-            } catch (IOException ex) {
-                h.warn(ex);
-            }
-        }
     }
 }
