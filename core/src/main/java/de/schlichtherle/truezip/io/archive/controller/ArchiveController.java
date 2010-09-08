@@ -356,14 +356,14 @@ public abstract class ArchiveController implements Archive {
     }
 
     /**
-     * Tests if the archive entry with the given name has received or is
-     * currently receiving new data via an output stream.
+     * Tests if the file system entry with the given path name has received or
+     * is currently receiving new data via an output stream.
      * As an implication, the entry cannot receive new data from another
      * output stream before the next call to {@link #sync}.
      * Note that for directories this method will always return
      * {@code false}!
      */
-    abstract boolean hasNewData(String entryName);
+    abstract boolean hasNewData(String path);
 
     /**
      * Returns the virtual archive file system mounted from the target file.
@@ -389,7 +389,7 @@ public abstract class ArchiveController implements Archive {
 
     /**
      * Unmounts the archive file only if the archive file has already new
-     * data for {@code entryName}.
+     * data for the file system entry with the given path name.
      * <p>
      * <b>Warning:</b> As a side effect, all data structures returned by this
      * controller get reset (filesystem, entries, streams, etc.)!
@@ -405,10 +405,10 @@ public abstract class ArchiveController implements Archive {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    public final void autoUmount(final String entryName)
+    public final void autoSync(final String path)
     throws SyncException {
         assert writeLock().isLockedByCurrentThread();
-        if (hasNewData(entryName)) {
+        if (hasNewData(path)) {
             sync(new SyncConfiguration()
                     .setWaitForInputStreams(true)
                     .setCloseInputStreams(false)
@@ -524,7 +524,7 @@ public abstract class ArchiveController implements Archive {
                     implements IOOperation {
                         @Override
                         public void run() throws IOException {
-                            autoUmount(path);
+                            autoSync(path);
                         }
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
@@ -554,8 +554,8 @@ public abstract class ArchiveController implements Archive {
      * <ul>
      */
     abstract InputStream newInputStream(
-            IOReference<? extends ArchiveEntry> entry,
-            IOReference<? extends ArchiveEntry> dstEntry)
+            IOReference<? extends ArchiveEntry> targetRef,
+            IOReference<? extends ArchiveEntry> peerRef)
     throws IOException;
 
     /**
@@ -603,7 +603,7 @@ public abstract class ArchiveController implements Archive {
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot write to (virtual root) directory entry");
             } else {
-                autoUmount(path);
+                autoSync(path);
                 final boolean lenient = isLenient();
                 final ArchiveFileSystem fileSystem = autoMount(lenient);
                 in = append && fileSystem.getType(path) == FILE
@@ -640,8 +640,8 @@ public abstract class ArchiveController implements Archive {
      * <ul>
      */
     abstract OutputStream newOutputStream(
-            IOReference<? extends ArchiveEntry> entry,
-            IOReference<? extends ArchiveEntry> srcEntry)
+            IOReference<? extends ArchiveEntry> targetRef,
+            IOReference<? extends ArchiveEntry> peerRef)
     throws IOException;
 
     public final boolean isExisting(final String path)
@@ -942,7 +942,7 @@ public abstract class ArchiveController implements Archive {
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            autoUmount(path);
+            autoSync(path);
             final ArchiveFileSystem fileSystem = autoMount(false);
             return fileSystem.setLastModified(path, time);
         } finally {
@@ -1051,7 +1051,7 @@ public abstract class ArchiveController implements Archive {
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            autoUmount(path);
+            autoSync(path);
 
             if (isRoot(path)) {
                 // Get the file system or die trying!

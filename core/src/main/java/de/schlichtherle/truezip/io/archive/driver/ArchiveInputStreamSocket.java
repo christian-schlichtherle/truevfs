@@ -52,9 +52,9 @@ extends InputStreamSocket<AE, ArchiveEntry> {
     /**
      * {@inheritDoc}
      *
-     * @param  destination a nullable peer archive entry which is going to be
-     *         written in order to copy the data from the {@link #get() target}
-     *         archive entry.
+     * @param  destination a nullable reference to a peer archive entry which
+     *         is going to be written in order to copy the data from the
+     *         {@link #get() target} archive entry.
      *         <p>
      *         Implementations may test the runtime type of this object in
      *         order to check if they should set up the returned input stream

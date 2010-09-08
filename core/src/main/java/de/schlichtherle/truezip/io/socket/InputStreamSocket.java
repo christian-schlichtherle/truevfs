@@ -54,7 +54,7 @@ public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
      * Furthermore, the returned stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @param  peer the nullable peer target.
+     * @param  peer the nullable peer target reference.
      *         If this is {@code null}, then there is no peer target.
      * @return A new {@code InputStream}.
      * @see    IOReferences#ref(Object) How to create a nullable I/O reference.

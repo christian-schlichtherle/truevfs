@@ -41,13 +41,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.Paths.normalize;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -278,7 +276,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         // file system since controller.newInputStream(entryName)
                         // would do the same and controller.update() would
                         // invalidate the file system reference.
-                        controller.autoUmount(entryName);
+                        controller.autoSync(entryName);
 
                         // Keep a lock for the actual unwrapping.
                         // If this is an ordinary mounting procedure where the
@@ -457,34 +455,34 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     @Override
     InputStream newInputStream(
-            final IOReference<? extends ArchiveEntry> entry,
-            final IOReference<? extends ArchiveEntry> dstEntry)
+            final IOReference<? extends ArchiveEntry> targetRef,
+            final IOReference<? extends ArchiveEntry> peerRef)
     throws IOException {
-        assert entry != null;
+        assert targetRef != null;
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
-        assert !hasNewData(entry.get().getName());
-        assert entry.get().getType() != DIRECTORY;
+        assert !hasNewData(targetRef.get().getName());
+        assert targetRef.get().getType() != DIRECTORY;
 
         final InputStream in
-                = inArchive.getMetaData().newInputStream(entry, dstEntry);
-        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + entry.get().getName() + '"';
+                = inArchive.getMetaData().newInputStream(targetRef, peerRef);
+        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + targetRef.get().getName() + '"';
         return in;
     }
 
     @Override
     OutputStream newOutputStream(
-            final IOReference<? extends ArchiveEntry> entry,
-            final IOReference<? extends ArchiveEntry> srcEntry)
+            final IOReference<? extends ArchiveEntry> targetRef,
+            final IOReference<? extends ArchiveEntry> peerRef)
     throws IOException {
-        assert entry != null;
+        assert targetRef != null;
         assert writeLock().isLockedByCurrentThread();
-        assert !hasNewData(entry.get().getName());
-        assert entry.get().getType() != DIRECTORY;
+        assert !hasNewData(targetRef.get().getName());
+        assert targetRef.get().getType() != DIRECTORY;
 
         ensureOutArchive();
         final OutputStream out
-                = outArchive.getMetaData().newOutputStream(entry, srcEntry);
-        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + entry.get().getName() + '"';
+                = outArchive.getMetaData().newOutputStream(targetRef, peerRef);
+        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + targetRef.get().getName() + '"';
         return out;
     }
 
@@ -578,9 +576,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert outArchive != null;
     }
 
-    boolean hasNewData(String entryName) {
+    boolean hasNewData(String path) {
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
-        return outArchive != null && outArchive.getEntry(entryName) != null;
+        if (outArchive == null)
+            return false;
+        final ArchiveFileSystem fileSystem = getFileSystem();
+        final ArchiveEntry entry = IOReferences.deref(fileSystem.getReference(path));
+        return entry != null && outArchive.getEntry(entry.getName()) != null;
     }
 
     public void sync(final SyncConfiguration config)
