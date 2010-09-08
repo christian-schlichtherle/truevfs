@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
@@ -178,7 +179,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // that it can access the target in the real file system.
                     throw new FalsePositiveException(this, ex);
                 }
-                setFileSystem(new ArchiveFileSystem(
+                setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener, inArchive,
                         time, isReadOnly));
             } else if (!autoCreate) {
@@ -192,7 +193,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // This may fail e.g. if the target file is a RAES
                 // encrypted ZIP file and the user cancels password
                 // prompting.
-                setFileSystem(new ArchiveFileSystem(
+                setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener));
             }
         } else {
@@ -237,7 +238,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // output file has been set to the last modification time of
                 // its virtual root directory.
                 // Nice trick, isn't it?!
-                setFileSystem(new ArchiveFileSystem(
+                setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener, inArchive,
                         inFile.lastModified(), false));
             }
@@ -350,7 +351,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     throw new FileArchiveEntryFalsePositiveException(
                             this, controller, path, ex);
                 }
-                setFileSystem(new ArchiveFileSystem(
+                setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener, inArchive,
                         controllerFileSystem.getLastModified(path),
                         controllerFileSystem.isReadOnly()));
@@ -408,7 +409,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 throw ex;
             }
 
-            setFileSystem(new ArchiveFileSystem(
+            setFileSystem(newArchiveFileSystem(
                     getDriver(), vetoableTouchListener));
         }
     }
