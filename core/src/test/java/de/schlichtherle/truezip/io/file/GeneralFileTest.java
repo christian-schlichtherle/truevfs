@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
-import de.schlichtherle.truezip.io.file.File;
 import java.io.IOException;
 import java.net.URI;
 import junit.framework.TestCase;

@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.spi;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
@@ -109,17 +108,5 @@ public class FileEntry implements ArchiveEntry {
     @Override
     public void setTime(long time) {
         file.setLastModified(time);
-    }
-
-    /** Returns {@code null}. */
-    @Override
-    public ArchiveEntryMetaData getMetaData() {
-        return null;
-    }
-
-    /** A no-op: Does nothing. */
-    @Override
-    public void setMetaData(ArchiveEntryMetaData metaData) {
-        throw new UnsupportedOperationException();
     }
 }

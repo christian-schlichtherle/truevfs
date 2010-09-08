@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
-
 /**
  * Represents an entry in an archive file.
  * Archive drivers need to implement this interface in order to enable their
@@ -150,21 +148,4 @@ public interface ArchiveEntry {
      *         {@value #UNKNOWN}.
      */
     void setTime(long time);
-
-    /**
-     * Returns the meta data for this archive entry.
-     * The default value is {@code null}.
-     *
-     * @deprecated Remove this - it's not a concern of an archive entry!
-     */
-    ArchiveEntryMetaData getMetaData();
-
-    /**
-     * Sets the meta data for this archive entry.
-     *
-     * @param metaData The meta data - may be {@code null}.
-     *
-     * @deprecated Remove this - it's not a concern of an archive entry!
-     */
-    void setMetaData(ArchiveEntryMetaData metaData);
 }

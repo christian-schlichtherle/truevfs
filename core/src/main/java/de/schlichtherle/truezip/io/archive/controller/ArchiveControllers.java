@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.LinkOperation;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
@@ -460,7 +460,7 @@ public final class ArchiveControllers {
                         }
                     } // class SrcControllerUpdater
 
-                    final ArchiveEntry srcEntry, dstEntry;
+                    final Entry srcEntry, dstEntry;
                     final LinkOperation link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
@@ -579,16 +579,19 @@ public final class ArchiveControllers {
                     // same!
                     dstController.autoUmount(dstEntryName);
 
-                    final boolean lenient = isLenient();
+                    final Entry srcEntry, dstEntry;
+
                     // Get source archive entry.
-                    final ArchiveEntry srcEntry = new FileEntry(src); // TODO: Change this!
+                    srcEntry = Entry.wrap(new FileEntry(src)); // TODO: Change this!
+
                     // Get destination archive entry.
+                    final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
                     final LinkOperation link = dstFileSystem.link(
                             dstEntryName, FILE, lenient,
                             preserve ? srcEntry : null);
-                    final ArchiveEntry dstEntry = link.get();
+                    dstEntry = link.get();
 
                     // Create output stream.
                     out = dstController.newOutputStream(dstEntry, srcEntry);
