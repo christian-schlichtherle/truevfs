@@ -27,28 +27,29 @@ extends IOException {
 
     private static final long serialVersionUID = 4652084652223428651L;
     /** The entry's path name. */
-    private final String entryName;
-
-    ArchiveFileSystemException(String message) {
-        super(message);
-        this.entryName = null;
-    }
+    private final String path;
 
     ArchiveFileSystemException(String path, String message) {
         super(message);
-        this.entryName = path;
+        this.path = path;
     }
 
     ArchiveFileSystemException(String path, IOException cause) {
-        super(cause.toString());
-        this.entryName = path;
+        super(cause != null ? cause.toString() : null);
+        this.path = path;
+        super.initCause(cause);
+    }
+
+    ArchiveFileSystemException(String path, String message, IOException cause) {
+        super(message);
+        this.path = path;
         super.initCause(cause);
     }
 
     @Override
     public String getLocalizedMessage() {
-        if (entryName != null)
-            return new StringBuilder(entryName).append(" (").append(getMessage()).append(")").toString();
+        if (path != null)
+            return new StringBuilder(path).append(" (").append(getMessage()).append(")").toString();
         return getMessage();
     }
 }

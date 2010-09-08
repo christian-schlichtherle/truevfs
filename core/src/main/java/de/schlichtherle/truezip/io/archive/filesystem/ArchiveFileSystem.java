@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import java.util.Iterator;
 import de.schlichtherle.truezip.io.archive.driver.spi.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -29,6 +28,7 @@ import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -95,7 +95,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     ArchiveFileSystem(
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener)
-    throws IOException {
+    throws ArchiveFileSystemException {
         assert factory != null;
 
         this.factory = factory;
@@ -371,16 +371,21 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
      *
      * @throws ArchiveReadOnlyExceptionn If this virtual archive file system
      *         is read only.
-     * @throws IOException If setting up the required data structures in the
+     * @throws ArchiveFileSystemException If setting up the required data structures in the
      *         controller fails for some reason.
      */
-    private void touch() throws IOException {
+    private void touch() throws ArchiveFileSystemException {
         if (isReadOnly())
             throw new ReadOnlyArchiveFileSystemException();
 
         // Order is important here because of exceptions!
-        if (touched == 0 && vetoableTouchListener != null)
-            vetoableTouchListener.touch();
+        if (touched == 0 && vetoableTouchListener != null) {
+            try {
+                vetoableTouchListener.touch();
+            } catch (IOException ex) {
+                throw new ArchiveFileSystemException(null, "touch vetoed", ex);
+            }
+        }
         touched++;
     }
 
@@ -653,7 +658,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
          * Links the file system entries into this virtual archive file system.
          */
         @Override
-        void run() throws IOException;
+        void run() throws ArchiveFileSystemException;
     }
 
     private class Operation implements Link {
@@ -734,14 +739,12 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
         }
 
         @Override
-        public void run() throws IOException {
+        public void run() throws ArchiveFileSystemException {
             assert elements.length >= 2;
 
             touch();
-
-            final long time = System.currentTimeMillis();
             final int l = elements.length;
-
+            final long time = System.currentTimeMillis();
             CommonEntry parent = elements[0].entry;
             for (int i = 1; i < l ; i++) {
                 final PathNameElement element = elements[i];
@@ -754,7 +757,6 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
                 master.put(path, entry);
                 parent = entry;
             }
-
             final Entry entry = elements[l - 1].entry;
             if (entry.getTime() == UNKNOWN)
                 entry.setTime(time);
@@ -809,7 +811,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
      *         any other reason.
      */
     private void unlink(final String path)
-    throws IOException {
+    throws ArchiveFileSystemException {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
                     "virtual root directory cannot get unlinked");
@@ -855,7 +857,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     }
 
     public void setReadOnly(final String path)
-    throws IOException {
+    throws ArchiveFileSystemException {
         if (!isReadOnly() || getType(path) != FILE)
             throw new ArchiveFileSystemException(path,
                 "cannot set read-only state for archive file system entries");
@@ -896,7 +898,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     }
 
     public boolean setLastModified(final String path, final long time)
-    throws IOException {
+    throws ArchiveFileSystemException {
         if (time < 0)
             throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
@@ -927,12 +929,12 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     }
 
     public void mkdir(String path, boolean createParents)
-    throws IOException {
+    throws ArchiveFileSystemException {
         link(path, DIRECTORY, createParents, null).run();
     }
 
     public void delete(final String path)
-    throws IOException {
+    throws ArchiveFileSystemException {
         assert isRoot(path) || path.charAt(0) != SEPARATOR_CHAR;
 
         if (getEntry(path) != null) {
