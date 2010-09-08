@@ -463,8 +463,8 @@ public final class ArchiveControllers {
                         }
                     } // class SrcControllerUpdater
 
-                    final Entry srcEntry, dstEntry;
-                    final LinkOperation link;
+                    final IOReference<? extends ArchiveEntry> srcRef;
+                    final LinkOperation dstLink;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoUmount(dstEntryName);
@@ -472,30 +472,29 @@ public final class ArchiveControllers {
                         // Get source archive entry.
                         final ArchiveFileSystem srcFileSystem
                                 = srcController.autoMount(false);
-                        srcEntry = srcFileSystem.getEntry(srcEntryName);
+                        srcRef = srcFileSystem.getEntry(srcEntryName);
 
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
                         final ArchiveFileSystem dstFileSystem
                                 = dstController.autoMount(lenient);
-                        link = dstFileSystem.link(
+                        dstLink = dstFileSystem.link(
                                 dstEntryName, FILE, lenient,
-                                preserve ? srcEntry : null);
-                        dstEntry = link.get();
+                                preserve ? srcRef.get() : null);
 
                         // Create input stream.
-                        in = srcController.newInputStream(srcEntry, dstEntry);
+                        in = srcController.newInputStream(srcRef, dstLink);
                     } finally {
                         srcController.readLock().unlock();
                     }
 
                     try {
                         // Create output stream.
-                        out = dstController.newOutputStream(dstEntry, srcEntry);
+                        out = dstController.newOutputStream(dstLink, srcRef);
 
                         try {
                             // Now link the destination entry into the file system.
-                            link.run();
+                            dstLink.run();
                         } catch (IOException ex) {
                             out.close();
                             throw ex;
@@ -582,25 +581,23 @@ public final class ArchiveControllers {
                     // same!
                     dstController.autoUmount(dstEntryName);
 
-                    final IOReference<? extends ArchiveEntry> srcEntry, dstEntry;
-
                     // Get source archive entry reference.
-                    srcEntry = IOReferences.ref(new FileEntry(src));
+                    final IOReference<? extends ArchiveEntry> srcRef;
+                    srcRef = IOReferences.ref(new FileEntry(src));
 
                     // Get destination archive entry reference.
                     final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
-                    final LinkOperation link = dstFileSystem.link(
+                    final LinkOperation dstLink = dstFileSystem.link(
                             dstEntryName, FILE, lenient,
-                            preserve ? srcEntry.get() : null);
-                    dstEntry = link.get();
+                            preserve ? srcRef.get() : null);
 
                     // Create output stream.
-                    out = dstController.newOutputStream(dstEntry, srcEntry);
+                    out = dstController.newOutputStream(dstLink, srcRef);
 
                     // Now link the destination entry into the file system.
-                    link.run();
+                    dstLink.run();
                 }
             }
 
