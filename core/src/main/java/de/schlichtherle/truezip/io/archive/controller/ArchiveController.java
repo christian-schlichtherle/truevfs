@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -530,14 +530,16 @@ public abstract class ArchiveController implements Archive {
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final Entry entry = autoMount(false).getEntry(path);
-                if (entry == null)
+                final ArchiveFileSystem fileSystem =  autoMount(false);
+                final IOReference<? extends ArchiveEntry> ref
+                        = fileSystem.getReference(path);
+                if (ref == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
-                if (entry.getType() == DIRECTORY)
+                if (ref.get().getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "cannot read from directory entry");
-                return newInputStream(entry, null);
+                return newInputStream(ref, null);
             }
         } finally {
             readLock().unlock();
@@ -605,7 +607,7 @@ public abstract class ArchiveController implements Archive {
                 autoUmount(path);
                 final boolean lenient = isLenient();
                 final ArchiveFileSystem fileSystem = autoMount(lenient);
-                in = append && fileSystem.isFile(path)
+                in = append && fileSystem.getType(path) == FILE
                         ? newInputStream0(path)
                         : null;
                 // Start creating or overwriting the archive entry.
@@ -661,7 +663,7 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isExisting(path);
+            return fileSystem.getType(path) != null;
         } finally {
             readLock().unlock();
         }
@@ -691,7 +693,7 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isFile(path);
+            return fileSystem.getType(path) == FILE;
         } finally {
             readLock().unlock();
         }
@@ -717,7 +719,7 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isDirectory(path);
+            return fileSystem.getType(path) == DIRECTORY;
         } finally {
             readLock().unlock();
         }
@@ -793,7 +795,7 @@ public abstract class ArchiveController implements Archive {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.isExisting(path);
+            return fileSystem.getType(path) != null;
         } finally {
             readLock().unlock();
         }
@@ -970,7 +972,7 @@ public abstract class ArchiveController implements Archive {
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-            if (fileSystem.isExisting(path))
+            if (fileSystem.getType(path) != null)
                 return false;
 
             // If we got until here without an exception,
@@ -1069,7 +1071,7 @@ public abstract class ArchiveController implements Archive {
                 }
 
                 // We are actually working on the controller's target file.
-                if (fileSystem.getNumChildren(path) > 0)
+                if (fileSystem.getNumMembers(path) > 0)
                     throw new IOException("archive file system not empty!");
                 final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
                 // TODO: Review: This policy may be changed - see method start.
