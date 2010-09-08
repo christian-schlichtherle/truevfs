@@ -47,7 +47,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
 
     @Override
     final boolean isTouched() {
-        ArchiveFileSystem fileSystem = getFileSystem();
+        final ArchiveFileSystem fileSystem = getFileSystem();
         return fileSystem != null && fileSystem.isTouched();
     }
 
@@ -144,13 +144,13 @@ abstract class FileSystemArchiveController extends ArchiveController {
         private final ArchiveFileSystem fileSystem;
 
         private MountedFileSystem(final ArchiveFileSystem fileSystem) {
-            assert fileSystem != null : "It's illegal to use this state with null as the file system!";
+            if (fileSystem == null)
+                throw new NullPointerException();
             this.fileSystem = fileSystem;
         }
 
         @Override
-        ArchiveFileSystem autoMount(boolean create)
-        throws IOException {
+        ArchiveFileSystem autoMount(boolean create) {
             return fileSystem;
         }
 
@@ -160,8 +160,9 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        void setFileSystem(ArchiveFileSystem fileSystem) {
-            assert fileSystem == null : "It's illegal to assign a file system to an archive controller which already has its file system mounted!";
+        void setFileSystem(final ArchiveFileSystem fileSystem) {
+            if (fileSystem != null)
+                throw new IllegalArgumentException("File system already mounted!");
             autoMounter = new ResetFileSystem();
         }
     } // class MountedFileSystem
@@ -170,7 +171,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
         private final FalsePositiveException exception;
 
         private FalsePositiveFileSystem(final FalsePositiveException exception) {
-            assert exception != null : "It's illegal to use this state with null as the IOException!";
+            if (exception == null)
+                throw new NullPointerException();
             this.exception = exception;
         }
 
@@ -181,8 +183,9 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        void setFileSystem(ArchiveFileSystem fileSystem) {
-            assert fileSystem == null : "It's illegal to assign a file system to an archive controller for a false positive archive file!";
+        void setFileSystem(final ArchiveFileSystem fileSystem) {
+            if (fileSystem != null)
+                throw new IllegalArgumentException("False positive archive file cannot have file system!");
             autoMounter = new ResetFileSystem();
         }
     } // class FalsePositiveFileSystem

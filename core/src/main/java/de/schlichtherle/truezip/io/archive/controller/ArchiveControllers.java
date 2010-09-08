@@ -457,7 +457,7 @@ public final class ArchiveControllers {
                     // same!
                     class SrcControllerUpdater implements IOOperation {
                         public void run() throws IOException {
-                            srcController.autoUmount(srcEntryName);
+                            srcController.autoSync(srcEntryName);
                             srcController.readLock().lock(); // downgrade to read lock upon return
                         }
                     } // class SrcControllerUpdater
@@ -466,7 +466,7 @@ public final class ArchiveControllers {
                     final Link dstLink;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
-                        dstController.autoUmount(dstEntryName);
+                        dstController.autoSync(dstEntryName);
 
                         // Get source archive entry.
                         srcRef = srcController.autoMount(false)
@@ -575,7 +575,7 @@ public final class ArchiveControllers {
                     // This may invalidate the file system object, so it must be
                     // done first in case srcController and dstController are the
                     // same!
-                    dstController.autoUmount(dstEntryName);
+                    dstController.autoSync(dstEntryName);
 
                     // Get source archive entry reference.
                     final IOReference<? extends ArchiveEntry> srcRef;

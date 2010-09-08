@@ -55,9 +55,9 @@ extends OutputStreamSocket<AE, ArchiveEntry> {
     /**
      * {@inheritDoc}
      *
-     * @param  source a nullable peer archive entry which is going to be
-     *         read in order to copy its data to the {@link #get() target}
-     *         archive entry.
+     * @param  source a nullable reference to a peer archive entry which
+     *         is going to be read in order to copy its data to the
+     *         {@link #get() target} archive entry.
      *         <p>
      *         Implementations may test the runtime type of this object in
      *         order to check if they should copy some class-specific
