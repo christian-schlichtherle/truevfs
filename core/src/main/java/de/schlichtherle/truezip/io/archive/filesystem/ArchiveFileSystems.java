@@ -21,6 +21,8 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import java.io.IOException;
 
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+
 /**
  * Provides static utility methods for archive file systems.
  * 
@@ -92,5 +94,14 @@ public class ArchiveFileSystems {
             boolean readOnly) {
         return new ArchiveFileSystem(
                 factory, vetoableTouchListener, archive, rootTime, readOnly);
+    }
+
+    /**
+     * Returns {@code true} iff the given path name refers to the root
+     * directory.
+     */
+    public static boolean isRoot(String path) {
+        assert ROOT.isEmpty();
+        return path.isEmpty();
     }
 }

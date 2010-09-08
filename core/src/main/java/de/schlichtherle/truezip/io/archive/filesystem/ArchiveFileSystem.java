@@ -43,6 +43,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.normalize;
 
 /**
@@ -233,15 +234,6 @@ public final class ArchiveFileSystem {
         assert template == null || type == template.getType();
 
         return wrap(factory.newArchiveEntry(path, type, unwrap(template)));
-    }
-
-    /**
-     * Returns {@code true} iff the given path name refers to the
-     * virtual root directory of this file system.
-     */
-    public static boolean isRoot(String path) {
-        assert ROOT.isEmpty();
-        return path.isEmpty();
     }
 
     /**
@@ -653,7 +645,7 @@ public final class ArchiveFileSystem {
      * 
      * @see #link
      */
-    public class LinkOperation implements IOOperation, IOReference<Entry> {
+    public class LinkOperation implements IOOperation, IOReference<ArchiveEntry> {
         final Splitter splitter = new Splitter();
         final PathNameElement[] elements;
 
@@ -759,8 +751,8 @@ public final class ArchiveFileSystem {
         }
 
         @Override
-        public Entry get() {
-            return elements[elements.length - 1].entry;
+        public ArchiveEntry get() {
+            return elements[elements.length - 1].entry.get();
         }
     } // class LinkOperation
 

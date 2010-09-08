@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -243,7 +244,7 @@ public abstract class ArchiveController implements Archive {
      * virtual root directory within this controller.
      */
     static boolean isRoot(String entryName) {
-        return ArchiveFileSystem.isRoot(entryName);
+        return ArchiveFileSystems.isRoot(entryName);
     }
 
     boolean isLenient() {
@@ -612,7 +613,7 @@ public abstract class ArchiveController implements Archive {
                 // directory.
                 final LinkOperation link = fileSystem.link(path, FILE, lenient);
                 // Create output stream.
-                out = newOutputStream(link.get(), null);
+                out = newOutputStream(link, null);
                 // Now link the entry into the file system.
                 link.run();
             }
