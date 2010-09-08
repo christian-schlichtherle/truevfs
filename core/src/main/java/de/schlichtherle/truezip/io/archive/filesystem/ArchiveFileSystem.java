@@ -682,7 +682,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
                 throw new ReadOnlyArchiveFileSystemException();
             if (isRoot(entryPath))
                 throw new ArchiveFileSystemException(entryPath,
-                        "cannot replace root directory entry");
+                        "cannot replace virtual root directory entry");
             if (!isValidPath(entryPath))
                 throw new ArchiveFileSystemException(entryPath,
                         "is not a valid path name");
@@ -780,7 +780,7 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
 
     /**
      * A data class which represents a path name element for use by
-     * {@link LinkOperation}.
+     * {@link Operation}.
      */
     private static class PathNameElement {
         final String path;
@@ -857,22 +857,6 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
     // File system operations used by the ArchiveController class:
     //
 
-/*
-    public boolean isExisting(final String path) {
-        return getEntry(path) != null;
-    }
-
-    public boolean isFile(final String path) {
-        final ArchiveEntry entry = getEntry(path);
-        return entry != null && entry.getType() == FILE;
-    }
-    
-    public boolean isDirectory(final String path) {
-        final ArchiveEntry entry = getEntry(path);
-        return entry != null && entry.getType() == DIRECTORY;
-    }
-*/
-
     public Type getType(final String path) {
         final ArchiveEntry entry = getEntry(path);
         return entry != null ? entry.getType() : null;
@@ -882,10 +866,13 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
         return !isReadOnly() && getType(path) == FILE;
     }
 
-    public boolean setReadOnly(final String path) {
-        return isReadOnly() && getType(path) == FILE;
+    public void setReadOnly(final String path)
+    throws IOException {
+        if (!isReadOnly() || getType(path) != FILE)
+            throw new ArchiveFileSystemException(path,
+                "cannot set read-only state for archive file system entries");
     }
-    
+
     public long getLength(final String path) {
         final Entry entry = getEntry(path);
         if (entry == null || entry.getType() == DIRECTORY)
@@ -965,6 +952,6 @@ public final class ArchiveFileSystem implements Iterable<IOReference<? extends A
             return;
         }
         throw new ArchiveFileSystemException(path,
-                "archive entry does not exist");
+                "archive file system entry does not exist");
     }
 }

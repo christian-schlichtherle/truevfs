@@ -896,25 +896,21 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    public final boolean setReadOnly(final String path)
-    throws FalsePositiveException {
+    public final void setReadOnly(final String path)
+    throws FalsePositiveException, IOException {
         try {
-            return setReadOnly0(path);
+            setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.setReadOnly(enclEntryName(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
+            enclController.setReadOnly(enclEntryName(path));
         }
     }
 
-    private boolean setReadOnly0(final String path)
+    private void setReadOnly0(final String path)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.setReadOnly(path);
+            fileSystem.setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
