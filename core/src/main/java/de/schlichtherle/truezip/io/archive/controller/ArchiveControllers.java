@@ -475,8 +475,8 @@ public final class ArchiveControllers {
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
                         dstLink = dstController.autoMount(lenient)
-                                .link(  dstEntryName, FILE, lenient,
-                                        preserve ? srcRef.get() : null);
+                                .mknod(  dstEntryName, FILE,
+                                        preserve ? srcRef.get() : null, lenient);
 
                         // Create input stream.
                         in = srcController.newInputStream(srcRef, dstLink);
@@ -585,9 +585,9 @@ public final class ArchiveControllers {
                     final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
-                    final Link dstLink = dstFileSystem.link(
-                            dstEntryName, FILE, lenient,
-                            preserve ? srcRef.get() : null);
+                    final Link dstLink = dstFileSystem.mknod(
+                            dstEntryName, FILE,
+                            preserve ? srcRef.get() : null, lenient);
 
                     // Create output stream.
                     out = dstController.newOutputStream(dstLink, srcRef);

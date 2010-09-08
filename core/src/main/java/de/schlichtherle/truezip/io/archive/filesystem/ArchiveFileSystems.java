@@ -52,7 +52,7 @@ public class ArchiveFileSystems {
             ArchiveEntryFactory<? extends ArchiveEntry> factory,
             VetoableTouchListener vetoableTouchListener)
     throws IOException {
-        return new ArchiveFileSystem(factory, vetoableTouchListener);
+        return new DefaultArchiveFileSystem(factory, vetoableTouchListener);
     }
     /**
      * Returns a new archive file system which populates its entries from
@@ -92,7 +92,7 @@ public class ArchiveFileSystems {
             InputArchive<? extends ArchiveEntry> archive,
             long rootTime,
             boolean readOnly) {
-        return new ArchiveFileSystem(
+        return new DefaultArchiveFileSystem(
                 factory, vetoableTouchListener, archive, rootTime, readOnly);
     }
 

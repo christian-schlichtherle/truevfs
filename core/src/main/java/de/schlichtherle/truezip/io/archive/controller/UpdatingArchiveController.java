@@ -382,8 +382,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // file, but we may create it automatically.
             // TODO: Document this: Why do we need to pass File.isLenient()
             // instead of just true?
-            final IOOperation link = controllerFileSystem.link(
-                    path, FILE, ArchiveControllers.isLenient(), null);
+            final IOOperation link = controllerFileSystem.mknod(
+                    path, FILE, null, ArchiveControllers.isLenient());
 
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password

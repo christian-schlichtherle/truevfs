@@ -612,7 +612,7 @@ public abstract class ArchiveController implements Archive {
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final Link link = fileSystem.link(path, FILE, lenient, null);
+                final Link link = fileSystem.mknod(path, FILE, null, lenient);
                 // Create output stream.
                 out = newOutputStream(link, null);
                 // Now link the entry into the file system.
@@ -1015,7 +1015,7 @@ public abstract class ArchiveController implements Archive {
             } else { // !isRoot(entryName)
                 // This file is a regular archive entry.
                 final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-                fileSystem.mkdir(path, autoCreate);
+                fileSystem.mknod(path, DIRECTORY, null, autoCreate).run();
             }
         } finally {
             writeLock().unlock();
@@ -1097,7 +1097,7 @@ public abstract class ArchiveController implements Archive {
                 }
             } else { // !isRoot(entryName)
                 final ArchiveFileSystem fileSystem = autoMount(false);
-                fileSystem.delete(path);
+                fileSystem.unlink(path);
             }
         } finally {
             writeLock().unlock();
