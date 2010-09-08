@@ -16,12 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.LinkOperation;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
@@ -464,7 +463,7 @@ public final class ArchiveControllers {
                     } // class SrcControllerUpdater
 
                     final IOReference<? extends ArchiveEntry> srcRef;
-                    final LinkOperation dstLink;
+                    final Link dstLink;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoUmount(dstEntryName);
@@ -586,7 +585,7 @@ public final class ArchiveControllers {
                     final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
-                    final LinkOperation dstLink = dstFileSystem.link(
+                    final Link dstLink = dstFileSystem.link(
                             dstEntryName, FILE, lenient,
                             preserve ? srcRef.get() : null);
 
