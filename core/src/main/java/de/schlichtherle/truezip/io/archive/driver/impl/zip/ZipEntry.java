@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 
@@ -40,26 +39,12 @@ public class ZipEntry
                 == ArchiveEntry.UNKNOWN;
     }
 
-    private ArchiveEntryMetaData metaData;
-
     ZipEntry(String entryName) {
         super(entryName);
     }
 
     ZipEntry(ZipEntry blueprint) {
         super(blueprint);
-    }
-
-    /**
-     * Throws an UnsupportedOperationException.
-     *
-     * @throws UnsupportedOperationException
-     *         Cloning doesn't work with ArchiveEntryMetaData and is not
-     *         required for ArchiveDriver's anyway.
-     */
-    @Override
-    public de.schlichtherle.truezip.io.zip.ZipEntry clone() {
-        throw new UnsupportedOperationException("Cloning doesn't work with ArchiveEntryMetaData and is not required for an ArchiveDriver anyway.");
     }
 
     @Override
@@ -75,15 +60,5 @@ public class ZipEntry
     @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.ZIP;
-    }
-
-    @Override
-    public ArchiveEntryMetaData getMetaData() {
-        return metaData;
-    }
-
-    @Override
-    public void setMetaData(ArchiveEntryMetaData metaData) {
-        this.metaData = metaData;
     }
 }

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -449,9 +450,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inArchive != null;
     }
 
+    @Override
     InputStream newInputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry dstEntry)
+            final Entry entry,
+            final Entry dstEntry)
     throws IOException {
         assert entry != null;
         assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
@@ -464,9 +466,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         return in;
     }
 
+    @Override
     OutputStream newOutputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry srcEntry)
+            final Entry entry,
+            final Entry srcEntry)
     throws IOException {
         assert entry != null;
         assert writeLock().isLockedByCurrentThread();

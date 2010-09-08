@@ -16,10 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.File;
-import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
@@ -34,8 +32,6 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 public class TarEntry
         extends org.apache.tools.tar.TarEntry
         implements ArchiveEntry {
-
-    private ArchiveEntryMetaData metaData;
 
     public TarEntry(final String entryName) {
         super(entryName, true);
@@ -85,15 +81,5 @@ public class TarEntry
     @Override
     public void setTime(long time) {
         super.setModTime(time);
-    }
-
-    @Override
-    public ArchiveEntryMetaData getMetaData() {
-        return metaData;
-    }
-
-    @Override
-    public void setMetaData(ArchiveEntryMetaData metaData) {
-        this.metaData = metaData;
     }
 }

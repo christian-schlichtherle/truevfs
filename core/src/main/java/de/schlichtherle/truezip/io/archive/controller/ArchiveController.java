@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ChildVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -23,7 +24,6 @@ import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.Archive;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.LinkOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Operation;
@@ -527,7 +527,7 @@ public abstract class ArchiveController implements Archive {
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final ArchiveEntry entry = autoMount(false).get(path);
+                final Entry entry = autoMount(false).get(path);
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
@@ -549,9 +549,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream newInputStream(
-            ArchiveEntry entry,
-            ArchiveEntry dstEntry)
+    abstract InputStream newInputStream(Entry entry, Entry dstEntry)
     throws IOException;
 
     /**
@@ -635,9 +633,7 @@ public abstract class ArchiveController implements Archive {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream newOutputStream(
-            ArchiveEntry entry,
-            ArchiveEntry srcEntry)
+    abstract OutputStream newOutputStream(Entry entry, Entry srcEntry)
     throws IOException;
 
     public final boolean isExisting(final String path)

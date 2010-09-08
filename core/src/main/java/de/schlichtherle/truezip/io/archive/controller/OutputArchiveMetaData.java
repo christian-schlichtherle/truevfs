@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -104,16 +105,16 @@ public final class OutputArchiveMetaData {
     }
 
     synchronized OutputStream newOutputStream(
-            final ArchiveEntry entry,
-            final ArchiveEntry srcEntry)
+            final Entry entry,
+            final Entry srcEntry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         return new EntryOutputStream(
                 outArchive
-                .getOutputStreamSocket(entry)
-                .newOutputStream(IOReferences.ref(srcEntry)));
+                .getOutputStreamSocket(Entry.unwrap(entry))
+                .newOutputStream(IOReferences.ref(Entry.unwrap(srcEntry))));
     }
 
     /**

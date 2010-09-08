@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.spi;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 
 /**
  * A decorator for archive entries.
@@ -29,50 +28,40 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveEntryMetaData;
 public class FilterArchiveEntry<AE extends ArchiveEntry>
 implements ArchiveEntry {
 
-    /** The decorated archive entry - may be {@code null}. */
-    protected AE entry;
+    /** The decorated nullable archive entry. */
+    protected AE target;
 
     protected FilterArchiveEntry(final AE entry) {
-        this.entry = entry;
+        this.target = entry;
     }
 
     @Override
     public String getName() {
-        return entry.getName();
+        return target.getName();
     }
 
     @Override
     public Type getType() {
-        return entry.getType();
+        return target.getType();
     }
 
     @Override
     public long getSize() {
-        return entry.getSize();
+        return target.getSize();
     }
 
     @Override
     public void setSize(long size) {
-        entry.setSize(size);
+        target.setSize(size);
     }
 
     @Override
     public long getTime() {
-        return entry.getTime();
+        return target.getTime();
     }
 
     @Override
     public void setTime(long time) {
-        entry.setTime(time);
-    }
-
-    @Override
-    public ArchiveEntryMetaData getMetaData() {
-        return entry.getMetaData();
-    }
-
-    @Override
-    public void setMetaData(ArchiveEntryMetaData metaData) {
-        entry.setMetaData(metaData);
+        target.setTime(time);
     }
 }

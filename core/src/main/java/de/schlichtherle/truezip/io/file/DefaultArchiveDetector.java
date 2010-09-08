@@ -213,8 +213,8 @@ implements ArchiveDetector {
     }
 
     @Override
-    public File createFile(java.io.File blueprint) {
-        return new File(blueprint, this);
+    public File createFile(java.io.File template) {
+        return new File(template, this);
     }
 
     @Override
