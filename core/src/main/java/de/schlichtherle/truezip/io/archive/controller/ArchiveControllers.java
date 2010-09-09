@@ -433,9 +433,9 @@ public final class ArchiveControllers {
     public static void copy(
             final boolean preserve,
             final ArchiveController srcController,
-            final String srcEntryName,
+            final String srcPath,
             final ArchiveController dstController,
-            final String dstEntryName)
+            final String dstPath)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
@@ -457,7 +457,7 @@ public final class ArchiveControllers {
                     // same!
                     class SrcControllerUpdater implements IOOperation {
                         public void run() throws IOException {
-                            srcController.autoSync(srcEntryName);
+                            srcController.autoSync(srcPath);
                             srcController.readLock().lock(); // downgrade to read lock upon return
                         }
                     } // class SrcControllerUpdater
@@ -466,17 +466,18 @@ public final class ArchiveControllers {
                     final Link dstLink;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
-                        dstController.autoSync(dstEntryName);
+                        dstController.autoSync(dstPath);
 
                         // Get source archive entry.
                         srcRef = srcController.autoMount(false)
-                                .getReference(srcEntryName);
+                                .getReference(srcPath);
 
                         // Get destination archive entry.
                         final boolean lenient = isLenient();
                         dstLink = dstController.autoMount(lenient)
-                                .mknod(  dstEntryName, FILE,
-                                        preserve ? srcRef.get() : null, lenient);
+                                .mknod( dstPath, FILE,
+                                        preserve ? srcRef.get() : null,
+                                        lenient);
 
                         // Create input stream.
                         in = srcController.newInputStream(srcRef, dstLink);
@@ -528,9 +529,9 @@ public final class ArchiveControllers {
             if (!dstController.getCanonicalPath().equals(ex.getCanonicalPath())) {
                 throw ex; // not my job - pass on!
             }      // Reroute call to the destination's enclosing archive controller.
-            copy(preserve, srcController, srcEntryName,
+            copy(preserve, srcController, srcPath,
                     dstController.getEnclController(),
-                    dstController.enclEntryName(dstEntryName));
+                    dstController.enclEntryName(dstPath));
         }
     }
 
@@ -558,7 +559,7 @@ public final class ArchiveControllers {
             final java.io.File src,
             final InputStream in,
             final ArchiveController dstController,
-            final String dstEntryName)
+            final String dstPath)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
@@ -575,7 +576,7 @@ public final class ArchiveControllers {
                     // This may invalidate the file system object, so it must be
                     // done first in case srcController and dstController are the
                     // same!
-                    dstController.autoSync(dstEntryName);
+                    dstController.autoSync(dstPath);
 
                     // Get source archive entry reference.
                     final IOReference<? extends ArchiveEntry> srcRef;
@@ -586,7 +587,7 @@ public final class ArchiveControllers {
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(lenient);
                     final Link dstLink = dstFileSystem.mknod(
-                            dstEntryName, FILE,
+                            dstPath, FILE,
                             preserve ? srcRef.get() : null, lenient);
 
                     // Create output stream.
@@ -622,7 +623,7 @@ public final class ArchiveControllers {
             // Reroute call to the destination's enclosing ArchiveController.
             copy(   preserve, src, in,
                     dstController.getEnclController(),
-                    dstController.enclEntryName(dstEntryName));
+                    dstController.enclEntryName(dstPath));
         }
     }
 
