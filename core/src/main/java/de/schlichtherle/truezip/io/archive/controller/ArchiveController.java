@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.util.Set;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.archive.Archive;
@@ -530,15 +530,15 @@ public abstract class ArchiveController implements Archive {
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
                 final ArchiveFileSystem fileSystem =  autoMount(false);
-                final IOReference<? extends ArchiveEntry> ref
+                final IOReference<? extends ArchiveEntry> entryRef
                         = fileSystem.getReference(path);
-                if (ref == null)
+                if (entryRef == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file entry");
-                if (ref.get().getType() == DIRECTORY)
+                if (entryRef.get().getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "cannot read from directory entry");
-                return newInputStream(ref, null);
+                return newInputStream(entryRef, null);
             }
         } finally {
             readLock().unlock();
@@ -872,25 +872,25 @@ public abstract class ArchiveController implements Archive {
         }
     }
 
-    public final void list(final String path, final MemberVisitor visitor)
+    public final Set<String> list(final String path)
     throws FalsePositiveException {
         try {
-            list0(path, visitor);
+            return list0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            enclController.list(enclEntryName(path), visitor);
+            return enclController.list(enclEntryName(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
-            return; // could not create temp file or something like this
+            return null;
         }
     }
 
-    private void list0(final String path, final MemberVisitor visitor)
+    private Set<String> list0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             final ArchiveFileSystem fileSystem = autoMount(false);
-            fileSystem.list(path, visitor);
+            return fileSystem.list(path);
         } finally {
             readLock().unlock();
         }
@@ -1066,7 +1066,7 @@ public abstract class ArchiveController implements Archive {
                 }
 
                 // We are actually working on the controller's target file.
-                if (fileSystem.getNumMembers(path) > 0)
+                if (!fileSystem.list(path).isEmpty())
                     throw new IOException("archive file system not empty!");
                 final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
                 // TODO: Review: This policy may be changed - see method start.

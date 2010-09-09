@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
@@ -30,7 +31,6 @@ import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilde
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.filesystem.MemberVisitor;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -53,7 +53,6 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.util.Arrays.copyOf;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -679,6 +678,7 @@ public class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public File(
             final java.io.File delegate,
             final File innerArchive,
@@ -2529,26 +2529,13 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list() {
-        class Visitor implements MemberVisitor {
-            String children[];
-            int i;
-
-            @Override
-            public void init(final int numMembers) {
-                children = new String[numMembers];
-            }
-
-            @Override
-            public void visit(final String member) {
-                children[i++] = member;
-            }
-        }
         try {
             if (innerArchive != null) {
-                final Visitor visitor = new Visitor();
-                innerArchive.getArchiveController()
-                        .list(innerEntryName, visitor);
-                return visitor.children;
+                final Set<String> members = innerArchive
+                        .getArchiveController()
+                        .list(innerEntryName);
+                return members == null
+                        ? null : members.toArray(new String[members.size()]);
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -2573,29 +2560,20 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list(final FilenameFilter filter) {
-        class Visitor implements MemberVisitor {
-            String children[];
-            int i;
-
-            @Override
-            public void init(final int numMembers) {
-                children = new String[numMembers];
-            }
-
-            @Override
-            public void visit(final String member) {
-                if (filter == null || filter.accept(File.this, member))
-                    children[i++] = member;
-            }
-        }
         try {
             if (innerArchive != null) {
-                final Visitor visitor = new Visitor();
-                innerArchive.getArchiveController()
-                        .list(innerEntryName, visitor);
-                return visitor.children != null
-                        ? copyOf(visitor.children, visitor.i)
-                        : null;
+                final Set<String> members = innerArchive.getArchiveController()
+                        .list(innerEntryName);
+                if (members == null)
+                    return null;
+                if (filter == null)
+                    return members.toArray(new String[members.size()]);
+                final Collection<String> filtered
+                        = new ArrayList<String>(members.size());
+                for (final String member : members)
+                    if (filter.accept(this, member))
+                        filtered.add(member);
+                return filtered.toArray(new String[filtered.size()]);
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -2667,29 +2645,18 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FilenameFilter filter,
             final FileFactory factory) {
-        class Visitor implements MemberVisitor {
-            File children[];
-            int i;
-
-            @Override
-            public void init(final int numMembers) {
-                children = new File[numMembers];
-            }
-
-            @Override
-            public void visit(final String member) {
-                if (filter == null || filter.accept(File.this, member))
-                    children[i++] = factory.createFile(File.this, member);
-            }
-        }
         try {
             if (innerArchive != null) {
-                final Visitor visitor = new Visitor();
-                innerArchive.getArchiveController()
-                        .list(innerEntryName, visitor);
-                return visitor.children != null
-                        ? copyOf(visitor.children, visitor.i)
-                        : null;
+                final Set<String> members = innerArchive.getArchiveController()
+                        .list(innerEntryName);
+                if (members == null)
+                    return null;
+                final Collection<File> filtered
+                        = new ArrayList<File>(members.size());
+                for (final String member : members)
+                    if (filter == null || filter.accept(this, member))
+                        filtered.add(factory.createFile(File.this, member));
+                return filtered.toArray(new File[filtered.size()]);
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -2743,30 +2710,20 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FileFilter filter,
             final FileFactory factory) {
-        class Visitor implements MemberVisitor {
-            File children[];
-            int i;
-
-            @Override
-            public void init(final int numMembers) {
-                children = new File[numMembers];
-            }
-
-            @Override
-            public void visit(final String member) {
-                final File file = factory.createFile(File.this, member);
-                if (filter == null || filter.accept(file))
-                    children[i++] = file;
-            }
-        }
         try {
             if (innerArchive != null) {
-                final Visitor visitor = new Visitor();
-                innerArchive.getArchiveController()
-                        .list(innerEntryName, visitor);
-                return visitor.children != null
-                        ? copyOf(visitor.children, visitor.i)
-                        : null;
+                final Set<String> members = innerArchive.getArchiveController()
+                        .list(innerEntryName);
+                if (members == null)
+                    return null;
+                final Collection<File> filtered
+                        = new ArrayList<File>(members.size());
+                for (final String member : members) {
+                    final File file = factory.createFile(File.this, member);
+                    if (filter == null || filter.accept(file))
+                        filtered.add(file);
+                }
+                return filtered.toArray(new File[filtered.size()]);
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
