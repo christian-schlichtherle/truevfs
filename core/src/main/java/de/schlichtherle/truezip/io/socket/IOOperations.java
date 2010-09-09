@@ -37,7 +37,7 @@ public class IOOperations {
     /**
      * @deprecated This method is clearly experimental!
      */
-    public static <IT extends T, OT extends T, T> void copy(
+    public static <T, IT extends T, OT extends T> void copy(
             final InputStreamSocketProvider<IT, T> input,
             final IT source,
             final OutputStreamSocketProvider<OT, T> output,
@@ -51,7 +51,7 @@ public class IOOperations {
         }
         final OutputStreamSocket<? extends OT, ? super T> oss;
         oss = output.getOutputStreamSocket(destination);
-        copy(iss, oss);
+        copy((InputStreamSocket) iss, (OutputStreamSocket) oss); // FIXME: this cast tricks javac 1.6.0_21 - not required for javac 1.7.0 b106
     }
 
     /**
