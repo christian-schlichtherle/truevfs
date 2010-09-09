@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A virtual file system for archive entries.
@@ -149,9 +150,13 @@ extends Iterable<IOReference<? extends ArchiveEntry>> {
 
     long getLength(String path);
 
-    int getNumMembers(String path);
-
-    void list(final String path, final MemberVisitor visitor);
+    /**
+     * Returns an unmodifiable set of the base names of the members
+     * of the directory identified by {@code path} or {@code null} if no
+     * directory entry exists for the given path name in this virtual archive
+     * file system.
+     */
+    Set<String> list(final String path);
 
     boolean isWritable(String path);
 

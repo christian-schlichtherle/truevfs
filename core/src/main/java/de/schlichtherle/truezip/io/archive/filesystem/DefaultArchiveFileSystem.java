@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import java.util.Collection;
 import de.schlichtherle.truezip.io.archive.driver.spi.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.Paths;
@@ -26,12 +27,15 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
@@ -388,46 +392,11 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
     }
 
     @Override
-    public Entry getReference(String path) {
+    public CommonEntry getReference(String path) {
         if (path == null)
             throw new NullPointerException();
         return master.get(path);
     }
-
-    /**
-     * Defines the features of the file system entries in this archive file
-     * system.
-     */
-    private interface Entry
-    extends ArchiveEntry, IOReference<ArchiveEntry> {
-
-        /** @throws UnsupportedOperationException */
-        @Override
-        void setSize(long size);
-
-        /**
-         * Returns the number of members of this file system entry
-         * if and only if this file system entry is a directory.
-         *
-         * @throws UnsupportedOperationException if this file system entry is
-         *         not a directory.
-         */
-        int size();
-
-        /**
-         * Visits the members of this directory in arbitrary order
-         * if and only if this file system target is a directory.
-         * First, {@link MemberVisitor#init} is called in order to initialize
-         * the visitor.
-         * Then {@link MemberVisitor#visit} is called for every member of this
-         * directory.
-         *
-         * @throws UnsupportedOperationException if this file system target is
-         *         not a directory.
-         * @throws NullPointerException If {@code visitor} is {@code null}.
-         */
-        void list(MemberVisitor visitor);
-    } // interface Entry
 
     /**
      * Constructs a new instance of {@code Entry}
@@ -445,20 +414,11 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
 
     /**
      * Returns the decorated target archive entry if and only if
-     * {@code wrapper} is non-{@code null}.
-     * Otherwise, {@code null} is returned.
-     */
-    private static ArchiveEntry unwrap(final Entry wrapper) {
-        return wrapper != null ? wrapper.get() : null;
-    }
-
-    /**
-     * Returns the decorated target archive entry if and only if
      * {@code entry} is an instance of {@code Entry}.
      * Otherwise, {@code entry} is returned.
      */
     private static ArchiveEntry unwrap(final ArchiveEntry entry) {
-        return entry instanceof Entry ? ((Entry) entry).get() : entry;
+        return entry instanceof CommonEntry ? ((CommonEntry) entry).get() : entry;
     }
 
     /**
@@ -467,9 +427,9 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      * It's implemented as a decorator for {@link ArchiveEntry}s which
      * adds the methods required to implement the concept of a directory.
      */
-    private abstract static class CommonEntry
+    private static abstract class CommonEntry
     extends FilterArchiveEntry<ArchiveEntry>
-    implements Entry {
+    implements ArchiveEntry, IOReference<ArchiveEntry> {
 
         /** Constructs a new instance of {@code Entry}. */
         CommonEntry(final ArchiveEntry entry) {
@@ -478,18 +438,12 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
         }
 
         @Override
-        public final void setSize(final long size) {
+        public final void setSize(long size) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public int size() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void list(final MemberVisitor visitor) {
-            throw new UnsupportedOperationException();
+        Set<String> list() {
+            return null;
         }
 
         /**
@@ -528,7 +482,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
         }
     } // class CommonEntry
 
-    static final class FileEntry extends CommonEntry {
+    private static final class FileEntry extends CommonEntry {
         /** Constructs a new instance of {@code FileEntry}. */
         FileEntry(final ArchiveEntry entry) {
             super(entry);
@@ -536,8 +490,8 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
         }
     } // class FileEntry
 
-    static final class DirectoryEntry extends CommonEntry {
-        final Set<String> members = new LinkedHashSet<String>();
+    private static final class DirectoryEntry extends CommonEntry {
+        Set<String> members = new LinkedHashSet<String>();
 
         /** Constructs a new instance of {@code DirectoryEntry}. */
         DirectoryEntry(final ArchiveEntry entry) {
@@ -546,15 +500,10 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
         }
 
         @Override
-        public int size() {
-            return members.size();
-        }
-
-        @Override
-        public void list(final MemberVisitor visitor) {
-            visitor.init(members.size());
-            for (final String member : members)
-                visitor.visit(member);
+        Set<String> list() {
+            if (!(members instanceof CopyOnWriteArraySet))
+                members = new CopyOnWriteArraySet<String>(members);
+            return Collections.unmodifiableSet(members);
         }
 
         @Override
@@ -625,7 +574,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
                 if (parentEntry.getType() != DIRECTORY)
                     throw new ArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
-                final Entry oldEntry = master.get(entryPath);
+                final CommonEntry oldEntry = master.get(entryPath);
                 if (entryType == DIRECTORY) {
                     if (oldEntry != null) {
                         throw new ArchiveFileSystemException(entryPath,
@@ -673,7 +622,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
                 master.put(path, entry);
                 parent = entry;
             }
-            final Entry entry = elements[l - 1].entry;
+            final CommonEntry entry = elements[l - 1].entry;
             if (entry.getTime() == UNKNOWN)
                 entry.setTime(time);
         }
@@ -727,7 +676,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
                 throw new ArchiveFileSystemException(path,
                         "entry does not exist");
             assert entry != root;
-            if (entry.getType() == DIRECTORY && entry.size() != 0) {
+            if (entry.getType() == DIRECTORY && entry.list().size() > 0) {
                 master.put(path, entry); // Restore file system
                 throw new ArchiveFileSystemException(path,
                         "directory is not empty");
@@ -770,7 +719,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public long getLength(final String path) {
-        final Entry entry = getReference(path);
+        final CommonEntry entry = getReference(path);
         if (entry == null || entry.getType() == DIRECTORY)
             return 0;
 
@@ -789,7 +738,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public long getLastModified(final String path) {
-        final Entry entry = getReference(path);
+        final CommonEntry entry = getReference(path);
         if (entry != null) {
             // Depending on the driver type, target.getTime() could return
             // a negative value. E.g. this is the default value that the
@@ -807,14 +756,14 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
     @Override
     public boolean setLastModified(final String path, final long time)
     throws ArchiveFileSystemException {
+        if (isReadOnly())
+            return false;
+
         if (time < 0)
             throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
 
-        if (isReadOnly())
-            return false;
-
-        final Entry entry = getReference(path);
+        final CommonEntry entry = getReference(path);
         if (entry == null)
             return false;
 
@@ -826,15 +775,8 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
     }
 
     @Override
-    public int getNumMembers(final String path) {
-        final Entry entry = getReference(path);
-        return entry != null && entry.getType() == DIRECTORY ? entry.size() : 0;
-    }
-
-    @Override
-    public void list(final String path, final MemberVisitor visitor) {
-        final Entry entry = getReference(path);
-        if (entry != null && entry.getType() == DIRECTORY)
-            entry.list(visitor);
+    public Set<String> list(final String path) {
+        final CommonEntry entry = getReference(path);
+        return entry == null ? null : entry.list();
     }
 }
