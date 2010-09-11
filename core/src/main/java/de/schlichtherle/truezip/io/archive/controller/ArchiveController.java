@@ -221,7 +221,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         // they would dead lock each other!
         final int holdCount = readLock().getHoldCount();
         for (int c = holdCount; c-- > 0; )
-            readLock().unlock();
+                readLock().unlock();
         // The current thread may get blocked here!
         writeLock().lock();
         try {
@@ -1020,7 +1020,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    autoMount(false, createParents); // detect false positives!
+                    autoMount(false); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
                     autoMount(true, createParents);
                     return;

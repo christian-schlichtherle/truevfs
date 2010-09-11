@@ -52,7 +52,7 @@ public class ArchiveFileSystems {
             ArchiveEntryFactory<? extends ArchiveEntry> factory,
             VetoableTouchListener vetoableTouchListener)
     throws IOException {
-        return new DefaultArchiveFileSystem(factory, vetoableTouchListener);
+        return new ReadWriteArchiveFileSystem(factory, vetoableTouchListener);
     }
 
     /**
@@ -72,15 +72,15 @@ public class ArchiveFileSystems {
      * Note that the entries in this file system are shared with the given
      * {@code archive}.
      *
+     * @param input The archive input to read the entries for the population
+     *        of this file system.
+     * @param rootTime The last modification time of the root of the populated
+     *        file system in milliseconds since the epoch.
      * @param factory the archive entry factory to use.
      * @param vetoableTouchListener the nullable listener for touch events.
      *        If not {@code null}, its {@link VetoableTouchListener#touch()}
      *        method will be called whenever a client class changes the state
      *        of this archive file system.
-     * @param archive The input archive to read the entries for the population
-     *        of this file system.
-     * @param rootTime The last modification time of the root of the populated
-     *        file system in milliseconds since the epoch.
      * @param readOnly If and only if {@code true}, any subsequent
      *        modifying operation on this file system will result in a
      *        {@link ReadOnlyArchiveFileSystemException}.
@@ -88,13 +88,14 @@ public class ArchiveFileSystems {
      *         is {@code null}.
      */
     public static ArchiveFileSystem newArchiveFileSystem(
+            ArchiveInput<? extends ArchiveEntry> input,
+            long rootTime,
             ArchiveEntryFactory<? extends ArchiveEntry> factory,
             VetoableTouchListener vetoableTouchListener,
-            ArchiveInput<? extends ArchiveEntry> archive,
-            long rootTime,
             boolean readOnly) {
-        return new DefaultArchiveFileSystem(
-                factory, vetoableTouchListener, archive, rootTime, readOnly);
+        return readOnly
+            ? new ReadOnlyArchiveFileSystem(input, rootTime, factory)
+            : new ReadWriteArchiveFileSystem(input, rootTime, factory, vetoableTouchListener);
     }
 
     /**

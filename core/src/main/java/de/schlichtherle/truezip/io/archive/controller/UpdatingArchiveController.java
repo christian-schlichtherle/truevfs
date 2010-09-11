@@ -183,8 +183,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     throw new FalsePositiveException(this, ROOT, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                        getDriver(), vetoableTouchListener, inArchive,
-                        time, isReadOnly));
+                         inArchive, time, getDriver(),
+                        vetoableTouchListener, isReadOnly));
             } else if (!autoCreate) {
                 // The archive file does not exist and we may not create it
                 // automatically.
@@ -237,8 +237,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // its virtual root directory.
                 // Nice trick, isn't it?!
                 setFileSystem(newArchiveFileSystem(
-                        getDriver(), vetoableTouchListener, inArchive,
-                        inFile.lastModified(), false));
+                         inArchive,
+                        inFile.lastModified(), getDriver(), vetoableTouchListener, false));
             }
         }
     }
@@ -352,9 +352,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                        getDriver(), vetoableTouchListener, inArchive,
+                         inArchive,
                         controllerFileSystem.getLastModified(path),
-                        controllerFileSystem.isReadOnly()));
+                        getDriver(), vetoableTouchListener, controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or

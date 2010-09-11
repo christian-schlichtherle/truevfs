@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import java.util.Collection;
 import de.schlichtherle.truezip.io.archive.spi.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.Paths;
@@ -27,14 +26,12 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
@@ -55,13 +52,10 @@ import static de.schlichtherle.truezip.io.Paths.normalize;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class DefaultArchiveFileSystem implements ArchiveFileSystem {
+class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
 
     /** The controller that this filesystem belongs to. */
     private final ArchiveEntryFactory<? extends ArchiveEntry> factory;
-
-    /** The read only status of this file system. */
-    private final boolean readOnly;
 
     /**
      * The map of archive entries in this file system.
@@ -95,7 +89,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      *        a client class changes the state of this archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    DefaultArchiveFileSystem(
+    ReadWriteArchiveFileSystem(
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener)
     throws ArchiveFileSystemException {
@@ -108,8 +102,6 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
         root = newEntry(ROOT, DIRECTORY);
         root.setTime(System.currentTimeMillis());
         master.put(ROOT, root);
-
-        readOnly = false;
 
         this.vetoableTouchListener = vetoableTouchListener;
         touch();
@@ -141,18 +133,14 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      *        of this file system.
      * @param rootTime The last modification time of the root of the populated
      *        file system in milliseconds since the epoch.
-     * @param readOnly If and only if {@code true}, any subsequent
-     *        modifying operation on this file system will result in a
-     *        {@link ReadOnlyArchiveFileSystemException}.
      * @throws NullPointerException If {@code factory} or {@code archive}
      *         is {@code null}.
      */
-    DefaultArchiveFileSystem(
-            final ArchiveEntryFactory<? extends ArchiveEntry> factory,
-            final VetoableTouchListener vetoableTouchListener,
+    ReadWriteArchiveFileSystem(
             final ArchiveInput<? extends ArchiveEntry> archive,
             final long rootTime,
-            final boolean readOnly) {
+            final ArchiveEntryFactory<? extends ArchiveEntry> factory,
+            final VetoableTouchListener vetoableTouchListener) {
         this.factory = factory;
         master = new LinkedHashMap<String, CommonEntry>(
                 (int) (archive.size() / 0.75f) + 1);
@@ -181,12 +169,6 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
                 fsck.fix(path);
         }
 
-        // Make master map unmodifiable if this is a readonly file system
-        this.readOnly = readOnly;
-        if (readOnly)
-            master = Collections.unmodifiableMap(master);
-
-        assert !isTouched();
         this.vetoableTouchListener = vetoableTouchListener;
     }
 
@@ -353,11 +335,11 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public boolean isReadOnly() {
-        return readOnly;
+        return false;
     }
 
     @Override
-    public final boolean isTouched() {
+    public boolean isTouched() {
         return touched != 0;
     }
 
@@ -372,9 +354,6 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      *         controller fails for some reason.
      */
     private void touch() throws ArchiveFileSystemException {
-        if (isReadOnly())
-            throw new ReadOnlyArchiveFileSystemException();
-
         // Order is important here because of exceptions!
         if (touched == 0 && vetoableTouchListener != null) {
             try {
@@ -388,7 +367,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public Iterator<IOReference<? extends ArchiveEntry>> iterator() {
-        return (Iterator) master.values().iterator(); // FIXME: Make this typesafe!
+        return (Iterator) Collections.unmodifiableCollection(master.values()).iterator(); // FIXME: Make this typesafe!
     }
 
     @Override
@@ -536,8 +515,6 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
                 final boolean createParents,
                 final ArchiveEntry template)
         throws ArchiveFileSystemException {
-            if (isReadOnly())
-                throw new ReadOnlyArchiveFileSystemException();
             if (isRoot(entryPath))
                 throw new ArchiveFileSystemException(entryPath,
                         "cannot replace virtual root directory entry");
@@ -756,9 +733,6 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
     @Override
     public boolean setLastModified(final String path, final long time)
     throws ArchiveFileSystemException {
-        if (isReadOnly())
-            return false;
-
         if (time < 0)
             throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
