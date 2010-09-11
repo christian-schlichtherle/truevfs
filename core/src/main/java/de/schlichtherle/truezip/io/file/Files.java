@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
@@ -29,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -400,12 +402,15 @@ final class Files {
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert srcController.getMountPoint().equals(ex.getMountPoint());
+            final URI mountPoint = ex.getMountPoint();
+            final ArchiveController enclController
+                    = ArchiveControllers.get(mountPoint);
+            final String enclPath = mountPoint.relativize(
+                    mountPoint
+                    .resolve(ex.getPath() + SEPARATOR_CHAR)
+                    .resolve(srcPath)).toString();
             // Reroute call to the source's enclosing archive controller.
-            copy0(  preserve,
-                    srcController.getEnclDescriptor(),
-                    srcController.getEnclPath(srcPath),
-                    dst);
+            copy0(preserve, enclController, enclPath, dst);
         }
     }
 

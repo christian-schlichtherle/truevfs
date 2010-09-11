@@ -93,6 +93,10 @@ public final class ArchiveControllers {
     private ArchiveControllers() {
     }
 
+    public static ArchiveController get(URI mountPoint) {
+        return get(mountPoint, null, null);
+    }
+
     /**
      * Factory method returning an {@link ArchiveController} object for the
      * given archive file.
@@ -110,14 +114,13 @@ public final class ArchiveControllers {
      */
     public static ArchiveController get(
             URI mountPoint,
-            final ArchiveController enclController,
+            final URI enclMountPoint,
             final ArchiveDriver driver) {
         if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
         if (mountPoint.isOpaque()) throw new IllegalArgumentException();
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        if (driver == null) throw new NullPointerException();
         ArchiveController controller = null;
         boolean reconfigure = false;
         try {
@@ -131,7 +134,7 @@ public final class ArchiveControllers {
                         // If required, reconfiguration of the ArchiveController
                         // must be deferred until we have released the lock on
                         // controllers in order to prevent dead locks.
-                        reconfigure = controller.getDriver() != driver;
+                        reconfigure = driver != null && driver != controller.getDriver();
                         return controller;
                     }
                 } else if (value != null) {
@@ -150,10 +153,13 @@ public final class ArchiveControllers {
                     // ArchiveDetector.
                     return (ArchiveController) value;
                 }
+                assert value == null;
+                if (driver == null) // pure lookup operation?
+                    return null;
                 // TODO: Refactor this to a more flexible design which supports
                 // different sync strategies, like update or append.
                 controller = new UpdatingArchiveController(
-                        mountPoint, enclController, driver);
+                        mountPoint, enclMountPoint, driver);
             }
         } finally {
             if (reconfigure) {
@@ -245,17 +251,17 @@ public final class ArchiveControllers {
                 // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                for (final ArchiveController controller
-                        : get(prefix, REVERSE_CONTROLLERS)) {
-                    controller.writeLock().lock();
+                for (final ArchiveController c
+                        : getAll(prefix, REVERSE_CONTROLLERS)) {
+                    c.writeLock().lock();
                     try {
-                        if (controller.isTouched())
+                        if (c.isTouched())
                             touched++;
                         try {
                             // Upon return, some new ArchiveWarningException's may
                             // have been generated. We need to remember them for
                             // later throwing.
-                            controller.sync(config);
+                            c.sync(config);
                         } catch (SyncException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
@@ -265,7 +271,7 @@ public final class ArchiveControllers {
                             builder.warn(exception);
                         }
                     } finally {
-                        controller.writeLock().unlock();
+                        c.writeLock().unlock();
                     }
                     total++;
                 }
@@ -282,14 +288,15 @@ public final class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<? extends ArchiveController> get() {
-        return get(null, null);
+    static Iterable<? extends ArchiveController> getAll() {
+        return getAll(null, null);
     }
 
-    static Iterable<? extends ArchiveController> get(URI prefix, final Comparator c) {
+    static Iterable<? extends ArchiveController> getAll(
+            URI prefix,
+            final Comparator c) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
-
         final Set<ArchiveController> snapshot;
         synchronized (controllers) {
             snapshot = c != null
@@ -518,12 +525,17 @@ public final class ArchiveControllers {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
             // find out which controller actually detected the false positive.
-            if (!dstController.getMountPoint().equals(ex.getMountPoint()))
+            final URI mountPoint = ex.getMountPoint();
+            if (!dstController.getMountPoint().toString().startsWith(ex.getCanonicalPath()))
                 throw ex; // not my job - pass on!
+            final ArchiveController enclController
+                    = ArchiveControllers.get(mountPoint);
+            final String enclPath = mountPoint.relativize(
+                    mountPoint
+                    .resolve(ex.getPath() + SEPARATOR_CHAR)
+                    .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing archive controller.
-            copy(preserve, srcController, srcPath,
-                    dstController.getEnclDescriptor(),
-                    dstController.getEnclPath(dstPath));
+            copy(preserve, srcController, srcPath, enclController, enclPath);
         }
     }
 
@@ -611,11 +623,15 @@ public final class ArchiveControllers {
                 out.close();
             }
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert dstController.getMountPoint().equals(ex.getMountPoint());
+            final URI mountPoint = ex.getMountPoint();
+            final ArchiveController enclController
+                    = ArchiveControllers.get(mountPoint);
+            final String enclPath = mountPoint.relativize(
+                    mountPoint
+                    .resolve(ex.getPath() + SEPARATOR_CHAR)
+                    .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing ArchiveController.
-            copy(   preserve, src, in,
-                    dstController.getEnclDescriptor(),
-                    dstController.getEnclPath(dstPath));
+            copy(preserve, src, in, enclController, enclPath);
         }
     }
 

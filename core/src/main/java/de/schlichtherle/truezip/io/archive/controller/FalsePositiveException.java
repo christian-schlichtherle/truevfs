@@ -59,6 +59,10 @@ public class FalsePositiveException extends Exception {
         return mountPoint;
     }
 
+    public final String getPath() {
+        return path;
+    }
+
     /**
      * Returns the <em>canonical path</em> of the target entity which caused
      * this exception to be created when processing it.
@@ -66,10 +70,10 @@ public class FalsePositiveException extends Exception {
      * federated file system.
      *
      * @return A non-{@code null} URI representing the canonical path of the
-     *         archive entry.
+     *         target entity in the federated file system.
      */
-    public final URI getCanonicalPath() {
-        return getMountPoint().resolve(path);
+    public final String getCanonicalPath() {
+        return mountPoint.resolve(path).toString();
     }
 
     /**
@@ -84,7 +88,7 @@ public class FalsePositiveException extends Exception {
     public String getLocalizedMessage() {
         final String msg = getMessage();
         return msg != null
-                ? new StringBuilder(getCanonicalPath().toString()).append(" (").append(msg).append(")").toString()
-                : getCanonicalPath().toString();
+                ? new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString()
+                : getCanonicalPath();
     }
 }
