@@ -99,13 +99,12 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      * @throws NullPointerException If {@code operation} is {@code null}.
      * @throws Exception upon the discretion of {@code operation}.
      */
-    public <E extends Exception> void runWriteLocked(
-            final Operation<E> operation)
+    public <E extends Exception> void runWriteLocked(final Operation<E> operation)
     throws E {
         if (operation == null)
             throw new NullPointerException();
 
-        if (writeLock.isLockedByCurrentThread()) {
+        if (writeLock.isHeldByCurrentThread()) {
             // Calls to *.unlock/lock() are redundant.
             operation.run();
         } else {
@@ -115,15 +114,14 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             // implementation in JSE 5: If automatic upgrading were implemented,
             // two threads holding a read lock try to upgrade concurrently,
             // they would dead lock each other!
-            final int readHoldCount = readLock.getLockCount();
+            final int readHoldCount = readLock.getHoldCount();
             for (int c = readHoldCount; c > 0; c--)
                 readLock.unlock();
 
-            // Current thread may get deactivated exactly here!
-
+            // Current thread may get blocked exactly here!
             writeLock.lock();
             try {
-                for (int c = readHoldCount; c > 0; c--)
+                for (int c = readHoldCount; c-- > 0; )
                     readLock.lock();
                 operation.run(); // beware of side effects on locks!
             } finally {
@@ -140,7 +138,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     //
 
     private void lockRead() {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Wait until no other writer has acquired a lock.
             while (writeLockCount > writeHoldCount) {
@@ -159,7 +157,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
 
     private void lockInterruptiblyRead()
     throws InterruptedException {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Wait until no other writer has acquired a lock.
             while (writeLockCount > writeHoldCount) {
@@ -172,7 +170,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     }
 
     private boolean tryLockRead() {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Check if another writer has acquired a lock.
             if (writeLockCount > writeHoldCount) {
@@ -191,10 +189,10 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     }
 
     private void lockWrite() {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             if (writeHoldCount <= 0) { // If I'm not the writer...
-                final int readHoldCount = readLock.getLockCount();
+                final int readHoldCount = readLock.getHoldCount();
                 // ... wait until no other writer and no readers have acquired a lock.
                 while (readLockCount > 0 /*- readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
                         || writeLockCount > writeHoldCount) {
@@ -213,10 +211,10 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
 
     private void lockInterruptiblyWrite()
     throws InterruptedException {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             if (writeHoldCount <= 0) { // If I'm not the writer...
-                final int readHoldCount = readLock.getLockCount();
+                final int readHoldCount = readLock.getHoldCount();
                 // ... wait until no other writer and no readers have acquired a lock.
                 while (readLockCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
                         || writeLockCount > writeHoldCount) {
@@ -229,10 +227,10 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     }
 
     private boolean tryLockWrite() {
-        final int writeHoldCount = writeLock.getLockCount();
+        final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             if (writeHoldCount <= 0) { // If I'm not the writer...
-                final int readHoldCount = readLock.getLockCount();
+                final int readHoldCount = readLock.getHoldCount();
                 // ... check if another reader or writer has acquired a lock.
                 if (readLockCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
                         || writeLockCount > writeHoldCount) {
@@ -263,11 +261,11 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             return 0;
         }
 
-        public final boolean isLockedByCurrentThread() {
+        public final boolean isHeldByCurrentThread() {
             return get() > 0;
         }
 
-        public final int getLockCount() {
+        public final int getHoldCount() {
             return get();
         }
 

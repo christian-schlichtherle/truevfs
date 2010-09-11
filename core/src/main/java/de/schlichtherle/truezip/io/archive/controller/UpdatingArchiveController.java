@@ -118,15 +118,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     UpdatingArchiveController(
             URI mountPoint,
-            ArchiveController enclController,
+            URI enclMountPoint,
             ArchiveDriver driver) {
-        super(mountPoint, enclController, driver);
+        super(mountPoint, enclMountPoint, driver);
     }
 
     @Override
     void mount(final boolean autoCreate)
     throws FalsePositiveException, IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert inArchive == null;
         assert outFile == null;
         assert outArchive == null;
@@ -138,7 +138,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         try {
             mount0(autoCreate);
 
-            assert writeLock().isLockedByCurrentThread();
+            assert writeLock().isHeldByCurrentThread();
             assert autoCreate || inArchive != null;
             assert autoCreate || outFile == null;
             assert autoCreate || outArchive == null;
@@ -147,7 +147,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // Log at FINER level. This is mostly because of false positives.
             logger.log(Level.FINER, "mount.catch", ioe); // NOI18N
 
-            assert writeLock().isLockedByCurrentThread();
+            assert writeLock().isHeldByCurrentThread();
             assert inArchive == null;
             assert outFile == null;
             assert outArchive == null;
@@ -193,10 +193,6 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             } else {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
-                // Setup output first to implement fail-fast behavior.
-                // This may fail e.g. if the target file is a RAES
-                // encrypted ZIP file and the user cancels password
-                // prompting.
                 setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener));
             }
@@ -204,7 +200,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (inFile == null) {
-                unwrap(getEnclDescriptor(), getEnclPath(ROOT), autoCreate);
+                unwrap(getEnclController(), getEnclPath(ROOT), autoCreate);
             } else {
                 // The enclosed archive file has already been updated and the
                 // file previously used for output has been left over to be
@@ -219,7 +215,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // RAES encrypted ZIP file and the client application has
                     // inadvertently called KeyManager.resetKeyProviders() or
                     // similar and the subsequent repetitious prompting for
-                    // the key has unfortunately been cancelled by the user.
+                    // the key has been cancelled by the user.
                     // Now the next problem is that we cannot always generate
                     // a false positive exception with the correct enclosing
                     // controller because we haven't searched for it.
@@ -228,11 +224,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // controller and entry name information will not be used.
                     // When assertions are enabled, we prefer to treat this as
                     // a bug.
-                    assert false : "We should never get here! Read the source code comments for full details.";
+                    assert false : "We should never get here! Please read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
-                            getEnclDescriptor(), // FIXME: probably not correct!
-                            getEnclPath(ROOT), // dito
-                            ex);
+                            getEnclController(), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
                 // because we are reusing a file which has been previously
@@ -310,7 +304,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // enclosing controller.
             if (controller.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // just created - pass on
-            unwrap( controller.getEnclDescriptor(),
+            unwrap( controller.getEnclController(),
                     controller.getEnclPath(path),
                     autoCreate);
         }
@@ -322,7 +316,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final boolean autoCreate)
     throws FalsePositiveException, IOException {
         assert controller != null;
-        assert controller.readLock().isLockedByCurrentThread() || controller.writeLock().isLockedByCurrentThread();
+        assert controller.readLock().isHeldByCurrentThread() || controller.writeLock().isHeldByCurrentThread();
         assert path != null;
         assert !isRoot(path);
         assert inFile == null;
@@ -344,7 +338,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.copy( controller.newInputStream0(path),
+                Streams.copy(controller.newInputStream0(path),
                             new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
@@ -367,7 +361,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (inFile == null && !tmp.delete())
                     throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)");
             }
-        } else if (type == DIRECTORY) {
+        } else if (type != null) {
+            assert type == DIRECTORY : "Only file or directory entries are supported!";
             throw new DirectoryArchiveEntryFalsePositiveException(
                     controller, path,
                     new FileNotFoundException("cannot read directories"));
@@ -378,20 +373,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     controller, path, "may not create archive file");
         } else {
             assert autoCreate;
-            assert controller.writeLock().isLockedByCurrentThread();
+            assert controller.writeLock().isHeldByCurrentThread();
 
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
-            // TODO: Document this: Why do we need to pass File.isLenient()
-            // instead of just true?
             final IOOperation link = controllerFileSystem.mknod(
                     path, FILE, null, ArchiveControllers.isLenient());
-
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
             ensureOutArchive();
-
             // Now try to create the entry in the enclosing controller.
             try {
                 link.run();
@@ -409,10 +400,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     assert deleted;
                     outFile = null;
                 }
-
                 throw ex;
             }
-
             setFileSystem(newArchiveFileSystem(
                     getDriver(), vetoableTouchListener));
         }
@@ -426,7 +415,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private void initInArchive(final java.io.File inFile)
     throws IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert inArchive == null;
 
         logger.log(Level.FINEST, "initInArchive.try", inFile); // NOI18N
@@ -465,7 +454,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final IOReference<? extends ArchiveEntry> peerRef)
     throws IOException {
         assert targetRef != null;
-        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
+        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         assert !hasNewData(targetRef.get().getName());
         assert targetRef.get().getType() != DIRECTORY;
 
@@ -481,7 +470,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final IOReference<? extends ArchiveEntry> peerRef)
     throws IOException {
         assert targetRef != null;
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert !hasNewData(targetRef.get().getName());
         assert targetRef.get().getType() != DIRECTORY;
 
@@ -500,14 +489,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * while this method is called!
      */
     private void touch() throws IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         ensureOutArchive();
         setTouched(true);
     }
 
     private void ensureOutArchive()
     throws IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
 
         if (outArchive != null)
             return;
@@ -541,7 +530,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private void initOutArchive(final java.io.File outFile)
     throws IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert outArchive == null;
 
         logger.log(Level.FINEST, "initOutArchive.try", outFile); // NOI18N
@@ -586,7 +575,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     boolean hasNewData(String path) {
-        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
+        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (outArchive == null)
             return false;
         final ArchiveFileSystem fileSystem = getFileSystem();
@@ -598,7 +587,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     throws SyncException {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
         assert !config.getUmount() || config.getReassemble(); // sync => reassemble
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert inArchive == null || inFile != null; // input archive => input file
         assert !isTouched() || outArchive != null; // file system touched => output archive
         assert outArchive == null || outFile != null; // output archive => output file
@@ -744,7 +733,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private void update(final SyncExceptionHandler handler)
     throws SyncException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert isTouched();
         assert outArchive != null;
         assert checkNoDeletedEntriesWithNewData(handler);
@@ -902,7 +891,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     private void reassemble(final SyncExceptionHandler handler)
     throws SyncException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
 
         if (isRfsEntryTarget()) {
             // The archive file managed by this object is NOT enclosed in
@@ -946,10 +935,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclDescriptor(), getEnclPath(ROOT));
+                wrap(getEnclController(), getEnclPath(ROOT));
             } catch (IOException ex) {
                 throw handler.fail(new SyncException(
-                        getEnclDescriptor(),
+                        getEnclController(),
                         "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
                         ex));
             }
@@ -960,7 +949,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final ArchiveController controller,
             final String path)
     throws IOException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
@@ -980,7 +969,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             final String path)
     throws IOException {
         assert controller != null;
-        assert controller.writeLock().isLockedByCurrentThread();
+        assert controller.writeLock().isHeldByCurrentThread();
         assert path != null;
         assert !isRoot(path);
 
@@ -1013,7 +1002,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     @Override
     void reset(final SyncExceptionHandler handler)
     throws SyncException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
 
         try {
             shutdownStep1(handler);
@@ -1039,8 +1028,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // Tactical note: Assertions don't work in a finalizer, so we use
             // logging.
             if (    isTouched()
-                    || readLock().isLockedByCurrentThread()
-                    || writeLock().isLockedByCurrentThread())
+                    || readLock().isHeldByCurrentThread()
+                    || writeLock().isHeldByCurrentThread())
                 logger.log(Level.SEVERE, "finalize.invalidState", getMountPoint());
             final SyncExceptionBuilder handler
                     = new DefaultSyncExceptionBuilder();

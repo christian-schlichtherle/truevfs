@@ -40,9 +40,9 @@ abstract class FileSystemArchiveController extends ArchiveController {
      */
     FileSystemArchiveController(
             URI mountPoint,
-            ArchiveController enclController,
+            URI enclMountPoint,
             ArchiveDriver driver) {
-        super(mountPoint, enclController, driver);
+        super(mountPoint, enclMountPoint, driver);
     }
 
     @Override
@@ -54,7 +54,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
     @Override
     public final ArchiveFileSystem autoMount(final boolean create)
     throws FalsePositiveException, IOException {
-        assert readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread();
+        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return autoMounter.autoMount(create);
     }
 

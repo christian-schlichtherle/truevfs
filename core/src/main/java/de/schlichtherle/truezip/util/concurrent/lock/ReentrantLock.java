@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.util.concurrent.lock;
 
 /**
- * Similar to {@link java.util.concurrent.locks.Lock},
+ * Similar to {@link java.util.concurrent.locks.ReentrantLock},
  * but adapted to the particular needs of TrueZIP.
  * The subset of methods common to both this interface and its cousin
  * in JSE 5 is identical in functionality.
@@ -30,13 +30,13 @@ package de.schlichtherle.truezip.util.concurrent.lock;
 public interface ReentrantLock {
 
     /** Returns the number of times the current thread has acquired this lock. */
-    int getLockCount();
+    int getHoldCount(); // TODO: Rename to getHoldCount()?
 
     /**
      * Returns {@code true} if and only if the current thread has
      * acquired this lock.
      */
-    boolean isLockedByCurrentThread();
+    boolean isHeldByCurrentThread(); // TODO: Rename to isHeldByCurrentThread()!
 
     /** Acquires this lock by the current thread, eventually blocking. */
     void lock();

@@ -718,7 +718,7 @@ public class File extends java.io.File {
         final java.io.File target = getRealFile(delegate);
         this.controller = ArchiveControllers.get(
                 target.toURI(),
-                enclArchive == null ? null : enclArchive.getArchiveController(),
+                enclArchive == null ? null : enclArchive.getArchiveController().getMountPoint(),
                 detector.getArchiveDriver(target.getPath()));
     }
 
@@ -1819,6 +1819,8 @@ public class File extends java.io.File {
      * their meaning wherever possible.
      */
     public final String getInnerEntryName() {
+        assert innerArchive == this && innerEntryName == ROOT
+                || innerArchive == enclArchive && innerEntryName == enclEntryName;
         return innerEntryName; // TODO: return innerArchive == this ? ROOT : enclEntryName;
     }
 

@@ -48,10 +48,4 @@ public interface ArchiveDescriptor {
      *         file.
      */
     URI getMountPoint();
-
-    /**
-     * @return The descriptor for the enclosing archive of the archive
-     *         or {@code null} if it's not enclosed in another archive.
-     */
-    ArchiveDescriptor getEnclDescriptor();
 }

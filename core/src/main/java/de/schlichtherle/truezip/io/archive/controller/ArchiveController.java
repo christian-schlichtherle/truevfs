@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -152,23 +151,30 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      */
     ArchiveController(
             final URI mountPoint,
-            final ArchiveController enclController,
+            final URI enclMountPoint,
             final ArchiveDriver driver) {
-        assert mountPoint.isAbsolute();
+        assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
-        assert enclController == null || mountPoint.toString().startsWith(enclController.getMountPoint().toString());
+        assert enclMountPoint == null || "file".equals(enclMountPoint.getScheme());
+        assert enclMountPoint == null || mountPoint.getPath().startsWith(enclMountPoint.getPath());
+        //assert enclMountPoint == null || enclMountPoint.getPath().endsWith(SEPARATOR);
         assert driver != null;
 
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
-        this.enclController = enclController;
-        this.enclPath = enclController == null ? null
-                : enclController.getMountPoint().relativize(mountPoint);
+        if (enclMountPoint != null) {
+            this.enclController = ArchiveControllers.get(enclMountPoint);
+            assert this.enclController != null;
+            this.enclPath = enclMountPoint.relativize(mountPoint);
+        } else {
+            this.enclController = null;
+            this.enclPath = null;
+        }
         this.driver = driver;
 
-        ReadWriteLock rwl = new ReentrantReadWriteLock();
+        final ReadWriteLock rwl = new ReentrantReadWriteLock();
         this.readLock  = rwl.readLock();
         this.writeLock = rwl.writeLock();
 
@@ -201,37 +207,34 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * <p>
      * <b>Warning:</b> This method temporarily releases the read lock
      * before the write lock is acquired and the runnable is run!
-     * Hence, the runnable should recheck the state of the controller
+     * Hence, the runnable must retest the state of the controller
      * before it proceeds with any write operations.
      *
-     * @param runnable The {@link Operation} to run while the write lock is
+     * @param operation The {@link Operation} to run while the write lock is
      *        acquired.
-     *        No read lock is acquired while it's running.
      */
-    final <E extends Exception> void runWriteLocked(Operation<E> runnable)
+    final <E extends Exception> void runWriteLocked(Operation<E> operation)
     throws E {
+        assert operation != null;
+
         // A read lock cannot get upgraded to a write lock.
         // Hence the following mess is required.
         // Note that this is not just a limitation of the current
         // implementation in JSE 5: If automatic upgrading were implemented,
         // two threads holding a read lock try to upgrade concurrently,
         // they would dead lock each other!
-        final int lockCount = readLock().getLockCount();
-        for (int c = lockCount; c > 0; c--)
+        final int holdCount = readLock().getHoldCount();
+        for (int c = holdCount; c-- > 0; )
             readLock().unlock();
-
         // The current thread may get blocked here!
         writeLock().lock();
         try {
-            try {
-                runnable.run();
-            } finally {
-                // Restore lock count - effectively downgrading the lock
-                for (int c = lockCount; c > 0; c--)
-                    readLock().lock();
-            }
+            // First restore lock count to protect agains exceptions.
+            for (int c = holdCount; c-- > 0; )
+                readLock().lock();
+            operation.run();
         } finally {
-            writeLock().unlock();
+            writeLock().unlock(); // downgrade the lock
         }
     }
 
@@ -255,8 +258,12 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         return target;
     }
 
-    @Override
-    public final ArchiveController getEnclDescriptor() {
+    /**
+     * @return The controller for the enclosing archive file of this
+     *         controller's target archive file or {@code null} if it's not
+     *         enclosed in another archive file.
+     */
+    public final ArchiveController getEnclController() {
         return enclController;
     }
 
@@ -296,7 +303,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *        - never {@code null}.
      */
     final void setDriver(ArchiveDriver driver) {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
 
         // This affects all subsequent creations of the driver's products
         // (In/OutputArchive and ArchiveEntry) and hence ArchiveFileSystem.
@@ -410,7 +417,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      */
     public final void autoSync(final String path)
     throws SyncException {
-        assert writeLock().isLockedByCurrentThread();
+        assert writeLock().isHeldByCurrentThread();
         if (hasNewData(path)) {
             sync(new SyncConfiguration()
                     .setWaitForInputStreams(true)
@@ -499,7 +506,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return newInputStream0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().newInputStream(getEnclPath(path));
+            return getEnclController().newInputStream(getEnclPath(path));
         }
     }
 
@@ -512,14 +519,14 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    final boolean directory = isDirectory0(path); // detects false positives
-                    assert directory : "The root entry must be a directory!";
+                    autoMount(false); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
-                    assert isRoot(ex.getPath());
-                    throw new FalsePositiveException(this, path, ex);
+                    if (isRoot(ex.getPath()))
+                        throw new FalsePositiveException(this, path, ex);
+                    return getEnclController().newInputStream0(getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
-                        "cannot read from (virtual root) directory entry");
+                        "cannot read directories");
             } else {
                 if (hasNewData(path)) {
                     class AutoUmount4CreateInputStream
@@ -536,10 +543,10 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                         = fileSystem.getReference(path);
                 if (entryRef == null)
                     throw new ArchiveEntryNotFoundException(this, path,
-                            "no such file entry");
+                            "no such file or directory");
                 if (entryRef.get().getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
-                            "cannot read from directory entry");
+                            "cannot read directories");
                 return newInputStream(entryRef, null);
             }
         } finally {
@@ -578,7 +585,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return newOutputStream0(path, append);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().newOutputStream(getEnclPath(path),
+            return getEnclController().newOutputStream(getEnclPath(path),
                     append);
         }
     }
@@ -595,14 +602,14 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    final boolean directory = isDirectory0(path); // detects false positives
-                    assert directory : "The root entry must be a directory!";
+                    autoMount(false); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
-                    assert isRoot(ex.getPath());
-                    throw new FalsePositiveException(this, path, ex);
+                    if (isRoot(ex.getPath()))
+                        throw new FalsePositiveException(this, path, ex);
+                    return getEnclController().newOutputStream0(getEnclPath(path), append);
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
-                        "cannot write to (virtual root) directory entry");
+                        "cannot write directories");
             } else {
                 autoSync(path);
                 final boolean lenient = isLenient();
@@ -650,7 +657,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return isExisting0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().isExisting(getEnclPath(path));
+            return getEnclController().isExisting(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -662,8 +669,11 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.getType(path) != null;
+            try {
+                return autoMount(false).getType(path) != null;
+            } catch (ArchiveEntryNotFoundException ex) {
+                return false;
+            }
         } finally {
             readLock().unlock();
         }
@@ -674,13 +684,12 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return isFile0(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // TODO: Document this!
-            if (isRoot(path)
-            && ex.getCause() instanceof FileNotFoundException)
+            // TODO: Document this! Fast path when key prompting is cancelled?
+            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return getEnclDescriptor().isFile(getEnclPath(path));
+            return getEnclController().isFile(getEnclPath(path));
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().isFile(getEnclPath(path));
+            return getEnclController().isFile(getEnclPath(path)); // the directory could be one of the target's ancestors!
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -692,8 +701,11 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.getType(path) == FILE;
+            try {
+                return autoMount(false).getType(path) == FILE;
+            } catch (ArchiveEntryNotFoundException ex) {
+                return false;
+            }
         } finally {
             readLock().unlock();
         }
@@ -706,7 +718,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         } catch (FileArchiveEntryFalsePositiveException ex) {
             return false;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().isDirectory(getEnclPath(path));
+            return getEnclController().isDirectory(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -718,8 +730,11 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
-            return fileSystem.getType(path) == DIRECTORY;
+            try {
+                return autoMount(false).getType(path) == DIRECTORY;
+            } catch (ArchiveEntryNotFoundException ex) {
+                return false;
+            }
         } finally {
             readLock().unlock();
         }
@@ -730,7 +745,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return getOpenIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().getOpenIcon(getEnclPath(path));
+            return getEnclController().getOpenIcon(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -756,7 +771,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return getClosedIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().getClosedIcon(getEnclPath(path));
+            return getEnclController().getClosedIcon(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -782,7 +797,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return isReadable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().isReadable(getEnclPath(path));
+            return getEnclController().isReadable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -806,7 +821,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return isWritable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().isWritable(getEnclPath(path));
+            return getEnclController().isWritable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -830,7 +845,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return getLength0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().getLength(getEnclPath(path));
+            return getEnclController().getLength(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -854,7 +869,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return getLastModified0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().getLastModified(getEnclPath(path));
+            return getEnclController().getLastModified(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -878,7 +893,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return list0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().list(getEnclPath(path));
+            return getEnclController().list(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -902,7 +917,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            getEnclDescriptor().setReadOnly(getEnclPath(path));
+            getEnclController().setReadOnly(getEnclPath(path));
         }
     }
 
@@ -924,7 +939,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return setLastModified0(path, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().setLastModified(getEnclPath(path),
+            return getEnclController().setLastModified(getEnclPath(path),
                     time);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -954,7 +969,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return createNewFile0(path, autoCreate);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().createNewFile(getEnclPath(path),
+            return getEnclController().createNewFile(getEnclPath(path),
                     autoCreate);
         }
     }
@@ -989,7 +1004,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
             mkdir0(path, autoCreate);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().mkdir(getEnclPath(path), autoCreate);
+            return getEnclController().mkdir(getEnclPath(path), autoCreate);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1008,7 +1023,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     if (getTarget().exists())
                         throw new IOException("target file exists already!");
                 } else {
-                    if (getEnclDescriptor().isExisting(getEnclPath(path)))
+                    if (getEnclController().isExisting(getEnclPath(path)))
                         throw new IOException("target file exists already!");
                 }
                 // Ensure file system existence.
@@ -1029,14 +1044,14 @@ public abstract class ArchiveController implements ArchiveDescriptor {
             delete0(path);
             return true;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclDescriptor().delete(getEnclPath(path));
+            return getEnclController().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // TODO: Document this!
             if (isRoot(path)
-            && !getEnclDescriptor().isDirectory(getEnclPath(path))
+            && !getEnclController().isDirectory(getEnclPath(path))
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return getEnclDescriptor().delete(getEnclPath(path));
+            return getEnclController().delete(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1092,7 +1107,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    getEnclDescriptor().delete0(getEnclPath(path));
+                    getEnclController().delete0(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
                 final ArchiveFileSystem fileSystem = autoMount(false);

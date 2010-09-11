@@ -40,7 +40,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
 
     public int getArchivesTouched() {
         int result = 0;
-        for (final ArchiveController c : ArchiveControllers.get()) {
+        for (final ArchiveController c : ArchiveControllers.getAll()) {
             c.readLock().lock();
             try {
                 if (c.isTouched()) {
@@ -55,18 +55,18 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
 
     public int getTopLevelArchivesTotal() {
         int result = 0;
-        for (ArchiveController c : ArchiveControllers.get())
-            if (c.getEnclDescriptor() == null)
+        for (ArchiveController c : ArchiveControllers.getAll())
+            if (c.getEnclController() == null)
                 result++;
         return result;
     }
 
     public int getTopLevelArchivesTouched() {
         int result = 0;
-        for (final ArchiveController c : ArchiveControllers.get()) {
+        for (final ArchiveController c : ArchiveControllers.getAll()) {
             c.readLock().lock();
             try {
-                if (c.getEnclDescriptor() == null && c.isTouched()) {
+                if (c.getEnclController() == null && c.isTouched()) {
                     result++;
                 }
             } finally {
