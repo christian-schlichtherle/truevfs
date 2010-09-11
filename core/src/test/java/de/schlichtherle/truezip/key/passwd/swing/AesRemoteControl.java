@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.AesKeyProvider;
+import java.net.URI;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
 
@@ -25,7 +26,7 @@ import org.netbeans.jemmy.operators.JDialogOperator;
  * @version $Id$
  */
 public class AesRemoteControl extends RemoteControl {
-    public AesRemoteControl(final String id) {
+    public AesRemoteControl(final URI id) {
         super(id);
     }
 

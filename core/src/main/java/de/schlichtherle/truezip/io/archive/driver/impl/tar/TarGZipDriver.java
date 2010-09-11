@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +101,7 @@ public class TarGZipDriver extends TarDriver {
     //
 
     @Override
-    protected InputStream newInputStream(Archive archive, ReadOnlyFile rof)
+    protected InputStream newInputStream(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
         return new GZIPInputStream(
                 super.newInputStream(archive, rof),
@@ -110,7 +110,7 @@ public class TarGZipDriver extends TarDriver {
 
     @Override
     protected TarOutputArchive newTarOutputArchive(
-            final Archive archive,
+            final ArchiveDescriptor archive,
             final OutputStream out,
             final TarInputArchive source)
     throws IOException {

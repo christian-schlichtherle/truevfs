@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -119,7 +119,7 @@ public class TarBZip2Driver extends TarDriver {
      * unfortunately does not do sufficient verification!
      */
     @Override
-    protected InputStream newInputStream(Archive archive, ReadOnlyFile rof)
+    protected InputStream newInputStream(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
         final InputStream in = super.newInputStream(archive, rof);
         // Consume and check the first two magic bytes. This is required for
@@ -135,7 +135,7 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarOutputArchive newTarOutputArchive(
-            final Archive archive,
+            final ArchiveDescriptor archive,
             final OutputStream out,
             final TarInputArchive source)
     throws IOException {

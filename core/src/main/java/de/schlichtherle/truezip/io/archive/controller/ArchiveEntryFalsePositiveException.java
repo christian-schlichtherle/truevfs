@@ -16,61 +16,25 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.IOException;
 
 /**
- * Indicates that the target file of an archive controller is a false
- * positive archive file which actually exists as a plain file or directory
- * in an enclosing archive file.
+ * Indicates a false positive archive entry which actually exists as a
+ * file or directory entry in an enclosing archive file.
  * <p>
- * Instances of this class are always associated with an
- * {@code IOException} as their cause.
+ * Instances of this class are always associated with an {@code IOException}
+ * as their cause.
  */
 public abstract class ArchiveEntryFalsePositiveException
 extends FalsePositiveException {
 
-    private static final long serialVersionUID = 1234562841928746533L;
+    private static final long serialVersionUID = 1234592343828746533L;
 
-    private final ArchiveController enclController;
-    private final String enclEntryName;
-
-    ArchiveEntryFalsePositiveException(Archive archive, ArchiveController enclController, String enclEntryName, IOException cause) {
-        super(archive, cause);
-        assert enclController != archive;
-        assert isEnclosedBy(archive, enclController);
-        assert enclEntryName != null;
-        this.enclController = enclController;
-        this.enclEntryName = enclEntryName;
-    }
-
-    private static boolean isEnclosedBy(Archive archive, Archive wannabe) {
-        assert wannabe != null;
-        if (archive.getEnclArchive() == wannabe) {
-            return true;
-        }
-        if (archive.getEnclArchive() == null) {
-            return false;
-        }
-        return isEnclosedBy(archive.getEnclArchive(), wannabe);
-    }
-
-    /**
-     * Returns the controller which's target file contains the
-     * false positive archive file as an archive entry.
-     * Never {@code null}.
-     * <p>
-     * Note that this is not the same
-     */
-    final ArchiveController getEnclController() {
-        return enclController;
-    }
-
-    /**
-     * Returns the entry name of the false positive archive file.
-     * Never {@code null}.
-     */
-    final String getEnclEntryName() {
-        return enclEntryName;
+    ArchiveEntryFalsePositiveException(
+            ArchiveDescriptor archive,
+            String path,
+            IOException cause) {
+        super(archive, path, cause);
     }
 }

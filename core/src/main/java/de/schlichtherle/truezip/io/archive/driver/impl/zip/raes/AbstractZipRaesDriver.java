@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -103,7 +103,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputArchive newInputArchive(
-            final Archive archive,
+            final ArchiveDescriptor archive,
             final ReadOnlyFile rof)
     throws IOException {
         final RaesReadOnlyFile rrof;
@@ -157,7 +157,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputArchive newOutputArchive(
-            final Archive archive,
+            final ArchiveDescriptor archive,
             final OutputStream out,
             final ZipInputArchive source)
     throws IOException {
@@ -180,7 +180,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    public RaesParameters getRaesParameters(Archive archive) {
-        return new KeyManagerRaesParameters(archive.getCanonicalPath());
+    public RaesParameters getRaesParameters(ArchiveDescriptor archive) {
+        return new KeyManagerRaesParameters(archive.getMountPoint());
     }
 }

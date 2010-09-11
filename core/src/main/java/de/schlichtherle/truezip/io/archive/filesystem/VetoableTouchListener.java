@@ -30,7 +30,7 @@ public interface VetoableTouchListener {
     /**
      * Called whenever an archive file system has been <i>touched</i>,
      * i.e. modified.
-     * If this method throws an {@code IOException), the change in the archive
+     * If this method throws an {@code IOException}), the change in the archive
      * file system is vetoed.
      *
      * @throws IOException at the discretion of the implementation.

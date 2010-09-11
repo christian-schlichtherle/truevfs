@@ -33,7 +33,7 @@ package de.schlichtherle.truezip.key;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface PromptingKeyProviderUI<P extends PromptingKeyProvider> {
+public interface PromptingKeyProviderUI<K extends Cloneable, P extends PromptingKeyProvider<K>> {
 
     /**
      * Prompts the user for the key which may be used to create a new

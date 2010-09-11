@@ -16,10 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.archive.Archive;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.FileNotFoundException;
+import java.net.URI;
 
 /**
  * Indicates that an <i>archive entry</i>
@@ -33,44 +32,47 @@ extends FileNotFoundException {
 
     private static final long serialVersionUID = 2972350932856838564L;
 
-    private final String canonicalPath;
+    private final URI mountPoint;
+    private final String path;
 
-    ArchiveEntryNotFoundException(Archive archive, final String path, final String msg) {
-        //super(archive, msg);
-        //super.initPredecessor(null);
+    public ArchiveEntryNotFoundException(
+            final ArchiveDescriptor archive,
+            final String path,
+            final String msg) {
+        super(msg);
+        assert path != null;
         assert msg != null;
-        final StringBuilder result = new StringBuilder(archive.getCanonicalPath());
-        if (!ArchiveController.isRoot(path))
-            result.append(File.separator).append(path.replace(ArchiveEntry.SEPARATOR_CHAR, File.separatorChar));
-        canonicalPath = result.toString();
+        this.mountPoint = archive.getMountPoint();
+        this.path = path;
+    }
+
+    /** @see ArchiveDescriptor#getMountPoint() */
+    public final URI getMountPoint() {
+        return mountPoint;
+    }
+
+    public final String getPath() {
+        return path;
     }
 
     /**
-     * Returns the <em>canonical</em> path name of the archive entry which's
-     * processing caused this exception to be created.
-     * A canonical path is both absolute and unique within the virtual file
-     * system.
-     * The precise definition depends on the platform, but all elements in
-     * a canonical path are separated by {@link java.io.File#separator}s.
-     * <p>
-     * This property may be used to determine some archive file specific
-     * parameters, such as passwords or similar.
-     * However, implementations must not assume that the file denoted by the
-     * path actually isExisting as a file in the real file system!
+     * Returns the <em>canonical path</em> of the archive entry which caused
+     * this exception to be created when processing it.
+     * A canonical path is absolute, hierarchical and unique within the
+     * federated file system.
      *
-     * @return A string representing the canonical path of this archive
-     *         - never {@code null}.
+     * @return A non-{@code null} URI representing the canonical path of the
+     *         archive entry.
      */
-    // TODO: Change to URIs.
-    public final String getCanonicalPath() {
-        return canonicalPath;
+    public final URI getCanonicalPath() {
+        return getMountPoint().resolve(path);
     }
 
     @Override
     public String getLocalizedMessage() {
         final String msg = getMessage();
         return msg != null
-                ? new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString()
-                : getCanonicalPath();
+                ? new StringBuilder(getCanonicalPath().toString()).append(" (").append(msg).append(")").toString()
+                : getCanonicalPath().toString();
     }
 }

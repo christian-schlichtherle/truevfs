@@ -22,14 +22,14 @@ package de.schlichtherle.truezip.key;
  * AES encrypted resource or replacing the entire contents of an already
  * existing AES encrypted resource.
  * <p>
- * This class is thread safe.
+ * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class PromptingAesKeyProvider<K extends Cloneable>
-        extends PromptingKeyProvider<K>
-        implements AesKeyProvider<K> {
+extends PromptingKeyProvider<K>
+implements AesKeyProvider<K> {
 
     private int keyStrength = KEY_STRENGTH_256;
 
@@ -51,12 +51,12 @@ public class PromptingAesKeyProvider<K extends Cloneable>
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in this class returns the simple name of this class,
-     * {@code PromptingAesKeyProvider}.
+     * The implementation in this class simply returns its class object,
+     * {@code PromptingAesKeyProvider.class}.
      */
     @Override
-    protected String getUIClassID() {
-        return "PromptingAesKeyProvider"; // support code obfuscation!
+    protected Class<? extends PromptingAesKeyProvider> getUITypeKey() {
+        return PromptingAesKeyProvider.class;
     }
 
     /** Resets the key strength to 256 bits. */

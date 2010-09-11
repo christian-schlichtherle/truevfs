@@ -20,6 +20,9 @@ import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 
 /**
  * A facade which retrieves {@link RaesParameters} by using the
@@ -49,16 +52,22 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
  */
 public class KeyManagerRaesParameters implements RaesParametersAgent {
 
-    private final String cPath;
+    private final URI resource;
 
     /**
      * Constructs a new set of default RAES parameters.
      *
-     * @param cPath The canonical pathname of the RAES file
-     *        - {@code null} is not allowed!
+     * @param resource the non-{@code null} absolute, hierarchical and normalized
+     *        URI of the RAES file.
      */
-    public KeyManagerRaesParameters(String cPath) {
-        this.cPath = cPath;
+    public KeyManagerRaesParameters(URI resource) {
+        if (!resource.isAbsolute() || resource.isOpaque() || !resource.equals(resource.normalize()))
+            throw new IllegalArgumentException(resource.toString());
+        this.resource = resource;
+    }
+
+    public KeyManagerRaesParameters(File resource) throws IOException {
+        this.resource = resource.getCanonicalFile().toURI();
     }
 
     public RaesParameters getParameters(Class type) {
@@ -67,35 +76,14 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
 
     /**
      * An adapter which presents the KeyManager's {@code KeyProvider}
-     * interface as <ocde>Type0RaesParameters</code>.
+     * interface as {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
-        public char[] getOpenPasswd() throws RaesKeyException {
-            // Don't cache the key manager!
-            final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(cPath, AesKeyProvider.class);
-            try {
-                final Object key = provider.getOpenKey();
-                if (key instanceof byte[])
-                    return PKCS12BytesToChars((byte[]) key);
-                else
-                    return (char[]) key;
-            } catch (UnknownKeyException failure) {
-                throw new RaesKeyException(failure);
-            }
-        }
-
-        public void invalidOpenPasswd() {
-            // Don't cache the key manager!
-            final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(cPath, AesKeyProvider.class);
-            provider.invalidOpenKey();
-        }
-
+        @Override
         public char[] getCreatePasswd() throws RaesKeyException {
             // Don't cache the key manager!
-            final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(cPath, AesKeyProvider.class);
+            final KeyProvider<?> provider = KeyManager.getInstance()
+                    .getKeyProvider(resource, AesKeyProvider.class);
             try {
                 final Object key = provider.getCreateKey();
                 if (key instanceof byte[])
@@ -107,10 +95,35 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
             }
         }
 
-        public int getKeyStrength() {
+        @Override
+        public char[] getOpenPasswd() throws RaesKeyException {
+            // Don't cache the key manager!
+            final KeyProvider<?> provider = KeyManager.getInstance()
+                    .getKeyProvider(resource, AesKeyProvider.class);
+            try {
+                final Object key = provider.getOpenKey();
+                if (key instanceof byte[])
+                    return PKCS12BytesToChars((byte[]) key);
+                else
+                    return (char[]) key;
+            } catch (UnknownKeyException failure) {
+                throw new RaesKeyException(failure);
+            }
+        }
+
+        @Override
+        public void invalidOpenPasswd() {
             // Don't cache the key manager!
             final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(cPath, AesKeyProvider.class);
+                    .getKeyProvider(resource, AesKeyProvider.class);
+            provider.invalidOpenKey();
+        }
+
+        @Override
+        public int getKeyStrength() {
+            // Don't cache the key manager!
+            final KeyProvider<?> provider = KeyManager.getInstance()
+                    .getKeyProvider(resource, AesKeyProvider.class);
             if (provider instanceof AesKeyProvider) {
                 return ((AesKeyProvider) provider).getKeyStrength();
             } else {
@@ -118,10 +131,11 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
             }
         }
 
+        @Override
         public void setKeyStrength(int keyStrength) {
             // Don't cache the key manager!
-            final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(cPath, AesKeyProvider.class);
+            final KeyProvider<?> provider = KeyManager.getInstance()
+                    .getKeyProvider(resource, AesKeyProvider.class);
             if (provider instanceof AesKeyProvider) {
                 ((AesKeyProvider) provider).setKeyStrength(keyStrength);
             }

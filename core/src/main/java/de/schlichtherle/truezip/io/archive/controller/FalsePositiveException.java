@@ -16,35 +16,35 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import java.io.IOException;
+import java.net.URI;
 
 /**
- * Indicates that the target file of an archive controller is a false
- * positive archive file which actually exists as a plain file or directory
- * in the real file system or in an enclosing archive file.
+ * Indicates a false positive archive entry which actually exists as a
+ * file or directory entry in the real file system or in an enclosing archive
+ * file.
  * <p>
- * Instances of this class are always associated with an
- * {@code IOException} as their cause.
+ * Instances of this class are always associated with an {@code IOException}
+ * as their cause.
  */
-public class FalsePositiveException
-extends Exception {
-
+public class FalsePositiveException extends Exception {
     private static final long serialVersionUID = 947139561381472363L;
 
-    private final String canonicalPath;
-
+    private final URI mountPoint;
+    private final String path;
     private final boolean cacheable;
 
-    FalsePositiveException(Archive archive, IOException cause) {
-        //super(archive);
-        //super.initPredecessor(null);
-        // This exception type is never passed to the client application,
-        // so a descriptive message would be waste of performance.
-        //super(cause.toString());
+    FalsePositiveException(
+            final ArchiveDescriptor archive,
+            final String path,
+            final IOException cause) {
+        super(cause.getMessage());
         assert cause != null;
-        canonicalPath = archive.getCanonicalPath();
+        assert path != null;
+        this.mountPoint = archive.getMountPoint();
+        this.path = path;
         // A transient I/O exception is just a wrapper exception to mark
         // the real transient cause, therefore we can safely throw it away.
         // We must do this in order to allow an archive controller to inspect
@@ -54,43 +54,37 @@ extends Exception {
         cacheable = !trans;
     }
 
+    /** @see ArchiveDescriptor#getMountPoint() */
+    public final URI getMountPoint() {
+        return mountPoint;
+    }
+
     /**
-     * Returns {@code true} if and only if there is no cause
-     * associated with this exception or it is safe to cache it.
+     * Returns the <em>canonical path</em> of the target entity which caused
+     * this exception to be created when processing it.
+     * A canonical path is absolute, hierarchical and unique within the
+     * federated file system.
+     *
+     * @return A non-{@code null} URI representing the canonical path of the
+     *         archive entry.
+     */
+    public final URI getCanonicalPath() {
+        return getMountPoint().resolve(path);
+    }
+
+    /**
+     * Returns {@code true} if and only if there is no cause associated with
+     * this exception or it is safe to cache it.
      */
     final boolean isCacheable() {
         return cacheable;
     }
 
-    /**
-     * Returns the <em>canonical</em> path name of the archive file which's
-     * processing caused this exception to be created.
-     * A canonical path is both absolute and unique within the virtual file
-     * system.
-     * The precise definition depends on the platform, but all elements in
-     * a canonical path are separated by {@link java.io.File#separator}s.
-     * <p>
-     * This property may be used to determine some archive file specific
-     * parameters, such as passwords or similar.
-     * However, implementations must not assume that the file denoted by the
-     * path actually exists as a file in the real file system!
-     *
-     * @return A string representing the canonical path of this archive
-     *         - never {@code null}.
-     */
-    public final String getCanonicalPath() {
-        return canonicalPath;
-    }
-
     @Override
     public String getLocalizedMessage() {
         final String msg = getMessage();
-        if (msg != null)
-            return new StringBuilder(getCanonicalPath())
-                    .append(" (")
-                    .append(msg)
-                    .append(")")
-                    .toString();
-        return getCanonicalPath();
+        return msg != null
+                ? new StringBuilder(getCanonicalPath().toString()).append(" (").append(msg).append(")").toString()
+                : getCanonicalPath().toString();
     }
 }

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +34,7 @@ public class KeyMgmtLifeCycleThread extends Thread {
 
     private final KeyMgmtLifeCycle rlc;
 
-    public KeyMgmtLifeCycleThread(final String id) {
+    public KeyMgmtLifeCycleThread(final URI id) {
         this(new KeyMgmtLifeCycle(id));
     }
 
@@ -44,7 +45,7 @@ public class KeyMgmtLifeCycleThread extends Thread {
         //setDaemon(true); // thread may die.
     }
 
-    public String getResourceID() {
+    public URI getResource() {
         return rlc.id;
     }
 

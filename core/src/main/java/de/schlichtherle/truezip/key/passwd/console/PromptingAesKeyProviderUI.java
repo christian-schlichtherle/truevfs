@@ -30,12 +30,11 @@ import static de.schlichtherle.truezip.key.AesKeyProvider.KEY_STRENGTH_256;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingAesKeyProviderUI
-        extends PromptingKeyProviderUI<PromptingAesKeyProvider<? super char[]>> {
+public class PromptingAesKeyProviderUI<P extends PromptingAesKeyProvider<char[]>>
+extends PromptingKeyProviderUI<P> {
 
     @Override
-    protected void promptExtraData(
-            final PromptingAesKeyProvider<? super char[]> provider) {
+    protected void promptExtraData(final P provider) {
         con.printf(resources.getString("keyStrength.banner"));
         con.printf(resources.getString("keyStrength.medium"));
         con.printf(resources.getString("keyStrength.high"));

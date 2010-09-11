@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
 import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -26,7 +27,6 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
@@ -699,7 +699,7 @@ public class File extends java.io.File {
                 this.innerEntryName = ROOT;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
-                this.controller = ArchiveControllers.get(this);
+                initController();
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
@@ -712,6 +712,14 @@ public class File extends java.io.File {
         }
 
         assert invariants();
+    }
+
+    private void initController() {
+        final java.io.File target = getRealFile(delegate);
+        this.controller = ArchiveControllers.get(
+                target.toURI(),
+                enclArchive == null ? null : enclArchive.getArchiveController(),
+                detector.getArchiveDriver(target.getPath()));
     }
 
     /**
@@ -808,8 +816,7 @@ public class File extends java.io.File {
      * Initialize this file object by scanning its path for archive
      * files, using the given {@code ancestor} file (i.e. a direct or
      * indirect parent file) if any.
-     * {@code entry} and {@code detector} must already be
-     * initialized!
+     * {@code delegate} and {@code detector} must already be initialized!
      * Must not be called to re-initialize this object!
      */
     private void init(final File ancestor) {
@@ -818,7 +825,7 @@ public class File extends java.io.File {
         assert delegate.getPath().equals(path);
         assert detector != null;
 
-        final StringBuffer enclEntryNameBuf = new StringBuffer(path.length());
+        final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = enclEntryNameBuf.length() > 0 ? enclEntryNameBuf.toString() : null;
 
@@ -827,7 +834,7 @@ public class File extends java.io.File {
             // order to provide the ArchiveController with an otherwise fully
             // initialized object.
             innerEntryName = ROOT;
-            controller = ArchiveControllers.get(this);
+            initController();
         } else if (innerArchive == enclArchive) {
             innerEntryName = enclEntryName;
         }
@@ -838,7 +845,7 @@ public class File extends java.io.File {
             ArchiveDetector detector,
             int skip,
             final String path,
-            final StringBuffer enclEntryNameBuf,
+            final StringBuilder enclEntryNameBuf,
             final Splitter splitter) {
         if (path == null) {
             assert enclArchive == null;
@@ -941,7 +948,7 @@ public class File extends java.io.File {
             // controller init has been deferred until now in
             // order to provide the ArchiveController with a fully
             // initialized object.
-            controller = ArchiveControllers.get(this);
+            initController();
         }
     }
 
@@ -960,11 +967,9 @@ public class File extends java.io.File {
             enclEntryName = null;
             return;
         }
-
         splitter.split(path);
         String parent = splitter.getParentPath();
         final String base = splitter.getBaseName();
-
         if (base.length() == 0 || ".".equals(base)) {
             // Fall through.
         } else if ("..".equals(base)) {
@@ -1002,7 +1007,6 @@ public class File extends java.io.File {
                 }
             }
         }
-
         init(uri, skip, parent, splitter);
     }
 
@@ -1030,11 +1034,11 @@ public class File extends java.io.File {
 
         if (ROOT.equals(innerEntryName)) {  // equal, but...
             assert ROOT != innerEntryName;  // not identical!
-            //assert innerArchive == null;             // may be non-null when serialized by previous version
-            assert controller == null;                 // transient!
-            innerArchive = this;                       // postfix!
+            //assert innerArchive == null;  // may be non-null when serialized by previous version
+            assert controller == null;      // transient!
+            innerArchive = this;            // postfix!
             innerEntryName = ROOT;          // postfix!
-            controller = ArchiveControllers.get(this); // postfix!
+            initController();               // postfix!
         }
 
         try {
@@ -1110,7 +1114,7 @@ public class File extends java.io.File {
      *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
-     *         with constraints, such as a failure to set the last modification
+     *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException If the configuration uses the
@@ -1125,7 +1129,7 @@ public class File extends java.io.File {
      */
     public static void sync(SyncConfiguration config)
     throws SyncException {
-        ArchiveControllers.sync("", config);
+        ArchiveControllers.sync(null, config);
     }
 
     /**
@@ -1223,7 +1227,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.sync(archive.getCanOrAbsPath(), config);
+        ArchiveControllers.sync(archive.getCanOrAbsFile().toURI(), config);
     }
 
     /**
@@ -1433,7 +1437,7 @@ public class File extends java.io.File {
 
     /**
      * Returns a proxy instance which encapsulates <em>live</em> statistics
-     * about the total set of archive files accessed by this package.
+     * about the total map of archive files accessed by this package.
      * Any call to a method of the returned interface instance returns
      * up-to-date data, so there is no need to repeatedly call this method in
      * order to optain updated statistics.
@@ -1452,7 +1456,7 @@ public class File extends java.io.File {
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
      * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}.
-     * In other words, this returns {@code true} unless you set the
+     * In other words, this returns {@code true} unless you map the
      * system property
      * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
@@ -1477,7 +1481,7 @@ public class File extends java.io.File {
      * default configuration is used which would recognize &quot;outer.zip&quot; and
      * &quot;inner.zip&quot; as ZIP files.
      * <p>
-     * If this class property is set to {@code false}, then
+     * If this class property is map to {@code false}, then
      * the client application would have to call
      * {@code new File(&quot;a/outer.zip/b/inner.zip&quot;).mkdirs()}
      * before it could actually create the innermost &quot;c&quot; entry as a file
@@ -1487,7 +1491,7 @@ public class File extends java.io.File {
      * system, all its parent directories must exist, including archive
      * files. This emulates the behaviour of real file systems.
      * <p>
-     * If this class property is set to {@code true} however, then
+     * If this class property is map to {@code true} however, then
      * any missing parent directories (including archive files) up to the
      * outermost archive file (&quot;outer.zip&quot;) are created on the fly when using
      * operations to create the innermost element of the path (&quot;c&quot;).
@@ -1517,7 +1521,7 @@ public class File extends java.io.File {
      * {@link Object#finalize()} method which closes an archive entry stream
      * if its garbage collected.
      * <p>
-     * Now if this class property is set to {@code false}, then
+     * Now if this class property is map to {@code false}, then
      * TrueZIP maintains a hard reference to all archive entry streams
      * until {@link #umount} or {@link #update} is called, which will deal
      * with them: If they are not closed, an
@@ -1527,7 +1531,7 @@ public class File extends java.io.File {
      * This setting is useful if you do not want to tolerate the
      * &quot;unclosed streams issue&quot; in a client application.
      * <p>
-     * If this class property is set to {@code true} however, then
+     * If this class property is map to {@code true} however, then
      * TrueZIP maintains only a weak reference to all archive entry streams.
      * This allows the garbage collector to finalize them before
      * {@link #umount} or {@link #update} is called.
@@ -1556,7 +1560,7 @@ public class File extends java.io.File {
      * archive detector is passed explicitly to the constructor of a
      * {@code File} instance.
      * <p>
-     * This class property is initially set to
+     * This class property is initially map to
      * {@code ArchiveDetector.DEFAULT}
      *
      * @see ArchiveDetector
@@ -1788,7 +1792,7 @@ public class File extends java.io.File {
      * archive file, then this methods returns the file representing the
      * enclosing archive file, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all occurences of
+     * This method always returns a normalized path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
      * <p>
@@ -1797,7 +1801,7 @@ public class File extends java.io.File {
      * another archive file.
      */
     public final File getInnerArchive() {
-        return innerArchive;
+        return innerArchive; // TODO: Rename to nextArchive
     }
 
     /**
@@ -1815,7 +1819,7 @@ public class File extends java.io.File {
      * their meaning wherever possible.
      */
     public final String getInnerEntryName() {
-        return innerEntryName;
+        return innerEntryName; // TODO: return innerArchive == this ? ROOT : enclEntryName;
     }
 
     /**
@@ -1824,7 +1828,7 @@ public class File extends java.io.File {
      * then this method returns the file representing the enclosing archive
      * file, or {@code null} otherwise.
      * <p>
-     * This method always returns an undotified path, i.e. all occurences of
+     * This method always returns a normalized path, i.e. all occurences of
      * {@code "."} and {@code ".."} in the path name are removed according to
      * their meaning wherever possible.
      * <p>
@@ -1893,8 +1897,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    // FIXME: Make this package private again!
-    public final ArchiveController getArchiveController() {
+    final ArchiveController getArchiveController() {
         assert (controller != null) == isArchive();
         return controller;
     }
@@ -2241,19 +2244,19 @@ public class File extends java.io.File {
     }
 
     /**
-     * Throws an {@code ArchiveFileNotFoundException} if and only if this
+     * Throws an {@code ArchiveEntryNotFoundException} if and only if this
      * file is a true archive file, not just a false positive, including
      * RAES encrypted ZIP files for which key prompting has been cancelled
      * or disabled.
      */
     final void ensureNotVirtualRoot(final String prefix)
-    throws ArchiveFileNotFoundException {
+    throws ArchiveEntryNotFoundException {
         if (isArchive() && (isDirectory() || (exists() && !isFile()))) {
             String msg = "virtual root directory";
             if (prefix != null)
                 msg = prefix + " " + msg;
-            throw new ArchiveFileNotFoundException(getArchiveController(), msg);
-    }
+            throw new ArchiveEntryNotFoundException(getArchiveController(), ROOT, msg);
+        }
     }
 
     //

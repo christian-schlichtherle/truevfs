@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveFileNotFoundException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;

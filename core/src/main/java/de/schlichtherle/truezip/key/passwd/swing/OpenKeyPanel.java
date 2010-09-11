@@ -26,6 +26,7 @@ import java.awt.event.WindowFocusListener;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ResourceBundle;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
@@ -47,8 +48,7 @@ import javax.swing.event.DocumentListener;
  */
 public class OpenKeyPanel extends EnhancedPanel {
 
-    private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.key.passwd.swing.OpenKeyPanel";
+    private static final String CLASS_NAME = OpenKeyPanel.class.getName();
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final long serialVersionUID = 984673974236493651L;
@@ -79,27 +79,11 @@ public class OpenKeyPanel extends EnhancedPanel {
         };
         passwd.getDocument().addDocumentListener(dl);
         authenticationPanel.getKeyFileDocument().addDocumentListener(dl);
-        defaultForeground = resourceID.getForeground();
+        defaultForeground = resource.getForeground();
     }
 
     private Font getBoldFont() {
-        return resourceID.getFont().deriveFont(Font.BOLD);
-    }
-
-    /**
-     * Setter for property {@code resourceID}.
-     *
-     * @param resourceID New value of property {@code resourceID}.
-     */
-    public void setResourceID(final String resourceID) {
-        final String lastResourceID = PromptingKeyProviderUI.lastResourceID;
-        if (!lastResourceID.equals(resourceID) && !"".equals(lastResourceID)) {
-            this.resourceID.setForeground(Color.RED);
-        } else {
-            this.resourceID.setForeground(defaultForeground);
-        }
-        this.resourceID.setText(resourceID);
-        PromptingKeyProviderUI.lastResourceID = resourceID;
+        return resource.getFont().deriveFont(Font.BOLD);
     }
 
     /**
@@ -107,8 +91,24 @@ public class OpenKeyPanel extends EnhancedPanel {
      *
      * @return Value of property {@code resourceID}.
      */
-    public String getResourceID() {
-        return resourceID.getText();
+    public URI getResource() {
+        return URI.create(resource.getText());
+    }
+
+    /**
+     * Setter for property {@code resourceID}.
+     *
+     * @param resource New value of property {@code resourceID}.
+     */
+    public void setResource(final URI resource) {
+        final URI lastResource = PromptingKeyProviderUI.lastResource;
+        if (!lastResource.equals(resource) && !"".equals(lastResource)) {
+            this.resource.setForeground(Color.RED);
+        } else {
+            this.resource.setForeground(defaultForeground);
+        }
+        this.resource.setText(resource.toString());
+        PromptingKeyProviderUI.lastResource = resource;
     }
 
     /**
@@ -254,8 +254,8 @@ public class OpenKeyPanel extends EnhancedPanel {
         passwdLabel = new javax.swing.JLabel();
         passwd = new javax.swing.JPasswordField();
         final javax.swing.JLabel prompt = new javax.swing.JLabel();
-        resourceID = new javax.swing.JTextPane();
-		authenticationPanel = new de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel();
+        resource = new javax.swing.JTextPane();
+        authenticationPanel = new de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
         passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
@@ -293,7 +293,7 @@ public class OpenKeyPanel extends EnhancedPanel {
         });
         setLayout(new java.awt.GridBagLayout());
 
-        prompt.setLabelFor(resourceID);
+        prompt.setLabelFor(resource);
         prompt.setText(resources.getString("prompt")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -302,24 +302,24 @@ public class OpenKeyPanel extends EnhancedPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(prompt, gridBagConstraints);
 
-        resourceID.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
-        resourceID.setEditable(false);
-        resourceID.setFont(getBoldFont());
-        resourceID.setOpaque(false);
+        resource.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+        resource.setEditable(false);
+        resource.setFont(getBoldFont());
+        resource.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 15, 0);
-        add(resourceID, gridBagConstraints);
+        add(resource, gridBagConstraints);
 
-		authenticationPanel.setPasswdPanel(passwdPanel);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		add(authenticationPanel, gridBagConstraints);
+        authenticationPanel.setPasswdPanel(passwdPanel);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(authenticationPanel, gridBagConstraints);
 
         changeKey.setText(resources.getString("changeKey")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -399,12 +399,12 @@ public class OpenKeyPanel extends EnhancedPanel {
     }//GEN-LAST:event_passwdPanelAncestorWindowShown
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-	private de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel authenticationPanel;
+    private de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel authenticationPanel;
     private final javax.swing.JCheckBox changeKey = new javax.swing.JCheckBox();
     private javax.swing.JLabel error;
     private javax.swing.JPasswordField passwd;
     private javax.swing.JLabel passwdLabel;
     private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
-    private javax.swing.JTextPane resourceID;
+    private javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }

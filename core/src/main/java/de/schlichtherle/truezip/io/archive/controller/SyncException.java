@@ -16,8 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.ChainableIOException;
+import java.net.URI;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes for an archive file to the underlying file system.
@@ -29,45 +30,45 @@ public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
-    private final String canonicalPath;
+    private final URI mountPoint;
 
-    SyncException(Archive archive) {
-        this.canonicalPath = archive.getCanonicalPath();
+    SyncException(ArchiveDescriptor archive) {
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, String message) {
+    SyncException(ArchiveDescriptor archive, String message) {
         super(message);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, Throwable cause) {
+    SyncException(ArchiveDescriptor archive, Throwable cause) {
         super(cause);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, String message, Throwable cause) {
+    SyncException(ArchiveDescriptor archive, String message, Throwable cause) {
         super(message, cause);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, int priority) {
+    SyncException(ArchiveDescriptor archive, int priority) {
         super(priority);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, String message, int priority) {
+    SyncException(ArchiveDescriptor archive, String message, int priority) {
         super(message, priority);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, Throwable cause, int priority) {
+    SyncException(ArchiveDescriptor archive, Throwable cause, int priority) {
         super(cause, priority);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(Archive archive, String message, Throwable cause, int priority) {
+    SyncException(ArchiveDescriptor archive, String message, Throwable cause, int priority) {
         super(message, cause, priority);
-        this.canonicalPath = archive.getCanonicalPath();
+        this.mountPoint = archive.getMountPoint();
     }
 
     /**
@@ -79,35 +80,16 @@ public class SyncException extends ChainableIOException {
         return (SyncException) super.initCause(cause);
     }
 
-    /**
-     * Returns the <em>canonical</em> path name of the archive file which's
-     * processing caused this exception to be created.
-     * A canonical path is both absolute and unique within the virtual file
-     * system.
-     * The precise definition depends on the platform, but all elements in
-     * a canonical path are separated by {@link java.io.File#separator}s.
-     * <p>
-     * This property may be used to determine some archive file specific
-     * parameters, such as passwords or similar.
-     * However, implementations must not assume that the file denoted by the
-     * path actually exists as a file in the real file system!
-     *
-     * @return A string representing the canonical path of this archive
-     *         - never {@code null}.
-     */
-    public final String getCanonicalPath() {
-        return canonicalPath;
+    /** @see ArchiveDescriptor#getMountPoint() */
+    public final URI getMountPoint() {
+        return mountPoint;
     }
 
     @Override
     public String getLocalizedMessage() {
         final String msg = getMessage();
-        if (msg != null)
-            return new StringBuilder(getCanonicalPath())
-                    .append(" (")
-                    .append(msg)
-                    .append(")")
-                    .toString();
-        return getCanonicalPath();
+        return msg != null
+                ? new StringBuilder(getMountPoint().toString()).append(" (").append(msg).append(")").toString()
+                : getMountPoint().toString();
     }
 }

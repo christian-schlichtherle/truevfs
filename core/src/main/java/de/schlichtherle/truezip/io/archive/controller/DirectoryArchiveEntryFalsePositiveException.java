@@ -16,23 +16,25 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.IOException;
 
 /**
- * Indicates that the target file of an archive controller is a false
- * positive archive file which actually exists as a plain directory in an
- * enclosing archive file.
+ * Indicates a false positive archive entry which actually exists as a
+ * directory entry in an enclosing archive file.
  * <p>
- * Instances of this class are always associated with an
- * {@code IOException} as their cause.
+ * Instances of this class are always associated with an {@code IOException}
+ * as their cause.
  */
 public final class DirectoryArchiveEntryFalsePositiveException
 extends ArchiveEntryFalsePositiveException {
 
     private static final long serialVersionUID = 5672345295269335783L;
 
-    DirectoryArchiveEntryFalsePositiveException(Archive archive, ArchiveController enclController, String enclEntryName, IOException cause, ArchiveController outer) {
-        super(archive, enclController, enclEntryName, cause);
+    DirectoryArchiveEntryFalsePositiveException(
+            ArchiveDescriptor archive,
+            String path,
+            IOException cause) {
+        super(archive, path, cause);
     }
 }

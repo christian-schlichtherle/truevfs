@@ -69,8 +69,7 @@ public class RaesFiles {
         final RaesOutputStream out;
         try {
             final File raesFile = getNonArchiveFile(raesFilePath, detector);
-            final RaesParameters params = new KeyManagerRaesParameters(
-                    raesFile.getCanonicalPath()); // use canonical path name
+            final RaesParameters params = new KeyManagerRaesParameters(raesFile);
             out = RaesOutputStream.getInstance(
                     detector.createFileOutputStream(raesFile, false),
                     params);
@@ -115,8 +114,7 @@ public class RaesFiles {
             final ArchiveDetector detector)
     throws IOException {
         final File raesFile = getNonArchiveFile(raesFilePath, detector);
-        final RaesParameters params = new KeyManagerRaesParameters(
-                raesFile.getCanonicalPath()); // use canonical path name
+        final RaesParameters params = new KeyManagerRaesParameters(raesFile);
         final RaesReadOnlyFile rrof
                 = RaesReadOnlyFile.getInstance(raesFile, params);
         final InputStream in;

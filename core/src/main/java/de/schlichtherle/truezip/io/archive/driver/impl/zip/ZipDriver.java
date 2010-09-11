@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.MultiplexedOutputArchive;
@@ -202,13 +202,13 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInputArchive}.
      */
     @Override
-    public ZipInputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
+    public ZipInputArchive newInputArchive(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
         return newZipInputArchive(archive, rof);
     }
 
     protected ZipInputArchive newZipInputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         return new ZipInputArchive(
@@ -224,7 +224,7 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public OutputArchive<ZipEntry> newOutputArchive(
-            Archive archive, OutputStream out, ZipInputArchive source)
+            ArchiveDescriptor archive, OutputStream out, ZipInputArchive source)
     throws IOException {
         return new MultiplexedOutputArchive(
                 newZipOutputArchive(archive, out, source));
@@ -232,7 +232,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputArchive newZipOutputArchive(
-            Archive archive, OutputStream out, ZipInputArchive source)
+            ArchiveDescriptor archive, OutputStream out, ZipInputArchive source)
     throws IOException {
         return new ZipOutputArchive(out, getCharset(), level, source);
     }

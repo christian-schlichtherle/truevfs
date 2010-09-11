@@ -17,6 +17,8 @@
 package de.schlichtherle.truezip.key.passwd.console;
 
 import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
+import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
 
 /**
  * A simple key manager which enables users to enter passwords as keys using
@@ -63,10 +65,10 @@ public class PromptingKeyManager extends de.schlichtherle.truezip.key.PromptingK
      */
     public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
-                "PromptingKeyProvider",
+                PromptingKeyProvider.class,
                 PromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-                "PromptingAesKeyProvider",
+                PromptingAesKeyProvider.class,
                 PromptingAesKeyProviderUI.class);
     }
 

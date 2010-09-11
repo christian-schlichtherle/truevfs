@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
+import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOOperations;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.IOReference;
@@ -43,6 +45,7 @@ import java.util.logging.Logger;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
@@ -114,11 +117,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private boolean needsReassembly;
 
     UpdatingArchiveController(
-            java.io.File target,
+            URI mountPoint,
             ArchiveController enclController,
-            String enclEntryName,
             ArchiveDriver driver) {
-        super(target, enclController, enclEntryName, driver);
+        super(mountPoint, enclController, driver);
     }
 
     @Override
@@ -131,31 +133,30 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert getFileSystem() == null;
 
         // Do the logging part and leave the work to mount0.
-        logger.log(Level.FINER, "mount.entering", // NOI18N
-                new Object[] {
-                    getCanonicalPath(),
-                    Boolean.valueOf(autoCreate),
-        });
+        final Object stats[] = { getMountPoint(), autoCreate };
+        logger.log(Level.FINER, "mount.try", stats); // NOI18N
         try {
             mount0(autoCreate);
+
+            assert writeLock().isLockedByCurrentThread();
+            assert autoCreate || inArchive != null;
+            assert autoCreate || outFile == null;
+            assert autoCreate || outArchive == null;
+            assert getFileSystem() != null;
         } catch (IOException ioe) {
+            // Log at FINER level. This is mostly because of false positives.
+            logger.log(Level.FINER, "mount.catch", ioe); // NOI18N
+
             assert writeLock().isLockedByCurrentThread();
             assert inArchive == null;
             assert outFile == null;
             assert outArchive == null;
             assert getFileSystem() == null;
 
-            // Log at FINER level. This is mostly because of false positives.
-            logger.log(Level.FINER, "mount.throwing", ioe); // NOI18N
             throw ioe;
+        } finally {
+            logger.log(Level.FINER, "mount.finally", stats); // NOI18N
         }
-        logger.log(Level.FINER, "mount.exiting"); // NOI18N
-
-        assert writeLock().isLockedByCurrentThread();
-        assert autoCreate || inArchive != null;
-        assert autoCreate || outFile == null;
-        assert autoCreate || outArchive == null;
-        assert getFileSystem() != null;
     }
 
     private void mount0(final boolean autoCreate)
@@ -179,7 +180,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 } catch (IOException ex) {
                     // Wrap cause so that a matching catch block can assume
                     // that it can access the target in the real file system.
-                    throw new FalsePositiveException(this, ex);
+                    throw new FalsePositiveException(this, ROOT, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener, inArchive,
@@ -187,7 +188,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             } else if (!autoCreate) {
                 // The archive file does not exist and we may not create it
                 // automatically.
-                throw new ArchiveFileNotFoundException(this);
+                throw new ArchiveEntryNotFoundException(
+                        this, ROOT, "may not create archive file");
             } else {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
@@ -202,7 +204,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (inFile == null) {
-                unwrap(getEnclController(), getEnclEntryName(), autoCreate);
+                unwrap(getEnclDescriptor(), getEnclPath(ROOT), autoCreate);
             } else {
                 // The enclosed archive file has already been updated and the
                 // file previously used for output has been left over to be
@@ -228,9 +230,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // a bug.
                     assert false : "We should never get here! Read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
-                            this,
-                            getEnclController(), // probably not correct!
-                            getEnclEntryName(), // dito
+                            getEnclDescriptor(), // FIXME: probably not correct!
+                            getEnclPath(ROOT), // dito
                             ex);
                 }
                 // Note that the archive file system must be read-write
@@ -249,14 +250,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     private void unwrap(
             final ArchiveController controller,
-            final String entryName,
+            final String path,
             final boolean autoCreate)
     throws FalsePositiveException, IOException {
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
-        assert entryName != null;
-        assert !isRoot(entryName);
+        assert path != null;
+        assert !isRoot(path);
         assert inFile == null;
 
         try {
@@ -267,7 +268,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     ? controller.writeLock()
                     : controller.readLock();
             controller.readLock().lock();
-            if (controller.hasNewData(entryName) || autoCreate) {
+            if (controller.hasNewData(path) || autoCreate) {
                 controller.readLock().unlock();
                 class Locker implements IOOperation {
                     public void run() throws IOException {
@@ -276,7 +277,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         // file system since controller.newInputStream(entryName)
                         // would do the same and controller.update() would
                         // invalidate the file system reference.
-                        controller.autoSync(entryName);
+                        controller.autoSync(path);
 
                         // Keep a lock for the actual unwrapping.
                         // If this is an ordinary mounting procedure where the
@@ -297,7 +298,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 controller.runWriteLocked(new Locker());
             }
             try {
-                unwrapFromLockedController(controller, entryName, autoCreate);
+                unwrapFromLockedController(controller, path, autoCreate);
             } finally {
                 lock.unlock();
             }
@@ -307,11 +308,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // but then we would still hold the lock on controller, which
             // is not necessary while accessing the file system of its
             // enclosing controller.
-            if (ex.getEnclController() == controller)
+            if (controller.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // just created - pass on
-
-            unwrap( controller.getEnclController(),
-                    controller.enclEntryName(entryName),
+            unwrap( controller.getEnclDescriptor(),
+                    controller.getEnclPath(path),
                     autoCreate);
         }
     }
@@ -330,7 +330,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         final ArchiveFileSystem controllerFileSystem;
         controllerFileSystem = controller.autoMount(
                 autoCreate && ArchiveControllers.isLenient());
-        if (controllerFileSystem.getType(path) == FILE) {
+        final Type type = controllerFileSystem.getType(path);
+        if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
             // archive file entry.
@@ -351,7 +352,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     initInArchive(tmp);
                 } catch (IOException ex) {
                     throw new FileArchiveEntryFalsePositiveException(
-                            this, controller, path, ex);
+                            controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener, inArchive,
@@ -366,14 +367,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (inFile == null && !tmp.delete())
                     throw new IOException(tmp.getPath() + " (couldn't delete corrupted input file)");
             }
-        } else if (controllerFileSystem.getType(path) == DIRECTORY) {
+        } else if (type == DIRECTORY) {
             throw new DirectoryArchiveEntryFalsePositiveException(
-                    this, controller, path,
-                    new FileNotFoundException("cannot read directories"), this);
+                    controller, path,
+                    new FileNotFoundException("cannot read directories"));
         } else if (!autoCreate) {
             // The entry does NOT exist in the enclosing archive
             // file and we may not create it automatically.
-            throw new EnclosedArchiveFileNotFoundException(this);
+            throw new ArchiveEntryNotFoundException(
+                    controller, path, "may not create archive file");
         } else {
             assert autoCreate;
             assert controller.writeLock().isLockedByCurrentThread();
@@ -427,7 +429,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert writeLock().isLockedByCurrentThread();
         assert inArchive == null;
 
-        logger.log(Level.FINEST, "initInArchive.entering", inFile); // NOI18N
+        logger.log(Level.FINEST, "initInArchive.try", inFile); // NOI18N
         try {
             ReadOnlyFile rof = new SimpleReadOnlyFile(inFile);
             try {
@@ -444,11 +446,15 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
             inArchive.setMetaData(new InputArchiveMetaData(this, inArchive));
         } catch (IOException ex) {
+            logger.log(Level.FINEST, "initInArchive.catch", ex); // NOI18N
+
             assert inArchive == null;
-            logger.log(Level.FINEST, "initInArchive.throwing", ex); // NOI18N
+
             throw ex;
+        } finally {
+            logger.log(Level.FINEST, "initInArchive.finally",
+                    inArchive == null ? 0 : inArchive.size()); // NOI18N
         }
-        logger.log(Level.FINEST, "initInArchive.exiting", inArchive.size()); // NOI18N
 
         assert inArchive != null;
     }
@@ -538,7 +544,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert writeLock().isLockedByCurrentThread();
         assert outArchive == null;
 
-        logger.log(Level.FINEST, "initOutArchive.entering", outFile); // NOI18N
+        logger.log(Level.FINEST, "initOutArchive.try", outFile); // NOI18N
         try {
             OutputStream out = new java.io.FileOutputStream(outFile);
             try {
@@ -567,11 +573,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
             outArchive.setMetaData(new OutputArchiveMetaData(this, outArchive));
         } catch (IOException ex) {
+            logger.log(Level.FINEST, "initOutArchive.catch", ex); // NOI18N
+
             assert outArchive == null;
-            logger.log(Level.FINEST, "initOutArchive.throwing", ex); // NOI18N
+
             throw ex;
+        } finally {
+            logger.log(Level.FINEST, "initOutArchive.finally"); // NOI18N
         }
-        logger.log(Level.FINEST, "initOutArchive.exiting"); // NOI18N
 
         assert outArchive != null;
     }
@@ -594,24 +603,25 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert !isTouched() || outArchive != null; // file system touched => output archive
         assert outArchive == null || outFile != null; // output archive => output file
 
-        // Do the logging part and leave the work to umount0.
+        // Do the logging part and leave the work to sync0.
         final Object[] stats = new Object[] {
-            getCanonicalPath(),
-            Boolean.valueOf(config.getWaitForInputStreams()),
-            Boolean.valueOf(config.getCloseInputStreams()),
-            Boolean.valueOf(config.getWaitForOutputStreams()),
-            Boolean.valueOf(config.getCloseOutputStreams()),
-            Boolean.valueOf(config.getUmount()),
-            Boolean.valueOf(config.getReassemble()),
+            getMountPoint(),
+            config.getWaitForInputStreams(),
+            config.getCloseInputStreams(),
+            config.getWaitForOutputStreams(),
+            config.getCloseOutputStreams(),
+            config.getUmount(),
+            config.getReassemble(),
         };
-        logger.log(Level.FINER, "umount.entering", stats); // NOI18N
+        logger.log(Level.FINER, "sync.try", stats); // NOI18N
         try {
             sync0(config);
         } catch (SyncException ex) {
-            logger.log(Level.FINER, "umount.throwing", ex); // NOI18N
+            logger.log(Level.FINER, "sync.catch", ex); // NOI18N
             throw ex;
+        } finally {
+            logger.log(Level.FINER, "sync.finally", stats); // NOI18N
         }
-        logger.log(Level.FINER, "umount.exiting", stats); // NOI18N
     }
 
     private void sync0(final SyncConfiguration config)
@@ -936,30 +946,30 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclController(), getEnclEntryName());
-            } catch (IOException cause) {
+                wrap(getEnclDescriptor(), getEnclPath(ROOT));
+            } catch (IOException ex) {
                 throw handler.fail(new SyncException(
-                        getEnclController(),
-                        "could not update archive entry '" + getEnclEntryName() + "' - all changes are lost",
-                        cause));
+                        getEnclDescriptor(),
+                        "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
+                        ex));
             }
         }
     }
 
     private void wrap(
             final ArchiveController controller,
-            final String entryName)
+            final String path)
     throws IOException {
         assert writeLock().isLockedByCurrentThread();
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
-        assert entryName != null;
-        assert !isRoot(entryName);
+        assert path != null;
+        assert !isRoot(path);
 
         class Wrapper implements IOOperation {
             public void run() throws IOException {
-                wrapToWriteLockedController(controller, entryName);
+                wrapToWriteLockedController(controller, path);
             }
         }
         controller.runWriteLocked(new Wrapper());
@@ -967,12 +977,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     private void wrapToWriteLockedController(
             final ArchiveController controller,
-            final String entryName)
+            final String path)
     throws IOException {
         assert controller != null;
         assert controller.writeLock().isLockedByCurrentThread();
-        assert entryName != null;
-        assert !isRoot(entryName);
+        assert path != null;
+        assert !isRoot(path);
 
         // Write the updated output archive file as an entry
         // to its enclosing archive file, preserving the
@@ -980,7 +990,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // modification time of the entry.
         final InputStream in = new java.io.FileInputStream(outFile);
         try {
-            ArchiveControllers.copy(true, outFile, in, controller, entryName);
+            ArchiveControllers.copy(true, outFile, in, controller, path);
         } catch (FalsePositiveException cannotHappen) {
             throw new AssertionError(cannotHappen);
         } finally {
@@ -1017,8 +1027,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     @Override
     @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
+        logger.log(Level.FINEST, "finalize.try", getMountPoint()); // NOI18N
         try {
-            logger.log(Level.FINEST, "finalize.entering", getCanonicalPath()); // NOI18N
             // Note: If fileSystem or inArchive are not null, then the controller
             // has been used to perform read operations.
             // If outArchive is not null, the controller has been used to perform
@@ -1028,14 +1038,20 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // this object should never be made elegible for finalization!
             // Tactical note: Assertions don't work in a finalizer, so we use
             // logging.
-            if (isTouched() || readLock().isLockedByCurrentThread() || writeLock().isLockedByCurrentThread())
-                logger.log(Level.SEVERE, "finalize.invalidState", getCanonicalPath());
+            if (    isTouched()
+                    || readLock().isLockedByCurrentThread()
+                    || writeLock().isLockedByCurrentThread())
+                logger.log(Level.SEVERE, "finalize.invalidState", getMountPoint());
             final SyncExceptionBuilder handler
                     = new DefaultSyncExceptionBuilder();
             shutdownStep1(handler);
             shutdownStep2(handler);
             shutdownStep3(true);
+        } catch (IOException ex) {
+            logger.log(Level.FINEST, "finalize.catch", ex);
         } finally {
+            logger.log(Level.FINEST, "finalize.finally", getMountPoint());
+
             super.finalize();
         }
     }

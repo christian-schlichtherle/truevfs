@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
+import java.net.URI;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$
@@ -23,7 +25,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 public class RemoteControlThread extends Thread {
     private final RemoteControl rc;
 
-    public RemoteControlThread(final String id) {
+    public RemoteControlThread(final URI id) {
         this(new RemoteControl(id));
     }
 

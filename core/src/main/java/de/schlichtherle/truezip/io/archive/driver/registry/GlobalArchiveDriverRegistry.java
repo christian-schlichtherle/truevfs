@@ -68,20 +68,19 @@ public final class GlobalArchiveDriverRegistry
         implements Serializable {
 
     private static final long serialVersionUID = 1579600190374703884L;
-
     private static final String CLASS_NAME
             = GlobalArchiveDriverRegistry.class.getName();
-    private static final String PACKAGE_NAME
-            = GlobalArchiveDriverRegistry.class.getPackage().getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+    private static final String PACKAGE_NAME
+            = GlobalArchiveDriverRegistry.class.getPackage().getName();
+    private static final String PROP_KEY_REGISTRY = PACKAGE_NAME;
+    private static final String PROP_KEY_DEFAULT_SUFFIXES
+            = PROP_KEY_REGISTRY + ".default";
 
     static final String KWD_NULL = "NULL";  // NOI18N
     static final String KWD_ALL = "ALL";    // NOI18N
 
-    private static final String PROP_KEY_REGISTRY = PACKAGE_NAME;
-    private static final String PROP_KEY_DEFAULT_SUFFIXES
-            = PROP_KEY_REGISTRY + ".default";
 
     /** The (pseudo) singleton instance. */
     public static final GlobalArchiveDriverRegistry INSTANCE

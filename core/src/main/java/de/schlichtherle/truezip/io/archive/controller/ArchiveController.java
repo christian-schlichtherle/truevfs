@@ -16,15 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import java.util.Set;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
@@ -32,21 +30,26 @@ import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.util.Set;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * This is the base class for any archive controller, providing all the
- * essential services required by the {@link File} class to implement its
- * behaviour.
+ * essential services required for accessing archive files.
  * Each instance of this class manages a globally unique archive file
  * (the <i>target file</i>) in order to allow random access to it as if it
  * were a regular directory in the real file system.
@@ -74,13 +77,13 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
  * <p>
  * To ensure that for each archive file there is at most one
  * {code ArchiveController}, the path name of the archive file (called
- * <i>target</i>) is canonicalized, so it doesn't matter whether the
- * {@link File} class addresses an archive file as {@code "archive.zip"}
- * or {@code "/dir/archive.zip"} if {@code "/dir"} is the client
- * application's current directory.
+ * <i>target</i>) must be canonicalized, so it doesn't matter whether a target
+ * archive file is addressed as {@code "archive.zip"} or
+ * {@code "/dir/archive.zip"} if {@code "/dir"} is the client application's
+ * current directory.
  * <p>
  * Note that in general all of its methods are reentrant on exceptions.
- * This is important because the {@link File} class may repeatedly call them,
+ * This is important because client applications may repeatedly call them,
  * triggered by the client application. Of course, depending on the context,
  * some or all of the archive file's data may be lost in this case.
  * <p>
@@ -94,7 +97,7 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveController implements Archive {
+public abstract class ArchiveController implements ArchiveDescriptor {
 
     /**
      * A weak reference to this archive controller.
@@ -102,11 +105,13 @@ public abstract class ArchiveController implements Archive {
      */
     private final WeakReference weakThis = new WeakReference(this);
 
+    private final URI mountPoint;
+
     /**
      * The canonicalized or at least normalized absolute path name
      * representation of the target archive file.
      */
-    private final java.io.File target;
+    private final File target;
 
     /**
      * The archive controller of the enclosing archive, if any.
@@ -114,9 +119,10 @@ public abstract class ArchiveController implements Archive {
     private final ArchiveController enclController;
 
     /**
-     * The name of the entry for this archive in the enclosing archive, if any.
+     * The relative path name of the entry for the target archive in its
+     * enclosing archive, if any.
      */
-    private final String enclEntryName;
+    private final URI enclPath;
 
     /**
      * The {@link ArchiveDriver} to use for this controller's target file.
@@ -138,25 +144,28 @@ public abstract class ArchiveController implements Archive {
      * For example, if the controller has started to update some entry data,
      * it must call {@link #setTouched(boolean)} in order to force the
      * controller to be updated on the next call to
-     * {@link ArchiveControllers#sync(String, SyncConfiguration)}
+     * {@link ArchiveControllers#sync(URI, SyncConfiguration)}
      * even if the client application holds no more references to it.
      * Otherwise, all changes may get lost!
      * 
      * @see #setTouched(boolean)
      */
     ArchiveController(
-            final java.io.File target,
+            final URI mountPoint,
             final ArchiveController enclController,
-            final String enclEntryName,
             final ArchiveDriver driver) {
-        assert target != null;
-        assert target.isAbsolute();
-        assert (enclController != null) == (enclEntryName != null);
+        assert mountPoint.isAbsolute();
+        assert !mountPoint.isOpaque();
+        assert mountPoint.getPath().endsWith(SEPARATOR);
+        assert mountPoint.equals(mountPoint.normalize());
+        assert enclController == null || mountPoint.toString().startsWith(enclController.getMountPoint().toString());
         assert driver != null;
 
-        this.target = target;
+        this.mountPoint = mountPoint;
+        this.target = new File(mountPoint);
         this.enclController = enclController;
-        this.enclEntryName = enclEntryName;
+        this.enclPath = enclController == null ? null
+                : enclController.getMountPoint().relativize(mountPoint);
         this.driver = driver;
 
         ReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -164,6 +173,12 @@ public abstract class ArchiveController implements Archive {
         this.writeLock = rwl.writeLock();
 
         setTouched(false);
+
+        assert this.enclPath == null || this.enclPath.getPath().endsWith(SEPARATOR);
+    }
+
+    boolean isLenient() {
+        return ArchiveControllers.isLenient();
     }
 
     //
@@ -221,55 +236,43 @@ public abstract class ArchiveController implements Archive {
     }
 
     /**
-     * Returns the canonical or at least normalized absolute
-     * {@code java.io.File} object for the target archive file.
+     * {@inheritDoc}
+     * <p>
+     * Where the methods of this interface accept a path name string as a
+     * parameter, this must be a relative, hierarchical URI which is resolved
+     * against this mount point.
      */
-    final java.io.File getTarget() {
+    @Override
+    public final URI getMountPoint() {
+        return mountPoint;
+    }
+
+    /**
+     * Returns the canonical or at least normalized absolute file for the
+     * target archive file.
+     */
+    final File getTarget() {
         return target;
     }
 
     @Override
-    public final String getCanonicalPath() {
-        return target.getPath();
-    }
-
-    @Override
-    public final Archive getEnclArchive() {
+    public final ArchiveController getEnclDescriptor() {
         return enclController;
     }
 
     /**
-     * Returns {@code true} iff the given entry name refers to the
-     * virtual root directory within this controller.
+     * Resolves the given relative {@code path} against the relative path of
+     * the target archive file within its enclosing archive file.
+     *
+     * @throws NullPointerException if the target archive file is not enclosed
+     *         within another archive file.
      */
-    static boolean isRoot(String entryName) {
-        return ArchiveFileSystems.isRoot(entryName);
-    }
-
-    boolean isLenient() {
-        return ArchiveControllers.isLenient();
-    }
-
-    /**
-     * Returns the {@link ArchiveController} of the enclosing archive file,
-     * if any.
-     */
-    public final ArchiveController getEnclController() {
-        return enclController;
-    }
-
-    /**
-     * Returns the entry name of this controller within the enclosing archive
-     * file, if any.
-     */
-    public final String getEnclEntryName() {
-        return enclEntryName;
-    }
-
-    public final String enclEntryName(final String entryName) {
-        return isRoot(entryName)
-                ? enclEntryName
-                : enclEntryName + SEPARATOR + entryName;
+    public final String getEnclPath(final String path) {
+        final String result
+                = cutTrailingSeparators(enclPath.resolve(path).toString(), SEPARATOR_CHAR);
+        assert result.endsWith(path);
+        assert !result.endsWith(SEPARATOR);
+        return result;
     }
 
     /**
@@ -299,7 +302,7 @@ public abstract class ArchiveController implements Archive {
         // (In/OutputArchive and ArchiveEntry) and hence ArchiveFileSystem.
         // Normally, these are initialized together in mountFileSystem(...)
         // which is externally synchronized on this controller's write lock,
-        // so we don't need to be afraid of this.
+        // so we don't need to care about this.
         this.driver = driver;
     }
 
@@ -331,7 +334,7 @@ public abstract class ArchiveController implements Archive {
      * (re)schedules this archive controller for the synchronization of its
      * archive contents to the target archive file in the real file system
      * upon the next call to
-     * {@link ArchiveControllers#sync(String, SyncConfiguration)}
+     * {@link ArchiveControllers#sync(URI, SyncConfiguration)}
      * according to the given touch status:
      * <p>
      * If set to {@code true}, the archive contents of this controller are
@@ -352,7 +355,7 @@ public abstract class ArchiveController implements Archive {
      */
     final void setTouched(final boolean touched) {
         assert weakThis.get() != null || !touched; // (garbage collected => no scheduling) == (scheduling => not garbage collected)
-        ArchiveControllers.set( getTarget(), touched ? this : weakThis);
+        ArchiveControllers.map(getMountPoint(), touched ? this : weakThis);
     }
 
     /**
@@ -432,7 +435,7 @@ public abstract class ArchiveController implements Archive {
      * @throws NullPointerException if {@code config} is {@code null}.
      * @throws SyncException if any exceptional condition occurs
      *         throughout the processing of the target archive file.
-     * @see ArchiveControllers#sync(String, SyncConfiguration)
+     * @see ArchiveControllers#sync(URI, SyncConfiguration)
      */
     public abstract void sync(SyncConfiguration config)
     throws SyncException;
@@ -472,7 +475,7 @@ public abstract class ArchiveController implements Archive {
 
     @Override
     public String toString() {
-        return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getCanonicalPath() + ")";
+        return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getMountPoint() + ")";
     }
 
     //
@@ -496,7 +499,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return newInputStream0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.newInputStream(enclEntryName(path));
+            return getEnclDescriptor().newInputStream(getEnclPath(path));
         }
     }
 
@@ -511,10 +514,9 @@ public abstract class ArchiveController implements Archive {
                 try {
                     final boolean directory = isDirectory0(path); // detects false positives
                     assert directory : "The root entry must be a directory!";
-                } catch (EnclosedArchiveFileNotFoundException ex) {
-                    return enclController.newInputStream0(enclEntryName(path));
-                } catch (ArchiveFileNotFoundException ex) {
-                    throw new FalsePositiveException(this, ex);
+                } catch (ArchiveEntryNotFoundException ex) {
+                    assert isRoot(ex.getPath());
+                    throw new FalsePositiveException(this, path, ex);
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot read from (virtual root) directory entry");
@@ -576,7 +578,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return newOutputStream0(path, append);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.newOutputStream(enclEntryName(path),
+            return getEnclDescriptor().newOutputStream(getEnclPath(path),
                     append);
         }
     }
@@ -595,10 +597,9 @@ public abstract class ArchiveController implements Archive {
                 try {
                     final boolean directory = isDirectory0(path); // detects false positives
                     assert directory : "The root entry must be a directory!";
-                } catch (EnclosedArchiveFileNotFoundException ex) {
-                    return enclController.newOutputStream0(enclEntryName(path), append);
-                } catch (ArchiveFileNotFoundException ex) {
-                    throw new FalsePositiveException(this, ex);
+                } catch (ArchiveEntryNotFoundException ex) {
+                    assert isRoot(ex.getPath());
+                    throw new FalsePositiveException(this, path, ex);
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot write to (virtual root) directory entry");
@@ -649,7 +650,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return isExisting0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.isExisting(enclEntryName(path));
+            return getEnclDescriptor().isExisting(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -677,9 +678,9 @@ public abstract class ArchiveController implements Archive {
             if (isRoot(path)
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return enclController.isFile(enclEntryName(path));
+            return getEnclDescriptor().isFile(getEnclPath(path));
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.isFile(enclEntryName(path));
+            return getEnclDescriptor().isFile(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -705,7 +706,7 @@ public abstract class ArchiveController implements Archive {
         } catch (FileArchiveEntryFalsePositiveException ex) {
             return false;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.isDirectory(enclEntryName(path));
+            return getEnclDescriptor().isDirectory(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -729,7 +730,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return getOpenIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getOpenIcon(enclEntryName(path));
+            return getEnclDescriptor().getOpenIcon(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -755,7 +756,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return getClosedIcon0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getClosedIcon(enclEntryName(path));
+            return getEnclDescriptor().getClosedIcon(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -781,7 +782,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return isReadable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.isReadable(enclEntryName(path));
+            return getEnclDescriptor().isReadable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -805,7 +806,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return isWritable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.isWritable(enclEntryName(path));
+            return getEnclDescriptor().isWritable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -829,7 +830,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return getLength0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getLength(enclEntryName(path));
+            return getEnclDescriptor().getLength(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -853,7 +854,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return getLastModified0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.getLastModified(enclEntryName(path));
+            return getEnclDescriptor().getLastModified(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -877,7 +878,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return list0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.list(enclEntryName(path));
+            return getEnclDescriptor().list(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -901,7 +902,7 @@ public abstract class ArchiveController implements Archive {
         try {
             setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            enclController.setReadOnly(enclEntryName(path));
+            getEnclDescriptor().setReadOnly(getEnclPath(path));
         }
     }
 
@@ -923,7 +924,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return setLastModified0(path, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.setLastModified(enclEntryName(path),
+            return getEnclDescriptor().setLastModified(getEnclPath(path),
                     time);
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -953,7 +954,7 @@ public abstract class ArchiveController implements Archive {
         try {
             return createNewFile0(path, autoCreate);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.createNewFile(enclEntryName(path),
+            return getEnclDescriptor().createNewFile(getEnclPath(path),
                     autoCreate);
         }
     }
@@ -988,7 +989,7 @@ public abstract class ArchiveController implements Archive {
             mkdir0(path, autoCreate);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return enclController.mkdir(enclEntryName(path), autoCreate);
+            return getEnclDescriptor().mkdir(getEnclPath(path), autoCreate);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1004,10 +1005,10 @@ public abstract class ArchiveController implements Archive {
                 // This is the virtual root of an archive file system, so we
                 // are actually working on the controller's target file.
                 if (isRfsEntryTarget()) {
-                    if (target.exists())
+                    if (getTarget().exists())
                         throw new IOException("target file exists already!");
                 } else {
-                    if (enclController.isExisting(enclEntryName))
+                    if (getEnclDescriptor().isExisting(getEnclPath(path)))
                         throw new IOException("target file exists already!");
                 }
                 // Ensure file system existence.
@@ -1028,14 +1029,14 @@ public abstract class ArchiveController implements Archive {
             delete0(path);
             return true;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return enclController.delete(enclEntryName(path));
+            return getEnclDescriptor().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // TODO: Document this!
             if (isRoot(path)
-            && !enclController.isDirectory(enclEntryName(path))
+            && !getEnclDescriptor().isDirectory(getEnclPath(path))
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
-            return enclController.delete(enclEntryName(path));
+            return getEnclDescriptor().delete(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1048,7 +1049,6 @@ public abstract class ArchiveController implements Archive {
         writeLock().lock();
         try {
             autoSync(path);
-
             if (isRoot(path)) {
                 // Get the file system or die trying!
                 final ArchiveFileSystem fileSystem;
@@ -1064,7 +1064,6 @@ public abstract class ArchiveController implements Archive {
                     }
                     throw ex;
                 }
-
                 // We are actually working on the controller's target file.
                 if (!fileSystem.list(path).isEmpty())
                     throw new IOException("archive file system not empty!");
@@ -1081,19 +1080,19 @@ public abstract class ArchiveController implements Archive {
                 // forget it's password as well.
                 // TODO: Review: This is an archive driver dependency!
                 // Calling it doesn't harm, but please consider a more opaque
-                // way to model this.
-                PromptingKeyManager.resetKeyProvider(getCanonicalPath());
+                // way to model this, e.g. by calling a listener interface.
+                PromptingKeyManager.resetKeyProvider(getMountPoint());
                 // Delete the target file or the entry in the enclosing
                 // archive file, too.
                 if (isRfsEntryTarget()) {
                     // The target file of the controller is NOT enclosed
                     // in another archive file.
-                    if (!target.delete())
+                    if (!getTarget().delete())
                         throw new IOException("couldn't delete archive file!");
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    enclController.delete0(enclEntryName(path));
+                    getEnclDescriptor().delete0(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
                 final ArchiveFileSystem fileSystem = autoMount(false);

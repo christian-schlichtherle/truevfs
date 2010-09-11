@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 
 /**
  * Indicates that an archive file could not get updated because some input or
@@ -35,7 +35,7 @@ extends SyncException {
 
     private final int numStreams;
 
-    ArchiveBusyException(Archive archive, int numStreams) {
+    ArchiveBusyException(ArchiveDescriptor archive, int numStreams) {
         super(archive);
         this.numStreams = numStreams;
     }

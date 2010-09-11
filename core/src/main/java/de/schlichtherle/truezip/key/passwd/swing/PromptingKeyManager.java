@@ -17,6 +17,8 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
+import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Window;
@@ -68,10 +70,10 @@ public class PromptingKeyManager
      */
     public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
-                "PromptingKeyProvider",
+                PromptingKeyProvider.class,
                 PromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-                "PromptingAesKeyProvider",
+                PromptingAesKeyProvider.class,
                 PromptingAesKeyProviderUI.class);
     }
 

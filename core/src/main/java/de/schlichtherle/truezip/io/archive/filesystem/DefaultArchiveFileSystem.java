@@ -211,7 +211,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      * The returned file system entry is not yet linked into this virtual
      * archive file system.
      *
-     * @see    #link
+     * @see    #mknod
      * @param  path the non-{@code null} path name of the new file system entry.
      *         This is always a {@link #isValidPath(String) valid path name}.
      * @param  type the non-{@code null} type of the new file system entry.

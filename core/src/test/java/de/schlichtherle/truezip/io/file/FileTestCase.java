@@ -16,12 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
-import de.schlichtherle.truezip.io.file.ContainsFileException;
-import de.schlichtherle.truezip.io.file.FileOutputStream;
-import de.schlichtherle.truezip.io.file.FileBusyException;
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.FileInputStream;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
@@ -293,7 +287,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         
         assertNotSame(inner, inner2);
         assertNotSame(archive, archive2);
-        
+
         //
         // Test details of the persistet object graph - part of this is
         // repeated in the tests for DefaultArchiveDetector.
@@ -322,7 +316,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         final ArchiveController archive2Controller = archive2.getArchiveController();
         assertSame(innerController, inner2Controller);
         assertSame(archiveController, archive2Controller);
-        
+
         // Test that the controllers have been reconfigured with the new drivers.
         // Note that this is only possible because the file systems haven't
         // been touched yet (well, they haven't even been mounted).
@@ -642,8 +636,8 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileInputStream()
     throws IOException {
-        File file1 = new File(archive, "file1");
-        File file2 = new File(archive, "file2");
+        final File file1 = new File(archive, "file1");
+        final File file2 = new File(archive, "file2");
         
         // Test open output streams.
         assertTrue(file1.createNewFile());
@@ -658,15 +652,15 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         }
         assertFalse(file2.catFrom(fisA)); // fails for same reason.
         
-        // fis1 is still open!
+        // fisA is still open!
         try {
-            File.update(); // forces closing of fis1
+            File.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
         } catch (ArchiveBusyWarningException expected) {
             // Warning about fis1 still being used.
         }
         assertTrue(file2.isFile());
-        if (!file2.catFrom(fisA)) // fis1 may be invalidated after update!
+        if (!file2.catFrom(fisA)) // fisA may be invalidated after update!
             assertFalse(file2.exists()); // previous op has removed file2!
         
         // Open file2 as stream and let the garbage collection close the stream automatically.
@@ -695,7 +689,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         assertFalse(file1.delete());
         assertFalse(file1.exists());
     }
-    
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileOutputStream()
     throws IOException {
