@@ -33,11 +33,11 @@ public interface ArchiveEntryFactory<AE extends ArchiveEntry> {
      * A path name must meet the following common requirements:
      * <ol>
      * <li>A path name is a sequence of file or directory entity
-     *     <i>base names</i> which are separated by one or more <i>separator
+     *     <i>segments</i> which are separated by one or more <i>separator
      *     characters</i> ({@link ArchiveEntry#SEPARATOR_CHAR}).
-     *     This implies that a base name cannot contain separator characters.
+     *     This implies that a segment cannot contain separator characters.
      * <li>A path name may contain one or more dot ({@code "."}) or dot-dot
-     *     ({@code ".."}) base names which represent the current or parent
+     *     ({@code ".."}) segments which represent the current or parent
      *     directory respectively.
      * <li>If a path name starts with one or more separator characters its said
      *     to be <i>absolute</i>.

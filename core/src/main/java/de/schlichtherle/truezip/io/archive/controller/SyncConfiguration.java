@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  * Holds the configuration parameters for
- * {@link ArchiveControllers#sync(String, SyncConfiguration)} and
+ * {@link ArchiveControllers#sync(URI, SyncConfiguration)} and
  * {@link ArchiveController#sync(SyncConfiguration)}.
  * Note that this class is immutable and declared final.
  * Using any setter method returns a {@link #clone()} which has the respective

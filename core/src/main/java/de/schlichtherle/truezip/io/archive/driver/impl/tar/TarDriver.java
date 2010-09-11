@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.tar;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
@@ -113,12 +113,12 @@ public class TarDriver extends AbstractArchiveDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation calls {@link #newInputStream(Archive, ReadOnlyFile)
+     * This implementation calls {@link #newInputStream(ArchiveDescriptor, ReadOnlyFile)
      * newInputStream(archive, rof)} and passes the resulting stream to
-     * {@link #newTarInputArchive(Archive, InputStream)}.
+     * {@link #newTarInputArchive(ArchiveDescriptor, InputStream)}.
      */
     public InputArchive newInputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         final InputStream in = newInputStream(archive, rof);
@@ -138,10 +138,10 @@ public class TarDriver extends AbstractArchiveDriver {
      * <p>
      * Note that the returned stream should support marking for best
      * performance and will <em>always</em> be closed early by
-     * {@link #newInputArchive(Archive, ReadOnlyFile)}.
+     * {@link #newInputArchive(ArchiveDescriptor, ReadOnlyFile)}.
      */
     protected InputStream newInputStream(
-            Archive archive,
+            ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         return new ReadOnlyFileInputStream(rof);
@@ -154,7 +154,7 @@ public class TarDriver extends AbstractArchiveDriver {
      * {@code new TarInputArchive(in)}.
      */
     protected TarInputArchive newTarInputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             InputStream in)
     throws IOException {
         return new TarInputArchive(in);
@@ -167,7 +167,7 @@ public class TarDriver extends AbstractArchiveDriver {
      * and wraps the result in a new {@link MultiplexedOutputArchive}.
      */
     public OutputArchive newOutputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             OutputStream out,
             InputArchive source)
     throws IOException {
@@ -176,7 +176,7 @@ public class TarDriver extends AbstractArchiveDriver {
     }
 
     protected TarOutputArchive newTarOutputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             OutputStream out,
             TarInputArchive source)
     throws IOException {

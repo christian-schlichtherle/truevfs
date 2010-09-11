@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 
@@ -80,7 +80,7 @@ public class CheckedZipDriver extends ZipDriver {
     
     @Override
     protected ZipInputArchive newZipInputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputArchive(

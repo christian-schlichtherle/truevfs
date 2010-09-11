@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.key;
 
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ import java.util.Map;
  * <p>
  * Subclasses must use the method {@link #mapPromptingKeyProviderUIType} to
  * register a user interface class for a particular user interface class
- * identifier (the value returned by {@link PromptingKeyProvider#getUIClassID}).
+ * identifier (the value returned by {@link PromptingKeyProvider#getUITypeKey}).
  * This is best done in the constructor of the subclass.
  * <p>
  * Note that class loading and instantiation may happen in a JVM shutdown hook,
@@ -56,7 +57,8 @@ public class PromptingKeyManager extends KeyManager {
      * Values may be instances of {@link PromptingKeyProviderUI} or
      * {@link Class}.
      */
-    private final Map<String, Object> uis = new HashMap<String, Object>();
+    private final Map<Class<? extends PromptingKeyProvider>, Object> uis
+            = new HashMap<Class<? extends PromptingKeyProvider>, Object>();
 
     /**
      * Constructs a new {@code PromptingKeyManager}.
@@ -197,7 +199,7 @@ public class PromptingKeyManager extends KeyManager {
      */
     public static void resetCancelledPrompts() {
         forEachKeyProvider(new KeyProviderCommand() {
-            public void run(String resourceID, KeyProvider<?> provider) {
+            public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider)
                     ((PromptingKeyProvider<?>) provider).resetCancelledPrompt();
             }
@@ -211,32 +213,33 @@ public class PromptingKeyManager extends KeyManager {
     /**
      * Subclasses must use this method to register a user interface class
      * for a particular user interface class identifier as returned by
-     * {@link PromptingKeyProvider#getUIClassID}.
+     * {@link PromptingKeyProvider#getUITypeKey}.
      * This is best done in the constructor of the subclass
      * (this method is final).
      *
-     * @param uiClassID The identifier of the user interface class.
-     * @param uiClass The user interface class.
-     *        This class must have a nullary constructor.
-     * @see #getKeyProvider(String, Class)
+     * @param  forType The key type of the user interface class.
+     * @param  useType The value type of the user interface class.
+     *         This class must have a nullary constructor.
+     * @see    #getKeyProvider(URI, Class)
      * @throws NullPointerException If any of the parameters is
      *         {@code null}.
      * @throws IllegalArgumentException If {@code uiClass} does not
      *         provide a public constructor with no parameters.
      */
-    protected synchronized final void mapPromptingKeyProviderUIType(
-            final String uiClassID,
-            final Class<? extends PromptingKeyProviderUI> uiClass) {
-        if (uiClassID == null)
-            throw new NullPointerException("uiClassID");
+    protected final synchronized
+    void mapPromptingKeyProviderUIType(
+            final Class<? extends PromptingKeyProvider> forType,
+            final Class<? extends PromptingKeyProviderUI> useType) {
+        if (forType == null)
+            throw new NullPointerException();
         try {
-            uiClass.getConstructor((Class[]) null);
+            useType.getConstructor((Class[]) null);
         } catch (NoSuchMethodException noPublicNullaryConstructor) {
-            throw new IllegalArgumentException(uiClass.getName()
+            throw new IllegalArgumentException(useType.getName()
             + " (no public nullary constructor)",
                     noPublicNullaryConstructor);
         }
-        uis.put(uiClassID, uiClass);
+        uis.put(forType, useType);
     }
 
     /**
@@ -246,27 +249,26 @@ public class PromptingKeyManager extends KeyManager {
      * In this case, the appropriate user interface instance is determined
      * and installed in the key provider before it is returned.
      *
-     * @see KeyManager#getKeyProvider(String, Class)
+     * @see KeyManager#getKeyProvider(URI, Class)
      */
     @Override
     public KeyProvider<?> getKeyProvider(
-            final String resourceID,
+            final URI resource,
             final Class<? extends KeyProvider> type)
     throws NullPointerException, ClassCastException, IllegalArgumentException {
-        final KeyProvider<?> kp = super.getKeyProvider(resourceID, type);
-
+        final KeyProvider<?> kp = super.getKeyProvider(resource, type);
         if (kp instanceof PromptingKeyProvider) {
-            final PromptingKeyProvider<?> pkp = (PromptingKeyProvider) kp;
-            pkp.setUI(getUI(pkp.getUIClassID()));
+            final PromptingKeyProvider<?> pkp = (PromptingKeyProvider<?>) kp;
+            pkp.setUI((PromptingKeyProviderUI) getUI(pkp.getUITypeKey())); // FIXME: This is cheating!
         }
-
         return kp;
     }
 
-    private synchronized PromptingKeyProviderUI<? super PromptingKeyProvider> getUI(final String uiClassID) {
-        final Object value = uis.get(uiClassID);
-
-        final PromptingKeyProviderUI<? super PromptingKeyProvider> ui;
+    private synchronized
+    PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> getUI(
+            final Class<? extends PromptingKeyProvider> forType) {
+        final Object value = uis.get(forType);
+        final PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> ui;
         if (value instanceof Class) {
             try {
                 ui = (PromptingKeyProviderUI) ((Class) value).newInstance();
@@ -275,14 +277,13 @@ public class PromptingKeyManager extends KeyManager {
             } catch (IllegalAccessException failure) {
                 throw new UndeclaredThrowableException(failure);
             }
-            uis.put(uiClassID, ui);
+            uis.put(forType, ui);
         } else if (value != null) {
             ui = (PromptingKeyProviderUI) value;
         } else { // value == null
-            throw new IllegalArgumentException(uiClassID +
+            throw new IllegalArgumentException(forType +
                     " (unknown user interface for PromptingKeyProvider)");
         }
-
         return ui;
     }
 }

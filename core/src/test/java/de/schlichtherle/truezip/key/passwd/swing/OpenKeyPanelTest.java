@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 
 import java.awt.EventQueue;
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -95,12 +96,13 @@ public class OpenKeyPanelTest extends TestCase {
         });
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testResourceID() {
-        final String resourceID = "Hello world!";
-        instance.setResourceID(resourceID);
-        assertEquals(resourceID, instance.getResourceID());
+        final URI id = URI.create("HelloWorld!");
+        instance.setResource(id);
+        assertEquals(id, instance.getResource());
 
-        new JTextComponentOperator(frame, resourceID);
+        new JTextComponentOperator(frame, id.toString());
     }
 
     /**

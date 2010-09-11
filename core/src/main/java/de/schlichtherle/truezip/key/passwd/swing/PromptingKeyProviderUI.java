@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
+import java.net.URI;
 import de.schlichtherle.truezip.awt.EventDispatchTimeoutException;
 import de.schlichtherle.truezip.awt.EventQueue;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
@@ -46,14 +47,15 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * @version $Id$
  */
 public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
-        implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<P> {
+implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
 
-    private static final String PACKAGE_NAME
-            = "de.schlichtherle.truezip.key.passwd.swing";
     private static final String CLASS_NAME
-            = PACKAGE_NAME + ".PromptingKeyProviderUI";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(CLASS_NAME);
+            = PromptingKeyProviderUI.class.getName();
     private static final Logger logger = Logger.getLogger(CLASS_NAME);
+    private static final ResourceBundle resources
+            = ResourceBundle.getBundle(CLASS_NAME);
+    private static final String PACKAGE_NAME
+            = PromptingKeyProviderUI.class.getPackage().getName();
 
     /**
      * The timeout for the EDT to <em>start</em> prompting for a key in
@@ -71,14 +73,14 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
     // output.
     public static final int KEY_FILE_LEN = 512;
 
-    private static final Map<KeyProvider, OpenKeyPanel> openKeyPanels
-            = new WeakHashMap<KeyProvider, OpenKeyPanel>();
+    private static final Map<PromptingKeyProvider, OpenKeyPanel> openKeyPanels
+            = new WeakHashMap<PromptingKeyProvider, OpenKeyPanel>();
 
     /**
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    static String lastResourceID = "";
+    static URI lastResource = URI.create("null:/"); // NOI18N
 
     private Feedback unknownCreateKeyFeedback;
     private Feedback invalidCreateKeyFeedback;
@@ -235,9 +237,9 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
                 // de-highlighting the resource ID in the panel if the
                 // loop iteration has to be repeated due to an invalid
                 // user input.
-                final String resourceID = provider.getResourceID();
-                assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
-                createKeyPanel.setResourceID(resourceID);
+                final URI resource = provider.getResource();
+                assert resource != null : "violation of contract for PromptingKeyProviderUI";
+                createKeyPanel.setResource(resource);
                 createKeyPanel.setFeedback(createKeyPanel.getError() != null
                         ? getInvalidCreateKeyFeedback()
                         : getUnknownCreateKeyFeedback());
@@ -312,9 +314,9 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<Cloneable>>
                 // de-highlighting the resource ID in the panel if the
                 // loop iteration has to be repeated due to an invalid
                 // user input.
-                final String resourceID = provider.getResourceID();
-                assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
-                openKeyPanel.setResourceID(resourceID);
+                final URI resource = provider.getResource();
+                assert resource != null : "violation of contract for PromptingKeyProviderUI";
+                openKeyPanel.setResource(resource);
                 openKeyPanel.setFeedback(openKeyPanel.getError() != null
                         ? getInvalidOpenKeyFeedback()
                         : getUnknownOpenKeyFeedback());

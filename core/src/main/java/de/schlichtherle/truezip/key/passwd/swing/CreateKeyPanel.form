@@ -87,7 +87,7 @@
     <Component class="javax.swing.JLabel" name="prompt">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="resourceID"/>
+          <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/schlichtherle/truezip/key/passwd/swing/CreateKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
@@ -103,7 +103,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JTextPane" name="resourceID">
+    <Component class="javax.swing.JTextPane" name="resource">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">

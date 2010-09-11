@@ -181,6 +181,8 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     private void setPredecessor(
             final ChainableIOException predecessor) {
+        if (this.predecessor == predecessor)
+            return;
         if (this.predecessor != this)
             throw new IllegalStateException("Can't overwrite predecessor!");
         if (predecessor == this)
@@ -192,7 +194,8 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     /**
      * Initializes the <i>predecessor</i> of this chainable I/O exception to
-     * the given object. This method can be called at most once.
+     * the given object. This method can be called at most once unless the
+     * given predecessor is the same as the previously initialized predecessor.
      *
      * @param predecessor An exception that happened <em>before</em> and is
      *        <em>not</em> the cause for this exception!

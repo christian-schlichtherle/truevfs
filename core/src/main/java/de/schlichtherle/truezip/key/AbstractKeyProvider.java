@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.key;
 
 import java.lang.reflect.Array;
+import java.net.URI;
 
 /**
  * This abstract class implements the base functionality required to be a
@@ -217,7 +218,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * This allows subclasses to add additional behaviour or constraints
      * whenever an instance is mapped in the {@code KeyManager}.
      *
-     * @param resourceID The resource identifier to map this instance for.
+     * @param resource The resource identifier to map this instance for.
      * @return The key provider previously mapped for the given resource
      *         identifier or {@code null} if no key provider was mapped.
      * @throws NullPointerException If {@code resourceID} is
@@ -227,8 +228,8 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    protected KeyProvider<?> addToKeyManager(String resourceID) {
-        return KeyManager.mapKeyProvider(resourceID, this);
+    protected KeyProvider<?> addToKeyManager(URI resource) {
+        return KeyManager.mapKeyProvider(resource, this);
     }
 
     /**
@@ -240,7 +241,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      * This allows subclasses to add additional behaviour or constraints
      * whenever an instance is unmapped in the {@code KeyManager}.
      *
-     * @param resourceID The resource identifier to unmap this instance from.
+     * @param resource The resource identifier to unmap this instance from.
      * @return The key provider previously mapped for the given resource
      *         identifier.
      * @throws NullPointerException If {@code resourceID} is
@@ -250,7 +251,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         Please refer to the respective subclass documentation for
      *         more information about its constraint(s).
      */
-    protected KeyProvider<?> removeFromKeyManager(String resourceID) {
-        return KeyManager.unmapKeyProvider(resourceID);
+    protected KeyProvider<?> removeFromKeyManager(URI resource) {
+        return KeyManager.mapKeyProvider(resource, null);
     }
 }

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.spi;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.archive.driver.OutputArchive;
@@ -241,7 +241,7 @@ implements ArchiveDriver<AE, IA, OA>, Serializable {
      * @param archive Ignored.
      */
     @Override
-    public Icon getOpenIcon(Archive archive) {
+    public Icon getOpenIcon(ArchiveDescriptor archive) {
         return null;
     }
 
@@ -252,7 +252,7 @@ implements ArchiveDriver<AE, IA, OA>, Serializable {
      * returns {@code null}.
      */
     @Override
-    public Icon getClosedIcon(Archive archive) {
+    public Icon getClosedIcon(ArchiveDescriptor archive) {
         return null;
     }
 

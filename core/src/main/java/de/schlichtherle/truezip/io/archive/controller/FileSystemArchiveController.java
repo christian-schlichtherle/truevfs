@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * This archive controller implements the automounting functionality.
@@ -38,11 +39,10 @@ abstract class FileSystemArchiveController extends ArchiveController {
      * Creates a new instance of FileSystemArchiveController
      */
     FileSystemArchiveController(
-            java.io.File target,
+            URI mountPoint,
             ArchiveController enclController,
-            String enclEntryName,
             ArchiveDriver driver) {
-        super(target, enclController, enclEntryName, driver);
+        super(mountPoint, enclController, driver);
     }
 
     @Override

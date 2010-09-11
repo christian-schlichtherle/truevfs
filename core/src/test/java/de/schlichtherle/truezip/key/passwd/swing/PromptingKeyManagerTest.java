@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import java.awt.Window;
+import java.net.URI;
 import java.util.Random;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -62,10 +63,12 @@ public class PromptingKeyManagerTest extends TestCase {
         super(testName);
     }
 
+    @Override
     protected void setUp() throws Exception {
         JemmyProperties.setCurrentDispatchingModel(JemmyProperties.getDefaultDispatchingModel());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         PromptingKeyManager.resetAndRemoveKeyProviders();
     }
@@ -116,7 +119,7 @@ public class PromptingKeyManagerTest extends TestCase {
     }
 
     private void testMultithreadedKeyMgmtLifeCycle(final int nThreads) {
-        final String RESOURCE_PREFIX = "Resource ID ";
+        final URI RESOURCE_PREFIX = URI.create("Resource ID");
         final Random rnd = new Random();
 
         // Init required threads for each resource.
@@ -125,7 +128,7 @@ public class PromptingKeyManagerTest extends TestCase {
         final KeyMgmtLifeCycleThread[] kmlcThreads
                 = new KeyMgmtLifeCycleThread[nThreads];
         for (int i = 0; i < nThreads; i++) {
-            final String resource = RESOURCE_PREFIX + i;
+            final URI resource = RESOURCE_PREFIX.resolve("" + i);
 
             // Init, but don't yet start Remote Control Thread.
             final RemoteControl rc = (i % 2 == 0)

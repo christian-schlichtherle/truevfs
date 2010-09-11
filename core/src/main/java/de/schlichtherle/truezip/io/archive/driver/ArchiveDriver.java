@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -32,7 +32,7 @@ import javax.swing.Icon;
  * This "driver" interface is used as an abstract factory which reads and
  * writes archives of a particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ,
  * TAR.BZ2 or any other.
- * Archive drivers may be shared by their client applications.
+ * ArchiveDescriptor drivers may be shared by their client applications.
  * <p>
  * The following requirements must be met by any implementation:
  * <ul>
@@ -113,7 +113,7 @@ extends ArchiveEntryFactory<AE> {
      *         written or deleted.
      * @see    InputArchive
      */
-    IA newInputArchive(Archive archive, ReadOnlyFile rof)
+    IA newInputArchive(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
@@ -144,7 +144,7 @@ extends ArchiveEntryFactory<AE> {
      *         when writing the output archive.
      * @see    OutputArchive
      */
-    OA newOutputArchive(Archive archive, OutputStream out, IA source)
+    OA newOutputArchive(ArchiveDescriptor archive, OutputStream out, IA source)
     throws IOException;
 
     /**
@@ -157,7 +157,7 @@ extends ArchiveEntryFactory<AE> {
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
-    Icon getOpenIcon(Archive archive);
+    Icon getOpenIcon(ArchiveDescriptor archive);
 
     /**
      * Returns the icon that
@@ -171,5 +171,5 @@ extends ArchiveEntryFactory<AE> {
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
-    Icon getClosedIcon(Archive archive);
+    Icon getClosedIcon(ArchiveDescriptor archive);
 }

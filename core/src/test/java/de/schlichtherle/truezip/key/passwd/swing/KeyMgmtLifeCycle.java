@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class KeyMgmtLifeCycle implements Runnable {
             = Logger.getLogger(KeyMgmtLifeCycle.class.getName());
 
     /** The identifier of the protected resource. */
-    public final String id;
+    public final URI id;
 
     /** The reference key for the resource. */
     private Object refKey;
@@ -53,7 +54,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     /**
      * @param id The identifier of the protected resource.
      */
-    public KeyMgmtLifeCycle(final String id) {
+    public KeyMgmtLifeCycle(final URI id) {
         this.id = id;
     }
 
@@ -97,7 +98,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         createResourceHook(provider);
     }
 
-    protected KeyProvider getKeyProvider(KeyManager manager, String id) {
+    protected KeyProvider getKeyProvider(KeyManager manager, URI id) {
         return manager.getKeyProvider(id, KeyProvider.class);
     }
 

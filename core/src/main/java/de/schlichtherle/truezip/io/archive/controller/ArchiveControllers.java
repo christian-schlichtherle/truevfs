@@ -16,24 +16,26 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Operation;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -44,7 +46,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.Files.getRealFile;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
 
 /**
@@ -62,13 +65,13 @@ public final class ArchiveControllers {
 
     /**
      * The map of all archive controllers.
-     * The keys are plain {@link java.io.File} instances and the values
-     * are either {@code ArchiveController}s or {@link WeakReference}s
-     * to {@code ArchiveController}s.
+     * The keys are plain {@link URI} instances and the values are either
+     * {@code ArchiveController}s or {@link WeakReference}s to
+     * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<java.io.File, Object> controllers
-            = new WeakHashMap<java.io.File, Object>();
+    private static final Map<URI, Object> controllers
+            = new WeakHashMap<URI, Object>();
 
     private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
             = new Comparator<ArchiveController>() {
@@ -105,20 +108,21 @@ public final class ArchiveControllers {
      *     not a valid name for an archive file</li>
      * </ul>
      */
-    public static ArchiveController get(final File file) {
-        assert file != null;
-        assert file.isArchive();
-
-        final java.io.File target = getRealFile(file.getDelegate());
-        final ArchiveDriver driver = file.getArchiveDetector()
-                .getArchiveDriver(target.getPath());
-        assert driver != null : "Not an archive file: " + file.getPath();
-
+    public static ArchiveController get(
+            URI mountPoint,
+            final ArchiveController enclController,
+            final ArchiveDriver driver) {
+        if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
+        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
+        //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
+        mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
+        assert mountPoint.getPath().endsWith(SEPARATOR);
+        if (driver == null) throw new NullPointerException();
         ArchiveController controller = null;
         boolean reconfigure = false;
         try {
             synchronized (controllers) {
-                final Object value = controllers.get(target);
+                final Object value = controllers.get(mountPoint);
                 if (value instanceof Reference) {
                     controller = (ArchiveController) ((Reference) value).get();
                     // Check that the controller hasn't been garbage collected
@@ -139,29 +143,17 @@ public final class ArchiveControllers {
                     // In effect, for an application this means that the
                     // reconfiguration of a previously used ArchiveController
                     // is only guaranteed to happen if
-                    // (1) File.sync() or File.sync() has been called and
-                    // (2) a new File instance referring to the previously used
+                    // (1) sync(*) has been called and
+                    // (2) a new File object referring to the previously used
                     // archive file as either the file itself or one
                     // of its ancestors is created with a different
                     // ArchiveDetector.
                     return (ArchiveController) value;
                 }
-
-                final File enclArchive = file.getEnclArchive();
-                final ArchiveController enclController;
-                final String enclEntryName;
-                if (enclArchive != null) {
-                    enclController = enclArchive.getArchiveController();
-                    enclEntryName = file.getEnclEntryName();
-                } else {
-                    enclController = null;
-                    enclEntryName = null;
-                }
-
                 // TODO: Refactor this to a more flexible design which supports
                 // different sync strategies, like update or append.
                 controller = new UpdatingArchiveController(
-                        target, enclController, enclEntryName, driver);
+                        mountPoint, enclController, driver);
             }
         } finally {
             if (reconfigure) {
@@ -173,26 +165,27 @@ public final class ArchiveControllers {
                 }
             }
         }
-
         return controller;
     }
 
     /**
-     * Associates the given archive controller to the target file.
+     * Associates the given archive controller to its mount point.
      *
-     * @param target The target file. This must not be {@code null} or
-     *        an instance of the {@code File} class in this package!
+     * @param mountPoint the non-{@code null} URI for the mount point of the
+     *        target archive file.
      * @param controller An {@link ArchiveController} or a
      *        {@link WeakReference} to an {@link ArchiveController}.
+     * @see   ArchiveDescriptor#getMountPoint()
      */
-    static void set(final java.io.File target, final Object controller) {
-        assert target != null;
-        assert !(target instanceof File);
+    static void map(URI mountPoint, final Object controller) {
+        assert mountPoint.isAbsolute();
+        assert !mountPoint.isOpaque();
+        assert mountPoint.equals(URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize());
         assert controller instanceof ArchiveController
             || ((WeakReference) controller).get() instanceof ArchiveController;
 
         synchronized (controllers) {
-            controllers.put(target, controller);
+            controllers.put(mountPoint, controller);
         }
     }
 
@@ -224,15 +217,14 @@ public final class ArchiveControllers {
      *         {@code closeOutputStreams} is {@code true}.
      * @see ArchiveController#sync(SyncConfiguration)
      */
-    public static void sync(final String prefix, SyncConfiguration config)
+    public static void sync(final URI prefix, SyncConfiguration config)
     throws SyncException {
         if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
             throw new IllegalArgumentException();
         config = config.setReassemble(true);
 
         int total = 0, touched = 0;
-        logger.log(Level.FINE, "update.entering", // NOI18N
-                new Object[] {
+        logger.log(Level.FINE, "sync.try", new Object[] { // NOI18N
             prefix,
             config.getWaitForInputStreams(),
             config.getCloseInputStreams(),
@@ -282,11 +274,11 @@ public final class ArchiveControllers {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (SyncException chain) {
-            logger.log(Level.FINE, "update.throwing", chain);// NOI18N
-            throw chain;
+        } catch (SyncException ex) {
+            logger.log(Level.FINE, "sync.catch", ex);// NOI18N
+            throw ex;
         }
-        logger.log(Level.FINE, "update.exiting", // NOI18N
+        logger.log(Level.FINE, "sync.return", // NOI18N
                 new Object[] { total, touched });
     }
 
@@ -294,9 +286,9 @@ public final class ArchiveControllers {
         return get(null, null);
     }
 
-    static Iterable<? extends ArchiveController> get(String prefix, final Comparator c) {
+    static Iterable<? extends ArchiveController> get(URI prefix, final Comparator c) {
         if (prefix == null)
-            prefix = "";
+            prefix = URI.create(""); // catch all
 
         final Set<ArchiveController> snapshot;
         synchronized (controllers) {
@@ -317,7 +309,7 @@ public final class ArchiveControllers {
                 }
                 assert value != null;
                 assert value instanceof ArchiveController;
-                if (((ArchiveController) value).getCanonicalPath().startsWith(prefix))
+                if (((ArchiveController) value).getMountPoint().toString().startsWith(prefix.toString()))
                     snapshot.add((ArchiveController) value);
             }
         }
@@ -407,7 +399,7 @@ public final class ArchiveControllers {
                     }
                 } finally {
                     try {
-                        ArchiveControllers.sync("", new SyncConfiguration());
+                        ArchiveControllers.sync(null, new SyncConfiguration());
                     } catch (SyncException ouch) {
                         ouch.printStackTrace();
                     }
@@ -526,12 +518,12 @@ public final class ArchiveControllers {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
             // find out which controller actually detected the false positive.
-            if (!dstController.getCanonicalPath().equals(ex.getCanonicalPath())) {
+            if (!dstController.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // not my job - pass on!
-            }      // Reroute call to the destination's enclosing archive controller.
+            // Reroute call to the destination's enclosing archive controller.
             copy(preserve, srcController, srcPath,
-                    dstController.getEnclController(),
-                    dstController.enclEntryName(dstPath));
+                    dstController.getEnclDescriptor(),
+                    dstController.getEnclPath(dstPath));
         }
     }
 
@@ -556,7 +548,7 @@ public final class ArchiveControllers {
      */
     public static void copy(
             final boolean preserve,
-            final java.io.File src,
+            final File src,
             final InputStream in,
             final ArchiveController dstController,
             final String dstPath)
@@ -619,11 +611,11 @@ public final class ArchiveControllers {
                 out.close();
             }
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert dstController.getCanonicalPath().equals(ex.getCanonicalPath());
+            assert dstController.getMountPoint().equals(ex.getMountPoint());
             // Reroute call to the destination's enclosing ArchiveController.
             copy(   preserve, src, in,
-                    dstController.getEnclController(),
-                    dstController.enclEntryName(dstPath));
+                    dstController.getEnclDescriptor(),
+                    dstController.getEnclPath(dstPath));
         }
     }
 

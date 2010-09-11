@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
@@ -70,7 +70,7 @@ public final class InputArchiveMetaData {
      * However, it's provided for symmetry between input archive meta data
      * and output archive meta data.
      */
-    //private final Archive archive;
+    //private final ArchiveDescriptor archive;
 
     private final InputArchive inArchive;
 
@@ -97,7 +97,7 @@ public final class InputArchiveMetaData {
      * Creates a new instance of {@code InputArchiveMetaData}
      * and sets itself as the meta data for the given input archive.
      */
-    InputArchiveMetaData(final Archive archive, final InputArchive inArchive) {
+    InputArchiveMetaData(final ArchiveDescriptor archive, final InputArchive inArchive) {
         assert inArchive != null;
 
         //this.archive = archive;

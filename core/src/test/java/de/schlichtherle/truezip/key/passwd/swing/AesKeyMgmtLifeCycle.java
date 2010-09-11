@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
+import java.net.URI;
 import java.util.logging.Logger;
 
 /**
@@ -35,12 +36,12 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
     /**
      * @param id The identifier of the protected resource.
      */
-    public AesKeyMgmtLifeCycle(final String id) {
+    public AesKeyMgmtLifeCycle(final URI id) {
         super(id);
     }
 
     @Override
-    protected KeyProvider getKeyProvider(KeyManager manager, String id) {
+    protected KeyProvider getKeyProvider(KeyManager manager, URI id) {
         return manager.getKeyProvider(id, AesKeyProvider.class);
     }
 

@@ -364,12 +364,12 @@ final class Files {
                 }
             } catch (ArchiveEntryFalsePositiveException ex) {
                 throw ex;
-            } catch (FalsePositiveException isNotArchive) {
+            } catch (FalsePositiveException ex) {
                 // Both the source and/or the destination may be false positives,
                 // so we need to use the exception's additional information to
                 // find out which controller actually detected the false positive.
-                if (isNotArchive.getCanonicalPath().equals(srcController.getCanonicalPath()))
-                    throw isNotArchive; // not my job - pass on!
+                if (srcController.getMountPoint().equals(ex.getMountPoint()))
+                    throw ex; // not my job - pass on!
             }
 
             final InputStream in;
@@ -400,11 +400,11 @@ final class Files {
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {
-            assert srcController.getCanonicalPath().equals(ex.getCanonicalPath());
+            assert srcController.getMountPoint().equals(ex.getMountPoint());
             // Reroute call to the source's enclosing archive controller.
-            copy0(    preserve,
-                    srcController.getEnclController(),
-                    srcController.enclEntryName(srcPath),
+            copy0(  preserve,
+                    srcController.getEnclDescriptor(),
+                    srcController.getEnclPath(srcPath),
                     dst);
         }
     }

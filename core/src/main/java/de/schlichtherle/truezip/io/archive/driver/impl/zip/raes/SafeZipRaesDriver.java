@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.impl.zip.raes;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.impl.zip.CheckedZipInputArchive;
 import de.schlichtherle.truezip.io.archive.driver.impl.zip.ZipInputArchive;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -106,7 +106,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      */
     @Override
     protected ZipInputArchive newZipInputArchive(
-            Archive archive,
+            ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the

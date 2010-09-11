@@ -18,8 +18,6 @@ package de.schlichtherle.truezip.io.archive;
 
 /**
  * Describes general properties of any archive.
- * A single instance of this interface is created for every
- * canonical path name representation of an archive file.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use!
  * Client applications should never implement this interface because more

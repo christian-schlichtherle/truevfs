@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
@@ -30,19 +30,19 @@ extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    SyncWarningException(Archive archive) {
+    SyncWarningException(ArchiveDescriptor archive) {
         super(archive, -1);
     }
 
-    SyncWarningException(Archive archive, String message) {
+    SyncWarningException(ArchiveDescriptor archive, String message) {
         super(archive, message, -1);
     }
 
-    SyncWarningException(Archive archive, Throwable cause) {
+    SyncWarningException(ArchiveDescriptor archive, Throwable cause) {
         super(archive, cause, -1);
     }
 
-    SyncWarningException(Archive archive, String message, Throwable cause) {
+    SyncWarningException(ArchiveDescriptor archive, String message, Throwable cause) {
         super(archive, message, cause, -1);
     }
 }

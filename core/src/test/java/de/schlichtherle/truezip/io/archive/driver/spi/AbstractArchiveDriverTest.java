@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.spi;
 
 import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
 import de.schlichtherle.truezip.io.archive.driver.spi.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.InputArchive;
@@ -179,10 +179,10 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public InputArchive newInputArchive(Archive archive, ReadOnlyFile rof)
+        public InputArchive newInputArchive(ArchiveDescriptor archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
-                    archive.getCanonicalPath() + " (inaccessible archive file)");
+                    archive.getMountPoint() + " (inaccessible archive file)");
         }
 
         @Override
@@ -192,19 +192,19 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public OutputArchive newOutputArchive(Archive archive, OutputStream out, InputArchive source)
+        public OutputArchive newOutputArchive(ArchiveDescriptor archive, OutputStream out, InputArchive source)
         throws IOException {
             throw new FileNotFoundException(
-                    archive.getCanonicalPath() + " (inaccessible archive file)");
+                    archive.getMountPoint() + " (inaccessible archive file)");
         }
 
         @Override
-        public Icon getOpenIcon(Archive archive) {
+        public Icon getOpenIcon(ArchiveDescriptor archive) {
             return ICON;
         }
 
         @Override
-        public Icon getClosedIcon(Archive archive) {
+        public Icon getClosedIcon(ArchiveDescriptor archive) {
             return ICON;
         }
     }

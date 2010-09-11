@@ -115,7 +115,8 @@ public interface KeyProvider<K extends Cloneable> {
      * Returns the key which should be used to create a new protected
      * resource or entirely replace the contents of an already existing
      * protected resource.
-     * Hence, this key does not need to be authenticated.
+     * Hence, this key is not going to be used to authenticate an existing
+     * resource by the client application.
      * <p>
      * For each call to this method an object is returned which compares
      * {@link Object#equals equal} to the previously returned object, but is
@@ -134,9 +135,10 @@ public interface KeyProvider<K extends Cloneable> {
     /**
      * Returns the key which should be used to open an existing protected
      * resource in order to access its contents.
-     * Hence, this key needs to be authenticated.
+     * Hence, this key is going to be used to authenticate an existing
+     * resource by the client application.
      * If the authentication fails, {@link #invalidOpenKey} must be called
-     * immediately to indicate this situation.
+     * immediately to indicate this issue.
      * <p>
      * Unless {@link #invalidOpenKey} is called, on each call to this method
      * an object is returned which compares {@link Object#equals equal} to

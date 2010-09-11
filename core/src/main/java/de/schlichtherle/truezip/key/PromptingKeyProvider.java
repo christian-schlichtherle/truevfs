@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.key;
 
+import java.net.URI;
 import java.util.Arrays;
 
 /**
@@ -37,7 +38,7 @@ import java.util.Arrays;
  * <p>
  * Unlike its base class, instances of this class cannot get shared
  * among multiple protected resources because each instance has a unique
- * {@link #getResourceID() resource identifier} associated with it.
+ * {@link #getResource() resource identifier} associated with it.
  * Each try to share a key provider of this class among multiple protected
  * resources with the singleton {@link KeyManager} will be prosecuted and
  * sentenced with an {@link IllegalStateException} or, at the discretion of
@@ -52,7 +53,7 @@ import java.util.Arrays;
  * @version $Id$
  */
 public class PromptingKeyProvider<K extends Cloneable>
-        extends AbstractKeyProvider<K> {
+extends AbstractKeyProvider<K> {
 
     /**
      * Used to lock out prompting by multiple threads.
@@ -68,7 +69,7 @@ public class PromptingKeyProvider<K extends Cloneable>
     private final PromptingLock lock = new PromptingLock();
 
     /** The resource identifier for the protected resource. */
-    private String resourceID;
+    private URI resource;
 
     private State state = State.RESET;
 
@@ -77,15 +78,15 @@ public class PromptingKeyProvider<K extends Cloneable>
     /**
      * The user interface instance which is used to prompt the user for a key.
      */
-    private PromptingKeyProviderUI<? super PromptingKeyProvider<? super K>> ui;
+    private PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> ui;
 
     /**
      * Returns the unique resource identifier (resource ID) of the protected
      * resource for which this key provider is used.
      * May be {@code null}.
      */
-    public final synchronized String getResourceID() {
-        return resourceID;
+    public final synchronized URI getResource() {
+        return resource;
     }
 
     /**
@@ -93,8 +94,8 @@ public class PromptingKeyProvider<K extends Cloneable>
      * resource for which this key provider is used.
      * May be {@code null}.
      */
-    final synchronized void setResourceID(String resourceID) {
-        this.resourceID = resourceID;
+    final synchronized void setResource(URI resource) {
+        this.resource = resource;
     }
 
     /**
@@ -121,30 +122,29 @@ public class PromptingKeyProvider<K extends Cloneable>
     }
 
     /**
-     * Returns the identifier which is used by the {@link PromptingKeyManager}
+     * Returns the key which is used by the {@link PromptingKeyManager}
      * to look up an instance of the {@link PromptingKeyProviderUI} user
-     * interface class which is then used to prompt the user for a key.
+     * interface class which is subsequently used to prompt the user for a key.
      * <p>
-     * Subclasses which want to use a custom user interface should overwrite
-     * this method to return the name of their respective class as the
+     * Subclasses which want to use a custom key may overwrite this method to
+     * return the name of their respective class as the
      * identifier and provide a custom {@code PromptingKeyManager} which has
      * registered a {@code PromptingKeyProviderUI} class for this identifier.
      * <p>
-     * The implementation in this class returns the simple name of this class,
-     * {@code PromptingKeyProvider}.
+     * The implementation in this class simply returns its class object,
+     * {@code PromptingKeyProvider.class}.
      */
-    protected String getUIClassID() {
-        return "PromptingKeyProvider";
+    protected Class<? extends PromptingKeyProvider> getUITypeKey() {
+        return PromptingKeyProvider.class;
     }
 
     private synchronized
-    PromptingKeyProviderUI<? super PromptingKeyProvider<? super K>>
-    getUI() {
+    PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> getUI() {
         return ui;
     }
 
     final synchronized void setUI(
-    final PromptingKeyProviderUI<? super PromptingKeyProvider<? super K>> ui) {
+            final PromptingKeyProviderUI<K, ? super PromptingKeyProvider<K>> ui) {
         this.ui = ui;
     }
 
@@ -322,14 +322,14 @@ public class PromptingKeyProvider<K extends Cloneable>
      */
     // TODO: Make this redundant: It's not failsafe!
     @Override
-    protected synchronized KeyProvider<?> addToKeyManager(final String resourceID)
+    protected synchronized KeyProvider<?> addToKeyManager(final URI resource)
     throws NullPointerException, IllegalStateException {
-        final String oldResourceID = getResourceID();
-        if (oldResourceID != null && !resourceID.equals(oldResourceID))
+        final URI oldResource = getResource();
+        if (oldResource != null && !resource.equals(oldResource))
             throw new IllegalStateException(
-                    "this provider is used for resource ID \"" + oldResourceID + "\"");
-        final KeyProvider provider = super.addToKeyManager(resourceID);
-        setResourceID(resourceID);
+                    "this provider is used for resource ID \"" + oldResource + "\"");
+        final KeyProvider provider = super.addToKeyManager(resource);
+        setResource(resource);
 
         return provider;
     }
@@ -347,15 +347,16 @@ public class PromptingKeyProvider<K extends Cloneable>
      */
     // TODO: Make this redundant: It's not failsafe!
     @Override
-    protected synchronized KeyProvider<?> removeFromKeyManager(final String resourceID)
+    protected synchronized KeyProvider<?> removeFromKeyManager(
+            final URI resource)
     throws NullPointerException, IllegalStateException {
-        final String oldResourceID = getResourceID();
-        if (!resourceID.equals(oldResourceID))
+        final URI oldResource = getResource();
+        if (!resource.equals(oldResource))
             throw new IllegalStateException(
-                    "this provider is used for resource ID \"" + oldResourceID + "\"");
-        final KeyProvider provider = super.removeFromKeyManager(resourceID);
+                    "this provider is used for resource ID \"" + oldResource + "\"");
+        final KeyProvider provider = super.removeFromKeyManager(resource);
         assert provider == null || provider == this : "";
-        setResourceID(null);
+        setResource(null);
         return provider;
     }
 

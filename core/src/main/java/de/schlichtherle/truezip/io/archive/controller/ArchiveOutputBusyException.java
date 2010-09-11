@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.Archive;
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 
 /**
  * Like its super class, but indicates the existance of open output streams.
@@ -30,7 +30,7 @@ extends ArchiveBusyException {
     private static final long serialVersionUID = 4652936465192837172L;
 
     // TODO: Make this package private!
-    public ArchiveOutputBusyException(Archive archive, int numStreams) {
+    public ArchiveOutputBusyException(ArchiveDescriptor archive, int numStreams) {
         super(archive, numStreams);
     }
 }

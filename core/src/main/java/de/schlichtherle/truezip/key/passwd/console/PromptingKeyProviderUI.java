@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key.passwd.console;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import java.io.Console;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
@@ -28,11 +29,11 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[]>>
-        implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<P> {
+public class PromptingKeyProviderUI<P extends PromptingKeyProvider<char[]>>
+implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
 
     private static final String CLASS_NAME
-            = "de.schlichtherle.truezip.key.passwd.console.PromptingKeyProviderUI";
+            = PromptingKeyProviderUI.class.getName();
     protected static final ResourceBundle resources
             = ResourceBundle.getBundle(CLASS_NAME);
 
@@ -55,16 +56,16 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    private static String lastResourceID = "";
+    private static URI lastResource = URI.create("null:/"); // NOI18N
 
     public final void promptCreateKey(final P provider) {
         synchronized (lock) {
-            final String resourceID = provider.getResourceID();
-            assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
-            if (!resourceID.equals(lastResourceID))
+            final URI resource = provider.getResource();
+            assert resource != null : "violation of contract for PromptingKeyProviderUI";
+            if (!resource.equals(lastResource))
                 con.printf(resources.getString("createKey.banner"),
-                        provider.getResourceID());
-            lastResourceID = resourceID;
+                        provider.getResource());
+            lastResource = resource;
 
             while (true) {
                 char[] newPasswd1 = con.readPassword(
@@ -114,12 +115,12 @@ public class PromptingKeyProviderUI<P extends PromptingKeyProvider<? super char[
         if (invalid)
             con.printf(resources.getString("openKey.invalid"));
 
-        final String resourceID = provider.getResourceID();
-        assert resourceID != null : "violation of contract for PromptingKeyProviderUI";
-        if (!resourceID.equals(lastResourceID))
+        final URI resource = provider.getResource();
+        assert resource != null : "violation of contract for PromptingKeyProviderUI";
+        if (!resource.equals(lastResource))
             con.printf(resources.getString("openKey.banner"),
-                    provider.getResourceID());
-        lastResourceID = resourceID;
+                    provider.getResource());
+        lastResource = resource;
 
         char[] passwd = con.readPassword(resources.getString("openKey.passwd"));
         if (passwd == null || passwd.length <= 0) {

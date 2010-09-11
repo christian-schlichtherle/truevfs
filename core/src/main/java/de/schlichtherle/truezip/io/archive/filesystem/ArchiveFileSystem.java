@@ -113,7 +113,7 @@ extends Iterable<IOReference<? extends ArchiveEntry>> {
      * An I/O operation for creating (and hence probably replacing) and
      * linking file system entries into this virtual archive file system.
      *
-     * @see #link
+     * @see #mknod
      */
     interface Link
     extends IOOperation, IOReference<ArchiveEntry> {

@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.key.passwd.swing;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.net.URI;
 import java.util.Random;
 import javax.swing.JPasswordField;
 import junit.framework.Assert;
@@ -46,7 +47,7 @@ public class RemoteControl extends Assert implements Runnable {
     private static final Random rnd = new Random();
 
     /** The identifier of the protected resource. */
-    public final String id;
+    public final URI id;
 
     /**
      * Contains non-{@code null} if and only if {@code run()} has
@@ -54,7 +55,7 @@ public class RemoteControl extends Assert implements Runnable {
      */
     public Throwable throwable;
 
-    public RemoteControl(final String id) {
+    public RemoteControl(final URI id) {
         this.index = counter++;
         this.id = id;
     }
@@ -247,7 +248,7 @@ public class RemoteControl extends Assert implements Runnable {
             return null != JTextComponentOperator.findJTextComponent(
                         (Container) comp,
                         new JTextComponentOperator.JTextComponentByTextFinder(
-                            id,
+                            id.toString(),
                             new Operator.DefaultStringComparator(true, true)));
         }
 
