@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
@@ -347,6 +347,9 @@ public class File extends java.io.File {
 
     /** The prefix of a UNC (a Windows concept). */
     private static final String uncPrefix = separator + separator;
+
+    private static boolean lenient
+            = !Boolean.getBoolean(File.class.getPackage().getName() + ".strict");
 
     private static ArchiveDetector defaultDetector = ArchiveDetector.DEFAULT;
 
@@ -1464,7 +1467,7 @@ public class File extends java.io.File {
      * @see #setLenient(boolean)
      */
     public static boolean isLenient() {
-        return ArchiveControllers.isLenient();
+        return lenient;
     }
 
     /**
@@ -1552,7 +1555,7 @@ public class File extends java.io.File {
      * @see #isLenient()
      */
     public static void setLenient(boolean lenient) {
-        ArchiveControllers.setLenient(lenient);
+        File.lenient = lenient;
     }
 
     /**
@@ -2834,15 +2837,6 @@ public class File extends java.io.File {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-            // We are trying to create a directory which is enclosed in a false
-            // positive archive file which is actually a regular
-            // directory in the real file system.
-            // Now the directory we are trying to create must not be an archive
-            // file, because otherwise its controller would have identified
-            // the enclosing archive file as a false positive real directory
-            // and created its file system accordingly, to the effect that
-            // we would never get here.
-            assert !isArchive();
         }
         return delegate.mkdir();
     }

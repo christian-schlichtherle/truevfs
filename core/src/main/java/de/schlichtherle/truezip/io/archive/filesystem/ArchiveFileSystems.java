@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import java.io.IOException;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 
 /**
  * Provides static utility methods for archive file systems.
@@ -90,7 +90,7 @@ public class ArchiveFileSystems {
     public static ArchiveFileSystem newArchiveFileSystem(
             ArchiveEntryFactory<? extends ArchiveEntry> factory,
             VetoableTouchListener vetoableTouchListener,
-            InputArchive<? extends ArchiveEntry> archive,
+            ArchiveInput<? extends ArchiveEntry> archive,
             long rootTime,
             boolean readOnly) {
         return new DefaultArchiveFileSystem(

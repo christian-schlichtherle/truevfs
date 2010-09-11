@@ -347,12 +347,12 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    void testFalsePositive(File file) throws IOException {
+    void testFalsePositive(final File file) throws IOException {
         assert file.isArchive();
 
         // Note that file's parent directory may be a false positive directory!
 
-        // Create false positive file.
+        // Create file false positive.
         {
             OutputStream out = new FileOutputStream(file);
             try {
@@ -390,7 +390,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         }
         testDelete(file);
 
-        // Create false positive directory.
+        // Create directory false positive.
 
         assertTrue(newNonArchiveFile(file).mkdir());
         assertTrue(file.exists());
@@ -438,7 +438,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         testDelete(file);
     }
 
-    void testDelete(File file) throws IOException {
+    void testDelete(final File file) throws IOException {
         assertTrue(file.delete());
         assertFalse(file.exists());
         assertFalse(file.isDirectory());

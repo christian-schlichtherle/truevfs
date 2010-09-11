@@ -30,7 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -291,7 +291,7 @@ final class Files {
                     final String dstPath = dstFile.getEnclEntryName();
                     assert dstPath != null;
                     ArchiveControllers.copy(
-                            preserve,
+                            preserve, File.isLenient(),
                             src,
                             in,
                             dstArchive.getArchiveController(),
@@ -356,7 +356,7 @@ final class Files {
                         final String dstPath = dstFile.getEnclEntryName();
                         assert dstPath != null;
                         ArchiveControllers.copy(
-                                preserve,
+                                preserve, File.isLenient(),
                                 srcController,
                                 srcPath,
                                 dstArchive.getArchiveController(),

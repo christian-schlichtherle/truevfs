@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.spi.FileEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.spi.FileEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -46,9 +46,9 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.
@@ -431,6 +431,7 @@ public final class ArchiveControllers {
      */
     public static void copy(
             final boolean preserve,
+            final boolean createParents,
             final ArchiveController srcController,
             final String srcPath,
             final ArchiveController dstController,
@@ -472,11 +473,10 @@ public final class ArchiveControllers {
                                 .getReference(srcPath);
 
                         // Get destination archive entry.
-                        final boolean lenient = isLenient();
-                        dstLink = dstController.autoMount(lenient)
+                        dstLink = dstController.autoMount(createParents)
                                 .mknod( dstPath, FILE,
                                         preserve ? srcRef.get() : null,
-                                        lenient);
+                                        createParents);
 
                         // Create input stream.
                         in = srcController.newInputStream(srcRef, dstLink);
@@ -535,7 +535,9 @@ public final class ArchiveControllers {
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
                     .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing archive controller.
-            copy(preserve, srcController, srcPath, enclController, enclPath);
+            copy(   preserve, createParents,
+                    srcController, srcPath,
+                    enclController, enclPath);
         }
     }
 
@@ -560,6 +562,7 @@ public final class ArchiveControllers {
      */
     public static void copy(
             final boolean preserve,
+            final boolean createParents,
             final File src,
             final InputStream in,
             final ArchiveController dstController,
@@ -587,12 +590,11 @@ public final class ArchiveControllers {
                     srcRef = IOReferences.ref(new FileEntry(src));
 
                     // Get destination archive entry reference.
-                    final boolean lenient = isLenient();
                     final ArchiveFileSystem dstFileSystem
-                            = dstController.autoMount(lenient);
+                            = dstController.autoMount(createParents);
                     final Link dstLink = dstFileSystem.mknod(
                             dstPath, FILE,
-                            preserve ? srcRef.get() : null, lenient);
+                            preserve ? srcRef.get() : null, createParents);
 
                     // Create output stream.
                     out = dstController.newOutputStream(dstLink, srcRef);
@@ -631,7 +633,9 @@ public final class ArchiveControllers {
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
                     .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing ArchiveController.
-            copy(preserve, src, in, enclController, enclPath);
+            copy(   preserve, createParents,
+                    src, in,
+                    enclController, enclPath);
         }
     }
 
@@ -649,110 +653,4 @@ public final class ArchiveControllers {
      * are acquired in order to prevent dead locks.
      */
     private static final CopyLock copyLock = new CopyLock();
-
-    /**
-     * Returns the value of the class property {@code lenient}.
-     * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}.
-     * In other words, this returns {@code true} unless you set the
-     * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}
-     * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
-     *
-     * @see #setLenient(boolean)
-     */
-    public static boolean isLenient() {
-        return lenient;
-    }
-
-    /**
-     * This class property controls whether (1) archive files and enclosed
-     * directories shall be created on the fly if they don't exist and (2)
-     * open archive entry streams should automatically be closed if they are
-     * only weakly reachable.
-     * By default, this class property is {@code true}.
-     * <ol>
-     * <li>
-     * Consider the following path: &quot;a/outer.zip/b/inner.zip/c&quot;.
-     * Now let's assume that &quot;a&quot; isExisting as a directory in the real file
-     * system, while all other parts of this path don't, and that TrueZIP's
-     * default configuration is used which would recognize &quot;outer.zip&quot; and
-     * &quot;inner.zip&quot; as ZIP files.
-     * <p>
-     * If this class property is set to {@code false}, then
-     * the client application would have to call
-     * {@code new File(&quot;a/outer.zip/b/inner.zip&quot;).mkdirs()}
-     * before it could actually create the innermost &quot;c&quot; entry as a file
-     * or directory.
-     * <p>
-     * More formally, before you can access a node in the virtual file
-     * system, all its parent directories must exist, including archive
-     * files. This emulates the behaviour of real file systems.
-     * <p>
-     * If this class property is set to {@code true} however, then
-     * any missing parent directories (including archive files) up to the
-     * outermost archive file (&quot;outer.zip&quot;) are created on the fly when using
-     * operations to create the innermost element of the path (&quot;c&quot;).
-     * <p>
-     * This allows applications to succeed when doing this:
-     * {@code new File(&quot;a/outer.zip/b/inner.zip/c&quot;).createNewFile()},
-     * or that:
-     * {@code new FileOutputStream(&quot;a/outer.zip/b/inner.zip/c&quot;)}.
-     * <p>
-     * Note that in any case the parent directory of the outermost archive
-     * file (&quot;a&quot;), must exist - TrueZIP does not create regular directories
-     * in the real file system on the fly.
-     * </li>
-     * <li>
-     * Many Java applications unfortunately fail to close their streams in all
-     * cases, in particular if an {@code IOException} occured while
-     * accessing it.
-     * However, open streams are a limited resource in any operating system
-     * and may interfere with other services of the OS (on Windows, you can't
-     * delete an open file).
-     * This is called the &quot;unclosed streams issue&quot;.
-     * <p>
-     * Likewise, in TrueZIP an unclosed archive entry stream may result in an
-     * {@code ArchiveFileBusy(Warning)?Exception} to be thrown when
-     * {@link #sync} is called.
-     * In order to prevent this, TrueZIP's archive entry streams have a
-     * {@link Object#finalize()} method which closes an archive entry stream
-     * if its garbage collected.
-     * <p>
-     * Now if this class property is set to {@code false}, then
-     * TrueZIP maintains a hard reference to all archive entry streams
-     * until {@link #sync} is called, which will deal
-     * with them: If they are not closed, an
-     * {@code ArchiveFileBusy(Warning)?Exception} is thrown, depending on
-     * the boolean parameters to these methods.
-     * <p>
-     * This setting is useful if you do not want to tolerate the
-     * &quot;unclosed streams issue&quot; in a client application.
-     * <p>
-     * If this class property is set to {@code true} however, then
-     * TrueZIP maintains only a weak reference to all archive entry streams.
-     * This allows the garbage collector to finalize them before
-     * {@link #sync} is called.
-     * The finalize() method will then close these archive entry streams,
-     * which exempts them, from triggering an
-     * {@code ArchiveBusy(Warning)?Exception} on the next call to
-     * {@link #sync}.
-     * However, closing an archive entry output stream this way may result
-     * in loss of buffered data, so it's only a workaround for this issue.
-     * <p>
-     * Note that for the setting of this class property to take effect, any
-     * change must be made before an archive is first accessed.
-     * The setting will then persist until the archive is reset by the next
-     * call to {@link #sync}.
-     * </li>
-     * </ol>
-     *
-     * @see #isLenient()
-     */
-    public static void setLenient(final boolean lenient) {
-        ArchiveControllers.lenient = lenient;
-    }
-
-    private static boolean lenient
-            = !Boolean.getBoolean(ArchiveControllers.class.getName() + ".strict");
 }

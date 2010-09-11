@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
@@ -49,13 +53,15 @@ import javax.swing.Icon;
  * </ul>
  *
  * @param <AE> The type of the archive entries.
+ * @param <AI> The type of the archive input.
+ * @param <AO> The type of the archive output.
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveDriver<
         AE extends ArchiveEntry,
-        IA extends InputArchive<AE>,
-        OA extends OutputArchive<AE>>
+        AI extends ArchiveInput<AE>,
+        AO extends ArchiveOutput<AE>>
 extends ArchiveEntryFactory<AE> {
 
     /**
@@ -111,9 +117,9 @@ extends ArchiveEntryFactory<AE> {
      *         when reading the input archive and the implementation would like
      *         to treat the archive file like a regular file which may be read,
      *         written or deleted.
-     * @see    InputArchive
+     * @see    ArchiveInput
      */
-    IA newInputArchive(ArchiveDescriptor archive, ReadOnlyFile rof)
+    AI newArchiveInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
@@ -125,10 +131,10 @@ extends ArchiveEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  out the {@link OutputStream} to write the archive entries to
      *         - {@code null} is not permitted.
-     * @param  source the source {@link InputArchive} if
+     * @param  source the source {@link ArchiveInput} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputArchive} method.
+     *         of this driver's {@link #newArchiveInput} method.
      *         This may be used to copy some meta data which is specific to
      *         the type of archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
@@ -142,9 +148,9 @@ extends ArchiveEntryFactory<AE> {
      *         for any reason.
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
-     * @see    OutputArchive
+     * @see    ArchiveOutput
      */
-    OA newOutputArchive(ArchiveDescriptor archive, OutputStream out, IA source)
+    AO newArchiveOutput(ArchiveDescriptor archive, OutputStream out, AI source)
     throws IOException;
 
     /**

@@ -51,8 +51,8 @@ public class FileBusyException extends FileNotFoundException {
 
     /**
      * For use by
-     * {@link de.schlichtherle.truezip.io.archive.driver.InputArchiveBusyException} and
-     * {@link de.schlichtherle.truezip.io.archive.driver.OutputArchiveBusyException} only.
+     * {@link de.schlichtherle.truezip.io.archive.input.ArchiveInputBusyException} and
+     * {@link de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException} only.
      */
     protected FileBusyException(final String msg) {
         super(msg);

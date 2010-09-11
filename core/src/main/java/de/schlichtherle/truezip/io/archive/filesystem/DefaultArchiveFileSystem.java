@@ -17,14 +17,14 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import java.util.Collection;
-import de.schlichtherle.truezip.io.archive.driver.spi.FilterArchiveEntry;
+import de.schlichtherle.truezip.io.archive.spi.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.InputArchive;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,12 +37,12 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.normalize;
 
@@ -70,7 +70,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
      * This field should be considered final!
      * <p>
      * Note that the archive entries in this map are shared with the
-     * {@link InputArchive} object provided to this class' constructor.
+     * {@link ArchiveInput} object provided to this class' constructor.
      */
     private Map<String, CommonEntry> master;
 
@@ -150,7 +150,7 @@ class DefaultArchiveFileSystem implements ArchiveFileSystem {
     DefaultArchiveFileSystem(
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener,
-            final InputArchive<? extends ArchiveEntry> archive,
+            final ArchiveInput<? extends ArchiveEntry> archive,
             final long rootTime,
             final boolean readOnly) {
         this.factory = factory;
