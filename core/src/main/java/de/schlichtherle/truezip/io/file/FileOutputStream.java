@@ -157,7 +157,7 @@ public class FileOutputStream extends FilterOutputStream {
                     final String path = dstFile.getInnerEntryName();
                     assert path != null;
                     return archive.getArchiveController()
-                            .newOutputStream(path, append);
+                            .newOutputStream(path, append, File.isLenient());
                 }
             }
         } catch (FalsePositiveException isNotArchive) {

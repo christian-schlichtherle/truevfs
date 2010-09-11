@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
-import de.schlichtherle.truezip.io.archive.driver.impl.zip.CheckedZipDriver;
+import de.schlichtherle.truezip.io.archive.impl.zip.CheckedZipDriver;
 
 /**
  * Tests the TrueZIP API in de.schlichtherle.truezip.io with the ZIP driver.

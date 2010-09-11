@@ -181,10 +181,11 @@ public class ChainableIOException extends IOException implements Cloneable {
 
     private void setPredecessor(
             final ChainableIOException predecessor) {
-        if (this.predecessor == predecessor)
-            return;
-        if (this.predecessor != this)
+        if (this.predecessor != this) {
+            if (this.predecessor == predecessor)
+                return;
             throw new IllegalStateException("Can't overwrite predecessor!");
+        }
         if (predecessor == this)
             throw new IllegalArgumentException("Can't be predecessor of myself!");
         if (predecessor != null && predecessor.predecessor == predecessor)

@@ -52,10 +52,12 @@ abstract class FileSystemArchiveController extends ArchiveController {
     }
 
     @Override
-    public final ArchiveFileSystem autoMount(final boolean create)
+    public final ArchiveFileSystem autoMount(
+            final boolean autoCreate,
+            final boolean createParents)
     throws FalsePositiveException, IOException {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
-        return autoMounter.autoMount(create);
+        return autoMounter.autoMount(autoCreate, createParents);
     }
 
     final ArchiveFileSystem getFileSystem() {
@@ -68,10 +70,10 @@ abstract class FileSystemArchiveController extends ArchiveController {
 
     /**
      * Represents the mount state of the archive file system.
-     * This is an abstract class: The state is implemented in the sub classes.
+     * This is an abstract class: The state is implemented in the subclasses.
      */
     private static abstract class AutoMounter {
-        abstract ArchiveFileSystem autoMount(boolean create)
+        abstract ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
         throws FalsePositiveException, IOException;
 
         ArchiveFileSystem getFileSystem() {
@@ -83,7 +85,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
 
     private class ResetFileSystem extends AutoMounter {
         @Override
-        ArchiveFileSystem autoMount(final boolean create)
+        ArchiveFileSystem autoMount(final boolean autoCreate, final boolean createParents)
         throws FalsePositiveException, IOException {
             try {
                 class Mounter implements Operation<Exception> {
@@ -93,7 +95,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
                         // it while we released all read locks in order to
                         // acquire the write lock!
                         if (autoMounter == ResetFileSystem.this) {
-                            mount(create);
+                            mount(autoCreate, createParents);
                             assert autoMounter instanceof MountedFileSystem;
                         } else {
                             assert autoMounter != null;
@@ -129,7 +131,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
             // DON'T just call autoMounter.getFileSystem()!
             // This would return null if autoMounter is an instance of
             // FalsePositiveFileSystem.
-            return autoMounter.autoMount(create);
+            return autoMounter.autoMount(autoCreate, createParents);
         }
 
         @Override
@@ -150,7 +152,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        ArchiveFileSystem autoMount(boolean create) {
+        ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents) {
             return fileSystem;
         }
 
@@ -177,7 +179,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        ArchiveFileSystem autoMount(boolean create)
+        ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
         throws FalsePositiveException {
             throw exception;
         }
@@ -202,7 +204,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
      * state of this class or its super class.
      * It may, however, have side effects on the state of the sub class.
      *
-     * @param create If the archive file does not exist and this is
+     * @param autoCreate If the archive file does not exist and this is
      *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
@@ -210,7 +212,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
-    abstract void mount(boolean create)
+    abstract void mount(boolean autoCreate, boolean createParents)
     throws FalsePositiveException, IOException;
 
     @Override

@@ -16,13 +16,10 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.UnknownKeyException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -78,8 +75,8 @@ public class ZipRaesFileTest extends FileTestCase {
 
         try {
             assertFalse(entry1.createNewFile());
-            fail("A FileNotFoundException should have been thrown because password prompting has been disabled!");
-        } catch (FileNotFoundException expected) {
+            fail("An IOException should have been thrown because password prompting has been disabled!");
+        } catch (IOException expected) {
         }
         assertFalse(new java.io.File(entry1.getPath()).exists());
         assertFalse(new java.io.File(archive.getPath()).exists());
@@ -92,8 +89,8 @@ public class ZipRaesFileTest extends FileTestCase {
 
         try {
             assertFalse(entry2.createNewFile());
-            fail("A FileNotFoundException should have been thrown because password prompting has been disabled!");
-        } catch (FileNotFoundException expected) {
+            fail("An IOException should have been thrown because password prompting has been disabled!");
+        } catch (IOException expected) {
         }
         assertFalse(new java.io.File(entry2.getPath()).exists());
         assertFalse(new java.io.File(entry1.getPath()).exists());

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
@@ -39,10 +39,10 @@ import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -181,10 +181,6 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         setTouched(false);
 
         assert this.enclPath == null || this.enclPath.getPath().endsWith(SEPARATOR);
-    }
-
-    boolean isLenient() {
-        return ArchiveControllers.isLenient();
     }
 
     //
@@ -385,7 +381,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * method will temporarily release all locks, so any preconditions must be
      * checked again upon return to protect against concurrent modifications!
      * 
-     * @param create If the archive file does not exist and this is
+     * @param autoCreate If the archive file does not exist and this is
      *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
@@ -394,11 +390,16 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
-    public abstract ArchiveFileSystem autoMount(boolean create)
+    abstract ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
     throws FalsePositiveException, IOException;
 
+    ArchiveFileSystem autoMount(boolean autoCreate)
+    throws FalsePositiveException, IOException {
+        return autoMount(autoCreate, autoCreate);
+    }
+
     /**
-     * Unmounts the archive file only if the archive file has already new
+     * Synchronizes the archive file only if the archive file has already new
      * data for the file system entry with the given path name.
      * <p>
      * <b>Warning:</b> As a side effect, all data structures returned by this
@@ -578,21 +579,23 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      */
     public final OutputStream newOutputStream(
             final String path,
-            final boolean append)
+            final boolean append,
+            final boolean createParents)
     throws FalsePositiveException, IOException {
         assert path != null;
 
         try {
-            return newOutputStream0(path, append);
+            return newOutputStream0(path, append, createParents);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().newOutputStream(getEnclPath(path),
-                    append);
+            return getEnclController().newOutputStream(
+                    getEnclPath(path), append, createParents);
         }
     }
 
     private OutputStream newOutputStream0(
             final String path,
-            final boolean append)
+            final boolean append,
+            final boolean createParents)
     throws FalsePositiveException, IOException {
         assert path != null;
 
@@ -606,21 +609,20 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 } catch (ArchiveEntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
-                    return getEnclController().newOutputStream0(getEnclPath(path), append);
+                    return getEnclController().newOutputStream0(getEnclPath(path), append, createParents);
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot write directories");
             } else {
                 autoSync(path);
-                final boolean lenient = isLenient();
-                final ArchiveFileSystem fileSystem = autoMount(lenient);
+                final ArchiveFileSystem fileSystem = autoMount(createParents);
                 in = append && fileSystem.getType(path) == FILE
                         ? newInputStream0(path)
                         : null;
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final Link link = fileSystem.mknod(path, FILE, null, lenient);
+                final Link link = fileSystem.mknod(path, FILE, null, createParents);
                 // Create output stream.
                 out = newOutputStream(link, null);
                 // Now link the entry into the file system.
@@ -964,31 +966,31 @@ public abstract class ArchiveController implements ArchiveDescriptor {
 
     public final boolean createNewFile(
             final String path,
-            final boolean autoCreate)
+            final boolean createParents)
     throws FalsePositiveException, IOException {
         try {
-            return createNewFile0(path, autoCreate);
+            return createNewFile0(path, createParents);
         } catch (ArchiveEntryFalsePositiveException ex) {
             return getEnclController().createNewFile(getEnclPath(path),
-                    autoCreate);
+                    createParents);
         }
     }
 
     private boolean createNewFile0(
             final String path,
-            final boolean autoCreate)
+            final boolean createParents)
     throws FalsePositiveException, IOException {
         assert !isRoot(path);
 
         writeLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(autoCreate);
+            final ArchiveFileSystem fileSystem = autoMount(createParents);
             if (fileSystem.getType(path) != null)
                 return false;
 
             // If we got until here without an exception,
             // write an empty file now.
-            newOutputStream0(path, false).close();
+            newOutputStream0(path, false, createParents).close();
 
             return true;
         } finally {
@@ -998,13 +1000,13 @@ public abstract class ArchiveController implements ArchiveDescriptor {
 
     public final boolean mkdir(
             final String path,
-            final boolean autoCreate)
+            final boolean createParents)
     throws FalsePositiveException {
         try {
-            mkdir0(path, autoCreate);
+            mkdir0(path, createParents);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().mkdir(getEnclPath(path), autoCreate);
+            return getEnclController().mkdir(getEnclPath(path), createParents);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1012,26 +1014,23 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         }
     }
 
-    private void mkdir0(final String path, final boolean autoCreate)
+    private void mkdir0(final String path, final boolean createParents)
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
             if (isRoot(path)) {
-                // This is the virtual root of an archive file system, so we
-                // are actually working on the controller's target file.
-                if (isRfsEntryTarget()) {
-                    if (getTarget().exists())
-                        throw new IOException("target file exists already!");
-                } else {
-                    if (getEnclController().isExisting(getEnclPath(path)))
-                        throw new IOException("target file exists already!");
+                try {
+                    autoMount(false, createParents); // detect false positives!
+                } catch (ArchiveEntryNotFoundException ex) {
+                    autoMount(true, createParents);
+                    return;
                 }
-                // Ensure file system existence.
-                autoMount(true);
+                throw new ArchiveEntryNotFoundException(this, path,
+                        "directory exists already");
             } else { // !isRoot(entryName)
-                // This file is a regular archive entry.
-                final ArchiveFileSystem fileSystem = autoMount(autoCreate);
-                fileSystem.mknod(path, DIRECTORY, null, autoCreate).run();
+                // This is going to be a regular directory archive entry.
+                final ArchiveFileSystem fileSystem = autoMount(createParents);
+                fileSystem.mknod(path, DIRECTORY, null, createParents).run();
             }
         } finally {
             writeLock().unlock();
