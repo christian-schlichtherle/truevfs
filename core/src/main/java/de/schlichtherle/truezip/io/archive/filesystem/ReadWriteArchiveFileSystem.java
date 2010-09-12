@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.spi.FilterArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
