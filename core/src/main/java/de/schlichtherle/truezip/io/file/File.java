@@ -2305,7 +2305,7 @@ public class File extends java.io.File {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-            // TODO: Document this!
+            // See ArchiveDriver#newArchiveInput!
             if (isArchive()
                     && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
@@ -2860,10 +2860,10 @@ public class File extends java.io.File {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-            // TODO: Document this!
+            // See ArchiveDriver#newArchiveInput!
             if (isArchive()
-                    && !delegate.isDirectory()
-                    && isNotArchive.getCause() instanceof FileNotFoundException)
+            && !delegate.isDirectory()
+            && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
         }
         return delegate.delete();
