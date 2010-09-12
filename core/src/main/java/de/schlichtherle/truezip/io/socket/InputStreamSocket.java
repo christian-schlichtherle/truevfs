@@ -36,7 +36,7 @@ public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
      * Returns the non-{@code null} local target for I/O operations.
      * <p>
      * The result of changing the state of the returned object is undefined.
-     * In particular, a subsequent call to {@link #newInputStream(IOReference)}
+     * In particular, a subsequent call to {@link #newInputStream(Object)}
      * may not reflect any changes or may even fail.
      * However, this term may be overridden by sub-interfaces or
      * implementations.

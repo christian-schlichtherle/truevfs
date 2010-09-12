@@ -44,7 +44,7 @@ extends OutputStreamSocket<AE, ArchiveEntry> {
      * <p>
      * Implementations must reflect any changes to the state of the returned
      * archive entry by the client applications before a call to the method
-     * {@link #newOutputStream(IOReference)}.
+     * {@link #newOutputStream(ArchiveEntry)}.
      * The effect of any subsequent changes to the state of the returned
      * archive entry is undefined.
      *
