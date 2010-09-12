@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.impl.zip;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @version $Id$
  */
 public class OdfOutput
-extends MultiplexedOutputArchive<ZipEntry> {
+extends MultiplexedArchiveOutput<ZipEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";

@@ -33,13 +33,13 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputArchive<AE extends ArchiveEntry>
+public class FilterArchiveOutput<AE extends ArchiveEntry>
 extends FilterArchiveEntryContainer<AE>
 implements ArchiveOutput<AE> {
 
     protected ArchiveOutput<AE> target;
 
-    public FilterOutputArchive(final ArchiveOutput<AE> target) {
+    public FilterArchiveOutput(final ArchiveOutput<AE> target) {
         this.target = target;
     }
 

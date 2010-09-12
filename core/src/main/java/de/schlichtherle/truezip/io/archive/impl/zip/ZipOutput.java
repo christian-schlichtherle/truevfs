@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.impl.zip;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
@@ -52,7 +52,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link MultiplexedOutputArchive}
+ * {@link MultiplexedArchiveOutput}
  * to overcome this limitation.
  * 
  * @see ZipDriver

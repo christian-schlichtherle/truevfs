@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.spi.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
@@ -220,13 +220,13 @@ implements ZipEntryFactory<ZipEntry> {
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
      * {@link #newZipOutputArchive} and wraps the result in a new
-     * {@link MultiplexedOutputArchive}.
+     * {@link MultiplexedArchiveOutput}.
      */
     @Override
     public ArchiveOutput<ZipEntry> newArchiveOutput(
             ArchiveDescriptor archive, OutputStream out, ZipInput source)
     throws IOException {
-        return new MultiplexedOutputArchive(
+        return new MultiplexedArchiveOutput(
                 newZipOutputArchive(archive, out, source));
         //return newZipOutputArchive(archive, out, (ZipInput) source);
     }

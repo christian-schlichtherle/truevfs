@@ -54,6 +54,7 @@ public class ZipRaesFileTest extends FileTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        cancelling = false;
         super.tearDown();
         KeyManager.setInstance(oldKeyManager);
     }
@@ -118,6 +119,11 @@ public class ZipRaesFileTest extends FileTestCase {
         assertTrue(inner.exists());
         assertFalse(inner.isDirectory());
         assertFalse(inner.isFile());
+
+        assertFalse(archive.deleteAll());
+
+        cancelling = false;
+        assertTrue(archive.deleteAll());
     }
 
     public static class CustomKeyManager extends KeyManager {
