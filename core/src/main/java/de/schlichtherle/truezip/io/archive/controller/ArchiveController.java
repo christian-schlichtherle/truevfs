@@ -17,13 +17,14 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
@@ -552,7 +553,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 if (entry.getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "cannot read directories");
-                return newInputStream(entry, null);
+                return getInputStreamSocket(entry).newInputStream(null);
             }
         } finally {
             readLock().unlock();
@@ -567,7 +568,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream newInputStream(ArchiveEntry target, ArchiveEntry peer)
+    abstract ArchiveInputStreamSocket getInputStreamSocket(ArchiveEntry target)
     throws IOException;
 
     /**
@@ -626,7 +627,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 // directory.
                 final Link link = fileSystem.mknod(path, FILE, null, createParents);
                 // Create output stream.
-                out = newOutputStream(link.get(), null);
+                out = getOutputStreamSocket(link.get()).newOutputStream(null);
                 // Now link the entry into the file system.
                 link.run();
             }
@@ -651,7 +652,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream newOutputStream(ArchiveEntry target, ArchiveEntry peer)
+    abstract ArchiveOutputStreamSocket getOutputStreamSocket(ArchiveEntry target)
     throws IOException;
 
     public final boolean isExisting(final String path)

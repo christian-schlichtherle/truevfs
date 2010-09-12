@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -61,7 +60,6 @@ extends BasicZipOutputStream<ZipEntry>
 implements ArchiveOutput<ZipEntry> {
 
     private final ZipInput source;
-    private ArchiveOutputMetaData metaData;
     private ZipEntry tempEntry;
 
     /**
@@ -352,13 +350,5 @@ implements ArchiveOutput<ZipEntry> {
         } finally {
             in.close();
         }
-    }
-
-    public ArchiveOutputMetaData getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(final ArchiveOutputMetaData metaData) {
-        this.metaData = metaData;
     }
 }

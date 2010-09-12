@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.input;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
-import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.SynchronizedOutputStream;
+import de.schlichtherle.truezip.io.SynchronizedInputStream;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -33,46 +33,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Annotates an {@link ArchiveOutput} with the methods required for safe
- * writing of archive entries.
- * As an implication of this, it's also responsible for the synchronization
- * of the streams between multiple threads.
- * <p>
- * <b>Warning:</b> This class is <em>not</em> intended for public use!
- * It's only public for technical reasons and may getEntry renamed or entirely
- * disappear without notice.
+ * Decorates an {@code ArchiveInput} to add accounting and multithreading
+ * synchronization for all input streams created by the target archive
+ * input.
  *
- * @see ArchiveInputMetaData
+ * @param   <AE> The type of the archive entries.
+ * @see ConcurrentArchiveOutput
  * @author Christian Schlichtherle
  * @version $Id$
  */
-// TODO: Make this class package private!
-public final class ArchiveOutputMetaData {
+public final class ConcurrentArchiveInput<AE extends ArchiveEntry>
+extends FilterArchiveInput<AE> {
 
     private static final String CLASS_NAME
-            = ArchiveOutputMetaData.class.getName();
+            = ConcurrentArchiveInput.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
-
-    /**
-     * The archive which uses this instance.
-     * Although this field is actually never used in this class, it makes an
-     * archive controller strongly reachable from any entry stream in use by
-     * any thread.
-     * This is required to keep the archive controller from being garbarge
-     * collected meanwhile.
-     * <p>
-     * <b>Detail:</b> While this is really required for input streams for
-     * archives which are unmodified, it's actually not required for output
-     * streams, since the archive file system is touched for these streams
-     * anyway, which in turn schedules the archive controller for the next
-     * update, which in turn prevents it from being garbage collected.
-     * However, it's provided for symmetry between input archive meta data
-     * and output archive meta data.
-     */
-    //private final ArchiveDescriptor archive;
-
-    private final ArchiveOutput outArchive;
 
     /**
      * The pool of all open entry streams.
@@ -80,42 +56,71 @@ public final class ArchiveOutputMetaData {
      * value is the current thread.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
-     * This reduces the likeliness of an exception in case a sloppy client
-     * application has forgot to close a stream before the target archive file
-     * gets updated.
+     * This reduces the likeliness of an {@link ArchiveBusyWarningException}
+     * in case a sloppy client application has forgot to close a stream before
+     * the target archive file gets synchronized, e.g. by using
+     * {@link ArchiveControllers#sync(java.net.URI, SyncConfiguration) umount}.
      */
-    private final Map<EntryOutputStream, Thread> streams
-            = new WeakHashMap<EntryOutputStream, Thread>();
+    private final Map<EntryInputStream, Thread> streams
+            = new WeakHashMap<EntryInputStream, Thread>();
 
     private volatile boolean stopped;
 
-    /**
-     * Creates a new instance of {@code ArchiveOutputMetaData}
-     * and sets itself as the meta data for the given output archive.
-     */
-    ArchiveOutputMetaData(final ArchiveDescriptor archive, final ArchiveOutput outArchive) {
-        assert outArchive != null;
-
-        //this.archive = archive;
-        this.outArchive = outArchive;
+    /** Constructs a new instance of {@code ConcurrentArchiveInput}. */
+    private ConcurrentArchiveInput(final ArchiveInput<AE> input) {
+        super(input);
     }
 
-    synchronized OutputStream newOutputStream(
-            final ArchiveEntry target,
-            final ArchiveEntry peer)
-    throws IOException {
-        assert !stopped;
-        assert target != null;
+    /**
+     * Returns a new concurrent archive input which decorates (wraps) the
+     * given non-{@code null} archive input.
+     */
+    public static <AE extends ArchiveEntry>
+    ConcurrentArchiveInput<AE> wrap(ArchiveInput<AE> archive) {
+        return new ConcurrentArchiveInput<AE>(archive);
+    }
 
-        return new EntryOutputStream(
-                outArchive.getOutputStreamSocket(target).newOutputStream(peer));
+    /**
+     * Returns the wrapped archive input or {@code null} if and only if
+     * {@code proxy} is {@code null}.
+     */
+    public static <AE extends ArchiveEntry>
+    ArchiveInput<AE> unwrap(ConcurrentArchiveInput<AE> proxy) {
+        return proxy != null ? proxy.target : null;
+    }
+
+    @Override
+    public ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(
+            final AE entry)
+    throws FileNotFoundException {
+        assert !stopped;
+        assert entry != null;
+
+        // TODO: Consider synchronization!
+        final ArchiveInputStreamSocket<? extends AE> input
+                = target.getInputStreamSocket(entry);
+        class InputStreamSocket implements ArchiveInputStreamSocket<AE> {
+            @Override
+            public AE get() {
+                return entry;
+            }
+
+            @Override
+            public InputStream newInputStream(final ArchiveEntry dst)
+            throws IOException {
+                synchronized (ConcurrentArchiveInput.this) {
+                    return new EntryInputStream(input.newInputStream(dst));
+                }
+            }
+        }
+        return new InputStreamSocket();
     }
 
     /**
      * Waits until all entry streams which have been opened (and not yet closed)
      * by all <em>other threads</em> are closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
-     * a warn message is logged using {@code java.util.logging} and
+     * a warning message is logged using {@code java.util.logging} and
      * this method returns.
      * <p>
      * Unless otherwise prevented, another thread could immediately open
@@ -125,7 +130,7 @@ public final class ArchiveOutputMetaData {
      *
      * @return The number of all open streams.
      */
-    synchronized int waitAllOutputStreamsByOtherThreads(final long timeout) {
+    public synchronized int waitCloseAllInputStreams(final long timeout) {
         assert !stopped;
 
         final long start = System.currentTimeMillis();
@@ -145,15 +150,13 @@ public final class ArchiveOutputMetaData {
                 wait(toWait);
             }
         } catch (InterruptedException ignored) {
-            logger.warning("interrupted");
+            logger.warning("wait.interrupted");
         }
 
         return streams.size();
     }
 
-    /**
-     * Returns the number of streams opened by the current thread.
-     */
+    /** Returns the number of streams opened by the current thread. */
     private int threadStreams() {
         final Thread thisThread = Thread.currentThread();
         int n = 0;
@@ -164,18 +167,18 @@ public final class ArchiveOutputMetaData {
     }
 
     /**
-     * Closes and disconnects <em>all</em> entry streams for the archive
-     * containing this metadata object.
+     * Closes and disconnects <em>all</em> entry streams for the target archive
+     * file.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    synchronized <E extends Exception>
-    void closeAllOutputStreams(final ExceptionHandler<IOException, E> handler)
+    public synchronized <E extends Exception>
+    void closeAllInputStreams(final ExceptionHandler<IOException, E> handler)
     throws E {
         assert !stopped;
         stopped = true;
-        for (final Iterator<EntryOutputStream> it = streams.keySet().iterator();
+        for (final Iterator<EntryInputStream> it = streams.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -190,21 +193,21 @@ public final class ArchiveOutputMetaData {
     }
 
     /**
-     * An {@link OutputStream} to write the entry data to an
-     * {@link ArchiveOutput}.
-     * This output stream provides support for finalization and throws an
-     * {@link IOException} on any subsequent attempt to write data after
-     * {@link #closeAllOutputStreams} has been called.
+     * An {@link InputStream} to read the entry data from an
+     * {@link ArchiveInput}.
+     * This input stream provides support for finalization and throws an
+     * {@link IOException} on any subsequent attempt to read data after
+     * {@link #closeAllInputStreams} has been called.
      */
-    private final class EntryOutputStream extends SynchronizedOutputStream {
+    private final class EntryInputStream extends SynchronizedInputStream {
         private /*volatile*/ boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
-        private EntryOutputStream(final OutputStream out) {
-            super(out, ArchiveOutputMetaData.this);
-            assert out != null;
+        private EntryInputStream(final InputStream in) {
+            super(in, ConcurrentArchiveInput.this);
+            assert in != null;
             streams.put(this, Thread.currentThread());
-            ArchiveOutputMetaData.this.notify(); // there can be only one waiting thread!
+            ConcurrentArchiveInput.this.notify(); // there can be only one waiting thread!
         }
 
         private void ensureNotStopped() throws IOException {
@@ -213,50 +216,72 @@ public final class ArchiveOutputMetaData {
         }
 
         @Override
-        public void write(int b) throws IOException {
+        public int read() throws IOException {
             ensureNotStopped();
-            super.write(b);
+            return super.read();
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
+        public int read(byte[] b) throws IOException {
             ensureNotStopped();
-            super.write(b);
+            return super.read(b);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws IOException {
             ensureNotStopped();
-            super.write(b, off, len);
+            return super.read(b, off, len);
         }
 
         @Override
-        public void flush() throws IOException {
+        public long skip(long n) throws IOException {
             ensureNotStopped();
-            super.flush();
+            return super.skip(n);
+        }
+
+        @Override
+        public int available() throws IOException {
+            ensureNotStopped();
+            return super.available();
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            if (!stopped)
+                super.mark(readlimit);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            ensureNotStopped();
+            super.reset();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return !stopped && super.markSupported();
         }
 
         /**
          * Closes this archive entry stream and releases any resources
          * associated with it.
          * This method tolerates multiple calls to it: Only the first
-         * invocation flushes and closes the underlying stream.
+         * invocation closes the underlying stream.
          *
          * @throws IOException If an I/O exception occurs.
          */
         @Override
         public final void close() throws IOException {
-            assert ArchiveOutputMetaData.this == lock;
-            synchronized (ArchiveOutputMetaData.this) {
+            assert ConcurrentArchiveInput.this == lock;
+            synchronized (ConcurrentArchiveInput.this) {
                 if (closed)
                     return;
-
                 // Order is important!
                 try {
                     doClose();
                 } finally {
                     streams.remove(this);
-                    ArchiveOutputMetaData.this.notify(); // there can be only one waiting thread!
+                    ConcurrentArchiveInput.this.notify(); // there can be only one waiting thread!
                 }
             }
         }
@@ -274,17 +299,16 @@ public final class ArchiveOutputMetaData {
             assert !closed;
             /*if (closed)
                 return;*/
-
             // Order is important!
             closed = true;
             super.doClose();
         }
 
         /**
-         * The finalizer in this class forces this archive entry output
+         * The finalizer in this class forces this archive entry input
          * stream to close.
          * This is used to ensure that an archive can be updated although
-         * the client may have "forgot" to close this output stream before.
+         * the client may have "forgot" to close this input stream before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
@@ -292,16 +316,15 @@ public final class ArchiveOutputMetaData {
             try {
                 if (closed)
                     return;
-
                 logger.finer("finalize.open");
                 try {
                     doClose();
                 } catch (IOException failure) {
-                    logger.log(Level.FINE, "finalize.exception", failure);
+                    logger.log(Level.FINE, "finalize.catch", failure);
                 }
             } finally {
                 super.finalize();
             }
         }
-    } // class EntryOutputStream
+    } // class EntryInputStream
 }

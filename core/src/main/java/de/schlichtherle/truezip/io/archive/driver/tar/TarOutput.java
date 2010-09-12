@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -68,7 +67,6 @@ implements ArchiveOutput<TarEntry> {
     private final Map<String, TarEntry> entries
             = new LinkedHashMap<String, TarEntry>();
 
-    private ArchiveOutputMetaData metaData;
     private boolean busy;
 
     public TarOutput(OutputStream out) {
@@ -233,16 +231,4 @@ implements ArchiveOutput<TarEntry> {
             }
         }
     } // class TempEntryOutputStream
-
-    //
-    // Metadata stuff.
-    //
-
-    public ArchiveOutputMetaData getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(final ArchiveOutputMetaData metaData) {
-        this.metaData = metaData;
-    }
 }

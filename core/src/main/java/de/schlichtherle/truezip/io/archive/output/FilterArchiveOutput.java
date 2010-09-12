@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntryContainer;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.FilterArchiveInput;
 import java.io.FileNotFoundException;
@@ -45,7 +44,7 @@ implements ArchiveOutput<AE> {
     }
 
     @Override
-    protected final ArchiveOutput<AE> getTarget() {
+    protected ArchiveOutput<AE> getTarget() {
         return target;
     }
 
@@ -54,16 +53,6 @@ implements ArchiveOutput<AE> {
             final AE entry)
     throws FileNotFoundException {
         return getTarget().getOutputStreamSocket(entry);
-    }
-
-    @Override
-    public ArchiveOutputMetaData getMetaData() {
-        return getTarget().getMetaData();
-    }
-
-    @Override
-    public void setMetaData(final ArchiveOutputMetaData metaData) {
-        getTarget().setMetaData(metaData);
     }
 
     @Override

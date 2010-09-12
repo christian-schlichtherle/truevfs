@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import java.io.Closeable;
 
@@ -42,20 +41,4 @@ public interface ArchiveOutput<AE extends ArchiveEntry>
 extends ArchiveEntryContainer<AE>,
         ArchiveOutputStreamSocketProvider<AE>,
         Closeable {
-
-    /**
-     * Returns the meta data for this output archive.
-     * The default value is {@code null}.
-     *
-     * @deprecated
-     */
-    ArchiveOutputMetaData getMetaData();
-
-    /**
-     * Sets the meta data for this output archive.
-     *
-     * @param metaData The meta data - may not be {@code null}.
-     * @deprecated
-     */
-    void setMetaData(ArchiveOutputMetaData metaData);
 }

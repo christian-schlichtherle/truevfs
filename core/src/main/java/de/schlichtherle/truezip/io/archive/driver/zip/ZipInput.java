@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputMetaData;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
@@ -39,8 +38,6 @@ import java.util.zip.ZipException;
 public class ZipInput
 extends BasicZipFile<ZipEntry>
 implements ArchiveInput<ZipEntry> {
-
-    private ArchiveInputMetaData metaData;
 
     public ZipInput(
             ReadOnlyFile rof,
@@ -80,13 +77,5 @@ implements ArchiveInput<ZipEntry> {
     throws IOException {
         return super.getInputStream(    entry.getName(), false,
                                         !(dstEntry instanceof ZipEntry));
-    }
-
-    public ArchiveInputMetaData getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(ArchiveInputMetaData metaData) {
-        this.metaData = metaData;
     }
 }
