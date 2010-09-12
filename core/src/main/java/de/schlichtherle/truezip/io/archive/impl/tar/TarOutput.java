@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.spi.MultiplexedOutputArchive;
+import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
 import java.io.File;
@@ -56,7 +56,7 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * underlying {@link TarOutputStream} instead.
  * <p>
  * This output archive can only write one entry concurrently.
- * Archive drivers may wrap this class in a {@link MultiplexedOutputArchive}
+ * Archive drivers may wrap this class in a {@link MultiplexedArchiveOutput}
  * to overcome this limitation.
  * 
  * @author Christian Schlichtherle

@@ -60,8 +60,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class MultiplexedOutputArchive<AE extends ArchiveEntry>
-extends FilterOutputArchive<AE> {
+public class MultiplexedArchiveOutput<AE extends ArchiveEntry>
+extends FilterArchiveOutput<AE> {
 
     /** Prefix for temporary files created by the multiplexer. */
     static final String TEMP_FILE_PREFIX = "tzp-mux";
@@ -77,12 +77,12 @@ extends FilterOutputArchive<AE> {
     private boolean targetBusy;
 
     /**
-     * Constructs a new {@code MultiplexedOutputArchive}.
+     * Constructs a new {@code MultiplexedArchiveOutput}.
      * 
      * @param target the decorated output archive.
      * @throws NullPointerException iff {@code target} is {@code null}.
      */
-    public MultiplexedOutputArchive(final ArchiveOutput<AE> target) {
+    public MultiplexedArchiveOutput(final ArchiveOutput<AE> target) {
         super(target);
         if (target == null)
             throw new NullPointerException();
@@ -143,7 +143,7 @@ extends FilterOutputArchive<AE> {
             public OutputStream newOutputStream(
                     final IOReference<? extends ArchiveEntry> src)
             throws IOException {
-                return MultiplexedOutputArchive.this.newOutputStream(dst, src);
+                return MultiplexedArchiveOutput.this.newOutputStream(dst, src);
             }
         } // class OutputStreamProxy
         return new OutputStreamSocket();
