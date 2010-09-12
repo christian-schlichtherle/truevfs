@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.impl.tar;
 
-import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
@@ -103,8 +101,7 @@ implements ArchiveOutput<TarEntry> {
                 return entry;
             }
 
-            public OutputStream newOutputStream(
-                    final IOReference<? extends ArchiveEntry> src)
+            public OutputStream newOutputStream(final ArchiveEntry src)
             throws IOException {
                 return TarOutput.this.newOutputStream(entry, src);
             }
@@ -114,7 +111,7 @@ implements ArchiveOutput<TarEntry> {
 
     protected OutputStream newOutputStream(
             final TarEntry entry,
-            final IOReference<? extends ArchiveEntry> src)
+            final ArchiveEntry src)
     throws IOException {
         if (isBusy())
             throw new ArchiveOutputBusyException(entry);
@@ -122,9 +119,8 @@ implements ArchiveOutput<TarEntry> {
             entry.setSize(0);
             return new EntryOutputStream(entry);
         }
-        final ArchiveEntry srcEntry = IOReferences.deref(src);
-        if (srcEntry != null) {
-            entry.setSize(srcEntry.getSize());
+        if (src != null) {
+            entry.setSize(src.getSize());
             return new EntryOutputStream(entry);
         }
         // The source entry does not exist or cannot support DDC

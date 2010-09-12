@@ -21,8 +21,6 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.zip.BasicZipFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
@@ -70,11 +68,9 @@ implements ArchiveInput<ZipEntry> {
             }
 
             @Override
-            public InputStream newInputStream(
-                    final IOReference<? extends ArchiveEntry> dst)
+            public InputStream newInputStream(final ArchiveEntry dst)
             throws IOException {
-                final ArchiveEntry dstEntry = IOReferences.deref(dst);
-                return ZipInput.this.newInputStream(entry, dstEntry);
+                return ZipInput.this.newInputStream(entry, dst);
             }
         }
         return new InputStreamSocket();

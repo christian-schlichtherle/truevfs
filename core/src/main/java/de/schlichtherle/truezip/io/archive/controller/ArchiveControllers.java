@@ -461,35 +461,35 @@ public final class ArchiveControllers {
                         }
                     } // class SrcControllerUpdater
 
-                    final IOReference<? extends ArchiveEntry> srcRef;
-                    final Link dstLink;
+                    final ArchiveEntry srcEntry, dstEntry;
+                    final Link link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoSync(dstPath);
 
                         // Get source archive entry.
-                        srcRef = srcController.autoMount(false)
-                                .getReference(srcPath);
+                        srcEntry = srcController.autoMount(false).get(srcPath);
 
                         // Get destination archive entry.
-                        dstLink = dstController.autoMount(createParents)
+                        link = dstController.autoMount(createParents)
                                 .mknod( dstPath, FILE,
-                                        preserve ? srcRef.get() : null,
+                                        preserve ? srcEntry : null,
                                         createParents);
+                        dstEntry = link.get();
 
                         // Create input stream.
-                        in = srcController.newInputStream(srcRef, dstLink);
+                        in = srcController.newInputStream(srcEntry, dstEntry);
                     } finally {
                         srcController.readLock().unlock();
                     }
 
                     try {
                         // Create output stream.
-                        out = dstController.newOutputStream(dstLink, srcRef);
+                        out = dstController.newOutputStream(dstEntry, srcEntry);
 
                         try {
                             // Now link the destination entry into the file system.
-                            dstLink.run();
+                            link.run();
                         } catch (IOException ex) {
                             out.close();
                             throw ex;
@@ -585,18 +585,17 @@ public final class ArchiveControllers {
                     dstController.autoSync(dstPath);
 
                     // Get source archive entry reference.
-                    final IOReference<? extends ArchiveEntry> srcRef;
-                    srcRef = IOReferences.ref(new FileEntry(src));
+                    final ArchiveEntry srcEntry = new FileEntry(src);
 
                     // Get destination archive entry reference.
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(createParents);
                     final Link dstLink = dstFileSystem.mknod(
                             dstPath, FILE,
-                            preserve ? srcRef.get() : null, createParents);
+                            preserve ? srcEntry : null, createParents);
 
                     // Create output stream.
-                    out = dstController.newOutputStream(dstLink, srcRef);
+                    out = dstController.newOutputStream(dstLink.get(), srcEntry);
 
                     // Now link the destination entry into the file system.
                     dstLink.run();

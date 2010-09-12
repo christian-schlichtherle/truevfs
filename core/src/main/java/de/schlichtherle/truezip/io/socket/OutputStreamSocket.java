@@ -54,11 +54,10 @@ public interface OutputStreamSocket<LT, PT> extends IOReference<LT> {
      * Furthermore, the returned stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @param  peer the nullable peer target reference.
+     * @param  peer the nullable peer target.
      *         If this is {@code null}, then there is no peer target.
      * @return A new {@code OutputStream}.
      * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
      */
-    OutputStream newOutputStream(IOReference<? extends PT> peer)
-    throws IOException;
+    OutputStream newOutputStream(PT peer) throws IOException;
 }

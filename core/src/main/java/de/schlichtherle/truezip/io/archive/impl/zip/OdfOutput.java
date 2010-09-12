@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.impl.zip;
 
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -50,16 +49,16 @@ extends MultiplexedArchiveOutput<ZipEntry> {
 
     @Override
     protected OutputStream newOutputStream(
-            final ArchiveOutputStreamSocket<? extends ZipEntry> dst,
-            final IOReference<? extends ArchiveEntry> src)
+            final ArchiveOutputStreamSocket<? extends ZipEntry> dstSocket,
+            final ArchiveEntry src)
     throws IOException {
-        final ZipEntry dstEntry = dst.get();
-        if (MIMETYPE.equals(dstEntry.getName())) {
+        final ZipEntry dst = dstSocket.get();
+        if (MIMETYPE.equals(dst.getName())) {
             mimetype = true;
-            if (dstEntry.getMethod() == UNKNOWN)
-                dstEntry.setMethod(STORED);
+            if (dst.getMethod() == UNKNOWN)
+                dst.setMethod(STORED);
         }
-        return super.newOutputStream(dst, src);
+        return super.newOutputStream(dstSocket, src);
     }
 
     @Override

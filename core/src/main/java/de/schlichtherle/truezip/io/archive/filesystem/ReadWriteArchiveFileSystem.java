@@ -366,15 +366,31 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
     }
 
     @Override
-    public Iterator<IOReference<? extends ArchiveEntry>> iterator() {
-        return (Iterator) Collections.unmodifiableCollection(master.values()).iterator(); // FIXME: Make this typesafe!
+    public Iterator<ArchiveEntry> iterator() {
+        class ArchiveEntryIterator implements Iterator<ArchiveEntry> {
+            final Iterator<CommonEntry> it = master.values().iterator();
+
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            public ArchiveEntry next() {
+                return it.next().get();
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        }
+        return new ArchiveEntryIterator();
     }
 
     @Override
-    public CommonEntry getReference(String path) {
+    public ArchiveEntry get(String path) {
         if (path == null)
             throw new NullPointerException();
-        return master.get(path);
+        final CommonEntry entry = master.get(path);
+        return entry == null ? null : entry.get();
     }
 
     /**
@@ -677,7 +693,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public Type getType(final String path) {
-        final ArchiveEntry entry = getReference(path);
+        final CommonEntry entry = master.get(path);
         return entry != null ? entry.getType() : null;
     }
 
@@ -696,7 +712,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public long getLength(final String path) {
-        final CommonEntry entry = getReference(path);
+        final CommonEntry entry = master.get(path);
         if (entry == null || entry.getType() == DIRECTORY)
             return 0;
 
@@ -715,7 +731,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public long getLastModified(final String path) {
-        final CommonEntry entry = getReference(path);
+        final CommonEntry entry = master.get(path);
         if (entry != null) {
             // Depending on the driver type, target.getTime() could return
             // a negative value. E.g. this is the default value that the
@@ -737,7 +753,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
             throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
 
-        final CommonEntry entry = getReference(path);
+        final CommonEntry entry = master.get(path);
         if (entry == null)
             return false;
 
@@ -750,7 +766,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
 
     @Override
     public Set<String> list(final String path) {
-        final CommonEntry entry = getReference(path);
+        final CommonEntry entry = master.get(path);
         return entry == null ? null : entry.list();
     }
 }
