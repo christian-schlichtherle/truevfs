@@ -4,3 +4,5 @@
 \.rej$
 \.conflict\~$
 glob:*/target/
+glob:**/*.log
+glob:**/*.log.xml
