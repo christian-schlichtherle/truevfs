@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveInputMetaData;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
@@ -73,8 +72,6 @@ implements ArchiveInput<TarEntry> {
     /** Maps entry names to tar entries [String -> TarEntry]. */
     private final Map<String, TarEntry> entries
             = new LinkedHashMap<String, TarEntry>();
-
-    private ArchiveInputMetaData metaData;
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
@@ -230,7 +227,7 @@ implements ArchiveInput<TarEntry> {
             throws IOException {
                 return TarInput.this.newInputStream(entry, dst);
             }
-        } // class InputStreamProxy
+        } // class InputStreamSocket
         return new InputStreamSocket();
     }
 
@@ -260,14 +257,6 @@ implements ArchiveInput<TarEntry> {
                 file.deleteOnExit();
             }
         }
-    }
-
-    public ArchiveInputMetaData getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(ArchiveInputMetaData metaData) {
-        this.metaData = metaData;
     }
 
     /**

@@ -478,14 +478,18 @@ public final class ArchiveControllers {
                         dstEntry = link.get();
 
                         // Create input stream.
-                        in = srcController.newInputStream(srcEntry, dstEntry);
+                        in = srcController
+                                .getInputStreamSocket(srcEntry)
+                                .newInputStream(dstEntry);
                     } finally {
                         srcController.readLock().unlock();
                     }
 
                     try {
                         // Create output stream.
-                        out = dstController.newOutputStream(dstEntry, srcEntry);
+                        out = dstController
+                                .getOutputStreamSocket(dstEntry)
+                                .newOutputStream(srcEntry);
 
                         try {
                             // Now link the destination entry into the file system.
@@ -595,7 +599,9 @@ public final class ArchiveControllers {
                             preserve ? srcEntry : null, createParents);
 
                     // Create output stream.
-                    out = dstController.newOutputStream(dstLink.get(), srcEntry);
+                    out = dstController
+                            .getOutputStreamSocket(dstLink.get())
+                            .newOutputStream(srcEntry);
 
                     // Now link the destination entry into the file system.
                     dstLink.run();

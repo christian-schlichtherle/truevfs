@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
+import de.schlichtherle.truezip.io.archive.input.ConcurrentArchiveInput;
+import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import java.net.URI;
@@ -30,6 +34,7 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -45,7 +50,6 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
@@ -96,7 +100,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * An {@link ArchiveInput} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private ArchiveInput<ArchiveEntry> inArchive;
+    private ConcurrentArchiveInput<ArchiveEntry> input;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -108,7 +112,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * The (possibly temporary) {@link ArchiveOutput} we are writing newly
      * created or modified entries to.
      */
-    private ArchiveOutput<ArchiveEntry> outArchive;
+    private ConcurrentArchiveOutput<ArchiveEntry> output;
 
     /**
      * Whether or not nesting this archive file to its enclosing
@@ -123,13 +127,27 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         super(mountPoint, enclMountPoint, driver);
     }
 
+    private ArchiveFileSystem newArchiveFileSystem()
+    throws IOException {
+        return ArchiveFileSystems.newArchiveFileSystem(
+                getDriver(), vetoableTouchListener);
+    }
+
+    private ArchiveFileSystem newArchiveFileSystem(
+            long rootTime,
+            boolean readOnly) {
+        return ArchiveFileSystems.newArchiveFileSystem(
+                ConcurrentArchiveInput.unwrap(input),
+                rootTime, getDriver(), vetoableTouchListener, readOnly);
+    }
+
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
     throws FalsePositiveException, IOException {
         assert writeLock().isHeldByCurrentThread();
-        assert inArchive == null;
+        assert input == null;
         assert outFile == null;
-        assert outArchive == null;
+        assert output == null;
         assert getFileSystem() == null;
 
         // Do the logging part and leave the work to mount0.
@@ -139,18 +157,18 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             mount0(autoCreate, createParents);
 
             assert writeLock().isHeldByCurrentThread();
-            assert autoCreate || inArchive != null;
+            assert autoCreate || input != null;
             assert autoCreate || outFile == null;
-            assert autoCreate || outArchive == null;
+            assert autoCreate || output == null;
             assert getFileSystem() != null;
         } catch (IOException ex) {
             // Log at FINER level. This is mostly because of false positives.
             logger.log(Level.FINER, "mount.catch", ex); // NOI18N
 
             assert writeLock().isHeldByCurrentThread();
-            assert inArchive == null;
+            assert input == null;
             assert outFile == null;
-            assert outArchive == null;
+            assert output == null;
             assert getFileSystem() == null;
 
             throw ex;
@@ -182,14 +200,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // that it can access the target in the real file system.
                     throw new FalsePositiveException(this, ROOT, ex);
                 }
-                setFileSystem(newArchiveFileSystem(
-                         inArchive, time, getDriver(),
-                        vetoableTouchListener, isReadOnly));
+                setFileSystem(newArchiveFileSystem(time, isReadOnly));
             } else if (autoCreate) {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
-                setFileSystem(newArchiveFileSystem(
-                        getDriver(), vetoableTouchListener));
+                setFileSystem(newArchiveFileSystem());
             } else {
                 assert !autoCreate;
 
@@ -239,8 +254,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // its virtual root directory.
                 // Nice trick, isn't it?!
                 setFileSystem(newArchiveFileSystem(
-                        inArchive, inFile.lastModified(),
-                        getDriver(), vetoableTouchListener, false));
+                        inFile.lastModified(), false));
             }
         }
     }
@@ -343,8 +357,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.copy(controller.newInputStream0(path),
-                            new java.io.FileOutputStream(tmp));
+                Streams.copy(   controller.newInputStream0(path),
+                                new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
                 try {
@@ -354,8 +368,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                        inArchive, controllerFileSystem.getLastModified(path),
-                        getDriver(), vetoableTouchListener,
+                        controllerFileSystem.getLastModified(path),
                         controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
@@ -382,10 +395,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // encrypted ZIP file and the user cancels password
             // prompting.
             //ensureOutArchive(); // side effect of the following
-            final ArchiveFileSystem fileSystem = newArchiveFileSystem(
-                    getDriver(), vetoableTouchListener);
+            final ArchiveFileSystem fileSystem = newArchiveFileSystem();
             assert outFile != null;
-            assert outArchive != null;
+            assert output != null;
             // Now try to create the entry in the enclosing controller.
             try {
                 link.run();
@@ -394,9 +406,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // Hence, we need to revert our state changes.
                 try {
                     try {
-                        outArchive.close();
+                        output.close();
                     } finally {
-                        outArchive = null;
+                        output = null;
                     }
                 } finally {
                     boolean deleted = outFile.delete();
@@ -425,7 +437,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private void initInArchive(final java.io.File inFile)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
-        assert inArchive == null;
+        assert input == null;
 
         logger.log(Level.FINEST, "initInArchive.try", inFile); // NOI18N
         try {
@@ -433,50 +445,46 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 if (isRfsEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                inArchive = getDriver().newArchiveInput(this, rof);
+                input = ConcurrentArchiveInput.wrap(
+                        getDriver().newArchiveInput(this, rof));
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
                 // We are checking success to make sure that we always delete
                 // the newly created temp file in case of an error.
-                if (inArchive == null)
+                if (input == null)
                     rof.close();
             }
-            inArchive.setMetaData(new ArchiveInputMetaData(this, inArchive));
         } catch (IOException ex) {
             logger.log(Level.FINEST, "initInArchive.catch", ex); // NOI18N
 
-            assert inArchive == null;
+            assert input == null;
 
             throw ex;
         } finally {
             logger.log(Level.FINEST, "initInArchive.finally",
-                    inArchive == null ? 0 : inArchive.size()); // NOI18N
+                    input == null ? 0 : input.size()); // NOI18N
         }
 
-        assert inArchive != null;
+        assert input != null;
     }
 
     @Override
-    InputStream newInputStream(
-            final ArchiveEntry target,
-            final ArchiveEntry peer)
+    ArchiveInputStreamSocket getInputStreamSocket(final ArchiveEntry target)
     throws IOException {
         assert target != null;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         assert !hasNewData(target.getName());
         assert target.getType() != DIRECTORY;
 
-        final InputStream in
-                = inArchive.getMetaData().newInputStream(target, peer);
+        final ArchiveInputStreamSocket in = input
+                .getInputStreamSocket(target);
         assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + target.getName() + '"';
         return in;
     }
 
     @Override
-    OutputStream newOutputStream(
-            final ArchiveEntry target,
-            final ArchiveEntry peer)
+    ArchiveOutputStreamSocket getOutputStreamSocket(final ArchiveEntry target)
     throws IOException {
         assert target != null;
         assert writeLock().isHeldByCurrentThread();
@@ -484,8 +492,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert target.getType() != DIRECTORY;
 
         ensureOutArchive();
-        final OutputStream out
-                = outArchive.getMetaData().newOutputStream(target, peer);
+        final ArchiveOutputStreamSocket out = output
+                .getOutputStreamSocket(target);
         assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + target.getName() + '"';
         return out;
     }
@@ -494,7 +502,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
 
-        if (outArchive != null)
+        if (output != null)
             return;
 
         java.io.File tmp = outFile;
@@ -527,7 +535,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private void initOutArchive(final java.io.File outFile)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
-        assert outArchive == null;
+        assert output == null;
 
         logger.log(Level.FINEST, "initOutArchive.try", outFile); // NOI18N
         try {
@@ -538,7 +546,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    outArchive = getDriver().newArchiveOutput(this, out, inArchive);
+                    output = ConcurrentArchiveOutput.wrap(
+                            getDriver().newArchiveOutput(
+                                this, out,
+                                ConcurrentArchiveInput.unwrap(input)));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -550,32 +561,31 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // similar if the class path is not set up correctly.
                 // We are checking success to make sure that we always delete
                 // the newly created temp file in case of an error.
-                if (outArchive == null) {
+                if (output == null) {
                     out.close();
                     if (!outFile.delete())
                         throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)");
                 }
             }
-            outArchive.setMetaData(new ArchiveOutputMetaData(this, outArchive));
         } catch (IOException ex) {
             logger.log(Level.FINEST, "initOutArchive.catch", ex); // NOI18N
 
-            assert outArchive == null;
+            assert output == null;
 
             throw ex;
         } finally {
             logger.log(Level.FINEST, "initOutArchive.finally"); // NOI18N
         }
 
-        assert outArchive != null;
+        assert output != null;
     }
 
     boolean hasNewData(String path) {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
-        if (outArchive == null)
+        if (output == null)
             return false;
         final ArchiveEntry entry = getFileSystem().get(path);
-        return entry != null && outArchive.getEntry(entry.getName()) != null;
+        return entry != null && output.getEntry(entry.getName()) != null;
     }
 
     public void sync(final SyncConfiguration config)
@@ -583,9 +593,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert config.getCloseInputStreams() || !config.getCloseOutputStreams(); // closeOutputStreams => closeInputStreams
         assert !config.getUmount() || config.getReassemble(); // sync => reassemble
         assert writeLock().isHeldByCurrentThread();
-        assert inArchive == null || inFile != null; // input archive => input file
-        assert !isTouched() || outArchive != null; // file system touched => output archive
-        assert outArchive == null || outFile != null; // output archive => output file
+        assert input == null || inFile != null; // input archive => input file
+        assert !isTouched() || output != null; // file system touched => output archive
+        assert output == null || outFile != null; // output archive => output file
 
         // Do the logging part and leave the work to sync0.
         final Object[] stats = new Object[] {
@@ -617,9 +627,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // true and closeOutputStreams may be false in which case we
         // don't even need to check open input streams if there are
         // some open output streams.
-        if (outArchive != null) {
-            final ArchiveOutputMetaData outMetaData = outArchive.getMetaData();
-            final int outStreams = outMetaData.waitAllOutputStreamsByOtherThreads(
+        if (output != null) {
+            final int outStreams = output.waitCloseAllOutputStreams(
                     config.getWaitForOutputStreams() ? 0 : 50);
             if (outStreams > 0) {
                 if (!config.getCloseOutputStreams())
@@ -629,9 +638,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         this, outStreams));
             }
         }
-        if (inArchive != null) {
-            final ArchiveInputMetaData inMetaData = inArchive.getMetaData();
-            final int inStreams = inMetaData.waitAllInputStreamsByOtherThreads(
+        if (input != null) {
+            final int inStreams = input.waitCloseAllInputStreams(
                     config.getWaitForInputStreams() ? 0 : 50);
             if (inStreams > 0) {
                 if (!config.getCloseInputStreams())
@@ -655,9 +663,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 try {
                     update(builder);
                     assert getFileSystem() == null;
-                    assert inArchive == null;
+                    assert input == null;
                 } finally {
-                    assert outArchive == null;
+                    assert output == null;
                 }
                 try {
                     if (config.getReassemble()) {
@@ -691,7 +699,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // This may happen if File.update() or File.sync() has
                 // been called and no modifications have been applied to
                 // this ArchiveController since its creation or last update.
-                assert outArchive == null;
+                assert output == null;
             }
         } catch (SyncException ex) {
             throw ex;
@@ -705,14 +713,14 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     final int waitAllInputStreamsByOtherThreads(long timeout) {
-        return inArchive != null
-                ? inArchive.getMetaData().waitAllInputStreamsByOtherThreads(timeout)
+        return input != null
+                ? input.waitCloseAllInputStreams(timeout)
                 : 0;
     }
 
     final int waitAllOutputStreamsByOtherThreads(long timeout) {
-        return outArchive != null
-                ? outArchive.getMetaData().waitAllOutputStreamsByOtherThreads(timeout)
+        return output != null
+                ? output.waitCloseAllOutputStreams(timeout)
                 : 0;
     }
 
@@ -730,7 +738,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     throws SyncException {
         assert writeLock().isHeldByCurrentThread();
         assert isTouched();
-        assert outArchive != null;
+        assert output != null;
         assert checkNoDeletedEntriesWithNewData(handler);
 
         class FilterExceptionHandler
@@ -814,7 +822,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // deleted from the archive file system meanwhile and prepare
         // to throw a warning exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
-        for (final ArchiveEntry entry : outArchive) {
+        for (final ArchiveEntry entry : output) {
             assert entry.getType() != DIRECTORY;
             // At this point in time we could have written only file archive
             // entries with valid path names, so the following test should be
@@ -835,12 +843,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     public <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
+        final ArchiveInput<ArchiveEntry> in
+                = ConcurrentArchiveInput.unwrap(input);
+        final ArchiveOutput<ArchiveEntry> out
+                = ConcurrentArchiveOutput.unwrap(output);
         final ArchiveFileSystem fileSystem = getFileSystem();
         final ArchiveEntry root = fileSystem.get(ROOT);
         assert root != null;
         for (final ArchiveEntry e : fileSystem) {
             final String n = e.getName();
-            if (outArchive.getEntry(n) != null)
+            if (out.getEntry(n) != null)
                 continue; // we have already written this target
             try {
                 if (e.getType() == DIRECTORY) {
@@ -848,13 +860,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    outArchive.getOutputStreamSocket(e)
+                    out.getOutputStreamSocket(e)
                             .newOutputStream(null)
                             .close();
-                } else if (inArchive != null && inArchive.getEntry(n) != null) {
-                    assert e == inArchive.getEntry(n);
-                    IOOperations.copy(  inArchive.getInputStreamSocket(e),
-                                        outArchive.getOutputStreamSocket(e));
+                } else if (in != null && in.getEntry(n) != null) {
+                    assert e == in.getEntry(n);
+                    IOOperations.copy(  in.getInputStreamSocket(e),
+                                        out.getOutputStreamSocket(e));
                 } else {
                     // The file system entry is an archive file which has been
                     // newly created and not yet been reassembled
@@ -862,7 +874,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    outArchive.getOutputStreamSocket(e)
+                    out.getOutputStreamSocket(e)
                             .newOutputStream(null)
                             .close();
                 }
@@ -1063,10 +1075,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
         } // class FilterExceptionHandler
         final FilterExceptionHandler decoratedHandler = new FilterExceptionHandler();
-        if (outArchive != null)
-            outArchive.getMetaData().closeAllOutputStreams(decoratedHandler);
-        if (inArchive != null)
-            inArchive.getMetaData().closeAllInputStreams(decoratedHandler);
+        if (output != null)
+            output.closeAllOutputStreams(decoratedHandler);
+        if (input != null)
+            input.closeAllInputStreams(decoratedHandler);
     }
 
     /**
@@ -1088,23 +1100,23 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         // E.g. with ZIP archive files, the ArchiveOutput copies the postamble
         // from the ArchiveInput when it closes.
         try {
-            if (outArchive != null) {
+            if (output != null) {
                 try {
-                    outArchive.close();
+                    output.close();
                 } catch (IOException ioe) {
                     handler.warn(new SyncException(this, ioe));
                 } finally {
-                    outArchive = null;
+                    output = null;
                 }
             }
         } finally {
-            if (inArchive != null) {
+            if (input != null) {
                 try {
-                    inArchive.close();
+                    input.close();
                 } catch (IOException ioe) {
                     handler.warn(new SyncWarningException(this, ioe));
                 } finally {
-                    inArchive = null;
+                    input = null;
                 }
             }
         }
