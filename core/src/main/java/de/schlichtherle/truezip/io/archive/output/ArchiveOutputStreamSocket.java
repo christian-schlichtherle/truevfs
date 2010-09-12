@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,9 +56,9 @@ extends OutputStreamSocket<AE, ArchiveEntry> {
     /**
      * {@inheritDoc}
      *
-     * @param  source a nullable reference to a peer archive entry which
-     *         is going to be read in order to copy its data to the
-     *         {@link #get() target} archive entry.
+     * @param  source a nullable peer archive entry which is going to be
+     *         read in order to copy its data to the {@link #get() target}
+     *         archive entry.
      *         <p>
      *         Implementations may test the runtime type of this object in
      *         order to check if they should copy some class-specific
@@ -81,6 +80,5 @@ extends OutputStreamSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    OutputStream newOutputStream(IOReference<? extends ArchiveEntry> source)
-    throws IOException;
+    OutputStream newOutputStream(ArchiveEntry source) throws IOException;
 }

@@ -398,6 +398,11 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         return autoMount(autoCreate, autoCreate);
     }
 
+    ArchiveFileSystem autoMount()
+    throws FalsePositiveException, IOException {
+        return autoMount(false, false);
+    }
+
     /**
      * Synchronizes the archive file only if the archive file has already new
      * data for the file system entry with the given path name.
@@ -520,7 +525,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    autoMount(false); // detect false positives!
+                    autoMount(); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
@@ -539,16 +544,15 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final ArchiveFileSystem fileSystem =  autoMount(false);
-                final IOReference<? extends ArchiveEntry> entryRef
-                        = fileSystem.getReference(path);
-                if (entryRef == null)
+                final ArchiveFileSystem fileSystem = autoMount();
+                final ArchiveEntry entry = fileSystem.get(path);
+                if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file or directory");
-                if (entryRef.get().getType() == DIRECTORY)
+                if (entry.getType() == DIRECTORY)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "cannot read directories");
-                return newInputStream(entryRef, null);
+                return newInputStream(entry, null);
             }
         } finally {
             readLock().unlock();
@@ -563,9 +567,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract InputStream newInputStream(
-            IOReference<? extends ArchiveEntry> targetRef,
-            IOReference<? extends ArchiveEntry> peerRef)
+    abstract InputStream newInputStream(ArchiveEntry target, ArchiveEntry peer)
     throws IOException;
 
     /**
@@ -605,7 +607,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    autoMount(false); // detect false positives!
+                    autoMount(); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
@@ -624,7 +626,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 // directory.
                 final Link link = fileSystem.mknod(path, FILE, null, createParents);
                 // Create output stream.
-                out = newOutputStream(link, null);
+                out = newOutputStream(link.get(), null);
                 // Now link the entry into the file system.
                 link.run();
             }
@@ -649,9 +651,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract OutputStream newOutputStream(
-            IOReference<? extends ArchiveEntry> targetRef,
-            IOReference<? extends ArchiveEntry> peerRef)
+    abstract OutputStream newOutputStream(ArchiveEntry target, ArchiveEntry peer)
     throws IOException;
 
     public final boolean isExisting(final String path)
@@ -672,7 +672,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         readLock().lock();
         try {
             try {
-                return autoMount(false).getType(path) != null;
+                return autoMount().getType(path) != null;
             } catch (ArchiveEntryNotFoundException ex) {
                 return false;
             }
@@ -704,7 +704,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         readLock().lock();
         try {
             try {
-                return autoMount(false).getType(path) == FILE;
+                return autoMount().getType(path) == FILE;
             } catch (ArchiveEntryNotFoundException ex) {
                 return false;
             }
@@ -733,7 +733,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         readLock().lock();
         try {
             try {
-                return autoMount(false).getType(path) == DIRECTORY;
+                return autoMount().getType(path) == DIRECTORY;
             } catch (ArchiveEntryNotFoundException ex) {
                 return false;
             }
@@ -759,7 +759,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            autoMount(false); // detect false positives!
+            autoMount(); // detect false positives!
             return isRoot(path)
                     ? getDriver().getOpenIcon(this)
                     : null;
@@ -785,7 +785,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            autoMount(false); // detect false positives!
+            autoMount(); // detect false positives!
             return isRoot(path)
                     ? getDriver().getClosedIcon(this)
                     : null;
@@ -811,7 +811,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.getType(path) != null;
         } finally {
             readLock().unlock();
@@ -835,7 +835,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.isWritable(path);
         } finally {
             readLock().unlock();
@@ -859,7 +859,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.getLength(path);
         } finally {
             readLock().unlock();
@@ -883,7 +883,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.getLastModified(path);
         } finally {
             readLock().unlock();
@@ -907,7 +907,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.list(path);
         } finally {
             readLock().unlock();
@@ -927,7 +927,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             fileSystem.setReadOnly(path);
         } finally {
             writeLock().unlock();
@@ -956,7 +956,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         writeLock().lock();
         try {
             autoSync(path);
-            final ArchiveFileSystem fileSystem = autoMount(false);
+            final ArchiveFileSystem fileSystem = autoMount();
             return fileSystem.setLastModified(path, time);
         } finally {
             writeLock().unlock();
@@ -1019,7 +1019,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             if (isRoot(path)) {
                 try {
-                    autoMount(false); // detect false positives!
+                    autoMount(); // detect false positives!
                 } catch (ArchiveEntryNotFoundException ex) {
                     autoMount(true, createParents);
                     return;
@@ -1066,7 +1066,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 // Get the file system or die trying!
                 final ArchiveFileSystem fileSystem;
                 try {
-                    fileSystem = autoMount(false);
+                    fileSystem = autoMount();
                 } catch (FalsePositiveException ex) {
                     // The File instance is going to delete the target file
                     // anyway, so we need to reset now.
@@ -1108,7 +1108,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     getEnclController().delete0(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
-                final ArchiveFileSystem fileSystem = autoMount(false);
+                final ArchiveFileSystem fileSystem = autoMount();
                 fileSystem.unlink(path);
             }
         } finally {

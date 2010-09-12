@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.spi;
 
-import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.InputStreamSocket;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -140,8 +138,7 @@ extends FilterArchiveOutput<AE> {
             }
 
             @Override
-            public OutputStream newOutputStream(
-                    final IOReference<? extends ArchiveEntry> src)
+            public OutputStream newOutputStream(final ArchiveEntry src)
             throws IOException {
                 return MultiplexedArchiveOutput.this.newOutputStream(dst, src);
             }
@@ -150,18 +147,17 @@ extends FilterArchiveOutput<AE> {
     }
 
     protected OutputStream newOutputStream(
-            final ArchiveOutputStreamSocket<? extends AE> dst,
-            final IOReference<? extends ArchiveEntry> src)
+            final ArchiveOutputStreamSocket<? extends AE> dstSocket,
+            final ArchiveEntry src)
     throws IOException {
-        final ArchiveEntry srcEntry = IOReferences.deref(src);
-        if (srcEntry != null) {
-            final ArchiveEntry dstEntry = dst.get();
-            dstEntry.setSize(srcEntry.getSize()); // data may be compressed!
+        if (src != null) {
+            final ArchiveEntry dst = dstSocket.get();
+            dst.setSize(src.getSize()); // data may be compressed!
         }
         return isTargetBusy()
                 ? new TempEntryOutputStream(
-                    createTempFile(TEMP_FILE_PREFIX), dst, src)
-                : new EntryOutputStream(dst.newOutputStream(src));
+                    createTempFile(TEMP_FILE_PREFIX), dstSocket, src)
+                : new EntryOutputStream(dstSocket.newOutputStream(src));
     }
 
     /**
@@ -218,14 +214,14 @@ extends FilterArchiveOutput<AE> {
     implements IOReference<AE> {
         private final File temp;
         private final ArchiveOutputStreamSocket<? extends AE> dst;
-        private final InputStreamSocket<? extends ArchiveEntry, ArchiveEntry> src;
+        private final ArchiveInputStreamSocket<ArchiveEntry> src;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
                 final ArchiveOutputStreamSocket<? extends AE> dst,
-                final IOReference<? extends ArchiveEntry> src)
+                final ArchiveEntry src)
         throws IOException {
             super(temp);
             class TempInputStreamSocket
@@ -233,8 +229,7 @@ extends FilterArchiveOutput<AE> {
                 private final ArchiveEntry entry;
 
                 TempInputStreamSocket() {
-                    final ArchiveEntry e = IOReferences.deref(src);
-                    this.entry = e != null ? e : new FileEntry(temp);
+                    this.entry = src != null ? src : new FileEntry(temp);
                 }
 
                 @Override
@@ -243,16 +238,14 @@ extends FilterArchiveOutput<AE> {
                 }
 
                 @Override
-                public InputStream newInputStream(IOReference<? extends ArchiveEntry> dst)
-                        throws IOException {
+                public InputStream newInputStream(ArchiveEntry dst)
+                throws IOException {
                     return new FileInputStream(temp);
                 }
             } // class TempInputStreamSocket
             this.temp = temp;
             this.dst = dst;
-            this.src = src instanceof InputStreamSocket
-                    ? (InputStreamSocket) src
-                    : new TempInputStreamSocket();
+            this.src = new TempInputStreamSocket();
             temps.put(dst.get().getName(), this);
         }
 

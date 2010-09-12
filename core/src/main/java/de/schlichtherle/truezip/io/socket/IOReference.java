@@ -35,7 +35,6 @@ public interface IOReference<T> {
      * The result of changing the state of the returned object is undefined.
      * However, this term may be overridden by sub-interfaces or
      * implementations.
-     *
      * 
      * @return The target for I/O operations.
      */

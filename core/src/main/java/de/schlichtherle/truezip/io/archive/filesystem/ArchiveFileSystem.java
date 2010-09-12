@@ -32,8 +32,7 @@ import java.util.Set;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystem
-extends Iterable<IOReference<? extends ArchiveEntry>> {
+public interface ArchiveFileSystem extends Iterable<ArchiveEntry> {
 
     /**
      * Returns {@code true} if and only if this archive file system is
@@ -47,14 +46,13 @@ extends Iterable<IOReference<? extends ArchiveEntry>> {
      */
     boolean isTouched();
 
-    Iterator<IOReference<? extends ArchiveEntry>> iterator();
+    Iterator<ArchiveEntry> iterator();
 
     /**
      * Looks up the archive entry with the given path name in this virtual
-     * archive file system and returns a reference to it or {@code null} if not
-     * existent.
+     * archive file system and returns it or {@code null} if not existent.
      */
-    IOReference<? extends ArchiveEntry> getReference(String path);
+    ArchiveEntry get(String path);
 
     /**
      * Begins a &quot;create and link target&quot; transaction to ensure that

@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.impl.zip;
 
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputMetaData;
 import de.schlichtherle.truezip.io.archive.spi.MultiplexedArchiveOutput;
@@ -24,8 +23,6 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.socket.InputStreamSocket;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -137,8 +134,7 @@ implements ArchiveOutput<ZipEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream(
-                    final IOReference<? extends ArchiveEntry> src)
+            public OutputStream newOutputStream(final ArchiveEntry src)
             throws IOException {
                 return ZipOutput.this.newOutputStream(entry, src);
             }
@@ -148,7 +144,7 @@ implements ArchiveOutput<ZipEntry> {
 
     protected OutputStream newOutputStream(
             final ZipEntry entry,
-            final IOReference<? extends ArchiveEntry> src)
+            final ArchiveEntry src)
     throws IOException {
         if (isBusy())
             throw new ArchiveOutputBusyException(entry);
@@ -161,15 +157,14 @@ implements ArchiveOutput<ZipEntry> {
             return new EntryOutputStream(entry);
         }
 
-        final ArchiveEntry srcEntry = IOReferences.deref(src);
-        if (srcEntry != null) {
-            entry.setSize(srcEntry.getSize());
-            if (srcEntry instanceof ZipEntry) {
+        if (src != null) {
+            entry.setSize(src.getSize());
+            if (src instanceof ZipEntry) {
                 // Set up entry attributes for Direct Data Copying (DDC).
                 // A preset method in the entry takes priority.
                 // The ZIP.RAES drivers use this feature to enforce deflation
                 // for enhanced authentication security.
-                final ZipEntry srcZipEntry = (ZipEntry) srcEntry;
+                final ZipEntry srcZipEntry = (ZipEntry) src;
                 if (entry.getMethod() == UNKNOWN)
                     entry.setMethod(srcZipEntry.getMethod());
                 if (entry.getMethod() == srcZipEntry.getMethod())
@@ -188,18 +183,9 @@ implements ArchiveOutput<ZipEntry> {
             case STORED:
                 if (entry.getCrc() == UNKNOWN
                         || entry.getCompressedSize() == UNKNOWN
-                        || entry.getSize() == UNKNOWN) {
-                    if (!(src instanceof InputStreamSocket))
-                        return new TempEntryOutputStream(
-                                createTempFile(TEMP_FILE_PREFIX), entry);
-                    final InputStream in = ((InputStreamSocket) src)
-                            .newInputStream(IOReferences.ref(null));
-                    final Crc32OutputStream out = new Crc32OutputStream();
-                    Streams.copy(in, out);
-                    entry.setCrc(out.crc.getValue());
-                    entry.setCompressedSize(srcEntry.getSize()); // STORED!
-                    entry.setSize(srcEntry.getSize());
-                }
+                        || entry.getSize() == UNKNOWN)
+                    return new TempEntryOutputStream(
+                            createTempFile(TEMP_FILE_PREFIX), entry);
                 break;
 
             case DEFLATED:

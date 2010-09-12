@@ -20,8 +20,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOOperations;
-import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -330,7 +328,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert inFile == null;
 
         final ArchiveFileSystem controllerFileSystem;
-        controllerFileSystem = controller.autoMount(createParents, createParents);
+        controllerFileSystem = controller.autoMount(createParents);
         final Type type = controllerFileSystem.getType(path);
         if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
@@ -461,34 +459,34 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
 
     @Override
     InputStream newInputStream(
-            final IOReference<? extends ArchiveEntry> targetRef,
-            final IOReference<? extends ArchiveEntry> peerRef)
+            final ArchiveEntry target,
+            final ArchiveEntry peer)
     throws IOException {
-        assert targetRef != null;
+        assert target != null;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
-        assert !hasNewData(targetRef.get().getName());
-        assert targetRef.get().getType() != DIRECTORY;
+        assert !hasNewData(target.getName());
+        assert target.getType() != DIRECTORY;
 
         final InputStream in
-                = inArchive.getMetaData().newInputStream(targetRef, peerRef);
-        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + targetRef.get().getName() + '"';
+                = inArchive.getMetaData().newInputStream(target, peer);
+        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + target.getName() + '"';
         return in;
     }
 
     @Override
     OutputStream newOutputStream(
-            final IOReference<? extends ArchiveEntry> targetRef,
-            final IOReference<? extends ArchiveEntry> peerRef)
+            final ArchiveEntry target,
+            final ArchiveEntry peer)
     throws IOException {
-        assert targetRef != null;
+        assert target != null;
         assert writeLock().isHeldByCurrentThread();
-        assert !hasNewData(targetRef.get().getName());
-        assert targetRef.get().getType() != DIRECTORY;
+        assert !hasNewData(target.getName());
+        assert target.getType() != DIRECTORY;
 
         ensureOutArchive();
         final OutputStream out
-                = outArchive.getMetaData().newOutputStream(targetRef, peerRef);
-        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + targetRef.get().getName() + '"';
+                = outArchive.getMetaData().newOutputStream(target, peer);
+        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + target.getName() + '"';
         return out;
     }
 
@@ -576,8 +574,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (outArchive == null)
             return false;
-        final ArchiveFileSystem fileSystem = getFileSystem();
-        final ArchiveEntry entry = IOReferences.deref(fileSystem.getReference(path));
+        final ArchiveEntry entry = getFileSystem().get(path);
         return entry != null && outArchive.getEntry(entry.getName()) != null;
     }
 
@@ -839,10 +836,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final ArchiveEntry root = fileSystem.getReference(ROOT).get();
+        final ArchiveEntry root = fileSystem.get(ROOT);
         assert root != null;
-        for (final IOReference<? extends ArchiveEntry> v : fileSystem) {
-            final ArchiveEntry e = v.get();
+        for (final ArchiveEntry e : fileSystem) {
             final String n = e.getName();
             if (outArchive.getEntry(n) != null)
                 continue; // we have already written this target
@@ -853,7 +849,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
                     outArchive.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
+                            .newOutputStream(null)
                             .close();
                 } else if (inArchive != null && inArchive.getEntry(n) != null) {
                     assert e == inArchive.getEntry(n);
@@ -867,7 +863,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
                     outArchive.getOutputStreamSocket(e)
-                            .newOutputStream(IOReferences.ref((ArchiveEntry) null))
+                            .newOutputStream(null)
                             .close();
                 }
             } catch (IOException ex) {

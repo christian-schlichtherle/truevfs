@@ -18,14 +18,11 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -101,16 +98,14 @@ public final class ArchiveInputMetaData {
     }
 
     synchronized InputStream newInputStream(
-            final IOReference<? extends ArchiveEntry> targetRef,
-            final IOReference<? extends ArchiveEntry> peerRef)
+            final ArchiveEntry target,
+            final ArchiveEntry peer)
             throws IOException {
         assert !stopped;
-        assert targetRef != null;
+        assert target != null;
 
         return new EntryInputStream(
-                inArchive
-                .getInputStreamSocket(IOReferences.deref(targetRef))
-                .newInputStream(peerRef));
+                inArchive.getInputStreamSocket(target).newInputStream(peer));
     }
 
     /**

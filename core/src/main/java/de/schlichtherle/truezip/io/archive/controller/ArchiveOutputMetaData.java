@@ -101,16 +101,14 @@ public final class ArchiveOutputMetaData {
     }
 
     synchronized OutputStream newOutputStream(
-            final IOReference<? extends ArchiveEntry> targetRef,
-            final IOReference<? extends ArchiveEntry> peerRef)
+            final ArchiveEntry target,
+            final ArchiveEntry peer)
     throws IOException {
         assert !stopped;
-        assert targetRef != null;
+        assert target != null;
 
         return new EntryOutputStream(
-                outArchive
-                .getOutputStreamSocket(IOReferences.deref(targetRef))
-                .newOutputStream(peerRef));
+                outArchive.getOutputStreamSocket(target).newOutputStream(peer));
     }
 
     /**

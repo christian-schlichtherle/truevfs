@@ -56,13 +56,13 @@ public class IOStreamSockets {
             }
 
             @Override
-            public InputStream newInputStream(IOReference<? extends PT> dst)
+            public InputStream newInputStream(PT dst)
             throws FileNotFoundException {
                 return new FileInputStream(file);
             }
 
             @Override
-            public OutputStream newOutputStream(final IOReference<? extends PT> src)
+            public OutputStream newOutputStream(final PT src)
             throws FileNotFoundException {
                 class FileOutputStreamDecorator extends FileOutputStream {
                     public FileOutputStreamDecorator() throws FileNotFoundException {
@@ -72,9 +72,8 @@ public class IOStreamSockets {
                     @Override
                     public void close() throws IOException {
                         super.close();
-                        final Object srcTarget = IOReferences.deref(src);
-                        if (srcTarget instanceof File)
-                            file.setLastModified(((File) srcTarget).lastModified());
+                        if (src instanceof File)
+                            file.setLastModified(((File) src).lastModified());
                     }
                 }
                 return new FileOutputStreamDecorator();
