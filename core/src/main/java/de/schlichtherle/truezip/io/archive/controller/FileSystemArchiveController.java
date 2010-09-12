@@ -121,8 +121,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 if (fpe.isCacheable())
                     autoMounter = new FalsePositiveFileSystem(fpe);
                 throw fpe;
-            } catch (IOException ioe) {
-                throw ioe;
+            } catch (IOException ex) {
+                throw ex;
             } catch (Exception cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }

@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.LittleEndian;
 import junit.framework.TestCase;
 import java.util.Arrays;
 

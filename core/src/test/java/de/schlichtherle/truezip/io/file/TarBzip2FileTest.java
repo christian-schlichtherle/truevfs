@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.io.archive.impl.tar.TarBZip2Driver;
 
 /**
@@ -27,8 +25,6 @@ import de.schlichtherle.truezip.io.archive.impl.tar.TarBZip2Driver;
  * @version $Id$
  */
 public class TarBzip2FileTest extends FileTestCase {
-    private static final java.io.File _tempDir = new java.io.File(System.getProperty("java.io.tmpdir"));
-    private static final java.io.File _baseDir = _tempDir;
 
     /**
      * Creates a new instance of TarBzip2FileTest

@@ -164,10 +164,10 @@ public class FileOutputStream extends FilterOutputStream {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-        } catch (FileNotFoundException ex) {
-            throw ex;
         } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
+        } catch (FileNotFoundException ex) {
+            throw ex;
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
                     = new FileNotFoundException(ioe.toString());

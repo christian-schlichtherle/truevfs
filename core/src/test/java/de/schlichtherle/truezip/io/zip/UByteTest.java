@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.UByte;
 import junit.framework.TestCase;
 
 /**
