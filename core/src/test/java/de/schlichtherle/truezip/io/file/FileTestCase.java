@@ -152,7 +152,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         return ArchiveDetector.NULL.createFile(
                 file.getParentFile(), file.getName());
     }
-    
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testParentConstructor() throws Exception {
         // Test normalization and parent+child constructors.
