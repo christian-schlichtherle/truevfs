@@ -34,8 +34,6 @@ import java.io.IOException;
 public class ZipRaesFileTest extends FileTestCase {
 
     private static boolean cancelling;
-    private static final java.io.File _tempDir = new java.io.File(System.getProperty("java.io.tmpdir"));
-    private static final java.io.File _baseDir = _tempDir;
 
     private KeyManager oldKeyManager;
 
@@ -97,6 +95,31 @@ public class ZipRaesFileTest extends FileTestCase {
         assertFalse(new java.io.File(archive.getPath()).exists());
     }
 
+    public void testFileStatus()
+    throws IOException {
+        final File inner = new File(archive, "inner" + suffix);
+
+        assertTrue(archive.mkdir());
+        assertTrue(inner.mkdir());
+
+        File.umount();
+
+        cancelling = true;
+        assertTrue(archive.exists());
+        assertFalse(archive.isDirectory());
+        assertFalse(archive.isFile());
+
+        cancelling = false;
+        assertTrue(archive.exists());
+        assertTrue(archive.isDirectory());
+        assertFalse(archive.isFile());
+
+        cancelling = true;
+        assertTrue(inner.exists());
+        assertFalse(inner.isDirectory());
+        assertFalse(inner.isFile());
+    }
+
     public static class CustomKeyManager extends KeyManager {
         public CustomKeyManager() {
             mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
@@ -107,15 +130,13 @@ public class ZipRaesFileTest extends FileTestCase {
         public char[] getCreateKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
-            else
-                return "secret".toCharArray(); // return clone!
+            return "secret".toCharArray(); // return clone!
         }
 
         public char[] getOpenKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
-            else
-                return "secret".toCharArray(); // return clone!
+            return "secret".toCharArray(); // return clone!
         }
 
         public void invalidOpenKey() {

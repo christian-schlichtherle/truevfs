@@ -116,17 +116,19 @@ public class ChainableIOExceptionTest extends TestCase {
         }
 
         exc1.initPredecessor(null);
+        exc1.initPredecessor(null);
 
         try {
-            exc1.initPredecessor(null);
+            exc1.initPredecessor(exc2);
             fail("Predecessor reinitialization not allowed!");
         } catch (IllegalStateException expected) {
         }
 
         exc2.initPredecessor(exc1);
+        exc2.initPredecessor(exc1);
 
         try {
-            exc2.initPredecessor(exc1);
+            exc2.initPredecessor(null);
             fail("Predecessor reinitialization not allowed!");
         } catch (IllegalStateException expected) {
         }

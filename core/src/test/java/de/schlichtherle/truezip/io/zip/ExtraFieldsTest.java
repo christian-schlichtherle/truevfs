@@ -16,9 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.ExtraFields;
-import de.schlichtherle.truezip.io.zip.DefaultExtraField;
-import de.schlichtherle.truezip.io.zip.ExtraField;
 import java.util.Arrays;
 import junit.framework.TestCase;
 

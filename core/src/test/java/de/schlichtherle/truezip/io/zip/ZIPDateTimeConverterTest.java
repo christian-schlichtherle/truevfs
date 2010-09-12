@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

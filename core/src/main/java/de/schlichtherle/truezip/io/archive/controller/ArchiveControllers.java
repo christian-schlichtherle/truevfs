@@ -153,7 +153,6 @@ public final class ArchiveControllers {
                     // ArchiveDetector.
                     return (ArchiveController) value;
                 }
-                assert value == null;
                 if (driver == null) // pure lookup operation?
                     return null;
                 // TODO: Refactor this to a more flexible design which supports

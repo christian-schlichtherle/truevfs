@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.file.ArchiveDetector;
-import de.schlichtherle.truezip.io.file.DefaultArchiveDetector;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.impl.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.impl.zip.ZipDriver;

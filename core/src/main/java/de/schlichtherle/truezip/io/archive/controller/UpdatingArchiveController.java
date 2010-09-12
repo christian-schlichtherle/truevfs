@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOOperations;
@@ -143,9 +144,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             assert autoCreate || outFile == null;
             assert autoCreate || outArchive == null;
             assert getFileSystem() != null;
-        } catch (IOException ioe) {
+        } catch (IOException ex) {
             // Log at FINER level. This is mostly because of false positives.
-            logger.log(Level.FINER, "mount.catch", ioe); // NOI18N
+            logger.log(Level.FINER, "mount.catch", ex); // NOI18N
 
             assert writeLock().isHeldByCurrentThread();
             assert inArchive == null;
@@ -153,7 +154,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             assert outArchive == null;
             assert getFileSystem() == null;
 
-            throw ioe;
+            throw ex;
         } finally {
             logger.log(Level.FINER, "mount.finally", stats); // NOI18N
         }
@@ -185,16 +186,16 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 setFileSystem(newArchiveFileSystem(
                          inArchive, time, getDriver(),
                         vetoableTouchListener, isReadOnly));
-            } else if (!autoCreate) {
-                // The archive file does not exist and we may not create it
-                // automatically.
-                throw new ArchiveEntryNotFoundException(
-                        this, ROOT, "may not create archive file");
-            } else {
+            } else if (autoCreate) {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
                 setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener));
+            } else {
+                // The archive file does not exist and we may not create it
+                // automatically.
+                throw new ArchiveEntryNotFoundException(
+                        this, ROOT, "may not create archive file");
             }
         } else {
             // The target file of this controller IS (or appears to be)
@@ -369,18 +370,12 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             throw new DirectoryArchiveEntryFalsePositiveException(
                     controller, path,
                     new FileNotFoundException("cannot read directories"));
-        } else if (!autoCreate) {
-            // The entry does NOT exist in the enclosing archive
-            // file and we may not create it automatically.
-            throw new ArchiveEntryNotFoundException(
-                    controller, path, "may not create archive file");
-        } else {
-            assert autoCreate;
+        } else if (autoCreate) {
             assert controller.writeLock().isHeldByCurrentThread();
 
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
-            final IOOperation link = controllerFileSystem.mknod(
+            final Link link = controllerFileSystem.mknod(
                     path, FILE, null, createParents);
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -407,6 +402,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
             setFileSystem(newArchiveFileSystem(
                     getDriver(), vetoableTouchListener));
+        } else {
+            assert !autoCreate;
+
+            // The entry does NOT exist in the enclosing archive
+            // file and we may not create it automatically.
+            throw new ArchiveEntryNotFoundException(
+                    controller, path, "may not create archive file");
         }
     }
 

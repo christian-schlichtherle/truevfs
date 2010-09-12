@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import de.schlichtherle.truezip.io.zip.DateTimeConverter;
-import de.schlichtherle.truezip.io.zip.UInt;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
