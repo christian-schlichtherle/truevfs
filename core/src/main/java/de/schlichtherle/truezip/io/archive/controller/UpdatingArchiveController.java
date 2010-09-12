@@ -77,7 +77,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private class TouchListener implements VetoableTouchListener {
         @Override
         public void touch() throws IOException {
-            UpdatingArchiveController.this.touch();
+            ensureOutArchive();
+            setTouched(true);
         }
     }
 
@@ -192,6 +193,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 setFileSystem(newArchiveFileSystem(
                         getDriver(), vetoableTouchListener));
             } else {
+                assert !autoCreate;
+
                 // The archive file does not exist and we may not create it
                 // automatically.
                 throw new ArchiveEntryNotFoundException(
@@ -208,7 +211,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // file previously used for output has been left over to be
                 // reused as our input in order to skip the lengthy process
                 // of searching for the right enclosing archive controller
-                // to extract the entry which is our target.
+                // to extract the entry which is our target archive file.
                 try {
                     initInArchive(inFile);
                 } catch (IOException ex) {
@@ -238,8 +241,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 // its virtual root directory.
                 // Nice trick, isn't it?!
                 setFileSystem(newArchiveFileSystem(
-                         inArchive,
-                        inFile.lastModified(), getDriver(), vetoableTouchListener, false));
+                        inArchive, inFile.lastModified(),
+                        getDriver(), vetoableTouchListener, false));
             }
         }
     }
@@ -353,9 +356,9 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                         inArchive,
-                        controllerFileSystem.getLastModified(path),
-                        getDriver(), vetoableTouchListener, controllerFileSystem.isReadOnly()));
+                        inArchive, controllerFileSystem.getLastModified(path),
+                        getDriver(), vetoableTouchListener,
+                        controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
@@ -380,7 +383,11 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            ensureOutArchive();
+            //ensureOutArchive(); // side effect of the following
+            final ArchiveFileSystem fileSystem = newArchiveFileSystem(
+                    getDriver(), vetoableTouchListener);
+            assert outFile != null;
+            assert outArchive != null;
             // Now try to create the entry in the enclosing controller.
             try {
                 link.run();
@@ -400,8 +407,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 }
                 throw ex;
             }
-            setFileSystem(newArchiveFileSystem(
-                    getDriver(), vetoableTouchListener));
+            setFileSystem(fileSystem);
         } else {
             assert !autoCreate;
 
@@ -484,19 +490,6 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 = outArchive.getMetaData().newOutputStream(targetRef, peerRef);
         assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + targetRef.get().getName() + '"';
         return out;
-    }
-
-    /**
-     * Ensures the output archive is set up and sets the touch status to
-     * {@code true}.
-     * <p>
-     * <b>Warning:</b> The write lock of this controller must be acquired
-     * while this method is called!
-     */
-    private void touch() throws IOException {
-        assert writeLock().isHeldByCurrentThread();
-        ensureOutArchive();
-        setTouched(true);
     }
 
     private void ensureOutArchive()

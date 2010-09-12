@@ -686,7 +686,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return isFile0(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // TODO: Document this! Fast path when key prompting is cancelled?
+            // See ArchiveDriver#newArchiveInput!
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
                 return false;
             return getEnclController().isFile(getEnclPath(path));
@@ -941,8 +941,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return setLastModified0(path, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().setLastModified(getEnclPath(path),
-                    time);
+            return getEnclController().setLastModified(getEnclPath(path), time);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -971,8 +970,8 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         try {
             return createNewFile0(path, createParents);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().createNewFile(getEnclPath(path),
-                    createParents);
+            return getEnclController().createNewFile(
+                    getEnclPath(path), createParents);
         }
     }
 
@@ -1045,9 +1044,9 @@ public abstract class ArchiveController implements ArchiveDescriptor {
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
             return getEnclController().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // TODO: Document this!
+            // See ArchiveDriver#newArchiveInput!
             if (isRoot(path)
-            && !getEnclController().isDirectory(getEnclPath(path))
+            && !getEnclController().isDirectory(getEnclPath(path)) // isFile() would fail!
             && ex.getCause() instanceof FileNotFoundException)
                 return false;
             return getEnclController().delete(getEnclPath(path));

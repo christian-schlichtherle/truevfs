@@ -105,7 +105,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 } // class Mounter
 
                 runWriteLocked(new Mounter());
-            } catch (FalsePositiveException fpe) {
+            } catch (FalsePositiveException ex) {
                 // Catch and cache exceptions for uncacheable false positives.
                 // The state is reset when File.delete() is called on the false
                 // positive archive file or File.update() or File.sync().
@@ -118,9 +118,9 @@ abstract class FileSystemArchiveController extends ArchiveController {
                 //   Note that it is important to cache the exceptions for
                 // cacheable false positives only: Otherwise, side effects
                 // of the archive driver may not be accounted for.
-                if (fpe.isCacheable())
-                    autoMounter = new FalsePositiveFileSystem(fpe);
-                throw fpe;
+                if (ex.isCacheable())
+                    autoMounter = new FalsePositiveFileSystem(ex);
+                throw ex;
             } catch (IOException ex) {
                 throw ex;
             } catch (Exception cannotHappen) {
