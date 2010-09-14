@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ConcurrentArchiveInput<AE extends ArchiveEntry>
+public class ConcurrentArchiveInput<AE extends ArchiveEntry>
 extends FilterArchiveInput<AE> {
 
     private static final String CLASS_NAME
@@ -67,26 +67,8 @@ extends FilterArchiveInput<AE> {
     private volatile boolean stopped;
 
     /** Constructs a new instance of {@code ConcurrentArchiveInput}. */
-    private ConcurrentArchiveInput(final ArchiveInput<AE> input) {
+    public ConcurrentArchiveInput(final ArchiveInput<AE> input) {
         super(input);
-    }
-
-    /**
-     * Returns a new concurrent archive input which decorates (wraps) the
-     * given non-{@code null} archive input.
-     */
-    public static <AE extends ArchiveEntry>
-    ConcurrentArchiveInput<AE> wrap(ArchiveInput<AE> archive) {
-        return new ConcurrentArchiveInput<AE>(archive);
-    }
-
-    /**
-     * Returns the wrapped archive input or {@code null} if and only if
-     * {@code proxy} is {@code null}.
-     */
-    public static <AE extends ArchiveEntry>
-    ArchiveInput<AE> unwrap(ConcurrentArchiveInput<AE> proxy) {
-        return proxy != null ? proxy.target : null;
     }
 
     @Override

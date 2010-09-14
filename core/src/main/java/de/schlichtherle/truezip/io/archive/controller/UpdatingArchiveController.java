@@ -76,7 +76,47 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
 
-    private class TouchListener implements VetoableTouchListener {
+    /**
+     * This member class makes an archive controller object strongly reachable
+     * from any input stream created by instances of this class.
+     * This is required in order to ensure that for any prospective archive
+     * file at most one archive controller object exists at any time.
+     *
+     * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
+     */
+    private final class Input
+    extends ConcurrentArchiveInput<ArchiveEntry> {
+        Input(ArchiveInput<ArchiveEntry> input) {
+            super(input);
+        }
+
+        @Override
+        protected ArchiveInput<ArchiveEntry> getTarget() {
+            return target;
+        }
+    }
+
+    /**
+     * This member class makes an archive controller object strongly reachable
+     * from any output stream created by instances of this class.
+     * This is required in order to ensure that for any prospective archive
+     * file at most one archive controller object exists at any time.
+     *
+     * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
+     */
+    private final class Output
+    extends ConcurrentArchiveOutput<ArchiveEntry> {
+        Output(ArchiveOutput<ArchiveEntry> output) {
+            super(output);
+        }
+
+        @Override
+        protected ArchiveOutput<ArchiveEntry> getTarget() {
+            return target;
+        }
+    }
+
+    private final class TouchListener implements VetoableTouchListener {
         @Override
         public void touch() throws IOException {
             ensureOutArchive();
@@ -97,10 +137,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private java.io.File inFile;
 
     /**
-     * An {@link ArchiveInput} object used to mount the virtual file system
+     * An {@link Input} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private ConcurrentArchiveInput<ArchiveEntry> input;
+    private Input input;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -109,10 +149,10 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     private java.io.File outFile;
 
     /**
-     * The (possibly temporary) {@link ArchiveOutput} we are writing newly
+     * The (possibly temporary) {@link Output} we are writing newly
      * created or modified entries to.
      */
-    private ConcurrentArchiveOutput<ArchiveEntry> output;
+    private Output output;
 
     /**
      * Whether or not nesting this archive file to its enclosing
@@ -127,6 +167,38 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         super(mountPoint, enclMountPoint, driver);
     }
 
+    /**
+     * Returns a new concurrent archive input which decorates (wraps) the
+     * given non-{@code null} archive input.
+     */
+    private Input wrap(ArchiveInput archive) {
+        return new Input(archive);
+    }
+
+    /**
+     * Returns the wrapped archive input or {@code null} if and only if
+     * {@code proxy} is {@code null}.
+     */
+    private ArchiveInput unwrap(Input proxy) {
+        return proxy != null ? proxy.getTarget() : null;
+    }
+
+    /**
+     * Returns a new concurrent archive input which decorates (wraps) the
+     * given non-{@code null} archive input.
+     */
+    private Output wrap(ArchiveOutput archive) {
+        return new Output(archive);
+    }
+
+    /**
+     * Returns the wrapped archive input or {@code null} if and only if
+     * {@code proxy} is {@code null}.
+     */
+    private ArchiveOutput unwrap(Output proxy) {
+        return proxy != null ? proxy.getTarget() : null;
+    }
+
     private ArchiveFileSystem newArchiveFileSystem()
     throws IOException {
         return ArchiveFileSystems.newArchiveFileSystem(
@@ -137,8 +209,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             long rootTime,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
-                ConcurrentArchiveInput.unwrap(input),
-                rootTime, getDriver(), vetoableTouchListener, readOnly);
+                unwrap(input), rootTime, getDriver(),
+                vetoableTouchListener, readOnly);
     }
 
     @Override
@@ -445,8 +517,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 if (isRfsEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                input = ConcurrentArchiveInput.wrap(
-                        getDriver().newArchiveInput(this, rof));
+                input = wrap(getDriver().newArchiveInput(this, rof));
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -546,10 +617,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    output = ConcurrentArchiveOutput.wrap(
-                            getDriver().newArchiveOutput(
-                                this, out,
-                                ConcurrentArchiveInput.unwrap(input)));
+                    output = wrap(getDriver().newArchiveOutput(
+                                this, out, unwrap(input)));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -843,10 +912,8 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     public <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
-        final ArchiveInput<ArchiveEntry> in
-                = ConcurrentArchiveInput.unwrap(input);
-        final ArchiveOutput<ArchiveEntry> out
-                = ConcurrentArchiveOutput.unwrap(output);
+        final ArchiveInput<ArchiveEntry> in = unwrap(input);
+        final ArchiveOutput<ArchiveEntry> out = unwrap(output);
         final ArchiveFileSystem fileSystem = getFileSystem();
         final ArchiveEntry root = fileSystem.get(ROOT);
         assert root != null;

@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.tar.TarBZip2Driver;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarBzip2FileTest extends FileTestCase {
+public class TarBzip2FileTest extends IOFileTestCase {
 
     /**
      * Creates a new instance of TarBzip2FileTest
