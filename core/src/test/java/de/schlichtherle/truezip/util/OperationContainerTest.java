@@ -28,6 +28,7 @@ import junit.framework.TestCase;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
+ * @deprecated This feature is currently unused.
  */
 public class OperationContainerTest extends TestCase {
 

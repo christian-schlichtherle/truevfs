@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.io.file;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipFileTest extends FileTestCase {
+public class ZipFileTest extends IOFileTestCase {
 
     /**
      * Creates a new instance of {@code ZipFileTest}.

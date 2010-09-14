@@ -340,7 +340,7 @@ public class File extends java.io.File {
     // Static fields:
     //
 
-    private static final long serialVersionUID = 3617072883686191745L;
+    private static final long serialVersionUID = 3617072259051821745L;
 
     /** The filesystem roots. */
     private static final Set roots = new TreeSet(Arrays.asList(listRoots()));
@@ -381,14 +381,7 @@ public class File extends java.io.File {
      * @see #getInnerArchive
      * @see #readObject
      */
-    private transient File innerArchive;
-
-    /**
-     * This field should be considered final!
-     *
-     * @see #getInnerEntryName
-     */
-    private String innerEntryName;
+    private File innerArchive;
 
     /**
      * This field should be considered final!
@@ -453,7 +446,6 @@ public class File extends java.io.File {
             this.enclArchive = file.enclArchive;
             this.enclEntryName = file.enclEntryName;
             this.innerArchive = file.isArchive() ? this : file.innerArchive;
-            this.innerEntryName = file.innerEntryName;
             this.controller = file.controller;
         } else {
             this.delegate = template;
@@ -699,14 +691,13 @@ public class File extends java.io.File {
             if (path.length() == innerArchivePathLength) {
                 this.detector = innerArchive.detector;
                 this.innerArchive = this;
-                this.innerEntryName = ROOT;
                 this.enclArchive = innerArchive.enclArchive;
                 this.enclEntryName = innerArchive.enclEntryName;
                 initController();
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
-                this.innerEntryName = this.enclEntryName
+                this.enclEntryName
                         = path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                         .replace(separatorChar, ArchiveEntry.SEPARATOR_CHAR);
             }
@@ -764,7 +755,6 @@ public class File extends java.io.File {
         this.enclArchive = enclArchive;
         this.enclEntryName = template.enclEntryName;
         this.innerArchive = template.isArchive() ? this : enclArchive;
-        this.innerEntryName = template.innerEntryName;
         this.controller = template.controller;
 
         assert invariants();
@@ -836,10 +826,7 @@ public class File extends java.io.File {
             // controller initialization has been deferred until now in
             // order to provide the ArchiveController with an otherwise fully
             // initialized object.
-            innerEntryName = ROOT;
             initController();
-        } else if (innerArchive == enclArchive) {
-            innerEntryName = enclEntryName;
         }
     }
 
@@ -987,7 +974,6 @@ public class File extends java.io.File {
                     enclArchive = detector.createFile(newURI(scheme, path)); // use the same detector for the parent directory
                     if (innerArchive != this) {
                         innerArchive = enclArchive;
-                        innerEntryName = enclEntryName;
                     }
                     return;
                 }
@@ -995,7 +981,6 @@ public class File extends java.io.File {
             } else {
                 if (isArchive) {
                     innerArchive = this;
-                    innerEntryName = ROOT;
                     int i = parent.indexOf(':');
                     assert i >= 0;
                     scheme = parent.substring(0, i);
@@ -1035,12 +1020,8 @@ public class File extends java.io.File {
     throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        if (ROOT.equals(innerEntryName)) {  // equal, but...
-            assert ROOT != innerEntryName;  // not identical!
-            //assert innerArchive == null;  // may be non-null when serialized by previous version
+        if (innerArchive == this) {
             assert controller == null;      // transient!
-            innerArchive = this;            // postfix!
-            innerEntryName = ROOT;          // postfix!
             initController();               // postfix!
         }
 
@@ -1079,19 +1060,14 @@ public class File extends java.io.File {
             throw new AssertionError();
         if (detector == null)
             throw new AssertionError();
-        if ((innerArchive != null) != (innerEntryName != null))
+        if ((innerArchive != null) != (getInnerEntryName() != null))
             throw new AssertionError();
         if ((enclArchive != null) != (enclEntryName != null))
             throw new AssertionError();
         if (enclArchive == this)
             throw new AssertionError();
-        if (!((innerArchive == this
-                    && innerEntryName == ROOT
-                    && !innerEntryName.equals(enclEntryName)
-                    && controller != null)
-                ^ (innerArchive == enclArchive
-                    && innerEntryName == enclEntryName
-                    && controller == null)))
+        if (!((innerArchive == this && controller != null)
+                ^ (innerArchive == enclArchive && controller == null)))
             throw new AssertionError();
         if (!(enclArchive == null
                 || contains(enclArchive.getPath(), delegate.getParentFile().getPath())
@@ -1822,9 +1798,7 @@ public class File extends java.io.File {
      * their meaning wherever possible.
      */
     public final String getInnerEntryName() {
-        assert innerArchive == this && innerEntryName == ROOT
-                || innerArchive == enclArchive && innerEntryName == enclEntryName;
-        return innerEntryName; // TODO: return innerArchive == this ? ROOT : enclEntryName;
+        return innerArchive == this ? ROOT : enclEntryName;
     }
 
     /**
@@ -2300,7 +2274,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .isFile(innerEntryName);
+                        .isFile(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2334,7 +2308,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .isDirectory(innerEntryName);
+                        .isDirectory(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2352,7 +2326,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .getOpenIcon(innerEntryName);
+                        .getOpenIcon(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2370,7 +2344,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .getClosedIcon(innerEntryName);
+                        .getClosedIcon(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2385,7 +2359,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .isReadable(innerEntryName);
+                        .isReadable(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2399,7 +2373,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .isWritable(innerEntryName);
+                        .isWritable(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2422,7 +2396,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 innerArchive.getArchiveController()
-                        .setReadOnly(innerEntryName);
+                        .setReadOnly(getInnerEntryName());
                 return true;
             }
         } catch (FalsePositiveException isNotArchive) {
@@ -2457,7 +2431,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .getLength(innerEntryName);
+                        .getLength(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2482,7 +2456,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .getLastModified(innerEntryName);
+                        .getLastModified(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2515,7 +2489,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .setLastModified(innerEntryName, time);
+                        .setLastModified(getInnerEntryName(),time);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2541,7 +2515,7 @@ public class File extends java.io.File {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive
                         .getArchiveController()
-                        .list(innerEntryName);
+                        .list(getInnerEntryName());
                 return members == null
                         ? null : members.toArray(new String[members.size()]);
             }
@@ -2571,7 +2545,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive.getArchiveController()
-                        .list(innerEntryName);
+                        .list(getInnerEntryName());
                 if (members == null)
                     return null;
                 if (filter == null)
@@ -2656,7 +2630,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive.getArchiveController()
-                        .list(innerEntryName);
+                        .list(getInnerEntryName());
                 if (members == null)
                     return null;
                 final Collection<File> filtered
@@ -2721,7 +2695,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive.getArchiveController()
-                        .list(innerEntryName);
+                        .list(getInnerEntryName());
                 if (members == null)
                     return null;
                 final Collection<File> filtered
@@ -2832,7 +2806,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .mkdir(innerEntryName, isLenient());
+                        .mkdir( getInnerEntryName(), isLenient());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2855,7 +2829,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .delete(innerEntryName);
+                        .delete(getInnerEntryName());
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";

@@ -582,17 +582,6 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns an enumeration of all entries in this ZIP file.
-     * Note that the enumerated entries are shared with this instance.
-     * It is illegal to change their state!
-     *
-     * @deprecated Use {@link #iterator()} instead.
-     */
-    public Enumeration<? extends ZipEntry> entries() {
-        return Collections.enumeration(entries.values());
-    }
-
-    /**
      * Returns an iteration of all entries in this ZIP file.
      * Note that the iteration supports element removal and the returned
      * entries are shared with this instance.

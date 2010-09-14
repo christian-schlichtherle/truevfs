@@ -17,11 +17,9 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
@@ -29,10 +27,10 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
@@ -46,10 +44,10 @@ import junit.framework.AssertionFailedError;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
+public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
 
     private static final Logger logger = Logger.getLogger(
-            FileTestCase.class.getName());
+            IOFileTestCase.class.getName());
 
     private static final java.io.File _baseDir = tempDir;
 
@@ -90,7 +88,7 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
     /** The temporary file to use as an archive file. */
     protected File archive;
     
-    protected FileTestCase(String testName) {
+    protected IOFileTestCase(String testName) {
         super(testName);
         
         File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
@@ -128,10 +126,12 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
         prefix = null;
         suffix = null;
 
-        final boolean deleted = archive.delete();
-        if (!deleted && archive.exists())
-            logger.log(Level.WARNING, "{0} (could not delete)", archive);
-        archive = null;
+        if (archive != null) {
+            final boolean deleted = archive.delete();
+            if (!deleted && archive.exists())
+                logger.log(Level.WARNING, "{0} (could not delete)", archive);
+            archive = null;
+        }
 
         // sync now to delete temps and free memory.
         // This prevents subsequent warnings about left over temporary files
@@ -153,182 +153,49 @@ public abstract class FileTestCase extends UpdatingArchiveControllerTestCase {
                 file.getParentFile(), file.getName());
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testParentConstructor() throws Exception {
-        // Test normalization and parent+child constructors.
-        // This is not yet a comprehensive test.
-        
-        {
-            try {
-                new File("x", (String) null);
-                fail("Expected NullPointerException!");
-            } catch (NullPointerException expected) {
-            }
-            
-            try {
-                new File(new File("x"), (String) null);
-                fail("Expected NullPointerException!");
-            } catch (NullPointerException expected) {
-            }
-        }
-        
-        final String fs = File.separator;
-        
-        {
-            final File[] files = {
-                new File(archive, ""),
-                new File(archive, "."),
-                new File(archive, "." + fs),
-                new File(archive, "." + fs + "."),
-                new File(archive, "." + fs + "." + fs),
-                new File(archive, "." + fs + "." + fs + "."),
-            };
-            for (int i = 0; i < files.length; i++) {
-                final File file = files[i];
-                assertSame(file, file.getInnerArchive());
-                assertEquals("", file.getInnerEntryName());
-                assertNull(file.getEnclArchive());
-                assertNull(file.getEnclEntryName());
-            }
-        }
-        
-        {
-            final String innerName = "inner" + suffix;
-            final File inner = new File(archive, innerName);
-            final File[] files = {
-                new File(inner, ""),
-                new File(inner, "."),
-                new File(inner, "." + fs),
-                new File(inner, "." + fs + "."),
-                new File(inner, "." + fs + "." + fs),
-                new File(inner, "." + fs + "." + fs + "."),
-            };
-            for (int i = 0; i < files.length; i++) {
-                final File file = files[i];
-                assertSame(file, file.getInnerArchive());
-                assertEquals("", file.getInnerEntryName());
-                assertSame(archive, file.getEnclArchive());
-                assertEquals(innerName, file.getEnclEntryName());
-            }
-        }
-        
-        {
-            final String entryName = "entry";
-            final File entry = new File(archive, entryName);
-            final File[] files = {
-                new File(entry, ""),
-                new File(entry, "."),
-                new File(entry, "." + fs),
-                new File(entry, "." + fs + "."),
-                new File(entry, "." + fs + "." + fs),
-                new File(entry, "." + fs + "." + fs + "."),
-            };
-            for (int i = 0; i < files.length; i++) {
-                final File file = files[i];
-                assertSame(archive, file.getInnerArchive());
-                assertEquals(entryName, file.getInnerEntryName());
-                assertSame(archive, file.getEnclArchive());
-                assertEquals(entryName, file.getEnclEntryName());
-            }
-        }
-        
-        final File a = new File("outer" + suffix + "/removed" + suffix);
-        File b, c;
-        
-        b = new File("../removed.dir/removed.dir/../../dir/./inner" + suffix);
-        c = new File(a, b.getPath());
-        assertTrue(c.isArchive());
-        assertTrue(c.isEntry());
-        assertEquals("outer" + suffix,
-                c.getEnclArchive().getPath());
-        assertEquals("dir/inner" + suffix,
-                c.getEnclEntryName());
-        
-        b = new File("../removed.dir/removed.dir/../../dir/./inner" + suffix);
-        c = new File(a, b.getPath(), ArchiveDetector.NULL);
-        assertFalse(c.isArchive());
-        assertTrue(c.isEntry());
-        assertEquals("outer" + suffix,
-                c.getInnerArchive().getPath());
-        assertEquals("dir/inner" + suffix,
-                c.getInnerEntryName());
-        
-        b = new File("../removed.dir/removed.dir/../../dir/./inner"
-                + suffix + "/removed.dir/removed.dir/../../dir/./test.txt");
-        c = new File(a, b.getPath());
-        assertFalse(c.isArchive());
-        assertTrue(c.isEntry());
-        assertEquals("outer" + suffix + fs + "removed" + suffix + fs + ".."
-                + fs + "removed.dir" + fs + "removed.dir" + fs + ".." + fs
-                + ".." + fs + "dir" + fs + "." + fs + "inner" + suffix,
-                c.getInnerArchive().getPath());
-        assertEquals("dir/inner" + suffix,
-                c.getInnerArchive().getEnclEntryName());
-    }
-    
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        // Preamble.
-        final File inner = new File(archive, "inner" + suffix);
-        assertTrue(archive.isArchive());
-        assertTrue(inner.isArchive());
-        
-        // Serialize.
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(inner);
-        out.close();
-        
-        // Deserialize.
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bis);
-        final File inner2 = (File) in.readObject();
-        final File archive2 = (File) inner2.getParentFile();
+    public void testArchiveControllerStateWithInputStream()
+    throws IOException, InterruptedException {
+        final String path = archive.getPath() + "/test";
+        archive = null;
+        assertTrue(new File(path).createNewFile());
+        File.umount();
+        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        assertNotNull(ref.get());
+        InputStream in = new FileInputStream(path);
         in.close();
-        
-        assertNotSame(inner, inner2);
-        assertNotSame(archive, archive2);
-
-        //
-        // Test details of the persistet object graph - part of this is
-        // repeated in the tests for DefaultArchiveDetector.
-        //
-
-        // Assert that detectors have been persistet.
-        final ArchiveDetector innerDetector = inner.getArchiveDetector();
-        final ArchiveDetector archiveDetector = archive.getArchiveDetector();
-        final ArchiveDetector inner2Detector = inner2.getArchiveDetector();
-        final ArchiveDetector archive2Detector = archive2.getArchiveDetector();
-        assertNotSame(innerDetector, inner2Detector);
-        assertNotSame(archiveDetector, archive2Detector);
-        
-        // Assert that drivers have been persistet.
-        final ArchiveDriver innerDriver = innerDetector.getArchiveDriver(inner.getPath());
-        final ArchiveDriver archiveDriver = archiveDetector.getArchiveDriver(archive.getPath());
-        final ArchiveDriver inner2Driver = inner2Detector.getArchiveDriver(inner2.getPath());
-        final ArchiveDriver archive2Driver = archive2Detector.getArchiveDriver(archive2.getPath());
-        assertNotSame(innerDriver, inner2Driver);
-        assertNotSame(archiveDriver, archive2Driver);
-
-        // Assert that the controllers haven't been persistet.
-        final ArchiveController innerController = inner.getArchiveController();
-        final ArchiveController archiveController = archive.getArchiveController();
-        final ArchiveController inner2Controller = inner2.getArchiveController();
-        final ArchiveController archive2Controller = archive2.getArchiveController();
-        assertSame(innerController, inner2Controller);
-        assertSame(archiveController, archive2Controller);
-
-        // Test that the controllers have been reconfigured with the new drivers.
-        // Note that this is only possible because the file systems haven't
-        // been touched yet (well, they haven't even been mounted).
-        final ArchiveDriver innerControllerDriver = innerController.getDriver();
-        final ArchiveDriver archiveControllerDriver = archiveController.getDriver();
-        assertSame(innerControllerDriver, inner2Driver);
-        assertSame(archiveControllerDriver, archive2Driver);
+        System.gc();
+        System.runFinalization();
+        Thread.sleep(100);
+        assertNotNull(ref.get());
+        assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
+        in = null;
+        System.gc();
+        System.runFinalization();
+        Thread.sleep(100);
+        assertNull(ref.get());
     }
-    
-    public void testGetOutermostArchive() {
-        File file = new File("abc/def" + suffix + "/efg" + suffix + "/hij" + suffix + "/test.txt");
-        assertEquals(new java.io.File("abc/def" + suffix), file.getTopLevelArchive());
+
+    public void testArchiveControllerStateWithOutputStream()
+    throws IOException, InterruptedException {
+        final String path = archive.getPath() + "/test";
+        archive = null;
+        assertTrue(new File(path).createNewFile());
+        File.umount();
+        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        assertNotNull(ref.get());
+        OutputStream out = new FileOutputStream(path);
+        out.close();
+        out = null;
+        System.gc();
+        System.runFinalization();
+        Thread.sleep(100);
+        assertNotNull(ref.get());
+        assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
+        File.umount();
+        System.gc();
+        System.runFinalization();
+        Thread.sleep(100);
+        assertNull(ref.get());
     }
 
     public void testFalsePositives() throws IOException {

@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ZipRaesFileTest extends FileTestCase {
+public class ZipRaesFileTest extends IOFileTestCase {
 
     private static boolean cancelling;
 

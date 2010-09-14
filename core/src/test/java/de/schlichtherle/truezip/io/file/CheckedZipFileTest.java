@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipDriver;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class CheckedZipFileTest extends FileTestCase {
+public class CheckedZipFileTest extends IOFileTestCase {
     
     /**
      * Creates a new instance of {@code CheckedZipFileTest}.

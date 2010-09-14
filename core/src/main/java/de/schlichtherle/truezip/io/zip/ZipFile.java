@@ -312,19 +312,18 @@ public class ZipFile extends BasicZipFile<ZipEntry> {
     /**
      * Enumerates clones of all entries in this ZIP file.
      *
-     * @deprecated Use {@link #iterator()} instead.
+     * @see #iterator()
      */
-    @Override
     public synchronized Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
-            final Enumeration<? extends ZipEntry> e = ZipFile.super.entries();
+            final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             public boolean hasMoreElements() {
-                return e.hasMoreElements();
+                return i.hasNext();
             }
 
             public ZipEntry nextElement() {
-                return e.nextElement().clone();
+                return i.next().clone();
             }
         }
         return new CloneEnumeration();
@@ -337,7 +336,7 @@ public class ZipFile extends BasicZipFile<ZipEntry> {
     @Override
     public synchronized Iterator<ZipEntry> iterator() {
         class EntryIterator implements Iterator<ZipEntry> {
-            private final Iterator<ZipEntry> i = ZipFile.super.iterator();
+            final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             public boolean hasNext() {
                 return i.hasNext();
