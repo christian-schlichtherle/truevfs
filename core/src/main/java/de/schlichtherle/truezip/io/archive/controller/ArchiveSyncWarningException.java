@@ -25,24 +25,24 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SyncWarningException
-extends SyncException {
+public class ArchiveSyncWarningException
+extends ArchiveSyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    SyncWarningException(ArchiveDescriptor archive) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive) {
         super(archive, -1);
     }
 
-    SyncWarningException(ArchiveDescriptor archive, String message) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive, String message) {
         super(archive, message, -1);
     }
 
-    SyncWarningException(ArchiveDescriptor archive, Throwable cause) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive, Throwable cause) {
         super(archive, cause, -1);
     }
 
-    SyncWarningException(ArchiveDescriptor archive, String message, Throwable cause) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive, String message, Throwable cause) {
         super(archive, message, cause, -1);
     }
 }

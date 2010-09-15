@@ -58,8 +58,7 @@ extends FilterArchiveOutput<AE> {
      * stream if there are no more references to it.
      * This reduces the likeliness of an {@link ArchiveBusyWarningException}
      * in case a sloppy client application has forgot to close a stream before
-     * the target archive file gets synchronized, e.g. by using
-     * {@link ArchiveControllers#sync(java.net.URI, SyncConfiguration) umount}.
+     * the target archive file gets synchronized.
      */
     private final Map<EntryOutputStream, Thread> streams
             = new WeakHashMap<EntryOutputStream, Thread>();

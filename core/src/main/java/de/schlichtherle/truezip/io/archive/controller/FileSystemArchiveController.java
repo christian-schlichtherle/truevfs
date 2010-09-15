@@ -216,8 +216,8 @@ abstract class FileSystemArchiveController extends ArchiveController {
     throws FalsePositiveException, IOException;
 
     @Override
-    void reset(final SyncExceptionHandler handler)
-    throws SyncException {
+    void reset(final ArchiveSyncExceptionHandler handler)
+    throws ArchiveSyncException {
         setFileSystem(null);
     }
 }

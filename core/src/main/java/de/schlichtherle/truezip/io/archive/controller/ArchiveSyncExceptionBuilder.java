@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface SyncExceptionBuilder
-extends SyncExceptionHandler,
-        ExceptionBuilder<SyncException, SyncException> {
+public interface ArchiveSyncExceptionBuilder
+extends ArchiveSyncExceptionHandler,
+        ExceptionBuilder<ArchiveSyncException, ArchiveSyncException> {
 }

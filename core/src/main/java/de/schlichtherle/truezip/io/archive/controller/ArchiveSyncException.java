@@ -26,58 +26,58 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SyncException extends ChainableIOException {
+public class ArchiveSyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
     private final URI mountPoint;
 
-    SyncException(ArchiveDescriptor archive) {
+    ArchiveSyncException(ArchiveDescriptor archive) {
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, String message) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message) {
         super(message);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, Throwable cause) {
+    ArchiveSyncException(ArchiveDescriptor archive, Throwable cause) {
         super(cause);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, String message, Throwable cause) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message, Throwable cause) {
         super(message, cause);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, int priority) {
         super(priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, String message, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message, int priority) {
         super(message, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, Throwable cause, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, Throwable cause, int priority) {
         super(cause, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    SyncException(ArchiveDescriptor archive, String message, Throwable cause, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message, Throwable cause, int priority) {
         super(message, cause, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
     /**
      * Equivalent to
-     * {@code return (SyncException) super.initCause(cause);}.
+     * {@code return (ArchiveSyncException) super.initCause(cause);}.
      */
     @Override
-    public SyncException initCause(final Throwable cause) {
-        return (SyncException) super.initCause(cause);
+    public ArchiveSyncException initCause(final Throwable cause) {
+        return (ArchiveSyncException) super.initCause(cause);
     }
 
     /** @see ArchiveDescriptor#getMountPoint() */
