@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import java.io.ByteArrayInputStream;
@@ -139,8 +139,9 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (SyncException ignored) {
-            // You should never (!) ignore all exceptions thrown by this method.
+        } catch (ArchiveSyncException ignored) {
+            // Normally, you should NOT ignore all exceptions thrown by this
+            // method.
             // The reason we do it here is that they are usually after effects
             // of failed tests and we don't want any exception from the tests
             // to be overridden by an exception thrown in this clean up method.

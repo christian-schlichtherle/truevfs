@@ -30,7 +30,7 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
  * @version $Id$
  */
 public class ArchiveBusyWarningException
-extends SyncWarningException {
+extends ArchiveSyncWarningException {
 
     private static final long serialVersionUID = 2635419873651362891L;
 

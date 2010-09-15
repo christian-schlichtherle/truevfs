@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
 import java.util.Collection;
 import java.util.Arrays;
@@ -26,11 +27,11 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
-import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.controller.SyncConfiguration;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
+import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -49,6 +50,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.*;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
@@ -1090,14 +1092,14 @@ public class File extends java.io.File {
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
+     *         {@link DefaultArchiveSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and any error
+     *         {@link DefaultArchiveSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException If {@code config} is {@code null}.
@@ -1106,81 +1108,64 @@ public class File extends java.io.File {
      *         {@code closeOutputStreams} is {@code true}.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void sync(SyncConfiguration config)
-    throws SyncException {
-        ArchiveControllers.sync(null, config);
+    public static void sync(BitField<ArchiveSyncOption> options)
+    throws ArchiveSyncException {
+        ArchiveControllers.sync(
+                null, options, new DefaultArchiveSyncExceptionBuilder());
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(true));
+        sync(BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void umount()
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(true));
+        sync(   BitField.of(UMOUNT)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void umount(boolean closeStreams)
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(   BitField.of(UMOUNT)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(true));
+        sync(   BitField.of(UMOUNT)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void umount(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(   BitField.of(UMOUNT)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
     }
 
     /**
-     * Similar to {@link #sync(SyncConfiguration) sync(config)},
+     * Similar to {@link #sync(BitField) sync(options)},
      * but will only update the given {@code archive} and all its enclosed
      * (nested) archives.
      * <p>
@@ -1198,220 +1183,183 @@ public class File extends java.io.File {
      * @throws NullPointerException If {@code archive} is {@code null}.
      * @throws IllegalArgumentException If {@code archive} is not an
      *         archive or is enclosed in another archive (is not top level).
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
-    public static void sync(File archive, SyncConfiguration config)
-    throws SyncException {
+    public static void sync(
+            final File archive,
+            final BitField<ArchiveSyncOption> options)
+    throws ArchiveSyncException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.sync(archive.getCanOrAbsFile().toURI(), config);
+        ArchiveControllers.sync(
+                archive.getCanOrAbsFile().toURI(),
+                options,
+                new DefaultArchiveSyncExceptionBuilder());
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(true));
+        sync(   archive,
+                BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void umount(File archive)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(true));
+        sync(   archive,
+                BitField.of(UMOUNT)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void umount(File archive, boolean closeStreams)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.of(UMOUNT)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(true));
+        sync(   archive,
+                BitField.of(UMOUNT)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void umount(File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(true));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.of(UMOUNT)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(false));
+        sync(BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void update()
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(false));
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void update(boolean closeStreams)
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(false));
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
      * }.
      *
-     * @see #sync(SyncConfiguration)
+     * @see #sync(BitField)
      */
     public static void update(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws SyncException {
-        sync(new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(false));
+        sync(   archive,
+                BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void update(File archive)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(true)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(true)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(false));
+        sync(   archive,
+                BitField.noneOf(ArchiveSyncOption.class)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void update(File archive, boolean closeStreams)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(false)
-                .setCloseInputStreams(closeStreams)
-                .setWaitForOutputStreams(false)
-                .setCloseOutputStreams(closeStreams)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.noneOf(ArchiveSyncOption.class)
+                .set(CLOSE_INPUT_STREAMS, closeStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(false));
+        sync(   archive,
+                BitField.noneOf(ArchiveSyncOption.class)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
      * }.
      *
-     * @see #sync(File, SyncConfiguration)
+     * @see #sync(File, BitField)
      */
     public static void update(
             File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws SyncException {
-        sync(archive, new SyncConfiguration()
-                .setWaitForInputStreams(waitForInputStreams)
-                .setCloseInputStreams(closeInputStreams)
-                .setWaitForOutputStreams(waitForOutputStreams)
-                .setCloseOutputStreams(closeOutputStreams)
-                .setUmount(false));
+    throws ArchiveSyncException {
+        sync(   archive,
+                BitField.noneOf(ArchiveSyncOption.class)
+                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
+                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
+                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
+                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
     }
 
     /**
@@ -2914,7 +2862,7 @@ public class File extends java.io.File {
                 try {
                     sync(this);
                     sync((File) dst);
-                } catch (SyncException ex) {
+                } catch (ArchiveSyncException ex) {
                     return false;
                 }
                 return delegate.renameTo(dst);

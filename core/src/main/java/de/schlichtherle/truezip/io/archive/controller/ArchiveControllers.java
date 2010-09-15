@@ -24,10 +24,9 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +45,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.*;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
@@ -206,44 +206,45 @@ public final class ArchiveControllers {
      *        This may be {@code null} or empty in order to select all accessed
      *        archive files.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
+     *         {@link DefaultArchiveSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and any error
+     *         {@link DefaultArchiveSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException if {@code config} is {@code null}.
      * @throws IllegalArgumentException if the configuration property
      *         {@code closeInputStreams} is {@code false} and
      *         {@code closeOutputStreams} is {@code true}.
-     * @see ArchiveController#sync(SyncConfiguration)
+     * @see ArchiveController#sync(BitField, ArchiveSyncExceptionBuilder)
      */
-    public static void sync(final URI prefix, SyncConfiguration config)
-    throws SyncException {
-        if (!config.getCloseInputStreams() && config.getCloseOutputStreams())
+    public static void sync(
+            final URI prefix,
+            BitField<ArchiveSyncOption> options,
+            final ArchiveSyncExceptionBuilder builder)
+    throws ArchiveSyncException {
+        if (!options.get(CLOSE_INPUT_STREAMS) && options.get(CLOSE_OUTPUT_STREAMS))
             throw new IllegalArgumentException();
-        config = config.setReassemble(true);
+        options = options.set(REASSEMBLE);
 
         int total = 0, touched = 0;
         logger.log(Level.FINE, "sync.try", new Object[] { // NOI18N
             prefix,
-            config.getWaitForInputStreams(),
-            config.getCloseInputStreams(),
-            config.getWaitForOutputStreams(),
-            config.getCloseOutputStreams(),
-            config.getUmount(),
+            options.get(WAIT_FOR_INPUT_STREAMS),
+            options.get(CLOSE_INPUT_STREAMS),
+            options.get(WAIT_FOR_OUTPUT_STREAMS),
+            options.get(CLOSE_OUTPUT_STREAMS),
+            options.get(UMOUNT),
         });
         try {
             // Reset statistics if it hasn't happened yet.
             CountingReadOnlyFile.init();
             CountingOutputStream.init();
             try {
-                final SyncExceptionBuilder builder
-                        = config.getSyncExceptionBuilder();
                 // The general algorithm is to sort the targets in descending order
                 // of their pathnames (considering the system's default name
                 // separator character) and then walk the array in reverse order to
@@ -260,8 +261,8 @@ public final class ArchiveControllers {
                             // Upon return, some new ArchiveWarningException's may
                             // have been generated. We need to remember them for
                             // later throwing.
-                            c.sync(config);
-                        } catch (SyncException exception) {
+                            c.sync(options, builder);
+                        } catch (ArchiveSyncException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
                             // exception for some reason.
@@ -279,7 +280,7 @@ public final class ArchiveControllers {
                 CountingReadOnlyFile.resetOnInit();
                 CountingOutputStream.resetOnInit();
             }
-        } catch (SyncException ex) {
+        } catch (ArchiveSyncException ex) {
             logger.log(Level.FINE, "sync.catch", ex);// NOI18N
             throw ex;
         }
@@ -405,8 +406,11 @@ public final class ArchiveControllers {
                     }
                 } finally {
                     try {
-                        ArchiveControllers.sync(null, new SyncConfiguration());
-                    } catch (SyncException ouch) {
+                        ArchiveControllers.sync(
+                                null,
+                                BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS, UMOUNT),
+                                new DefaultArchiveSyncExceptionBuilder());
+                    } catch (ArchiveSyncException ouch) {
                         ouch.printStackTrace();
                     }
                 }

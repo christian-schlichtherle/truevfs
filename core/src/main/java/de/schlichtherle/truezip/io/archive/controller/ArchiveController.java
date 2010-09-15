@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
@@ -40,6 +41,7 @@ import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.*;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
@@ -144,7 +146,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * For example, if the controller has started to update some entry data,
      * it must call {@link #setTouched(boolean)} in order to force the
      * controller to be updated on the next call to
-     * {@link ArchiveControllers#sync(URI, SyncConfiguration)}
+     * {@link ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)}
      * even if the client application holds no more references to it.
      * Otherwise, all changes may get lost!
      * 
@@ -338,7 +340,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * (re)schedules this archive controller for the synchronization of its
      * archive contents to the target archive file in the real file system
      * upon the next call to
-     * {@link ArchiveControllers#sync(URI, SyncConfiguration)}
+     * {@link ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)}
      * according to the given touch status:
      * <p>
      * If set to {@code true}, the archive contents of this controller are
@@ -418,21 +420,16 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * only the last written entry would be added to the central directory
      * of the archive (unless the archive type doesn't support this).
      * 
-     * @see #sync(SyncConfiguration)
-     * @throws SyncException If any exceptional condition occurs
+     * @see #sync(BitField, ArchiveSyncExceptionBuilder)
+     * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
     public final void autoSync(final String path)
-    throws SyncException {
+    throws ArchiveSyncException {
         assert writeLock().isHeldByCurrentThread();
         if (hasNewData(path)) {
-            sync(new SyncConfiguration()
-                    .setWaitForInputStreams(true)
-                    .setCloseInputStreams(false)
-                    .setWaitForOutputStreams(true)
-                    .setCloseOutputStreams(false)
-                    .setUmount(false)
-                    .setReassemble(false));
+            sync(   BitField.of(WAIT_FOR_INPUT_STREAMS, WAIT_FOR_OUTPUT_STREAMS),
+                    new DefaultArchiveSyncExceptionBuilder());
         }
     }
 
@@ -444,15 +441,17 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * This method requires external synchronization on this controller's write
      * lock!
      *
-     * @param config The parameters for processing - {@code null} is not
-     *        permitted.
-     * @throws NullPointerException if {@code config} is {@code null}.
-     * @throws SyncException if any exceptional condition occurs
+     * @param options The non-{@code null} options for processing.
+     * @throws NullPointerException if {@code options} or {@code builder} is
+     *         {@code null}.
+     * @throws ArchiveSyncException if any exceptional condition occurs
      *         throughout the processing of the target archive file.
-     * @see ArchiveControllers#sync(URI, SyncConfiguration)
+     * @see ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)
      */
-    public abstract void sync(SyncConfiguration config)
-    throws SyncException;
+    public abstract void sync(
+            BitField<ArchiveSyncOption> options,
+            ArchiveSyncExceptionBuilder builder)
+    throws ArchiveSyncException;
 
     // TODO: Document this!
     abstract int waitAllInputStreamsByOtherThreads(long timeout);
@@ -467,9 +466,9 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * created and any subsequent operations on its entries will remount
      * the virtual file system from the archive file again.
      */
-    final void reset() throws SyncException {
-        final SyncExceptionBuilder builder
-                = new DefaultSyncExceptionBuilder();
+    final void reset() throws ArchiveSyncException {
+        final ArchiveSyncExceptionBuilder builder
+                = new DefaultArchiveSyncExceptionBuilder();
         reset(builder);
         builder.check();
     }
@@ -484,8 +483,8 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * This method should be overridden by subclasses, but must still be
      * called when doing so.
      */
-    abstract void reset(final SyncExceptionHandler handler)
-    throws SyncException;
+    abstract void reset(final ArchiveSyncExceptionHandler handler)
+    throws ArchiveSyncException;
 
     @Override
     public String toString() {
@@ -1073,7 +1072,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     // anyway, so we need to reset now.
                     try {
                         reset();
-                    } catch (SyncException cannotHappen) {
+                    } catch (ArchiveSyncException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
                     throw ex;
