@@ -17,11 +17,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>de.schlichtherle.truezip</groupId>
     <artifactId>truezip-core</artifactId>
     <version>7.0-SNAPSHOT</version>
-
+    <packaging>jar</packaging>
     <name>TrueZIP Core ${pom.version}</name>
     <description>TrueZIP is a Java based Virtual File System (VFS) to enable
 transparent, multi-threaded read/write access to archive files
@@ -59,6 +58,18 @@ limitations under the License.
         <developerConnection>scm:hg:https://hg.kenai.com/hg/truezip~v7-sandbox</developerConnection>
         <url>http://kenai.com/projects/truezip/sources/v7-release/show</url>
     </scm>
+    <developers>
+        <developer>
+            <name>Christian Schlichtherle</name>
+            <email>christian AT schlichtherle DOT de</email>
+            <organization>Schlichtherle IT Services</organization>
+            <organizationUrl>http://schlichtherle.de</organizationUrl>
+            <timezone>1</timezone>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -146,6 +157,14 @@ limitations under the License.
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- <redirectTestOutputToFile>true</redirectTestOutputToFile> -->
@@ -169,11 +188,16 @@ limitations under the License.
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <show>private</show>
-                    <nohelp>true</nohelp>
-                </configuration>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
