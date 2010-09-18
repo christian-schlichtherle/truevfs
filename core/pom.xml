@@ -54,6 +54,11 @@ limitations under the License.
             <distribution>manual</distribution>
         </license>
     </licenses>
+    <scm>
+        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7-release</connection>
+        <developerConnection>scm:hg:https://hg.kenai.com/hg/truezip~v7-sandbox</developerConnection>
+        <url>http://kenai.com/projects/truezip/sources/v7-release/show</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -116,6 +121,14 @@ limitations under the License.
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <configuration>
+                    <goals>clean source:jar javadoc:jar install</goals>
+                    <goalsDirectory>core</goalsDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
@@ -173,20 +186,20 @@ limitations under the License.
                 <configuration>
                     <groups>
                         <group>
-                            <title>High Level API For Accessing Archive Files Of Any Supported Type</title>
+                            <title>High Level API For Accessing Archive Files</title>
                             <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample</packages>
                         </group>
                         <group>
+                            <title>GUI For Accessing Archive Files</title>
+                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
+                        </group>
+                        <group>
                             <title>Low Level API For Accessing ZIP Files</title>
-                            <packages>de.schlichtherle.truezip.util.zip</packages>
+                            <packages>de.schlichtherle.truezip.io.zip</packages>
                         </group>
                         <group>
                             <title>Low Level API For Accessing RAES Files</title>
                             <packages>de.schlichtherle.truezip.crypto.io.raes:de.schlichtherle.truezip.key*</packages>
-                        </group>
-                        <group>
-                            <title>GUI For Accessing Archive Files Of Any Supported Type</title>
-                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
                         </group>
                         <group>
                             <title>SPI And Implementations For Pluggable Archive Drivers</title>
