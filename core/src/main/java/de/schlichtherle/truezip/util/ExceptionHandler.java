@@ -21,12 +21,12 @@ package de.schlichtherle.truezip.util;
  * applications</i> in order to inject an exception handling strategy into a
  * <i>cooperative algorithm</i> as its dependency.
  * In the event of an exceptional condition, the cooperative algorithm would
- * then call this interface (with the exception provided as the cause) in order
+ * then call this interface (with an exception provided as the cause) in order
  * to let the implementation decide how to proceed.
  * The implementation would then make the following decisions:
  * <ol>
  * <li>If possible, shall the control be returned to the cooperative algorithm
- *     proceed in order to proceed its task?
+ *     in order to proceed its task?
  * <li>If not, shall the cause exception be wrapped in another exception before
  *     throwing it?
  * </ol>
