@@ -38,14 +38,6 @@
             </properties>
         </action>
         <action>
-            <actionName>CUSTOM-Generate Javadoc JAR</actionName>
-            <displayName>Generate Javadoc JAR</displayName>
-            <goals>
-                <goal>generate-sources</goal>
-                <goal>javadoc:jar</goal>
-            </goals>
-        </action>
-        <action>
             <actionName>CUSTOM-site</actionName>
             <displayName>site</displayName>
             <goals>
@@ -57,6 +49,7 @@
             <actionName>build</actionName>
             <goals>
                 <goal>package</goal>
+                
             </goals>
         </action>
         <action>
@@ -68,17 +61,27 @@
         </action>
         <action>
             <actionName>build-with-dependencies</actionName>
-            <basedir>../</basedir>
-            <reactor>also-make</reactor>
             <goals>
                 <goal>package</goal>
+                
             </goals>
+            <basedir>../</basedir>
+            <reactor>also-make</reactor>
         </action>
         <action>
             <actionName>CUSTOM-install</actionName>
             <displayName>install</displayName>
             <goals>
+                <goal>source:jar</goal>
+                <goal>javadoc:jar</goal>
                 <goal>install</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>javadoc</actionName>
+            <goals>
+                <goal>generate-sources</goal>
+                <goal>javadoc:jar</goal>
             </goals>
         </action>
     </actions>
