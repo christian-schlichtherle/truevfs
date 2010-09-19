@@ -416,7 +416,6 @@ implements ArchiveFileSystem<AE> {
          * If this is not a directory entry, {@code null} is returned.
          * Otherwise, an unmodifiable set of strings is returned which
          * represent the base names of the members of this directory entry.
-         * @return
          */
         Set<String> list() {
             return null;
