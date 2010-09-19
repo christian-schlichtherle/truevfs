@@ -127,7 +127,7 @@ extends FilterArchiveOutput<AE> {
     @Override
     public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
             final AE entry)
-    throws FileNotFoundException {
+    throws IOException {
         final ArchiveOutputStreamSocket<? extends AE> dst
                 = super.getOutputStreamSocket(entry);
         class OutputStreamSocket implements ArchiveOutputStreamSocket<AE> {

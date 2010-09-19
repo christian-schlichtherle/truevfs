@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocketProvider;
 import de.schlichtherle.truezip.io.socket.OutputStreamSocket;
 import de.schlichtherle.truezip.io.socket.OutputStreamSocketProvider;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Provides {@link OutputStreamSocket}s for write access to archive entries.
@@ -46,5 +46,5 @@ extends OutputStreamSocketProvider<AE, ArchiveEntry> {
      */
     @Override
     ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(AE entry)
-    throws FileNotFoundException;
+    throws IOException;
 }

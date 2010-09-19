@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.output;
 import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.FilterArchiveInput;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -51,7 +50,7 @@ implements ArchiveOutput<AE> {
     @Override
     public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
             final AE entry)
-    throws FileNotFoundException {
+    throws IOException {
         return getTarget().getOutputStreamSocket(entry);
     }
 

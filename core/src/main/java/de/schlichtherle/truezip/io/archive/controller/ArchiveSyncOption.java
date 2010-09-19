@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Holds the configuration parameters for
- * {@link ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)} and
- * {@link ArchiveController#sync(BitField, ArchiveSyncExceptionBuilder)}.
+ * Defines the available options for archive synchronization operations, i.e.
+ * {@link ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)}
+ * and {@link ArchiveController#sync(BitField, ArchiveSyncExceptionBuilder)}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -47,11 +46,8 @@ public enum ArchiveSyncOption {
      * {@link IOException} (which is a typical bug in many Java
      * applications), then the respective archive controller will not
      * return from the update until the current thread gets interrupted!
-     * <p>
-     * The default value for this property is {@code false}.
      */
     WAIT_FOR_INPUT_STREAMS,
-
     /**
      * Suppose there are any open input streams for any archive entries of
      * an archive controller's target file because the client application has
@@ -68,19 +64,13 @@ public enum ArchiveSyncOption {
      * <em>not</em> updated and an {@link ArchiveBusyException} is thrown to
      * indicate that the application must close all entry input streams
      * first.
-     * <p>
-     * The default value for this property is {@code true}.
      */
     CLOSE_INPUT_STREAMS,
-
     /**
      * Similar to {@code waitInputStreams},
      * but applies to archive entry output streams instead.
-     * <p>
-     * The default value for this property is {@code false}.
      */
     WAIT_FOR_OUTPUT_STREAMS,
-
     /**
      * Similar to {@code closeInputStreams},
      * but applies to archive entry output streams instead.
@@ -88,11 +78,8 @@ public enum ArchiveSyncOption {
      * If this parameter is {@code true}, then
      * {@code closeInputStreams} must be {@code true}, too.
      * Otherwise, an {@code IllegalArgumentException} is thrown.
-     * <p>
-     * The default value for this property is {@code true}.
      */
     CLOSE_OUTPUT_STREAMS,
-
     /**
      * If this property is {@code true}, the archive controller's target file
      * is completely released in order to enable subsequent read/write access
@@ -106,11 +93,8 @@ public enum ArchiveSyncOption {
      * Note that temporary files are always deleted by TrueZIP unless the JVM
      * is terminated unexpectedly. This property solely exists to control
      * cooperation with third parties or enabling faster access.
-     * <p>
-     * The default value for this property is {@code true}.
      */
     UMOUNT,
-
     /**
      * Let's assume an archive controller's target file is enclosed in another
      * archive file.
@@ -120,8 +104,6 @@ public enum ArchiveSyncOption {
      * property {@code umount} is set to {@code true} as well.
      * Failing to comply to this requirement may throw an
      * {@link AssertionError} and will incur loss of data!
-     * <p>
-     * The default value for this property is {@code true}.
      */
     REASSEMBLE,
 }
