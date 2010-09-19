@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,11 +29,12 @@ import java.util.Set;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @author Christian Schlichtherle
+ * @param   <AE> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystem
-extends ArchiveEntryContainer<ArchiveEntry> {
+public interface ArchiveFileSystem<AE extends ArchiveEntry>
+extends ArchiveEntryContainer<AE> {
 
     /**
      * Returns {@code true} if and only if this archive file system is
@@ -48,26 +48,16 @@ extends ArchiveEntryContainer<ArchiveEntry> {
      */
     boolean isTouched();
 
-    Iterator<ArchiveEntry> iterator();
-
     /**
-     * Looks up the archive entry with the given path name in this virtual
-     * archive file system and returns it or {@code null} if not existent.
-     */
-    ArchiveEntry getEntry(String path);
-
-    /**
-     * An I/O operation for creating (and hence probably replacing) and
-     * linking file system entries into this virtual archive file system.
+     * An I/O operation for linking an entry into an archive file system.
+     * The linked entry may replace an existing entry.
      *
      * @see #mknod
      */
-    interface Link
-    extends IOOperation, IOReference<ArchiveEntry> {
+    interface Link<AE extends ArchiveEntry>
+    extends IOOperation, IOReference<AE> {
 
-        /**
-         * Links the file system entries into this virtual archive file system.
-         */
+        /** Links an entry into an archive file system. */
         @Override
         void run()
         throws ArchiveFileSystemException;
@@ -96,34 +86,34 @@ extends ArchiveEntryContainer<ArchiveEntry> {
      * Hence, if the operations which compose the transaction fails, the
      * returned object may be safely collected by the garbage collector,
      *
-     * @param path The relative path name of the target to create or replace.
-     * @param createParents If {@code true}, any non-existing parent
-     * directory will be created in this file system with its last
-     * modification time set to the system's current time.
-     * @param template If not {@code null}, then the newly created or
-     * replaced target shall inherit as much properties from this
-     * instance as possible (with the exception of the name).
-     * This is typically used for archive copy operations and requires
-     * some support by the archive driver.
+     * @param  path The relative path name of the target to create or replace.
+     * @param  template If not {@code null}, then the newly created or
+     *         replaced target shall inherit as much properties from this
+     *         instance as possible (with the exception of the name).
+     *         This is typically used for archive copy operations and requires
+     *         some support by the archive driver.
+     * @param  createParents If {@code true}, any missing parent
+     *         directory will be created in this file system with its last
+     *         modification time set to the system's current time.
      * @return An I/O operation. You must call its {@link IOOperation#run}
-     * method in order to link the newly created target into this
-     * archive file system.
+     *         method in order to link the newly created target into this
+     *         archive file system.
      * @throws ArchiveReadOnlyExceptionn If this virtual archive file system
-     * is read only.
+     *         is read only.
      * @throws ArchiveFileSystemException If one of the following is true:
-     * <ul>
-     * <li>{@code path} contains characters which are not
-     * supported by the archive file.
-     * <li>The target name indicates a directory (trailing {@code /})
-     * and its target does already exist within this file system.
-     * <li>The target is a file or directory and does already exist as
-     * the respective other type within this file system.
-     * <li>The parent directory does not exist and
-     * {@code createParents} is {@code false}.
-     * <li>One of the target's parents denotes a file.
-     * </ul>
+     *         <ul>
+     *         <li>{@code path} contains characters which are not
+     *             supported by the archive file.
+     *         <li>The target name indicates a directory (trailing {@code /})
+     *             and its target does already exist within this file system.
+     *         <li>The target is a file or directory and does already exist as
+     *             the respective other type within this file system.
+     *         <li>The parent directory does not exist and
+     *             {@code createParents} is {@code false}.
+     *         <li>One of the target's parents denotes a file.
+     *         </ul>
      */
-    Link mknod(String path, Type type, ArchiveEntry template, boolean createParents)
+    Link<AE> mknod(String path, Type type, ArchiveEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**

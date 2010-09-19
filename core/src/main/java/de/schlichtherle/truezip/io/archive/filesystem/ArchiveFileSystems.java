@@ -48,11 +48,12 @@ public class ArchiveFileSystems {
      *        a client class changes the state of this archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
-    public static ArchiveFileSystem newArchiveFileSystem(
-            ArchiveEntryFactory<? extends ArchiveEntry> factory,
+    public static <AE extends ArchiveEntry>
+    ArchiveFileSystem<AE> newArchiveFileSystem(
+            ArchiveEntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener)
     throws IOException {
-        return new ReadWriteArchiveFileSystem(factory, vetoableTouchListener);
+        return new ReadWriteArchiveFileSystem<AE>(factory, vetoableTouchListener);
     }
 
     /**
@@ -87,15 +88,16 @@ public class ArchiveFileSystems {
      * @throws NullPointerException If {@code factory} or {@code archive}
      *         is {@code null}.
      */
-    public static ArchiveFileSystem newArchiveFileSystem(
-            ArchiveEntryContainer<? extends ArchiveEntry> container,
+    public static <AE extends ArchiveEntry>
+    ArchiveFileSystem<AE> newArchiveFileSystem(
+            ArchiveEntryContainer<AE> container,
             long rootTime,
-            ArchiveEntryFactory<? extends ArchiveEntry> factory,
+            ArchiveEntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener,
             boolean readOnly) {
         return readOnly
-            ? new ReadOnlyArchiveFileSystem(container, rootTime, factory)
-            : new ReadWriteArchiveFileSystem(container, rootTime, factory, vetoableTouchListener);
+            ? new ReadOnlyArchiveFileSystem<AE>(container, rootTime, factory)
+            : new ReadWriteArchiveFileSystem<AE>(container, rootTime, factory, vetoableTouchListener);
     }
 
     /**

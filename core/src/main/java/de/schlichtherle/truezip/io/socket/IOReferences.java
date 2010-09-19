@@ -40,7 +40,7 @@ public class IOReferences {
     public static <T> IOReference<T> ref(final T target) {
         class TargetIOReference implements IOReference<T> {
             @Override
-            public T get() {
+            public T getTarget() {
                 return target;
             }
         } // class TargetIOReference
@@ -48,7 +48,7 @@ public class IOReferences {
     }
 
     /**
-     * Returns the {@link IOReference#get() target} for I/O operations of the
+     * Returns the {@link IOReference#getTarget() target} for I/O operations of the
      * given nullable I/O reference.
      * The returned target for I/O operations is {@code null} if and only if
      * either the given reference is {@code null} or its target for I/O
@@ -57,10 +57,10 @@ public class IOReferences {
      * @param  <T> The type of the target for I/O operations.
      * @param  reference a nullable I/O reference to the target for I/O
      *         operations.
-     * @return The {@link IOReference#get() target} for I/O operations of the
+     * @return The {@link IOReference#getTarget() target} for I/O operations of the
      *         given nullable I/O reference.
      */
     public static <T> T deref(final IOReference<T> reference) {
-        return reference != null ? reference.get() : null;
+        return reference != null ? reference.getTarget() : null;
     }
 }

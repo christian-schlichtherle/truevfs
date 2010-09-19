@@ -19,8 +19,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import java.io.IOException;
 
 /**
- * This exception is thrown when a client application tries to perform an
- * illegal operation on an archive file system.
+ * Thrown to indicate an exceptional condition in an {@link ArchiveFileSystem}.
  */
 public class ArchiveFileSystemException
 extends IOException {

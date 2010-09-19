@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 /**
- * This exception is thrown when a client tries to modify a read only
- * virtual archive file system.
+ * Thrown to indicate that an operation was trying to modify a read-only
+ * {@link ArchiveFileSystem}.
  */
 class ReadOnlyArchiveFileSystemException
 extends ArchiveFileSystemException {

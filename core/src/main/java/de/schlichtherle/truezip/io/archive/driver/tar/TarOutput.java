@@ -95,7 +95,7 @@ implements ArchiveOutput<TarEntry> {
     throws FileNotFoundException {
         class OutputStreamSocket implements ArchiveOutputStreamSocket<TarEntry> {
             @Override
-            public TarEntry get() {
+            public TarEntry getTarget() {
                 return entry;
             }
 

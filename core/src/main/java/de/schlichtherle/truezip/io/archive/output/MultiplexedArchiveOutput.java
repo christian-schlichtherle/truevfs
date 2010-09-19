@@ -106,7 +106,7 @@ extends FilterArchiveOutput<AE> {
 
         @Override
         public AE next() {
-            return i.next().get();
+            return i.next().getTarget();
         }
 
         @Override
@@ -121,7 +121,7 @@ extends FilterArchiveOutput<AE> {
         if (entry != null)
             return entry;
         final TempEntryOutputStream out = temps.get(name);
-        return out != null ? out.get() : null;
+        return out != null ? out.getTarget() : null;
     }
 
     @Override
@@ -132,7 +132,7 @@ extends FilterArchiveOutput<AE> {
                 = super.getOutputStreamSocket(entry);
         class OutputStreamSocket implements ArchiveOutputStreamSocket<AE> {
             @Override
-            public AE get() {
+            public AE getTarget() {
                 return entry;
             }
 
@@ -150,7 +150,7 @@ extends FilterArchiveOutput<AE> {
             final ArchiveEntry src)
     throws IOException {
         if (src != null) {
-            final ArchiveEntry dst = dstSocket.get();
+            final ArchiveEntry dst = dstSocket.getTarget();
             dst.setSize(src.getSize()); // data may be compressed!
         }
         return isTargetBusy()
@@ -232,7 +232,7 @@ extends FilterArchiveOutput<AE> {
                 }
 
                 @Override
-                public ArchiveEntry get() {
+                public ArchiveEntry getTarget() {
                     return entry;
                 }
 
@@ -245,12 +245,12 @@ extends FilterArchiveOutput<AE> {
             this.temp = temp;
             this.dst = dst;
             this.src = new TempInputStreamSocket();
-            temps.put(dst.get().getName(), this);
+            temps.put(dst.getTarget().getName(), this);
         }
 
         @Override
-        public AE get() {
-            return dst.get();
+        public AE getTarget() {
+            return dst.getTarget();
         }
 
         @Override
@@ -267,8 +267,8 @@ extends FilterArchiveOutput<AE> {
             try {
                 super.close();
             } finally {
-                final AE dstEntry = dst.get();
-                final ArchiveEntry srcEntry = src.get();
+                final AE dstEntry = dst.getTarget();
+                final ArchiveEntry srcEntry = src.getTarget();
                 if (dstEntry.getSize() == UNKNOWN)
                     dstEntry.setSize(srcEntry.getSize());
                 if (dstEntry.getTime() == UNKNOWN)

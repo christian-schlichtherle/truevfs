@@ -22,21 +22,28 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 
 /**
- * @author Christian Schlichtherle
+ * A read-only archive file system.
+ * <p>
+ * All modifying methods throw a {@link ReadOnlyArchiveFileSystemException}.
+ *
+ * @param   <AE> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class ReadOnlyArchiveFileSystem extends ReadWriteArchiveFileSystem {
+final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
+extends ReadWriteArchiveFileSystem<AE> {
 
     /**
      * @see ArchiveFileSystems#newArchiveFileSystem(ArchiveEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
      */
     ReadOnlyArchiveFileSystem(
-        final ArchiveEntryContainer<? extends ArchiveEntry> container,
+        final ArchiveEntryContainer<AE> container,
         final long rootTime,
-        final ArchiveEntryFactory<? extends ArchiveEntry> factory) {
+        final ArchiveEntryFactory<AE> factory) {
         super(container, rootTime, factory, null);
     }
 
+    /** The implementation in this class returns {@code true}. */
     @Override
     public boolean isReadOnly() {
         return true;
@@ -49,7 +56,8 @@ final class ReadOnlyArchiveFileSystem extends ReadWriteArchiveFileSystem {
     }
 
     @Override
-    public Link mknod(String path, Type type, ArchiveEntry template, boolean createParents) throws ArchiveFileSystemException {
+    public Link<AE> mknod(String path, Type type, ArchiveEntry template, boolean createParents)
+    throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 
@@ -59,7 +67,8 @@ final class ReadOnlyArchiveFileSystem extends ReadWriteArchiveFileSystem {
     }
 
     @Override
-    public boolean setLastModified(String path, long time) throws ArchiveFileSystemException {
+    public boolean setLastModified(String path, long time)
+    throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 }

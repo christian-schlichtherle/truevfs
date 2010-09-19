@@ -466,7 +466,7 @@ public final class ArchiveControllers {
                     } // class SrcControllerUpdater
 
                     final ArchiveEntry srcEntry, dstEntry;
-                    final Link link;
+                    final Link<?> link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoSync(dstPath);
@@ -479,7 +479,7 @@ public final class ArchiveControllers {
                                 .mknod( dstPath, FILE,
                                         preserve ? srcEntry : null,
                                         createParents);
-                        dstEntry = link.get();
+                        dstEntry = link.getTarget();
 
                         // Create input stream.
                         in = srcController
@@ -598,13 +598,13 @@ public final class ArchiveControllers {
                     // Get destination archive entry reference.
                     final ArchiveFileSystem dstFileSystem
                             = dstController.autoMount(createParents);
-                    final Link dstLink = dstFileSystem.mknod(
+                    final Link<?> dstLink = dstFileSystem.mknod(
                             dstPath, FILE,
                             preserve ? srcEntry : null, createParents);
 
                     // Create output stream.
                     out = dstController
-                            .getOutputStreamSocket(dstLink.get())
+                            .getOutputStreamSocket(dstLink.getTarget())
                             .newOutputStream(srcEntry);
 
                     // Now link the destination entry into the file system.

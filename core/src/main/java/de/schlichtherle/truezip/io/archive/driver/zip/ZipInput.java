@@ -60,7 +60,7 @@ implements ArchiveInput<ZipEntry> {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
         class InputStreamSocket implements ArchiveInputStreamSocket<ZipEntry> {
             @Override
-            public ZipEntry get() {
+            public ZipEntry getTarget() {
                 return entry;
             }
 
