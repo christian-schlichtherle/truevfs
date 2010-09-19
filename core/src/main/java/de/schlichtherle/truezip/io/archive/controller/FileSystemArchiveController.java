@@ -16,8 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +31,8 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class FileSystemArchiveController extends ArchiveController {
+abstract class FileSystemArchiveController<AE extends ArchiveEntry>
+extends ArchiveController<AE> {
 
     /** The mount state of the archive file system. */
     private AutoMounter autoMounter = new ResetFileSystem();
@@ -52,7 +54,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
     }
 
     @Override
-    public final ArchiveFileSystem autoMount(
+    public final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
             final boolean createParents)
     throws FalsePositiveException, IOException {
@@ -60,11 +62,11 @@ abstract class FileSystemArchiveController extends ArchiveController {
         return autoMounter.autoMount(autoCreate, createParents);
     }
 
-    final ArchiveFileSystem getFileSystem() {
+    final ArchiveFileSystem<AE> getFileSystem() {
         return autoMounter.getFileSystem();
     }
 
-    final void setFileSystem(ArchiveFileSystem fileSystem) {
+    final void setFileSystem(ArchiveFileSystem<AE> fileSystem) {
         autoMounter.setFileSystem(fileSystem);
     }
 
@@ -72,20 +74,21 @@ abstract class FileSystemArchiveController extends ArchiveController {
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
-    private static abstract class AutoMounter {
-        abstract ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
-        throws FalsePositiveException, IOException;
+    private abstract class AutoMounter {
 
-        ArchiveFileSystem getFileSystem() {
+        abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
+                throws FalsePositiveException, IOException;
+
+        ArchiveFileSystem<AE> getFileSystem() {
             return null;
         }
 
-        abstract void setFileSystem(ArchiveFileSystem fileSystem);
+        abstract void setFileSystem(ArchiveFileSystem<AE> fileSystem);
     } // class AutoMounter
 
     private class ResetFileSystem extends AutoMounter {
         @Override
-        ArchiveFileSystem autoMount(final boolean autoCreate, final boolean createParents)
+        ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
         throws FalsePositiveException, IOException {
             try {
                 class Mounter implements Operation<Exception> {
@@ -96,10 +99,10 @@ abstract class FileSystemArchiveController extends ArchiveController {
                         // acquire the write lock!
                         if (autoMounter == ResetFileSystem.this) {
                             mount(autoCreate, createParents);
-                            assert autoMounter instanceof MountedFileSystem;
+                            //assert autoMounter instanceof MountedFileSystem;
                         } else {
                             assert autoMounter != null;
-                            assert !(autoMounter instanceof ResetFileSystem);
+                            //assert !(autoMounter instanceof ResetFileSystem);
                         }
                     }
                 } // class Mounter
@@ -135,7 +138,7 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        void setFileSystem(ArchiveFileSystem fileSystem) {
+        void setFileSystem(ArchiveFileSystem<AE> fileSystem) {
             // Passing in null may happen by reset().
             if (fileSystem != null)
                 autoMounter = new MountedFileSystem(fileSystem);
@@ -143,26 +146,26 @@ abstract class FileSystemArchiveController extends ArchiveController {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends AutoMounter {
-        private final ArchiveFileSystem fileSystem;
+        private final ArchiveFileSystem<AE> fileSystem;
 
-        private MountedFileSystem(final ArchiveFileSystem fileSystem) {
+        private MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem == null)
                 throw new NullPointerException();
             this.fileSystem = fileSystem;
         }
 
         @Override
-        ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents) {
+        ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents) {
             return fileSystem;
         }
 
         @Override
-        ArchiveFileSystem getFileSystem() {
+        ArchiveFileSystem<AE> getFileSystem() {
             return fileSystem;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem != null)
                 throw new IllegalArgumentException("File system already mounted!");
             autoMounter = new ResetFileSystem();
@@ -179,13 +182,13 @@ abstract class FileSystemArchiveController extends ArchiveController {
         }
 
         @Override
-        ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
+        ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
         throws FalsePositiveException {
             throw exception;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem != null)
                 throw new IllegalArgumentException("False positive archive file cannot have file system!");
             autoMounter = new ResetFileSystem();

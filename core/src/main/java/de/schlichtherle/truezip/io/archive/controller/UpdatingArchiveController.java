@@ -62,7 +62,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController extends FileSystemArchiveController {
+final class UpdatingArchiveController<AE extends ArchiveEntry>
+extends FileSystemArchiveController<AE> {
 
     private static final String CLASS_NAME
             = UpdatingArchiveController.class.getName();
@@ -87,13 +88,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Input
-    extends ConcurrentArchiveInput<ArchiveEntry> {
-        Input(ArchiveInput<ArchiveEntry> input) {
+    extends ConcurrentArchiveInput<AE> {
+        Input(ArchiveInput<AE> input) {
             super(input);
         }
 
         @Override
-        protected ArchiveInput<ArchiveEntry> getTarget() {
+        protected ArchiveInput<AE> getTarget() {
             return target;
         }
     }
@@ -107,13 +108,13 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Output
-    extends ConcurrentArchiveOutput<ArchiveEntry> {
-        Output(ArchiveOutput<ArchiveEntry> output) {
+    extends ConcurrentArchiveOutput<AE> {
+        Output(ArchiveOutput<AE> output) {
             super(output);
         }
 
         @Override
-        protected ArchiveOutput<ArchiveEntry> getTarget() {
+        protected ArchiveOutput<AE> getTarget() {
             return target;
         }
     }
@@ -173,7 +174,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Returns a new concurrent archive input which decorates (wraps) the
      * given non-{@code null} archive input.
      */
-    private Input wrap(ArchiveInput archive) {
+    private Input wrap(ArchiveInput<AE> archive) {
         return new Input(archive);
     }
 
@@ -181,7 +182,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    private ArchiveInput unwrap(Input proxy) {
+    private ArchiveInput<AE> unwrap(Input proxy) {
         return proxy != null ? proxy.getTarget() : null;
     }
 
@@ -189,7 +190,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Returns a new concurrent archive input which decorates (wraps) the
      * given non-{@code null} archive input.
      */
-    private Output wrap(ArchiveOutput archive) {
+    private Output wrap(ArchiveOutput<AE> archive) {
         return new Output(archive);
     }
 
@@ -197,17 +198,17 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    private ArchiveOutput unwrap(Output proxy) {
+    private ArchiveOutput<AE> unwrap(Output proxy) {
         return proxy != null ? proxy.getTarget() : null;
     }
 
-    private ArchiveFileSystem newArchiveFileSystem()
+    private ArchiveFileSystem<AE> newArchiveFileSystem()
     throws IOException {
         return ArchiveFileSystems.newArchiveFileSystem(
                 getDriver(), vetoableTouchListener);
     }
 
-    private ArchiveFileSystem newArchiveFileSystem(
+    private ArchiveFileSystem<AE> newArchiveFileSystem(
             long rootTime,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
@@ -334,7 +335,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void unwrap(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -404,7 +405,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void unwrapFromLockedController(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -543,21 +544,21 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     @Override
-    ArchiveInputStreamSocket getInputStreamSocket(final ArchiveEntry target)
+    ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(final AE target)
     throws IOException {
         assert target != null;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         assert !hasNewData(target.getName());
         assert target.getType() != DIRECTORY;
 
-        final ArchiveInputStreamSocket in = input
+        final ArchiveInputStreamSocket<? extends AE> in = input
                 .getInputStreamSocket(target);
         assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + target.getName() + '"';
         return in;
     }
 
     @Override
-    ArchiveOutputStreamSocket getOutputStreamSocket(final ArchiveEntry target)
+    ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(final AE target)
     throws IOException {
         assert target != null;
         assert writeLock().isHeldByCurrentThread();
@@ -843,8 +844,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             }
         } // class FilterExceptionHandler
 
-        final ArchiveFileSystem fileSystem = getFileSystem();
-        final long rootTime = fileSystem.getLastModified(ROOT);
+        final long rootTime = getFileSystem().getLastModified(ROOT);
         try {
             try {
                 shutdownStep1(handler);
@@ -915,24 +915,22 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     public <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
-        final ArchiveInput<ArchiveEntry> in = unwrap(input);
-        final ArchiveOutput<ArchiveEntry> out = unwrap(output);
-        final ArchiveFileSystem<?> fileSystem = getFileSystem();
-        final ArchiveEntry root = fileSystem.getEntry(ROOT);
+        final ArchiveInput<AE> in = unwrap(input);
+        final ArchiveOutput<AE> out = unwrap(output);
+        final ArchiveFileSystem<AE> fs = getFileSystem();
+        final AE root = fs.getEntry(ROOT);
         assert root != null;
-        for (final ArchiveEntry e : fileSystem) {
+        for (final AE e : fs) {
             final String n = e.getName();
             if (out.getEntry(n) != null)
-                continue; // we have already written this target
+                continue; // we have already written this entry
             try {
                 if (e.getType() == DIRECTORY) {
                     if (root == e)
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    out.getOutputStreamSocket(e)
-                            .newOutputStream(null)
-                            .close();
+                    out.getOutputStreamSocket(e).newOutputStream(null).close();
                 } else if (in != null && in.getEntry(n) != null) {
                     assert e == in.getEntry(n);
                     IOOperations.copy(  in.getInputStreamSocket(e),
@@ -944,9 +942,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    out.getOutputStreamSocket(e)
-                            .newOutputStream(null)
-                            .close();
+                    out.getOutputStreamSocket(e).newOutputStream(null).close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);
@@ -1022,7 +1018,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void wrap(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
@@ -1041,7 +1037,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     }
 
     private void wrapToWriteLockedController(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path)
     throws IOException {
         assert controller != null;
