@@ -53,7 +53,7 @@ extends ArchiveController<AE, AI, AO> {
     }
 
     @Override
-    final boolean isTouched() {
+    public final boolean isTouched() {
         final ArchiveFileSystem fileSystem = getFileSystem();
         return fileSystem != null && fileSystem.isTouched();
     }

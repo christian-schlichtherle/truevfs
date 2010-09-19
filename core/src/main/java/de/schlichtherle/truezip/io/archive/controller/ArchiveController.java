@@ -320,7 +320,7 @@ implements ArchiveDescriptor {
      * Returns {@code true} if and only if the file system has been touched,
      * i.e. if an operation changed its state.
      */
-    abstract boolean isTouched();
+    public abstract boolean isTouched();
 
     /**
      * Sets the <i>touch status</i> of the virtual file system and
