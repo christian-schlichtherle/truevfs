@@ -80,7 +80,7 @@ extends FilterArchiveInput<AE> {
                 = target.getInputStreamSocket(entry);
         class InputStreamSocket implements ArchiveInputStreamSocket<AE> {
             @Override
-            public AE get() {
+            public AE getTarget() {
                 return entry;
             }
 

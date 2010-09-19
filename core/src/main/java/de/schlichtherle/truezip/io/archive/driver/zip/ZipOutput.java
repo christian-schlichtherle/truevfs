@@ -127,7 +127,7 @@ implements ArchiveOutput<ZipEntry> {
     throws FileNotFoundException {
         class OutputStreamSocket implements ArchiveOutputStreamSocket<ZipEntry> {
             @Override
-            public ZipEntry get() {
+            public ZipEntry getTarget() {
                 return entry;
             }
 

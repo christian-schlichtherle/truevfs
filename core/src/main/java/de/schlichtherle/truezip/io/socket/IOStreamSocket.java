@@ -21,7 +21,7 @@ package de.schlichtherle.truezip.io.socket;
  * its local target for I/O operations.
  *
  * @param   <LT> The type of the <i>local target</i> for I/O operations.
- *          i.e. the {@link #get() target} of this instance.
+ *          i.e. the {@link #getTarget() target} of this instance.
  * @param   <PT> The minimum required type of the <i>peer targets</i> for
  *          for I/O operations.
  * @author Christian Schlichtherle

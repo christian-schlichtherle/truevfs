@@ -35,9 +35,9 @@ public interface InputStreamSocketProvider<LT, PT> {
      * Multiple invocations with the same parameter may return the same
      * object again.
      * <p>
-     * The method {@link InputStreamSocket#get()} must return an object which
-     * {@link Object#equals(Object) compares equal} to the given local target
-     * when called on the returned input stream socket.
+     * The method {@link InputStreamSocket#getTarget()} must return an object
+     * which {@link Object#equals(Object) compares equal} to the given local
+     * target when called on the returned input stream socket.
      *
      * @param  target the non-{@code null} local target.
      * @return A non-{@code null} input stream socket for reading from the

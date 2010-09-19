@@ -23,7 +23,7 @@ import java.io.InputStream;
  * Creates input streams for reading bytes from its local target.
  * 
  * @param   <LT> The type of the <i>local target</i> for I/O operations,
- *          i.e. the {@link #get() target} of this instance.
+ *          i.e. the {@link #getTarget() target} of this instance.
  * @param   <PT> The minimum required type of the <i>peer targets</i>.
  * @see     InputStreamSocketProvider
  * @see     OutputStreamSocket
@@ -44,11 +44,11 @@ public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
      * @return The non-{@code null} local target for I/O operations.
      */
     @Override
-    LT get();
+    LT getTarget();
 
     /**
      * Returns a new {@code InputStream} for reading bytes from the
-     * {@link #get() local target}.
+     * {@link #getTarget() local target}.
      * <p>
      * Implementations must support calling this method any number of times.
      * Furthermore, the returned stream should <em>not</em> be buffered.

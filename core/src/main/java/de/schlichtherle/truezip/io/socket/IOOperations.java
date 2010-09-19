@@ -74,13 +74,13 @@ public class IOOperations {
     throws IOException {
         final InputStream is;
         try {
-            is = input.newInputStream(output.get());
+            is = input.newInputStream(output.getTarget());
         } catch (IOException ex) {
             throw new InputException(ex);
         }
         OutputStream os = null;
         try {
-            os = output.newOutputStream(input.get());
+            os = output.newOutputStream(input.getTarget());
         } finally {
             if (os == null) { // exception?
                 try {

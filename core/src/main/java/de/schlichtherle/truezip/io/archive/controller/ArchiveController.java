@@ -624,9 +624,9 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final Link link = fileSystem.mknod(path, FILE, null, createParents);
+                final Link<?> link = fileSystem.mknod(path, FILE, null, createParents);
                 // Create output stream.
-                out = getOutputStreamSocket(link.get()).newOutputStream(null);
+                out = getOutputStreamSocket(link.getTarget()).newOutputStream(null);
                 // Now link the entry into the file system.
                 link.run();
             }

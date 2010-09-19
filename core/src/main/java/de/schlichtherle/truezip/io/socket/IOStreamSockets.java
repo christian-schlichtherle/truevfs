@@ -51,7 +51,7 @@ public class IOStreamSockets {
             throw new NullPointerException();
         class FileIOStreamSocket<PT> implements IOStreamSocket<File, PT> {
             @Override
-            public File get() {
+            public File getTarget() {
                 return file;
             }
 

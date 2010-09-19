@@ -917,7 +917,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
     throws E {
         final ArchiveInput<ArchiveEntry> in = unwrap(input);
         final ArchiveOutput<ArchiveEntry> out = unwrap(output);
-        final ArchiveFileSystem fileSystem = getFileSystem();
+        final ArchiveFileSystem<?> fileSystem = getFileSystem();
         final ArchiveEntry root = fileSystem.getEntry(ROOT);
         assert root != null;
         for (final ArchiveEntry e : fileSystem) {

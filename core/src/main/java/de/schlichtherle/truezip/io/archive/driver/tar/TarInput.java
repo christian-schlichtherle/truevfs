@@ -218,7 +218,7 @@ implements ArchiveInput<TarEntry> {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
         class InputStreamSocket implements ArchiveInputStreamSocket<TarEntry> {
             @Override
-            public TarEntry get() {
+            public TarEntry getTarget() {
                 return entry;
             }
 

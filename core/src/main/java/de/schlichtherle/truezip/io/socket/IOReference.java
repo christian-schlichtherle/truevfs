@@ -38,5 +38,5 @@ public interface IOReference<T> {
      * 
      * @return The target for I/O operations.
      */
-    T get();
+    T getTarget();
 }
