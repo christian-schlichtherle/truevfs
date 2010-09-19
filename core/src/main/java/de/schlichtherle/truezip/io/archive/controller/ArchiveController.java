@@ -99,7 +99,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveController implements ArchiveDescriptor {
+public abstract class ArchiveController<AE extends ArchiveEntry>
+implements ArchiveDescriptor {
 
     /**
      * A weak reference to this archive controller.
@@ -118,7 +119,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final ArchiveController enclController;
+    private final ArchiveController<?> enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -262,7 +263,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *         controller's target archive file or {@code null} if it's not
      *         enclosed in another archive file.
      */
-    public final ArchiveController getEnclController() {
+    public final ArchiveController<?> getEnclController() {
         return enclController;
     }
 
@@ -393,15 +394,15 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
-    abstract ArchiveFileSystem autoMount(boolean autoCreate, boolean createParents)
+    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws FalsePositiveException, IOException;
 
-    ArchiveFileSystem autoMount(boolean autoCreate)
+    ArchiveFileSystem<AE> autoMount(boolean autoCreate)
     throws FalsePositiveException, IOException {
         return autoMount(autoCreate, autoCreate);
     }
 
-    ArchiveFileSystem autoMount()
+    ArchiveFileSystem<AE> autoMount()
     throws FalsePositiveException, IOException {
         return autoMount(false, false);
     }
@@ -544,8 +545,8 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     }
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
-                final ArchiveFileSystem fileSystem = autoMount();
-                final ArchiveEntry entry = fileSystem.getEntry(path);
+                final ArchiveFileSystem<AE> fs = autoMount();
+                final AE entry = fs.getEntry(path);
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file or directory");
@@ -567,7 +568,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract ArchiveInputStreamSocket getInputStreamSocket(ArchiveEntry target)
+    abstract ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(AE target)
     throws IOException;
 
     /**
@@ -617,14 +618,14 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                         "cannot write directories");
             } else {
                 autoSync(path);
-                final ArchiveFileSystem fileSystem = autoMount(createParents);
-                in = append && fileSystem.getType(path) == FILE
+                final ArchiveFileSystem<AE> fs = autoMount(createParents);
+                in = append && fs.getType(path) == FILE
                         ? newInputStream0(path)
                         : null;
                 // Start creating or overwriting the archive entry.
                 // Note that this will fail if the entry already isExisting as a
                 // directory.
-                final Link<?> link = fileSystem.mknod(path, FILE, null, createParents);
+                final Link<AE> link = fs.mknod(path, FILE, null, createParents);
                 // Create output stream.
                 out = getOutputStreamSocket(link.getTarget()).newOutputStream(null);
                 // Now link the entry into the file system.
@@ -651,7 +652,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *     {@link #hasNewData new data}.
      * <ul>
      */
-    abstract ArchiveOutputStreamSocket getOutputStreamSocket(ArchiveEntry target)
+    abstract ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(AE target)
     throws IOException;
 
     public final boolean isExisting(final String path)

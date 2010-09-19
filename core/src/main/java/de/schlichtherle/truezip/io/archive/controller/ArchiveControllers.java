@@ -432,12 +432,13 @@ public final class ArchiveControllers {
      * @throws IOException If copying the data fails because of an
      *         IOException in the destination.
      */
-    public static void copy(
+    public static <SE extends ArchiveEntry, DE extends ArchiveEntry>
+    void copy(
             final boolean preserve,
             final boolean createParents,
-            final ArchiveController srcController,
+            final ArchiveController<SE> srcController,
             final String srcPath,
-            final ArchiveController dstController,
+            final ArchiveController<DE> dstController,
             final String dstPath)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
@@ -465,8 +466,9 @@ public final class ArchiveControllers {
                         }
                     } // class SrcControllerUpdater
 
-                    final ArchiveEntry srcEntry, dstEntry;
-                    final Link<?> link;
+                    final SE srcEntry;
+                    final DE dstEntry;
+                    final Link<DE> link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoSync(dstPath);
