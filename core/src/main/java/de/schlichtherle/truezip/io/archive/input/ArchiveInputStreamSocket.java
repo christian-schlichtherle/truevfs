@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.input;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
 import de.schlichtherle.truezip.io.socket.InputStreamSocket;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
