@@ -109,12 +109,12 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected TarOutput newTarOutputArchive(
+    protected TarOutput newTarOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final TarInput source)
     throws IOException {
-        return super.newTarOutputArchive(
+        return super.newTarOutput(
                 archive,
                 new GZIPOutputStream(out, BUFSIZE, level),
                 source);

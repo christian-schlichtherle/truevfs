@@ -25,8 +25,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
@@ -40,8 +38,8 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
- * Provides unsafe access to a ZIP file using unsynchronized methods and shared
- * {@link ZipEntry} instances.
+ * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
+ * shared {@link ZipEntry} instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
@@ -59,7 +57,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicZipFile<E extends ZipEntry>
+public abstract class RawZipFile<E extends ZipEntry>
 implements Iterable<E>, Closeable {
 
     private static final long LONG_MSB = 0x8000000000000000L;
@@ -147,7 +145,7 @@ implements Iterable<E>, Closeable {
      * @throws IOException On any other I/O related issue.
      */
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected BasicZipFile(
+    protected RawZipFile(
             final ReadOnlyFile archive,
             final String charset,
             boolean preambled,
@@ -162,7 +160,7 @@ implements Iterable<E>, Closeable {
                 charset, factory, preambled, postambled);
     }
 
-    BasicZipFile(
+    RawZipFile(
             final ReadOnlyFileSource source,
             final String charset,
             final ZipEntryFactory<? extends E> zipEntryFactory,
@@ -1082,7 +1080,7 @@ implements Iterable<E>, Closeable {
      * InputStream that delegates requests to the underlying
      * RandomAccessFile, making sure that only bytes from a certain
      * range can be read.
-     * Calling close() on the enclosing BasicZipFile instance causes all
+     * Calling close() on the enclosing RawZipFile instance causes all
      * corresponding instances of this member class to get close()d, too.
      * Note that this class is <em>not</em> thread safe!
      */

@@ -545,7 +545,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
                     runWriteLocked(new AutoUmount4CreateInputStream());
                 }
                 final ArchiveFileSystem fileSystem = autoMount();
-                final ArchiveEntry entry = fileSystem.get(path);
+                final ArchiveEntry entry = fileSystem.getEntry(path);
                 if (entry == null)
                     throw new ArchiveEntryNotFoundException(this, path,
                             "no such file or directory");

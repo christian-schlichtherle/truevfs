@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.io.zip;
  * @param <E> The type of the created ZIP entries.
  * @author Christian Schlichtherle
  * @version $Id$
- * @see BasicZipFile
+ * @see RawZipFile
  */
 public interface ZipEntryFactory<E extends ZipEntry> {
 

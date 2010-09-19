@@ -51,7 +51,7 @@ import java.util.zip.ZipException;
  * @version $Id$
  * @see ZipOutputStream
  */
-public class ZipFile extends BasicZipFile<ZipEntry> {
+public class ZipFile extends RawZipFile<ZipEntry> {
 
     private final String name;
 

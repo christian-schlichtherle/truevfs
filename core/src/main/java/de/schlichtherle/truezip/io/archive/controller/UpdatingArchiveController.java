@@ -519,7 +519,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
             try {
                 if (isRfsEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                input = wrap(getDriver().newArchiveInput(this, rof));
+                input = wrap(getDriver().newInput(this, rof));
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -619,7 +619,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    output = wrap(getDriver().newArchiveOutput(
+                    output = wrap(getDriver().newOutput(
                                 this, out, unwrap(input)));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
@@ -655,7 +655,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)
             return false;
-        final ArchiveEntry entry = getFileSystem().get(path);
+        final ArchiveEntry entry = getFileSystem().getEntry(path);
         return entry != null && output.getEntry(entry.getName()) != null;
     }
 
@@ -918,7 +918,7 @@ final class UpdatingArchiveController extends FileSystemArchiveController {
         final ArchiveInput<ArchiveEntry> in = unwrap(input);
         final ArchiveOutput<ArchiveEntry> out = unwrap(output);
         final ArchiveFileSystem fileSystem = getFileSystem();
-        final ArchiveEntry root = fileSystem.get(ROOT);
+        final ArchiveEntry root = fileSystem.getEntry(ROOT);
         assert root != null;
         for (final ArchiveEntry e : fileSystem) {
             final String n = e.getName();

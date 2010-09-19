@@ -76,6 +76,6 @@ public interface ArchiveEntryFactory<AE extends ArchiveEntry> {
      * @throws CharConversionException if {@code path} contains characters
      *         which are not valid in the archive file.
      */
-    AE newArchiveEntry(String path, Type type, ArchiveEntry template)
+    AE newEntry(String path, Type type, ArchiveEntry template)
     throws CharConversionException;
 }

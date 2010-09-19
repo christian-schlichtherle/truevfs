@@ -65,7 +65,7 @@ public interface ArchiveDriver<
 extends ArchiveEntryFactory<AE> {
 
     /**
-     * Creates a new input archive for the given {@code archive} in order to
+     * Creates a new archive input for the given {@code archive} in order to
      * read the given read only file.
      * <p>
      * Note that if an exception is thrown, the method must be reentrant!
@@ -117,13 +117,12 @@ extends ArchiveEntryFactory<AE> {
      *         when reading the input archive and the implementation would like
      *         to treat the archive file like a regular file which may be read,
      *         written or deleted.
-     * @see    ArchiveInput
      */
-    AI newArchiveInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    AI newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
-     * Creates a new output archive for {@code archive}
+     * Creates a new archive output for {@code archive}
      * from the given output stream.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
@@ -134,7 +133,7 @@ extends ArchiveEntryFactory<AE> {
      * @param  source the source {@link ArchiveInput} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newArchiveInput} method.
+     *         of this driver's {@link #newInput} method.
      *         This may be used to copy some meta data which is specific to
      *         the type of archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
@@ -148,9 +147,8 @@ extends ArchiveEntryFactory<AE> {
      *         for any reason.
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
-     * @see    ArchiveOutput
      */
-    AO newArchiveOutput(ArchiveDescriptor archive, OutputStream out, AI source)
+    AO newOutput(ArchiveDescriptor archive, OutputStream out, AI source)
     throws IOException;
 
     /**

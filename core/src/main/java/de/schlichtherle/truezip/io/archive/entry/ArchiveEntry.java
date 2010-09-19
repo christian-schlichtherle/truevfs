@@ -97,7 +97,7 @@ public interface ArchiveEntry {
      * An entry name is a <i>path name</i> which meets all additional
      * requirements which may be defined by their particular archive type.
      *
-     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
      * @return The non-{@code null} <i>entry name</i>.
      */
     String getName();

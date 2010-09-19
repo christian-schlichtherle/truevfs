@@ -71,7 +71,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
     }
 
     @Override
-    protected ZipOutput newZipOutputArchive(
+    protected ZipOutput newZipOutput(
             ArchiveDescriptor archive,
             OutputStream out,
             ZipInput source)

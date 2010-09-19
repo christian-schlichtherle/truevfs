@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -51,9 +50,9 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  */
 public abstract class AbstractArchiveDriver<
         AE extends ArchiveEntry,
-        IA extends ArchiveInput<AE>,
-        OA extends ArchiveOutput<AE>>
-implements ArchiveDriver<AE, IA, OA>, Serializable {
+        AI extends ArchiveInput<AE>,
+        AO extends ArchiveOutput<AE>>
+implements ArchiveDriver<AE, AI, AO>, Serializable {
 
     private static final long serialVersionUID = 6546816446546846516L;
 
@@ -185,7 +184,7 @@ implements ArchiveDriver<AE, IA, OA>, Serializable {
      * <p>
      * First, {@link #ensureEncodable(String) ensureEncodable(path)} is called.
      *
-     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
      * @param  path a non-{@code null} <i>path name</i>.
      * @param  type a non-{@code null} entry type.
      * @return A non-{@code null} <i>entry name</i>.
@@ -209,9 +208,9 @@ implements ArchiveDriver<AE, IA, OA>, Serializable {
      * Ensures that the given path name can be encoded by this driver's
      * character set.
      * Should be called by sub classes in their implementation of the method
-     * {@link ArchiveEntryFactory#newArchiveEntry}.
+     * {@link ArchiveEntryFactory#newEntry}.
      * 
-     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
      * @param  path a non-{@code null} path name.
      * @see    #getCharset
      * @throws CharConversionException If the path name contains characters

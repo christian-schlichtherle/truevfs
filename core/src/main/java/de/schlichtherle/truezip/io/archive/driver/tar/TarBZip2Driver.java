@@ -134,7 +134,7 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected TarOutput newTarOutputArchive(
+    protected TarOutput newTarOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final TarInput source)
@@ -142,7 +142,7 @@ public class TarBZip2Driver extends TarDriver {
         // Produce the first two magic bytes. This is required for the
         // CBZip2OutputStream class.
         out.write(new byte[] { 'B', 'Z' });
-        return super.newTarOutputArchive(
+        return super.newTarOutput(
                 archive,
                 new CBZip2OutputStream(
                     new BufferedOutputStream(out, BUFSIZE),

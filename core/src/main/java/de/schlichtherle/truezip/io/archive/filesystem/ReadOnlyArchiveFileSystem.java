@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 
 /**
  * @author Christian Schlichtherle
@@ -27,11 +27,14 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
  */
 final class ReadOnlyArchiveFileSystem extends ReadWriteArchiveFileSystem {
 
+    /**
+     * @see ArchiveFileSystems#newArchiveFileSystem(ArchiveEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
+     */
     ReadOnlyArchiveFileSystem(
-        final ArchiveInput<? extends ArchiveEntry> archive,
+        final ArchiveEntryContainer<? extends ArchiveEntry> container,
         final long rootTime,
         final ArchiveEntryFactory<? extends ArchiveEntry> factory) {
-        super(archive, rootTime, factory, null);
+        super(container, rootTime, factory, null);
     }
 
     @Override

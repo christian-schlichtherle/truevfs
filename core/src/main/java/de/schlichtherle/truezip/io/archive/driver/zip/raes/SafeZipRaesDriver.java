@@ -96,7 +96,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * which doesn't do any authentication.
      * <p>
      * This complements the behaviour of the
-     * {@link AbstractZipRaesDriver#newArchiveInput} method in the super
+     * {@link AbstractZipRaesDriver#newInput} method in the super
      * class, which authenticates the cipher text using the MAC iff the gross
      * file length is smaller than or equal to the authentication trigger.
      * <p>
@@ -105,19 +105,19 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInput newZipInputArchive(
+    protected ZipInput newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already
         // been authenticated by
-        // {@link AbstractZipRaesDriver#newArchiveInput}.
+        // {@link AbstractZipRaesDriver#newInput}.
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
                 ? new CheckedZipInput(
                     rof, getCharset(), getPreambled(), getPostambled(), this)
-                : super.newZipInputArchive(archive, rof);
+                : super.newZipInput(archive, rof);
     }
 }
