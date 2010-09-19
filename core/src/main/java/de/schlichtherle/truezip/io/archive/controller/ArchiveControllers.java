@@ -73,9 +73,9 @@ public final class ArchiveControllers {
     private static final Map<URI, Object> controllers
             = new WeakHashMap<URI, Object>();
 
-    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
-            = new Comparator<ArchiveController>() {
-        public int compare(ArchiveController l, ArchiveController r) {
+    private static final Comparator<BasicArchiveController> REVERSE_CONTROLLERS
+            = new Comparator<BasicArchiveController>() {
+        public int compare(BasicArchiveController l, BasicArchiveController r) {
             return  r.getTarget().compareTo(l.getTarget());
         }
     };
@@ -424,9 +424,9 @@ public final class ArchiveControllers {
     void copy(
             final boolean preserve,
             final boolean createParents,
-            final ArchiveController<SE, ?, ?> srcController,
+            final ArchiveController srcController,
             final String srcPath,
-            final ArchiveController<DE, ?, ?> dstController,
+            final ArchiveController dstController,
             final String dstPath)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:
@@ -454,9 +454,8 @@ public final class ArchiveControllers {
                         }
                     } // class SrcControllerUpdater
 
-                    final SE srcEntry;
-                    final DE dstEntry;
-                    final Link<DE> link;
+                    final ArchiveEntry srcEntry, dstEntry;
+                    final Link<?> link;
                     srcController.runWriteLocked(new SrcControllerUpdater());
                     try {
                         dstController.autoSync(dstPath);
@@ -472,8 +471,7 @@ public final class ArchiveControllers {
                         dstEntry = link.getTarget();
 
                         // Create input stream.
-                        in = srcController
-                                .getInputStreamSocket(srcEntry)
+                        in = srcController.getInputStreamSocket(srcEntry)
                                 .newInputStream(dstEntry);
                     } finally {
                         srcController.readLock().unlock();
@@ -481,10 +479,8 @@ public final class ArchiveControllers {
 
                     try {
                         // Create output stream.
-                        out = dstController
-                                .getOutputStreamSocket(dstEntry)
+                        out = dstController.getOutputStreamSocket(dstEntry)
                                 .newOutputStream(srcEntry);
-
                         try {
                             // Now link the destination entry into the file system.
                             link.run();

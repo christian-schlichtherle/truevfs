@@ -338,7 +338,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrap(
-            final ArchiveController<?, ?, ?> controller,
+            final ArchiveController controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -408,7 +408,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrapFromLockedController(
-            final ArchiveController<?, ?, ?> controller,
+            final ArchiveController controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -547,7 +547,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     @Override
-    ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(final AE target)
+    public ArchiveInputStreamSocket<?> getInputStreamSocket(final ArchiveEntry target)
     throws IOException {
         assert target != null;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
@@ -555,13 +555,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert target.getType() != DIRECTORY;
 
         final ArchiveInputStreamSocket<? extends AE> in = input
-                .getInputStreamSocket(target);
+                .getInputStreamSocket((AE) target); // FIXME - this is cheating!
         assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + target.getName() + '"';
         return in;
     }
 
     @Override
-    ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(final AE target)
+    public ArchiveOutputStreamSocket<?> getOutputStreamSocket(final ArchiveEntry target)
     throws IOException {
         assert target != null;
         assert writeLock().isHeldByCurrentThread();
@@ -570,7 +570,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
         ensureOutArchive();
         final ArchiveOutputStreamSocket out = output
-                .getOutputStreamSocket(target);
+                .getOutputStreamSocket((AE) target); // FIXME - this is cheating!
         assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + target.getName() + '"';
         return out;
     }
@@ -655,7 +655,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert output != null;
     }
 
-    boolean hasNewData(String path) {
+    public boolean hasNewData(String path) {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)
             return false;
@@ -1021,7 +1021,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrap(
-            final ArchiveController<?, ?, ?> controller,
+            final ArchiveController controller,
             final String path)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
@@ -1040,7 +1040,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrapToWriteLockedController(
-            final ArchiveController<?, ?, ?> controller,
+            final ArchiveController controller,
             final String path)
     throws IOException {
         assert controller != null;

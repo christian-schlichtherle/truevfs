@@ -37,7 +37,7 @@ abstract class FileSystemArchiveController<
         AE extends ArchiveEntry,
         AI extends ArchiveInput<AE>,
         AO extends ArchiveOutput<AE>>
-extends ArchiveController<AE, AI, AO> {
+extends BasicArchiveController<AE, AI, AO> {
 
     /** The mount state of the archive file system. */
     private AutoMounter autoMounter = new ResetFileSystem();
