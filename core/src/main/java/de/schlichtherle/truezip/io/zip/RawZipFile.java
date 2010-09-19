@@ -253,7 +253,7 @@ implements Iterable<E>, Closeable {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
             final String charset = utf8 ? ZIP.UTF8 : this.charset;
-            final E entry = factory.newZipEntry(new String(name, charset));
+            final E entry = factory.newEntry(new String(name, charset));
             try {
                 int off = 0;
 
