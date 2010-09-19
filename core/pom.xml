@@ -54,9 +54,9 @@ limitations under the License.
         </license>
     </licenses>
     <scm>
-        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7-release</connection>
-        <developerConnection>scm:hg:https://hg.kenai.com/hg/truezip~v7-sandbox</developerConnection>
-        <url>http://kenai.com/projects/truezip/sources/v7-release/show</url>
+        <connection>${scm-connection}</connection>
+        <developerConnection>${scm-developerConnection}</developerConnection>
+        <url>${scm-url}</url>
     </scm>
     <developers>
         <developer>
@@ -70,6 +70,11 @@ limitations under the License.
             </roles>
         </developer>
     </developers>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>5</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -231,9 +236,8 @@ limitations under the License.
                         </group>
                     </groups>
                     <links>
-                        <link>http://download.java.net/jdk7/docs/api/</link>
-                        <!-- <link>http://download.oracle.com/javase/6/docs/api/</link> -->
-                        <link>http://www.bouncycastle.org/docs/docs1.4/</link>
+                        <link>${jse-api-docs-link}</link>
+                        <link>http://www.bouncycastle.org/docs/docs1.5/</link>
                     </links>
                     <doctitle>TrueZIP Core API&lt;br/&gt;Version ${pom.version}</doctitle>
                     <windowtitle>TrueZIP Core ${pom.version}</windowtitle>
@@ -246,7 +250,56 @@ limitations under the License.
         </plugins>
     </reporting>
 
+    <profiles>
+        <profile>
+            <id>jse-5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <properties>
+                <jse-api-docs-link>http://download.oracle.com/javase/1.5.0/docs/api/</jse-api-docs-link>
+            </properties>
+        </profile>
+        <profile>
+            <id>jse-6</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <properties>
+                <jse-api-docs-link>http://download.oracle.com/javase/6/docs/api/</jse-api-docs-link>
+            </properties>
+        </profile>
+        <profile>
+            <id>jse-7</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <properties>
+                <jse-api-docs-link>http://download.java.net/jdk7/docs/api/</jse-api-docs-link>
+            </properties>
+        </profile>
+        <profile>
+            <id>kenai.com-release-scm-repository</id>
+            <properties>
+                <scm-repository>v7-release</scm-repository>
+            </properties>
+        </profile>
+        <profile>
+            <id>googlecode.com-scm-repository</id>
+            <properties>
+                <scm-repository/>
+                <scm-connection>scm:hg:https://truezip.googlecode.com/hg/</scm-connection>
+                <scm-developerConnection>scm:hg:https://truezip.googlecode.com/hg/</scm-developerConnection>
+                <scm-url>http://code.google.com/p/truezip/source/browse/</scm-url>
+            </properties>
+        </profile>
+    </profiles>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scm-repository>v7-sandbox</scm-repository>
+        <scm-connection>scm:hg:https://hg.kenai.com/hg/truezip~${scm-repository}</scm-connection>
+        <scm-developerConnection>scm:hg:ssh://hg.kenai.com/truezip~${scm-repository}</scm-developerConnection>
+        <scm-url>http://kenai.com/projects/truezip/sources/${scm-repository}/show</scm-url>
     </properties>
 </project>
