@@ -472,7 +472,7 @@ public final class ArchiveControllers {
                         dstController.autoSync(dstPath);
 
                         // Get source archive entry.
-                        srcEntry = srcController.autoMount(false).get(srcPath);
+                        srcEntry = srcController.autoMount(false).getEntry(srcPath);
 
                         // Get destination archive entry.
                         link = dstController.autoMount(createParents)

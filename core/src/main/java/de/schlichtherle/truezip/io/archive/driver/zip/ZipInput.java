@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.zip.BasicZipFile;
+import de.schlichtherle.truezip.io.zip.RawZipFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.util.zip.ZipException;
  * @version $Id$
  */
 public class ZipInput
-extends BasicZipFile<ZipEntry>
+extends RawZipFile<ZipEntry>
 implements ArchiveInput<ZipEntry> {
 
     public ZipInput(

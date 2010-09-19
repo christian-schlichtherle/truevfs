@@ -37,8 +37,8 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.PLATFORM_FAT;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
- * Provides unsafe access to a ZIP file using unsynchronized methods and shared
- * {@link ZipEntry} instances.
+ * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
+ * shared {@link ZipEntry} instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicZipOutputStream<E extends ZipEntry>
+public abstract class RawZipOutputStream<E extends ZipEntry>
 extends FilterOutputStream
 implements Iterable<E>, Closeable, Flushable {
 
@@ -109,7 +109,7 @@ implements Iterable<E>, Closeable, Flushable {
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
-    protected BasicZipOutputStream(final OutputStream out)
+    protected RawZipOutputStream(final OutputStream out)
     throws NullPointerException {
         super(toLEDataOutputStream(out));
         if (out == null)
@@ -125,7 +125,7 @@ implements Iterable<E>, Closeable, Flushable {
      * @throws UnsupportedEncodingException If {@code charset} is not supported
      *         by this JVM.
      */
-    protected BasicZipOutputStream(
+    protected RawZipOutputStream(
             final OutputStream out,
             final String charset)
     throws  NullPointerException,
@@ -260,7 +260,7 @@ implements Iterable<E>, Closeable, Flushable {
 
     /**
      * Returns {@code true} if and only if this
-     * {@code BasicZipOutputStream} is currently writing a ZIP entry.
+     * {@code RawZipOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
         return entry != null;

@@ -51,11 +51,11 @@ import java.util.List;
  * @version $Id$
  * @see ZipFile
  */
-public class ZipOutputStream extends BasicZipOutputStream<ZipEntry> {
+public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     
     /**
      * Creates a new ZIP output stream decorating the given output stream,
-     * using the {@value de.schlichtherle.truezip.io.zip.BasicZipOutputStream#DEFAULT_CHARSET} charset.
+     * using the {@value de.schlichtherle.truezip.io.zip.RawZipOutputStream#DEFAULT_CHARSET} charset.
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */

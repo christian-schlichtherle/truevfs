@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.util.Iterator;
 import java.util.Set;
@@ -32,7 +33,8 @@ import java.util.Set;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystem extends Iterable<ArchiveEntry> {
+public interface ArchiveFileSystem
+extends ArchiveEntryContainer<ArchiveEntry> {
 
     /**
      * Returns {@code true} if and only if this archive file system is
@@ -52,7 +54,24 @@ public interface ArchiveFileSystem extends Iterable<ArchiveEntry> {
      * Looks up the archive entry with the given path name in this virtual
      * archive file system and returns it or {@code null} if not existent.
      */
-    ArchiveEntry get(String path);
+    ArchiveEntry getEntry(String path);
+
+    /**
+     * An I/O operation for creating (and hence probably replacing) and
+     * linking file system entries into this virtual archive file system.
+     *
+     * @see #mknod
+     */
+    interface Link
+    extends IOOperation, IOReference<ArchiveEntry> {
+
+        /**
+         * Links the file system entries into this virtual archive file system.
+         */
+        @Override
+        void run()
+        throws ArchiveFileSystemException;
+    }
 
     /**
      * Begins a &quot;create and link target&quot; transaction to ensure that
@@ -106,23 +125,6 @@ public interface ArchiveFileSystem extends Iterable<ArchiveEntry> {
      */
     Link mknod(String path, Type type, ArchiveEntry template, boolean createParents)
     throws ArchiveFileSystemException;
-
-    /**
-     * An I/O operation for creating (and hence probably replacing) and
-     * linking file system entries into this virtual archive file system.
-     *
-     * @see #mknod
-     */
-    interface Link
-    extends IOOperation, IOReference<ArchiveEntry> {
-
-        /**
-         * Links the file system entries into this virtual archive file system.
-         */
-        @Override
-        void run()
-        throws ArchiveFileSystemException;
-    }
 
     /**
      * If this method returns, the file system entry identified by the given

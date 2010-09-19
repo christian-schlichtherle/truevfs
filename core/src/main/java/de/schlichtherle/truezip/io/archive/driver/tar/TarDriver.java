@@ -79,7 +79,7 @@ public class TarDriver extends AbstractArchiveDriver {
     //
 
     @Override
-    public TarEntry newArchiveEntry(
+    public TarEntry newEntry(
             String path,
             final Type type,
             final ArchiveEntry template)
@@ -115,15 +115,15 @@ public class TarDriver extends AbstractArchiveDriver {
      * <p>
      * This implementation calls {@link #newInputStream(ArchiveDescriptor, ReadOnlyFile)
      * newInputStream(archive, rof)} and passes the resulting stream to
-     * {@link #newTarInputArchive(ArchiveDescriptor, InputStream)}.
+     * {@link #newTarInput(ArchiveDescriptor, InputStream)}.
      */
-    public ArchiveInput newArchiveInput(
+    public ArchiveInput newInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
         final InputStream in = newInputStream(archive, rof);
         try {
-            return newTarInputArchive(archive, in);
+            return newTarInput(archive, in);
         } finally {
             in.close();
         }
@@ -138,7 +138,7 @@ public class TarDriver extends AbstractArchiveDriver {
      * <p>
      * Note that the returned stream should support marking for best
      * performance and will <em>always</em> be closed early by
-     * {@link #newArchiveInput(ArchiveDescriptor, ReadOnlyFile)}.
+     * {@link #newInput(ArchiveDescriptor, ReadOnlyFile)}.
      */
     protected InputStream newInputStream(
             ArchiveDescriptor archive,
@@ -153,7 +153,7 @@ public class TarDriver extends AbstractArchiveDriver {
      * The implementation in this class simply returns
      * {@code new TarInput(in)}.
      */
-    protected TarInput newTarInputArchive(
+    protected TarInput newTarInput(
             ArchiveDescriptor archive,
             InputStream in)
     throws IOException {
@@ -163,19 +163,19 @@ public class TarDriver extends AbstractArchiveDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation forwards the call to {@link #newTarOutputArchive}
+     * This implementation forwards the call to {@link #newTarOutput}
      * and wraps the result in a new {@link MultiplexedArchiveOutput}.
      */
-    public ArchiveOutput newArchiveOutput(
+    public ArchiveOutput newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
             ArchiveInput source)
     throws IOException {
-        return new MultiplexedArchiveOutput(newTarOutputArchive(
+        return new MultiplexedArchiveOutput(newTarOutput(
                 archive, out, (TarInput) source));
     }
 
-    protected TarOutput newTarOutputArchive(
+    protected TarOutput newTarOutput(
             ArchiveDescriptor archive,
             OutputStream out,
             TarInput source)

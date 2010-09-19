@@ -178,20 +178,20 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public ArchiveInput newArchiveInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+        public ArchiveInput newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
         }
 
         @Override
-        public ArchiveEntry newArchiveEntry(String name, Type type, ArchiveEntry template)
+        public ArchiveEntry newEntry(String name, Type type, ArchiveEntry template)
         throws CharConversionException {
             return new FileEntry(new File("foo/bar"));
         }
 
         @Override
-        public ArchiveOutput newArchiveOutput(ArchiveDescriptor archive, OutputStream out, ArchiveInput source)
+        public ArchiveOutput newOutput(ArchiveDescriptor archive, OutputStream out, ArchiveInput source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");

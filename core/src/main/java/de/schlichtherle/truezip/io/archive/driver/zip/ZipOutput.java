@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.zip.BasicZipOutputStream;
+import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +56,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
  * @version $Id$
  */
 public class ZipOutput
-extends BasicZipOutputStream<ZipEntry>
+extends RawZipOutputStream<ZipEntry>
 implements ArchiveOutput<ZipEntry> {
 
     private final ZipInput source;

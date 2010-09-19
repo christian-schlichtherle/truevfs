@@ -52,6 +52,7 @@ extends Iterable<AE> {
      * @return An iteration of all archive entries in order
      *         - {@code null} is not permitted.
      */
+    @Override
     Iterator<AE> iterator();
 
     /**
@@ -61,7 +62,7 @@ extends Iterable<AE> {
      * An entry name is a <i>path name</i> which meets all additional
      * requirements which may be defined by their particular archive type.
      *
-     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
      * @param  name a non-{@code null} <i>entry name</i>.
      * @return The archive entry for the given <i>entry name</i> or
      *         {@code null} if no archive entry with this entry name exists in

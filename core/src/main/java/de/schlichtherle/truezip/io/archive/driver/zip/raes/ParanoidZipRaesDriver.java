@@ -78,14 +78,14 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * This implementation calls {@link #getRaesParameters}, with which it
      * initializes a new {@link RaesOutputStream}, and finally passes the
      * resulting stream to
-     * {@link #newZipOutputArchive(ArchiveDescriptor, OutputStream, ZipInput)}.
+     * {@link #newZipOutput(ArchiveDescriptor, OutputStream, ZipInput)}.
      * <p>
      * Note that this limits the number of concurrent output entry streams
      * to one in order to inhibit writing unencrypted temporary files for
      * buffering the written entries.
      */
     @Override
-    public ArchiveOutput newArchiveOutput(
+    public ArchiveOutput newOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final ZipInput source)
@@ -96,6 +96,6 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
         } catch (RaesKeyException failure) {
             throw new TransientIOException(failure);
         }
-        return newZipOutputArchive(archive, ros, source);
+        return newZipOutput(archive, ros, source);
     }
 }

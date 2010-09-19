@@ -16,23 +16,23 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -64,7 +64,8 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
      * This field should be considered final!
      * <p>
      * Note that the archive entries in this map are shared with the
-     * {@link ArchiveInput} object provided to this class' constructor.
+     * {@link ArchiveEntryContainer} object provided to the constructor of
+     * this class.
      */
     private Map<String, CommonEntry> master;
 
@@ -108,46 +109,20 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
     }
 
     /**
-     * Constructs a new archive file system which populates its entries from
-     * the given {@code archive} and ensures its integrity.
-     * <p>
-     * First, the entries from the archive are loaded into the file system.
-     * <p>
-     * Second, a root directory with the given last modification time is
-     * created and linked into the filesystem (so it's never loaded from the
-     * archive).
-     * <p>
-     * Finally, the file system integrity is checked and fixed: Any missing
-     * parent directories are created using the system's current time as their
-     * last modification time - existing directories will never be replaced.
-     * <p>
-     * Note that the entries in this file system are shared with the given
-     * {@code archive}.
-     * 
-     * @param factory the archive entry factory to use.
-     * @param vetoableTouchListener the nullable listener for touch events.
-     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
-     *        method will be called whenever a client class changes the state
-     *        of this archive file system.
-     * @param archive The input archive to read the entries for the population
-     *        of this file system.
-     * @param rootTime The last modification time of the root of the populated
-     *        file system in milliseconds since the epoch.
-     * @throws NullPointerException If {@code factory} or {@code archive}
-     *         is {@code null}.
+     * @see ArchiveFileSystems#newArchiveFileSystem(ArchiveEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
      */
     ReadWriteArchiveFileSystem(
-            final ArchiveInput<? extends ArchiveEntry> archive,
+            final ArchiveEntryContainer<? extends ArchiveEntry> container,
             final long rootTime,
             final ArchiveEntryFactory<? extends ArchiveEntry> factory,
             final VetoableTouchListener vetoableTouchListener) {
         this.factory = factory;
         master = new LinkedHashMap<String, CommonEntry>(
-                (int) (archive.size() / 0.75f) + 1);
+                (int) (container.size() / 0.75f) + 1);
 
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         // Load entries from input archive.
-        for (final ArchiveEntry entry : archive) {
+        for (final ArchiveEntry entry : container) {
             final String path = normalizer.normalize(entry.getName());
             master.put(path, wrap(entry));
         }
@@ -163,7 +138,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Check fsck = new Check();
-        for (final ArchiveEntry entry : archive) {
+        for (final ArchiveEntry entry : container) {
             final String path = normalizer.normalize(entry.getName());
             if (isValidPath(path))
                 fsck.fix(path);
@@ -215,7 +190,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
         assert !isRoot(path) || type == DIRECTORY;
         assert template == null || type == template.getType();
 
-        return wrap(factory.newArchiveEntry(path, type, unwrap(template)));
+        return wrap(factory.newEntry(path, type, unwrap(template)));
     }
 
     /**
@@ -225,7 +200,7 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
-     * @see    ArchiveEntryFactory#newArchiveEntry Common Requirements For Path Names
+     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
      * @param  name a non-{@code null} path name.
      */
     private static boolean isValidPath(final String name) {
@@ -379,14 +354,19 @@ class ReadWriteArchiveFileSystem implements ArchiveFileSystem {
             }
 
             public void remove() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException();
             }
         }
         return new ArchiveEntryIterator();
     }
 
     @Override
-    public ArchiveEntry get(String path) {
+    public int size() {
+        return master.size();
+    }
+
+    @Override
+    public ArchiveEntry getEntry(String path) {
         if (path == null)
             throw new NullPointerException();
         final CommonEntry entry = master.get(path);

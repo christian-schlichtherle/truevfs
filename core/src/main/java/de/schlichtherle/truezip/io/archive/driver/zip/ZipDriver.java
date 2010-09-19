@@ -164,7 +164,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-    public ZipEntry newArchiveEntry(
+    public ZipEntry newEntry(
             String path,
             final Type type,
             final ArchiveEntry template)
@@ -199,15 +199,15 @@ implements ZipEntryFactory<ZipEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #newZipInputArchive}.
+     * {@link #newZipInput}.
      */
     @Override
-    public ZipInput newArchiveInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    public ZipInput newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
-        return newZipInputArchive(archive, rof);
+        return newZipInput(archive, rof);
     }
 
-    protected ZipInput newZipInputArchive(
+    protected ZipInput newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -219,19 +219,19 @@ implements ZipEntryFactory<ZipEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #newZipOutputArchive} and wraps the result in a new
+     * {@link #newZipOutput} and wraps the result in a new
      * {@link MultiplexedArchiveOutput}.
      */
     @Override
-    public ArchiveOutput<ZipEntry> newArchiveOutput(
+    public ArchiveOutput<ZipEntry> newOutput(
             ArchiveDescriptor archive, OutputStream out, ZipInput source)
     throws IOException {
         return new MultiplexedArchiveOutput(
-                newZipOutputArchive(archive, out, source));
-        //return newZipOutputArchive(archive, out, (ZipInput) source);
+                newZipOutput(archive, out, source));
+        //return newZipOutput(archive, out, (ZipInput) source);
     }
 
-    protected ZipOutput newZipOutputArchive(
+    protected ZipOutput newZipOutput(
             ArchiveDescriptor archive, OutputStream out, ZipInput source)
     throws IOException {
         return new ZipOutput(out, getCharset(), level, source);

@@ -102,7 +102,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public ZipInput newArchiveInput(
+    public ZipInput newInput(
             final ArchiveDescriptor archive,
             final ReadOnlyFile rof)
     throws IOException {
@@ -119,7 +119,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             // ordinary file which may be read, written or deleted.
             rrof.authenticate();
         }
-        return super.newArchiveInput(archive, rrof);
+        return super.newInput(archive, rrof);
     }
 
     /**
@@ -129,12 +129,12 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public ZipEntry newArchiveEntry(
+    public ZipEntry newEntry(
             final String path,
             final Type type,
             final ArchiveEntry template)
     throws CharConversionException {
-        final JarEntry entry = (JarEntry) super.newArchiveEntry(path, type, template);
+        final JarEntry entry = (JarEntry) super.newEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);
@@ -156,7 +156,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *        the destination.
      */
     @Override
-    public ArchiveOutput newArchiveOutput(
+    public ArchiveOutput newOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final ZipInput source)
@@ -167,7 +167,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
         } catch (RaesKeyException failure) {
             throw new TransientIOException(failure);
         }
-        return super.newArchiveOutput(archive, ros, source);
+        return super.newOutput(archive, ros, source);
     }
 
     /**
