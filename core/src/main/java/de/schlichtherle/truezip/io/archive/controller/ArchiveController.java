@@ -16,15 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
@@ -99,7 +101,10 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveController<AE extends ArchiveEntry>
+public abstract class ArchiveController<
+        AE extends ArchiveEntry,
+        AI extends ArchiveInput<AE>,
+        AO extends ArchiveOutput<AE>>
 implements ArchiveDescriptor {
 
     /**
@@ -119,7 +124,7 @@ implements ArchiveDescriptor {
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final ArchiveController<?> enclController;
+    private final ArchiveController<?, ?, ?> enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -130,7 +135,7 @@ implements ArchiveDescriptor {
     /**
      * The {@link ArchiveDriver} to use for this controller's target file.
      */
-    private /*volatile*/ ArchiveDriver driver;
+    private /*volatile*/ ArchiveDriver<AE, AI, AO> driver;
 
     private final ReentrantLock  readLock;
     private final ReentrantLock writeLock;
@@ -156,7 +161,7 @@ implements ArchiveDescriptor {
     ArchiveController(
             final URI mountPoint,
             final URI enclMountPoint,
-            final ArchiveDriver driver) {
+            final ArchiveDriver<AE, AI, AO> driver) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -263,7 +268,7 @@ implements ArchiveDescriptor {
      *         controller's target archive file or {@code null} if it's not
      *         enclosed in another archive file.
      */
-    public final ArchiveController<?> getEnclController() {
+    public final ArchiveController<?, ?, ?> getEnclController() {
         return enclController;
     }
 
@@ -290,27 +295,8 @@ implements ArchiveDescriptor {
      * @return A valid reference to an {@link ArchiveDriver} object
      *         - never {@code null}.
      */
-    public final ArchiveDriver getDriver() {
+    final ArchiveDriver<AE, AI, AO> getDriver() {
         return driver;
-    }
-
-    /**
-     * Sets the driver instance which is used for the target archive.
-     * All access to this method must be externally synchronized on this
-     * controller's write lock!
-     * 
-     * @param driver A valid reference to an {@link ArchiveDriver} object
-     *        - never {@code null}.
-     */
-    final void setDriver(ArchiveDriver driver) {
-        assert writeLock().isHeldByCurrentThread();
-
-        // This affects all subsequent creations of the driver's products
-        // (In/OutputArchive and ArchiveEntry) and hence ArchiveFileSystem.
-        // Normally, these are initialized together in mountFileSystem(...)
-        // which is externally synchronized on this controller's write lock,
-        // so we don't need to care about this.
-        this.driver = driver;
     }
 
     /**

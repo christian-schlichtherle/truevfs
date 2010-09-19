@@ -223,7 +223,7 @@ implements ZipEntryFactory<ZipEntry> {
     public ArchiveOutput<ZipEntry> newOutput(
             ArchiveDescriptor archive, OutputStream out, ZipInput source)
     throws IOException {
-        return new MultiplexedArchiveOutput(
+        return new MultiplexedArchiveOutput<ZipEntry, ZipOutput>(
                 newZipOutput(archive, out, source));
         //return newZipOutput(archive, out, (ZipInput) source);
     }

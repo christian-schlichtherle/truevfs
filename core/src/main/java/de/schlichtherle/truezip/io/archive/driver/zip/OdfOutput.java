@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @version $Id$
  */
 public class OdfOutput
-extends MultiplexedArchiveOutput<ZipEntry> {
+extends MultiplexedArchiveOutput<ZipEntry, ZipOutput> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -43,7 +43,7 @@ extends MultiplexedArchiveOutput<ZipEntry> {
     private boolean mimetype;
 
     /** Creates a new {@code OdfOutput}. */
-    public OdfOutput(ArchiveOutput target) {
+    public OdfOutput(ZipOutput target) {
         super(target);
     }
 

@@ -62,8 +62,11 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController<AE extends ArchiveEntry>
-extends FileSystemArchiveController<AE> {
+final class UpdatingArchiveController<
+        AE extends ArchiveEntry,
+        AI extends ArchiveInput<AE>,
+        AO extends ArchiveOutput<AE>>
+extends FileSystemArchiveController<AE, AI, AO> {
 
     private static final String CLASS_NAME
             = UpdatingArchiveController.class.getName();
@@ -88,13 +91,13 @@ extends FileSystemArchiveController<AE> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Input
-    extends ConcurrentArchiveInput<AE> {
-        Input(ArchiveInput<AE> input) {
-            super(input);
+    extends ConcurrentArchiveInput<AE, AI> {
+        Input(AI target) {
+            super(target);
         }
 
         @Override
-        protected ArchiveInput<AE> getTarget() {
+        protected AI getTarget() {
             return target;
         }
     }
@@ -108,13 +111,13 @@ extends FileSystemArchiveController<AE> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Output
-    extends ConcurrentArchiveOutput<AE> {
-        Output(ArchiveOutput<AE> output) {
-            super(output);
+    extends ConcurrentArchiveOutput<AE, AO> {
+        Output(AO target) {
+            super(target);
         }
 
         @Override
-        protected ArchiveOutput<AE> getTarget() {
+        protected AO getTarget() {
             return target;
         }
     }
@@ -174,7 +177,7 @@ extends FileSystemArchiveController<AE> {
      * Returns a new concurrent archive input which decorates (wraps) the
      * given non-{@code null} archive input.
      */
-    private Input wrap(ArchiveInput<AE> archive) {
+    private Input wrap(AI archive) {
         return new Input(archive);
     }
 
@@ -182,7 +185,7 @@ extends FileSystemArchiveController<AE> {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    private ArchiveInput<AE> unwrap(Input proxy) {
+    private AI unwrap(Input proxy) {
         return proxy != null ? proxy.getTarget() : null;
     }
 
@@ -190,7 +193,7 @@ extends FileSystemArchiveController<AE> {
      * Returns a new concurrent archive input which decorates (wraps) the
      * given non-{@code null} archive input.
      */
-    private Output wrap(ArchiveOutput<AE> archive) {
+    private Output wrap(AO archive) {
         return new Output(archive);
     }
 
@@ -198,7 +201,7 @@ extends FileSystemArchiveController<AE> {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    private ArchiveOutput<AE> unwrap(Output proxy) {
+    private AO unwrap(Output proxy) {
         return proxy != null ? proxy.getTarget() : null;
     }
 
@@ -335,7 +338,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void unwrap(
-            final ArchiveController<?> controller,
+            final ArchiveController<?, ?, ?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -405,7 +408,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void unwrapFromLockedController(
-            final ArchiveController<?> controller,
+            final ArchiveController<?, ?, ?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -1018,7 +1021,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void wrap(
-            final ArchiveController<?> controller,
+            final ArchiveController<?, ?, ?> controller,
             final String path)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
@@ -1037,7 +1040,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void wrapToWriteLockedController(
-            final ArchiveController<?> controller,
+            final ArchiveController<?, ?, ?> controller,
             final String path)
     throws IOException {
         assert controller != null;

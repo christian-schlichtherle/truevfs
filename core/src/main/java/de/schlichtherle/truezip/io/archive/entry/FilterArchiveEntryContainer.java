@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.entry;
 import java.util.Iterator;
 
 /*
- * A decorator for archive entry containers.
+ * Decorates an {@code ArchiveEntryContainer}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -28,11 +28,13 @@ import java.util.Iterator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterArchiveEntryContainer<AE extends ArchiveEntry>
+public abstract class FilterArchiveEntryContainer<
+        AE extends ArchiveEntry,
+        AEC extends ArchiveEntryContainer<AE>>
 implements ArchiveEntryContainer<AE> {
 
     /** Returns the decorated archive entry container. */
-    protected abstract ArchiveEntryContainer<AE> getTarget();
+    protected abstract AEC getTarget();
 
     @Override
     public int size() {
