@@ -144,7 +144,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
             }
 
             public void remove() {
-                throw new UnsupportedOperationException("read-only iterator");
+                throw new UnsupportedOperationException();
             }
         }
         return new EntryIterator();

@@ -35,22 +35,26 @@ extends Iterable<AE> {
     int size();
 
     /**
-     * Returns a new iteration of all archive entries in this archive entry
+     * Returns a new iterator over all archive entries in this archive entry
      * container.
      * <p>
-     * The iteration <em>must</em> be consistent: Multiple iterators must
-     * return the same archive entries in the same order again unless the set
-     * of entries has changed.
+     * First, the iteration <em>must</em> be consistent: Multiple iterators
+     * must return the same archive entries in the same order again unless the
+     * set of entries has changed.
      * <p>
-     * The iteration <em>should</em> also reflect the natural order of the
-     * entries in this archive entry container.
+     * Next, the iteration <em>should</em> also reflect the natural order of
+     * the entries in this archive entry container.
      * For example, if this archive entry container is an input archive, the
      * iteration should reflect the order of the entries in the archive file.
      * Whether this reflects the order of the entry data in the file or a
      * list of entries in a central directory is up to the implementation.
+     * <p>
+     * Finally, the iteration <em>may</em> be unmodifiable, i.e. its
+     * {@link Iterator#remove()} method may throw an
+     * {@link UnsupportedOperationException}.
      *
-     * @return An iteration of all archive entries in order
-     *         - {@code null} is not permitted.
+     * @return A new non-{@code null} iterator over all archive entries in
+     *         this archive entry container.
      */
     @Override
     Iterator<AE> iterator();

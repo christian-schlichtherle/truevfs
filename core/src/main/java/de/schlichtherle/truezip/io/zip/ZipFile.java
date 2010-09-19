@@ -347,7 +347,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             }
 
             public void remove() {
-                throw new UnsupportedOperationException("read-only iterator");
+                throw new UnsupportedOperationException();
             }
         }
         return new EntryIterator();
