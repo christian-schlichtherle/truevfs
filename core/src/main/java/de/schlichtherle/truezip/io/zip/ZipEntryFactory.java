@@ -32,5 +32,5 @@ public interface ZipEntryFactory<E extends ZipEntry> {
      * @param  name the entry name - {@code null} is not permitted.
      * @return A new ZIP entry with the given {@code name}.
      */
-    E newZipEntry(String name);
+    E newEntry(String name);
 }

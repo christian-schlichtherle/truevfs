@@ -29,7 +29,7 @@ class DefaultZipEntryFactory implements ZipEntryFactory {
     private DefaultZipEntryFactory() {
     }
 
-    public ZipEntry newZipEntry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 }

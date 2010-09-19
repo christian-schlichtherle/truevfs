@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -38,7 +37,8 @@ import java.io.OutputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TarDriver extends AbstractArchiveDriver {
+public class TarDriver
+extends AbstractArchiveDriver<TarEntry, TarInput, ArchiveOutput<TarEntry>> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -88,25 +88,25 @@ public class TarDriver extends AbstractArchiveDriver {
         final TarEntry entry;
         if (template != null) {
             if (template instanceof TarEntry) {
-                entry = newTarEntry((TarEntry) template);
+                entry = newEntry((TarEntry) template);
                 entry.setName(path);
             } else {
-                entry = newTarEntry(path);
+                entry = newEntry(path);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newTarEntry(path);
+            entry = newEntry(path);
         }
 
         return entry;
     }
 
-    public TarEntry newTarEntry(String name) {
+    public TarEntry newEntry(String name) {
         return new TarEntry(name);
     }
 
-    public TarEntry newTarEntry(TarEntry template) {
+    public TarEntry newEntry(TarEntry template) {
         return new TarEntry(template);
     }
 
@@ -117,7 +117,8 @@ public class TarDriver extends AbstractArchiveDriver {
      * newInputStream(archive, rof)} and passes the resulting stream to
      * {@link #newTarInput(ArchiveDescriptor, InputStream)}.
      */
-    public ArchiveInput newInput(
+    @Override
+    public TarInput newInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -166,10 +167,11 @@ public class TarDriver extends AbstractArchiveDriver {
      * This implementation forwards the call to {@link #newTarOutput}
      * and wraps the result in a new {@link MultiplexedArchiveOutput}.
      */
-    public ArchiveOutput newOutput(
+    @Override
+    public ArchiveOutput<TarEntry> newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
-            ArchiveInput source)
+            TarInput source)
     throws IOException {
         return new MultiplexedArchiveOutput(newTarOutput(
                 archive, out, (TarInput) source));

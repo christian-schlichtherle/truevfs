@@ -162,14 +162,6 @@ limitations under the License.
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <show>private</show>
-                    <nohelp>true</nohelp>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- <redirectTestOutputToFile>true</redirectTestOutputToFile> -->
@@ -213,6 +205,8 @@ limitations under the License.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <show>${javadoc-show}</show>
+                    <nohelp>${javadoc-nohelp}</nohelp>
                     <groups>
                         <group>
                             <title>High Level API For Accessing Archive Files</title>
@@ -293,6 +287,13 @@ limitations under the License.
                 <scm-url>http://code.google.com/p/truezip/source/browse/</scm-url>
             </properties>
         </profile>
+        <profile>
+            <id>release-javadoc</id>
+            <properties>
+                <javadoc-show>protected</javadoc-show>
+                <javadoc-nohelp>false</javadoc-nohelp>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>
@@ -301,5 +302,7 @@ limitations under the License.
         <scm-connection>scm:hg:https://hg.kenai.com/hg/truezip~${scm-repository}</scm-connection>
         <scm-developerConnection>scm:hg:ssh://hg.kenai.com/truezip~${scm-repository}</scm-developerConnection>
         <scm-url>http://kenai.com/projects/truezip/sources/${scm-repository}/show</scm-url>
+        <javadoc-show>private</javadoc-show>
+        <javadoc-nohelp>true</javadoc-nohelp>
     </properties>
 </project>

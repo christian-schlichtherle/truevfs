@@ -45,10 +45,7 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver<
-        ZipEntry,
-        ZipInput,
-        ArchiveOutput<ZipEntry>>
+extends AbstractArchiveDriver<ZipEntry, ZipInput, ArchiveOutput<ZipEntry>>
 implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
@@ -173,25 +170,25 @@ implements ZipEntryFactory<ZipEntry> {
         final ZipEntry entry;
         if (template != null) {
             if (template instanceof ZipEntry) {
-                entry = newZipEntry((ZipEntry) template);
+                entry = newEntry((ZipEntry) template);
                 entry.setName(path);
             } else {
-                entry = newZipEntry(path);
+                entry = newEntry(path);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newZipEntry(path);
+            entry = newEntry(path);
         }
         return entry;
     }
 
     @Override
-    public ZipEntry newZipEntry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 
-    public ZipEntry newZipEntry(ZipEntry template) {
+    public ZipEntry newEntry(ZipEntry template) {
         return new ZipEntry(template);
     }
 
