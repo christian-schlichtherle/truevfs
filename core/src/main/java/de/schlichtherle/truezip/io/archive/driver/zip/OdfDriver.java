@@ -80,7 +80,6 @@ public class OdfDriver extends JarDriver {
             OutputStream out,
             ZipInput source)
     throws IOException {
-        return new OdfOutput(newZipOutput(
-                archive, out, source));
+        return new OdfOutput(newZipOutput(archive, out, source));
     }
 }

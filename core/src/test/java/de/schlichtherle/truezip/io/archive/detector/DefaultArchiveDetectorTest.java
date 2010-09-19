@@ -536,9 +536,9 @@ public class DefaultArchiveDetectorTest extends TestCase {
         assertNotSame(detector, detector2);
         assertNotSame(detector.getSuffixes(), detector2.getSuffixes());
         final ZipDriver driver
-                = (ZipDriver) detector.getArchiveDriver("foo.zip");
+                = (ZipDriver) detector.getArchiveDriver("test.zip");
         final ZipDriver driver2
-                = (ZipDriver) detector2.getArchiveDriver("bar.zip");
+                = (ZipDriver) detector2.getArchiveDriver("test.zip");
         assertNotNull(driver);
         assertNotNull(driver2);
         assertNotSame(driver, driver2);

@@ -121,56 +121,44 @@ public final class ArchiveControllers {
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        ArchiveController controller = null;
-        boolean reconfigure = false;
-        try {
-            synchronized (controllers) {
-                final Object value = controllers.get(mountPoint);
-                if (value instanceof Reference) {
-                    controller = (ArchiveController) ((Reference) value).get();
-                    // Check that the controller hasn't been garbage collected
-                    // meanwhile!
-                    if (controller != null) {
-                        // If required, reconfiguration of the ArchiveController
-                        // must be deferred until we have released the lock on
-                        // controllers in order to prevent dead locks.
-                        reconfigure = driver != null && driver != controller.getDriver();
-                        return controller;
-                    }
-                } else if (value != null) {
-                    // Do NOT reconfigure this ArchiveController with another
-                    // ArchiveDetector: This controller is touched, i.e. it
-                    // most probably has mounted the virtual file system and
-                    // using another ArchiveDetector could potentially break
-                    // the sync process.
-                    // In effect, for an application this means that the
-                    // reconfiguration of a previously used ArchiveController
-                    // is only guaranteed to happen if
-                    // (1) sync(*) has been called and
-                    // (2) a new File object referring to the previously used
-                    // archive file as either the file itself or one
-                    // of its ancestors is created with a different
-                    // ArchiveDetector.
-                    return (ArchiveController) value;
+        synchronized (controllers) {
+            final Object value = controllers.get(mountPoint);
+            if (value instanceof Reference) {
+                final ArchiveController controller
+                        = (ArchiveController) ((Reference) value).get();
+                // Check that the controller hasn't been garbage collected
+                // meanwhile!
+                if (controller != null) {
+                    // If required, reconfiguration of the ArchiveController
+                    // must be deferred until we have released the lock on
+                    // controllers in order to prevent dead locks.
+                    //reconfigure = driver != null && driver != controller.getDriver();
+                    return controller;
                 }
-                if (driver == null) // pure lookup operation?
-                    return null;
-                // TODO: Refactor this to a more flexible design which supports
-                // different sync strategies, like update or append.
-                controller = new UpdatingArchiveController(
-                        mountPoint, enclMountPoint, driver);
+                // Fall through!
+            } else if (value != null) {
+                // Do NOT reconfigure this ArchiveController with another
+                // ArchiveDetector: This controller is touched, i.e. it
+                // most probably has mounted the virtual file system and
+                // using another ArchiveDetector could potentially break
+                // the sync process.
+                // Effectively, this means that the reconfiguration of a
+                // previously created ArchiveController is only guaranteed
+                // to happen if
+                // (1) sync(*) has been called and
+                // (2) a new File object referring to the previously used
+                //     archive file as either the file itself or one of its
+                //     ancestors is created with a different
+                //     ArchiveDetector.
+                return (ArchiveController) value;
             }
-        } finally {
-            if (reconfigure) {
-                controller.writeLock().lock();
-                try {
-                    controller.setDriver(driver);
-                } finally {
-                    controller.writeLock().unlock();
-                }
-            }
+            if (driver == null) // pure lookup operation?
+                return null;
+            // TODO: Refactor this to a more flexible design which supports
+            // different sync strategies, like update or append.
+            return new UpdatingArchiveController(
+                    mountPoint, enclMountPoint, driver);
         }
-        return controller;
     }
 
     /**
@@ -436,9 +424,9 @@ public final class ArchiveControllers {
     void copy(
             final boolean preserve,
             final boolean createParents,
-            final ArchiveController<SE> srcController,
+            final ArchiveController<SE, ?, ?> srcController,
             final String srcPath,
-            final ArchiveController<DE> dstController,
+            final ArchiveController<DE, ?, ?> dstController,
             final String dstPath)
     throws FalsePositiveException, IOException {
         // Do not assume anything about the lock status of the controller:

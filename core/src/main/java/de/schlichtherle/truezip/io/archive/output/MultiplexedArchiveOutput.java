@@ -27,7 +27,6 @@ import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -41,9 +40,10 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
- * A decorator for output archives which allows to write an unlimited number
- * of entries concurrently while at most one entry is actually concurrently
- * written to the target output archive.
+ * Decorates an {@code ArchiveOutput} in order to support a virtually
+ * unlimited number of entries which may be written concurrently while
+ * actually at most one entry is written concurrently to the target archive
+ * output.
  * If there is more than one entry to be written concurrently, the additional
  * entries are actually written to temp files and copied to the target
  * output archive upon a call to their {@link OutputStream#close()} method.
@@ -53,12 +53,14 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param   <AE> The run time type of the archive entries in this container.
+ * @param   <AE> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class MultiplexedArchiveOutput<AE extends ArchiveEntry>
-extends FilterArchiveOutput<AE> {
+public class MultiplexedArchiveOutput<
+        AE extends ArchiveEntry,
+        AO extends ArchiveOutput<AE>>
+extends FilterArchiveOutput<AE, AO> {
 
     /** Prefix for temporary files created by the multiplexer. */
     static final String TEMP_FILE_PREFIX = "tzp-mux";
@@ -79,7 +81,7 @@ extends FilterArchiveOutput<AE> {
      * @param target the decorated output archive.
      * @throws NullPointerException iff {@code target} is {@code null}.
      */
-    public MultiplexedArchiveOutput(final ArchiveOutput<AE> target) {
+    public MultiplexedArchiveOutput(final AO target) {
         super(target);
         if (target == null)
             throw new NullPointerException();

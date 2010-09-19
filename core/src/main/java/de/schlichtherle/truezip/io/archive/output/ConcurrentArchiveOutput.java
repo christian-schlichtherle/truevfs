@@ -40,8 +40,10 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentArchiveOutput<AE extends ArchiveEntry>
-extends FilterArchiveOutput<AE> {
+public class ConcurrentArchiveOutput<
+        AE extends ArchiveEntry,
+        AO extends ArchiveOutput<AE>>
+extends FilterArchiveOutput<AE, AO> {
 
     private static final String CLASS_NAME
             = ConcurrentArchiveOutput.class.getName();
@@ -63,9 +65,9 @@ extends FilterArchiveOutput<AE> {
 
     private volatile boolean stopped;
 
-    /** Constructs a new instance of {@code ArchiveInputProxy}. */
-    public ConcurrentArchiveOutput(final ArchiveOutput<AE> input) {
-        super(input);
+    /** Constructs a new {@code ConcurrentArchiveOutput}. */
+    public ConcurrentArchiveOutput(final AO target) {
+        super(target);
     }
 
     @Override

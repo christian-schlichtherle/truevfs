@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
 import java.net.URI;
@@ -31,8 +33,11 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class FileSystemArchiveController<AE extends ArchiveEntry>
-extends ArchiveController<AE> {
+abstract class FileSystemArchiveController<
+        AE extends ArchiveEntry,
+        AI extends ArchiveInput<AE>,
+        AO extends ArchiveOutput<AE>>
+extends ArchiveController<AE, AI, AO> {
 
     /** The mount state of the archive file system. */
     private AutoMounter autoMounter = new ResetFileSystem();

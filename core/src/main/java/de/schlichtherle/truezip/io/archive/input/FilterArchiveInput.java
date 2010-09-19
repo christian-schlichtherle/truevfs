@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.archive.output.FilterArchiveOutput;
 import java.io.IOException;
 
 /**
- * A decorator for archive inputs.
+ * Decorates an {@code ArchiveInput}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -32,18 +32,20 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterArchiveInput<AE extends ArchiveEntry>
-extends FilterArchiveEntryContainer<AE>
+public class FilterArchiveInput<
+        AE extends ArchiveEntry,
+        AI extends ArchiveInput<AE>>
+extends FilterArchiveEntryContainer<AE, AI>
 implements ArchiveInput<AE> {
 
-    protected ArchiveInput<AE> target;
+    protected AI target;
 
-    public FilterArchiveInput(final ArchiveInput<AE> target) {
+    public FilterArchiveInput(final AI target) {
         this.target = target;
     }
 
     @Override
-    protected ArchiveInput<AE> getTarget() {
+    protected AI getTarget() {
         return target;
     }
 

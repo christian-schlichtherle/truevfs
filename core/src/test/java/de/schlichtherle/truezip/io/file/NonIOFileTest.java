@@ -461,7 +461,7 @@ public class NonIOFileTest extends TestCase {
         assertFalse(l.equals(u));
         assertFalse(u.equals(l));
     }
-    
+
     void testEqualsAndHashCode(File a, File b) {
         if (File.separatorChar == '\\') {
             assertTrue(a.equals(b));
@@ -503,36 +503,28 @@ public class NonIOFileTest extends TestCase {
         //
 
         // Assert that detectors have been persistet.
-        final ArchiveDetector innerDetector = inner.getArchiveDetector();
         final ArchiveDetector archiveDetector = archive.getArchiveDetector();
-        final ArchiveDetector inner2Detector = inner2.getArchiveDetector();
         final ArchiveDetector archive2Detector = archive2.getArchiveDetector();
-        assertNotSame(innerDetector, inner2Detector);
         assertNotSame(archiveDetector, archive2Detector);
+        final ArchiveDetector innerDetector = inner.getArchiveDetector();
+        final ArchiveDetector inner2Detector = inner2.getArchiveDetector();
+        assertNotSame(innerDetector, inner2Detector);
 
         // Assert that drivers have been persistet.
-        final ArchiveDriver innerDriver = innerDetector.getArchiveDriver(inner.getPath());
         final ArchiveDriver archiveDriver = archiveDetector.getArchiveDriver(archive.getPath());
-        final ArchiveDriver inner2Driver = inner2Detector.getArchiveDriver(inner2.getPath());
         final ArchiveDriver archive2Driver = archive2Detector.getArchiveDriver(archive2.getPath());
-        assertNotSame(innerDriver, inner2Driver);
         assertNotSame(archiveDriver, archive2Driver);
+        final ArchiveDriver innerDriver = innerDetector.getArchiveDriver(inner.getPath());
+        final ArchiveDriver inner2Driver = inner2Detector.getArchiveDriver(inner2.getPath());
+        assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final ArchiveController innerController = inner.getArchiveController();
         final ArchiveController archiveController = archive.getArchiveController();
-        final ArchiveController inner2Controller = inner2.getArchiveController();
         final ArchiveController archive2Controller = archive2.getArchiveController();
-        assertSame(innerController, inner2Controller);
         assertSame(archiveController, archive2Controller);
-
-        // Test that the controllers have been reconfigured with the new drivers.
-        // Note that this is only possible because the file systems haven't
-        // been touched yet (well, they haven't even been mounted).
-        final ArchiveDriver innerControllerDriver = innerController.getDriver();
-        final ArchiveDriver archiveControllerDriver = archiveController.getDriver();
-        assertSame(innerControllerDriver, inner2Driver);
-        assertSame(archiveControllerDriver, archive2Driver);
+        final ArchiveController innerController = inner.getArchiveController();
+        final ArchiveController inner2Controller = inner2.getArchiveController();
+        assertSame(innerController, inner2Controller);
     }
 
     public void testGetOutermostArchive() {
