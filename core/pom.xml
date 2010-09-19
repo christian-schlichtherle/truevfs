@@ -273,6 +273,13 @@ limitations under the License.
             </properties>
         </profile>
         <profile>
+            <id>release-javadoc</id>
+            <properties>
+                <javadoc-show>protected</javadoc-show>
+                <javadoc-nohelp>false</javadoc-nohelp>
+            </properties>
+        </profile>
+        <profile>
             <id>kenai.com-release-scm-repository</id>
             <properties>
                 <scm-repository>v7-release</scm-repository>
@@ -285,13 +292,6 @@ limitations under the License.
                 <scm-connection>scm:hg:https://truezip.googlecode.com/hg/</scm-connection>
                 <scm-developerConnection>scm:hg:https://truezip.googlecode.com/hg/</scm-developerConnection>
                 <scm-url>http://code.google.com/p/truezip/source/browse/</scm-url>
-            </properties>
-        </profile>
-        <profile>
-            <id>release-javadoc</id>
-            <properties>
-                <javadoc-show>protected</javadoc-show>
-                <javadoc-nohelp>false</javadoc-nohelp>
             </properties>
         </profile>
     </profiles>
