@@ -18,12 +18,10 @@ package de.schlichtherle.truezip.io.archive.input;
 
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -73,7 +71,7 @@ extends FilterArchiveInput<AE> {
     @Override
     public ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(
             final AE entry)
-    throws FileNotFoundException {
+    throws IOException {
         assert !stopped;
         assert entry != null;
 

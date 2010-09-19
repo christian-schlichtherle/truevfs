@@ -64,30 +64,26 @@ public interface ArchiveEntry {
      */
     byte UNKNOWN = -1;
 
-    /**
-     * Defines the type of archive entry.
-     */
-    public enum Type {
+    /** Defines the type of archive entry. */
+    enum Type {
+
         /**
          * Regular file.
          * A file usually has some content associated to it which can be read
          * and written using a stream.
          */
         FILE,
-
         /**
          * Regular directory.
          * A directory can have other archive entries as children.
          */
         DIRECTORY,
-
         /**
          * Symbolic (named) link.
          * A symbolic link refers to another file system node which could even
          * be located outside the current archive file.
          */
         SYMLINK,
-
         /**
          * Special file.
          * A special file is a byte or block oriented interface to an arbitrary
