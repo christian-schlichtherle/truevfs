@@ -40,7 +40,8 @@ import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.*;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;

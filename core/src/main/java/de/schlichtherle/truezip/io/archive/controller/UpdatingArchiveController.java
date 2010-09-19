@@ -47,7 +47,12 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.*;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
@@ -664,7 +669,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     public void sync(
-            final BitField<ArchiveSyncOption> options,
+            final BitField<SyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         assert options.get(CLOSE_INPUT_STREAMS) || !options.get(CLOSE_OUTPUT_STREAMS); // closeOutputStreams => closeInputStreams
@@ -696,7 +701,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void sync0(
-            final BitField<ArchiveSyncOption> options,
+            final BitField<SyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         // Check output streams first, because closeInputStreams may be
