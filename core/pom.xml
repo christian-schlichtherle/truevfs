@@ -136,7 +136,6 @@ limitations under the License.
         </testResources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-plugin</artifactId>
                 <configuration>
                     <goals>clean source:jar javadoc:jar install</goals>
@@ -144,7 +143,6 @@ limitations under the License.
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
@@ -154,14 +152,20 @@ limitations under the License.
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <nohelp>true</nohelp>
+                    <show>private</show>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- <redirectTestOutputToFile>true</redirectTestOutputToFile> -->
@@ -184,7 +188,6 @@ limitations under the License.
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <executions>
                     <execution>
@@ -202,11 +205,11 @@ limitations under the License.
     <reporting>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
                 <configuration>
-                    <show>${javadoc-show}</show>
-                    <nohelp>${javadoc-nohelp}</nohelp>
+                    <author>true</author>
+                    <doctitle>TrueZIP Core API&lt;br/&gt;Version ${pom.version}</doctitle>
                     <groups>
                         <group>
                             <title>High Level API For Accessing Archive Files</title>
@@ -229,16 +232,14 @@ limitations under the License.
                             <packages>de.schlichtherle.truezip.io.archive*</packages>
                         </group>
                     </groups>
+                    <header>&lt;b&gt;TrueZIP Core ${pom.version}&lt;/b&gt;</header>
                     <links>
-                        <link>${jse-api-docs-link}</link>
                         <link>http://www.bouncycastle.org/docs/docs1.5/</link>
                     </links>
-                    <doctitle>TrueZIP Core API&lt;br/&gt;Version ${pom.version}</doctitle>
-                    <windowtitle>TrueZIP Core ${pom.version}</windowtitle>
-                    <header>&lt;b&gt;TrueZIP Core ${pom.version}&lt;/b&gt;</header>
-                    <author>true</author>
-                    <version>true</version>
+                    <quiet>true</quiet>
                     <splitindex>true</splitindex>
+                    <version>true</version>
+                    <windowtitle>TrueZIP Core ${pom.version}</windowtitle>
                 </configuration>
             </plugin>
         </plugins>
@@ -246,41 +247,13 @@ limitations under the License.
 
     <profiles>
         <profile>
-            <id>jse-5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <properties>
-                <jse-api-docs-link>http://download.oracle.com/javase/1.5.0/docs/api/</jse-api-docs-link>
-            </properties>
-        </profile>
-        <profile>
-            <id>jse-6</id>
-            <activation>
-                <jdk>1.6</jdk>
-            </activation>
-            <properties>
-                <jse-api-docs-link>http://download.oracle.com/javase/6/docs/api/</jse-api-docs-link>
-            </properties>
-        </profile>
-        <profile>
-            <id>jse-7</id>
-            <activation>
-                <jdk>1.7</jdk>
-            </activation>
-            <properties>
-                <jse-api-docs-link>http://download.java.net/jdk7/docs/api/</jse-api-docs-link>
-            </properties>
-        </profile>
-        <profile>
-            <id>release-javadoc</id>
-            <properties>
-                <javadoc-show>protected</javadoc-show>
-                <javadoc-nohelp>false</javadoc-nohelp>
-            </properties>
-        </profile>
-        <profile>
             <id>kenai.com-release-scm-repository</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <properties>
                 <scm-repository>v7-release</scm-repository>
             </properties>
@@ -302,7 +275,5 @@ limitations under the License.
         <scm-connection>scm:hg:https://hg.kenai.com/hg/truezip~${scm-repository}</scm-connection>
         <scm-developerConnection>scm:hg:ssh://hg.kenai.com/truezip~${scm-repository}</scm-developerConnection>
         <scm-url>http://kenai.com/projects/truezip/sources/${scm-repository}/show</scm-url>
-        <javadoc-show>private</javadoc-show>
-        <javadoc-nohelp>true</javadoc-nohelp>
     </properties>
 </project>
