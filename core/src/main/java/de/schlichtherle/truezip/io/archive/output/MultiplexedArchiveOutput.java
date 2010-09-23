@@ -16,6 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -130,7 +133,7 @@ extends FilterArchiveOutput<AE, AO> {
     public ArchiveOutputSocket<? extends AE> getOutputSocket(
             final AE entry)
     throws IOException {
-        final ArchiveOutputSocket<? extends AE> dst
+        final ArchiveOutputSocket<? extends AE> output
                 = super.getOutputSocket(entry);
         class OutputSocket extends ArchiveOutputSocket<AE> {
             @Override
@@ -139,26 +142,26 @@ extends FilterArchiveOutput<AE, AO> {
             }
 
             @Override
-            public OutputStream newOutputStream(final ArchiveEntry src)
+            public OutputStream newOutputStream()
             throws IOException {
-                return MultiplexedArchiveOutput.this.newOutputStream(dst, src);
+                return newOutputStream(output.chain(this));
             }
         }
         return new OutputSocket();
     }
 
     protected OutputStream newOutputStream(
-            final ArchiveOutputSocket<? extends AE> dstSocket,
-            final ArchiveEntry src)
+            final OutputSocket<? extends AE, ArchiveEntry> output)
     throws IOException {
-        if (src != null) {
-            final ArchiveEntry dst = dstSocket.getTarget();
-            dst.setSize(src.getSize()); // data may be compressed!
+        final ArchiveEntry peer = output.getPeerTarget();
+        if (peer != null) {
+            final ArchiveEntry local = output.getTarget();
+            local.setSize(peer.getSize()); // data may be compressed!
         }
         return isTargetBusy()
                 ? new TempEntryOutputStream(
-                    createTempFile(TEMP_FILE_PREFIX), dstSocket, src)
-                : new EntryOutputStream(dstSocket.newOutputStream(src));
+                    createTempFile(TEMP_FILE_PREFIX), output, peer)
+                : new EntryOutputStream(output.newOutputStream());
     }
 
     /**
@@ -214,44 +217,42 @@ extends FilterArchiveOutput<AE, AO> {
     extends FileOutputStream
     implements IOReference<AE> {
         private final File temp;
-        private final ArchiveOutputSocket<? extends AE> dst;
-        private final ArchiveInputSocket<ArchiveEntry> src;
+        private final OutputSocket<? extends AE, ArchiveEntry> output;
+        private final InputSocket<ArchiveEntry, ArchiveEntry> input;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
-                final ArchiveOutputSocket<? extends AE> dst,
-                final ArchiveEntry src)
+                final OutputSocket<? extends AE, ArchiveEntry> output,
+                final ArchiveEntry peer)
         throws IOException {
             super(temp);
-            class TempInputSocket extends ArchiveInputSocket<ArchiveEntry> {
-                private final ArchiveEntry entry;
-
-                TempInputSocket() {
-                    this.entry = src != null ? src : new FileEntry(temp);
-                }
+            class TempInputSocket
+            extends InputSocket<ArchiveEntry, ArchiveEntry> {
+                private final ArchiveEntry target
+                        = null != peer ? peer : new FileEntry(temp);
 
                 @Override
                 public ArchiveEntry getTarget() {
-                    return entry;
+                    return target;
                 }
 
                 @Override
-                public InputStream newInputStream(ArchiveEntry dst)
+                public InputStream newInputStream()
                 throws IOException {
                     return new FileInputStream(temp);
                 }
             }
             this.temp = temp;
-            this.dst = dst;
-            this.src = new TempInputSocket();
-            temps.put(dst.getTarget().getName(), this);
+            this.output = output;
+            this.input = new TempInputSocket();
+            temps.put(output.getTarget().getName(), this);
         }
 
         @Override
         public AE getTarget() {
-            return dst.getTarget();
+            return output.getTarget();
         }
 
         @Override
@@ -268,8 +269,8 @@ extends FilterArchiveOutput<AE, AO> {
             try {
                 super.close();
             } finally {
-                final AE dstEntry = dst.getTarget();
-                final ArchiveEntry srcEntry = src.getTarget();
+                final AE dstEntry = output.getTarget();
+                final ArchiveEntry srcEntry = input.getTarget();
                 if (dstEntry.getSize() == UNKNOWN)
                     dstEntry.setSize(srcEntry.getSize());
                 if (dstEntry.getTime() == UNKNOWN)
@@ -283,7 +284,7 @@ extends FilterArchiveOutput<AE, AO> {
                 return false;
 
             try {
-                IOSockets.copy(src, dst);
+                IOSockets.copy(input, output);
             } finally {
                 if (!temp.delete()) // may fail on Windoze if in.close() failed!
                     temp.deleteOnExit(); // be bullish never to leavy any temps!

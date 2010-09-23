@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -23,29 +22,59 @@ import java.io.InputStream;
 /**
  * Creates input streams for reading bytes from its local target.
  * 
- * @param   <LT> The type of the <i>local target</i> for I/O operations,
- *          i.e. the {@link #getTarget() target} of this instance.
- * @param   <PT> The minimum required type of the <i>peer targets</i>.
+ * @param   <LT> The type of the {@link #getTarget() local target} for I/O
+ *          operations.
+ * @param   <PT> The type of the {@link #getPeerTarget() peer target} for I/O
+ *          operations.
  * @see     InputSocketProvider
  * @see     OutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class InputSocket<LT, PT> implements IOReference<LT> {
+public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
+
+    private OutputSocket<? extends PT, ? super LT> peer;
+
+    public InputSocket<LT, PT> chain(InputSocket<? super LT, ? extends PT> input) {
+        return connect(null == input ? null : input.peer);
+    }
+
+    public InputSocket<LT, PT> connect(
+            final OutputSocket<? extends PT, ? super LT> newPeer) {
+        final OutputSocket<? extends PT, ? super LT> oldPeer = peer;
+        if (!equal(oldPeer, newPeer)) {
+            peer = newPeer;
+            beforeConnectComplete();
+            if (null != newPeer)
+                newPeer.connect(this);
+            afterConnectComplete();
+        }
+        return this;
+    }
+
+    protected void beforeConnectComplete() {
+    }
+
+    protected void afterConnectComplete() {
+    }
+
+    private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
+    }
 
     /**
-     * Returns the non-{@code null} local target for I/O operations.
+     * Returns the nullable peer target for I/O operations.
      * <p>
-     * The result of changing the state of the returned object is undefined.
-     * In particular, a subsequent call to {@link #newInputStream(Object)}
-     * may not reflect any changes or may even fail.
-     * However, this term may be overridden by sub-interfaces or
-     * implementations.
+     * The result of changing the state of the peer target is undefined.
+     * In particular, a subsequent I/O operation may not reflect the change
+     * or may even fail.
+     * This term may be overridden by sub-interfaces or implementations.
      *
-     * @return The non-{@code null} local target for I/O operations.
+     * @return The nullable peer target for I/O operations.
      */
-    @Override
-    public abstract LT getTarget();
+    public PT getPeerTarget() {
+        return IOReferences.deref(peer);
+    }
 
     /**
      * Returns a new input stream for reading bytes from the
@@ -55,12 +84,9 @@ public abstract class InputSocket<LT, PT> implements IOReference<LT> {
      * Furthermore, the returned input stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @param  peer the nullable peer target.
-     *         If this is {@code null}, then there is no peer target.
      * @return A new input stream.
-     * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
      */
-    public abstract InputStream newInputStream(PT peer) throws IOException;
+    public abstract InputStream newInputStream() throws IOException;
 
     /**
      * <b>Optional:</b> Returns a new read only file for reading bytes from the
@@ -72,17 +98,10 @@ public abstract class InputSocket<LT, PT> implements IOReference<LT> {
      * Buffering should be addressed by client applications instead.
      *
      * @return A new read only file.
-     * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
-     * @throws UnsupportedOperationException to indicate that this operation is not (yet)
-     *         supported.
+     * @throws UnsupportedOperationException to indicate that this operation
+     *         is not (yet) supported.
      */
     public ReadOnlyFile newReadOnlyFile() throws IOException {
         throw new UnsupportedOperationException();
-    }
-
-    /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
-    @Override
-    public final String toString() {
-        return getTarget().toString();
     }
 }

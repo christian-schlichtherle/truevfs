@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.socket;
 
 import java.io.IOException;
@@ -22,29 +21,59 @@ import java.io.OutputStream;
 /**
  * Creates output streams for writing bytes to its local target.
  *
- * @param   <LT> The type of the <i>local target</i> for I/O operations,
- *          i.e. the {@link #getTarget() target} of this instance.
- * @param   <PT> The minimum required type of the <i>peer targets</i>.
+ * @param   <LT> The type of the {@link #getTarget() local target} for I/O
+ *          operations.
+ * @param   <PT> The type of the {@link #getPeerTarget() peer target} for I/O
+ *          operations.
  * @see     OutputSocketProvider
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OutputSocket<LT, PT> implements IOReference<LT> {
+public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
+
+    private InputSocket<? extends PT, ? super LT> peer;
+
+    public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> output) {
+        return connect(null == output ? null : output.peer);
+    }
+
+    public OutputSocket<LT, PT> connect(
+            final InputSocket<? extends PT, ? super LT> newPeer) {
+        final InputSocket<? extends PT, ? super LT> oldPeer = peer;
+        if (!equal(oldPeer, newPeer)) {
+            peer = newPeer;
+            beforeConnectComplete();
+            if (null != newPeer)
+                newPeer.connect(this);
+            afterConnectComplete();
+        }
+        return this;
+    }
+
+    protected void beforeConnectComplete() {
+    }
+
+    protected void afterConnectComplete() {
+    }
+
+    private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
+    }
 
     /**
-     * Returns the non-{@code null} local target for I/O operations.
+     * Returns the nullable peer target for I/O operations.
      * <p>
-     * The result of changing the state of the returned object is undefined.
-     * In particular, a subsequent call to {@link #newOutputStream(Object)}
-     * may not reflect any changes or may even fail.
-     * However, this term may be overridden by sub-interfaces or
-     * implementations.
+     * The result of changing the state of the peer target is undefined.
+     * In particular, a subsequent I/O operation may not reflect the change
+     * or may even fail.
+     * This term may be overridden by sub-interfaces or implementations.
      *
-     * @return The non-{@code null} local target for I/O operations.
+     * @return The nullable peer target for I/O operations.
      */
-    @Override
-    public abstract LT getTarget();
+    public PT getPeerTarget() {
+        return IOReferences.deref(peer);
+    }
 
     /**
      * Returns a new output stream for writing bytes to the
@@ -54,16 +83,7 @@ public abstract class OutputSocket<LT, PT> implements IOReference<LT> {
      * Furthermore, the returned output stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @param  peer the nullable peer target.
-     *         If this is {@code null}, then there is no peer target.
      * @return A new output stream.
-     * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
      */
-    public abstract OutputStream newOutputStream(PT peer) throws IOException;
-
-    /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
-    @Override
-    public final String toString() {
-        return getTarget().toString();
-    }
+    public abstract OutputStream newOutputStream() throws IOException;
 }

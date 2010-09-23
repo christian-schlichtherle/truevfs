@@ -222,9 +222,9 @@ implements ArchiveInput<TarEntry> {
             }
 
             @Override
-            public InputStream newInputStream(final ArchiveEntry dst)
+            public InputStream newInputStream()
             throws IOException {
-                return TarInput.this.newInputStream(entry, dst);
+                return TarInput.this.newInputStream(entry, getPeerTarget());
             }
         }
         return new InputSocket();

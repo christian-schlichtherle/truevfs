@@ -385,7 +385,8 @@ class Files {
                         .getInputSocket( // detects false positives!
                             BitField.noneOf(IOOption.class),
                             srcPath)
-                        .newInputStream(null);
+                        .connect(null)
+                        .newInputStream();
                 time = srcController.getLastModified(srcPath);
             /*} finally {
                 srcController.readLock().unlock();

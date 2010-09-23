@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.socket;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
@@ -35,7 +34,8 @@ public class FileEntrySocketProvider
 implements  ArchiveInputSocketProvider<FileEntry>,
             ArchiveOutputSocketProvider<FileEntry> {
 
-    private static final FileEntrySocketProvider singleton = new FileEntrySocketProvider();
+    private static final FileEntrySocketProvider singleton
+            = new FileEntrySocketProvider();
 
     public static FileEntrySocketProvider get() {
         return singleton;
@@ -55,7 +55,7 @@ implements  ArchiveInputSocketProvider<FileEntry>,
             }
 
             @Override
-            public InputStream newInputStream(ArchiveEntry peer)
+            public InputStream newInputStream()
             throws IOException {
                 return new FileInputStream(target.getFile());
             }
@@ -74,7 +74,7 @@ implements  ArchiveInputSocketProvider<FileEntry>,
             }
 
             @Override
-            public OutputStream newOutputStream(ArchiveEntry peer)
+            public OutputStream newOutputStream()
             throws IOException {
                 return new FileOutputStream(target.getFile());
             }

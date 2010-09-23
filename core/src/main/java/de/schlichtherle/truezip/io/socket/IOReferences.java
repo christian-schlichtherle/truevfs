@@ -44,7 +44,7 @@ public class IOReferences {
                 return target;
             }
         } // class TargetIOReference
-        return target != null ? new TargetIOReference() : null;
+        return target == null ? null : new TargetIOReference();
     }
 
     /**
@@ -61,6 +61,6 @@ public class IOReferences {
      *         given nullable I/O reference.
      */
     public static <T> T deref(final IOReference<T> reference) {
-        return reference != null ? reference.getTarget() : null;
+        return reference == null ? null : reference.getTarget();
     }
 }

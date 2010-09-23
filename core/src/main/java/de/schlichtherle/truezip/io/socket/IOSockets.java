@@ -64,14 +64,14 @@ public class IOSockets {
             final OutputSocket<? extends T, ? super T> output)
     throws IOException {
         final InputStream in;
-        try {
-            in = input.newInputStream(output.getTarget());
-        } catch (IOException ex) {
-            throw new InputException(ex);
-        }
+        //try {
+            in = input.connect(output).newInputStream();
+        /*} catch (IOException ex) {
+            throw new InputException(ex); // DONT WRAP THE CAUSE: would break false positive archive file detection!
+        }*/
         OutputStream out = null;
         try {
-            out = output.newOutputStream(input.getTarget());
+            out = output.connect(input).newOutputStream();
         } finally {
             if (out == null) { // exception?
                 try {

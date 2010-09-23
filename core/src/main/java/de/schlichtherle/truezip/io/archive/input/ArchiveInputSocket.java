@@ -76,6 +76,6 @@ extends InputSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    public abstract InputStream newInputStream(ArchiveEntry peer)
+    public abstract InputStream newInputStream()
     throws IOException;
 }

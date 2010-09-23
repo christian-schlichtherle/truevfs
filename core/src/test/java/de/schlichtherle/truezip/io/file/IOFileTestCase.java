@@ -904,7 +904,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
 
     void testCopyDelete0(final File a, final File b, final long granularity)
     throws IOException {
-        // Create file a with old timestamp.
+        // Create file an with old timestamp.
         {
             final OutputStream out = new FileOutputStream(a);
             try {

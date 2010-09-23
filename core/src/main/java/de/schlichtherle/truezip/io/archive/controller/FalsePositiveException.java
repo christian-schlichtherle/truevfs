@@ -29,7 +29,7 @@ import java.net.URI;
  * Instances of this class are always associated with an {@code IOException}
  * as their cause.
  */
-public class FalsePositiveException extends Exception {
+public class FalsePositiveException extends IOException {
     private static final long serialVersionUID = 947139561381472363L;
 
     private final URI mountPoint;

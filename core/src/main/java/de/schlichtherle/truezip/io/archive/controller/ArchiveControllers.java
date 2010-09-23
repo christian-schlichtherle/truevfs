@@ -450,7 +450,7 @@ public class ArchiveControllers {
             final ArchiveInputSocket<?> input
                     = srcController.getInputSocket(options, srcPath);
             final ArchiveOutputSocket<?> output
-                    = dstController.getOutputSocket(options, dstPath, input);
+                    = dstController.getOutputSocket(options, dstPath);
             IOSockets.copy(input, output);
         } catch (ArchiveEntryFalsePositiveException ex) {
             // Both the source and/or the destination may be false positives,
@@ -512,9 +512,9 @@ public class ArchiveControllers {
                                 BitField.noneOf(IOOption.class)
                                     .set(PRESERVE, preserve)
                                     .set(CREATE_PARENTS, createParents),
-                                dstPath,
-                                input)
-                            .newOutputStream(input.getTarget());
+                                dstPath)
+                            .connect(input)
+                            .newOutputStream();
             try {
                 Streams.cat(in, out);
             } finally {
