@@ -17,8 +17,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
@@ -47,14 +45,14 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.REASSEMBLE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -220,7 +218,7 @@ public class ArchiveControllers {
      */
     public static void sync(
             final URI prefix,
-            BitField<SyncOption> options,
+            BitField<ArchiveSyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         if (!options.get(CLOSE_INPUT_STREAMS) && options.get(CLOSE_OUTPUT_STREAMS))
@@ -444,7 +442,7 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final BitField<IOOption> options = BitField.noneOf(IOOption.class)
+            final BitField<ArchiveIOOption> options = BitField.noneOf(ArchiveIOOption.class)
                     .set(PRESERVE, preserve)
                     .set(CREATE_PARENTS, createParents);
             final ArchiveInputSocket<?> input
@@ -505,16 +503,18 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final ArchiveInputSocket<?> input = FileEntrySocketProvider.get()
+            final ArchiveInputSocket<?> input
+                    = FileEntrySocketProvider.get()
                     .getInputSocket(new FileEntry(src));
-            final OutputStream out = dstController
-                            .getOutputSocket(
-                                BitField.noneOf(IOOption.class)
-                                    .set(PRESERVE, preserve)
-                                    .set(CREATE_PARENTS, createParents),
-                                dstPath)
-                            .connect(input)
-                            .newOutputStream();
+            final OutputStream out
+                    = dstController
+                    .getOutputSocket(
+                        BitField.noneOf(ArchiveIOOption.class)
+                            .set(PRESERVE, preserve)
+                            .set(CREATE_PARENTS, createParents),
+                        dstPath)
+                    .peer(input)
+                    .newOutputStream();
             try {
                 Streams.cat(in, out);
             } finally {

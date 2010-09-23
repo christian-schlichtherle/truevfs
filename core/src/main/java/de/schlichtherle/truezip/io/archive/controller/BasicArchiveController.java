@@ -48,11 +48,11 @@ import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
@@ -422,7 +422,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
     @Override
     public ArchiveInputSocket<?> getInputSocket(
-            final BitField<IOOption> options, // currently unused
+            final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
         assert path != null;
@@ -435,7 +435,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     private ArchiveInputSocket<?> getInputSocket0(
-            final BitField<IOOption> options, // currently unused
+            final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
         assert options != null;
@@ -461,9 +461,9 @@ implements  ArchiveInputSocketProvider<AE>,
                     private IOReference<AE> local = this;
 
                     @Override
-                    public InputSocket<AE, ArchiveEntry> connect(
+                    public InputSocket<AE, ArchiveEntry> peer(
                             final OutputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
-                        super.connect(newPeer);
+                        super.peer(newPeer);
                         getPeerTarget();
                         return this;
                     }
@@ -539,7 +539,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
     @Override
     public ArchiveOutputSocket<?> getOutputSocket(
-            final BitField<IOOption> options,
+            final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
         assert path != null;
@@ -553,7 +553,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     private ArchiveOutputSocket<?> getOutputSocket0(
-            final BitField<IOOption> options,
+            final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
         assert path != null;
@@ -578,9 +578,9 @@ implements  ArchiveInputSocketProvider<AE>,
                     private Link<AE> local;
 
                     @Override
-                    public OutputSocket<AE, ArchiveEntry> connect(
+                    public OutputSocket<AE, ArchiveEntry> peer(
                             final InputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
-                        super.connect(newPeer);
+                        super.peer(newPeer);
                         getPeerTarget();
                         return this;
                     }
@@ -643,7 +643,7 @@ implements  ArchiveInputSocketProvider<AE>,
                                 final boolean append = options.get(APPEND);
                                 final InputStream in = append
                                         ? getInputSocket(target)
-                                            .connect(null)
+                                            .peer(null)
                                             .newInputStream()
                                         : null;
                                 try {
@@ -1022,10 +1022,10 @@ implements  ArchiveInputSocketProvider<AE>,
             // If we got here without an exception, write an empty file now.
             getOutputSocket0(
                         BitField
-                            .noneOf(IOOption.class)
+                            .noneOf(ArchiveIOOption.class)
                             .set(CREATE_PARENTS, createParents),
                         path)
-                    .connect(null)
+                    .peer(null)
                     .newOutputStream()
                     .close();
             return true;

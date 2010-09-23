@@ -65,13 +65,13 @@ public class IOSockets {
     throws IOException {
         final InputStream in;
         //try {
-            in = input.connect(output).newInputStream();
+            in = input.peer(output).newInputStream();
         /*} catch (IOException ex) {
             throw new InputException(ex); // DONT WRAP THE CAUSE: would break false positive archive file detection!
         }*/
         OutputStream out = null;
         try {
-            out = output.connect(input).newOutputStream();
+            out = output.peer(input).newOutputStream();
         } finally {
             if (out == null) { // exception?
                 try {

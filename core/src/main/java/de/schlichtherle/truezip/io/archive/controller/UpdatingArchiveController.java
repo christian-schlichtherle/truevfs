@@ -47,12 +47,12 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.REASSEMBLE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
@@ -442,8 +442,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 // TODO: Use InputSocket.newReadOnlyFile()!
                 Streams.copy(
                         controller
-                            .getInputSocket(BitField.noneOf(IOOption.class), path)
-                            .connect(null)
+                            .getInputSocket(BitField.noneOf(ArchiveIOOption.class), path)
+                            .peer(null)
                             .newInputStream(),
                         new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
@@ -665,7 +665,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     public void sync(
-            final BitField<SyncOption> options,
+            final BitField<ArchiveSyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         assert options.get(CLOSE_INPUT_STREAMS) || !options.get(CLOSE_OUTPUT_STREAMS); // closeOutputStreams => closeInputStreams
@@ -697,7 +697,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void sync0(
-            final BitField<SyncOption> options,
+            final BitField<ArchiveSyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         // Check output streams first, because closeInputStreams may be
@@ -934,10 +934,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    out.getOutputSocket(e)
-                            .connect(null)
-                            .newOutputStream()
-                            .close();
+                    out.getOutputSocket(e).peer(null).newOutputStream().close();
                 } else if (in != null && in.getEntry(n) != null) {
                     assert e == in.getEntry(n);
                     IOSockets.copy(  in.getInputSocket(e),
@@ -949,10 +946,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    out.getOutputSocket(e)
-                            .connect(null)
-                            .newOutputStream()
-                            .close();
+                    out.getOutputSocket(e).peer(null).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);

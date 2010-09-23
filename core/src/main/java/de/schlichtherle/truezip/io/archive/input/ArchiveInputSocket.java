@@ -53,19 +53,6 @@ extends InputSocket<AE, ArchiveEntry> {
     /**
      * {@inheritDoc}
      *
-     * @param  peer a nullable peer archive entry which is going to be
-     *         written in order to copy the data from the {@link #getTarget() target}
-     *         archive entry.
-     *         <p>
-     *         Implementations may test the runtime type of this object in
-     *         order to check if they should set up the returned input stream
-     *         appropriately.
-     *         <p>
-     *         For example, the ZIP driver family uses this to copy the
-     *         deflated entry data directly without recompressing it.
-     *         As another example, the TAR driver family uses this to determine
-     *         the size of the input file, thereby removing the need to create
-     *         (yet another) temporary file.
      * @throws InputArchiveBusyException if the archive is currently busy
      *         on input for another entry.
      *         This exception is guaranteed to be recoverable, meaning it
