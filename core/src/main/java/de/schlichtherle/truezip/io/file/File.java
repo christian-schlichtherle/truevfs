@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
 import java.util.Collection;
@@ -50,11 +50,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
@@ -1112,7 +1112,7 @@ public class File extends java.io.File {
      *         {@code closeOutputStreams} is {@code true}.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void sync(BitField<SyncOption> options)
+    public static void sync(BitField<ArchiveSyncOption> options)
     throws ArchiveSyncException {
         ArchiveControllers.sync(
                 null, options, new DefaultArchiveSyncExceptionBuilder());
@@ -1191,7 +1191,7 @@ public class File extends java.io.File {
      */
     public static void sync(
             final File archive,
-            final BitField<SyncOption> options)
+            final BitField<ArchiveSyncOption> options)
     throws ArchiveSyncException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
@@ -1282,7 +1282,7 @@ public class File extends java.io.File {
      */
     public static void update(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(SyncOption.class)
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
@@ -1302,7 +1302,7 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(SyncOption.class)
+        sync(   BitField.noneOf(ArchiveSyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
@@ -1336,7 +1336,7 @@ public class File extends java.io.File {
     public static void update(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
+                BitField.noneOf(ArchiveSyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
@@ -1359,7 +1359,7 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
+                BitField.noneOf(ArchiveSyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)

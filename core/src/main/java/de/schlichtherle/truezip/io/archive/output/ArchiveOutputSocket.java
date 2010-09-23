@@ -44,7 +44,7 @@ extends OutputSocket<AE, ArchiveEntry> {
      * <p>
      * Implementations must reflect any changes to the state of the returned
      * archive entry by the client applications before a call to the method
-     * {@link #newOutputStream(ArchiveEntry)}.
+     * {@link #newOutputStream()}.
      * The effect of any subsequent changes to the state of the returned
      * archive entry is undefined.
      *
@@ -56,20 +56,6 @@ extends OutputSocket<AE, ArchiveEntry> {
     /**
      * {@inheritDoc}
      *
-     * @param  peer a nullable peer archive entry which is going to be
-     *         read in order to copy its data to the {@link #getTarget() target}
-     *         archive entry.
-     *         <p>
-     *         Implementations may test the runtime type of this object in
-     *         order to check if they should copy some class-specific
-     *         properties from the input archive entry to the output archive
-     *         entry or set up the returned output stream appropriately.
-     *         <p>
-     *         For example, the ZIP driver family uses this to copy the
-     *         deflated entry data directly without recompressing it.
-     *         As another example, the TAR driver family uses this to determine
-     *         the size of the input file, thereby removing the need to create
-     *         (yet another) temporary file.
      * @throws OutputArchiveBusyException if the archive is currently busy
      *         on output for another entry.
      *         This exception is guaranteed to be recoverable, meaning it

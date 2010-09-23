@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
@@ -383,9 +383,9 @@ class Files {
             try {*/
                 in = srcController
                         .getInputSocket( // detects false positives!
-                            BitField.noneOf(IOOption.class),
+                            BitField.noneOf(ArchiveIOOption.class),
                             srcPath)
-                        .connect(null)
+                        .peer(null)
                         .newInputStream();
                 time = srcController.getLastModified(srcPath);
             /*} finally {

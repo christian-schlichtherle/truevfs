@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -128,8 +128,8 @@ public class FileInputStream extends FilterInputStream {
                     return archive
                             .getArchiveController()
                             .getInputSocket(
-                                BitField.noneOf(IOOption.class), path)
-                            .connect(null)
+                                BitField.noneOf(ArchiveIOOption.class), path)
+                            .peer(null)
                             .newInputStream();
                 }
             }
