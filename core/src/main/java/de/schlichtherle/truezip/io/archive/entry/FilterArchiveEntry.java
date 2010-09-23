@@ -26,7 +26,7 @@ package de.schlichtherle.truezip.io.archive.entry;
 public class FilterArchiveEntry<AE extends ArchiveEntry>
 implements ArchiveEntry {
 
-    /** The decorated nullable archive entry. */
+    /** The decorated archive entry. */
     protected AE target;
 
     protected FilterArchiveEntry(final AE entry) {

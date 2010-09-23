@@ -25,7 +25,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 import junit.framework.TestCase;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
@@ -42,14 +41,14 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AuthenticationPanelTest extends TestCase {
+public class AuthenticationPanelUITest extends TestCase {
 
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     private static final Logger logger = Logger.getLogger(
-            AuthenticationPanelTest.class.getName());
+            AuthenticationPanelUITest.class.getName());
 
     static final File rootDir;
     static {
@@ -62,13 +61,10 @@ public class AuthenticationPanelTest extends TestCase {
     private final ComponentChooser keyFileChooser
             = new NameComponentChooser("keyFileChooser");
 
-    public AuthenticationPanelTest(String testName) {
+    public AuthenticationPanelUITest(String testName) {
         super(testName);
     }
 
-    /**
-     * Test of getFileChooser method, of class de.schlichtherle.truezip.key.passwd.swing.AuthenticationPanel.
-     */
     public void testGetFileChooser() throws InterruptedException {
         final ReferenceQueue<JFileChooser> queue = new ReferenceQueue<JFileChooser>();
         final PhantomReference<JFileChooser> ref = initQueue(queue, rootDir);

@@ -31,9 +31,9 @@ public class RemoteControlThread extends Thread {
 
     public RemoteControlThread(RemoteControl rc) {
         super(rc, "Remote Control Thread for \"" + rc.id + "\"");
-        this.rc = rc;
+        setDaemon(true); // thread may die.
         //setPriority(Thread.MAX_PRIORITY);
-        //setDaemon(true); // thread may die.
+        this.rc = rc;
     }
 
     /**

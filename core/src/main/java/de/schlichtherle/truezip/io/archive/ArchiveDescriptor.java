@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive;
 
 import java.net.URI;
@@ -24,12 +23,14 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDescriptor {
+public abstract class ArchiveDescriptor {
 
     /**
      * Returns an absolute, hierarchical and normalized Unique Resource
      * Identifier (URI) for the target archive file's <i>mount point</i>
      * in the federated file system.
+     * The path of this URI ends with a {@code '/'} character so that
+     * relative URIs can be resolved against it.
      * <p>
      * The mount point may be used to construct error messages or to locate
      * and access archive metadata which is stored outside the federated file
@@ -41,11 +42,15 @@ public interface ArchiveDescriptor {
      * <p>
      * Implementation notes: If the returned URI uses the <i>file scheme</i>,
      * its path must be canonical in order to be really unique.
-     * Furthermore, the path of the URI must end with a {@code '/'} character
-     * so that relative URIs can be resolved against it.
      *
      * @return A non-{@code null} URI for the mount point of the target archive
      *         file.
      */
-    URI getMountPoint();
+    public abstract URI getMountPoint();
+
+    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
+    @Override
+    public final String toString() {
+        return getMountPoint().toString();
+    }
 }

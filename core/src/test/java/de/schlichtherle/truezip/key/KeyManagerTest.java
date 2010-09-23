@@ -31,13 +31,14 @@ public class KeyManagerTest extends TestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
-        KeyManager.setInstance(null); // request new instance
+    protected void setUp() {
+        KeyManager.setInstance(null);
         instance = KeyManager.getInstance();
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
+        KeyManager.setInstance(null);
     }
 
     /**

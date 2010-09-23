@@ -38,15 +38,15 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileComboBoxBrowserTest extends TestCase {
+public class FileComboBoxBrowserUITest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     private static final Logger logger
-            = Logger.getLogger(FileComboBoxBrowserTest.class.getName());
+            = Logger.getLogger(FileComboBoxBrowserUITest.class.getName());
 
-    public FileComboBoxBrowserTest(String testName) {
+    public FileComboBoxBrowserUITest(String testName) {
         super(testName);
     }
 

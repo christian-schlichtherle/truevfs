@@ -354,6 +354,10 @@ public abstract class ZipTestCase extends TestCase {
         class CheckAllEntriesThread extends Thread {
             Throwable failure;
 
+            CheckAllEntriesThread() {
+                setDaemon(true);
+            }
+
             @Override
             public void run() {
                 try {

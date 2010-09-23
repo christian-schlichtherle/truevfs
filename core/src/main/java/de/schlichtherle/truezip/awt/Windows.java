@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.key.passwd.swing;
+package de.schlichtherle.truezip.awt;
 
 import java.awt.Container;
 import java.awt.Frame;
@@ -28,11 +28,16 @@ import javax.swing.JOptionPane;
 
 /**
  * A utility class for window management.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class Windows {
+public class Windows {
+
+    Windows() {
+    }
+
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";
 
     private static Reference<KeyboardFocusManager> lastFocusManager
@@ -43,30 +48,34 @@ final class Windows {
     private static PropertyChangeListener focusListener
             = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            Window w = (Window) evt.getNewValue();
-            if (w != null)
-                lastFocusedWindow = new WeakReference<Window>(w);
+            setLastFocusedWindow((Window) evt.getNewValue());
         }
     };
 
-    /** You cannot instantiate this class. */
-    Windows() {
+    /**
+     * Returns a suitable parent window, which is the last explicitly set
+     * and still showing parent window or any of its showing parent windows,
+     * the last focused and still showing window or any of its showing parent
+     * windows or any other showing window  - whichever is found first.
+     * If no showing window is found, {@link JOptionPane}'s root frame is
+     * returned.
+     */
+    public static synchronized Window getParentWindow() {
+        Window w;
+        if ((w = findFirstShowingWindow(getLastFocusedWindow())) == null)
+            w = getAnyShowingWindow();
+        return w != null ? w : JOptionPane.getRootFrame();
     }
 
-    /** @see PromptingKeyManager#getParentWindow */
-    public static synchronized Window getParentWindow() {
-        Window w = getLastFocusedWindow();
-        if (w == null)
-            w = getAnyShowingWindow();
-
-        // Search the containment hierarchy updwards for the first showing
-        // window.
+    /**
+     * Search the containment hierarchy updwards for the first showing
+     * window.
+     */
+    private static Window findFirstShowingWindow(final Window w) {
         for (Container c = w; c != null; c = c.getParent())
             if (c instanceof Window && c.isShowing())
                 return (Window) c;
-
-        // No window is showing, use JOptionPane's default.
-        return JOptionPane.getRootFrame();
+        return null;
     }
 
     /**
@@ -88,7 +97,7 @@ final class Windows {
      * Ensures that the focused window managed by the current keyboard focus
      * manager is observed.
      */
-    private static synchronized void observeFocusedWindow() {
+    private static void observeFocusedWindow() {
         final KeyboardFocusManager lfm = lastFocusManager.get();
         final KeyboardFocusManager fm
                 = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -96,12 +105,23 @@ final class Windows {
             return;
 
         if (lfm != null)
-            lfm.removePropertyChangeListener(PROPERTY_FOCUSED_WINDOW,
-                    focusListener);
-        fm.addPropertyChangeListener(PROPERTY_FOCUSED_WINDOW,
-                focusListener);
+            lfm.removePropertyChangeListener(
+                    PROPERTY_FOCUSED_WINDOW, focusListener);
+        fm.addPropertyChangeListener(
+                PROPERTY_FOCUSED_WINDOW, focusListener);
         lastFocusManager = new WeakReference<KeyboardFocusManager>(fm);
-        lastFocusedWindow = new WeakReference<Window>(fm.getFocusedWindow());
+        setLastFocusedWindow0(fm.getFocusedWindow());
+    }
+
+    private static synchronized void setLastFocusedWindow(Window w) {
+        setLastFocusedWindow0(w);
+    }
+
+    private static void setLastFocusedWindow0(Window w) {
+        if (w == null || !w.isShowing())
+            if ((w = lastFocusedWindow.get()) != null && !w.isShowing())
+                w = null;
+        lastFocusedWindow = new WeakReference<Window>(w);
     }
 
     private static Window getAnyShowingWindow() {

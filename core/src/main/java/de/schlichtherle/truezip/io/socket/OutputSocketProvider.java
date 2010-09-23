@@ -19,33 +19,33 @@ package de.schlichtherle.truezip.io.socket;
 import java.io.IOException;
 
 /**
- * Provides {@link InputStreamSocket}s for read access to local targets.
+ * Provides {@link OutputSocket}s for write access to local targets.
  *
  * @param   <LT> The type of the <i>local targets</i> for I/O operations.
  * @param   <PT> The minimum required type of the <i>peer targets</i>.
- * @see     OutputStreamSocketProvider
+ * @see     InputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputStreamSocketProvider<LT, PT> {
+public interface OutputSocketProvider<LT, PT> {
 
     /**
-     * Returns a non-{@code null} input stream socket for read access to the
+     * Returns a non-{@code null} output socket for write access to the
      * given local target.
+     * <p>
+     * The implementation must not assume that the returned output socket will
+     * ever be used and must tolerate changes to all settable properties of the
+     * local target object.
+     * <p>
      * Multiple invocations with the same parameter may return the same
      * object again.
-     * <p>
-     * The method {@link InputStreamSocket#getTarget()} must return an object
-     * which {@link Object#equals(Object) compares equal} to the given local
-     * target when called on the returned input stream socket.
      *
      * @param  target the non-{@code null} local target.
-     * @return A non-{@code null} input stream socket for reading from the
-     *         local target.
-     * @throws IOException If the local target does not exist or
+     * @return A non-{@code null} output socket for writing to the local target.
+     * @throws IOException If the local target
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    InputStreamSocket<? extends LT, ? super PT> getInputStreamSocket(LT target)
+    OutputSocket<? extends LT, ? super PT> getOutputSocket(LT target)
     throws IOException;
 }

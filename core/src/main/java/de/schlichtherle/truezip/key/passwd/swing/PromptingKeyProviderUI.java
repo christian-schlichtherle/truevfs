@@ -16,19 +16,21 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import java.net.URI;
 import de.schlichtherle.truezip.awt.EventDispatchTimeoutException;
 import de.schlichtherle.truezip.awt.EventQueue;
+import de.schlichtherle.truezip.awt.Windows;
+import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.KeyPromptingTimeoutException;
-import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.awt.Window;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URI;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
@@ -93,8 +95,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
      *
      * @throws EOFException If the file is not at least {@code KEY_FILE_LEN}
      *         bytes long.
-     * @throws IOException If an IOException occurs when opening, reading or
-     *         closing the file.
+     * @throws IOException on any other I/O related issue.
      */
     static byte[] readKeyFile(String pathname)
     throws IOException {
@@ -169,7 +170,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
             String n = System.getProperty(
                     PACKAGE_NAME + "." + type,
                     PACKAGE_NAME + ".Basic" + type);
-            Class c = loadClass(n, PromptingKeyProviderUI.class);
+            Class<?> c = loadClass(n, PromptingKeyProviderUI.class);
             Feedback f = (Feedback) c.newInstance();
             return f;
         } catch (ClassNotFoundException ex) {
@@ -230,7 +231,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         final CreateKeyPanel createKeyPanel = newCreateKeyPanel();
         createKeyPanel.setExtraDataUI(extraDataUI);
 
-        final Window parent = PromptingKeyManager.getParentWindow();
+        final Window parent = Windows.getParentWindow();
         try {
             while (!Thread.interrupted()) { // test and clear status!
                 // Setting this inside the loop has the side effect of
@@ -307,7 +308,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         }
         openKeyPanels.put(provider, openKeyPanel);
 
-        final Window parent = PromptingKeyManager.getParentWindow();
+        final Window parent = Windows.getParentWindow();
         try {
             while (!Thread.interrupted()) { // test and clear status!
                 // Setting this inside the loop has the side effect of
@@ -411,8 +412,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
     private static void multiplexOnEDT(final Runnable task)
     throws UnknownKeyException {
         if (Thread.interrupted())
-            throw new UndeclaredThrowableException(
-                    new KeyPromptingInterruptedException());
+            throw new KeyPromptingInterruptedException();
 
         if (EventQueue.isDispatchThread()) {
             task.run();
@@ -436,7 +436,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
                     // the PromptingKeyProvider class.
                     throw new KeyPromptingInterruptedException(failure));
                 */} catch (InvocationTargetException ex) {
-                    throw new UndeclaredThrowableException(ex);
+                    throw new UnknownKeyException(ex);
                 } finally {
                     Thread.interrupted();
                 }

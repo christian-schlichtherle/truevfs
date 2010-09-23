@@ -19,13 +19,15 @@ package de.schlichtherle.truezip.util;
 import java.lang.reflect.Array;
 
 /**
+ * Provides static utility methods for arrays.
+ * This class cannot get instantiated outside its package.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class Arrays {
+public class Arrays {
 
-    /** You cannot instantiate this class. */
-    private Arrays() {
+    Arrays() {
     }
 
     /**

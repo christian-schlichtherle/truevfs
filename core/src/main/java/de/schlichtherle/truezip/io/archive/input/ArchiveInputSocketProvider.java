@@ -17,24 +17,24 @@
 package de.schlichtherle.truezip.io.archive.input;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocketProvider;
-import de.schlichtherle.truezip.io.socket.InputStreamSocket;
-import de.schlichtherle.truezip.io.socket.InputStreamSocketProvider;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocketProvider;
 import java.io.IOException;
 
 /**
- * Provides {@link InputStreamSocket}s for read access to archive entries.
+ * Provides {@link InputSocket}s for read access to archive entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
  * @param   <AE> The type of the archive entries.
- * @see     ArchiveOutputStreamSocketProvider
+ * @see     ArchiveOutputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveInputStreamSocketProvider<AE extends ArchiveEntry>
-extends InputStreamSocketProvider<AE, ArchiveEntry> {
+public interface ArchiveInputSocketProvider<AE extends ArchiveEntry>
+extends InputSocketProvider<AE, ArchiveEntry> {
 
     /**
      * {@inheritDoc}
@@ -45,6 +45,6 @@ extends InputStreamSocketProvider<AE, ArchiveEntry> {
      * @param entry a non-{@code null} archive entry.
      */
     @Override
-    ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(AE entry)
+    ArchiveInputSocket<? extends AE> getInputSocket(AE entry)
     throws IOException;
 }

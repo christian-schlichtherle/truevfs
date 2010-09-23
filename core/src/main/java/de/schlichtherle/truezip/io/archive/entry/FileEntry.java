@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.entry;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;

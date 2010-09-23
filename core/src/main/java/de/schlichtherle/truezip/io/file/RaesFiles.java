@@ -28,6 +28,8 @@ import java.io.OutputStream;
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
  * file format for encryption and decryption.
+ * This class cannot get instantiated outside its package.
+ * <p>
  * Note that this class is not intended to access RAES encrypted ZIP files -
  * use the {@link File} class for this task instead.
  *
@@ -36,8 +38,7 @@ import java.io.OutputStream;
  */
 public class RaesFiles {
 
-    /** You cannot instantiate this class. */
-    protected RaesFiles() {
+    RaesFiles() {
     }
 
     /**

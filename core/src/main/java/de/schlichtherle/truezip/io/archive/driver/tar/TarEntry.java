@@ -30,8 +30,8 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
  * @version $Id$
  */
 public class TarEntry
-        extends org.apache.tools.tar.TarEntry
-        implements ArchiveEntry {
+extends     org.apache.tools.tar.TarEntry
+implements  ArchiveEntry {
 
     public TarEntry(final String entryName) {
         super(entryName, true);
@@ -81,5 +81,11 @@ public class TarEntry
     @Override
     public void setTime(long time) {
         super.setModTime(time);
+    }
+
+    /** Returns {@link #getName()}. */
+    @Override
+    public final String toString() {
+        return getName();
     }
 }

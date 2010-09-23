@@ -39,6 +39,6 @@ import java.io.Closeable;
  */
 public interface ArchiveOutput<AE extends ArchiveEntry>
 extends ArchiveEntryContainer<AE>,
-        ArchiveOutputStreamSocketProvider<AE>,
+        ArchiveOutputSocketProvider<AE>,
         Closeable {
 }

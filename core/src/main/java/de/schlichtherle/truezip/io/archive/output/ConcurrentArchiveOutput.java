@@ -71,16 +71,15 @@ extends FilterArchiveOutput<AE, AO> {
     }
 
     @Override
-    public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
-            final AE entry)
+    public ArchiveOutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         // TODO: Consider synchronization!
-        final ArchiveOutputStreamSocket<? extends AE> output
-                = target.getOutputStreamSocket(entry);
-        class OutputStreamSocket implements ArchiveOutputStreamSocket<AE> {
+        final ArchiveOutputSocket<? extends AE> output
+                = target.getOutputSocket(entry);
+        class OutputSocket extends ArchiveOutputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;
@@ -94,7 +93,7 @@ extends FilterArchiveOutput<AE, AO> {
                 }
             }
         }
-        return new OutputStreamSocket();
+        return new OutputSocket();
     }
 
     /**

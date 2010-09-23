@@ -16,19 +16,20 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.archive.socket.FileEntrySocketProvider;
 import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Operation;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
@@ -54,15 +57,15 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveControllers {
+public class ArchiveControllers {
 
     private static final String CLASS_NAME
             = ArchiveControllers.class.getName();
@@ -95,8 +98,7 @@ public final class ArchiveControllers {
         return controllers.size();
     }
 
-    /** You cannot instantiate this class. */
-    private ArchiveControllers() {
+    ArchiveControllers() {
     }
 
     public static ArchiveController get(URI mountPoint) {
@@ -357,7 +359,6 @@ public final class ArchiveControllers {
 
         private final Collection<Runnable> runnables = new HashSet<Runnable>();
 
-        /** You cannot instantiate this class. */
         private ShutdownHook() {
             // Force loading the key manager now in order to prevent class
             // loading when running the shutdown hook.
@@ -443,83 +444,14 @@ public final class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class IOStreamCreator implements Operation<Exception> {
-
-                InputStream in;
-                OutputStream out;
-
-                public void run() throws FalsePositiveException, IOException {
-                    // Update controllers.
-                    // This may invalidate the file system object, so it must be
-                    // done first in case srcController and dstController are the
-                    // same!
-                    class SrcControllerUpdater implements IOOperation {
-                        public void run() throws IOException {
-                            srcController.autoSync(srcPath);
-                            srcController.readLock().lock(); // downgrade to read lock upon return
-                        }
-                    } // class SrcControllerUpdater
-
-                    final ArchiveEntry srcEntry, dstEntry;
-                    final Link<?> link;
-                    srcController.runWriteLocked(new SrcControllerUpdater());
-                    try {
-                        dstController.autoSync(dstPath);
-
-                        // Get source archive entry.
-                        srcEntry = srcController.autoMount(false).getEntry(srcPath);
-
-                        // Get destination archive entry.
-                        link = dstController.autoMount(createParents)
-                                .mknod( dstPath, FILE,
-                                        preserve ? srcEntry : null,
-                                        createParents);
-                        dstEntry = link.getTarget();
-
-                        // Create input stream.
-                        in = srcController.getInputStreamSocket(srcEntry)
-                                .newInputStream(dstEntry);
-                    } finally {
-                        srcController.readLock().unlock();
-                    }
-
-                    try {
-                        // Create output stream.
-                        out = dstController.getOutputStreamSocket(dstEntry)
-                                .newOutputStream(srcEntry);
-                        try {
-                            // Now link the destination entry into the file system.
-                            link.run();
-                        } catch (IOException ex) {
-                            out.close();
-                            throw ex;
-                        }
-                    } catch (IOException ex) {
-                        try {
-                            in.close();
-                        } catch (IOException inFailure) {
-                            throw new InputException(inFailure);
-                        }
-                        throw ex;
-                    }
-                }
-            } // class IOStreamCreator
-
-            final IOStreamCreator streams = new IOStreamCreator();
-            synchronized (copyLock) {
-                try {
-                    dstController.runWriteLocked(streams);
-                } catch (FalsePositiveException ex) {
-                    throw ex;
-                } catch (IOException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new AssertionError(ex);
-                }
-            }
-
-            // Finally copy the entry data.
-            Streams.copy(streams.in, streams.out);
+            final BitField<IOOption> options = BitField.noneOf(IOOption.class)
+                    .set(PRESERVE, preserve)
+                    .set(CREATE_PARENTS, createParents);
+            final ArchiveInputSocket<?> input
+                    = srcController.getInputSocket(options, srcPath);
+            final ArchiveOutputSocket<?> output
+                    = dstController.getOutputSocket(options, dstPath, input);
+            IOSockets.copy(input, output);
         } catch (ArchiveEntryFalsePositiveException ex) {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
@@ -573,52 +505,16 @@ public final class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            class OStreamCreator implements Operation<Exception> {
-
-                OutputStream out; // = null;
-
-                public void run() throws FalsePositiveException, IOException {
-                    // Update controller.
-                    // This may invalidate the file system object, so it must be
-                    // done first in case srcController and dstController are the
-                    // same!
-                    dstController.autoSync(dstPath);
-
-                    // Get source archive entry reference.
-                    final ArchiveEntry srcEntry = new FileEntry(src);
-
-                    // Get destination archive entry reference.
-                    final ArchiveFileSystem dstFileSystem
-                            = dstController.autoMount(createParents);
-                    final Link<?> dstLink = dstFileSystem.mknod(
-                            dstPath, FILE,
-                            preserve ? srcEntry : null, createParents);
-
-                    // Create output stream.
-                    out = dstController
-                            .getOutputStreamSocket(dstLink.getTarget())
-                            .newOutputStream(srcEntry);
-
-                    // Now link the destination entry into the file system.
-                    dstLink.run();
-                }
-            }
-
-            // Create the output stream while the destination controller is
-            // write locked.
-            final OStreamCreator stream = new OStreamCreator();
-            try {
-                dstController.runWriteLocked(stream);
-            } catch (FalsePositiveException ex) {
-                throw ex;
-            } catch (IOException ex) {
-                throw ex;
-            } catch (Exception ex) {
-                throw new AssertionError(ex);
-            }
-            final OutputStream out = stream.out;
-
-            // Finally copy the entry data.
+            final ArchiveInputSocket<?> input = FileEntrySocketProvider.get()
+                    .getInputSocket(new FileEntry(src));
+            final OutputStream out = dstController
+                            .getOutputSocket(
+                                BitField.noneOf(IOOption.class)
+                                    .set(PRESERVE, preserve)
+                                    .set(CREATE_PARENTS, createParents),
+                                dstPath,
+                                input)
+                            .newOutputStream(input.getTarget());
             try {
                 Streams.cat(in, out);
             } finally {
@@ -638,19 +534,4 @@ public final class ArchiveControllers {
                     enclController, enclPath);
         }
     }
-
-    /**
-     * A lock used when copying data from one archive to another.
-     * This lock must be acquired before any other locks on the controllers
-     * are acquired in order to prevent dead locks.
-     */
-    private static class CopyLock {
-    }
-
-    /**
-     * A lock used when copying data from one archive file to another.
-     * This lock must be acquired before any other locks on the controllers
-     * are acquired in order to prevent dead locks.
-     */
-    private static final CopyLock copyLock = new CopyLock();
 }

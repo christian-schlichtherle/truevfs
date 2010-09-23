@@ -33,19 +33,16 @@ public class AesRemoteControl extends RemoteControl {
     @Override
     protected void createResourceHook(final JDialogOperator dialog) {
         final JComboBoxOperator keyStrength = new JComboBoxOperator(dialog);
-        assertEquals(
-                AesKeyProvider.KEY_STRENGTH_256,
-                keyStrength.getSelectedIndex());
-        // FIXME: Doesn't work with JSE 5!
+        assertEquals(   AesKeyProvider.KEY_STRENGTH_256,
+                        keyStrength.getSelectedIndex());
         keyStrength.selectItem(AesKeyProvider.KEY_STRENGTH_128);
     }
 
     @Override
     protected void overwriteResourceHook(final JDialogOperator dialog) {
         final JComboBoxOperator keyStrength = new JComboBoxOperator(dialog);
-        assertEquals(
-                AesKeyProvider.KEY_STRENGTH_128,
-                keyStrength.getSelectedIndex());
+        assertEquals(   AesKeyProvider.KEY_STRENGTH_128,
+                        keyStrength.getSelectedIndex());
         keyStrength.selectItem(AesKeyProvider.KEY_STRENGTH_192);
     }
 }

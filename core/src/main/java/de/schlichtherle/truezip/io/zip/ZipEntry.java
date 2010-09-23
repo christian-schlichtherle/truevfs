@@ -597,9 +597,9 @@ public class ZipEntry implements Cloneable {
         this.comment = comment;
     }
 
-    /** Returns the ZIP entry name. */
+    /** Returns {@link #getName()}. */
     @Override
-    public String toString() {
+    public final String toString() {
         return getName();
     }
 }

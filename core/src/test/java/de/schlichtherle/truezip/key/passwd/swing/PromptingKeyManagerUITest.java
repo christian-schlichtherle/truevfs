@@ -16,89 +16,51 @@
 
 package de.schlichtherle.truezip.key.passwd.swing;
 
-import java.awt.Window;
+import java.awt.EventQueue;
 import java.net.URI;
 import java.util.Random;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import junit.framework.Test;
+import javax.swing.JOptionPane;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JDialogOperator;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PromptingKeyManagerTest extends TestCase {
+public class PromptingKeyManagerUITest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
 
-    public static Test suite() throws Exception {
         // Who says you can't have fun with automated GUI testing? :-)
-        {
-            String feedback;
-            feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidOpenKeyFeedback";
-            System.setProperty(feedback,
-                    System.getProperty(feedback,
-                        "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
+        String feedback;
+        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidOpenKeyFeedback";
+        System.setProperty(feedback,
+                System.getProperty(feedback,
+                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
 
-            feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidCreateKeyFeedback";
-            System.setProperty(feedback,
-                    System.getProperty(feedback,
-                        "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
-        }
-
-        // FIXME: Fix Jemmy test to work with JRE 5+.
-        //TestSuite suite = new TestSuite(PromptingKeyManagerTest.class);
-        TestSuite suite = new TestSuite();
-        suite.addTest(new PromptingKeyManagerTest("testParentWindow"));
-
-        return suite;
+        feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidCreateKeyFeedback";
+        System.setProperty(feedback,
+                System.getProperty(feedback,
+                    "de.schlichtherle.truezip.key.passwd.swing.HurlingWindowFeedback"));
     }
 
-    public PromptingKeyManagerTest(String testName) {
+    public PromptingKeyManagerUITest(String testName) {
         super(testName);
     }
 
     @Override
-    protected void setUp() throws Exception {
-        JemmyProperties.setCurrentDispatchingModel(JemmyProperties.getDefaultDispatchingModel());
+    protected void setUp() {
+        PromptingKeyManager.setInstance(null);
+        PromptingKeyManager.setPrompting(true);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        PromptingKeyManager.resetAndRemoveKeyProviders();
-    }
-
-    /**
-     * Test of getParentWindow method, of class de.schlichtherle.key.passwd.swing.PromptingKeyManager.
-     */
-    public void testParentWindow() {
-        Window result = PromptingKeyManager.getParentWindow();
-        assertNotNull(result);
-        assertFalse(result.isVisible());
-
-        final JFrame frame = new JFrame();
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        final JDialog dialog = new JDialog(frame);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-
-        assertFalse(dialog.isVisible());
-        result = PromptingKeyManager.getParentWindow();
-        assertSame(frame, result);
-
-        dialog.setVisible(true);
-        result = PromptingKeyManager.getParentWindow();
-        assertSame(frame, result); // dialog is not a frame!
-
-        dialog.dispose();
-        frame.dispose();
+    protected void tearDown() {
+        PromptingKeyManager.setInstance(null);
+        PromptingKeyManager.setPrompting(true);
     }
 
     /**
@@ -106,16 +68,18 @@ public class PromptingKeyManagerTest extends TestCase {
      * user for the keys during the typical life cycle of a protected resource
      * and its associated key.
      * Ensure that only one window is showing at any time.
-     * <p>
-     * This test works with Jemmy's Robot dispatching model only.
-     * So beware not to touch the GUI windows concurrently.
      */
     public void testMultithreadedKeyMgmtLifeCycle() {
-        // This test only works with the Robot Dispatching Model.
-        JemmyProperties.setCurrentDispatchingModel(JemmyProperties.ROBOT_MODEL_MASK);
-        //JemmyProperties.setCurrentTimeout("WindowWaiter.WaitWindowTimeout", 180000);
+        // TODO: This is a workaround: Without it, the very first key dialog
+        // would get closed on any input by its remote control.
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                JOptionPane.showMessageDialog(null, "Hello World!");
+            }
+        });
+        new JButtonOperator(new JDialogOperator()).push();
 
-        testMultithreadedKeyMgmtLifeCycle(10);
+        testMultithreadedKeyMgmtLifeCycle(4);
     }
 
     private void testMultithreadedKeyMgmtLifeCycle(final int nThreads) {

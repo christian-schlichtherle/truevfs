@@ -62,16 +62,16 @@ public class RemoteControl extends Assert implements Runnable {
 
     public void run() {
         try {
-            runIt();
+            runChecked();
         } catch (Throwable t) {
             throwable = t;
         }
     }
 
     @SuppressWarnings("deprecation")
-    private void runIt() {
+    private void runChecked() {
         JDialogOperator dialog;
-        JPasswordFieldOperator passwd1,  passwd2;
+        JPasswordFieldOperator passwd1, passwd2;
         String passwd;
         JCheckBoxOperator newPasswd;
 
@@ -217,14 +217,7 @@ public class RemoteControl extends Assert implements Runnable {
      */
     private JDialogOperator waitDialog() {
         // Wait for dialog (index position 0).
-        // Doing this twice seems to help with some timing issues in Jemmy.
-        new QueueTool().waitEmpty(); // waitEmpty(100) doesn't always work
         JDialogOperator dialog = new JDialogOperator(new ByResourceIDFinder());
-        new QueueTool().waitEmpty(); // waitEmpty(100) doesn't always work
-        /*try {
-            Thread.sleep(100);
-        } catch (InterruptedException ignored) {
-        }*/
 
         // Ensure that no other dialog is showing, i.e. that there is no
         // dialog at index position 1.

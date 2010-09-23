@@ -1281,6 +1281,10 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         // Define thread class to enumerate and read all entries.
         class CheckAllEntriesThread extends Thread {
             Throwable failure;
+
+            CheckAllEntriesThread() {
+                setDaemon(true);
+            }
             
             @Override
             public void run() {
@@ -1371,6 +1375,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
             Throwable failure;
             
             WritingThread(int i) {
+                setDaemon(true);
                 this.i = i;
             }
             
@@ -1445,7 +1450,11 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         
         class WritingThread extends Thread {
             Throwable failure;
-            
+
+            WritingThread() {
+                setDaemon(true);
+            }
+
             @Override
             public void run() {
                 try {

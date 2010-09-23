@@ -22,7 +22,6 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     public static final LiveArchiveStatistics SINGLETON
             = new LiveArchiveStatistics();
 
-    /** You cannot instantiate this class. */
     private LiveArchiveStatistics() {
     }
 

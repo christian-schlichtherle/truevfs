@@ -34,11 +34,15 @@ import java.util.concurrent.ThreadFactory;
 /**
  * Provides static utility methods for {@link InputStream}s and
  * {@link OutputStream}s.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Streams {
+
+    Streams() {
+    }
 
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new InputStreamReaderThreadFactory());
@@ -47,13 +51,9 @@ public class Streams {
     implements ThreadFactory {
         public Thread newThread(Runnable r) {
             final Thread t = new Thread(r, "TrueZIP InputStream Reader");
-            //t.setDaemon(true);
+            t.setDaemon(true);
             return t;
         }
-    }
-
-    /** You cannot instantiate this class. */
-    Streams() {
     }
 
     /**

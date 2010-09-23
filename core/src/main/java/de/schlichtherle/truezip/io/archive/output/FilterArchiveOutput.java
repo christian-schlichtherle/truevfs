@@ -38,26 +38,18 @@ public class FilterArchiveOutput<
 extends FilterArchiveEntryContainer<AE, AO>
 implements ArchiveOutput<AE> {
 
-    protected AO target;
-
     public FilterArchiveOutput(final AO target) {
-        this.target = target;
+        super(target);
     }
 
     @Override
-    protected AO getTarget() {
-        return target;
-    }
-
-    @Override
-    public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
-            final AE entry)
+    public ArchiveOutputSocket<? extends AE> getOutputSocket(AE entry)
     throws IOException {
-        return getTarget().getOutputStreamSocket(entry);
+        return target.getOutputSocket(entry);
     }
 
     @Override
     public void close() throws IOException {
-        getTarget().close();
+        target.close();
     }
 }

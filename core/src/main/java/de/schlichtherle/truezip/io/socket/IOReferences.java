@@ -18,13 +18,13 @@ package de.schlichtherle.truezip.io.socket;
 
 /**
  * Provides static utility methods for dealing with I/O references.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class IOReferences {
 
-    /** You cannot instantiate this class. */
     IOReferences() {
     }
 

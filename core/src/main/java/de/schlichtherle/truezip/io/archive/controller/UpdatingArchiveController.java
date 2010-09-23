@@ -17,14 +17,14 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.input.ConcurrentArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
 import java.net.URI;
-import de.schlichtherle.truezip.io.socket.IOOperations;
+import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -35,7 +35,7 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -101,8 +101,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             super(target);
         }
 
-        @Override
-        protected AI getTarget() {
+        AI getTarget() {
             return target;
         }
     }
@@ -121,8 +120,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             super(target);
         }
 
-        @Override
-        protected AO getTarget() {
+        AO getTarget() {
             return target;
         }
     }
@@ -440,8 +438,12 @@ extends FileSystemArchiveController<AE, AI, AO> {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                Streams.copy(   controller.newInputStream0(path),
-                                new java.io.FileOutputStream(tmp));
+                // TODO: Use sockets!
+                Streams.copy(
+                        controller
+                            .getInputSocket(BitField.noneOf(IOOption.class), path)
+                            .newInputStream(null),
+                        new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
                 try {
@@ -551,33 +553,25 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert input != null;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * As an amendment to its interface contract, this method returns
+     * {@code null} if no archive input is present.
+     */
     @Override
-    public ArchiveInputStreamSocket<?> getInputStreamSocket(final ArchiveEntry target)
+    public ArchiveInputSocket<? extends AE> getInputSocket(final AE target)
     throws IOException {
-        assert target != null;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
-        assert !hasNewData(target.getName());
-        assert target.getType() != DIRECTORY;
-
-        final ArchiveInputStreamSocket<? extends AE> in = input
-                .getInputStreamSocket((AE) target); // FIXME - this is cheating!
-        assert in != null : "Bad archive driver returned illegal null value for archive entry \"" + target.getName() + '"';
-        return in;
+        return null == input ? null : input.getInputSocket(target);
     }
 
     @Override
-    public ArchiveOutputStreamSocket<?> getOutputStreamSocket(final ArchiveEntry target)
+    public ArchiveOutputSocket<? extends AE> getOutputSocket(final AE target)
     throws IOException {
-        assert target != null;
         assert writeLock().isHeldByCurrentThread();
-        assert !hasNewData(target.getName());
-        assert target.getType() != DIRECTORY;
-
         ensureOutArchive();
-        final ArchiveOutputStreamSocket out = output
-                .getOutputStreamSocket((AE) target); // FIXME - this is cheating!
-        assert out != null : "Bad archive driver returned illegal null value for archive entry: \"" + target.getName() + '"';
-        return out;
+        return output.getOutputSocket(target);
     }
 
     private void ensureOutArchive()
@@ -938,11 +932,11 @@ extends FileSystemArchiveController<AE, AI, AO> {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    out.getOutputStreamSocket(e).newOutputStream(null).close();
+                    out.getOutputSocket(e).newOutputStream(null).close();
                 } else if (in != null && in.getEntry(n) != null) {
                     assert e == in.getEntry(n);
-                    IOOperations.copy(  in.getInputStreamSocket(e),
-                                        out.getOutputStreamSocket(e));
+                    IOSockets.copy(  in.getInputSocket(e),
+                                        out.getOutputSocket(e));
                 } else {
                     // The file system entry is an archive file which has been
                     // newly created and not yet been reassembled
@@ -950,7 +944,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    out.getOutputStreamSocket(e).newOutputStream(null).close();
+                    out.getOutputSocket(e).newOutputStream(null).close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);

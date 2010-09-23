@@ -35,4 +35,8 @@ public class UnknownKeyException extends GeneralSecurityException {
     protected UnknownKeyException(String msg) {
         super(msg);
     }
+
+    public UnknownKeyException(Throwable cause) {
+        super(cause);
+    }
 }

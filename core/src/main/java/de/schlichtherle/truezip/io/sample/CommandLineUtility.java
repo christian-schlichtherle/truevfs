@@ -110,7 +110,7 @@ abstract class CommandLineUtility {
     public final int run(final String[] args) {
         try {
             try {
-                return runWithException(args) ? 0 : 1;
+                return runChecked(args) ? 0 : 1;
             } finally {
                 try {
                     File.umount();
@@ -139,7 +139,7 @@ abstract class CommandLineUtility {
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
-    public abstract boolean runWithException(String[] args)
+    public abstract boolean runChecked(String[] args)
     throws IllegalUsageException, IOException;
 
     protected static abstract class IllegalUsageException extends IllegalArgumentException {
@@ -156,9 +156,9 @@ abstract class CommandLineUtility {
         private final ArchiveStatistics liveStats = File.getLiveArchiveStatistics();
 
         ProgressMonitor(final PrintStream err) {
-            this.err = err;
-            setPriority(Thread.MAX_PRIORITY);
             setDaemon(true);
+            setPriority(Thread.MAX_PRIORITY);
+            this.err = err;
         }
 
         @Override

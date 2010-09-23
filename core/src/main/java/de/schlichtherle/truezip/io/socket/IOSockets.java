@@ -24,44 +24,35 @@ import java.io.OutputStream;
 
 /**
  * Provides static utility methods for dealing with I/O operations.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class IOOperations {
+public class IOSockets {
 
-    /** You cannot instantiate this class. */
-    IOOperations() {
+    IOSockets() {
     }
 
-    /**
-     * @deprecated This method is clearly experimental!
-     */
+    /** @deprecated Currently unused and may get deleted. */
     public static <T, IT extends T, OT extends T> void copy(
-            final InputStreamSocketProvider<IT, T> input,
+            final InputSocketProvider<IT, T> input,
             final IT source,
-            final OutputStreamSocketProvider<OT, T> output,
+            final OutputSocketProvider<OT, T> output,
             final OT destination)
     throws IOException {
-        final InputStreamSocket<? extends IT, ? super T> iss;
-        try {
-            iss = input.getInputStreamSocket(source);
-        } catch (IOException ex) {
-            throw new InputException(ex);
-        }
-        final OutputStreamSocket<? extends OT, ? super T> oss;
-        oss = output.getOutputStreamSocket(destination);
-        copy((InputStreamSocket) iss, (OutputStreamSocket) oss); // FIXME: this cast tricks javac 1.6.0_21 - not required for javac 1.7.0 b106
+        copy(input .getInputSocket (source     ),
+             output.getOutputSocket(destination));
     }
 
     /**
-     * Copies an input stream {@link InputStreamSocket#newInputStream created}
-     * by the input stream socket {@code input} to an output stream
-     * {@link OutputStreamSocket#newOutputStream created} by the output stream
-     * socket {@code output}.
+     * Copies an input stream {@link InputSocket#newInputStream created}
+     * by the input socket {@code input} to an output stream
+     * {@link OutputSocket#newOutputStream created} by the output socket
+     * {@code output}.
      *
-     * @param  input a non-{@code null} stream socket for the input target.
-     * @param  output a non-{@code null} stream socket for the output target.
+     * @param  input a non-{@code null} input socket for the input target.
+     * @param  output a non-{@code null} output socket for the output target.
      * @throws InputException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
@@ -69,27 +60,27 @@ public class IOOperations {
      * @throws NullPointerException if any parameter is {@code null}.
      */
     public static <T> void copy(
-            final InputStreamSocket<? extends T, ? super T> input,
-            final OutputStreamSocket<? extends T, ? super T> output)
+            final InputSocket<? extends T, ? super T> input,
+            final OutputSocket<? extends T, ? super T> output)
     throws IOException {
-        final InputStream is;
+        final InputStream in;
         try {
-            is = input.newInputStream(output.getTarget());
+            in = input.newInputStream(output.getTarget());
         } catch (IOException ex) {
             throw new InputException(ex);
         }
-        OutputStream os = null;
+        OutputStream out = null;
         try {
-            os = output.newOutputStream(input.getTarget());
+            out = output.newOutputStream(input.getTarget());
         } finally {
-            if (os == null) { // exception?
+            if (out == null) { // exception?
                 try {
-                    is.close();
+                    in.close();
                 } catch (IOException ex) {
                     throw new InputException(ex);
                 }
             }
         }
-        Streams.copy(is, os);
+        Streams.copy(in, out);
     }
 }

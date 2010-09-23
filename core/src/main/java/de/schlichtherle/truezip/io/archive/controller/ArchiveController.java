@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * Provides multi-threaded read/write access to its <i>target archive file</i>
@@ -60,7 +62,46 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveController extends ArchiveDescriptor {
+public abstract class ArchiveController extends ArchiveDescriptor {
+
+    /** This class cannot get instantiated outside its package. */
+    ArchiveController() {}
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Where the methods of this class accept a path name string as a
+     * parameter, this must be a relative, hierarchical URI which is resolved
+     * against this mount point.
+     */
+    @Override
+    public abstract URI getMountPoint();
+
+    /**
+     * Returns the controller for the enclosing archive file of this
+     * controller's target archive file or {@code null} if it's not enclosed
+     * in another archive file.
+     */
+    public abstract ArchiveController getEnclController();
+
+    /**
+     * Resolves the given relative {@code path} against the relative path of
+     * the target archive file within its enclosing archive file.
+     *
+     * @throws NullPointerException if the target archive file is not enclosed
+     *         within another archive file.
+     */
+    public String getEnclPath(final String path) {
+        final URI enclPath = getEnclController()
+                .getMountPoint()
+                .relativize(getMountPoint());
+        final String result = isRoot(path)
+                ? cutTrailingSeparators(enclPath.toString(), SEPARATOR_CHAR)
+                : enclPath.resolve(path).toString();
+        assert result.endsWith(path);
+        assert !result.endsWith(SEPARATOR);
+        return result;
+    }
 
     /**
      * Synchronizes the archive file only if the archive file has already new
@@ -80,95 +121,45 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    void autoSync(final String path) throws ArchiveSyncException;
+    public abstract void autoSync(final String path) throws ArchiveSyncException;
 
-    boolean createNewFile(final String path, final boolean createParents) throws FalsePositiveException, IOException;
+    public abstract boolean createNewFile(final String path, final boolean createParents) throws FalsePositiveException, IOException;
 
-    boolean delete(final String path) throws FalsePositiveException;
+    public abstract boolean delete(final String path) throws FalsePositiveException;
 
-    Icon getClosedIcon(final String path) throws FalsePositiveException;
+    public abstract Icon getClosedIcon(final String path) throws FalsePositiveException;
 
-    /**
-     * Returns the controller for the enclosing archive file of this
-     * controller's target archive file or {@code null} if it's not enclosed
-     * in another archive file.
-     */
-    ArchiveController getEnclController();
+    public abstract long getLastModified(final String path) throws FalsePositiveException;
 
-    /**
-     * Resolves the given relative {@code path} against the relative path of
-     * the target archive file within its enclosing archive file.
-     *
-     * @throws NullPointerException if the target archive file is not enclosed
-     *         within another archive file.
-     */
-    String getEnclPath(final String path);
+    public abstract long getLength(final String path) throws FalsePositiveException;
 
-    long getLastModified(final String path) throws FalsePositiveException;
+    public abstract Icon getOpenIcon(final String path) throws FalsePositiveException;
 
-    long getLength(final String path) throws FalsePositiveException;
+    public abstract boolean isDirectory(final String path) throws FalsePositiveException;
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Where the methods of this interface accept a path name string as a
-     * parameter, this must be a relative, hierarchical URI which is resolved
-     * against this mount point.
-     */
-    URI getMountPoint();
+    public abstract boolean isExisting(final String path) throws FalsePositiveException;
 
-    Icon getOpenIcon(final String path) throws FalsePositiveException;
+    public abstract boolean isFile(final String path) throws FalsePositiveException;
 
-    boolean isDirectory(final String path) throws FalsePositiveException;
-
-    boolean isExisting(final String path) throws FalsePositiveException;
-
-    boolean isFile(final String path) throws FalsePositiveException;
-
-    boolean isReadable(final String path) throws FalsePositiveException;
+    public abstract boolean isReadable(final String path) throws FalsePositiveException;
 
     /**
      * Returns {@code true} if and only if the file system has been touched,
      * i.e. if an operation changed its state.
      */
-    boolean isTouched();
+    public abstract boolean isTouched();
 
-    boolean isWritable(final String path) throws FalsePositiveException;
+    public abstract boolean isWritable(final String path) throws FalsePositiveException;
 
-    Set<String> list(final String path) throws FalsePositiveException;
+    public abstract Set<String> list(final String path) throws FalsePositiveException;
 
-    boolean mkdir(final String path, final boolean createParents) throws FalsePositiveException;
+    public abstract boolean mkdir(final String path, final boolean createParents) throws FalsePositiveException;
 
-    /**
-     * A factory method returning an input stream which is positioned
-     * at the beginning of the given entry in the target archive file.
-     *
-     * @param path An entry in the virtual archive file system
-     *        - {@code null} or {@code ""} is not permitted.
-     * @return A valid {@code InputStream} object
-     *         - {@code null} is never returned.
-     */
-    InputStream newInputStream(final String path) throws FalsePositiveException, IOException;
+    public abstract ReentrantLock readLock();
 
-    // TODO: Remove this!
-    InputStream newInputStream0(final String path) throws FalsePositiveException, IOException;
+    public abstract boolean setLastModified(final String path, final long time) throws FalsePositiveException;
 
-    /**
-     * A factory method returning an {@code OutputStream} allowing to
-     * (re)write the given entry in the target archive file.
-     *
-     * @param path An entry in the virtual archive file system
-     *        - {@code null} or {@code ""} is not permitted.
-     * @return A valid {@code OutputStream} object
-     *         - {@code null} is never returned.
-     */
-    OutputStream newOutputStream(final String path, final boolean append, final boolean createParents) throws FalsePositiveException, IOException;
-
-    ReentrantLock readLock();
-
-    boolean setLastModified(final String path, final long time) throws FalsePositiveException;
-
-    void setReadOnly(final String path) throws FalsePositiveException, IOException;
+    public abstract void setReadOnly(final String path) throws FalsePositiveException, IOException;
 
     /**
      * Defines the available options for archive synchronization operations, i.e.
@@ -272,13 +263,10 @@ public interface ArchiveController extends ArchiveDescriptor {
      * throughout the processing of the target archive file.
      * @see ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)
      */
-    void sync(BitField<SyncOption> options, ArchiveSyncExceptionBuilder builder)
+    public abstract void sync(BitField<SyncOption> options, ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException;
 
-    @Override
-    String toString();
-
-    ReentrantLock writeLock();
+    public abstract ReentrantLock writeLock();
 
     /**
      * Runs the given {@link Operation} while this controller has
@@ -294,10 +282,11 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @param operation The {@link Operation} to run while the write lock is
      *        acquired.
      */
-    <E extends Exception> void runWriteLocked(Operation<E> operation)
+    public abstract <E extends Exception>
+    void runWriteLocked(Operation<E> operation)
     throws E;
 
-    ArchiveFileSystem autoMount(boolean autoCreate)
+    public abstract ArchiveFileSystem autoMount(boolean autoCreate)
     throws FalsePositiveException, IOException;
 
     /**
@@ -308,27 +297,70 @@ public interface ArchiveController extends ArchiveDescriptor {
      * Note that for directories this method will always return
      * {@code false}!
      */
-    boolean hasNewData(String path);
+    public abstract boolean hasNewData(String path);
 
     /**
-     * <b>Important:</b>
-     * <ul>
-     * <li>This controller's read <em>or</em> write lock must be acquired.
-     * <li>{@code entry} must not have received
-     *     {@link #hasNewData new data}.
-     * <ul>
+     * Defines the available options for archive file system operations.
+     * Not all available options may be applicable for all operations and
+     * certain combinations may be useless or even illegal.
+     * It's up to the particular operation to define which available options
+     * are applicable for it and which combinations are supported.
      */
-    ArchiveInputStreamSocket<?> getInputStreamSocket(ArchiveEntry target)
-    throws IOException;
+    public enum IOOption {
+
+        /**
+         * Whether or not any missing parent directory entries within an archive
+         * file shall get created automatically.
+         * If set, client applications do not need to call {@link #mkdir}
+         * to create the parent directory entries of a file entry within an
+         * archive file before they can write to it.
+         */
+        CREATE_PARENTS,
+        /**
+         * Whether or not an operation is recursive.
+         * This option affects only files and directories <em>below</em> the
+         * operated node in the file system tree.
+         */
+        //RECURSIVE,
+        /**
+         * Whether or not a copy operation shall preserve as much attributes
+         * of a file or directory entry within an archive file as possible.
+         */
+        PRESERVE,
+        /**
+         * Whether or not a write operation shall append to or replace the contents
+         * of a file entry within an archive file.
+         */
+        APPEND,
+    }
 
     /**
-     * <b>Important:</b>
-     * <ul>
-     * <li>This controller's <em>write</em> lock must be acquired.
-     * <li>{@code entry} must not have received
-     *     {@link #hasNewData new data}.
-     * <ul>
+     * Returns an input socket for reading the given entry from the
+     * target archive file.
+     *
+     * @param  path a non-{@code null} entry in the virtual archive file
+     *         system.
+     * @return A non-{@code null} {@code ArchiveInputSocket}.
      */
-    abstract ArchiveOutputStreamSocket<?> getOutputStreamSocket(ArchiveEntry target)
-    throws IOException;
+    public abstract ArchiveInputSocket<?>
+    getInputSocket(
+            BitField<IOOption> options, // currently unused
+            String path)
+    throws FalsePositiveException, IOException;
+
+    /**
+     * Returns an output socket for writing the given entry to the
+     * target archive file.
+     *
+     * @param  path a non-{@code null} entry in the virtual archive file
+     *         system.
+     * @param  input a nullable archive input socket.
+     * @return A non-{@code null} {@code ArchiveInputSocket}.
+     */
+    public abstract ArchiveOutputSocket<?>
+    getOutputSocket(
+            BitField<IOOption> options,
+            String path,
+            ArchiveInputSocket<?> input)
+    throws FalsePositiveException, IOException;
 }
