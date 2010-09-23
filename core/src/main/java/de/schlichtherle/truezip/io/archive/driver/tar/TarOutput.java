@@ -98,9 +98,9 @@ implements ArchiveOutput<TarEntry> {
                 return entry;
             }
 
-            public OutputStream newOutputStream(final ArchiveEntry src)
+            public OutputStream newOutputStream()
             throws IOException {
-                return TarOutput.this.newOutputStream(entry, src);
+                return TarOutput.this.newOutputStream(entry, getPeerTarget());
             }
         }
         return new OutputSocket();

@@ -86,10 +86,11 @@ extends FilterArchiveOutput<AE, AO> {
             }
 
             @Override
-            public OutputStream newOutputStream(final ArchiveEntry input)
+            public OutputStream newOutputStream()
             throws IOException {
                 synchronized (ConcurrentArchiveOutput.this) {
-                    return new EntryOutputStream(output.newOutputStream(input));
+                    return new EntryOutputStream(
+                            output.chain(this).newOutputStream());
                 }
             }
         }

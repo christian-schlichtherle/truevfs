@@ -80,6 +80,6 @@ extends OutputSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    public abstract OutputStream newOutputStream(ArchiveEntry peer)
+    public abstract OutputStream newOutputStream()
     throws IOException;
 }

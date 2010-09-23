@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
-import de.schlichtherle.truezip.util.Operation;
 import java.io.IOException;
 import java.net.URI;
 
@@ -62,7 +62,7 @@ extends BasicArchiveController<AE, AI, AO> {
     public final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
             final boolean createParents)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return autoMounter.autoMount(autoCreate, createParents);
     }
@@ -81,8 +81,10 @@ extends BasicArchiveController<AE, AI, AO> {
      */
     private abstract class AutoMounter {
 
-        abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-                throws FalsePositiveException, IOException;
+        abstract ArchiveFileSystem<AE> autoMount(
+                boolean autoCreate,
+                boolean createParents)
+        throws IOException;
 
         ArchiveFileSystem<AE> getFileSystem() {
             return null;
@@ -94,11 +96,11 @@ extends BasicArchiveController<AE, AI, AO> {
     private class ResetFileSystem extends AutoMounter {
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
-        throws FalsePositiveException, IOException {
+        throws IOException {
             try {
-                class Mounter implements Operation<Exception> {
+                class Mounter implements IOOperation {
                     @Override
-                    public void run() throws FalsePositiveException, IOException {
+                    public void run() throws IOException {
                         // Check state again: Another thread may have changed
                         // it while we released all read locks in order to
                         // acquire the write lock!
@@ -111,7 +113,6 @@ extends BasicArchiveController<AE, AI, AO> {
                         }
                     }
                 } // class Mounter
-
                 runWriteLocked(new Mounter());
             } catch (FalsePositiveException ex) {
                 // Catch and cache exceptions for uncacheable false positives.
@@ -221,7 +222,7 @@ extends BasicArchiveController<AE, AI, AO> {
      *         or the target file of any enclosing archive file's controller.
      */
     abstract void mount(boolean autoCreate, boolean createParents)
-    throws FalsePositiveException, IOException;
+    throws IOException;
 
     @Override
     void reset(final ArchiveSyncExceptionHandler handler)

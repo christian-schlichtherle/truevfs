@@ -168,9 +168,9 @@ public class FileOutputStream extends FilterOutputStream {
                                 BitField.noneOf(IOOption.class)
                                     .set(APPEND, append)
                                     .set(CREATE_PARENTS, File.isLenient()),
-                                path,
-                                null)
-                            .newOutputStream(null);
+                                path)
+                            .connect(null)
+                            .newOutputStream();
                 }
             }
         } catch (FalsePositiveException isNotArchive) {

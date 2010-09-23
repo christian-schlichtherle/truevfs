@@ -129,7 +129,8 @@ public class FileInputStream extends FilterInputStream {
                             .getArchiveController()
                             .getInputSocket(
                                 BitField.noneOf(IOOption.class), path)
-                            .newInputStream(null);
+                            .connect(null)
+                            .newInputStream();
                 }
             }
         } catch (FalsePositiveException isNotArchive) {

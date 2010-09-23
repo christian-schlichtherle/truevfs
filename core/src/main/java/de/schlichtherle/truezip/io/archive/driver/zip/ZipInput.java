@@ -64,9 +64,9 @@ implements ArchiveInput<ZipEntry> {
             }
 
             @Override
-            public InputStream newInputStream(final ArchiveEntry dst)
+            public InputStream newInputStream()
             throws IOException {
-                return ZipInput.this.newInputStream(entry, dst);
+                return ZipInput.this.newInputStream(entry, getPeerTarget());
             }
         }
         return new InputSocket();

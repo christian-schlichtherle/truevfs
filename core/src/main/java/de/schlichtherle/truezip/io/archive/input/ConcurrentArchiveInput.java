@@ -86,10 +86,11 @@ extends FilterArchiveInput<AE, AI> {
             }
 
             @Override
-            public InputStream newInputStream(final ArchiveEntry dst)
+            public InputStream newInputStream()
             throws IOException {
                 synchronized (ConcurrentArchiveInput.this) {
-                    return new EntryInputStream(input.newInputStream(dst));
+                    return new EntryInputStream(
+                            input.chain(this).newInputStream());
                 }
             }
         }

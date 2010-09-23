@@ -131,9 +131,9 @@ implements ArchiveOutput<ZipEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream(final ArchiveEntry src)
+            public OutputStream newOutputStream()
             throws IOException {
-                return ZipOutput.this.newOutputStream(entry, src);
+                return ZipOutput.this.newOutputStream(entry, getPeerTarget());
             }
         }
         return new OutputSocket();
