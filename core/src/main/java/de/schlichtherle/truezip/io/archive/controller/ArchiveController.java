@@ -15,12 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +103,23 @@ public abstract class ArchiveController extends ArchiveDescriptor {
         assert !result.endsWith(SEPARATOR);
         return result;
     }
+
+    /**
+     * Runs the given {@link Operation} while this controller has
+     * acquired its write lock regardless of the state of its read lock.
+     * You must use this method if this controller may have acquired a
+     * read lock in order to prevent a dead lock.
+     * <p>
+     * <b>Warning:</b> This method temporarily releases the read lock
+     * before the write lock is acquired and the runnable is run!
+     * Hence, the runnable must retest the state of the controller
+     * before it proceeds with any write operations.
+     *
+     * @param  operation the operation to run while the write lock is acquired.
+     * @return {@code operation}
+     */
+    public abstract <O extends IOOperation> O runWriteLocked(O operation)
+    throws IOException;
 
     /**
      * Synchronizes the archive file only if the archive file has already new
@@ -268,24 +286,6 @@ public abstract class ArchiveController extends ArchiveDescriptor {
 
     public abstract ReentrantLock writeLock();
 
-    /**
-     * Runs the given {@link Operation} while this controller has
-     * acquired its write lock regardless of the state of its read lock.
-     * You must use this method if this controller may have acquired a
-     * read lock in order to prevent a dead lock.
-     * <p>
-     * <b>Warning:</b> This method temporarily releases the read lock
-     * before the write lock is acquired and the runnable is run!
-     * Hence, the runnable must retest the state of the controller
-     * before it proceeds with any write operations.
-     *
-     * @param operation The {@link Operation} to run while the write lock is
-     *        acquired.
-     */
-    public abstract <E extends Exception>
-    void runWriteLocked(Operation<E> operation)
-    throws E;
-
     public abstract ArchiveFileSystem autoMount(boolean autoCreate)
     throws FalsePositiveException, IOException;
 
@@ -343,9 +343,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code ArchiveInputSocket}.
      */
     public abstract ArchiveInputSocket<?>
-    getInputSocket(
-            BitField<IOOption> options, // currently unused
-            String path)
+    getInputSocket(BitField<IOOption> options, String path)
     throws FalsePositiveException, IOException;
 
     /**
@@ -358,9 +356,6 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code ArchiveInputSocket}.
      */
     public abstract ArchiveOutputSocket<?>
-    getOutputSocket(
-            BitField<IOOption> options,
-            String path,
-            ArchiveInputSocket<?> input)
+    getOutputSocket(BitField<IOOption> options, String path)
     throws FalsePositiveException, IOException;
 }

@@ -224,7 +224,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         assert writeLock().isHeldByCurrentThread();
         assert input == null;
         assert outFile == null;
@@ -259,7 +259,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void mount0(final boolean autoCreate, final boolean createParents)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         // We need to mount the virtual file system from the input file.
         // and so far we have not successfully opened the input file.
         if (isRfsEntryTarget()) {
@@ -345,7 +345,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             final String path,
             final boolean autoCreate,
             final boolean createParents)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         assert controller != null;
         //assert !controller.readLock().isLocked();
         //assert !controller.writeLock().isLocked();
@@ -364,6 +364,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             if (controller.hasNewData(path) || autoCreate) {
                 controller.readLock().unlock();
                 class Locker implements IOOperation {
+                    @Override
                     public void run() throws IOException {
                         // Update controller if the entry already has new data.
                         // This needs to be done first before we can access the
@@ -387,7 +388,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                         // too.
                         lock.lock(); // keep lock upon return
                     }
-                } // class Locker
+                }
                 controller.runWriteLocked(new Locker());
             }
             try {
@@ -415,7 +416,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             final String path,
             final boolean autoCreate,
             final boolean createParents)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         assert controller != null;
         assert controller.readLock().isHeldByCurrentThread() || controller.writeLock().isHeldByCurrentThread();
         assert path != null;
@@ -438,11 +439,12 @@ extends FileSystemArchiveController<AE, AI, AO> {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                // TODO: Use sockets!
+                // TODO: Use InputSocket.newReadOnlyFile()!
                 Streams.copy(
                         controller
                             .getInputSocket(BitField.noneOf(IOOption.class), path)
-                            .newInputStream(null),
+                            .connect(null)
+                            .newInputStream(),
                         new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
@@ -932,7 +934,10 @@ extends FileSystemArchiveController<AE, AI, AO> {
                         continue; // never write the virtual root directory
                     if (e.getTime() < 0)
                         continue; // never write ghost directories
-                    out.getOutputSocket(e).newOutputStream(null).close();
+                    out.getOutputSocket(e)
+                            .connect(null)
+                            .newOutputStream()
+                            .close();
                 } else if (in != null && in.getEntry(n) != null) {
                     assert e == in.getEntry(n);
                     IOSockets.copy(  in.getInputSocket(e),
@@ -944,7 +949,10 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    out.getOutputSocket(e).newOutputStream(null).close();
+                    out.getOutputSocket(e)
+                            .connect(null)
+                            .newOutputStream()
+                            .close();
                 }
             } catch (IOException ex) {
                 h.warn(ex);
@@ -1031,6 +1039,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert !isRoot(path);
 
         class Wrapper implements IOOperation {
+            @Override
             public void run() throws IOException {
                 wrapToWriteLockedController(controller, path);
             }
