@@ -83,7 +83,7 @@ public class PromptingKeyManagerUITest extends TestCase {
     }
 
     private void testMultithreadedKeyMgmtLifeCycle(final int nThreads) {
-        final URI RESOURCE_PREFIX = URI.create("Resource ID");
+        final URI RESOURCE_PREFIX = URI.create("resource/");
         final Random rnd = new Random();
 
         // Init required threads for each resource.
