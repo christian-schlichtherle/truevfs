@@ -21,6 +21,7 @@ import java.util.Enumeration;
 /**
  * Provides static utility methods for convenient class and resource loading
  * which is designed to work in both JEE and OSGi environments.
+ * This class cannot get instantiated outside its package.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use!
  * It's just a workaround which will exist until the introduction of a better,
@@ -30,10 +31,9 @@ import java.util.Enumeration;
  * @version $Id$
  */
 // TODO: Exchange this class for a more general solution, e.g. OSGi.
-public final class ClassLoaders {
+public class ClassLoaders {
 
-    /** You cannot instantiate this class. */
-    private ClassLoaders() {
+    ClassLoaders() {
     }
 
     /**
@@ -48,7 +48,7 @@ public final class ClassLoaders {
      * @throws ClassNotFoundException If loading the class failed for some
      *         reason.
      */
-    public static Class loadClass(String classToLoad, Class loadingClass)
+    public static Class<?> loadClass(String classToLoad, Class loadingClass)
     throws ClassNotFoundException {
         ClassLoader l1 = loadingClass.getClassLoader();
         if (l1 == null)

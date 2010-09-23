@@ -54,9 +54,9 @@ limitations under the License.
         </license>
     </licenses>
     <scm>
-        <connection>${scm-connection}</connection>
-        <developerConnection>${scm-developerConnection}</developerConnection>
-        <url>${scm-url}</url>
+        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7-release</connection>
+        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7-release</developerConnection>
+        <url>http://kenai.com/projects/truezip/sources/v7-release/show</url>
     </scm>
     <developers>
         <developer>
@@ -75,20 +75,7 @@ limitations under the License.
         <artifactId>oss-parent</artifactId>
         <version>5</version>
     </parent>
-
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans</groupId>
-            <artifactId>jemmy</artifactId>
-            <version>2.3.1.0</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
@@ -99,62 +86,76 @@ limitations under the License.
             <artifactId>bcprov-jdk15</artifactId>
             <version>1.45</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
+            <version>2.2.7.5</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
                 </includes>
-                <filtering>true</filtering>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>false</filtering>
                 <excludes>
                     <exclude>**/*.properties</exclude>
                 </excludes>
-                <filtering>false</filtering>
             </resource>
         </resources>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
+                <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
                 </includes>
-                <filtering>true</filtering>
             </testResource>
             <testResource>
                 <directory>src/test/resources</directory>
+                <filtering>false</filtering>
                 <excludes>
                     <exclude>**/*.properties</exclude>
                 </excludes>
-                <filtering>false</filtering>
             </testResource>
         </testResources>
         <plugins>
             <plugin>
                 <artifactId>maven-scm-plugin</artifactId>
+                <version>1.4</version>
                 <configuration>
                     <goals>clean source:jar javadoc:jar install</goals>
                     <goalsDirectory>core</goalsDirectory>
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <showDeprecation>true</showDeprecation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -167,9 +168,8 @@ limitations under the License.
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.6</version>
                 <configuration>
-                    <!-- <redirectTestOutputToFile>true</redirectTestOutputToFile> -->
-                    <!-- Skip the normal tests, we'll run them in the integration-test phase -->
                     <skipTests>true</skipTests>
                     <includes>
                         <include>**/*Test.java</include>
@@ -189,6 +189,7 @@ limitations under the License.
             </plugin>
             <plugin>
                 <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -199,9 +200,15 @@ limitations under the License.
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <releaseProfiles>release</releaseProfiles>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
     <reporting>
         <plugins>
             <plugin>
@@ -244,36 +251,24 @@ limitations under the License.
             </plugin>
         </plugins>
     </reporting>
-
     <profiles>
         <profile>
-            <id>kenai.com-release-scm-repository</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <scm-repository>v7-release</scm-repository>
-            </properties>
-        </profile>
-        <profile>
-            <id>googlecode.com-scm-repository</id>
-            <properties>
-                <scm-repository/>
-                <scm-connection>scm:hg:https://truezip.googlecode.com/hg/</scm-connection>
-                <scm-developerConnection>scm:hg:https://truezip.googlecode.com/hg/</scm-developerConnection>
-                <scm-url>http://code.google.com/p/truezip/source/browse/</scm-url>
-            </properties>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.7</version>
+                        <configuration>
+                            <nohelp>false</nohelp>
+                            <show>protected</show>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scm-repository>v7-sandbox</scm-repository>
-        <scm-connection>scm:hg:https://hg.kenai.com/hg/truezip~${scm-repository}</scm-connection>
-        <scm-developerConnection>scm:hg:ssh://hg.kenai.com/truezip~${scm-repository}</scm-developerConnection>
-        <scm-url>http://kenai.com/projects/truezip/sources/${scm-repository}/show</scm-url>
     </properties>
 </project>

@@ -17,26 +17,26 @@
 package de.schlichtherle.truezip.io.socket;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * Creates input streams for reading bytes from its local target.
- * 
+ * Creates output streams for writing bytes to its local target.
+ *
  * @param   <LT> The type of the <i>local target</i> for I/O operations,
  *          i.e. the {@link #getTarget() target} of this instance.
  * @param   <PT> The minimum required type of the <i>peer targets</i>.
- * @see     InputStreamSocketProvider
- * @see     OutputStreamSocket
+ * @see     OutputSocketProvider
+ * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
+public abstract class OutputSocket<LT, PT> implements IOReference<LT> {
 
     /**
      * Returns the non-{@code null} local target for I/O operations.
      * <p>
      * The result of changing the state of the returned object is undefined.
-     * In particular, a subsequent call to {@link #newInputStream(Object)}
+     * In particular, a subsequent call to {@link #newOutputStream(Object)}
      * may not reflect any changes or may even fail.
      * However, this term may be overridden by sub-interfaces or
      * implementations.
@@ -44,20 +44,26 @@ public interface InputStreamSocket<LT, PT> extends IOReference<LT> {
      * @return The non-{@code null} local target for I/O operations.
      */
     @Override
-    LT getTarget();
+    public abstract LT getTarget();
 
     /**
-     * Returns a new {@code InputStream} for reading bytes from the
+     * Returns a new output stream for writing bytes to the
      * {@link #getTarget() local target}.
      * <p>
-     * Implementations must support calling this method any number of times.
-     * Furthermore, the returned stream should <em>not</em> be buffered.
+     * Implementations must enable calling this method any number of times.
+     * Furthermore, the returned output stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
      * @param  peer the nullable peer target.
      *         If this is {@code null}, then there is no peer target.
-     * @return A new {@code InputStream}.
+     * @return A new output stream.
      * @see    IOReferences#ref(Object) How to create a nullable I/O reference.
      */
-    InputStream newInputStream(PT peer) throws IOException;
+    public abstract OutputStream newOutputStream(PT peer) throws IOException;
+
+    /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
+    @Override
+    public final String toString() {
+        return getTarget().toString();
+    }
 }

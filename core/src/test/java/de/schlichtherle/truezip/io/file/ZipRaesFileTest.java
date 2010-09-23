@@ -35,8 +35,6 @@ public class ZipRaesFileTest extends IOFileTestCase {
 
     private static boolean cancelling;
 
-    private KeyManager oldKeyManager;
-
     /** Creates a new instance of {@code ZipRaesFileTest}. */
     public ZipRaesFileTest(String testName) {
         super(testName);
@@ -46,7 +44,6 @@ public class ZipRaesFileTest extends IOFileTestCase {
     protected void setUp() throws Exception {
         suffix = ".tzp";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("tzp"));
-        oldKeyManager = KeyManager.getInstance();
         KeyManager.setInstance(new CustomKeyManager());
         cancelling = false;
         super.setUp();
@@ -56,7 +53,7 @@ public class ZipRaesFileTest extends IOFileTestCase {
     protected void tearDown() throws Exception {
         cancelling = false;
         super.tearDown();
-        KeyManager.setInstance(oldKeyManager);
+        KeyManager.setInstance(null);
     }
 
     public void testCancelling()

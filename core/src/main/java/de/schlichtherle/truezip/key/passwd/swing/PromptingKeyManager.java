@@ -21,8 +21,6 @@ import de.schlichtherle.truezip.key.PromptingAesKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
-import java.awt.Window;
-import javax.swing.JOptionPane;
 
 /**
  * A key manager which enables users to enter passwords or select key files
@@ -76,28 +74,6 @@ public class PromptingKeyManager
                 PromptingAesKeyProvider.class,
                 PromptingAesKeyProviderUI.class);
     }
-
-    /**
-     * Returns a window which is suitable to be the parent of the dialog
-     * used to prompt the user for a key.
-     * If no parent window has been set explicitly, then the last focused
-     * window is used.
-     * If no window received the focus yet or is already made eligible for
-     * finalization, then any showing window is used.
-     * <p>
-     * In all cases, the first showing parent window which is found by
-     * searching the containment hierarchy upwards is preferrably returned.
-     * <p>
-     * As a last resort, if no window is showing, then {@link JOptionPane}'s
-     * root frame is used.
-     */
-    public static Window getParentWindow() {
-        return Windows.getParentWindow();
-    }
-
-    //
-    // Instance stuff:
-    //
 
     @Override
     protected boolean isPromptingImpl() {

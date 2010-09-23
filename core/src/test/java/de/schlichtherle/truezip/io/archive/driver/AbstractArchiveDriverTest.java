@@ -123,6 +123,10 @@ public class AbstractArchiveDriverTest extends TestCase {
         class TestThread extends Thread {
             Throwable throwable; // = null;
 
+            TestThread() {
+                setDaemon(true);
+            }
+
             @Override
             public void run() {
                 try {

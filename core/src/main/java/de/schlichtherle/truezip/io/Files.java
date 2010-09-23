@@ -23,13 +23,13 @@ import static java.io.File.separatorChar;
 
 /**
  * Provides static utility methods for file objects and path names.
+ * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class Files extends Paths {
 
-    /** You cannot instantiate this class. */
     Files() {
     }
 

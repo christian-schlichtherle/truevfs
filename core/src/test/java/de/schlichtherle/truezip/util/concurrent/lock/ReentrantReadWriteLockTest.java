@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.util.concurrent.locks;
+package de.schlichtherle.truezip.util.concurrent.lock;
 
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.Operation;
 import junit.framework.TestCase;
 

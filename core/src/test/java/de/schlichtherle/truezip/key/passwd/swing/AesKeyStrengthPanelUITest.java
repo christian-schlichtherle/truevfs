@@ -30,7 +30,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AesKeyStrengthPanelTest extends TestCase {
+public class AesKeyStrengthPanelUITest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
@@ -39,7 +39,7 @@ public class AesKeyStrengthPanelTest extends TestCase {
     private JFrame frame;
     private JFrameOperator frameOp;
 
-    public AesKeyStrengthPanelTest(String testName) {
+    public AesKeyStrengthPanelUITest(String testName) {
         super(testName);
     }
 

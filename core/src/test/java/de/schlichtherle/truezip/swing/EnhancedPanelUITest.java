@@ -37,14 +37,14 @@ import org.netbeans.jemmy.operators.JDialogOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class EnhancedPanelTest extends TestCase {
+public class EnhancedPanelUITest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
     private EnhancedPanel instance;
 
-    public EnhancedPanelTest(String testName) {
+    public EnhancedPanelUITest(String testName) {
         super(testName);
     }
 

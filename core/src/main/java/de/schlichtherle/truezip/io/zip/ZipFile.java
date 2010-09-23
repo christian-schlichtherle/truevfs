@@ -203,7 +203,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         super(  new SimpleReadOnlyFileSource(file),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
-        this.name = file.getPath();
+        this.name = file.toString();
     }
 
     /**
@@ -277,7 +277,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             IOException {
         super(  rof, charset, preambled, postambled,
                 DefaultZipEntryFactory.SINGLETON);
-        this.name = null;
+        this.name = rof.toString();
     }
 
     private static class SimpleReadOnlyFileSource
@@ -302,8 +302,9 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * Returns the path name of the ZIP file or {@code null} if this object
-     * was created with a {@link ReadOnlyFile}.
+     * Returns the {@link Object#toString() string representation} of whatever
+     * input source object was used to construct this ZIP file.
+     * For {@link String} and {@link File} objects, this is a path name.
      */
     public String getName() {
         return name;

@@ -143,7 +143,7 @@ public class NZip extends CommandLineUtility {
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
-    public boolean runWithException(String[] args)
+    public boolean runChecked(String[] args)
     throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();

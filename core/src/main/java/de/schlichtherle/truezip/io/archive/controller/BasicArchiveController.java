@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -23,7 +27,9 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
@@ -38,8 +44,13 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -99,11 +110,13 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class BasicArchiveController<
+abstract class BasicArchiveController<
         AE extends ArchiveEntry,
         AI extends ArchiveInput<AE>,
         AO extends ArchiveOutput<AE>>
-implements ArchiveController {
+extends     ArchiveController
+implements  ArchiveInputSocketProvider<AE>,
+            ArchiveOutputSocketProvider<AE> {
 
     /**
      * A weak reference to this archive controller.
@@ -112,12 +125,6 @@ implements ArchiveController {
     private final WeakReference weakThis = new WeakReference(this);
 
     private final URI mountPoint;
-
-    /**
-     * The canonicalized or at least normalized absolute path name
-     * representation of the target archive file.
-     */
-    private final File target;
 
     /**
      * The archive controller of the enclosing archive, if any.
@@ -133,7 +140,13 @@ implements ArchiveController {
     /**
      * The {@link ArchiveDriver} to use for this controller's target file.
      */
-    private /*volatile*/ ArchiveDriver<AE, AI, AO> driver;
+    private final ArchiveDriver<AE, AI, AO> driver;
+
+    /**
+     * The canonicalized or at least normalized absolute path name
+     * representation of the target archive file.
+     */
+    private final File target;
 
     private final ReentrantLock  readLock;
     private final ReentrantLock writeLock;
@@ -235,14 +248,6 @@ implements ArchiveController {
         return mountPoint;
     }
 
-    /**
-     * Returns the canonical or at least normalized absolute file for the
-     * target archive file.
-     */
-    final File getTarget() {
-        return target;
-    }
-
     @Override
     public final BasicArchiveController getEnclController() {
         return enclController;
@@ -250,10 +255,10 @@ implements ArchiveController {
 
     @Override
     public final String getEnclPath(final String path) {
-        final String result
-                = cutTrailingSeparators(enclPath.resolve(path).toString(), SEPARATOR_CHAR);
-        assert result.endsWith(path);
-        assert !result.endsWith(SEPARATOR);
+        final String result = isRoot(path)
+                ? cutTrailingSeparators(enclPath.toString(), SEPARATOR_CHAR)
+                : enclPath.resolve(path).toString();
+        assert super.getEnclPath(path).equals(result);
         return result;
     }
 
@@ -261,12 +266,20 @@ implements ArchiveController {
      * Returns the driver instance which is used for the target archive.
      * All access to this method must be externally synchronized on this
      * controller's read lock!
-     * 
+     *
      * @return A valid reference to an {@link ArchiveDriver} object
      *         - never {@code null}.
      */
     final ArchiveDriver<AE, AI, AO> getDriver() {
         return driver;
+    }
+
+    /**
+     * Returns the canonical or at least normalized absolute file for the
+     * target archive file.
+     */
+    final File getTarget() {
+        return target;
     }
 
     /**
@@ -393,31 +406,24 @@ implements ArchiveController {
     throws ArchiveSyncException;
 
     @Override
-    public String toString() {
-        return getClass().getName() + "@" + System.identityHashCode(this) + "(" + getMountPoint() + ")";
-    }
-
-    //
-    // File system operations used by the File* classes.
-    // Stream operations:
-    //
-
-    @Override
-    public final InputStream newInputStream(final String path)
+    public ArchiveInputSocket<?> getInputSocket(
+            final BitField<IOOption> options, // currently unused
+            final String path)
     throws FalsePositiveException, IOException {
         assert path != null;
 
         try {
-            return newInputStream0(path);
+            return getInputSocket0(options, path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().newInputStream(getEnclPath(path));
+            return getEnclController().getInputSocket(options, getEnclPath(path));
         }
     }
 
-    // TODO: Make this private!
-    @Override
-    public InputStream newInputStream0(final String path)
+    private ArchiveInputSocket<?> getInputSocket0(
+            final BitField<IOOption> options, // currently unused
+            final String path)
     throws FalsePositiveException, IOException {
+        assert options != null;
         assert path != null;
 
         readLock().lock();
@@ -428,30 +434,75 @@ implements ArchiveController {
                 } catch (ArchiveEntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
-                    return getEnclController().newInputStream0(getEnclPath(path));
+                    // TODO: throw new ArchiveEntryFalsePositiveException(ex); ?!?! archive entry not found is not really an archive entry false positive ?!?!
+                    return getEnclController().getInputSocket0(
+                            options, getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot read directories");
             } else {
-                if (hasNewData(path)) {
-                    class AutoUmount4CreateInputStream
-                    implements IOOperation {
-                        @Override
-                        public void run() throws IOException {
-                            autoSync(path);
+                autoMount(); // detect false positives!
+                class InputSocket extends ArchiveInputSocket<AE> {
+                    private IOReference<AE> link = this;
+
+                    private AE target() throws IOException {
+                        if (hasNewData(path)) {
+                            link = this;
+                            class AutoSync implements IOOperation {
+                                @Override
+                                public void run() throws IOException {
+                                    autoSync(path);
+                                }
+                            }
+                            runWriteLocked(new AutoSync());
+                        }
+                        if (this == link) {
+                            try {
+                                link = IOReferences.ref(autoMount().getEntry(path));
+                            } catch (FalsePositiveException alreadyDetected) {
+                                throw new AssertionError(alreadyDetected);
+                            }
+                        }
+                        return IOReferences.deref(link);
+                    }
+
+                    @Override
+                    public AE getTarget() {
+                        readLock().lock();
+                        try {
+                            try {
+                                return target();
+                            } catch (IOException resolveToNull) {
+                                return null; // FIXME: interface contract violation
+                            }
+                        } finally {
+                            readLock().unlock();
                         }
                     }
-                    runWriteLocked(new AutoUmount4CreateInputStream());
+
+                    @Override
+                    public InputStream newInputStream(final ArchiveEntry peer)
+                    throws IOException {
+                        readLock().lock();
+                        try {
+                            final AE target = target();
+                            if (null != target && DIRECTORY == target.getType())
+                                throw new ArchiveEntryNotFoundException(
+                                        BasicArchiveController.this, path,
+                                        "cannot read directories");
+                            final ArchiveInputSocket<? extends AE> input;
+                            if (null == target ||
+                                    null == (input = getInputSocket(target)))
+                                throw new ArchiveEntryNotFoundException(
+                                        BasicArchiveController.this, path,
+                                        "no such file or directory");
+                            return input.newInputStream(peer);
+                        } finally {
+                            readLock().unlock();
+                        }
+                    }
                 }
-                final ArchiveFileSystem<AE> fs = autoMount();
-                final AE entry = fs.getEntry(path);
-                if (entry == null)
-                    throw new ArchiveEntryNotFoundException(this, path,
-                            "no such file or directory");
-                if (entry.getType() == DIRECTORY)
-                    throw new ArchiveEntryNotFoundException(this, path,
-                            "cannot read directories");
-                return getInputStreamSocket(entry).newInputStream(null);
+                return new InputSocket();
             }
         } finally {
             readLock().unlock();
@@ -459,30 +510,28 @@ implements ArchiveController {
     }
 
     @Override
-    public final OutputStream newOutputStream(
+    public ArchiveOutputSocket<?> getOutputSocket(
+            final BitField<IOOption> options,
             final String path,
-            final boolean append,
-            final boolean createParents)
+            final ArchiveInputSocket<?> input)
     throws FalsePositiveException, IOException {
         assert path != null;
 
         try {
-            return newOutputStream0(path, append, createParents);
+            return getOutputSocket0(options, path, input);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().newOutputStream(
-                    getEnclPath(path), append, createParents);
+            return getEnclController().getOutputSocket(
+                    options, getEnclPath(path), input);
         }
     }
 
-    private OutputStream newOutputStream0(
+    private ArchiveOutputSocket<?> getOutputSocket0(
+            final BitField<IOOption> options,
             final String path,
-            final boolean append,
-            final boolean createParents)
+            final ArchiveInputSocket<?> input)
     throws FalsePositiveException, IOException {
         assert path != null;
 
-        final InputStream in;
-        final OutputStream out;
         writeLock().lock();
         try {
             if (isRoot(path)) {
@@ -491,36 +540,97 @@ implements ArchiveController {
                 } catch (ArchiveEntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
-                    return getEnclController().newOutputStream0(getEnclPath(path), append, createParents);
+                    // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
+                    return getEnclController().getOutputSocket0(
+                            options, getEnclPath(path), input);
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "cannot write directories");
             } else {
-                autoSync(path);
-                final ArchiveFileSystem<AE> fs = autoMount(createParents);
-                in = append && fs.getType(path) == FILE
-                        ? newInputStream0(path)
-                        : null;
-                // Start creating or overwriting the archive entry.
-                // Note that this will fail if the entry already isExisting as a
-                // directory.
-                final Link<AE> link = fs.mknod(path, FILE, null, createParents);
-                // Create output stream.
-                out = getOutputStreamSocket(link.getTarget()).newOutputStream(null);
-                // Now link the entry into the file system.
-                link.run();
+                autoMount(options.get(CREATE_PARENTS)); // detect false positives!
+                class OutputSocket extends ArchiveOutputSocket<AE> {
+                    private Link<AE> link;
+
+                    private AE target() throws IOException {
+                        if (hasNewData(path)) {
+                            link = null;
+                            autoSync(path);
+                        }
+                        if (null == link) {
+                            final ArchiveEntry peer = null == input
+                                    ? null : input.getTarget();
+                            try {
+                                // Start creating or overwriting the archive entry.
+                                // This will fail if the entry already exists as a directory.
+                                link = autoMount(options.get(CREATE_PARENTS))
+                                        .mknod(path, FILE,
+                                            options.get(PRESERVE) ? peer : null,
+                                            options.get(CREATE_PARENTS));
+                            } catch (FalsePositiveException alreadyDetected) {
+                                throw new AssertionError(alreadyDetected);
+                            }
+                        }
+                        return link.getTarget();
+                    }
+
+                    @Override
+                    public AE getTarget() {
+                        writeLock().lock();
+                        try {
+                            try {
+                                return target();
+                            } catch (IOException resolveToNull) {
+                                return null; // FIXME: interface contract violation
+                            }
+                        } finally {
+                            writeLock().unlock();
+                        }
+                    }
+
+                    @Override
+                    public OutputStream newOutputStream(final ArchiveEntry peer)
+                    throws IOException {
+                        writeLock().lock();
+                        try {
+                            final AE target = target();
+                            final ArchiveOutputSocket<? extends AE> output
+                                    = getOutputSocket(target);
+                            final boolean append = options.get(APPEND);
+                            final InputStream in = append
+                                    ? getInputSocket(target)
+                                        .newInputStream(null)
+                                    : null;
+                            try {
+                                final OutputStream out = output
+                                        .newOutputStream(append ? null : peer);
+                                try {
+                                    link.run();
+                                    if (in != null)
+                                        Streams.cat(in, out);
+                                    return out;
+                                } catch (IOException ex) {
+                                    out.close(); // may throw another exception!
+                                    throw ex;
+                                }
+                            } finally {
+                                if (in != null) {
+                                    try {
+                                        in.close();
+                                    } catch (IOException ex) {
+                                        throw new InputException(ex);
+                                    }
+                                }
+                            }
+                        } finally {
+                            writeLock().unlock();
+                        }
+                    }
+                }
+                return new OutputSocket();
             }
         } finally {
             writeLock().unlock();
         }
-        if (in != null) {
-            try {
-                Streams.cat(in, out);
-            } finally {
-                in.close();
-            }
-        }
-        return out;
     }
 
     @Override
@@ -686,8 +796,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.getType(path) != null;
+            return autoMount().getType(path) != null;
         } finally {
             readLock().unlock();
         }
@@ -711,8 +820,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.isWritable(path);
+            return autoMount().isWritable(path);
         } finally {
             readLock().unlock();
         }
@@ -736,8 +844,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.getLength(path);
+            return autoMount().getLength(path);
         } finally {
             readLock().unlock();
         }
@@ -761,8 +868,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.getLastModified(path);
+            return autoMount().getLastModified(path);
         } finally {
             readLock().unlock();
         }
@@ -786,8 +892,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.list(path);
+            return autoMount().list(path);
         } finally {
             readLock().unlock();
         }
@@ -807,8 +912,7 @@ implements ArchiveController {
     throws FalsePositiveException, IOException {
         writeLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount();
-            fileSystem.setReadOnly(path);
+            autoMount().setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
@@ -837,8 +941,7 @@ implements ArchiveController {
         writeLock().lock();
         try {
             autoSync(path);
-            final ArchiveFileSystem fileSystem = autoMount();
-            return fileSystem.setLastModified(path, time);
+            return autoMount().setLastModified(path, time);
         } finally {
             writeLock().unlock();
         }
@@ -865,13 +968,15 @@ implements ArchiveController {
 
         writeLock().lock();
         try {
-            final ArchiveFileSystem fileSystem = autoMount(createParents);
-            if (fileSystem.getType(path) != null)
+            final ArchiveFileSystem fs = autoMount(createParents);
+            if (fs.getType(path) != null)
                 return false;
 
-            // If we got until here without an exception,
-            // write an empty file now.
-            newOutputStream0(path, false, createParents).close();
+            // If we got here without an exception, write an empty file now.
+            getOutputSocket0(
+                    BitField.noneOf(IOOption.class).set(CREATE_PARENTS, createParents),
+                    path, null)
+                    .newOutputStream(null).close();
 
             return true;
         } finally {

@@ -25,13 +25,13 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 
 /**
  * Provides static utility methods for archive file systems.
+ * This class cannot get instantiated outside its package.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class ArchiveFileSystems {
 
-    /** You cannot instantiate this class. */
     ArchiveFileSystems() {
     }
 

@@ -71,16 +71,15 @@ extends FilterArchiveInput<AE, AI> {
     }
 
     @Override
-    public ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(
-            final AE entry)
+    public ArchiveInputSocket<? extends AE> getInputSocket(final AE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         // TODO: Consider synchronization!
-        final ArchiveInputStreamSocket<? extends AE> input
-                = target.getInputStreamSocket(entry);
-        class InputStreamSocket implements ArchiveInputStreamSocket<AE> {
+        final ArchiveInputSocket<? extends AE> input
+                = target.getInputSocket(entry);
+        class InputSocket extends ArchiveInputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;
@@ -94,7 +93,7 @@ extends FilterArchiveInput<AE, AI> {
                 }
             }
         }
-        return new InputStreamSocket();
+        return new InputSocket();
     }
 
     /**

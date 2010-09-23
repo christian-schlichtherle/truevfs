@@ -18,12 +18,18 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -156,8 +162,15 @@ public class FileOutputStream extends FilterOutputStream {
                 if (archive != null) {
                     final String path = dstFile.getInnerEntryName();
                     assert path != null;
-                    return archive.getArchiveController()
-                            .newOutputStream(path, append, File.isLenient());
+                    return archive
+                            .getArchiveController()
+                            .getOutputSocket(
+                                BitField.noneOf(IOOption.class)
+                                    .set(APPEND, append)
+                                    .set(CREATE_PARENTS, File.isLenient()),
+                                path,
+                                null)
+                            .newOutputStream(null);
                 }
             }
         } catch (FalsePositiveException isNotArchive) {

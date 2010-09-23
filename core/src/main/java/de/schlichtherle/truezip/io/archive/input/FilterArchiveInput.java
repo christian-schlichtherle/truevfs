@@ -38,26 +38,18 @@ public class FilterArchiveInput<
 extends FilterArchiveEntryContainer<AE, AI>
 implements ArchiveInput<AE> {
 
-    protected AI target;
-
     public FilterArchiveInput(final AI target) {
-        this.target = target;
+        super(target);
     }
 
     @Override
-    protected AI getTarget() {
-        return target;
-    }
-
-    @Override
-    public ArchiveInputStreamSocket<? extends AE> getInputStreamSocket(
-            final AE entry)
+    public ArchiveInputSocket<? extends AE> getInputSocket(AE entry)
     throws IOException {
-        return getTarget().getInputStreamSocket(entry);
+        return target.getInputSocket(entry);
     }
 
     @Override
     public void close() throws IOException {
-        getTarget().close();
+        target.close();
     }
 }

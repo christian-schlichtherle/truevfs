@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.file.FileBusyException;
 
 /**
  * Thrown to indicate that the
- * {@link ArchiveInputStreamSocket#newInputStream}
+ * {@link ArchiveInputSocket#newInputStream}
  * method failed because the archive is already busy on input.
  * This exception is guaranteed to be recoverable,
  * meaning it must be possible to read the same entry again as soon as the

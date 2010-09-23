@@ -33,21 +33,25 @@ public abstract class FilterArchiveEntryContainer<
         AEC extends ArchiveEntryContainer<AE>>
 implements ArchiveEntryContainer<AE> {
 
-    /** Returns the decorated archive entry container. */
-    protected abstract AEC getTarget();
+    /** The decorated archive entry container. */
+    protected AEC target;
+
+    protected FilterArchiveEntryContainer(final AEC entry) {
+        this.target = entry;
+    }
 
     @Override
     public int size() {
-        return getTarget().size();
+        return target.size();
     }
 
     @Override
     public Iterator<AE> iterator() {
-        return getTarget().iterator();
+        return target.iterator();
     }
 
     @Override
     public AE getEntry(String name) {
-        return getTarget().getEntry(name);
+        return target.getEntry(name);
     }
 }

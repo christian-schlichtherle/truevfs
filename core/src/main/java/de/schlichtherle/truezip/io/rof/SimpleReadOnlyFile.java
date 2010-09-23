@@ -29,9 +29,8 @@ import java.io.RandomAccessFile;
  * @version $Id$
  */
 public class SimpleReadOnlyFile
-        extends RandomAccessFile
-        implements ReadOnlyFile
-{
+extends RandomAccessFile
+implements ReadOnlyFile {
     public SimpleReadOnlyFile(File file)
     throws FileNotFoundException {
         super(file, "r");

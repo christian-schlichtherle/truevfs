@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
@@ -24,6 +25,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveE
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,8 @@ import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
  * Provides static utility methods for {@link File}s.
+ * This class cannot get instantiated outside its package.
+ * <p>
  * Note that in contrast to the {@link File} class, the methods in this
  * class accept and return plain {@code java.io.File} instances.
  * Full advantage is taken if a parameter is actually an instance of the
@@ -46,10 +50,9 @@ import static de.schlichtherle.truezip.io.Files.contains;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class Files {
+class Files {
 
-    /** You cannot instantiate this class. */
-    private Files() {
+    Files() {
     }
 
     /**
@@ -374,15 +377,19 @@ final class Files {
                     throw ex; // not my job - pass on!
             }
 
-            final InputStream in;
             final long time;
-            srcController.readLock().lock();
-            try {
-                in = srcController.newInputStream0(srcPath); // detects false positives!
+            final InputStream in;
+            /*srcController.readLock().lock();
+            try {*/
+                in = srcController
+                        .getInputSocket( // detects false positives!
+                            BitField.noneOf(IOOption.class),
+                            srcPath)
+                        .newInputStream(null);
                 time = srcController.getLastModified(srcPath);
-            } finally {
+            /*} finally {
                 srcController.readLock().unlock();
-            }
+            }*/
 
             // Treat the destination like a regular file.
             final OutputStream out;
@@ -427,12 +434,12 @@ final class Files {
     static boolean deleteAll(final java.io.File file) {
         boolean ok = true;
         if (file.isDirectory()) {
-            // Note that listing the directory this way will cause a recursive
-            // deletion if the directory is actually an archive file.
-            // Although this does not provide best performance (the archive
-            // file could simply be removed like an ordinary file), it ensures
-            // that the state cached by the ArchiveController is not bypassed
-            // and hence prevents a potential bug.
+            // If the directory is an archive file, one may be tempted to delete it
+            // directly (using e.g. java.io.File.delete()).
+            // However, this would bypass the ArchiveController's state and cause
+            // subsequent mayhem.
+            // So we play it safe despite the fact that this procedure is comparably
+            // much slower.
             java.io.File[] members = file.listFiles();
             for (int i = members.length; --i >= 0;)
                 ok &= deleteAll(members[i]);

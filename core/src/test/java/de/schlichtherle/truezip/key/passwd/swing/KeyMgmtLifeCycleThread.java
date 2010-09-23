@@ -40,9 +40,9 @@ public class KeyMgmtLifeCycleThread extends Thread {
 
     public KeyMgmtLifeCycleThread(KeyMgmtLifeCycle rlc) {
         super(rlc, "Key Management Life Cycle Thread for \"" + rlc.id + "\"");
-        this.rlc = rlc;
+        setDaemon(true); // thread may die.
         //setPriority(Thread.MIN_PRIORITY);
-        //setDaemon(true); // thread may die.
+        this.rlc = rlc;
     }
 
     public URI getResource() {

@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputStreamSocket;
+import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOOperations;
+import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
@@ -127,12 +127,12 @@ extends FilterArchiveOutput<AE, AO> {
     }
 
     @Override
-    public ArchiveOutputStreamSocket<? extends AE> getOutputStreamSocket(
+    public ArchiveOutputSocket<? extends AE> getOutputSocket(
             final AE entry)
     throws IOException {
-        final ArchiveOutputStreamSocket<? extends AE> dst
-                = super.getOutputStreamSocket(entry);
-        class OutputStreamSocket implements ArchiveOutputStreamSocket<AE> {
+        final ArchiveOutputSocket<? extends AE> dst
+                = super.getOutputSocket(entry);
+        class OutputSocket extends ArchiveOutputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;
@@ -143,12 +143,12 @@ extends FilterArchiveOutput<AE, AO> {
             throws IOException {
                 return MultiplexedArchiveOutput.this.newOutputStream(dst, src);
             }
-        } // class OutputStreamProxy
-        return new OutputStreamSocket();
+        }
+        return new OutputSocket();
     }
 
     protected OutputStream newOutputStream(
-            final ArchiveOutputStreamSocket<? extends AE> dstSocket,
+            final ArchiveOutputSocket<? extends AE> dstSocket,
             final ArchiveEntry src)
     throws IOException {
         if (src != null) {
@@ -214,22 +214,21 @@ extends FilterArchiveOutput<AE, AO> {
     extends FileOutputStream
     implements IOReference<AE> {
         private final File temp;
-        private final ArchiveOutputStreamSocket<? extends AE> dst;
-        private final ArchiveInputStreamSocket<ArchiveEntry> src;
+        private final ArchiveOutputSocket<? extends AE> dst;
+        private final ArchiveInputSocket<ArchiveEntry> src;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
-                final ArchiveOutputStreamSocket<? extends AE> dst,
+                final ArchiveOutputSocket<? extends AE> dst,
                 final ArchiveEntry src)
         throws IOException {
             super(temp);
-            class TempInputStreamSocket
-            implements ArchiveInputStreamSocket<ArchiveEntry> {
+            class TempInputSocket extends ArchiveInputSocket<ArchiveEntry> {
                 private final ArchiveEntry entry;
 
-                TempInputStreamSocket() {
+                TempInputSocket() {
                     this.entry = src != null ? src : new FileEntry(temp);
                 }
 
@@ -243,10 +242,10 @@ extends FilterArchiveOutput<AE, AO> {
                 throws IOException {
                     return new FileInputStream(temp);
                 }
-            } // class TempInputStreamSocket
+            }
             this.temp = temp;
             this.dst = dst;
-            this.src = new TempInputStreamSocket();
+            this.src = new TempInputSocket();
             temps.put(dst.getTarget().getName(), this);
         }
 
@@ -284,7 +283,7 @@ extends FilterArchiveOutput<AE, AO> {
                 return false;
 
             try {
-                IOOperations.copy(src, dst);
+                IOSockets.copy(src, dst);
             } finally {
                 if (!temp.delete()) // may fail on Windoze if in.close() failed!
                     temp.deleteOnExit(); // be bullish never to leavy any temps!

@@ -19,34 +19,33 @@ package de.schlichtherle.truezip.io.socket;
 import java.io.IOException;
 
 /**
- * Provides {@link OutputStreamSocket}s for write access to local targets.
+ * Provides {@link InputSocket}s for read access to local targets.
  *
  * @param   <LT> The type of the <i>local targets</i> for I/O operations.
  * @param   <PT> The minimum required type of the <i>peer targets</i>.
- * @see     InputStreamSocketProvider
+ * @see     OutputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputStreamSocketProvider<LT, PT> {
+public interface InputSocketProvider<LT, PT> {
 
     /**
-     * Returns a non-{@code null} output stream socket for write access to the
+     * Returns a non-{@code null} input socket for read access to the
      * given local target.
-     * <p>
-     * The implementation must not assume that the returned output stream
-     * socket will ever be used and must tolerate changes to all settable
-     * properties of the local target object.
-     * <p>
      * Multiple invocations with the same parameter may return the same
      * object again.
+     * <p>
+     * The method {@link InputSocket#getTarget()} must return an object
+     * which {@link Object#equals(Object) compares equal} to the given local
+     * target when called on the returned input socket.
      *
      * @param  target the non-{@code null} local target.
-     * @return A non-{@code null} output stream socket for writing to the
-     *         local target.
-     * @throws IOException If the local target
+     * @return A non-{@code null} input socket for reading from the local
+     *         target.
+     * @throws IOException If the local target does not exist or
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    OutputStreamSocket<? extends LT, ? super PT> getOutputStreamSocket(LT target)
+    InputSocket<? extends LT, ? super PT> getInputSocket(LT target)
     throws IOException;
 }

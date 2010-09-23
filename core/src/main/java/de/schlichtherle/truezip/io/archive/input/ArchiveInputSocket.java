@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.input;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputStreamSocket;
-import de.schlichtherle.truezip.io.socket.InputStreamSocket;
+import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,13 +31,13 @@ import java.io.InputStream;
  * Multithreading needs to be addressed by client classes.
  *
  * @param   <AE> The type of the {@link #getTarget() local target} archive entry.
- * @see     ArchiveOutputStreamSocket
+ * @see     ArchiveOutputSocket
  * @see     ArchiveInput
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveInputStreamSocket<AE extends ArchiveEntry>
-extends InputStreamSocket<AE, ArchiveEntry> {
+public abstract class ArchiveInputSocket<AE extends ArchiveEntry>
+extends InputSocket<AE, ArchiveEntry> {
 
     /**
      * Returns the non-{@code null} local target archive entry.
@@ -48,12 +48,12 @@ extends InputStreamSocket<AE, ArchiveEntry> {
      * @return The non-{@code null} local archive entry target.
      */
     @Override
-    AE getTarget();
+    public abstract AE getTarget();
 
     /**
      * {@inheritDoc}
      *
-     * @param  destination a nullable peer archive entry which is going to be
+     * @param  peer a nullable peer archive entry which is going to be
      *         written in order to copy the data from the {@link #getTarget() target}
      *         archive entry.
      *         <p>
@@ -76,5 +76,6 @@ extends InputStreamSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    InputStream newInputStream(ArchiveEntry destination) throws IOException;
+    public abstract InputStream newInputStream(ArchiveEntry peer)
+    throws IOException;
 }

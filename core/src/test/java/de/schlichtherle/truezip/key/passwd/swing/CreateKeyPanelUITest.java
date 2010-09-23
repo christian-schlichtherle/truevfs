@@ -41,7 +41,7 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class CreateKeyPanelTest extends TestCase {
+public class CreateKeyPanelUITest extends TestCase {
     static {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
@@ -52,7 +52,7 @@ public class CreateKeyPanelTest extends TestCase {
     private final ComponentChooser keyFileChooser
                 = new NameComponentChooser("keyFileChooser");
 
-    public CreateKeyPanelTest(String testName) {
+    public CreateKeyPanelUITest(String testName) {
         super(testName);
     }
 
