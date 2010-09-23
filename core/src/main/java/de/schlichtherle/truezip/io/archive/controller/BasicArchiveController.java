@@ -968,8 +968,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
         writeLock().lock();
         try {
-            final ArchiveFileSystem fs = autoMount(createParents);
-            if (fs.getType(path) != null)
+            if (autoMount(createParents).getType(path) != null)
                 return false;
 
             // If we got here without an exception, write an empty file now.
@@ -1016,8 +1015,9 @@ implements  ArchiveInputSocketProvider<AE>,
                         "directory exists already");
             } else { // !isRoot(entryName)
                 // This is going to be a regular directory archive entry.
-                final ArchiveFileSystem fileSystem = autoMount(createParents);
-                fileSystem.mknod(path, DIRECTORY, null, createParents).run();
+                autoMount(createParents)
+                        .mknod(path, DIRECTORY, null, createParents)
+                        .run();
             }
         } finally {
             writeLock().unlock();
@@ -1097,8 +1097,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     getEnclController().delete0(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
-                final ArchiveFileSystem fileSystem = autoMount();
-                fileSystem.unlink(path);
+                autoMount().unlink(path);
             }
         } finally {
             writeLock().unlock();
