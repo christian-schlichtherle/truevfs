@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.util.Set;
@@ -35,7 +35,7 @@ import java.util.Set;
  * @version $Id$
  */
 public interface ArchiveFileSystem<AE extends ArchiveEntry>
-extends ArchiveEntryContainer<AE> {
+extends CommonEntryContainer<AE> {
 
     /**
      * Returns {@code true} if and only if this archive file system is

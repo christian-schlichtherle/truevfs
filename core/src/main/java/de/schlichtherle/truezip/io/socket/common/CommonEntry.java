@@ -90,12 +90,28 @@ public interface CommonEntry {
     }
 
     /**
-     * Returns the non-{@code null} <i>entry name</i>.
-     * An entry name is a <i>path name</i> which meets all additional
-     * requirements which may be defined by their particular archive type.
+     * Returns the non-{@code null} <i>common entry name</i>.
+     * A common entry name must meet the following requirements:
+     * <ol>
+     * <li>A common entry name is a sequence of <i>segments</i> which are
+     *     separated by one or more <i>separator characters</i>
+     *     ({@link #SEPARATOR_CHAR}).
+     *     This implies that a segment cannot contain separator characters.</li>
+     * <li>A common entry name may contain one or more dot ({@code "."}) or
+     *     dot-dot ({@code ".."}) segments which represent the current or
+     *     parent directory respectively.</li>
+     * <li>If a common entry name starts with one or more separator characters
+     *     its said to be <i>absolute</i>.
+     *     Otherwise, its said to be <i>relative</i>.</li>
+     * </ol>
+     * For example, {@code "foo/bar"} and
+     * {@code "./abc/../foo/./def/./../bar/."} are both valid common entry
+     * names which refer to the same entity.
+     * <p>
+     * Note that implementations may impose additional terms for a common
+     * entry name to meet their particular requirements.
      *
-     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
-     * @return The non-{@code null} <i>entry name</i>.
+     * @return The non-{@code null} <i>common entry name</i>.
      */
     String getName();
 
@@ -117,8 +133,6 @@ public interface CommonEntry {
     /**
      * Returns the last modification time of this archive entry since the
      * epoch or {@value #UNKNOWN}.
-     *
-     * @see #setTime
      */
     long getTime();
 }

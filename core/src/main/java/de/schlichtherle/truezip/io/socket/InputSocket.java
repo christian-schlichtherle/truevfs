@@ -58,7 +58,6 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
     protected void afterPeeringComplete() {
     }
 
-    /** @Oracle: Please save me from reinventing the wheel here! */
     private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }

@@ -49,11 +49,6 @@ import java.io.FileNotFoundException;
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
 
-    /**
-     * For use by
-     * {@link de.schlichtherle.truezip.io.archive.input.ArchiveInputBusyException} and
-     * {@link de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException} only.
-     */
     protected FileBusyException(final String msg) {
         super(msg);
     }

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class ArchiveFileSystems {
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
-            ArchiveEntryContainer<AE> container,
+            CommonEntryContainer<AE> container,
             long rootTime,
             ArchiveEntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener,

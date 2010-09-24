@@ -81,23 +81,23 @@ extends AbstractArchiveDriver<TarEntry, TarInput, ArchiveOutput<TarEntry>> {
 
     @Override
     public TarEntry newEntry(
-            String path,
+            String name,
             final Type type,
             final CommonEntry template)
     throws CharConversionException {
-        path = toZipOrTarEntryName(path, type);
+        name = toZipOrTarEntryName(name, type);
         final TarEntry entry;
         if (template != null) {
             if (template instanceof TarEntry) {
                 entry = newEntry((TarEntry) template);
-                entry.setName(path);
+                entry.setName(name);
             } else {
-                entry = newEntry(path);
+                entry = newEntry(name);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newEntry(path);
+            entry = newEntry(name);
         }
 
         return entry;

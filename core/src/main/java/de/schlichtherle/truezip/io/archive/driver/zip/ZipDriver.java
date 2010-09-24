@@ -163,23 +163,23 @@ implements ZipEntryFactory<ZipEntry> {
 
     @Override
     public ZipEntry newEntry(
-            String path,
+            String name,
             final Type type,
             final CommonEntry template)
     throws CharConversionException {
-        path = toZipOrTarEntryName(path, type);
+        name = toZipOrTarEntryName(name, type);
         final ZipEntry entry;
         if (template != null) {
             if (template instanceof ZipEntry) {
                 entry = newEntry((ZipEntry) template);
-                entry.setName(path);
+                entry.setName(name);
             } else {
-                entry = newEntry(path);
+                entry = newEntry(name);
                 entry.setTime(template.getTime());
                 entry.setSize(template.getSize());
             }
         } else {
-            entry = newEntry(path);
+            entry = newEntry(name);
         }
         return entry;
     }

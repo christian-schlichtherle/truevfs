@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 
@@ -35,10 +35,10 @@ final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
 extends ReadWriteArchiveFileSystem<AE> {
 
     /**
-     * @see ArchiveFileSystems#newArchiveFileSystem(ArchiveEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
+     * @see ArchiveFileSystems#newArchiveFileSystem(CommonEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
      */
     ReadOnlyArchiveFileSystem(
-        final ArchiveEntryContainer<AE> container,
+        final CommonEntryContainer<AE> container,
         final long rootTime,
         final ArchiveEntryFactory<AE> factory) {
         super(container, rootTime, factory, null);

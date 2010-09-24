@@ -16,10 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.entry;
 
+import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
 import java.util.Iterator;
 
 /*
- * Decorates an {@code ArchiveEntryContainer}.
+ * Decorates an {@code CommonEntryContainer}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -30,8 +31,8 @@ import java.util.Iterator;
  */
 public abstract class FilterArchiveEntryContainer<
         AE extends ArchiveEntry,
-        AEC extends ArchiveEntryContainer<AE>>
-implements ArchiveEntryContainer<AE> {
+        AEC extends CommonEntryContainer<AE>>
+implements CommonEntryContainer<AE> {
 
     /** The decorated archive entry container. */
     protected AEC target;
