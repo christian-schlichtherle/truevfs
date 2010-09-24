@@ -187,7 +187,7 @@ implements  CommonInputSocketProvider<AE>,
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
         if (enclMountPoint != null) {
-            this.enclController = ArchiveControllers.get(enclMountPoint); // FIXME: This is cheating!
+            this.enclController = ArchiveControllers.get(enclMountPoint);
             assert this.enclController != null;
             this.enclPath = enclMountPoint.relativize(mountPoint);
         } else {

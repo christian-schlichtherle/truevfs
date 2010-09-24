@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.filesystem;
+package de.schlichtherle.truezip.io.socket.common;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.common.FileSystemEntry;
+import java.util.Set;
 
 /**
- * A file system entry which refers to an archive entry.
+ * A common entry which can list directory members.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemEntry
-extends FileSystemEntry, IOReference<ArchiveEntry> {
+public interface FileSystemEntry extends CommonEntry {
+
+    /**
+     * If this is not a directory entry, {@code null} is returned.
+     * Otherwise, an unmodifiable set of strings is returned which
+     * represent the base names of the members of this directory entry.
+     */
+    Set<String> list();
 }
