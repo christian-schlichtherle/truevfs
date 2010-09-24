@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.socket.common.output;
 
-import de.schlichtherle.truezip.io.file.FileBusyException;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 
 /**
- * Thrown to indicate that the {@link CommonOutputSocket#newOutputStream}
+ * Indicates that the {@link CommonOutputSocket#newOutputStream}
  * method failed because the common output socket's destination is already busy.
  * This exception is guaranteed to be recoverable, meaning it must be possible
  * to write the same entry again as soon as the common output socket's

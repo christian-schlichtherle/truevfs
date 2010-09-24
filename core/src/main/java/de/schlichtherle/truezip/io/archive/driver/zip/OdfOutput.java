@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 

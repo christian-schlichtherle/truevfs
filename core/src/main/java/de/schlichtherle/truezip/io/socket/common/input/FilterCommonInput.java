@@ -14,39 +14,38 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.output;
+package de.schlichtherle.truezip.io.socket.common.input;
 
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.input.FilterArchiveInput;
+import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutput;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import java.io.IOException;
 
 /**
- * Decorates an {@code ArchiveOutput}.
+ * Decorates an {@code CommonInput}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <AE> The type of the archive entries.
- * @see FilterArchiveInput
+ * @param <CE> The type of the common entries.
+ * @see FilterCommonOutput
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterArchiveOutput<
-        AE extends ArchiveEntry,
-        AO extends ArchiveOutput<AE>>
-extends FilterArchiveEntryContainer<AE, AO>
-implements ArchiveOutput<AE> {
+public class FilterCommonInput<
+        CE extends CommonEntry,
+        CI extends CommonInput<CE>>
+extends    FilterCommonEntryContainer<CE, CI>
+implements CommonInput<CE> {
 
-    public FilterArchiveOutput(final AO target) {
+    public FilterCommonInput(final CI target) {
         super(target);
     }
 
     @Override
-    public CommonOutputSocket<AE> getOutputSocket(AE entry)
+    public CommonInputSocket<CE> getInputSocket(CE entry)
     throws IOException {
-        return target.getOutputSocket(entry);
+        return target.getInputSocket(entry);
     }
 
     @Override

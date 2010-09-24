@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FileBusyException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;

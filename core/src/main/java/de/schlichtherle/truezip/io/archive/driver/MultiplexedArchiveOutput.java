@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.output;
+package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
@@ -43,7 +45,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
- * Decorates an {@code ArchiveOutput} in order to support a virtually
+ * Decorates an {@code CommonOutput} in order to support a virtually
  * unlimited number of entries which may be written concurrently while
  * actually at most one entry is written concurrently to the target archive
  * output.
@@ -62,8 +64,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 public class MultiplexedArchiveOutput<
         AE extends ArchiveEntry,
-        AO extends ArchiveOutput<AE>>
-extends FilterArchiveOutput<AE, AO> {
+        CO extends CommonOutput<AE>>
+extends FilterCommonOutput<AE, CO> {
 
     /** Prefix for temporary files created by the multiplexer. */
     static final String TEMP_FILE_PREFIX = "tzp-mux";
@@ -84,7 +86,7 @@ extends FilterArchiveOutput<AE, AO> {
      * @param target the decorated output archive.
      * @throws NullPointerException iff {@code target} is {@code null}.
      */
-    public MultiplexedArchiveOutput(final AO target) {
+    public MultiplexedArchiveOutput(final CO target) {
         super(target);
         if (target == null)
             throw new NullPointerException();
@@ -152,7 +154,7 @@ extends FilterArchiveOutput<AE, AO> {
     throws IOException {
         final CommonEntry peer = output.getPeerTarget();
         if (peer != null) {
-            final ArchiveEntry local = output.getTarget();
+            final AE local = output.getTarget();
             local.setSize(peer.getSize()); // data may be compressed!
         }
         return isTargetBusy()

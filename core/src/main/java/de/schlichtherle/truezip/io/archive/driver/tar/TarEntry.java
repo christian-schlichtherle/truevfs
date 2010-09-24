@@ -19,8 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 
 /**
  * An entry in a TAR archive which implements the {@code ArchiveEntry}

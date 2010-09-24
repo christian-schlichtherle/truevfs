@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.socket.common.entry;
 
-import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import java.util.Iterator;
 
 /*
- * Decorates an {@code CommonEntryContainer}.
+ * Decorates a {@code CommonEntryContainer}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <AE> The type of the archive entries.
+ * @param <CE> The type of the common entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterArchiveEntryContainer<
-        AE extends ArchiveEntry,
-        AEC extends CommonEntryContainer<AE>>
-implements CommonEntryContainer<AE> {
+public abstract class FilterCommonEntryContainer<
+        CE extends CommonEntry,
+        CEC extends CommonEntryContainer<CE>>
+implements CommonEntryContainer<CE> {
 
-    /** The decorated archive entry container. */
-    protected AEC target;
+    /** The decorated common entry container. */
+    protected CEC target;
 
-    protected FilterArchiveEntryContainer(final AEC entry) {
+    protected FilterCommonEntryContainer(final CEC entry) {
         this.target = entry;
     }
 
@@ -47,12 +48,12 @@ implements CommonEntryContainer<AE> {
     }
 
     @Override
-    public Iterator<AE> iterator() {
+    public Iterator<CE> iterator() {
         return target.iterator();
     }
 
     @Override
-    public AE getEntry(String name) {
+    public CE getEntry(String name) {
         return target.getEntry(name);
     }
 }

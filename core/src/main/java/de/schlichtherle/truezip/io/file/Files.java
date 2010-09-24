@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;

@@ -16,13 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
@@ -46,7 +46,7 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver<ZipEntry, ZipInput, ArchiveOutput<ZipEntry>>
+extends AbstractArchiveDriver<ZipEntry, ZipInput, CommonOutput<ZipEntry>>
 implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
@@ -221,7 +221,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link MultiplexedArchiveOutput}.
      */
     @Override
-    public ArchiveOutput<ZipEntry> newOutput(
+    public CommonOutput<ZipEntry> newOutput(
             ArchiveDescriptor archive, OutputStream out, ZipInput source)
     throws IOException {
         return new MultiplexedArchiveOutput<ZipEntry, ZipOutput>(

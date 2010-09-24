@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.input;
+package de.schlichtherle.truezip.io.socket.common.input;
 
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
-import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import java.io.Closeable;
 
 /**
- * An archive entry container which supports reading archive entries from an
- * arbitrary input source.
+ * A closeable common entry container which provides input sockets for
+ * reading common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <AE> The type of the archive entries.
- * @see     ArchiveOutput
+ * @param   <CE> The type of the common entries.
+ * @see     CommonOutput
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveInput<AE extends ArchiveEntry>
-extends CommonEntryContainer<AE>,
-        CommonInputSocketProvider<AE>,
-        Closeable {
+public interface CommonInput<CE extends CommonEntry>
+extends Closeable,
+        CommonEntryContainer<CE>,
+        CommonInputSocketProvider<CE> {
 }
