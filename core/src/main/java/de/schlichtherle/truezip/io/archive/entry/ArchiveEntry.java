@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.entry;
 
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 
-
 /**
  * Represents an entry in an archive file.
  * Archive drivers need to implement this interface in order to enable their

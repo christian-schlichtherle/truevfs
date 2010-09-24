@@ -61,9 +61,9 @@ public class CheckedZipInput extends ZipInput {
 
     /** Overridden to read from a checked input stream. */
     @Override
-    protected InputStream newInputStream(ZipEntry entry, CommonEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry target, CommonEntry peer)
     throws  IOException {
-        return super.getInputStream(    entry.getName(), true,
-                                        !(dstEntry instanceof ZipEntry));
+        return super.getInputStream(    target.getName(), true,
+                                        !(peer instanceof ZipEntry));
     }
 }

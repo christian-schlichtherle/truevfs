@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
@@ -23,7 +24,6 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
-import de.schlichtherle.truezip.io.archive.entry.UnmodifiableArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -352,16 +352,16 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public Iterator<AE> iterator() {
-        class ArchiveEntryIterator implements Iterator<AE> {
+    public Iterator<Entry<AE>> iterator() {
+        class ArchiveEntryIterator implements Iterator<Entry<AE>> {
             final Iterator<BaseEntry<AE>> it = master.values().iterator();
 
             public boolean hasNext() {
                 return it.hasNext();
             }
 
-            public AE next() {
-                return it.next().getTarget(); // must return target!
+            public Entry<AE> next() {
+                return it.next();
             }
 
             public void remove() {
@@ -372,11 +372,10 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public AE getEntry(String path) {
+    public Entry<AE> getEntry(String path) {
         if (path == null)
             throw new NullPointerException();
-        final BaseEntry<AE> entry = master.get(path);
-        return entry == null ? null : entry.getTarget();
+        return master.get(path);
     }
 
     /**
@@ -398,9 +397,8 @@ implements ArchiveFileSystem<AE> {
      * required to implement the concept of a directory.
      */
     private static abstract class BaseEntry<AE extends ArchiveEntry>
-    extends UnmodifiableArchiveEntry<AE>
-    implements ArchiveFileSystemEntry {
-
+    extends FilterCommonEntry<AE>
+    implements Entry<AE> {
         /** Constructs a new instance of {@code CommonEntry}. */
         BaseEntry(final AE entry) {
             super(entry);
@@ -592,13 +590,13 @@ implements ArchiveFileSystem<AE> {
                     parent.getTarget().setTime(time);
                 parent = entry;
             }
-            final AE entry = getTarget();
+            final AE entry = getTarget().getTarget();
             if (entry.getTime() == UNKNOWN)
                 entry.setTime(time);
         }
 
         @Override
-        public AE getTarget() {
+        public Entry<AE> getTarget() {
             return links[links.length - 1].getTarget();
         }
     } // class PathLink
@@ -608,7 +606,7 @@ implements ArchiveFileSystem<AE> {
      * {@link PathLink}.
      */
     private static final class SegmentLink<AE extends ArchiveEntry>
-    implements IOReference<AE> {
+    implements IOReference<Entry<AE>> {
         final String path;
         final BaseEntry<AE> entry;
         final String base;
@@ -634,8 +632,8 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        public AE getTarget() {
-            return entry.getTarget();
+        public Entry<AE> getTarget() {
+            return entry;
         }
     } // class SegmentLink
 
@@ -701,11 +699,5 @@ implements ArchiveFileSystem<AE> {
         touch();
         entry.getTarget().setTime(time);
         return true;
-    }
-
-    @Override
-    public Set<String> list(final String path) {
-        final BaseEntry<AE> entry = master.get(path);
-        return entry == null ? null : entry.list();
     }
 }

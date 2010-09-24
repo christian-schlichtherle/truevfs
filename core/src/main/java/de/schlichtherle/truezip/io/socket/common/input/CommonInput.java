@@ -19,16 +19,17 @@ package de.schlichtherle.truezip.io.socket.common.input;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
 import java.io.Closeable;
 
 /**
- * A closeable common entry container which provides input sockets for
- * reading common entries.
+ * A closeable archive entry container which provides archive entry input
+ * sockets.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the common entries.
+ * @param   <CE> The type of the archive entries.
  * @see     CommonOutput
  * @author  Christian Schlichtherle
  * @version $Id$

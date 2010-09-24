@@ -38,7 +38,7 @@ public class FilterCommonOutput<
 extends FilterCommonEntryContainer<CE, CO>
 implements CommonOutput<CE> {
 
-    public FilterCommonOutput(final CO target) {
+    protected FilterCommonOutput(final CO target) {
         super(target);
     }
 

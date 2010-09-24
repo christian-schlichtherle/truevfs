@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputBusyException;
@@ -108,25 +107,25 @@ implements CommonOutput<TarEntry> {
     }
 
     protected OutputStream newOutputStream(
-            final TarEntry entry,
-            final CommonEntry src)
+            final TarEntry target,
+            final CommonEntry peer)
     throws IOException {
         if (isBusy())
-            throw new CommonOutputBusyException(entry);
-        if (entry.isDirectory()) {
-            entry.setSize(0);
-            return new EntryOutputStream(entry);
+            throw new CommonOutputBusyException(target);
+        if (target.isDirectory()) {
+            target.setSize(0);
+            return new EntryOutputStream(target);
         }
-        if (src != null) {
-            entry.setSize(src.getSize());
-            return new EntryOutputStream(entry);
+        if (peer != null) {
+            target.setSize(peer.getSize());
+            return new EntryOutputStream(target);
         }
         // The source entry does not exist or cannot support DDC
         // to the destination entry.
         // So we need to buffer the output in a temporary file and write
         // it upon close().
         return new TempEntryOutputStream(
-                createTempFile(TEMP_FILE_PREFIX), entry);
+                createTempFile(TEMP_FILE_PREFIX), target);
     }
 
     /**

@@ -39,7 +39,7 @@ public abstract class CommonOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE, CommonEntry> {
 
     @Override
-    public CommonOutputSocket<CE> chain(OutputSocket<CE, CommonEntry> output) {
+    public CommonOutputSocket<CE> chain(OutputSocket<? super CE, ? extends CommonEntry> output) {
         super.chain(output);
         return this;
     }

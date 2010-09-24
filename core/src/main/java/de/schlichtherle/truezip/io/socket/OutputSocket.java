@@ -34,7 +34,7 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
 
     private InputSocket<? extends PT, ? super LT> peer;
 
-    public OutputSocket<LT, PT> chain(OutputSocket<LT, PT> output) {
+    public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> output) {
         return peer(output.peer);
     }
 

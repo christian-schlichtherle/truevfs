@@ -19,11 +19,12 @@ package de.schlichtherle.truezip.io.socket.common.output;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
 import java.io.Closeable;
 
 /**
- * A closeable common entry container which provides output sockets for
- * writing common entries.
+ * A closeable common entry container which provides common entry output
+ * sockets.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have just been partially written yet, i.e. which have not already
@@ -32,7 +33,7 @@ import java.io.Closeable;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the common entries.
+ * @param   <CE> The type of the archive entries.
  * @see     CommonInput
  * @author  Christian Schlichtherle
  * @version $Id$

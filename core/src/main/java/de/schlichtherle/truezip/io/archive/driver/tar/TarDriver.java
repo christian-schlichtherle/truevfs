@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
@@ -174,7 +173,7 @@ extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutput<TarEntry>> {
             OutputStream out,
             TarInput source)
     throws IOException {
-        return new MultiplexedArchiveOutput(newTarOutput(
+        return new MultiplexedArchiveOutput<TarEntry>(newTarOutput(
                 archive, out, (TarInput) source));
     }
 

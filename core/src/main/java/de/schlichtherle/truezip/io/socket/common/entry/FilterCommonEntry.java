@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.socket.common.entry;
 
 /**
- * A decorator for archive entries.
+ * A decorator for file system entries.
  *
- * @param <AE> The type of the decorated archive entry.
+ * @param <CE> The type of the decorated file system entry.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterArchiveEntry<AE extends ArchiveEntry>
-implements ArchiveEntry {
+public class FilterCommonEntry<CE extends CommonEntry>
+implements CommonEntry {
 
-    /** The decorated archive entry. */
-    protected AE target;
+    /** The decorated file system entry. */
+    protected CE target;
 
-    protected FilterArchiveEntry(final AE target) {
+    protected FilterCommonEntry(final CE target) {
         this.target = target;
     }
 
@@ -48,17 +48,7 @@ implements ArchiveEntry {
     }
 
     @Override
-    public void setSize(long size) {
-        target.setSize(size);
-    }
-
-    @Override
     public long getTime() {
         return target.getTime();
-    }
-
-    @Override
-    public void setTime(long time) {
-        target.setTime(time);
     }
 }

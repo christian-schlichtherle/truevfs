@@ -15,24 +15,21 @@
  */
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.FileSystemEntry;
+import java.util.Set;
 
 /**
- * A file system entry which refers to an archive entry.
+ * A common entry which can list directory members.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemEntry
-extends FileSystemEntry, IOReference<ArchiveEntry> {
+public interface ArchiveFileSystemEntry extends CommonEntry {
 
     /**
      * Returns the non-{@code null} <i>path name</i>.
-     * A path name is a {@link CommonEntry#getName() common entry name} which
-     * meets the following additional requirement:
+     * A path name is a {@link CommonEntry#getName() common entry name}
+     * which meets the following additional requirement:
      * <ol>
      * <li>A path name <em>must not</em> end with a separator character.</li>
      * </ol>
@@ -41,4 +38,11 @@ extends FileSystemEntry, IOReference<ArchiveEntry> {
      */
     @Override
     String getName();
+
+    /**
+     * If this is not a directory entry, {@code null} is returned.
+     * Otherwise, an unmodifiable set of strings is returned which
+     * represent the base names of the members of this directory entry.
+     */
+    Set<String> list();
 }

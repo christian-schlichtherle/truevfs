@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
@@ -30,7 +32,6 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -95,14 +96,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
      *
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
-    private final class Input
-    extends ConcurrentCommonInput<AE, AI> {
+    private final class Input extends ConcurrentCommonInput<AE> {
         Input(AI target) {
             super(target);
         }
 
         AI getTarget() {
-            return target;
+            return (AI) target;
         }
     }
 
@@ -114,14 +114,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
      *
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
-    private final class Output
-    extends ConcurrentCommonOutput<AE, AO> {
+    private final class Output extends ConcurrentCommonOutput<AE> {
         Output(AO target) {
             super(target);
         }
 
         AO getTarget() {
-            return target;
+            return (AO) target;
         }
     }
 
@@ -208,13 +207,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
         return proxy != null ? proxy.getTarget() : null;
     }
 
-    private ArchiveFileSystem<AE> newArchiveFileSystem()
+    private ArchiveFileSystem newArchiveFileSystem()
     throws IOException {
         return ArchiveFileSystems.newArchiveFileSystem(
                 getDriver(), vetoableTouchListener);
     }
 
-    private ArchiveFileSystem<AE> newArchiveFileSystem(
+    private ArchiveFileSystem newArchiveFileSystem(
             long rootTime,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
@@ -423,9 +422,9 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert !isRoot(path);
         assert inFile == null;
 
-        final ArchiveFileSystem<AE> controllerFileSystem;
-        controllerFileSystem = controller.autoMount(createParents);
-        final AE entry = controllerFileSystem.getEntry(path);
+        final ArchiveFileSystem<AE> controllerFileSystem
+                = controller.autoMount(createParents);
+        final Entry<AE> entry = controllerFileSystem.getEntry(path);
         final Type type = null == entry ? null : entry.getType();
         if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
@@ -662,7 +661,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)
             return false;
-        final ArchiveEntry entry = getFileSystem().getEntry(path);
+        final Entry entry = getFileSystem().getEntry(path);
         return entry != null && output.getEntry(entry.getName()) != null;
     }
 
@@ -900,7 +899,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
         // deleted from the archive file system meanwhile and prepare
         // to throw a warning exception.
         final ArchiveFileSystem fileSystem = getFileSystem();
-        for (final ArchiveEntry entry : output) {
+        for (final AE entry : output) {
             assert entry.getType() != DIRECTORY;
             // At this point in time we could have written only file archive
             // entries with valid path names, so the following test should be
@@ -921,12 +920,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
     public <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
-        final CommonInput<AE> in = unwrap(input);
-        final CommonOutput<AE> out = unwrap(output);
+        final CommonInput in = unwrap(input);
+        final CommonOutput out = unwrap(output);
         final ArchiveFileSystem<AE> fs = getFileSystem();
-        final AE root = fs.getEntry(ROOT);
+        final AE root = fs.getEntry(ROOT).getTarget();
         assert root != null;
-        for (final AE e : fs) {
+        for (final Entry<AE> fse : fs) {
+            final AE e = fse.getTarget();
             final String n = e.getName();
             if (out.getEntry(n) != null)
                 continue; // we have already written this entry
@@ -939,8 +939,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     out.getOutputSocket(e).peer(null).newOutputStream().close();
                 } else if (in != null && in.getEntry(n) != null) {
                     assert e == in.getEntry(n);
-                    IOSockets.copy(  in.getInputSocket(e),
-                                        out.getOutputSocket(e));
+                    IOSockets.copy( in.getInputSocket(e),
+                                    out.getOutputSocket(e));
                 } else {
                     // The file system entry is an archive file which has been
                     // newly created and not yet been reassembled

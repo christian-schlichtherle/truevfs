@@ -38,10 +38,8 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentCommonInput<
-        CE extends CommonEntry,
-        CI extends CommonInput<CE>>
-extends FilterCommonInput<CE, CI> {
+public class ConcurrentCommonInput<CE extends CommonEntry>
+extends FilterCommonInput<CE, CommonInput<CE>> {
 
     private static final String CLASS_NAME
             = ConcurrentCommonInput.class.getName();
@@ -64,7 +62,7 @@ extends FilterCommonInput<CE, CI> {
     private volatile boolean stopped;
 
     /** Constructs a new {@code ConcurrentCommonInput}. */
-    public ConcurrentCommonInput(final CI target) {
+    public ConcurrentCommonInput(final CommonInput<CE> target) {
         super(target);
     }
 

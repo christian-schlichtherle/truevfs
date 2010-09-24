@@ -15,14 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -115,10 +114,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
     public abstract boolean isWritable(String path)
     throws FalsePositiveException;
 
-    public abstract ArchiveEntry getEntry(String path)
-    throws FalsePositiveException;
-
-    public abstract Set<String> list(String path)
+    public abstract ArchiveFileSystemEntry getEntry(String path)
     throws FalsePositiveException;
 
     /**
@@ -130,7 +126,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
-    public abstract CommonInputSocket
+    public abstract CommonInputSocket<?>
     getInputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
 
@@ -143,7 +139,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
-    public abstract CommonOutputSocket
+    public abstract CommonOutputSocket<?>
     getOutputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
 

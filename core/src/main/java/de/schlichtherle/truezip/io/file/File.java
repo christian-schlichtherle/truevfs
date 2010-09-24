@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
@@ -2227,8 +2228,8 @@ public class File extends java.io.File {
     public boolean isFile() {
         try {
             if (innerArchive != null) {
-                final ArchiveEntry entry = innerArchive.getArchiveController()
-                        .getEntry(getInnerEntryName());
+                final ArchiveFileSystemEntry entry = innerArchive
+                        .getArchiveController().getEntry(getInnerEntryName());
                 return null != entry && entry.getType() == FILE;
             }
         } catch (FalsePositiveException isNotArchive) {
@@ -2263,8 +2264,8 @@ public class File extends java.io.File {
     public boolean isDirectory() {
         try {
             if (innerArchive != null) {
-                final ArchiveEntry entry = innerArchive.getArchiveController()
-                        .getEntry(getInnerEntryName());
+                final ArchiveFileSystemEntry entry = innerArchive
+                        .getArchiveController().getEntry(getInnerEntryName());
                 return null != entry && entry.getType() == DIRECTORY;
             }
         } catch (FalsePositiveException isNotArchive) {
@@ -2387,8 +2388,8 @@ public class File extends java.io.File {
     public long length() {
         try {
             if (innerArchive != null) {
-                final ArchiveEntry entry = innerArchive.getArchiveController()
-                        .getEntry(getInnerEntryName());
+                final ArchiveFileSystemEntry entry = innerArchive
+                        .getArchiveController().getEntry(getInnerEntryName());
                 if (null == entry || entry.getType() == DIRECTORY)
                     return 0;
 
@@ -2427,8 +2428,8 @@ public class File extends java.io.File {
     public long lastModified() {
         try {
             if (innerArchive != null) {
-                final ArchiveEntry entry = innerArchive.getArchiveController()
-                        .getEntry(getInnerEntryName());
+                final ArchiveFileSystemEntry entry = innerArchive
+                        .getArchiveController().getEntry(getInnerEntryName());
                 if (null == entry)
                     return 0;
                 // Depending on the driver type, target.getTime() could return
@@ -2498,7 +2499,8 @@ public class File extends java.io.File {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive
                         .getArchiveController()
-                        .list(getInnerEntryName());
+                        .getEntry(getInnerEntryName())
+                        .list();
                 return members == null
                         ? null : members.toArray(new String[members.size()]);
             }
@@ -2527,8 +2529,10 @@ public class File extends java.io.File {
     public String[] list(final FilenameFilter filter) {
         try {
             if (innerArchive != null) {
-                final Set<String> members = innerArchive.getArchiveController()
-                        .list(getInnerEntryName());
+                final Set<String> members = innerArchive
+                        .getArchiveController()
+                        .getEntry(getInnerEntryName())
+                        .list();
                 if (members == null)
                     return null;
                 if (filter == null)
@@ -2612,8 +2616,10 @@ public class File extends java.io.File {
             final FileFactory factory) {
         try {
             if (innerArchive != null) {
-                final Set<String> members = innerArchive.getArchiveController()
-                        .list(getInnerEntryName());
+                final Set<String> members = innerArchive
+                        .getArchiveController()
+                        .getEntry(getInnerEntryName())
+                        .list();
                 if (members == null)
                     return null;
                 final Collection<File> filtered
@@ -2678,7 +2684,8 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive.getArchiveController()
-                        .list(getInnerEntryName());
+                        .getEntry(getInnerEntryName())
+                        .list();
                 if (members == null)
                     return null;
                 final Collection<File> filtered
