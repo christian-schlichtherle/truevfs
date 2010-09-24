@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.entry;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import java.io.CharConversionException;
 
 /**

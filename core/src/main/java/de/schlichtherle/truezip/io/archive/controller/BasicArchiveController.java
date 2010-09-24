@@ -56,9 +56,9 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.W
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -1084,7 +1084,7 @@ implements  ArchiveInputSocketProvider<AE>,
                 // TODO: Review: This policy may be changed - see method start.
                 assert outputStreams <= 0
                         : "Entries for open output streams should not be deletable!";
-                // Note: Entry for open input streams ARE deletable!
+                // Note: CommonEntry for open input streams ARE deletable!
                 final int inputStreams = waitAllInputStreamsByOtherThreads(50);
                 if (inputStreams > 0 || outputStreams > 0)
                     throw new IOException("archive file has open streams!");
