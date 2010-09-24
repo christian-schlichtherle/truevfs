@@ -262,7 +262,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     throws IOException {
         // We need to mount the virtual file system from the input file.
         // and so far we have not successfully opened the input file.
-        if (isRfsEntryTarget()) {
+        if (isHostFileSystemEntryTarget()) {
             // The target file of this controller is NOT enclosed
             // in another archive file.
             // Test modification time BEFORE opening the input file!
@@ -423,9 +423,10 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert !isRoot(path);
         assert inFile == null;
 
-        final ArchiveFileSystem controllerFileSystem;
+        final ArchiveFileSystem<AE> controllerFileSystem;
         controllerFileSystem = controller.autoMount(createParents);
-        final Type type = controllerFileSystem.getType(path);
+        final AE entry = controllerFileSystem.getEntry(path);
+        final Type type = null == entry ? null : entry.getType();
         if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
@@ -455,7 +456,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                        controllerFileSystem.getLastModified(path),
+                        controllerFileSystem.getEntry(path).getTime(),
                         controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
@@ -530,7 +531,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
         try {
             ReadOnlyFile rof = new SimpleReadOnlyFile(inFile);
             try {
-                if (isRfsEntryTarget())
+                if (isHostFileSystemEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
                 input = wrap(getDriver().newInput(this, rof));
             } finally {
@@ -585,7 +586,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
         java.io.File tmp = outFile;
         if (tmp == null) {
-            if (isRfsEntryTarget() && !getTarget().isFile()) {
+            if (isHostFileSystemEntryTarget() && !getTarget().isFile()) {
                 tmp = getTarget();
             } else {
                 // Use a new temporary file as the output archive file.
@@ -849,7 +850,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             }
         } // class FilterExceptionHandler
 
-        final long rootTime = getFileSystem().getLastModified(ROOT);
+        final long rootTime = getFileSystem().getEntry(ROOT).getTime();
         try {
             try {
                 shutdownStep1(handler);
@@ -906,7 +907,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             // enough:
             final String path = entry.getName();
             //final String path = normalize(entry.getName(), SEPARATOR_CHAR);
-            if (fileSystem.getType(path) == null) {
+            if (fileSystem.getEntry(path) == null) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
@@ -970,7 +971,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     throws ArchiveSyncException {
         assert writeLock().isHeldByCurrentThread();
 
-        if (isRfsEntryTarget()) {
+        if (isHostFileSystemEntryTarget()) {
             // The archive file managed by this object is NOT enclosed in
             // another archive file.
             if (outFile != getTarget()) {

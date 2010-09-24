@@ -56,6 +56,10 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.U
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SYMLINK;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
@@ -2204,7 +2208,7 @@ public class File extends java.io.File {
         try {
             if (enclArchive != null)
                 return enclArchive.getArchiveController()
-                        .isExisting(enclEntryName);
+                        .getEntry(enclEntryName) != null;
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2224,9 +2228,11 @@ public class File extends java.io.File {
     @Override
     public boolean isFile() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .isFile(getInnerEntryName());
+            if (innerArchive != null) {
+                final ArchiveEntry entry = innerArchive.getArchiveController()
+                        .getEntry(getInnerEntryName());
+                return null != entry && entry.getType() == FILE;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2258,9 +2264,11 @@ public class File extends java.io.File {
     @Override
     public boolean isDirectory() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .isDirectory(getInnerEntryName());
+            if (innerArchive != null) {
+                final ArchiveEntry entry = innerArchive.getArchiveController()
+                        .getEntry(getInnerEntryName());
+                return null != entry && entry.getType() == DIRECTORY;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2270,15 +2278,15 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns an icon for this file or directory if it is in <i>open</i>
-     * state for {@link de.schlichtherle.truezip.io.swing.JFileTree}
-     * or {@code null} if the default should be used.
+     * If this file is a true archive file, its archive driver is asked to
+     * return an icon to be used for
+     * {@link de.schlichtherle.truezip.io.swing.JFileTree}.
+     * Otherwise, null is returned.
      */
     public Icon getOpenIcon() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .getOpenIcon(getInnerEntryName());
+            if (innerArchive == this)
+                return getArchiveController().getOpenIcon();
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2288,15 +2296,15 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns an icon for this file or directory if it is in <i>closed</i>
-     * state for {@link de.schlichtherle.truezip.io.swing.JFileTree}
-     * or {@code null} if the default should be used.
+     * If this file is a true archive file, its archive driver is asked to
+     * return an icon to be used for
+     * {@link de.schlichtherle.truezip.io.swing.JFileTree}.
+     * Otherwise, null is returned.
      */
     public Icon getClosedIcon() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .getClosedIcon(getInnerEntryName());
+            if (innerArchive == this)
+                return getArchiveController().getClosedIcon();
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2380,9 +2388,24 @@ public class File extends java.io.File {
     @Override
     public long length() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .getLength(getInnerEntryName());
+            if (innerArchive != null) {
+                final ArchiveEntry entry = innerArchive.getArchiveController()
+                        .getEntry(getInnerEntryName());
+                if (null == entry || entry.getType() == DIRECTORY)
+                    return 0;
+
+                // TODO: Review: Can we avoid this special case?
+                // It's probably ZipDriver specific!
+                // This target is a plain file in the file system.
+                // If target.getSize() returns UNKNOWN, the getLength is yet unknown.
+                // This may happen if e.g. a ZIP target has only been partially
+                // written, i.e. not yet closed by another thread, or if this is a
+                // ghost directory.
+                // As this is not specified in the contract of this class,
+                // return 0 in this case instead.
+                final long length = entry.getSize();
+                return length >= 0 ? length : 0;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2405,9 +2428,20 @@ public class File extends java.io.File {
     @Override
     public long lastModified() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .getLastModified(getInnerEntryName());
+            if (innerArchive != null) {
+                final ArchiveEntry entry = innerArchive.getArchiveController()
+                        .getEntry(getInnerEntryName());
+                if (null == entry)
+                    return 0;
+                // Depending on the driver type, target.getTime() could return
+                // a negative value. E.g. this is the default value that the
+                // ArchiveDriver uses for newly created entries in order to
+                // indicate an unknown time.
+                // As this is not specified in the contract of this class,
+                // 0 is returned in this case instead.
+                final long time = entry.getTime();
+                return time >= 0 ? time : 0;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";

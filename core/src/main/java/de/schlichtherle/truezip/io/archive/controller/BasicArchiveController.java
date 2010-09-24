@@ -58,6 +58,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -302,12 +303,13 @@ implements  ArchiveInputSocketProvider<AE>,
 
     /**
      * Returns {@code true} if and only if the target file of this
-     * controller should be considered to be a file or directory in the real
-     * file system (RFS).
+     * controller should be considered to be a file or directory in the host
+     * file system.
      * Note that the target doesn't need to exist for this method to return
      * {@code true}.
      */
-    final boolean isRfsEntryTarget() {
+    // TODO: Move to UpdatingArchiveController and declare private.
+    final boolean isHostFileSystemEntryTarget() {
         // May be called from FileOutputStream while unlocked!
         //assert readLock().isLocked() || writeLock().isLocked();
 
@@ -712,6 +714,80 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
+    public final Icon getOpenIcon()
+    throws FalsePositiveException {
+        try {
+            return getOpenIcon0();
+        } catch (ArchiveEntryFalsePositiveException ex) {
+            return getEnclController().getOpenIcon();
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    private Icon getOpenIcon0()
+    throws FalsePositiveException, IOException {
+        readLock().lock();
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getOpenIcon(this);
+        } finally {
+            readLock().unlock();
+        }
+    }
+
+    @Override
+    public final Icon getClosedIcon()
+    throws FalsePositiveException {
+        try {
+            return getClosedIcon0();
+        } catch (ArchiveEntryFalsePositiveException ex) {
+            return getEnclController().getClosedIcon();
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    private Icon getClosedIcon0()
+    throws FalsePositiveException, IOException {
+        readLock().lock();
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getClosedIcon(this);
+        } finally {
+            readLock().unlock();
+        }
+    }
+
+    @Override
+    public final boolean isReadOnly()
+    throws FalsePositiveException {
+        try {
+            return isReadOnly0();
+        } catch (ArchiveEntryFalsePositiveException ex) {
+            return getEnclController().isReadOnly();
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return true;
+        }
+    }
+
+    private boolean isReadOnly0()
+    throws FalsePositiveException, IOException {
+        readLock().lock();
+        try {
+            return autoMount().isReadOnly();
+        } finally {
+            readLock().unlock();
+        }
+    }
+
+    @Override
     public final ArchiveEntry getEntry(final String path)
     throws FalsePositiveException {
         try {
@@ -729,156 +805,26 @@ implements  ArchiveInputSocketProvider<AE>,
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            try {
-                return new UnmodifiableArchiveEntry(autoMount().getEntry(path));
-            } catch (ArchiveEntryNotFoundException ex) {
-                return null;
-            }
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final boolean isExisting(final String path)
-    throws FalsePositiveException {
-        try {
-            return isExisting0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isExisting(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    private boolean isExisting0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            try {
-                return autoMount().getType(path) != null;
-            } catch (ArchiveEntryNotFoundException ex) {
-                return false;
-            }
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final boolean isFile(final String path)
-    throws FalsePositiveException {
-        try {
-            return isFile0(path);
+            final ArchiveEntry entry = autoMount().getEntry(path);
+            return null == entry ? null : new UnmodifiableArchiveEntry(entry);
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // See ArchiveDriver#newArchiveInput!
-            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return false;
-            return getEnclController().isFile(getEnclPath(path));
-        } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isFile(getEnclPath(path)); // the directory could be one of the target's ancestors!
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
+            /** @see ArchiveDriver#newInput! */
+            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException) {
+                class SpecialFileEntry extends UnmodifiableArchiveEntry {
+                    SpecialFileEntry(ArchiveEntry target) {
+                        super(target);
+                    }
 
-    private boolean isFile0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            try {
-                return autoMount().getType(path) == FILE;
-            } catch (ArchiveEntryNotFoundException ex) {
-                return false;
+                    @Override
+                    public Type getType() {
+                        assert FILE == super.getType();
+                        return SPECIAL;
+                    }
+                }
+                return new SpecialFileEntry(
+                        getEnclController().getEntry(getEnclPath(path))); // the exception asserts that the entry exists as a file!
             }
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final boolean isDirectory(final String path)
-    throws FalsePositiveException {
-        try {
-            return isDirectory0(path);
-        } catch (FileArchiveEntryFalsePositiveException ex) {
-            return false;
-        } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isDirectory(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
             throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    private boolean isDirectory0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            try {
-                return autoMount().getType(path) == DIRECTORY;
-            } catch (ArchiveEntryNotFoundException ex) {
-                return false;
-            }
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final Icon getOpenIcon(final String path)
-    throws FalsePositiveException {
-        try {
-            return getOpenIcon0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getOpenIcon(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private Icon getOpenIcon0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            autoMount(); // detect false positives!
-            return isRoot(path)
-                    ? getDriver().getOpenIcon(this)
-                    : null;
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final Icon getClosedIcon(final String path)
-    throws FalsePositiveException {
-        try {
-            return getClosedIcon0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getClosedIcon(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private Icon getClosedIcon0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            autoMount(); // detect false positives!
-            return isRoot(path)
-                    ? getDriver().getClosedIcon(this)
-                    : null;
         } finally {
             readLock().unlock();
         }
@@ -902,7 +848,7 @@ implements  ArchiveInputSocketProvider<AE>,
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            return autoMount().getType(path) != null;
+            return autoMount().getEntry(path) != null;
         } finally {
             readLock().unlock();
         }
@@ -927,54 +873,6 @@ implements  ArchiveInputSocketProvider<AE>,
         readLock().lock();
         try {
             return autoMount().isWritable(path);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final long getLength(final String path)
-    throws FalsePositiveException {
-        try {
-            return getLength0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getLength(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return 0;
-        }
-    }
-
-    private long getLength0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().getLength(path);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final long getLastModified(final String path)
-    throws FalsePositiveException {
-        try {
-            return getLastModified0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getLastModified(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return 0;
-        }
-    }
-
-    private long getLastModified0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().getLastModified(path);
         } finally {
             readLock().unlock();
         }
@@ -1077,7 +975,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
         writeLock().lock();
         try {
-            if (autoMount(createParents).getType(path) != null)
+            if (autoMount(createParents).getEntry(path) != null)
                 return false;
             // If we got here without an exception, write an empty file now.
             getOutputSocket0(
@@ -1145,10 +1043,12 @@ implements  ArchiveInputSocketProvider<AE>,
             return getEnclController().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // See ArchiveDriver#newArchiveInput!
-            if (isRoot(path)
-            && !getEnclController().isDirectory(getEnclPath(path)) // isFile() would fail!
-            && ex.getCause() instanceof FileNotFoundException)
-                return false;
+            if (isRoot(path)) {
+                final ArchiveEntry entry = getEnclController().getEntry(getEnclPath(path));
+                if (null == entry || entry.getType() != DIRECTORY
+                    && ex.getCause() instanceof FileNotFoundException)
+                    return false;
+            }
             return getEnclController().delete(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
@@ -1197,7 +1097,7 @@ implements  ArchiveInputSocketProvider<AE>,
                 PromptingKeyManager.resetKeyProvider(getMountPoint());
                 // Delete the target file or the entry in the enclosing
                 // archive file, too.
-                if (isRfsEntryTarget()) {
+                if (isHostFileSystemEntryTarget()) { // FIXME: Do not use this method!
                     // The target file of the controller is NOT enclosed
                     // in another archive file.
                     if (!getTarget().delete())

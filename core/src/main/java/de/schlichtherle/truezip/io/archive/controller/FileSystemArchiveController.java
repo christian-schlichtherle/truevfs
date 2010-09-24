@@ -132,8 +132,6 @@ extends BasicArchiveController<AE, AI, AO> {
                 throw ex;
             } catch (IOException ex) {
                 throw ex;
-            } catch (Exception cannotHappen) {
-                throw new AssertionError(cannotHappen);
             }
 
             assert autoMounter != this;

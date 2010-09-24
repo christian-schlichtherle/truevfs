@@ -67,33 +67,6 @@ extends ArchiveEntryFactory<AE> {
     /**
      * Creates a new archive input for the given {@code archive} in order to
      * read the given read only file.
-     * <p>
-     * Note that if an exception is thrown, the method must be reentrant!
-     * In addition, the exception type determines the behaviour of the
-     * {@link ArchiveController} class as follows:
-     * <table>
-     * <tr>
-     *   <th>Exception type</td>
-     *   <th>{@link ArchiveController#isFile}</th>
-     *   <th>{@link ArchiveController#isDirectory}</th>
-     *   <th>{@link ArchiveController#isExisting}</th>
-     *   <th>{@link ArchiveController#delete}</th>
-     * </tr>
-     * <tr>
-     *   <td>{@link FileNotFoundException}</td>
-     *   <td><b>{@code false}</b></td>
-     *   <td>{@code false}</td>
-     *   <td>{@code true}</td>
-     *   <td>{@code true} (unless prohibited by the real file system)</td>
-     * </tr>
-     * <tr>
-     *   <td>{@link IOException}</td>
-     *   <td><b>{@code true}</b></td>
-     *   <td>{@code false}</td>
-     *   <td>{@code true}</td>
-     *   <td>{@code true} (unless prohibited by the real file system)</td>
-     * </tr>
-     * </table>
      * 
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link ArchiveController} is processing
@@ -110,13 +83,13 @@ extends ArchiveEntryFactory<AE> {
      *         This exception is associated with another {@link IOException}
      *         as its cause which is unwrapped and interpreted as below.
      * @throws FileNotFoundException If the input archive is inaccessible
-     *         for any reason and the implementation would like to mask the
-     *         archive file like a special file which cannot get read, written
-     *         or deleted.
+     *         for any reason and the implementation would like the client
+     *         application to recognize the archive file as a <i>special</i>
+     *         file.
      * @throws IOException On any other I/O or data format related issue
      *         when reading the input archive and the implementation would like
-     *         to treat the archive file like a regular file which may be read,
-     *         written or deleted.
+     *         the client application to recognize the archive file as a
+     *         <i>regular</i> file.
      */
     AI newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;

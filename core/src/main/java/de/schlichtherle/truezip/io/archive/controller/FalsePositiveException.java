@@ -23,7 +23,7 @@ import java.net.URI;
 
 /**
  * Indicates a false positive archive entry which actually exists as a
- * file or directory entry in the real file system or in an enclosing archive
+ * file or directory entry in the host file system or in an enclosing archive
  * file.
  * <p>
  * Instances of this class are always associated with an {@code IOException}

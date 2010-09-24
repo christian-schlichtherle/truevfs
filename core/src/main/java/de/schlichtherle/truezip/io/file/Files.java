@@ -387,7 +387,7 @@ class Files {
                             srcPath)
                         .peer(null)
                         .newInputStream();
-                time = srcController.getLastModified(srcPath);
+                time = srcController.getEntry(srcPath).getTime();
             /*} finally {
                 srcController.readLock().unlock();
             }*/
