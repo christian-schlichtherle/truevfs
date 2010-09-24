@@ -14,67 +14,46 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.socket.common.file;
 
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.SPECIAL;
 
 /**
- * Adapts a {@link File} instance to an {@link ArchiveEntry}.
+ * Adapts a {@link File} instance to a {@link CommonEntry}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class FileEntry implements CommonEntry {
-    private final String name;
     private final File file;
 
     /**
      * Constructs a new {@code FileEntry}.
-     * This constructor uses the file's path to build a valid entry name.
      * 
-     * @param file A valid {@code File} instance.
+     * @param file A non-{@code null} file.
      * @throws NullPointerException If {@code file} is {@code null}.
      */
     public FileEntry(final File file) {
-        this(file, getName(file));
-    }
-
-    /**
-     * Constructs a new {@code FileEntry}.
-     * 
-     * @param file A valid {@code File} instance.
-     * @param entryName A valid archive entry name.
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive CommonEntry Names</a>
-     * @throws NullPointerException If any parameter is {@code null}.
-     */
-    public FileEntry(final File file, final String entryName) {
-        if (entryName == null || file == null)
+        if (file == null)
             throw new NullPointerException();
-        this.name = entryName;
         this.file = file;
     }
 
     /** Returns the adapted file. */
-    public File getFile() {
+    File getFile() {
         return file;
-    }
-
-    private static String getName(File file) {
-        String entryName = file.getPath().replace(
-                File.separatorChar, SEPARATOR_CHAR);
-        if (file.isDirectory())
-            return entryName + SEPARATOR_CHAR;
-        return entryName;
     }
 
     /** Returns the name provided to the constructor. */
     @Override
     public String getName() {
-        return name;
+        return file.getName();
     }
 
     /** Returns whether the file is a directory or not. */

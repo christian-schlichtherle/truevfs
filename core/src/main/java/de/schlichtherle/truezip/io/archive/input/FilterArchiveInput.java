@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.input;
 
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.FilterArchiveOutput;
@@ -43,7 +44,7 @@ implements ArchiveInput<AE> {
     }
 
     @Override
-    public ArchiveInputSocket<AE> getInputSocket(AE entry)
+    public CommonInputSocket<AE> getInputSocket(AE entry)
     throws IOException {
         return target.getInputSocket(entry);
     }

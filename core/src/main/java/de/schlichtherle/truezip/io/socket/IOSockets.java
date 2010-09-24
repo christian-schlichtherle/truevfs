@@ -34,17 +34,6 @@ public class IOSockets {
     IOSockets() {
     }
 
-    ///** @deprecated Currently unused and may get deleted. */
-    /*public static <T, IT extends T, OT extends T> void copy(
-            final InputSocketProvider<IT, T> input,
-            final IT source,
-            final OutputSocketProvider<OT, T> output,
-            final OT destination)
-    throws IOException {
-        copy(input .getInputSocket (source     ),
-             output.getOutputSocket(destination));
-    }*/
-
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
      * by the input socket {@code input} to an output stream

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
@@ -71,14 +72,14 @@ extends FilterArchiveOutput<AE, AO> {
     }
 
     @Override
-    public ArchiveOutputSocket<AE> getOutputSocket(final AE entry)
+    public CommonOutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         // TODO: Consider synchronization!
-        final ArchiveOutputSocket<AE> output = target.getOutputSocket(entry);
-        class OutputSocket extends ArchiveOutputSocket<AE> {
+        final CommonOutputSocket<AE> output = target.getOutputSocket(entry);
+        class OutputSocket extends CommonOutputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;

@@ -16,10 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.output;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.archive.entry.FileEntry;
+import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -129,10 +130,10 @@ extends FilterArchiveOutput<AE, AO> {
     }
 
     @Override
-    public ArchiveOutputSocket<AE> getOutputSocket(final AE entry)
+    public CommonOutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
-        final ArchiveOutputSocket<AE> output = super.getOutputSocket(entry);
-        class OutputSocket extends ArchiveOutputSocket<AE> {
+        final CommonOutputSocket<AE> output = super.getOutputSocket(entry);
+        class OutputSocket extends CommonOutputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;
@@ -147,7 +148,7 @@ extends FilterArchiveOutput<AE, AO> {
         return new OutputSocket();
     }
 
-    protected OutputStream newOutputStream(final ArchiveOutputSocket<AE> output)
+    protected OutputStream newOutputStream(final CommonOutputSocket<AE> output)
     throws IOException {
         final CommonEntry peer = output.getPeerTarget();
         if (peer != null) {

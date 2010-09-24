@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.schlichtherle.truezip.io.socket.common.input;
 
-package de.schlichtherle.truezip.io.archive.input;
-
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.file.FileBusyException;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 
 /**
- * Thrown to indicate that the
- * {@link ArchiveInputSocket#newInputStream}
- * method failed because the archive is already busy on input.
- * This exception is guaranteed to be recoverable,
- * meaning it must be possible to read the same entry again as soon as the
- * archive is not busy on input anymore, unless another exceptional condition
- * applies.
+ * Thrown to indicate that the {@link CommonInputSocket#newInputStream}
+ * method failed because the common input socket's source is already busy.
+ * This exception is guaranteed to be recoverable, meaning it must be possible
+ * to read the same entry again as soon as the common input socket's source is
+ * not busy anymore, unless another exceptional condition applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveInputBusyException
+public class CommonInputBusyException
 extends FileBusyException {
 
     private static final long serialVersionUID = 1983745618753823654L;
 
     /**
-     * Constructs an instance of {@code ArchiveInputBusyException} with
-     * the specified archive entry.
+     * Constructs a new {@code CommonInputBusyException} with the specified
+     * common entry.
      * 
-     * @param entry The archive entry which was tried to read while
-     *        its associated {@link ArchiveInput} was busy.
+     * @param entry The common entry which was tried to read while
+     *        the common input socket's source was busy.
      */
-    public ArchiveInputBusyException(ArchiveEntry entry) {
+    public CommonInputBusyException(CommonEntry entry) {
         super(entry.getName());
     }
 }

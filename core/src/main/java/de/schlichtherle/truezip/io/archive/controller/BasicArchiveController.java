@@ -15,14 +15,14 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -57,9 +57,9 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.W
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -117,8 +117,8 @@ abstract class BasicArchiveController<  AE extends ArchiveEntry,
                                         AI extends ArchiveInput<AE>,
                                         AO extends ArchiveOutput<AE>>
 extends     ArchiveController
-implements  ArchiveInputSocketProvider<AE>,
-            ArchiveOutputSocketProvider<AE> {
+implements  CommonInputSocketProvider<AE>,
+            CommonOutputSocketProvider<AE> {
 
     /**
      * A weak reference to this archive controller.
@@ -453,7 +453,7 @@ implements  ArchiveInputSocketProvider<AE>,
     throws ArchiveSyncException;
 
     @Override
-    public ArchiveInputSocket<AE> getInputSocket(
+    public CommonInputSocket<AE> getInputSocket(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -466,7 +466,7 @@ implements  ArchiveInputSocketProvider<AE>,
         }
     }
 
-    private ArchiveInputSocket<AE> getInputSocket0(
+    private CommonInputSocket<AE> getInputSocket0(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -489,11 +489,11 @@ implements  ArchiveInputSocketProvider<AE>,
                         "cannot read directories");
             } else {
                 autoMount(); // detect false positives!
-                class InputSocketProxy extends ArchiveInputSocket<AE> {
+                class InputSocketProxy extends CommonInputSocket<AE> {
                     private IOReference<AE> local = this;
 
                     @Override
-                    public ArchiveInputSocket<AE> peer(
+                    public CommonInputSocket<AE> peer(
                             final OutputSocket<? extends CommonEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
@@ -501,7 +501,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     }
 
                     @Override
-                    protected void beforeConnectComplete() {
+                    protected void beforePeeringComplete() {
                         local = this; // reset local target reference
                     }
 
@@ -550,7 +550,7 @@ implements  ArchiveInputSocketProvider<AE>,
                                 throw new ArchiveEntryNotFoundException(
                                         BasicArchiveController.this, path,
                                         "cannot read directories");
-                            final ArchiveInputSocket<AE> input;
+                            final CommonInputSocket<AE> input;
                             if (null == target ||
                                     null == (input = getInputSocket(target)))
                                 throw new ArchiveEntryNotFoundException(
@@ -570,7 +570,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
-    public ArchiveOutputSocket<AE> getOutputSocket(
+    public CommonOutputSocket<AE> getOutputSocket(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -584,7 +584,7 @@ implements  ArchiveInputSocketProvider<AE>,
         }
     }
 
-    private ArchiveOutputSocket<AE> getOutputSocket0(
+    private CommonOutputSocket<AE> getOutputSocket0(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -606,11 +606,11 @@ implements  ArchiveInputSocketProvider<AE>,
                         "cannot write directories");
             } else {
                 autoMount(options.get(CREATE_PARENTS)); // detect false positives!
-                class OutputSocketProxy extends ArchiveOutputSocket<AE> {
+                class OutputSocketProxy extends CommonOutputSocket<AE> {
                     private Link<AE> local;
 
                     @Override
-                    public ArchiveOutputSocket<AE> peer(
+                    public CommonOutputSocket<AE> peer(
                             final InputSocket<? extends CommonEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
@@ -618,7 +618,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     }
 
                     @Override
-                    protected void beforeConnectComplete() {
+                    protected void beforePeeringComplete() {
                         local = null; // reset local target reference
                     }
 
@@ -670,7 +670,7 @@ implements  ArchiveInputSocketProvider<AE>,
                             @Override
                             public void run() throws IOException {
                                 final AE target = target();
-                                final ArchiveOutputSocket<AE> output
+                                final CommonOutputSocket<AE> output
                                         = getOutputSocket(target);
                                 final boolean append = options.get(APPEND);
                                 final InputStream in = append

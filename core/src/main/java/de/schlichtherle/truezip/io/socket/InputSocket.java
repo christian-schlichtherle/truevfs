@@ -44,20 +44,21 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
         final OutputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             peer = newPeer;
-            beforeConnectComplete();
+            beforePeeringComplete();
             if (null != newPeer)
                 newPeer.peer(this);
-            afterConnectComplete();
+            afterPeeringComplete();
         }
         return this;
     }
 
-    protected void beforeConnectComplete() {
+    protected void beforePeeringComplete() {
     }
 
-    protected void afterConnectComplete() {
+    protected void afterPeeringComplete() {
     }
 
+    /** @Oracle: Please save me from reinventing the wheel here! */
     private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }

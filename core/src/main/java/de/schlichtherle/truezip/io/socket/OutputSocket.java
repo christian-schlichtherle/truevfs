@@ -43,21 +43,21 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         final InputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             peer = newPeer;
-            beforeConnectComplete();
+            beforePeeringComplete();
             if (null != newPeer)
                 newPeer.peer(this);
-            afterConnectComplete();
+            afterPeeringComplete();
         }
         return this;
     }
 
-    protected void beforeConnectComplete() {
+    protected void beforePeeringComplete() {
     }
 
-    protected void afterConnectComplete() {
+    protected void afterPeeringComplete() {
     }
 
-    /** The definitive algorithm in the wide field of object equality testing. :-) */
+    /** @Oracle: Please save me from reinventing the wheel here! */
     private static boolean equal(Object o1, Object o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }

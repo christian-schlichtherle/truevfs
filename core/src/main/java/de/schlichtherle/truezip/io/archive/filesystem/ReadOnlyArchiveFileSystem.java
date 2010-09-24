@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 
 /**
  * A read-only archive file system.

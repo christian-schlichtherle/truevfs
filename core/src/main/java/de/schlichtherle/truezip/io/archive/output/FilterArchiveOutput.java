@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.archive.entry.FilterArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.FilterArchiveInput;
@@ -43,7 +44,7 @@ implements ArchiveOutput<AE> {
     }
 
     @Override
-    public ArchiveOutputSocket<AE> getOutputSocket(AE entry)
+    public CommonOutputSocket<AE> getOutputSocket(AE entry)
     throws IOException {
         return target.getOutputSocket(entry);
     }

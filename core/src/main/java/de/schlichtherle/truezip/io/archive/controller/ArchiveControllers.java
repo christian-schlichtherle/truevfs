@@ -20,10 +20,10 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.FileEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
-import de.schlichtherle.truezip.io.archive.socket.FileEntrySocketProvider;
+import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.file.FileEntrySocketProvider;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.Streams;
@@ -446,9 +446,9 @@ public class ArchiveControllers {
             final BitField<ArchiveIOOption> options = BitField.noneOf(ArchiveIOOption.class)
                     .set(PRESERVE, preserve)
                     .set(CREATE_PARENTS, createParents);
-            final ArchiveInputSocket<?> input
+            final CommonInputSocket<?> input
                     = srcController.getInputSocket(options, srcPath);
-            final ArchiveOutputSocket<?> output
+            final CommonOutputSocket<?> output
                     = dstController.getOutputSocket(options, dstPath);
             IOSockets.copy(input, output);
         } catch (ArchiveEntryFalsePositiveException ex) {

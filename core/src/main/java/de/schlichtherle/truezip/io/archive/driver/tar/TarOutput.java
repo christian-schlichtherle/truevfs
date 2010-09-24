@@ -16,13 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -91,9 +91,9 @@ implements ArchiveOutput<TarEntry> {
     }
 
     @Override
-    public ArchiveOutputSocket<TarEntry> getOutputSocket(final TarEntry entry)
+    public CommonOutputSocket<TarEntry> getOutputSocket(final TarEntry entry)
     throws FileNotFoundException {
-        class OutputSocket extends ArchiveOutputSocket<TarEntry> {
+        class OutputSocket extends CommonOutputSocket<TarEntry> {
             @Override
             public TarEntry getTarget() {
                 return entry;
@@ -112,7 +112,7 @@ implements ArchiveOutput<TarEntry> {
             final CommonEntry src)
     throws IOException {
         if (isBusy())
-            throw new ArchiveOutputBusyException(entry);
+            throw new CommonOutputBusyException(entry);
         if (entry.isDirectory()) {
             entry.setSize(0);
             return new EntryOutputStream(entry);

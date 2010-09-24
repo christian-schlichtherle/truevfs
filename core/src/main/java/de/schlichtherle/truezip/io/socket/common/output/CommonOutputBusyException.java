@@ -13,37 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.schlichtherle.truezip.io.socket.common.output;
 
-package de.schlichtherle.truezip.io.archive.output;
-
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.file.FileBusyException;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 
 /**
- * Thrown to indicate that the
- * {@link ArchiveOutputSocket#newOutputStream}
- * method failed because the archive is already busy on output.
- * This exception is guaranteed to be recoverable,
- * meaning it must be possible to write the same entry again as soon as the
- * archive is not busy on output anymore, unless another exceptional condition
+ * Thrown to indicate that the {@link CommonOutputSocket#newOutputStream}
+ * method failed because the common output socket's destination is already busy.
+ * This exception is guaranteed to be recoverable, meaning it must be possible
+ * to write the same entry again as soon as the common output socket's
+ * destination is not busy anymore, unless another exceptional condition
  * applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveOutputBusyException
+public class CommonOutputBusyException
 extends FileBusyException {
 
     private static final long serialVersionUID = 962318648273654198L;
     
     /**
-     * Constructs an instance of {@code ArchiveDriverBusyException} with
-     * the specified archive entry.
+     * Constructs a new {@code CommonOutputBusyException} with the specified
+     * common entry.
      * 
-     * @param entry The archive entry which was tried to write while
-     *        its associated {@link ArchiveOutput} was busy.
+     * @param entry The common entry which was tried to write while
+     *        the common output socket's destination was busy.
      */
-    public ArchiveOutputBusyException(ArchiveEntry entry) {
+    public CommonOutputBusyException(CommonEntry entry) {
         super(entry.getName());
     }
 }
