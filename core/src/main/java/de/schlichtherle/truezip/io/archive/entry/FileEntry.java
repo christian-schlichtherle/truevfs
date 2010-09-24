@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.archive.entry;
 
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.SPECIAL;
 
 /**
  * Adapts a {@link File} instance to an {@link ArchiveEntry}.
@@ -48,7 +48,7 @@ public class FileEntry implements ArchiveEntry {
      * 
      * @param file A valid {@code File} instance.
      * @param entryName A valid archive entry name.
-     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive Entry Names</a>
+     * @see <a href="ArchiveEntry.html#entryName">Requirements for Archive CommonEntry Names</a>
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public FileEntry(final File file, final String entryName) {

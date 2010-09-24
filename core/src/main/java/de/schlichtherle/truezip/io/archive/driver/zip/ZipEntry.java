@@ -19,8 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
 
 /**
  * An adapter class to make the {@link ZipEntry} class implement the
