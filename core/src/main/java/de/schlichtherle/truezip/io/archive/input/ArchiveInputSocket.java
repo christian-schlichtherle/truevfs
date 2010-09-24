@@ -41,8 +41,7 @@ public abstract class ArchiveInputSocket<AE extends ArchiveEntry>
 extends InputSocket<AE, ArchiveEntry> {
 
     @Override
-    public ArchiveInputSocket<AE> chain(
-            InputSocket<? super AE, ? extends ArchiveEntry> output) {
+    public ArchiveInputSocket<AE> chain(InputSocket<AE, ArchiveEntry> output) {
         super.chain(output);
         return this;
     }

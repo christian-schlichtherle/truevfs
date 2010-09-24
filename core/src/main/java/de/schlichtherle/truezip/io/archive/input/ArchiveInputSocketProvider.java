@@ -45,6 +45,5 @@ extends InputSocketProvider<AE, ArchiveEntry> {
      * @param entry a non-{@code null} archive entry.
      */
     @Override
-    ArchiveInputSocket<AE> getInputSocket(AE entry)
-    throws IOException;
+    ArchiveInputSocket<AE> getInputSocket(AE entry) throws IOException;
 }
