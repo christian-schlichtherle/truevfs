@@ -2347,9 +2347,8 @@ public class File extends java.io.File {
     public boolean setReadOnly() {
         try {
             if (innerArchive != null) {
-                innerArchive.getArchiveController()
+                return innerArchive.getArchiveController()
                         .setReadOnly(getInnerEntryName());
-                return true;
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)

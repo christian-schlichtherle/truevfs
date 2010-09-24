@@ -57,7 +57,8 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
     protected void afterConnectComplete() {
     }
 
-    private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
+    /** The definitive algorithm in the wide field of object equality testing. :-) */
+    private static boolean equal(Object o1, Object o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }
 

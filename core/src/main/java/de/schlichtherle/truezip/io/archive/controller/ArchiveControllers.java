@@ -99,8 +99,8 @@ public class ArchiveControllers {
     ArchiveControllers() {
     }
 
-    public static ArchiveController get(URI mountPoint) {
-        return get(mountPoint, null, null);
+    static BasicArchiveController get(URI mountPoint) {
+        return (BasicArchiveController) get(mountPoint, null, null);
     }
 
     /**
@@ -245,17 +245,20 @@ public class ArchiveControllers {
                 // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                for (final ArchiveController c
+                for (final BasicArchiveController c
                         : getAll(prefix, REVERSE_CONTROLLERS)) {
-                    c.writeLock().lock();
-                    try {
-                        if (c.isTouched())
-                            touched++;
                         try {
-                            // Upon return, some new ArchiveWarningException's may
-                            // have been generated. We need to remember them for
-                            // later throwing.
-                            c.sync(options, builder);
+                            c.writeLock().lock();
+                            try {
+                                if (c.isTouched())
+                                    touched++;
+                                // Upon return, some new ArchiveWarningException's may
+                                // have been generated. We need to remember them for
+                                // later throwing.
+                                c.sync(options, builder);
+                            } finally {
+                                c.writeLock().unlock();
+                            }
                         } catch (ArchiveSyncException exception) {
                             // Updating the archive file or wrapping it back into
                             // one of it's enclosing archive files resulted in an
@@ -264,9 +267,6 @@ public class ArchiveControllers {
                             // later throwing only and continue updating the rest.
                             builder.warn(exception);
                         }
-                    } finally {
-                        c.writeLock().unlock();
-                    }
                     total++;
                 }
                 builder.check();
@@ -282,16 +282,16 @@ public class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<? extends ArchiveController> getAll() {
+    static Iterable<BasicArchiveController> getAll() {
         return getAll(null, null);
     }
 
-    static Iterable<? extends ArchiveController> getAll(
+    static Iterable<BasicArchiveController> getAll(
             URI prefix,
             final Comparator c) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
-        final Set<ArchiveController> snapshot;
+        final Set<BasicArchiveController> snapshot;
         synchronized (controllers) {
             snapshot = c != null
                     ? new TreeSet(c)
@@ -309,9 +309,9 @@ public class ArchiveControllers {
                     }
                 }
                 assert value != null;
-                assert value instanceof ArchiveController;
-                if (((ArchiveController) value).getMountPoint().toString().startsWith(prefix.toString()))
-                    snapshot.add((ArchiveController) value);
+                assert value instanceof BasicArchiveController;
+                if (((BasicArchiveController) value).getMountPoint().toString().startsWith(prefix.toString()))
+                    snapshot.add((BasicArchiveController) value);
             }
         }
         return snapshot;

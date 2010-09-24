@@ -48,8 +48,8 @@ extends OutputSocket<AE, ArchiveEntry> {
 
     @Override
     public ArchiveOutputSocket<AE> peer(
-            InputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
-        super.peer(newPeer);
+            InputSocket<? extends ArchiveEntry, ? super AE> peer) {
+        super.peer(peer);
         return this;
     }
 
@@ -80,6 +80,5 @@ extends OutputSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    public abstract OutputStream newOutputStream()
-    throws IOException;
+    public abstract OutputStream newOutputStream() throws IOException;
 }

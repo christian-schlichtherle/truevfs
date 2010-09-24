@@ -48,10 +48,6 @@ extends Iterable<AE> {
      * iteration should reflect the order of the entries in the archive file.
      * Whether this reflects the order of the entry data in the file or a
      * list of entries in a central directory is up to the implementation.
-     * <p>
-     * Finally, the iteration <em>may</em> be unmodifiable, i.e. its
-     * {@link Iterator#remove()} method may throw an
-     * {@link UnsupportedOperationException}.
      *
      * @return A new non-{@code null} iterator over all archive entries in
      *         this archive entry container.

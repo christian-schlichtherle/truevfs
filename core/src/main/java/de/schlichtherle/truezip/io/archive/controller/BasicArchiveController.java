@@ -31,6 +31,7 @@ import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.entry.UnmodifiableArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
@@ -110,10 +111,9 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<
-        AE extends ArchiveEntry,
-        AI extends ArchiveInput<AE>,
-        AO extends ArchiveOutput<AE>>
+abstract class BasicArchiveController<  AE extends ArchiveEntry,
+                                        AI extends ArchiveInput<AE>,
+                                        AO extends ArchiveOutput<AE>>
 extends     ArchiveController
 implements  ArchiveInputSocketProvider<AE>,
             ArchiveOutputSocketProvider<AE> {
@@ -129,7 +129,7 @@ implements  ArchiveInputSocketProvider<AE>,
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final ArchiveController enclController;
+    private final BasicArchiveController enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -185,7 +185,7 @@ implements  ArchiveInputSocketProvider<AE>,
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
         if (enclMountPoint != null) {
-            this.enclController = (BasicArchiveController) ArchiveControllers.get(enclMountPoint); // FIXME: This is cheating!
+            this.enclController = ArchiveControllers.get(enclMountPoint); // FIXME: This is cheating!
             assert this.enclController != null;
             this.enclPath = enclMountPoint.relativize(mountPoint);
         } else {
@@ -207,15 +207,19 @@ implements  ArchiveInputSocketProvider<AE>,
     // Methods.
     //
 
-    @Override
-    public final ReentrantLock readLock() {
+    final ReentrantLock readLock() {
         return readLock;
     }
 
-    @Override
-    public final ReentrantLock writeLock() {
+    final ReentrantLock writeLock() {
         return writeLock;
     }
+
+    /**
+     * Returns {@code true} if and only if the file system has been touched,
+     * i.e. if an operation changed its state.
+     */
+    abstract boolean isTouched();
 
     /**
      * Runs the given {@link Operation} while this controller has
@@ -231,8 +235,7 @@ implements  ArchiveInputSocketProvider<AE>,
      * @param  operation the operation to run while the write lock is acquired.
      * @return {@code operation}
      */
-    @Override
-    public final <O extends IOOperation> O runWriteLocked(O operation)
+    final <O extends IOOperation> O runWriteLocked(O operation)
     throws IOException {
         assert operation != null;
 
@@ -264,7 +267,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
-    public final ArchiveController getEnclController() {
+    public final BasicArchiveController getEnclController() {
         return enclController;
     }
 
@@ -293,8 +296,7 @@ implements  ArchiveInputSocketProvider<AE>,
      * Returns the canonical or at least normalized absolute file for the
      * target archive file.
      */
-    @Override
-    public final File getTarget() {
+    final File getTarget() {
         return target;
     }
 
@@ -304,8 +306,6 @@ implements  ArchiveInputSocketProvider<AE>,
      * file system (RFS).
      * Note that the target doesn't need to exist for this method to return
      * {@code true}.
-     *
-     * @deprecated
      */
     final boolean isRfsEntryTarget() {
         // May be called from FileOutputStream while unlocked!
@@ -313,7 +313,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final ArchiveController enclController = getEnclController();
+        final BasicArchiveController enclController = getEnclController();
         return enclController == null
                 || enclController.getTarget().isDirectory();
     }
@@ -369,8 +369,7 @@ implements  ArchiveInputSocketProvider<AE>,
     abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException;
 
-    @Override
-    public final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
+    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
     throws IOException {
         return autoMount(autoCreate, autoCreate);
     }
@@ -380,8 +379,35 @@ implements  ArchiveInputSocketProvider<AE>,
         return autoMount(false, false);
     }
 
-    @Override
-    public final void autoSync(final String path)
+    /**
+     * Tests if the file system entry with the given path name has received or
+     * is currently receiving new data via an output stream.
+     * As an implication, the entry cannot receive new data from another
+     * output stream before the next call to {@link #sync}.
+     * Note that for directories this method will always return
+     * {@code false}!
+     */
+    abstract boolean hasNewData(String path);
+
+    /**
+     * Synchronizes the archive file only if the archive file has already new
+     * data for the file system entry with the given path name.
+     * <p>
+     * <b>Warning:</b> As a side effect, all data structures returned by this
+     * controller get reset (filesystem, entries, streams, etc.)!
+     * As an implication, this method requires external synchronization on
+     * this controller's write lock!
+     * <p>
+     * <b>TODO:</b> Consider adding configuration switch to allow overwriting
+     * an archive entry to the same output archive multiple times, whereby
+     * only the last written entry would be added to the central directory
+     * of the archive (unless the archive type doesn't support this).
+     *
+     * @see    #sync(BitField, ArchiveSyncExceptionBuilder)
+     * @throws ArchiveSyncException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
+     */
+    final void autoSync(final String path)
     throws ArchiveSyncException {
         assert writeLock().isHeldByCurrentThread();
         if (hasNewData(path)) {
@@ -424,7 +450,7 @@ implements  ArchiveInputSocketProvider<AE>,
     throws ArchiveSyncException;
 
     @Override
-    public ArchiveInputSocket<?> getInputSocket(
+    public ArchiveInputSocket<AE> getInputSocket(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -437,7 +463,7 @@ implements  ArchiveInputSocketProvider<AE>,
         }
     }
 
-    private ArchiveInputSocket<?> getInputSocket0(
+    private ArchiveInputSocket<AE> getInputSocket0(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -541,7 +567,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
-    public ArchiveOutputSocket<?> getOutputSocket(
+    public ArchiveOutputSocket<AE> getOutputSocket(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -555,7 +581,7 @@ implements  ArchiveInputSocketProvider<AE>,
         }
     }
 
-    private ArchiveOutputSocket<?> getOutputSocket0(
+    private ArchiveOutputSocket<AE> getOutputSocket0(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -682,6 +708,34 @@ implements  ArchiveInputSocketProvider<AE>,
             }
         } finally {
             writeLock().unlock();
+        }
+    }
+
+    @Override
+    public final ArchiveEntry getEntry(final String path)
+    throws FalsePositiveException {
+        try {
+            return getEntry0(path);
+        } catch (ArchiveEntryFalsePositiveException ex) {
+            return getEnclController().getEntry(getEnclPath(path));
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    private ArchiveEntry getEntry0(final String path)
+    throws FalsePositiveException, IOException {
+        readLock().lock();
+        try {
+            try {
+                return new UnmodifiableArchiveEntry(autoMount().getEntry(path));
+            } catch (ArchiveEntryNotFoundException ex) {
+                return null;
+            }
+        } finally {
+            readLock().unlock();
         }
     }
 
@@ -951,13 +1005,16 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
-    public final void setReadOnly(final String path)
-    throws FalsePositiveException, IOException {
+    public final boolean setReadOnly(final String path)
+    throws FalsePositiveException {
         try {
             setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
+        } catch (IOException ex) {
+            return false;
         }
+        return true;
     }
 
     private void setReadOnly0(final String path)

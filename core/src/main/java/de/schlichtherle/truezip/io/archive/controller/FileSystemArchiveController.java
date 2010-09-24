@@ -53,13 +53,13 @@ extends BasicArchiveController<AE, AI, AO> {
     }
 
     @Override
-    public final boolean isTouched() {
+    final boolean isTouched() {
         final ArchiveFileSystem fileSystem = getFileSystem();
         return fileSystem != null && fileSystem.isTouched();
     }
 
     @Override
-    public final ArchiveFileSystem<AE> autoMount(
+    final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
             final boolean createParents)
     throws IOException {

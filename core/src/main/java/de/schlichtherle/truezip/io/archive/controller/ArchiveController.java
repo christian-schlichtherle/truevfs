@@ -15,15 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import java.io.File;
-import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.util.Operation;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
@@ -104,42 +100,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
         return result;
     }
 
-    /**
-     * Runs the given {@link Operation} while this controller has
-     * acquired its write lock regardless of the state of its read lock.
-     * You must use this method if this controller may have acquired a
-     * read lock in order to prevent a dead lock.
-     * <p>
-     * <b>Warning:</b> This method temporarily releases the read lock
-     * before the write lock is acquired and the runnable is run!
-     * Hence, the runnable must retest the state of the controller
-     * before it proceeds with any write operations.
-     *
-     * @param  operation the operation to run while the write lock is acquired.
-     * @return {@code operation}
-     */
-    public abstract <O extends IOOperation> O runWriteLocked(O operation)
-    throws IOException;
-
-    /**
-     * Synchronizes the archive file only if the archive file has already new
-     * data for the file system entry with the given path name.
-     * <p>
-     * <b>Warning:</b> As a side effect, all data structures returned by this
-     * controller get reset (filesystem, entries, streams, etc.)!
-     * As an implication, this method requires external synchronization on
-     * this controller's write lock!
-     * <p>
-     * <b>TODO:</b> Consider adding configuration switch to allow overwriting
-     * an archive entry to the same output archive multiple times, whereby
-     * only the last written entry would be added to the central directory
-     * of the archive (unless the archive type doesn't support this).
-     *
-     * @see    #sync(BitField, ArchiveSyncExceptionBuilder)
-     * @throws ArchiveSyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
-     */
-    public abstract void autoSync(final String path) throws ArchiveSyncException;
+    public abstract ArchiveEntry getEntry(final String path) throws FalsePositiveException;
 
     public abstract boolean createNewFile(final String path, final boolean createParents) throws IOException;
 
@@ -161,12 +122,6 @@ public abstract class ArchiveController extends ArchiveDescriptor {
 
     public abstract boolean isReadable(final String path) throws FalsePositiveException;
 
-    /**
-     * Returns {@code true} if and only if the file system has been touched,
-     * i.e. if an operation changed its state.
-     */
-    public abstract boolean isTouched();
-
     public abstract boolean isWritable(final String path) throws FalsePositiveException;
 
     public abstract Set<String> list(final String path) throws FalsePositiveException;
@@ -175,7 +130,33 @@ public abstract class ArchiveController extends ArchiveDescriptor {
 
     public abstract boolean setLastModified(final String path, final long time) throws FalsePositiveException;
 
-    public abstract void setReadOnly(final String path) throws IOException;
+    public abstract boolean setReadOnly(final String path) throws FalsePositiveException;
+
+    /**
+     * Returns an input socket for reading the given entry from the
+     * target archive file.
+     *
+     * @param  path a non-{@code null} entry in the virtual archive file
+     *         system.
+     * @return A non-{@code null} {@code ArchiveInputSocket}.
+     */
+    // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
+    public abstract ArchiveInputSocket
+    getInputSocket(BitField<ArchiveIOOption> options, String path)
+    throws IOException;
+
+    /**
+     * Returns an output socket for writing the given entry to the
+     * target archive file.
+     *
+     * @param  path a non-{@code null} entry in the virtual archive file
+     *         system.
+     * @return A non-{@code null} {@code ArchiveInputSocket}.
+     */
+    // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
+    public abstract ArchiveOutputSocket
+    getOutputSocket(BitField<ArchiveIOOption> options, String path)
+    throws IOException;
 
     /**
      * Writes all changes to the contents of the target archive file to the
@@ -194,45 +175,4 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      */
     public abstract void sync(BitField<ArchiveSyncOption> options, ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException;
-
-    public abstract ArchiveFileSystem autoMount(boolean autoCreate)
-    throws IOException;
-
-    /**
-     * Returns an input socket for reading the given entry from the
-     * target archive file.
-     *
-     * @param  path a non-{@code null} entry in the virtual archive file
-     *         system.
-     * @return A non-{@code null} {@code ArchiveInputSocket}.
-     */
-    // TODO: Consider variant without options in order to implement InputSocketProvider interface
-    public abstract ArchiveInputSocket<?>
-    getInputSocket(BitField<ArchiveIOOption> options, String path)
-    throws IOException;
-
-    /**
-     * Returns an output socket for writing the given entry to the
-     * target archive file.
-     *
-     * @param  path a non-{@code null} entry in the virtual archive file
-     *         system.
-     * @return A non-{@code null} {@code ArchiveInputSocket}.
-     */
-    // TODO: Consider variant without options in order to implement InputSocketProvider interface
-    public abstract ArchiveOutputSocket<?>
-    getOutputSocket(BitField<ArchiveIOOption> options, String path)
-    throws IOException;
-
-    /** @deprecated FIXME: Remove this! */
-    public abstract boolean hasNewData(String path);
-
-    /** @deprecated FIXME: Remove this! */
-    public abstract ReentrantLock readLock();
-
-    /** @deprecated FIXME: Remove this! */
-    public abstract ReentrantLock writeLock();
-
-    /** @deprecated FIXME: Remove this! */
-    public abstract File getTarget();
 }
