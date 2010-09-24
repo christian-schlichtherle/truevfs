@@ -19,10 +19,10 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
-import de.schlichtherle.truezip.io.archive.input.ConcurrentArchiveInput;
-import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInput;
+import de.schlichtherle.truezip.io.socket.common.output.ConcurrentCommonOutput;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -31,8 +31,8 @@ import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
@@ -54,8 +54,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.U
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
@@ -69,8 +69,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 final class UpdatingArchiveController<
         AE extends ArchiveEntry,
-        AI extends ArchiveInput<AE>,
-        AO extends ArchiveOutput<AE>>
+        AI extends CommonInput<AE>,
+        AO extends CommonOutput<AE>>
 extends FileSystemArchiveController<AE, AI, AO> {
 
     private static final String CLASS_NAME
@@ -96,7 +96,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Input
-    extends ConcurrentArchiveInput<AE, AI> {
+    extends ConcurrentCommonInput<AE, AI> {
         Input(AI target) {
             super(target);
         }
@@ -115,7 +115,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Output
-    extends ConcurrentArchiveOutput<AE, AO> {
+    extends ConcurrentCommonOutput<AE, AO> {
         Output(AO target) {
             super(target);
         }
@@ -518,7 +518,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
     /**
      * Initializes {@code inArchive} with a newly created
-     * {@link ArchiveInput} for reading {@code inFile}.
+     * {@link CommonInput} for reading {@code inFile}.
      *
      * @throws IOException On any I/O related issue with {@code inFile}.
      */
@@ -605,7 +605,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
     /**
      * Initializes {@code outArchive} with a newly created
-     * {@link ArchiveOutput} for writing {@code outFile}.
+     * {@link CommonOutput} for writing {@code outFile}.
      * This method will delete {@code outFile} if it has successfully
      * opened it for overwriting, but failed to write the archive file header.
      *
@@ -858,7 +858,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
-                // normal case) have been modified by the ArchiveOutput
+                // normal case) have been modified by the CommonOutput
                 // and thus cannot get used anymore to access the input;
                 // and (2) if there has been any IOException on the
                 // output archive there is no way to recover from it.
@@ -921,8 +921,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
     public <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> h)
     throws E {
-        final ArchiveInput<AE> in = unwrap(input);
-        final ArchiveOutput<AE> out = unwrap(output);
+        final CommonInput<AE> in = unwrap(input);
+        final CommonOutput<AE> out = unwrap(output);
         final ArchiveFileSystem<AE> fs = getFileSystem();
         final AE root = fs.getEntry(ROOT);
         assert root != null;
@@ -1170,8 +1170,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
         // to output archive as the "source" when it was created and may
         // be using the input archive when its closing to retrieve some
         // meta data information.
-        // E.g. with ZIP archive files, the ArchiveOutput copies the postamble
-        // from the ArchiveInput when it closes.
+        // E.g. with ZIP archive files, the CommonOutput copies the postamble
+        // from the CommonInput when it closes.
         try {
             if (output != null) {
                 try {

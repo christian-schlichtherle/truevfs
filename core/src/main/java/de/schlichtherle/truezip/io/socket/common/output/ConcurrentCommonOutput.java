@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.input;
+package de.schlichtherle.truezip.io.socket.common.output;
 
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.SynchronizedInputStream;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
+import de.schlichtherle.truezip.io.SynchronizedOutputStream;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
+import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInput;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -32,22 +30,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Decorates an {@code ArchiveInput} to add accounting and multithreading
- * synchronization for all input streams created by the target archive
- * input.
+ * Decorates an {@code CommonOutput} to add accounting and multithreading
+ * synchronization for all output streams created by the target common
+ * output.
  *
- * @param   <AE> The type of the archive entries.
- * @see ConcurrentArchiveOutput
+ * @param   <CE> The type of the common entries.
+ * @see ConcurrentCommonInput
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentArchiveInput<
-        AE extends ArchiveEntry,
-        AI extends ArchiveInput<AE>>
-extends FilterArchiveInput<AE, AI> {
+public class ConcurrentCommonOutput<
+        CE extends CommonEntry,
+        CO extends CommonOutput<CE>>
+extends FilterCommonOutput<CE, CO> {
 
     private static final String CLASS_NAME
-            = ConcurrentArchiveInput.class.getName();
+            = ConcurrentCommonOutput.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -57,51 +55,51 @@ extends FilterArchiveInput<AE, AI> {
      * value is the current thread.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
-     * This reduces the likeliness of an {@link ArchiveBusyWarningException}
+     * This reduces the likeliness of an {@link CommonOutputBusyException}
      * in case a sloppy client application has forgot to close a stream before
-     * the target archive file gets synchronized.
+     * the common output gets closed.
      */
-    private final Map<EntryInputStream, Thread> streams
-            = new WeakHashMap<EntryInputStream, Thread>();
+    private final Map<EntryOutputStream, Thread> streams
+            = new WeakHashMap<EntryOutputStream, Thread>();
 
     private volatile boolean stopped;
 
-    /** Constructs a new {@code ConcurrentArchiveInput}. */
-    public ConcurrentArchiveInput(final AI target) {
+    /** Constructs a new {@code ConcurrentCommonOutput}. */
+    public ConcurrentCommonOutput(final CO target) {
         super(target);
     }
 
     @Override
-    public CommonInputSocket<AE> getInputSocket(final AE entry)
+    public CommonOutputSocket<CE> getOutputSocket(final CE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         // TODO: Consider synchronization!
-        final CommonInputSocket<AE> input = target.getInputSocket(entry);
-        class InputSocket extends CommonInputSocket<AE> {
+        final CommonOutputSocket<CE> output = target.getOutputSocket(entry);
+        class OutputSocket extends CommonOutputSocket<CE> {
             @Override
-            public AE getTarget() {
+            public CE getTarget() {
                 return entry;
             }
 
             @Override
-            public InputStream newInputStream()
+            public OutputStream newOutputStream()
             throws IOException {
-                synchronized (ConcurrentArchiveInput.this) {
-                    return new EntryInputStream(
-                            input.chain(this).newInputStream());
+                synchronized (ConcurrentCommonOutput.this) {
+                    return new EntryOutputStream(
+                            output.chain(this).newOutputStream());
                 }
             }
         }
-        return new InputSocket();
+        return new OutputSocket();
     }
 
     /**
      * Waits until all entry streams which have been opened (and not yet closed)
      * by all <em>other threads</em> are closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
-     * a warning message is logged using {@code java.util.logging} and
+     * a warn message is logged using {@code java.util.logging} and
      * this method returns.
      * <p>
      * Unless otherwise prevented, another thread could immediately open
@@ -111,7 +109,7 @@ extends FilterArchiveInput<AE, AI> {
      *
      * @return The number of all open streams.
      */
-    public synchronized int waitCloseAllInputStreams(final long timeout) {
+    public synchronized int waitCloseAllOutputStreams(final long timeout) {
         assert !stopped;
 
         final long start = System.currentTimeMillis();
@@ -137,7 +135,9 @@ extends FilterArchiveInput<AE, AI> {
         return streams.size();
     }
 
-    /** Returns the number of streams opened by the current thread. */
+    /**
+     * Returns the number of streams opened by the current thread.
+     */
     private int threadStreams() {
         final Thread thisThread = Thread.currentThread();
         int n = 0;
@@ -148,18 +148,17 @@ extends FilterArchiveInput<AE, AI> {
     }
 
     /**
-     * Closes and disconnects <em>all</em> entry streams for the target archive
-     * file.
+     * Closes and disconnects <em>all</em> entry streams from this common output.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
     public synchronized <E extends Exception>
-    void closeAllInputStreams(final ExceptionHandler<IOException, E> handler)
+    void closeAllOutputStreams(final ExceptionHandler<IOException, E> handler)
     throws E {
         assert !stopped;
         stopped = true;
-        for (final Iterator<EntryInputStream> it = streams.keySet().iterator();
+        for (final Iterator<EntryOutputStream> it = streams.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -174,87 +173,64 @@ extends FilterArchiveInput<AE, AI> {
     }
 
     /**
-     * An {@link InputStream} to read the entry data from an
-     * {@link ArchiveInput}.
-     * This input stream provides support for finalization and throws an
-     * {@link IOException} on any subsequent attempt to read data after
-     * {@link #closeAllInputStreams} has been called.
+     * An {@link OutputStream} to write the entry data to an
+     * {@link CommonOutput}.
+     * This output stream provides support for finalization and throws an
+     * {@link IOException} on any subsequent attempt to write data after
+     * {@link #closeAllOutputStreams} has been called.
      */
-    private final class EntryInputStream extends SynchronizedInputStream {
+    private final class EntryOutputStream extends SynchronizedOutputStream {
         private /*volatile*/ boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
-        private EntryInputStream(final InputStream in) {
-            super(in, ConcurrentArchiveInput.this);
-            assert in != null;
+        private EntryOutputStream(final OutputStream out) {
+            super(out, ConcurrentCommonOutput.this);
+            assert out != null;
             streams.put(this, Thread.currentThread());
-            ConcurrentArchiveInput.this.notify(); // there can be only one waiting thread!
+            ConcurrentCommonOutput.this.notify(); // there can be only one waiting thread!
         }
 
         private void ensureNotStopped() throws IOException {
             if (stopped)
-                throw new ArchiveEntryStreamClosedException();
+                throw new CommonEntryStreamClosedException();
         }
 
         @Override
-        public int read() throws IOException {
+        public void write(int b) throws IOException {
             ensureNotStopped();
-            return super.read();
+            super.write(b);
         }
 
         @Override
-        public int read(byte[] b) throws IOException {
+        public void write(byte[] b) throws IOException {
             ensureNotStopped();
-            return super.read(b);
+            super.write(b);
         }
 
         @Override
-        public int read(byte[] b, int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             ensureNotStopped();
-            return super.read(b, off, len);
+            super.write(b, off, len);
         }
 
         @Override
-        public long skip(long n) throws IOException {
+        public void flush() throws IOException {
             ensureNotStopped();
-            return super.skip(n);
-        }
-
-        @Override
-        public int available() throws IOException {
-            ensureNotStopped();
-            return super.available();
-        }
-
-        @Override
-        public void mark(int readlimit) {
-            if (!stopped)
-                super.mark(readlimit);
-        }
-
-        @Override
-        public void reset() throws IOException {
-            ensureNotStopped();
-            super.reset();
-        }
-
-        @Override
-        public boolean markSupported() {
-            return !stopped && super.markSupported();
+            super.flush();
         }
 
         /**
-         * Closes this archive entry stream and releases any resources
+         * Closes this common entry stream and releases any resources
          * associated with it.
          * This method tolerates multiple calls to it: Only the first
-         * invocation closes the underlying stream.
+         * invocation flushes and closes the underlying stream.
          *
          * @throws IOException If an I/O exception occurs.
          */
         @Override
         public final void close() throws IOException {
-            assert ConcurrentArchiveInput.this == lock;
-            synchronized (ConcurrentArchiveInput.this) {
+            assert ConcurrentCommonOutput.this == lock;
+            synchronized (ConcurrentCommonOutput.this) {
                 if (closed)
                     return;
                 // Order is important!
@@ -262,7 +238,7 @@ extends FilterArchiveInput<AE, AI> {
                     doClose();
                 } finally {
                     streams.remove(this);
-                    ConcurrentArchiveInput.this.notify(); // there can be only one waiting thread!
+                    ConcurrentCommonOutput.this.notify(); // there can be only one waiting thread!
                 }
             }
         }
@@ -286,10 +262,10 @@ extends FilterArchiveInput<AE, AI> {
         }
 
         /**
-         * The finalizer in this class forces this archive entry input
-         * stream to close.
-         * This is used to ensure that an archive can be updated although
-         * the client may have "forgot" to close this input stream before.
+         * The finalizer in this class forces this common entry output stream
+         * to close.
+         * This ensures that a common output can be updated although the client
+         * application may have "forgot" to close this output stream before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
@@ -307,5 +283,5 @@ extends FilterArchiveInput<AE, AI> {
                 super.finalize();
             }
         }
-    } // class EntryInputStream
+    } // class EntryOutputStream
 }

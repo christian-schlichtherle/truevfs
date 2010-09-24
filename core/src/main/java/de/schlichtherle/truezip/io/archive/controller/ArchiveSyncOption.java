@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -57,7 +58,7 @@ public enum ArchiveSyncOption {
      * controller will proceed to update the target archive file anyway and
      * finally throw an {@link ArchiveBusyWarningException} to indicate
      * that any subsequent operations on these streams will fail with an
-     * {@link ArchiveEntryStreamClosedException} because they have been
+     * {@link CommonEntryStreamClosedException} because they have been
      * forced to close.
      * <p>
      * If this property is {@code false}, the target archive file is

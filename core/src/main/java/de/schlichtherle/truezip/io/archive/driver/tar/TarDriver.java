@@ -19,10 +19,10 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.CharConversionException;
@@ -39,7 +39,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class TarDriver
-extends AbstractArchiveDriver<TarEntry, TarInput, ArchiveOutput<TarEntry>> {
+extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutput<TarEntry>> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -169,7 +169,7 @@ extends AbstractArchiveDriver<TarEntry, TarInput, ArchiveOutput<TarEntry>> {
      * and wraps the result in a new {@link MultiplexedArchiveOutput}.
      */
     @Override
-    public ArchiveOutput<TarEntry> newOutput(
+    public CommonOutput<TarEntry> newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
             TarInput source)

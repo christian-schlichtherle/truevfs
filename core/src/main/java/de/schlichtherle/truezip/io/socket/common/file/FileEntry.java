@@ -16,13 +16,13 @@
 
 package de.schlichtherle.truezip.io.socket.common.file;
 
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.SPECIAL;
 
 /**
  * Adapts a {@link File} instance to a {@link CommonEntry}.

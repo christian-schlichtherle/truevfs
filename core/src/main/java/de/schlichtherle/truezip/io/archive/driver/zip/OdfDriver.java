@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -75,7 +75,7 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public ArchiveOutput<ZipEntry> newOutput(
+    public CommonOutput<ZipEntry> newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
             ZipInput source)

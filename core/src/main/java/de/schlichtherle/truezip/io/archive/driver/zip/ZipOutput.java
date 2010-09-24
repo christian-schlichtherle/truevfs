@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
@@ -44,7 +44,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
 
 /**
- * An implementation of {@link ArchiveOutput} to write ZIP archives.
+ * An implementation of {@link CommonOutput} to write ZIP archives.
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
@@ -57,7 +57,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
  */
 public class ZipOutput
 extends RawZipOutputStream<ZipEntry>
-implements ArchiveOutput<ZipEntry> {
+implements CommonOutput<ZipEntry> {
 
     private final ZipInput source;
     private ZipEntry tempEntry;

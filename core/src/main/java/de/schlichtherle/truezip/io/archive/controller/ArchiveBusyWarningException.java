@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
 
 /**
  * Indicates that an archive file has been successfully updated, but some
@@ -24,7 +25,7 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
  * <p>
  * With the exception of their {@code close()} method, any subsequent
  * I/O operation on the closed entry streams will throw an
- * {@link ArchiveEntryStreamClosedException}.
+ * {@link CommonEntryStreamClosedException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$

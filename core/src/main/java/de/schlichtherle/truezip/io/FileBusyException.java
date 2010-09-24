@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2005-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Indicates that an input or output stream for an archive entry has been
- * forced to close when the archive file was (explicitly or implicitly)
- * unmounted.
+ * Indicates that a file system entity could not get read or written because
+ * the entity or its container is busy.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveEntryStreamClosedException extends IOException {
-    private static final long serialVersionUID = 4563928734723923649L;
-    
-    // TODO: Make this package private!
-    public ArchiveEntryStreamClosedException() {
-        super("entry stream has been forced to close() when the archive file was unmounted");
+public class FileBusyException extends FileNotFoundException {
+    private static final long serialVersionUID = 2056108562576389242L;
+
+    public FileBusyException(final String msg) {
+        super(msg);
+    }
+
+    public FileBusyException(IOException cause) {
+        super(cause != null ? cause.toString() : null);
+        initCause(cause);
     }
 }

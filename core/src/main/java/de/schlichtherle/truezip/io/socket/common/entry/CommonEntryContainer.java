@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket.common;
+package de.schlichtherle.truezip.io.socket.common.entry;
 
 import java.util.Iterator;
 

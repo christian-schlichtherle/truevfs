@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.FileSystemEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.FileSystemEntry;
 
 /**
  * A file system entry which refers to an archive entry.

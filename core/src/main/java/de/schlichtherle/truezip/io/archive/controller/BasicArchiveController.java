@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOReferences;
@@ -27,8 +27,8 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
@@ -57,9 +57,9 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.W
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -114,8 +114,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<  AE extends ArchiveEntry,
-                                        AI extends ArchiveInput<AE>,
-                                        AO extends ArchiveOutput<AE>>
+                                        AI extends CommonInput<AE>,
+                                        AO extends CommonOutput<AE>>
 extends     ArchiveController
 implements  CommonInputSocketProvider<AE>,
             CommonOutputSocketProvider<AE> {
