@@ -18,8 +18,9 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.util.Set;
 
@@ -113,7 +114,7 @@ extends ArchiveEntryContainer<AE> {
      *         <li>One of the target's parents denotes a file.
      *         </ul>
      */
-    Link<AE> mknod(String path, Type type, ArchiveEntry template, boolean createParents)
+    Link<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**
@@ -131,14 +132,8 @@ extends ArchiveEntryContainer<AE> {
     void unlink(String path)
     throws ArchiveFileSystemException;
 
-    Type getType(String path);
-
-    long getLastModified(String path);
-
     boolean setLastModified(String path, long time)
     throws ArchiveFileSystemException;
-
-    long getLength(String path);
 
     /**
      * Returns an unmodifiable set of the base names of the members

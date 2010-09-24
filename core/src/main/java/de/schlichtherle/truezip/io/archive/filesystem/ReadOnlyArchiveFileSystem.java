@@ -17,9 +17,10 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.Type;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 
 /**
  * A read-only archive file system.
@@ -56,7 +57,7 @@ extends ReadWriteArchiveFileSystem<AE> {
     }
 
     @Override
-    public Link<AE> mknod(String path, Type type, ArchiveEntry template, boolean createParents)
+    public Link<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
