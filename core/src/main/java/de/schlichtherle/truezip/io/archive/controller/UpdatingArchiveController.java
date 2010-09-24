@@ -17,12 +17,12 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.input.ConcurrentArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ConcurrentArchiveOutput;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -35,7 +35,7 @@ import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -54,8 +54,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.U
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
@@ -563,14 +563,14 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * {@code null} if no archive input is present.
      */
     @Override
-    public ArchiveInputSocket<AE> getInputSocket(final AE target)
+    public CommonInputSocket<AE> getInputSocket(final AE target)
     throws IOException {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return null == input ? null : input.getInputSocket(target);
     }
 
     @Override
-    public ArchiveOutputSocket<AE> getOutputSocket(final AE target)
+    public CommonOutputSocket<AE> getOutputSocket(final AE target)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
         ensureOutArchive();

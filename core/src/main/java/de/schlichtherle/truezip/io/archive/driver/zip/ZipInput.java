@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.RawZipFile;
@@ -55,10 +55,10 @@ implements ArchiveInput<ZipEntry> {
     }
 
     @Override
-    public ArchiveInputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
+    public CommonInputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         assert getEntry(entry.getName()) == entry : "interface contract violation";
-        class InputSocket extends ArchiveInputSocket<ZipEntry> {
+        class InputSocket extends CommonInputSocket<ZipEntry> {
             @Override
             public ZipEntry getTarget() {
                 return entry;

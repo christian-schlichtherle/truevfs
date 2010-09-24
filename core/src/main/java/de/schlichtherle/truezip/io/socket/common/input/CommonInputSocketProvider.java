@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.input;
+package de.schlichtherle.truezip.io.socket.common.input;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocketProvider;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import java.io.IOException;
 
 /**
- * Provides {@link InputSocket}s for read access to archive entries.
+ * Provides {@link InputSocket}s for read access to common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <AE> The type of the archive entries.
- * @see     ArchiveOutputSocketProvider
+ * @param   <CE> The type of the common entries.
+ * @see     CommonOutputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveInputSocketProvider<AE extends ArchiveEntry>
-extends InputSocketProvider<AE, CommonEntry> {
+public interface CommonInputSocketProvider<CE extends CommonEntry>
+extends InputSocketProvider<CE, CommonEntry> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The given archive entry is guaranteed to be one of the entries in this
-     * container.
-     *
-     * @param entry a non-{@code null} archive entry.
-     */
     @Override
-    ArchiveInputSocket<AE> getInputSocket(AE entry) throws IOException;
+    CommonInputSocket<CE> getInputSocket(CE entry) throws IOException;
 }

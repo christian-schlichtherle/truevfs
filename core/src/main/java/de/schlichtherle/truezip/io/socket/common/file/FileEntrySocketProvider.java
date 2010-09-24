@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.socket;
+package de.schlichtherle.truezip.io.socket.common.file;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.entry.FileEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocketProvider;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,8 +30,8 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class FileEntrySocketProvider
-implements  InputSocketProvider<FileEntry, CommonEntry>,
-            OutputSocketProvider<FileEntry, CommonEntry> {
+implements  CommonInputSocketProvider<FileEntry>,
+            CommonOutputSocketProvider<FileEntry> {
 
     private static final FileEntrySocketProvider singleton
             = new FileEntrySocketProvider();
@@ -50,9 +44,9 @@ implements  InputSocketProvider<FileEntry, CommonEntry>,
     }
 
     @Override
-    public InputSocket<FileEntry, CommonEntry> getInputSocket(final FileEntry target)
+    public CommonInputSocket<FileEntry> getInputSocket(final FileEntry target)
     throws IOException {
-        class Input extends InputSocket<FileEntry, CommonEntry> {
+        class Input extends CommonInputSocket<FileEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;
@@ -68,9 +62,9 @@ implements  InputSocketProvider<FileEntry, CommonEntry>,
     }
 
     @Override
-    public OutputSocket<FileEntry, CommonEntry> getOutputSocket(final FileEntry target)
+    public CommonOutputSocket<FileEntry> getOutputSocket(final FileEntry target)
     throws IOException {
-        class Output extends OutputSocket<FileEntry, CommonEntry> {
+        class Output extends CommonOutputSocket<FileEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;

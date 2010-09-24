@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
@@ -213,10 +213,10 @@ implements ArchiveInput<TarEntry> {
     }
 
     @Override
-    public ArchiveInputSocket<TarEntry> getInputSocket(final TarEntry entry)
+    public CommonInputSocket<TarEntry> getInputSocket(final TarEntry entry)
     throws FileNotFoundException {
         assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
-        class InputSocket extends ArchiveInputSocket<TarEntry> {
+        class InputSocket extends CommonInputSocket<TarEntry> {
             @Override
             public TarEntry getTarget() {
                 return entry;

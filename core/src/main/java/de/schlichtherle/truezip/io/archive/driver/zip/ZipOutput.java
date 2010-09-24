@@ -16,11 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
@@ -122,9 +122,9 @@ implements ArchiveOutput<ZipEntry> {
     }
 
     @Override
-    public ArchiveOutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
+    public CommonOutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
     throws FileNotFoundException {
-        class OutputSocket extends ArchiveOutputSocket<ZipEntry> {
+        class OutputSocket extends CommonOutputSocket<ZipEntry> {
             @Override
             public ZipEntry getTarget() {
                 return entry;
@@ -144,7 +144,7 @@ implements ArchiveOutput<ZipEntry> {
             final CommonEntry src)
     throws IOException {
         if (isBusy())
-            throw new ArchiveOutputBusyException(entry);
+            throw new CommonOutputBusyException(entry);
 
         if (entry.isDirectory()) {
             entry.setMethod(STORED);

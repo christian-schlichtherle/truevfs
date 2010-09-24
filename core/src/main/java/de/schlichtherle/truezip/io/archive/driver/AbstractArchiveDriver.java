@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;

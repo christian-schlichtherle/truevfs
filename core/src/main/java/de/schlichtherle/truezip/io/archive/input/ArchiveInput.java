@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.input;
 
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -35,6 +36,6 @@ import java.io.Closeable;
  */
 public interface ArchiveInput<AE extends ArchiveEntry>
 extends ArchiveEntryContainer<AE>,
-        ArchiveInputSocketProvider<AE>,
+        CommonInputSocketProvider<AE>,
         Closeable {
 }

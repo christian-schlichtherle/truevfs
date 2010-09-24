@@ -56,8 +56,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.U
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;

@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
@@ -39,8 +39,8 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.common.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.normalize;
 

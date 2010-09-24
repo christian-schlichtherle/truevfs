@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
-import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.net.URI;
@@ -127,10 +127,10 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      *
      * @param  path a non-{@code null} entry in the virtual archive file
      *         system.
-     * @return A non-{@code null} {@code ArchiveInputSocket}.
+     * @return A non-{@code null} {@code CommonInputSocket}.
      */
     // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
-    public abstract ArchiveInputSocket
+    public abstract CommonInputSocket
     getInputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
 
@@ -140,10 +140,10 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      *
      * @param  path a non-{@code null} entry in the virtual archive file
      *         system.
-     * @return A non-{@code null} {@code ArchiveInputSocket}.
+     * @return A non-{@code null} {@code CommonInputSocket}.
      */
     // TODO: Consider variant without options in order to implement InputSocketProvider<String> interface
-    public abstract ArchiveOutputSocket
+    public abstract CommonOutputSocket
     getOutputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
 

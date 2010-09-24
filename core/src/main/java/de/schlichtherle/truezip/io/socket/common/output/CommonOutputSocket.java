@@ -13,70 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.schlichtherle.truezip.io.socket.common.output;
 
-package de.schlichtherle.truezip.io.archive.output;
-
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
  * Creates output streams for writing bytes to its <i>local target</i>
- * archive entry.
+ * common entry.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <AE> The type of the {@link #getTarget() local target} archive entry.
- * @see     ArchiveInputSocket
- * @see     ArchiveOutput
+ * @param   <CE> The type of the {@link #getTarget() local target} common entry.
+ * @see     CommonInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveOutputSocket<AE extends ArchiveEntry>
-extends OutputSocket<AE, CommonEntry> {
+public abstract class CommonOutputSocket<CE extends CommonEntry>
+extends OutputSocket<CE, CommonEntry> {
 
     @Override
-    public ArchiveOutputSocket<AE> chain(OutputSocket<AE, CommonEntry> output) {
+    public CommonOutputSocket<CE> chain(OutputSocket<CE, CommonEntry> output) {
         super.chain(output);
         return this;
     }
 
     @Override
-    public ArchiveOutputSocket<AE> peer(
-            InputSocket<? extends CommonEntry, ? super AE> peer) {
+    public CommonOutputSocket<CE> peer(
+            InputSocket<? extends CommonEntry, ? super CE> peer) {
         super.peer(peer);
         return this;
     }
 
     /**
-     * Returns the non-{@code null} local target archive entry.
+     * Returns the non-{@code null} local target common entry.
      * <p>
      * Implementations must reflect any changes to the state of the returned
-     * archive entry by the client applications before a call to the method
+     * common entry by the client applications before a call to the method
      * {@link #newOutputStream()}.
      * The effect of any subsequent changes to the state of the returned
-     * archive entry is undefined.
+     * common entry is undefined.
      *
-     * @return The non-{@code null} local archive entry target.
+     * @return The non-{@code null} local common entry target.
      */
     @Override
-    public abstract AE getTarget();
+    public abstract CE getTarget();
 
     /**
      * {@inheritDoc}
      *
-     * @throws OutputArchiveBusyException if the archive is currently busy
-     *         on output for another entry.
+     * @throws CommonOuputBusyException if the socket's destination is
+     *         currently busy with output.
      *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to write the same entry again as soon as
-     *         the archive is not busy on output anymore.
-     * @throws FileNotFoundException if the archive entry is not accessible
+     *         should be possible to write the common entry again as soon as
+     *         the socket's destination is not busy anymore.
+     * @throws FileNotFoundException if the common entry is not accessible
      *         for some reason.
      * @throws IOException on any other exceptional condition.
      */

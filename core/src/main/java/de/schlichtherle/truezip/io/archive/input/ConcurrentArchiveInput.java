@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.input;
 
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryStreamClosedException;
@@ -71,14 +72,14 @@ extends FilterArchiveInput<AE, AI> {
     }
 
     @Override
-    public ArchiveInputSocket<AE> getInputSocket(final AE entry)
+    public CommonInputSocket<AE> getInputSocket(final AE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
         // TODO: Consider synchronization!
-        final ArchiveInputSocket<AE> input = target.getInputSocket(entry);
-        class InputSocket extends ArchiveInputSocket<AE> {
+        final CommonInputSocket<AE> input = target.getInputSocket(entry);
+        class InputSocket extends CommonInputSocket<AE> {
             @Override
             public AE getTarget() {
                 return entry;
