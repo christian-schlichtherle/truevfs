@@ -341,7 +341,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrap(
-            final ArchiveController controller,
+            final BasicArchiveController controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -412,7 +412,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrapFromLockedController(
-            final ArchiveController controller,
+            final BasicArchiveController controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -656,16 +656,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert output != null;
     }
 
-    /**
-     * Tests if the file system entry with the given path name has received or
-     * is currently receiving new data via an output stream.
-     * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #sync}.
-     * Note that for directories this method will always return
-     * {@code false}!
-     */
     @Override
-    public boolean hasNewData(String path) {
+    boolean hasNewData(String path) {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)
             return false;
@@ -1031,7 +1023,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrap(
-            final ArchiveController controller,
+            final BasicArchiveController controller,
             final String path)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
@@ -1051,7 +1043,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrapToWriteLockedController(
-            final ArchiveController controller,
+            final BasicArchiveController controller,
             final String path)
     throws IOException {
         assert controller != null;

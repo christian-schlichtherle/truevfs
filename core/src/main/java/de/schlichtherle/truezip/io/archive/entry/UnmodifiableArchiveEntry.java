@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010 Schlichtherle IT Services
+ * Copyright 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,23 @@
 package de.schlichtherle.truezip.io.archive.entry;
 
 /**
- * A decorator for archive entries.
- *
- * @param <AE> The type of the decorated archive entry.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterArchiveEntry<AE extends ArchiveEntry>
-implements ArchiveEntry {
+public class UnmodifiableArchiveEntry<AE extends ArchiveEntry>
+extends FilterArchiveEntry<AE> {
 
-    /** The decorated archive entry. */
-    protected AE target;
-
-    protected FilterArchiveEntry(final AE target) {
-        this.target = target;
-    }
-
-    @Override
-    public String getName() {
-        return target.getName();
-    }
-
-    @Override
-    public Type getType() {
-        return target.getType();
-    }
-
-    @Override
-    public long getSize() {
-        return target.getSize();
+    public UnmodifiableArchiveEntry(AE target) {
+        super(target);
     }
 
     @Override
     public void setSize(long size) {
-        target.setSize(size);
-    }
-
-    @Override
-    public long getTime() {
-        return target.getTime();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setTime(long time) {
-        target.setTime(time);
+        throw new UnsupportedOperationException();
     }
 }

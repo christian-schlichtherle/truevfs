@@ -412,7 +412,7 @@ class Files {
         } catch (ArchiveEntryFalsePositiveException ex) {
             final URI mountPoint = ex.getMountPoint();
             final ArchiveController enclController
-                    = ArchiveControllers.get(mountPoint);
+                    = ArchiveControllers.get(mountPoint, null, null); // FIXME: Redesign delegation strategy!
             final String enclPath = mountPoint.relativize(
                     mountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)

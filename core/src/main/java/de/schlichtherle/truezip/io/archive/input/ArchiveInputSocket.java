@@ -41,15 +41,15 @@ public abstract class ArchiveInputSocket<AE extends ArchiveEntry>
 extends InputSocket<AE, ArchiveEntry> {
 
     @Override
-    public ArchiveInputSocket<AE> chain(InputSocket<AE, ArchiveEntry> output) {
-        super.chain(output);
+    public ArchiveInputSocket<AE> chain(InputSocket<AE, ArchiveEntry> input) {
+        super.chain(input);
         return this;
     }
 
     @Override
     public ArchiveInputSocket<AE> peer(
-            OutputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
-        super.peer(newPeer);
+            OutputSocket<? extends ArchiveEntry, ? super AE> peer) {
+        super.peer(peer);
         return this;
     }
 
@@ -77,6 +77,5 @@ extends InputSocket<AE, ArchiveEntry> {
      * @throws IOException on any other exceptional condition.
      */
     @Override
-    public abstract InputStream newInputStream()
-    throws IOException;
+    public abstract InputStream newInputStream() throws IOException;
 }
