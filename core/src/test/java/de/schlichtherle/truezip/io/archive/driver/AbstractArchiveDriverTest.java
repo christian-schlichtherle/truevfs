@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -168,16 +169,16 @@ public class AbstractArchiveDriverTest extends TestCase {
     }
 
     private static class DummyArchiveDriver extends AbstractArchiveDriver {
-        private static final long serialVersionUID = 2382398676900721212L;
+        static final long serialVersionUID = 2382398676900721212L;
 
-        private static final Icon ICON = new ImageIcon(
+        static final Icon ICON = new ImageIcon(
                 DummyArchiveDriver.class.getResource("empty.gif"));
 
-        private DummyArchiveDriver() {
+        DummyArchiveDriver() {
             this("US-ASCII");
         }
 
-        private DummyArchiveDriver(final String encoding) {
+        DummyArchiveDriver(final String encoding) {
             super(encoding);
         }
 
@@ -189,9 +190,9 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public ArchiveEntry newEntry(String name, Type type, ArchiveEntry template)
+        public ArchiveEntry newEntry(String name, Type type, CommonEntry template)
         throws CharConversionException {
-            return new FileEntry(new File("foo/bar"));
+            return new DummyEntry(new File("foo/bar"));
         }
 
         @Override
@@ -209,6 +210,20 @@ public class AbstractArchiveDriverTest extends TestCase {
         @Override
         public Icon getClosedIcon(ArchiveDescriptor archive) {
             return ICON;
+        }
+    }
+
+    private static class DummyEntry extends FileEntry implements ArchiveEntry {
+        DummyEntry(File file) {
+            super(file);
+        }
+
+        public void setSize(long size) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setTime(long time) {
+            throw new UnsupportedOperationException();
         }
     }
 }

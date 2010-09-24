@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
@@ -148,7 +149,7 @@ extends FilterArchiveOutput<AE, AO> {
 
     protected OutputStream newOutputStream(final ArchiveOutputSocket<AE> output)
     throws IOException {
-        final ArchiveEntry peer = output.getPeerTarget();
+        final CommonEntry peer = output.getPeerTarget();
         if (peer != null) {
             final ArchiveEntry local = output.getTarget();
             local.setSize(peer.getSize()); // data may be compressed!
@@ -212,24 +213,24 @@ extends FilterArchiveOutput<AE, AO> {
     extends FileOutputStream
     implements IOReference<AE> {
         private final File temp;
-        private final OutputSocket<? extends AE, ArchiveEntry> output;
-        private final InputSocket<ArchiveEntry, ArchiveEntry> input;
+        private final OutputSocket<? extends AE, CommonEntry> output;
+        private final InputSocket<CommonEntry, CommonEntry> input;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
-                final OutputSocket<? extends AE, ArchiveEntry> output,
-                final ArchiveEntry peer)
+                final OutputSocket<? extends AE, CommonEntry> output,
+                final CommonEntry peer)
         throws IOException {
             super(temp);
             class TempInputSocket
-            extends InputSocket<ArchiveEntry, ArchiveEntry> {
-                private final ArchiveEntry target
+            extends InputSocket<CommonEntry, CommonEntry> {
+                private final CommonEntry target
                         = null != peer ? peer : new FileEntry(temp);
 
                 @Override
-                public ArchiveEntry getTarget() {
+                public CommonEntry getTarget() {
                     return target;
                 }
 
@@ -265,7 +266,7 @@ extends FilterArchiveOutput<AE, AO> {
                 super.close();
             } finally {
                 final AE dstEntry = output.getTarget();
-                final ArchiveEntry srcEntry = input.getTarget();
+                final CommonEntry srcEntry = input.getTarget();
                 if (dstEntry.getSize() == UNKNOWN)
                     dstEntry.setSize(srcEntry.getSize());
                 if (dstEntry.getTime() == UNKNOWN)

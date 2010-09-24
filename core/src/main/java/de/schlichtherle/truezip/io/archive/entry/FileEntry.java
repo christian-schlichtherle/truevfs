@@ -28,7 +28,7 @@ import static de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type.SPECIAL
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry implements ArchiveEntry {
+public class FileEntry implements CommonEntry {
     private final String name;
     private final File file;
 
@@ -92,20 +92,9 @@ public class FileEntry implements ArchiveEntry {
         return file.length();
     }
 
-    @Override
-    public void setSize(long size) {
-        throw new UnsupportedOperationException();
-    }
-
     /** Returns the file's last modification time. */
     @Override
     public long getTime() {
         return file.lastModified();
-    }
-
-    /** Sets the file's last modification time. */
-    @Override
-    public void setTime(long time) {
-        file.setLastModified(time);
     }
 }

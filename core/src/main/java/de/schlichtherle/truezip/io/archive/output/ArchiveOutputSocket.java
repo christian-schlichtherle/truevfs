@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -38,17 +39,17 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public abstract class ArchiveOutputSocket<AE extends ArchiveEntry>
-extends OutputSocket<AE, ArchiveEntry> {
+extends OutputSocket<AE, CommonEntry> {
 
     @Override
-    public ArchiveOutputSocket<AE> chain(OutputSocket<AE, ArchiveEntry> output) {
+    public ArchiveOutputSocket<AE> chain(OutputSocket<AE, CommonEntry> output) {
         super.chain(output);
         return this;
     }
 
     @Override
     public ArchiveOutputSocket<AE> peer(
-            InputSocket<? extends ArchiveEntry, ? super AE> peer) {
+            InputSocket<? extends CommonEntry, ? super AE> peer) {
         super.peer(peer);
         return this;
     }

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
@@ -164,7 +165,7 @@ implements ZipEntryFactory<ZipEntry> {
     public ZipEntry newEntry(
             String path,
             final Type type,
-            final ArchiveEntry template)
+            final CommonEntry template)
     throws CharConversionException {
         path = toZipOrTarEntryName(path, type);
         final ZipEntry entry;

@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
@@ -34,7 +35,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public interface ArchiveOutputSocketProvider<AE extends ArchiveEntry>
-extends OutputSocketProvider<AE, ArchiveEntry> {
+extends OutputSocketProvider<AE, CommonEntry> {
 
     /**
      * {@inheritDoc}

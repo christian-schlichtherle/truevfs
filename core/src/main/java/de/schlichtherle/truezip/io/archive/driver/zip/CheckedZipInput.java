@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.CRC32Exception;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
@@ -60,7 +61,7 @@ public class CheckedZipInput extends ZipInput {
 
     /** Overridden to read from a checked input stream. */
     @Override
-    protected InputStream newInputStream(ZipEntry entry, ArchiveEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry entry, CommonEntry dstEntry)
     throws  IOException {
         return super.getInputStream(    entry.getName(), true,
                                         !(dstEntry instanceof ZipEntry));

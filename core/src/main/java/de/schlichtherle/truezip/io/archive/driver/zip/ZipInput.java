@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInput;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.RawZipFile;
@@ -72,7 +73,7 @@ implements ArchiveInput<ZipEntry> {
         return new InputSocket();
     }
 
-    protected InputStream newInputStream(ZipEntry entry, ArchiveEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry entry, CommonEntry dstEntry)
     throws IOException {
         return super.getInputStream(    entry.getName(), false,
                                         !(dstEntry instanceof ZipEntry));

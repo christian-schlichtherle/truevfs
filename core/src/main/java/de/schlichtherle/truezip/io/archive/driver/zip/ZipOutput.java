@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
@@ -141,7 +141,7 @@ implements ArchiveOutput<ZipEntry> {
 
     protected OutputStream newOutputStream(
             final ZipEntry entry,
-            final ArchiveEntry src)
+            final CommonEntry src)
     throws IOException {
         if (isBusy())
             throw new ArchiveOutputBusyException(entry);
