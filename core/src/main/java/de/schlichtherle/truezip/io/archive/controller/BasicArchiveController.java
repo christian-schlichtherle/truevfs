@@ -521,7 +521,7 @@ implements  ArchiveInputSocketProvider<AE>,
                                 throw new ArchiveEntryNotFoundException(
                                         BasicArchiveController.this, path,
                                         "cannot read directories");
-                            final ArchiveInputSocket<? extends AE> input;
+                            final ArchiveInputSocket<AE> input;
                             if (null == target ||
                                     null == (input = getInputSocket(target)))
                                 throw new ArchiveEntryNotFoundException(
