@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -230,7 +231,7 @@ implements ArchiveInput<TarEntry> {
         return new InputSocket();
     }
 
-    protected InputStream newInputStream(TarEntry src, ArchiveEntry dst)
+    protected InputStream newInputStream(TarEntry src, CommonEntry dst)
     throws IOException {
         return new FileInputStream(src.getFile());
     }

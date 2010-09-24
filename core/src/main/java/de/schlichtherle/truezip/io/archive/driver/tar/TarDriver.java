@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutput;
@@ -82,7 +83,7 @@ extends AbstractArchiveDriver<TarEntry, TarInput, ArchiveOutput<TarEntry>> {
     public TarEntry newEntry(
             String path,
             final Type type,
-            final ArchiveEntry template)
+            final CommonEntry template)
     throws CharConversionException {
         path = toZipOrTarEntryName(path, type);
         final TarEntry entry;

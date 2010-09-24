@@ -15,11 +15,16 @@
  */
 package de.schlichtherle.truezip.io.archive.socket;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocketProvider;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocketProvider;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocketProvider;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,8 +36,8 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class FileEntrySocketProvider
-implements  ArchiveInputSocketProvider<FileEntry>,
-            ArchiveOutputSocketProvider<FileEntry> {
+implements  InputSocketProvider<FileEntry, CommonEntry>,
+            OutputSocketProvider<FileEntry, CommonEntry> {
 
     private static final FileEntrySocketProvider singleton
             = new FileEntrySocketProvider();
@@ -45,9 +50,9 @@ implements  ArchiveInputSocketProvider<FileEntry>,
     }
 
     @Override
-    public ArchiveInputSocket<FileEntry> getInputSocket(final FileEntry target)
+    public InputSocket<FileEntry, CommonEntry> getInputSocket(final FileEntry target)
     throws IOException {
-        class InputSocket extends ArchiveInputSocket<FileEntry> {
+        class Input extends InputSocket<FileEntry, CommonEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;
@@ -59,13 +64,13 @@ implements  ArchiveInputSocketProvider<FileEntry>,
                 return new FileInputStream(target.getFile());
             }
         }
-        return new InputSocket();
+        return new Input();
     }
 
     @Override
-    public ArchiveOutputSocket<FileEntry> getOutputSocket(final FileEntry target)
+    public OutputSocket<FileEntry, CommonEntry> getOutputSocket(final FileEntry target)
     throws IOException {
-        class OutputSocket extends ArchiveOutputSocket<FileEntry> {
+        class Output extends OutputSocket<FileEntry, CommonEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;
@@ -77,6 +82,6 @@ implements  ArchiveInputSocketProvider<FileEntry>,
                 return new FileOutputStream(target.getFile());
             }
         }
-        return new OutputSocket();
+        return new Output();
     }
 }

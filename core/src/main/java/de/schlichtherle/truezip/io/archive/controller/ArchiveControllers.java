@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -503,7 +504,7 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final ArchiveInputSocket<?> input
+            final InputSocket<?, ?> input
                     = FileEntrySocketProvider.get()
                     .getInputSocket(new FileEntry(src));
             final OutputStream out

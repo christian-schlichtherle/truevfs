@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOReferences;
@@ -493,7 +494,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
                     @Override
                     public ArchiveInputSocket<AE> peer(
-                            final OutputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
+                            final OutputSocket<? extends CommonEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
                         return this;
@@ -610,7 +611,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
                     @Override
                     public ArchiveOutputSocket<AE> peer(
-                            final InputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
+                            final InputSocket<? extends CommonEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
                         return this;

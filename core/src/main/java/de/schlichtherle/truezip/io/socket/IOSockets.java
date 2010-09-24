@@ -34,8 +34,8 @@ public class IOSockets {
     IOSockets() {
     }
 
-    /** @deprecated Currently unused and may get deleted. */
-    public static <T, IT extends T, OT extends T> void copy(
+    ///** @deprecated Currently unused and may get deleted. */
+    /*public static <T, IT extends T, OT extends T> void copy(
             final InputSocketProvider<IT, T> input,
             final IT source,
             final OutputSocketProvider<OT, T> output,
@@ -43,7 +43,7 @@ public class IOSockets {
     throws IOException {
         copy(input .getInputSocket (source     ),
              output.getOutputSocket(destination));
-    }
+    }*/
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
@@ -60,8 +60,8 @@ public class IOSockets {
      * @throws NullPointerException if any parameter is {@code null}.
      */
     public static <T> void copy(
-            final InputSocket<? extends T, ? super T> input,
-            final OutputSocket<? extends T, ? super T> output)
+            final InputSocket <? extends T, T> input,
+            final OutputSocket<? extends T, T> output)
     throws IOException {
         final InputStream in;
         //try {
