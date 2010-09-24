@@ -399,21 +399,12 @@ implements ArchiveFileSystem<AE> {
      */
     private static abstract class BaseEntry<AE extends ArchiveEntry>
     extends UnmodifiableArchiveEntry<AE>
-    implements IOReference<AE> {
+    implements ArchiveFileSystemEntry {
 
         /** Constructs a new instance of {@code CommonEntry}. */
         BaseEntry(final AE entry) {
             super(entry);
             assert entry != null;
-        }
-
-        /**
-         * If this is not a directory entry, {@code null} is returned.
-         * Otherwise, an unmodifiable set of strings is returned which
-         * represent the base names of the members of this directory entry.
-         */
-        Set<String> list() {
-            return null;
         }
 
         /**
@@ -461,6 +452,11 @@ implements ArchiveFileSystem<AE> {
             super(entry);
             assert entry.getType() != DIRECTORY;
         }
+
+        @Override
+        public Set<String> list() {
+            return null;
+        }
     } // class FileEntry
 
     /** A directory entry. */
@@ -475,7 +471,7 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        Set<String> list() {
+        public Set<String> list() {
             if (!(members instanceof CopyOnWriteArraySet))
                 members = new CopyOnWriteArraySet<String>(members);
             return Collections.unmodifiableSet(members);
