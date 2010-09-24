@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.socket.common.entry;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import java.util.Iterator;
 
 /*
@@ -38,8 +36,8 @@ implements CommonEntryContainer<CE> {
     /** The decorated common entry container. */
     protected CEC target;
 
-    protected FilterCommonEntryContainer(final CEC entry) {
-        this.target = entry;
+    protected FilterCommonEntryContainer(final CEC target) {
+        this.target = target;
     }
 
     @Override

@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import java.util.Set;
 
 /**
  * A virtual file system for archive entries.
@@ -30,12 +29,16 @@ import java.util.Set;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <AE> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveFileSystem<AE extends ArchiveEntry>
-extends CommonEntryContainer<AE> {
+extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
+
+    /** An archive file system entry which refers to an archive entry. */
+    public interface Entry<AE extends ArchiveEntry>
+    extends ArchiveFileSystemEntry, IOReference<AE> {
+    }
 
     /**
      * Returns {@code true} if and only if this archive file system is
@@ -56,7 +59,7 @@ extends CommonEntryContainer<AE> {
      * @see #mknod
      */
     interface Link<AE extends ArchiveEntry>
-    extends IOOperation, IOReference<AE> {
+    extends IOOperation, IOReference<Entry<AE>> {
 
         /** Links an entry into an archive file system. */
         @Override
@@ -134,14 +137,6 @@ extends CommonEntryContainer<AE> {
 
     boolean setLastModified(String path, long time)
     throws ArchiveFileSystemException;
-
-    /**
-     * Returns an unmodifiable set of the base names of the members
-     * of the directory identified by {@code path} or {@code null} if no
-     * directory entry exists for the given path name in this virtual archive
-     * file system.
-     */
-    Set<String> list(final String path);
 
     boolean isWritable(String path);
 

@@ -39,10 +39,8 @@ import java.util.logging.Logger;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentCommonOutput<
-        CE extends CommonEntry,
-        CO extends CommonOutput<CE>>
-extends FilterCommonOutput<CE, CO> {
+public class ConcurrentCommonOutput<CE extends CommonEntry>
+extends FilterCommonOutput<CE, CommonOutput<CE>> {
 
     private static final String CLASS_NAME
             = ConcurrentCommonOutput.class.getName();
@@ -65,7 +63,7 @@ extends FilterCommonOutput<CE, CO> {
     private volatile boolean stopped;
 
     /** Constructs a new {@code ConcurrentCommonOutput}. */
-    public ConcurrentCommonOutput(final CO target) {
+    public ConcurrentCommonOutput(final CommonOutput<CE> target) {
         super(target);
     }
 

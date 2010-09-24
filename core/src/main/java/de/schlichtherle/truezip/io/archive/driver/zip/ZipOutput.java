@@ -140,49 +140,49 @@ implements CommonOutput<ZipEntry> {
     }
 
     protected OutputStream newOutputStream(
-            final ZipEntry entry,
-            final CommonEntry src)
+            final ZipEntry target,
+            final CommonEntry peer)
     throws IOException {
         if (isBusy())
-            throw new CommonOutputBusyException(entry);
+            throw new CommonOutputBusyException(target);
 
-        if (entry.isDirectory()) {
-            entry.setMethod(STORED);
-            entry.setCrc(0);
-            entry.setCompressedSize(0);
-            entry.setSize(0);
-            return new EntryOutputStream(entry);
+        if (target.isDirectory()) {
+            target.setMethod(STORED);
+            target.setCrc(0);
+            target.setCompressedSize(0);
+            target.setSize(0);
+            return new EntryOutputStream(target);
         }
 
-        if (src != null) {
-            entry.setSize(src.getSize());
-            if (src instanceof ZipEntry) {
+        if (peer != null) {
+            target.setSize(peer.getSize());
+            if (peer instanceof ZipEntry) {
                 // Set up entry attributes for Direct Data Copying (DDC).
                 // A preset method in the entry takes priority.
                 // The ZIP.RAES drivers use this feature to enforce deflation
                 // for enhanced authentication security.
-                final ZipEntry srcZipEntry = (ZipEntry) src;
-                if (entry.getMethod() == UNKNOWN)
-                    entry.setMethod(srcZipEntry.getMethod());
-                if (entry.getMethod() == srcZipEntry.getMethod())
-                    entry.setCompressedSize(srcZipEntry.getCompressedSize());
-                entry.setCrc(srcZipEntry.getCrc());
+                final ZipEntry srcZipEntry = (ZipEntry) peer;
+                if (target.getMethod() == UNKNOWN)
+                    target.setMethod(srcZipEntry.getMethod());
+                if (target.getMethod() == srcZipEntry.getMethod())
+                    target.setCompressedSize(srcZipEntry.getCompressedSize());
+                target.setCrc(srcZipEntry.getCrc());
                 return new EntryOutputStream(
-                        entry, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
+                        target, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
             }
         }
 
-        switch (entry.getMethod()) {
+        switch (target.getMethod()) {
             case UNKNOWN:
-                entry.setMethod(DEFLATED);
+                target.setMethod(DEFLATED);
                 break;
 
             case STORED:
-                if (entry.getCrc() == UNKNOWN
-                        || entry.getCompressedSize() == UNKNOWN
-                        || entry.getSize() == UNKNOWN)
+                if (target.getCrc() == UNKNOWN
+                        || target.getCompressedSize() == UNKNOWN
+                        || target.getSize() == UNKNOWN)
                     return new TempEntryOutputStream(
-                            createTempFile(TEMP_FILE_PREFIX), entry);
+                            createTempFile(TEMP_FILE_PREFIX), target);
                 break;
 
             case DEFLATED:
@@ -191,7 +191,7 @@ implements CommonOutput<ZipEntry> {
             default:
                 assert false : "unsupported method";
         }
-        return new EntryOutputStream(entry);
+        return new EntryOutputStream(target);
     }
 
     /**

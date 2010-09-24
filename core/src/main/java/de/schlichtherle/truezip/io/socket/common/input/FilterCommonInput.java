@@ -38,7 +38,7 @@ public class FilterCommonInput<
 extends    FilterCommonEntryContainer<CE, CI>
 implements CommonInput<CE> {
 
-    public FilterCommonInput(final CI target) {
+    protected FilterCommonInput(final CI target) {
         super(target);
     }
 

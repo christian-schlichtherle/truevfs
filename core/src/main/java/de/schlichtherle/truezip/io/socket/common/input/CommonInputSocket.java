@@ -39,7 +39,7 @@ public abstract class CommonInputSocket<CE extends CommonEntry>
 extends InputSocket<CE, CommonEntry> {
 
     @Override
-    public CommonInputSocket<CE> chain(InputSocket<CE, CommonEntry> input) {
+    public CommonInputSocket<CE> chain(InputSocket<? super CE, ? extends CommonEntry> input) {
         super.chain(input);
         return this;
     }

@@ -15,6 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -27,12 +32,9 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.entry.UnmodifiableArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
@@ -131,7 +133,7 @@ implements  CommonInputSocketProvider<AE>,
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final BasicArchiveController enclController;
+    private final BasicArchiveController<?, ?, ?> enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -269,7 +271,7 @@ implements  CommonInputSocketProvider<AE>,
     }
 
     @Override
-    public final BasicArchiveController getEnclController() {
+    public final BasicArchiveController<?, ?, ?> getEnclController() {
         return enclController;
     }
 
@@ -453,7 +455,7 @@ implements  CommonInputSocketProvider<AE>,
     throws ArchiveSyncException;
 
     @Override
-    public CommonInputSocket<AE> getInputSocket(
+    public CommonInputSocket<?> getInputSocket(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -466,10 +468,84 @@ implements  CommonInputSocketProvider<AE>,
         }
     }
 
-    private CommonInputSocket<AE> getInputSocket0(
+    private CommonInputSocket<?> getInputSocket0(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
+        class Input extends CommonInputSocket<AE> {
+            private IOReference<AE> local = this;
+
+            @Override
+            public CommonInputSocket<AE> peer(
+                    final OutputSocket<? extends CommonEntry, ? super AE> newPeer) {
+                super.peer(newPeer);
+                getPeerTarget();
+                return this;
+            }
+
+            @Override
+            protected void beforePeeringComplete() {
+                local = this; // reset local target reference
+            }
+
+            private AE entry() throws IOException {
+                if (hasNewData(path)) {
+                    local = this;
+                    class AutoSync implements IOOperation {
+                        @Override
+                        public void run() throws IOException {
+                            autoSync(path);
+                        }
+                    }
+                    runWriteLocked(new AutoSync());
+                }
+                if (this == local) {
+                    try {
+                        local = autoMount().getEntry(path);
+                    } catch (FalsePositiveException alreadyDetected) {
+                        throw new AssertionError(alreadyDetected);
+                    }
+                }
+                return IOReferences.deref(local);
+            }
+
+            @Override
+            public AE getTarget() {
+                readLock().lock();
+                try {
+                    try {
+                        return entry();
+                    } catch (IOException resolveToNull) {
+                        return null; // FIXME: interface contract violation
+                    }
+                } finally {
+                    readLock().unlock();
+                }
+            }
+
+            @Override
+            public InputStream newInputStream()
+            throws IOException {
+                readLock().lock();
+                try {
+                    final AE entry = entry();
+                    if (null != entry && DIRECTORY == entry.getType())
+                        throw new ArchiveEntryNotFoundException(
+                                BasicArchiveController.this, path,
+                                "cannot read directories");
+                    final CommonInputSocket<AE> input;
+                    if (null == entry ||
+                            null == (input = getInputSocket(entry)))
+                        throw new ArchiveEntryNotFoundException(
+                                BasicArchiveController.this, path,
+                                "no such file or directory");
+                    return input.chain(this).newInputStream();
+                } finally {
+                    readLock().unlock();
+                }
+            }
+        }
+
         assert options != null;
         assert path != null;
 
@@ -489,80 +565,7 @@ implements  CommonInputSocketProvider<AE>,
                         "cannot read directories");
             } else {
                 autoMount(); // detect false positives!
-                class InputSocketProxy extends CommonInputSocket<AE> {
-                    private IOReference<AE> local = this;
-
-                    @Override
-                    public CommonInputSocket<AE> peer(
-                            final OutputSocket<? extends CommonEntry, ? super AE> newPeer) {
-                        super.peer(newPeer);
-                        getPeerTarget();
-                        return this;
-                    }
-
-                    @Override
-                    protected void beforePeeringComplete() {
-                        local = this; // reset local target reference
-                    }
-
-                    private AE target() throws IOException {
-                        if (hasNewData(path)) {
-                            local = this;
-                            class AutoSync implements IOOperation {
-                                @Override
-                                public void run() throws IOException {
-                                    autoSync(path);
-                                }
-                            }
-                            runWriteLocked(new AutoSync());
-                        }
-                        if (this == local) {
-                            try {
-                                local = IOReferences.ref(autoMount().getEntry(path));
-                            } catch (FalsePositiveException alreadyDetected) {
-                                throw new AssertionError(alreadyDetected);
-                            }
-                        }
-                        return IOReferences.deref(local);
-                    }
-
-                    @Override
-                    public AE getTarget() {
-                        readLock().lock();
-                        try {
-                            try {
-                                return target();
-                            } catch (IOException resolveToNull) {
-                                return null; // FIXME: interface contract violation
-                            }
-                        } finally {
-                            readLock().unlock();
-                        }
-                    }
-
-                    @Override
-                    public InputStream newInputStream()
-                    throws IOException {
-                        readLock().lock();
-                        try {
-                            final AE target = target();
-                            if (null != target && DIRECTORY == target.getType())
-                                throw new ArchiveEntryNotFoundException(
-                                        BasicArchiveController.this, path,
-                                        "cannot read directories");
-                            final CommonInputSocket<AE> input;
-                            if (null == target ||
-                                    null == (input = getInputSocket(target)))
-                                throw new ArchiveEntryNotFoundException(
-                                        BasicArchiveController.this, path,
-                                        "no such file or directory");
-                            return input.chain(this).newInputStream();
-                        } finally {
-                            readLock().unlock();
-                        }
-                    }
-                }
-                return new InputSocketProxy();
+                return new Input();
             }
         } finally {
             readLock().unlock();
@@ -570,7 +573,7 @@ implements  CommonInputSocketProvider<AE>,
     }
 
     @Override
-    public CommonOutputSocket<AE> getOutputSocket(
+    public CommonOutputSocket<?> getOutputSocket(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -584,10 +587,112 @@ implements  CommonInputSocketProvider<AE>,
         }
     }
 
-    private CommonOutputSocket<AE> getOutputSocket0(
+    private CommonOutputSocket<?> getOutputSocket0(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
+        class Output extends CommonOutputSocket<AE> {
+            private Link<AE> local;
+
+            @Override
+            public CommonOutputSocket<AE> peer(
+                    final InputSocket<? extends CommonEntry, ? super AE> newPeer) {
+                super.peer(newPeer);
+                getPeerTarget();
+                return this;
+            }
+
+            @Override
+            protected void beforePeeringComplete() {
+                local = null; // reset local target reference
+            }
+
+            private AE entry() throws IOException {
+                if (hasNewData(path)) {
+                    local = null;
+                    autoSync(path);
+                }
+                if (null == local) {
+                    try {
+                        // Start creating or overwriting the archive entry.
+                        // This will fail if the entry already exists as a directory.
+                        local = autoMount(options.get(CREATE_PARENTS))
+                                .mknod(path, FILE,
+                                    options.get(PRESERVE)
+                                        ? getPeerTarget()
+                                        : null,
+                                    options.get(CREATE_PARENTS));
+                    } catch (FalsePositiveException alreadyDetected) {
+                        throw new AssertionError(alreadyDetected);
+                    }
+                }
+                return local.getTarget().getTarget();
+            }
+
+            @Override
+            public AE getTarget() {
+                class GetTarget implements IOOperation {
+                    AE entry;
+
+                    @Override
+                    public void run() throws IOException {
+                        entry = entry();
+                    }
+                }
+                try {
+                    return runWriteLocked(new GetTarget()).entry;
+                } catch (IOException ex) {
+                    return null; // FIXME: interface contract violation
+                }
+            }
+
+            @Override
+            public OutputStream newOutputStream()
+            throws IOException {
+                class NewOutputStream implements IOOperation {
+                    OutputStream out;
+
+                    @Override
+                    public void run() throws IOException {
+                        final AE entry = entry();
+                        final CommonOutputSocket<AE> output
+                                = getOutputSocket(entry);
+                        final boolean append = options.get(APPEND);
+                        final InputStream in = append
+                                ? getInputSocket(entry)
+                                    .peer(null)
+                                    .newInputStream()
+                                : null;
+                        try {
+                            out = output
+                                    .chain(append
+                                        ? null
+                                        : Output.this)
+                                    .newOutputStream();
+                            try {
+                                local.run();
+                                if (in != null)
+                                    Streams.cat(in, out);
+                            } catch (IOException ex) {
+                                out.close(); // may throw another exception!
+                                throw ex;
+                            }
+                        } finally {
+                            if (in != null) {
+                                try {
+                                    in.close();
+                                } catch (IOException ex) {
+                                    throw new InputException(ex);
+                                }
+                            }
+                        }
+                    }
+
+                }
+                return runWriteLocked(new NewOutputStream()).out;
+            }
+        }
+
         assert path != null;
 
         writeLock().lock();
@@ -606,108 +711,7 @@ implements  CommonInputSocketProvider<AE>,
                         "cannot write directories");
             } else {
                 autoMount(options.get(CREATE_PARENTS)); // detect false positives!
-                class OutputSocketProxy extends CommonOutputSocket<AE> {
-                    private Link<AE> local;
-
-                    @Override
-                    public CommonOutputSocket<AE> peer(
-                            final InputSocket<? extends CommonEntry, ? super AE> newPeer) {
-                        super.peer(newPeer);
-                        getPeerTarget();
-                        return this;
-                    }
-
-                    @Override
-                    protected void beforePeeringComplete() {
-                        local = null; // reset local target reference
-                    }
-
-                    private AE target() throws IOException {
-                        if (hasNewData(path)) {
-                            local = null;
-                            autoSync(path);
-                        }
-                        if (null == local) {
-                            try {
-                                // Start creating or overwriting the archive entry.
-                                // This will fail if the entry already exists as a directory.
-                                local = autoMount(options.get(CREATE_PARENTS))
-                                        .mknod(path, FILE,
-                                            options.get(PRESERVE)
-                                                ? getPeerTarget()
-                                                : null,
-                                            options.get(CREATE_PARENTS));
-                            } catch (FalsePositiveException alreadyDetected) {
-                                throw new AssertionError(alreadyDetected);
-                            }
-                        }
-                        return local.getTarget();
-                    }
-
-                    @Override
-                    public AE getTarget() {
-                        class GetTarget implements IOOperation {
-                            AE target;
-
-                            @Override
-                            public void run() throws IOException {
-                                target = target();
-                            }
-                        }
-                        try {
-                            return runWriteLocked(new GetTarget()).target;
-                        } catch (IOException ex) {
-                            return null; // FIXME: interface contract violation
-                        }
-                    }
-
-                    @Override
-                    public OutputStream newOutputStream()
-                    throws IOException {
-                        class NewOutputStream implements IOOperation {
-                            OutputStream out;
-
-                            @Override
-                            public void run() throws IOException {
-                                final AE target = target();
-                                final CommonOutputSocket<AE> output
-                                        = getOutputSocket(target);
-                                final boolean append = options.get(APPEND);
-                                final InputStream in = append
-                                        ? getInputSocket(target)
-                                            .peer(null)
-                                            .newInputStream()
-                                        : null;
-                                try {
-                                    out = output
-                                            .chain(append
-                                                ? null
-                                                : OutputSocketProxy.this)
-                                            .newOutputStream();
-                                    try {
-                                        local.run();
-                                        if (in != null)
-                                            Streams.cat(in, out);
-                                    } catch (IOException ex) {
-                                        out.close(); // may throw another exception!
-                                        throw ex;
-                                    }
-                                } finally {
-                                    if (in != null) {
-                                        try {
-                                            in.close();
-                                        } catch (IOException ex) {
-                                            throw new InputException(ex);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        return runWriteLocked(new NewOutputStream()).out;
-                    }
-                }
-                return new OutputSocketProxy();
+                return new Output();
             }
         } finally {
             writeLock().unlock();
@@ -789,7 +793,7 @@ implements  CommonInputSocketProvider<AE>,
     }
 
     @Override
-    public final ArchiveEntry getEntry(final String path)
+    public final Entry<?> getEntry(final String path)
     throws FalsePositiveException {
         try {
             return getEntry0(path);
@@ -802,32 +806,44 @@ implements  CommonInputSocketProvider<AE>,
         }
     }
 
-    private ArchiveEntry getEntry0(final String path)
+    private Entry<?> getEntry0(final String path)
     throws FalsePositiveException, IOException {
         readLock().lock();
         try {
-            final ArchiveEntry entry = autoMount().getEntry(path);
-            return null == entry ? null : new UnmodifiableArchiveEntry(entry);
+            return autoMount().getEntry(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
             /** @see ArchiveDriver#newInput! */
-            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException) {
-                class SpecialFileEntry extends UnmodifiableArchiveEntry {
-                    SpecialFileEntry(ArchiveEntry target) {
-                        super(target);
-                    }
-
-                    @Override
-                    public Type getType() {
-                        assert FILE == super.getType();
-                        return SPECIAL;
-                    }
-                }
-                return new SpecialFileEntry(
-                        getEnclController().getEntry(getEnclPath(path))); // the exception asserts that the entry exists as a file!
-            }
+            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
+                return new SpecialFileEntry(getEnclController()
+                        .getEntry(getEnclPath(path))
+                        .getTarget()); // the exception asserts that the entry exists as a file!
             throw ex;
         } finally {
             readLock().unlock();
+        }
+    }
+
+    private static final class SpecialFileEntry
+    extends FilterCommonEntry<ArchiveEntry>
+    implements Entry<ArchiveEntry> {
+        SpecialFileEntry(ArchiveEntry target) {
+            super(target);
+        }
+
+        @Override
+        public Type getType() {
+            assert FILE == super.getType();
+            return SPECIAL;
+        }
+
+        @Override
+        public Set<String> list() {
+            return null;
+        }
+
+        @Override
+        public ArchiveEntry getTarget() {
+            return target;
         }
     }
 
@@ -874,30 +890,6 @@ implements  CommonInputSocketProvider<AE>,
         readLock().lock();
         try {
             return autoMount().isWritable(path);
-        } finally {
-            readLock().unlock();
-        }
-    }
-
-    @Override
-    public final Set<String> list(final String path)
-    throws FalsePositiveException {
-        try {
-            return list0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().list(getEnclPath(path));
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private Set<String> list0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().list(path);
         } finally {
             readLock().unlock();
         }
@@ -1043,9 +1035,10 @@ implements  CommonInputSocketProvider<AE>,
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
             return getEnclController().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // See ArchiveDriver#newArchiveInput!
+            // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
+            /** @see ArchiveDriver#newInput! */
             if (isRoot(path)) {
-                final ArchiveEntry entry = getEnclController().getEntry(getEnclPath(path));
+                final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
                 if (null == entry || entry.getType() != DIRECTORY
                     && ex.getCause() instanceof FileNotFoundException)
                     return false;
@@ -1065,7 +1058,7 @@ implements  CommonInputSocketProvider<AE>,
             autoSync(path);
             if (isRoot(path)) {
                 // Get the file system or die trying!
-                final ArchiveFileSystem fileSystem;
+                final ArchiveFileSystem<AE> fileSystem;
                 try {
                     fileSystem = autoMount();
                 } catch (FalsePositiveException ex) {
@@ -1079,7 +1072,7 @@ implements  CommonInputSocketProvider<AE>,
                     throw ex;
                 }
                 // We are actually working on the controller's target file.
-                if (!fileSystem.list(path).isEmpty())
+                if (!fileSystem.getEntry(path).list().isEmpty())
                     throw new IOException("archive file system not empty!");
                 final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
                 // TODO: Review: This policy may be changed - see method start.

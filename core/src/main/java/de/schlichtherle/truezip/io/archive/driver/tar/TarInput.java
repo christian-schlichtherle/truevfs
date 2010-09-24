@@ -231,9 +231,9 @@ implements CommonInput<TarEntry> {
         return new InputSocket();
     }
 
-    protected InputStream newInputStream(TarEntry src, CommonEntry dst)
+    protected InputStream newInputStream(TarEntry target, CommonEntry peer)
     throws IOException {
-        return new FileInputStream(src.getFile());
+        return new FileInputStream(target.getFile());
     }
 
     @Override

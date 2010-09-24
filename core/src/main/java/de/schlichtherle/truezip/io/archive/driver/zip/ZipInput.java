@@ -73,9 +73,9 @@ implements CommonInput<ZipEntry> {
         return new InputSocket();
     }
 
-    protected InputStream newInputStream(ZipEntry entry, CommonEntry dstEntry)
+    protected InputStream newInputStream(ZipEntry target, CommonEntry peer)
     throws IOException {
-        return super.getInputStream(    entry.getName(), false,
-                                        !(dstEntry instanceof ZipEntry));
+        return super.getInputStream(    target.getName(), false,
+                                        !(peer instanceof ZipEntry));
     }
 }
