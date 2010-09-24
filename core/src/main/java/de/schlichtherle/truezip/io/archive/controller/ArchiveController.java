@@ -39,16 +39,16 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * to update the contents of the virtual file system to the target file
  * in the real file system.
  * In cooperation with the calling methods, it also knows how to deal with
- * nested archive files (such as {@code "outer.zip/inner.tar.gz"}
+ * nested archive files (such as {@code outer.zip/inner.tar.gz}
  * and <i>false positives</i>, i.e. plain files or directories or file or
  * directory entries in an enclosing archive file which have been incorrectly
  * recognized to be <i>prospective archive files</i>.
  * <p>
  * To ensure that for each archive file there is at most one
- * {code ArchiveController}, the path name of the archive file (called
- * <i>mount point</i>) must be canonicalized, so it doesn't matter whether a
- * target archive file is addressed as {@code "archive.zip"} or
- * {@code "/dir/archive.zip"} if {@code "/dir"} is the client application's
+ * {code ArchiveController}, the path name of the archive file - called
+ * <i>mount point</i> - must be canonicalized, so it doesn't matter whether a
+ * target archive file is addressed as {@code archive.zip} or
+ * {@code /dir/archive.zip} if {@code /dir} is the client application's
  * current directory.
  * <p>
  * Note that in general all of its methods are reentrant on exceptions - so
@@ -100,40 +100,29 @@ public abstract class ArchiveController extends ArchiveDescriptor {
         return result;
     }
 
-    public abstract ArchiveEntry getEntry(final String path) throws FalsePositiveException;
+    public abstract Icon getOpenIcon()
+    throws FalsePositiveException;
 
-    public abstract boolean createNewFile(final String path, final boolean createParents) throws IOException;
+    public abstract Icon getClosedIcon()
+    throws FalsePositiveException;
 
-    public abstract boolean delete(final String path) throws FalsePositiveException;
+    public abstract boolean isReadOnly()
+    throws FalsePositiveException;
 
-    public abstract Icon getOpenIcon(final String path) throws FalsePositiveException;
+    public abstract boolean isReadable(String path)
+    throws FalsePositiveException;
 
-    public abstract Icon getClosedIcon(final String path) throws FalsePositiveException;
+    public abstract boolean isWritable(String path)
+    throws FalsePositiveException;
 
-    public abstract long getLastModified(final String path) throws FalsePositiveException;
+    public abstract ArchiveEntry getEntry(String path)
+    throws FalsePositiveException;
 
-    public abstract long getLength(final String path) throws FalsePositiveException;
-
-    public abstract boolean isDirectory(final String path) throws FalsePositiveException;
-
-    public abstract boolean isExisting(final String path) throws FalsePositiveException;
-
-    public abstract boolean isFile(final String path) throws FalsePositiveException;
-
-    public abstract boolean isReadable(final String path) throws FalsePositiveException;
-
-    public abstract boolean isWritable(final String path) throws FalsePositiveException;
-
-    public abstract Set<String> list(final String path) throws FalsePositiveException;
-
-    public abstract boolean mkdir(final String path, final boolean createParents) throws FalsePositiveException;
-
-    public abstract boolean setLastModified(final String path, final long time) throws FalsePositiveException;
-
-    public abstract boolean setReadOnly(final String path) throws FalsePositiveException;
+    public abstract Set<String> list(String path)
+    throws FalsePositiveException;
 
     /**
-     * Returns an input socket for reading the given entry from the
+     * Returns an archive input socket for reading the given entry from the
      * target archive file.
      *
      * @param  path a non-{@code null} entry in the virtual archive file
@@ -146,7 +135,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
     throws IOException;
 
     /**
-     * Returns an output socket for writing the given entry to the
+     * Returns an archive output socket for writing the given entry to the
      * target archive file.
      *
      * @param  path a non-{@code null} entry in the virtual archive file
@@ -157,6 +146,21 @@ public abstract class ArchiveController extends ArchiveDescriptor {
     public abstract ArchiveOutputSocket
     getOutputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
+
+    public abstract boolean createNewFile(String path, boolean createParents)
+    throws IOException;
+
+    public abstract boolean mkdir(String path, boolean createParents)
+    throws FalsePositiveException;
+
+    public abstract boolean delete(String path)
+    throws FalsePositiveException;
+
+    public abstract boolean setLastModified(String path, long time)
+    throws FalsePositiveException;
+
+    public abstract boolean setReadOnly(String path)
+    throws FalsePositiveException;
 
     /**
      * Writes all changes to the contents of the target archive file to the
