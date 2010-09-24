@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryContainer;
+import de.schlichtherle.truezip.io.socket.common.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
@@ -67,7 +67,7 @@ implements ArchiveFileSystem<AE> {
      * This field should be considered final!
      * <p>
      * Note that the archive entries in this map are shared with the
-     * {@link ArchiveEntryContainer} object provided to the constructor of
+     * {@link CommonEntryContainer} object provided to the constructor of
      * this class.
      */
     private Map<String, BaseEntry<AE>> master;
@@ -112,10 +112,10 @@ implements ArchiveFileSystem<AE> {
     }
 
     /**
-     * @see ArchiveFileSystems#newArchiveFileSystem(ArchiveEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
+     * @see ArchiveFileSystems#newArchiveFileSystem(CommonEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
      */
     ReadWriteArchiveFileSystem(
-            final ArchiveEntryContainer<AE> container,
+            final CommonEntryContainer<AE> container,
             final long rootTime,
             final ArchiveEntryFactory<AE> factory,
             final VetoableTouchListener vetoableTouchListener) {
@@ -151,7 +151,7 @@ implements ArchiveFileSystem<AE> {
     }
 
     /**
-     * Like {@link #newEntry(String, ArchiveEntry.Type, ArchiveEntry)
+     * Like {@link #newEntry(String, CommonEntry.Type, CommonEntry)
      * newEntry(path, type, null)}, but throws an
      * {@link AssertionError} instead of a {@link CharConversionException}.
      *

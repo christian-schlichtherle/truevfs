@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.archive.entry;
 
 import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 
+
 /**
  * Represents an entry in an archive file.
  * Archive drivers need to implement this interface in order to enable their
@@ -24,7 +25,9 @@ import de.schlichtherle.truezip.io.socket.common.CommonEntry;
  * and to archive files of their respective supported type.
  * <p>
  * In general, if a property has an unknown value, its getter method must
- * return the value {@value #UNKNOWN} or {@code null} respectively.
+ * return the value
+ * {@value de.schlichtherle.truezip.io.socket.common.CommonEntry#UNKNOWN}
+ * or {@code null} respectively.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -35,12 +38,30 @@ import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 public interface ArchiveEntry extends CommonEntry {
 
     /**
+     * Returns the non-{@code null} <i>archive entry name</i>.
+     * An archive entry name is a
+     * {@link CommonEntry#getName() common entry name} which meets the
+     * following additional requirement:
+     * <ol>
+     * <li>A common entry name may end with one or more separator
+     *     characters (e.g. to identify a directory entry).</li>
+     * </ol>
+     * For example, {@code "foo/bar/"} and
+     * {@code "./abc/../foo/./def/./../bar/."} are both valid path names
+     * which refer to the same entity in the archive file.
+     *
+     * @return The non-{@code null} <i>archive entry name</i>.
+     */
+    @Override
+    String getName();
+
+    /**
      * Sets the (uncompressed) size of this archive entry in bytes.
      *
-     * @param  size the (uncompressed) size of this archive entry in bytes
-     *         or {@value #UNKNOWN}.
+     * @param  size the (uncompressed) size of this archive entry in bytes or
+     *         {@value de.schlichtherle.truezip.io.socket.common.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code size} is negative and not
-     *         {@value #UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.common.CommonEntry#UNKNOWN}.
      */
     void setSize(long size);
 
@@ -48,9 +69,10 @@ public interface ArchiveEntry extends CommonEntry {
      * Sets the last modification time of this archive entry.
      *
      * @param  time the last modification time of this archive entry in
-     *         milliseconds since the epoch or {@value #UNKNOWN}.
+     *         milliseconds since the epoch or
+     *         {@value de.schlichtherle.truezip.io.socket.common.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
-     *         {@value #UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.common.CommonEntry#UNKNOWN}.
      */
     void setTime(long time);
 }

@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.socket.common.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.FileSystemEntry;
 
 /**
@@ -27,4 +28,17 @@ import de.schlichtherle.truezip.io.socket.common.FileSystemEntry;
  */
 public interface ArchiveFileSystemEntry
 extends FileSystemEntry, IOReference<ArchiveEntry> {
+
+    /**
+     * Returns the non-{@code null} <i>path name</i>.
+     * A path name is a {@link CommonEntry#getName() common entry name} which
+     * meets the following additional requirement:
+     * <ol>
+     * <li>A path name <em>must not</em> end with a separator character.</li>
+     * </ol>
+     *
+     * @return The non-{@code null} <i>path name</i>.
+     */
+    @Override
+    String getName();
 }
