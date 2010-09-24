@@ -43,7 +43,7 @@ implements ArchiveOutput<AE> {
     }
 
     @Override
-    public ArchiveOutputSocket<? extends AE> getOutputSocket(AE entry)
+    public ArchiveOutputSocket<AE> getOutputSocket(AE entry)
     throws IOException {
         return target.getOutputSocket(entry);
     }

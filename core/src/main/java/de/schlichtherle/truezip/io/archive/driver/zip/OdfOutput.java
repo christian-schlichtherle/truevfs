@@ -50,7 +50,7 @@ extends MultiplexedArchiveOutput<ZipEntry, ZipOutput> {
 
     @Override
     protected OutputStream newOutputStream(
-            final OutputSocket<? extends ZipEntry, ArchiveEntry> output)
+            final ArchiveOutputSocket<ZipEntry> output)
     throws IOException {
         final ZipEntry local = output.getTarget();
         if (MIMETYPE.equals(local.getName())) {

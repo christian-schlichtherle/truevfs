@@ -516,7 +516,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
             new FileInputStream(file2);
             fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
         } catch (FileBusyException expected) {
-            // FIXME: The exception signature has chained. This exception is not thrown anymore!
         }
         assertFalse(file2.catFrom(fisA)); // fails for same reason.
         
@@ -585,7 +584,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         try {
             FileOutputStream fosB = new FileOutputStream(file1);
         } catch (FileBusyException busy) {
-            // FIXME: The exception signature has chained. This exception is not thrown anymore!
             // This is actually an implementation detail which may change in
             // a future version.
             assertTrue(busy.getCause() instanceof ArchiveBusyException);

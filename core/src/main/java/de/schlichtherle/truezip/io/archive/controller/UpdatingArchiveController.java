@@ -562,14 +562,14 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * {@code null} if no archive input is present.
      */
     @Override
-    public ArchiveInputSocket<? extends AE> getInputSocket(final AE target)
+    public ArchiveInputSocket<AE> getInputSocket(final AE target)
     throws IOException {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return null == input ? null : input.getInputSocket(target);
     }
 
     @Override
-    public ArchiveOutputSocket<? extends AE> getOutputSocket(final AE target)
+    public ArchiveOutputSocket<AE> getOutputSocket(final AE target)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
         ensureOutArchive();
@@ -656,6 +656,15 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert output != null;
     }
 
+    /**
+     * Tests if the file system entry with the given path name has received or
+     * is currently receiving new data via an output stream.
+     * As an implication, the entry cannot receive new data from another
+     * output stream before the next call to {@link #sync}.
+     * Note that for directories this method will always return
+     * {@code false}!
+     */
+    @Override
     public boolean hasNewData(String path) {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)

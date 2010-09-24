@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.input;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.output.ArchiveOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,20 @@ import java.io.InputStream;
  */
 public abstract class ArchiveInputSocket<AE extends ArchiveEntry>
 extends InputSocket<AE, ArchiveEntry> {
+
+    @Override
+    public ArchiveInputSocket<AE> chain(
+            InputSocket<? super AE, ? extends ArchiveEntry> output) {
+        super.chain(output);
+        return this;
+    }
+
+    @Override
+    public ArchiveInputSocket<AE> peer(
+            OutputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
+        super.peer(newPeer);
+        return this;
+    }
 
     /**
      * Returns the non-{@code null} local target archive entry.

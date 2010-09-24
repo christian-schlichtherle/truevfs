@@ -46,6 +46,6 @@ public interface OutputSocketProvider<LT, PT> {
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    OutputSocket<? extends LT, ? super PT> getOutputSocket(LT target)
+    OutputSocket<LT, PT> getOutputSocket(LT target)
     throws IOException;
 }

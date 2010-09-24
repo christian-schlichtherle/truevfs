@@ -26,4 +26,14 @@
                 <goal>package</goal>
             </goals>
         </action>
+    <action>
+            <actionName>CUSTOM-clean source:jar javadoc:jar deploy</actionName>
+            <displayName>clean source:jar javadoc:jar deploy</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>source:jar</goal>
+                <goal>javadoc:jar</goal>
+                <goal>deploy</goal>
+            </goals>
+        </action>
 </actions>

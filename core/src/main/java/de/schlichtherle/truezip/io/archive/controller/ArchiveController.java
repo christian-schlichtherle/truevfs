@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.io.File;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.util.Operation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
@@ -144,13 +145,13 @@ public abstract class ArchiveController extends ArchiveDescriptor {
 
     public abstract boolean delete(final String path) throws FalsePositiveException;
 
+    public abstract Icon getOpenIcon(final String path) throws FalsePositiveException;
+
     public abstract Icon getClosedIcon(final String path) throws FalsePositiveException;
 
     public abstract long getLastModified(final String path) throws FalsePositiveException;
 
     public abstract long getLength(final String path) throws FalsePositiveException;
-
-    public abstract Icon getOpenIcon(final String path) throws FalsePositiveException;
 
     public abstract boolean isDirectory(final String path) throws FalsePositiveException;
 
@@ -171,8 +172,6 @@ public abstract class ArchiveController extends ArchiveDescriptor {
     public abstract Set<String> list(final String path) throws FalsePositiveException;
 
     public abstract boolean mkdir(final String path, final boolean createParents) throws FalsePositiveException;
-
-    public abstract ReentrantLock readLock();
 
     public abstract boolean setLastModified(final String path, final long time) throws FalsePositiveException;
 
@@ -196,20 +195,8 @@ public abstract class ArchiveController extends ArchiveDescriptor {
     public abstract void sync(BitField<ArchiveSyncOption> options, ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException;
 
-    public abstract ReentrantLock writeLock();
-
     public abstract ArchiveFileSystem autoMount(boolean autoCreate)
     throws IOException;
-
-    /**
-     * Tests if the file system entry with the given path name has received or
-     * is currently receiving new data via an output stream.
-     * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #sync}.
-     * Note that for directories this method will always return
-     * {@code false}!
-     */
-    public abstract boolean hasNewData(String path);
 
     /**
      * Returns an input socket for reading the given entry from the
@@ -219,6 +206,7 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      *         system.
      * @return A non-{@code null} {@code ArchiveInputSocket}.
      */
+    // TODO: Consider variant without options in order to implement InputSocketProvider interface
     public abstract ArchiveInputSocket<?>
     getInputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
@@ -231,7 +219,20 @@ public abstract class ArchiveController extends ArchiveDescriptor {
      *         system.
      * @return A non-{@code null} {@code ArchiveInputSocket}.
      */
+    // TODO: Consider variant without options in order to implement InputSocketProvider interface
     public abstract ArchiveOutputSocket<?>
     getOutputSocket(BitField<ArchiveIOOption> options, String path)
     throws IOException;
+
+    /** @deprecated FIXME: Remove this! */
+    public abstract boolean hasNewData(String path);
+
+    /** @deprecated FIXME: Remove this! */
+    public abstract ReentrantLock readLock();
+
+    /** @deprecated FIXME: Remove this! */
+    public abstract ReentrantLock writeLock();
+
+    /** @deprecated FIXME: Remove this! */
+    public abstract File getTarget();
 }

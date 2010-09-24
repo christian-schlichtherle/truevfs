@@ -46,6 +46,6 @@ public interface InputSocketProvider<LT, PT> {
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    InputSocket<? extends LT, ? super PT> getInputSocket(LT target)
+    InputSocket<LT, PT> getInputSocket(LT target)
     throws IOException;
 }

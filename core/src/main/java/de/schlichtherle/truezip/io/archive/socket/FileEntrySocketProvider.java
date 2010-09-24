@@ -45,8 +45,7 @@ implements  ArchiveInputSocketProvider<FileEntry>,
     }
 
     @Override
-    public ArchiveInputSocket<? extends FileEntry>
-    getInputSocket(final FileEntry target)
+    public ArchiveInputSocket<FileEntry> getInputSocket(final FileEntry target)
     throws IOException {
         class InputSocket extends ArchiveInputSocket<FileEntry> {
             @Override
@@ -64,8 +63,7 @@ implements  ArchiveInputSocketProvider<FileEntry>,
     }
 
     @Override
-    public ArchiveOutputSocket<? extends FileEntry>
-    getOutputSocket(final FileEntry target)
+    public ArchiveOutputSocket<FileEntry> getOutputSocket(final FileEntry target)
     throws IOException {
         class OutputSocket extends ArchiveOutputSocket<FileEntry> {
             @Override
