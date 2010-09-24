@@ -129,7 +129,7 @@ implements  ArchiveInputSocketProvider<AE>,
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final BasicArchiveController enclController;
+    private final ArchiveController enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -264,7 +264,7 @@ implements  ArchiveInputSocketProvider<AE>,
     }
 
     @Override
-    public final BasicArchiveController getEnclController() {
+    public final ArchiveController getEnclController() {
         return enclController;
     }
 
@@ -293,7 +293,8 @@ implements  ArchiveInputSocketProvider<AE>,
      * Returns the canonical or at least normalized absolute file for the
      * target archive file.
      */
-    final File getTarget() {
+    @Override
+    public final File getTarget() {
         return target;
     }
 
@@ -303,6 +304,8 @@ implements  ArchiveInputSocketProvider<AE>,
      * file system (RFS).
      * Note that the target doesn't need to exist for this method to return
      * {@code true}.
+     *
+     * @deprecated
      */
     final boolean isRfsEntryTarget() {
         // May be called from FileOutputStream while unlocked!
@@ -310,7 +313,7 @@ implements  ArchiveInputSocketProvider<AE>,
 
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final BasicArchiveController enclController = getEnclController();
+        final ArchiveController enclController = getEnclController();
         return enclController == null
                 || enclController.getTarget().isDirectory();
     }
@@ -450,7 +453,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ?!?! archive entry not found is not really an archive entry false positive ?!?!
-                    return getEnclController().getInputSocket0(
+                    return getEnclController().getInputSocket(
                             options, getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
@@ -461,7 +464,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     private IOReference<AE> local = this;
 
                     @Override
-                    public InputSocket<AE, ArchiveEntry> peer(
+                    public ArchiveInputSocket<AE> peer(
                             final OutputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
@@ -567,7 +570,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
-                    return getEnclController().getOutputSocket0(
+                    return getEnclController().getOutputSocket(
                             options, getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
@@ -578,7 +581,7 @@ implements  ArchiveInputSocketProvider<AE>,
                     private Link<AE> local;
 
                     @Override
-                    public OutputSocket<AE, ArchiveEntry> peer(
+                    public ArchiveOutputSocket<AE> peer(
                             final InputSocket<? extends ArchiveEntry, ? super AE> newPeer) {
                         super.peer(newPeer);
                         getPeerTarget();
@@ -638,7 +641,7 @@ implements  ArchiveInputSocketProvider<AE>,
                             @Override
                             public void run() throws IOException {
                                 final AE target = target();
-                                final ArchiveOutputSocket<? extends AE> output
+                                final ArchiveOutputSocket<AE> output
                                         = getOutputSocket(target);
                                 final boolean append = options.get(APPEND);
                                 final InputStream in = append
@@ -1145,7 +1148,7 @@ implements  ArchiveInputSocketProvider<AE>,
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    getEnclController().delete0(getEnclPath(path));
+                    getEnclController().delete(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
                 autoMount().unlink(path);

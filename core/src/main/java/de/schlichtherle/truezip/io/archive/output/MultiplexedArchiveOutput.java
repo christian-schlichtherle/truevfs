@@ -17,10 +17,8 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.entry.FileEntry;
-import de.schlichtherle.truezip.io.archive.input.ArchiveInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOSockets;
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -130,11 +128,9 @@ extends FilterArchiveOutput<AE, AO> {
     }
 
     @Override
-    public ArchiveOutputSocket<? extends AE> getOutputSocket(
-            final AE entry)
+    public ArchiveOutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
-        final ArchiveOutputSocket<? extends AE> output
-                = super.getOutputSocket(entry);
+        final ArchiveOutputSocket<AE> output = super.getOutputSocket(entry);
         class OutputSocket extends ArchiveOutputSocket<AE> {
             @Override
             public AE getTarget() {
@@ -150,8 +146,7 @@ extends FilterArchiveOutput<AE, AO> {
         return new OutputSocket();
     }
 
-    protected OutputStream newOutputStream(
-            final OutputSocket<? extends AE, ArchiveEntry> output)
+    protected OutputStream newOutputStream(final ArchiveOutputSocket<AE> output)
     throws IOException {
         final ArchiveEntry peer = output.getPeerTarget();
         if (peer != null) {

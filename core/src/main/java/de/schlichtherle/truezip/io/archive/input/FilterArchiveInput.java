@@ -43,7 +43,7 @@ implements ArchiveInput<AE> {
     }
 
     @Override
-    public ArchiveInputSocket<? extends AE> getInputSocket(AE entry)
+    public ArchiveInputSocket<AE> getInputSocket(AE entry)
     throws IOException {
         return target.getInputSocket(entry);
     }

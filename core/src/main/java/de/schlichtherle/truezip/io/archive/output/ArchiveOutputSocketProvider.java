@@ -45,6 +45,6 @@ extends OutputSocketProvider<AE, ArchiveEntry> {
      * @param entry a non-{@code null} archive entry.
      */
     @Override
-    ArchiveOutputSocket<? extends AE> getOutputSocket(AE entry)
+    ArchiveOutputSocket<AE> getOutputSocket(AE entry)
     throws IOException;
 }
