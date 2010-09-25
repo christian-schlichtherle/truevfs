@@ -66,12 +66,7 @@ public interface ArchiveController extends ArchiveDescriptor {
     @Override
     URI getMountPoint();
 
-    /**
-     * Returns the controller for the enclosing archive file of this
-     * controller's target archive file or {@code null} if it's not enclosed
-     * in another archive file.
-     */
-    ArchiveController getEnclController();
+    ArchiveController getEnclArchive();
 
     /**
      * Resolves the given relative {@code path} against the relative path of
