@@ -45,9 +45,9 @@ extends OutputSocket<CE, CommonEntry> {
     }
 
     @Override
-    public CommonOutputSocket<CE> peer(
+    public CommonOutputSocket<CE> connect(
             InputSocket<? extends CommonEntry, ? super CE> peer) {
-        super.peer(peer);
+        super.connect(peer);
         return this;
     }
 

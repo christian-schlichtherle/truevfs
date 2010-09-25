@@ -130,7 +130,7 @@ public class FileInputStream extends FilterInputStream {
                             .getArchiveController()
                             .getInputSocket(
                                 BitField.noneOf(ArchiveIOOption.class), path)
-                            .peer(null)
+                            .connect(null)
                             .newInputStream();
                 }
             }

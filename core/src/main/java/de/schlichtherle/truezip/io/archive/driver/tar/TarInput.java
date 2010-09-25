@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.EOFException;
@@ -63,7 +63,7 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  * @version $Id$
  */
 public class TarInput
-implements CommonInput<TarEntry> {
+implements CommonInputSocketService<TarEntry> {
 
     private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
 

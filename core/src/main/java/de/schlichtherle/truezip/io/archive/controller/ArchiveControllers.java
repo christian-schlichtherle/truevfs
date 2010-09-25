@@ -22,9 +22,9 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.common.file.FileEntrySocketProvider;
+import de.schlichtherle.truezip.io.socket.common.file.FileIOSocketProvider;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.IOSockets;
+import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
@@ -449,7 +449,7 @@ public class ArchiveControllers {
                     = srcController.getInputSocket(options, srcPath);
             final CommonOutputSocket<?> output
                     = dstController.getOutputSocket(options, dstPath);
-            IOSockets.copy(input, output);
+            IOSocket.copy(input, output);
         } catch (ArchiveEntryFalsePositiveException ex) {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
@@ -503,7 +503,7 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final CommonInputSocket<?> input = FileEntrySocketProvider.get()
+            final CommonInputSocket<?> input = FileIOSocketProvider.get()
                     .getInputSocket(new FileEntry(src));
             final OutputStream out = dstController
                     .getOutputSocket(
@@ -511,7 +511,7 @@ public class ArchiveControllers {
                             .set(PRESERVE, preserve)
                             .set(CREATE_PARENTS, createParents),
                         dstPath)
-                    .peer(input)
+                    .connect(input)
                     .newOutputStream();
             try {
                 Streams.cat(in, out);

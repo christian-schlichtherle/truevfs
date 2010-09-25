@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
@@ -50,8 +50,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  */
 public abstract class AbstractArchiveDriver<
         AE extends ArchiveEntry,
-        AI extends CommonInput<AE>,
-        AO extends CommonOutput<AE>>
+        AI extends CommonInputSocketService<AE>,
+        AO extends CommonOutputSocketService<AE>>
 implements ArchiveDriver<AE, AI, AO>, Serializable {
 
     private static final long serialVersionUID = 6546816446546846516L;

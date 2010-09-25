@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
@@ -60,8 +60,8 @@ import javax.swing.Icon;
  */
 public interface ArchiveDriver<
         AE extends ArchiveEntry,
-        AI extends CommonInput<AE>,
-        AO extends CommonOutput<AE>>
+        AI extends CommonInputSocketService<AE>,
+        AO extends CommonOutputSocketService<AE>>
 extends ArchiveEntryFactory<AE> {
 
     /**
@@ -103,7 +103,7 @@ extends ArchiveEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  out the {@link OutputStream} to write the archive entries to
      *         - {@code null} is not permitted.
-     * @param  source the source {@link CommonInput} if
+     * @param  source the source {@link CommonInputSocketService} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
      *         of this driver's {@link #newInput} method.

@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.socket.common.output;
 
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
-import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInput;
+import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInputSocketService;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -30,20 +30,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Decorates an {@code CommonOutput} to add accounting and multithreading
+ * Decorates an {@code CommonOutputSocketService} to add accounting and multithreading
  * synchronization for all output streams created by the target common
  * output.
  *
  * @param   <CE> The type of the common entries.
- * @see ConcurrentCommonInput
+ * @see ConcurrentCommonInputSocketService
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentCommonOutput<CE extends CommonEntry>
-extends FilterCommonOutput<CE, CommonOutput<CE>> {
+public class ConcurrentCommonOutputSocketService<CE extends CommonEntry>
+extends FilterCommonOutputSocketService<CE, CommonOutputSocketService<CE>> {
 
     private static final String CLASS_NAME
-            = ConcurrentCommonOutput.class.getName();
+            = ConcurrentCommonOutputSocketService.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -62,8 +62,8 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
 
     private volatile boolean stopped;
 
-    /** Constructs a new {@code ConcurrentCommonOutput}. */
-    public ConcurrentCommonOutput(final CommonOutput<CE> target) {
+    /** Constructs a new {@code ConcurrentCommonOutputSocketService}. */
+    public ConcurrentCommonOutputSocketService(final CommonOutputSocketService<CE> target) {
         super(target);
     }
 
@@ -84,7 +84,7 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                synchronized (ConcurrentCommonOutput.this) {
+                synchronized (ConcurrentCommonOutputSocketService.this) {
                     return new EntryOutputStream(
                             output.chain(this).newOutputStream());
                 }
@@ -172,7 +172,7 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
 
     /**
      * An {@link OutputStream} to write the entry data to an
-     * {@link CommonOutput}.
+     * {@link CommonOutputSocketService}.
      * This output stream provides support for finalization and throws an
      * {@link IOException} on any subsequent attempt to write data after
      * {@link #closeAllOutputStreams} has been called.
@@ -182,10 +182,10 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryOutputStream(final OutputStream out) {
-            super(out, ConcurrentCommonOutput.this);
+            super(out, ConcurrentCommonOutputSocketService.this);
             assert out != null;
             streams.put(this, Thread.currentThread());
-            ConcurrentCommonOutput.this.notify(); // there can be only one waiting thread!
+            ConcurrentCommonOutputSocketService.this.notify(); // there can be only one waiting thread!
         }
 
         private void ensureNotStopped() throws IOException {
@@ -227,8 +227,8 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
          */
         @Override
         public final void close() throws IOException {
-            assert ConcurrentCommonOutput.this == lock;
-            synchronized (ConcurrentCommonOutput.this) {
+            assert ConcurrentCommonOutputSocketService.this == lock;
+            synchronized (ConcurrentCommonOutputSocketService.this) {
                 if (closed)
                     return;
                 // Order is important!
@@ -236,7 +236,7 @@ extends FilterCommonOutput<CE, CommonOutput<CE>> {
                     doClose();
                 } finally {
                     streams.remove(this);
-                    ConcurrentCommonOutput.this.notify(); // there can be only one waiting thread!
+                    ConcurrentCommonOutputSocketService.this.notify(); // there can be only one waiting thread!
                 }
             }
         }

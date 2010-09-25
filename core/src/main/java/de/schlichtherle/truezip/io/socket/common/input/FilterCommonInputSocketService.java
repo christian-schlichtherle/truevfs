@@ -17,28 +17,28 @@
 package de.schlichtherle.truezip.io.socket.common.input;
 
 import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import java.io.IOException;
 
 /**
- * Decorates an {@code CommonInput}.
+ * Decorates an {@code CommonInputSocketService}.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
  * @param <CE> The type of the common entries.
- * @see FilterCommonOutput
+ * @see FilterCommonOutputSocketService
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterCommonInput<
+public class FilterCommonInputSocketService<
         CE extends CommonEntry,
-        CI extends CommonInput<CE>>
+        CI extends CommonInputSocketService<CE>>
 extends    FilterCommonEntryContainer<CE, CI>
-implements CommonInput<CE> {
+implements CommonInputSocketService<CE> {
 
-    protected FilterCommonInput(final CI target) {
+    protected FilterCommonInputSocketService(final CI target) {
         super(target);
     }
 

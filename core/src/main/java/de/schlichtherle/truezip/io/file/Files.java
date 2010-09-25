@@ -386,7 +386,7 @@ class Files {
                         .getInputSocket( // detects false positives!
                             BitField.noneOf(ArchiveIOOption.class),
                             srcPath)
-                        .peer(null)
+                        .connect(null)
                         .newInputStream();
                 time = srcController.getEntry(srcPath).getTime();
             /*} finally {

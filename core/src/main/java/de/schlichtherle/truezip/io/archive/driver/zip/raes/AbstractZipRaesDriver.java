@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
@@ -157,7 +157,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *        the destination.
      */
     @Override
-    public CommonOutput newOutput(
+    public CommonOutputSocketService newOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final ZipInput source)

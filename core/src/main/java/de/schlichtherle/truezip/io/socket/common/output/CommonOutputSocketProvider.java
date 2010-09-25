@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.socket.common.output;
 
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
 import java.io.IOException;
@@ -33,9 +32,24 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonOutputSocketProvider<CE extends CommonEntry>
-extends OutputSocketProvider<CE, CommonEntry> {
+public interface CommonOutputSocketProvider<CE extends CommonEntry> {
 
-    @Override
-    CommonOutputSocket<CE> getOutputSocket(CE entry) throws IOException;
+    /**
+     * Returns a non-{@code null} output socket for write access to the
+     * given local target.
+     * <p>
+     * The implementation must not assume that the returned output socket will
+     * ever be used and must tolerate changes to all settable properties of the
+     * local target object.
+     * <p>
+     * Multiple invocations with the same parameter may return the same
+     * object again.
+     *
+     * @param  target the non-{@code null} local target.
+     * @return A non-{@code null} output socket for writing to the local target.
+     * @throws IOException If the local target
+     *         is not accessible for some reason.
+     * @throws NullPointerException if {@code target} is {@code null}.
+     */
+    CommonOutputSocket<CE> getOutputSocket(CE target) throws IOException;
 }

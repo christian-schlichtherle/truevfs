@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import java.io.IOException;
 import java.net.URI;
 
@@ -35,8 +35,8 @@ import java.net.URI;
  */
 abstract class FileSystemArchiveController<
         AE extends ArchiveEntry,
-        AI extends CommonInput<AE>,
-        AO extends CommonOutput<AE>>
+        AI extends CommonInputSocketService<AE>,
+        AO extends CommonOutputSocketService<AE>>
 extends BasicArchiveController<AE, AI, AO> {
 
     /** The mount state of the archive file system. */
