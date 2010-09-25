@@ -115,7 +115,7 @@ extends BasicArchiveController<AE, AI, AO> {
                 } // class Mounter
                 runWriteLocked(new Mounter());
             } catch (FalsePositiveException ex) {
-                // Catch and cache exceptions for uncacheable false positives.
+                // Catch and cache exceptions for non-transient false positives.
                 // The state is reset when File.delete() is called on the false
                 // positive archive file or File.update() or File.sync().
                 //   This is an important optimization: When hitting a false
@@ -125,9 +125,9 @@ extends BasicArchiveController<AE, AI, AO> {
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
                 //   Note that it is important to cache the exceptions for
-                // cacheable false positives only: Otherwise, side effects
+                // non-transient false positives only: Otherwise, side effects
                 // of the archive driver may not be accounted for.
-                if (ex.isCacheable())
+                if (!ex.isTransient())
                     autoMounter = new FalsePositiveFileSystem(ex);
                 throw ex;
             } catch (IOException ex) {

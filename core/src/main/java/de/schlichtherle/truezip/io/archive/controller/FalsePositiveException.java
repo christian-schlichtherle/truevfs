@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 
@@ -29,12 +30,13 @@ import java.net.URI;
  * Instances of this class are always associated with an {@code IOException}
  * as their cause.
  */
-public class FalsePositiveException extends IOException {
+public class FalsePositiveException extends FileNotFoundException {
+
     private static final long serialVersionUID = 947139561381472363L;
 
     private final URI mountPoint;
     private final String path;
-    private final boolean cacheable;
+    private final boolean trans;
 
     FalsePositiveException(
             final ArchiveDescriptor archive,
@@ -49,9 +51,8 @@ public class FalsePositiveException extends IOException {
         // the real transient cause, therefore we can safely throw it away.
         // We must do this in order to allow an archive controller to inspect
         // the real transient cause and act accordingly.
-        final boolean trans = cause instanceof TransientIOException;
+        trans = cause instanceof TransientIOException;
         super.initCause(trans ? cause.getCause() : cause);
-        cacheable = !trans;
     }
 
     /** @see ArchiveDescriptor#getMountPoint() */
@@ -77,11 +78,11 @@ public class FalsePositiveException extends IOException {
     }
 
     /**
-     * Returns {@code true} if and only if there is no cause associated with
-     * this exception or it is safe to cache it.
+     * Returns {@code true} if and only if this exception was created with a
+     * {@link TransientIOException} as its cause.
      */
-    final boolean isCacheable() {
-        return cacheable;
+    final boolean isTransient() {
+        return trans;
     }
 
     @Override

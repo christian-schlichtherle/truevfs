@@ -2182,6 +2182,8 @@ public class File extends java.io.File {
      * file is a true archive file, not just a false positive, including
      * RAES encrypted ZIP files for which key prompting has been cancelled
      * or disabled.
+     *
+     * @deprecated
      */
     final void ensureNotVirtualRoot(final String prefix)
     throws ArchiveEntryNotFoundException {
@@ -2236,7 +2238,8 @@ public class File extends java.io.File {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-            // See ArchiveDriver#newArchiveInput!
+            // See ArchiveDriver#newInput!
+            // FIXME: Check if needed anymore!
             if (isArchive()
                     && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
@@ -2824,7 +2827,8 @@ public class File extends java.io.File {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
-            // See ArchiveDriver#newArchiveInput!
+            // See ArchiveDriver#newInput!
+            // FIXME: Check if needed anymore!
             if (isArchive()
             && !delegate.isDirectory()
             && isNotArchive.getCause() instanceof FileNotFoundException)

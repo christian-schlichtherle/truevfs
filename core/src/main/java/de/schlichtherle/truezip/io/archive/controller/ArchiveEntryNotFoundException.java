@@ -27,14 +27,14 @@ import java.net.URI;
  * May be thrown by {@link ArchiveController#getInputSocket} or
  * {@link ArchiveController#getOutputSocket}.
  */
-public final class ArchiveEntryNotFoundException
-extends FileNotFoundException {
+public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 
     private static final long serialVersionUID = 2972350932856838564L;
 
     private final URI mountPoint;
     private final String path;
 
+    // TODO: Make this package private!
     public ArchiveEntryNotFoundException(
             final ArchiveDescriptor archive,
             final String path,

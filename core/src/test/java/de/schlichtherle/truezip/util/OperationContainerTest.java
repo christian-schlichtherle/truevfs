@@ -66,7 +66,7 @@ public class OperationContainerTest extends TestCase {
     private static class Failure implements Operation<IOException> {
         @Override
         public void run() throws IOException {
-            throw new FileNotFoundException("huh?");
+            throw new FileNotFoundException();
         }
     }
 
