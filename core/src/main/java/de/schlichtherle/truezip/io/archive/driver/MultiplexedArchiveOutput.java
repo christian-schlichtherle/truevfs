@@ -16,15 +16,15 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
-import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOSockets;
+import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
- * Decorates an {@code CommonOutput} in order to support a virtually
+ * Decorates an {@code CommonOutputSocketService} in order to support a virtually
  * unlimited number of entries which may be written concurrently while
  * actually at most one entry is written concurrently to the target archive
  * output.
@@ -63,7 +63,7 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @version $Id$
  */
 public class MultiplexedArchiveOutput<AE extends ArchiveEntry>
-extends FilterCommonOutput<AE, CommonOutput<AE>> {
+extends FilterCommonOutputSocketService<AE, CommonOutputSocketService<AE>> {
 
     /** Prefix for temporary files created by the multiplexer. */
     static final String TEMP_FILE_PREFIX = "tzp-mux";
@@ -84,7 +84,7 @@ extends FilterCommonOutput<AE, CommonOutput<AE>> {
      * @param target the decorated output archive.
      * @throws NullPointerException iff {@code target} is {@code null}.
      */
-    public MultiplexedArchiveOutput(final CommonOutput<AE> target) {
+    public MultiplexedArchiveOutput(final CommonOutputSocketService<AE> target) {
         super(target);
         if (target == null)
             throw new NullPointerException();
@@ -281,7 +281,7 @@ extends FilterCommonOutput<AE, CommonOutput<AE>> {
                 return false;
 
             try {
-                IOSockets.copy(input, output);
+                IOSocket.copy(input, output);
             } finally {
                 if (!temp.delete()) // may fail on Windoze if in.close() failed!
                     temp.deleteOnExit(); // be bullish never to leavy any temps!

@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.RawZipFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
@@ -30,7 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.zip.ZipException;
 
 /**
- * An implementation of {@link CommonInput} to read ZIP archives.
+ * An implementation of {@link CommonInputSocketService} to read ZIP archives.
  *
  * @see ZipDriver
  * @author Christian Schlichtherle
@@ -38,7 +38,7 @@ import java.util.zip.ZipException;
  */
 public class ZipInput
 extends RawZipFile<ZipEntry>
-implements CommonInput<ZipEntry> {
+implements CommonInputSocketService<ZipEntry> {
 
     public ZipInput(
             ReadOnlyFile rof,

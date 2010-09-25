@@ -19,11 +19,13 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 
 /**
- * Indicates that the {@link CommonInputSocket#newInputStream}
- * method failed because the common input socket's source is already busy.
- * This exception is guaranteed to be recoverable, meaning it must be possible
- * to read the same entry again as soon as the common input socket's source is
- * not busy anymore, unless another exceptional condition applies.
+ * Indicates that a {@link CommonInputSocket common input socket}, its
+ * {@link CommonInputSocketProvider common input socket provider} or its
+ * {@link CommonInputSocketService common input socket service} is busy on
+ * input.
+ * This exception is guaranteed to be recoverable, meaning it should be
+ * possible to read the same common entry again as soon as the source is
+ * not busy anymore and unless another exceptional condition applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -37,8 +39,8 @@ extends FileBusyException {
      * Constructs a new {@code CommonInputBusyException} with the specified
      * common entry.
      * 
-     * @param entry The common entry which was tried to read while
-     *        the common input socket's source was busy.
+     * @param entry The common entry which was tried to read while the
+     *        destination was busy.
      */
     public CommonInputBusyException(CommonEntry entry) {
         super(entry.getName());

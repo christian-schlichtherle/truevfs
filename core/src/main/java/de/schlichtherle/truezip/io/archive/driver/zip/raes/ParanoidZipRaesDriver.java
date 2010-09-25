@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInput;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * buffering the written entries.
      */
     @Override
-    public CommonOutput newOutput(
+    public CommonOutputSocketService newOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final ZipInput source)

@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
- * An implementation of {@link CommonOutput} to write TAR archives.
+ * An implementation of {@link CommonOutputSocketService} to write TAR archives.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source (such as entries created with
@@ -61,7 +61,7 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 public class TarOutput
 extends TarOutputStream
-implements CommonOutput<TarEntry> {
+implements CommonOutputSocketService<TarEntry> {
 
     /** Maps entry names to tar entries [String -> TarEntry]. */
     private final Map<String, TarEntry> entries

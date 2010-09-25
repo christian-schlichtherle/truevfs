@@ -19,12 +19,13 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 
 /**
- * Indicates that the {@link CommonOutputSocket#newOutputStream}
- * method failed because the common output socket's destination is already busy.
- * This exception is guaranteed to be recoverable, meaning it must be possible
- * to write the same entry again as soon as the common output socket's
- * destination is not busy anymore, unless another exceptional condition
- * applies.
+ * Indicates that a {@link CommonOutputSocket common output socket}, its
+ * {@link CommonOutputSocketProvider common output socket provider} or its
+ * {@link CommonOutputSocketService common output socket service} is busy on
+ * output.
+ * This exception is guaranteed to be recoverable, meaning it should be
+ * possible to write the same common entry again as soon as the destination is
+ * not busy anymore and unless another exceptional condition applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -37,9 +38,9 @@ extends FileBusyException {
     /**
      * Constructs a new {@code CommonOutputBusyException} with the specified
      * common entry.
-     * 
-     * @param entry The common entry which was tried to write while
-     *        the common output socket's destination was busy.
+     *
+     * @param entry The common entry which was tried to write while the
+     *        destination was busy.
      */
     public CommonOutputBusyException(CommonEntry entry) {
         super(entry.getName());

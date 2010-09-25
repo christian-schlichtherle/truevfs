@@ -29,18 +29,18 @@ import java.io.OutputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntrySocketProvider
+public class FileIOSocketProvider
 implements  CommonInputSocketProvider<FileEntry>,
             CommonOutputSocketProvider<FileEntry> {
 
-    private static final FileEntrySocketProvider singleton
-            = new FileEntrySocketProvider();
+    private static final FileIOSocketProvider singleton
+            = new FileIOSocketProvider();
 
-    public static FileEntrySocketProvider get() {
+    public static FileIOSocketProvider get() {
         return singleton;
     }
 
-    private FileEntrySocketProvider() {
+    private FileIOSocketProvider() {
     }
 
     @Override

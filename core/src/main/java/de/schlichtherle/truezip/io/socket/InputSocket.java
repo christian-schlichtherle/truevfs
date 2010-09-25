@@ -20,13 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates input streams for reading bytes from its local target.
+ * Creates input streams for reading bytes from its
+ * {@link #getTarget local target}.
+ * An input socket can also get {@link #connect connected} to a
+ * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
  * 
- * @param   <LT> The type of the {@link #getTarget() local target} for I/O
+ * @param   <LT> The type of the {@link #getTarget local target} for I/O
  *          operations.
- * @param   <PT> The type of the {@link #getPeerTarget() peer target} for I/O
+ * @param   <PT> The type of the {@link #getPeerTarget peer target} for I/O
  *          operations.
- * @see     InputSocketProvider
  * @see     OutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -36,26 +38,26 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
     private OutputSocket<? extends PT, ? super LT> peer;
 
     public InputSocket<LT, PT> chain(InputSocket<? super LT, ? extends PT> input) {
-        return peer(input.peer);
+        return connect(input.peer);
     }
 
-    public InputSocket<LT, PT> peer(
+    public InputSocket<LT, PT> connect(
             final OutputSocket<? extends PT, ? super LT> newPeer) {
         final OutputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             peer = newPeer;
-            beforePeeringComplete();
+            beforeConnectComplete();
             if (null != newPeer)
-                newPeer.peer(this);
-            afterPeeringComplete();
+                newPeer.connect(this);
+            afterConnectComplete();
         }
         return this;
     }
 
-    protected void beforePeeringComplete() {
+    protected void beforeConnectComplete() {
     }
 
-    protected void afterPeeringComplete() {
+    protected void afterConnectComplete() {
     }
 
     private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {

@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutput;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -113,8 +113,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<  AE extends ArchiveEntry,
-                                        AI extends CommonInput<AE>,
-                                        AO extends CommonOutput<AE>>
+                                        AI extends CommonInputSocketService<AE>,
+                                        AO extends CommonOutputSocketService<AE>>
 implements  ArchiveController,
             CommonInputSocketProvider<AE>,
             CommonOutputSocketProvider<AE> {
@@ -498,12 +498,12 @@ implements  ArchiveController,
             }
 
             @Override
-            protected void beforePeeringComplete() {
+            protected void beforeConnectComplete() {
                 local = this; // reset local target reference
             }
 
             @Override
-            protected void afterPeeringComplete() {
+            protected void afterConnectComplete() {
                 getTarget();
             }
 
@@ -615,12 +615,12 @@ implements  ArchiveController,
             }
 
             @Override
-            protected void beforePeeringComplete() {
+            protected void beforeConnectComplete() {
                 local = null; // reset local target reference
             }
 
             @Override
-            protected void afterPeeringComplete() {
+            protected void afterConnectComplete() {
                 getTarget();
             }
 
@@ -655,7 +655,7 @@ implements  ArchiveController,
                         final boolean append = options.get(APPEND);
                         final InputStream in = append
                                 ? getInputSocket(entry)
-                                    .peer(null)
+                                    .connect(null)
                                     .newInputStream()
                                 : null;
                         try {
@@ -971,7 +971,7 @@ implements  ArchiveController,
                             .noneOf(ArchiveIOOption.class)
                             .set(CREATE_PARENTS, createParents),
                         path)
-                    .peer(null)
+                    .connect(null)
                     .newOutputStream()
                     .close();
             return true;

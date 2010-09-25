@@ -169,7 +169,7 @@ public class FileOutputStream extends FilterOutputStream {
                                     .set(APPEND, append)
                                     .set(CREATE_PARENTS, File.isLenient()),
                                 path)
-                            .peer(null)
+                            .connect(null)
                             .newOutputStream();
                 }
             }

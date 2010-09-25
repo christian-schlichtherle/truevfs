@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.socket.common.input;
 
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
-import de.schlichtherle.truezip.io.socket.common.output.ConcurrentCommonOutput;
+import de.schlichtherle.truezip.io.socket.common.output.ConcurrentCommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
@@ -30,19 +30,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Decorates an {@code CommonInput} to add accounting and multithreading
+ * Decorates an {@code CommonInputSocketService} to add accounting and multithreading
  * synchronization for all input streams created by the target common input.
  *
  * @param   <CE> The type of the common entries.
- * @see ConcurrentCommonOutput
+ * @see ConcurrentCommonOutputSocketService
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentCommonInput<CE extends CommonEntry>
-extends FilterCommonInput<CE, CommonInput<CE>> {
+public class ConcurrentCommonInputSocketService<CE extends CommonEntry>
+extends FilterCommonInputSocketService<CE, CommonInputSocketService<CE>> {
 
     private static final String CLASS_NAME
-            = ConcurrentCommonInput.class.getName();
+            = ConcurrentCommonInputSocketService.class.getName();
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
@@ -61,8 +61,8 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
 
     private volatile boolean stopped;
 
-    /** Constructs a new {@code ConcurrentCommonInput}. */
-    public ConcurrentCommonInput(final CommonInput<CE> target) {
+    /** Constructs a new {@code ConcurrentCommonInputSocketService}. */
+    public ConcurrentCommonInputSocketService(final CommonInputSocketService<CE> target) {
         super(target);
     }
 
@@ -83,7 +83,7 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
             @Override
             public InputStream newInputStream()
             throws IOException {
-                synchronized (ConcurrentCommonInput.this) {
+                synchronized (ConcurrentCommonInputSocketService.this) {
                     return new EntryInputStream(
                             input.chain(this).newInputStream());
                 }
@@ -169,7 +169,7 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
 
     /**
      * An {@link InputStream} to read the entry data from an
-     * {@link CommonInput}.
+     * {@link CommonInputSocketService}.
      * This input stream provides support for finalization and throws an
      * {@link IOException} on any subsequent attempt to read data after
      * {@link #closeAllInputStreams} has been called.
@@ -179,10 +179,10 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryInputStream(final InputStream in) {
-            super(in, ConcurrentCommonInput.this);
+            super(in, ConcurrentCommonInputSocketService.this);
             assert in != null;
             streams.put(this, Thread.currentThread());
-            ConcurrentCommonInput.this.notify(); // there can be only one waiting thread!
+            ConcurrentCommonInputSocketService.this.notify(); // there can be only one waiting thread!
         }
 
         private void ensureNotStopped() throws IOException {
@@ -247,8 +247,8 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
          */
         @Override
         public final void close() throws IOException {
-            assert ConcurrentCommonInput.this == lock;
-            synchronized (ConcurrentCommonInput.this) {
+            assert ConcurrentCommonInputSocketService.this == lock;
+            synchronized (ConcurrentCommonInputSocketService.this) {
                 if (closed)
                     return;
                 // Order is important!
@@ -256,7 +256,7 @@ extends FilterCommonInput<CE, CommonInput<CE>> {
                     doClose();
                 } finally {
                     streams.remove(this);
-                    ConcurrentCommonInput.this.notify(); // there can be only one waiting thread!
+                    ConcurrentCommonInputSocketService.this.notify(); // there can be only one waiting thread!
                 }
             }
         }

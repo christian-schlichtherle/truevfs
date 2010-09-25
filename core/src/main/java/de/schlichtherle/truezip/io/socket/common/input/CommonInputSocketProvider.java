@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.socket.common.input;
 
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocketProvider;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
 import java.io.IOException;
@@ -33,9 +32,24 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonInputSocketProvider<CE extends CommonEntry>
-extends InputSocketProvider<CE, CommonEntry> {
+public interface CommonInputSocketProvider<CE extends CommonEntry> {
 
-    @Override
-    CommonInputSocket<CE> getInputSocket(CE entry) throws IOException;
+    /**
+     * Returns a non-{@code null} input socket for read access to the
+     * given local target.
+     * Multiple invocations with the same parameter may return the same
+     * object again.
+     * <p>
+     * The method {@link InputSocket#getTarget()} must return an object
+     * which {@link Object#equals(Object) compares equal} to the given local
+     * target when called on the returned input socket.
+     *
+     * @param  target the non-{@code null} local target.
+     * @return A non-{@code null} input socket for reading from the local
+     *         target.
+     * @throws IOException If the local target does not exist or
+     *         is not accessible for some reason.
+     * @throws NullPointerException if {@code target} is {@code null}.
+     */
+    CommonInputSocket<CE> getInputSocket(CE target) throws IOException;
 }

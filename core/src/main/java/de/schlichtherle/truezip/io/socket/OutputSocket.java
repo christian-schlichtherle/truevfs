@@ -19,13 +19,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Creates output streams for writing bytes to its local target.
+ * Creates output streams for writing bytes to its
+ * {@link #getTarget local target}.
+ * An output socket can also get {@link #connect connected} to a
+ * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
  *
- * @param   <LT> The type of the {@link #getTarget() local target} for I/O
+ * @param   <LT> The type of the {@link #getTarget local target} for I/O
  *          operations.
- * @param   <PT> The type of the {@link #getPeerTarget() peer target} for I/O
+ * @param   <PT> The type of the {@link #getPeerTarget peer target} for I/O
  *          operations.
- * @see     OutputSocketProvider
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -35,26 +37,26 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
     private InputSocket<? extends PT, ? super LT> peer;
 
     public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> output) {
-        return peer(output.peer);
+        return connect(output.peer);
     }
 
-    public OutputSocket<LT, PT> peer(
+    public OutputSocket<LT, PT> connect(
             final InputSocket<? extends PT, ? super LT> newPeer) {
         final InputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             peer = newPeer;
-            beforePeeringComplete();
+            beforeConnectComplete();
             if (null != newPeer)
-                newPeer.peer(this);
-            afterPeeringComplete();
+                newPeer.connect(this);
+            afterConnectComplete();
         }
         return this;
     }
 
-    protected void beforePeeringComplete() {
+    protected void beforeConnectComplete() {
     }
 
-    protected void afterPeeringComplete() {
+    protected void afterConnectComplete() {
     }
 
     private static boolean equal(Object o1, Object o2) {
@@ -62,7 +64,7 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
     }
 
     /**
-     * Returns the nullable peer target for I/O operations.
+     * Returns the nullable <i>peer target</i> for I/O operations.
      * <p>
      * The result of changing the state of the peer target is undefined.
      * In particular, a subsequent I/O operation may not reflect the change
