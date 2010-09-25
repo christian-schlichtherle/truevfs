@@ -29,7 +29,7 @@ import java.util.Iterator;
  * @version $Id$
  */
 public abstract class FilterCommonEntryContainer<
-        CE extends CommonEntry,
+        CE  extends CommonEntry,
         CEC extends CommonEntryContainer<CE>>
 implements CommonEntryContainer<CE> {
 
