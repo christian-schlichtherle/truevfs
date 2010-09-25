@@ -28,17 +28,14 @@ import java.util.Iterator;
  * In general, passing {@code null} as a method parameter results in a
  * {@link NullPointerException}.
  * <p>
- * Subclasses could override the {@link #set(Enum, boolean)} and
- * {@link #clear()} methods in order to cache frequently used results, such
- * as a null bit field, single bit fields etc.
- * <p>
  * <b>TODO:</b> Add more modifying methods.
  *
  * @param <E> The type of {@link Enum} objects contained in this set.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
+public final class BitField<E extends Enum<E>>
+implements Iterable<E>, Cloneable {
 
     /**
      * Returns a bit field which can contain the given element type and is
@@ -103,18 +100,18 @@ public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
      * Constructs a new bit field which contains all or none of the enums
      * of the given element type.
      */
-    protected BitField(final Class<E> elementType, final boolean allOf) {
+    private BitField(final Class<E> elementType, final boolean allOf) {
         this.bits = allOf   ? EnumSet.allOf (elementType)
                             : EnumSet.noneOf(elementType);
     }
 
     /** Constructs a new bit field which contains the given bit. */
-    protected BitField(final E bit) {
+    private BitField(final E bit) {
         this.bits = EnumSet.of(bit);
     }
 
     /** Constructs a new bit field which contains the given bits. */
-    protected BitField(final E bit, final E... bits) {
+    private BitField(final E bit, final E... bits) {
         this.bits = EnumSet.of(bit, bits);
     }
 
@@ -153,7 +150,7 @@ public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
     }
 
     /** Equivalent to {@link #get(Enum) get(bit)}. */
-    public final boolean is(E bit) {
+    public boolean is(E bit) {
         return get(bit);
     }
 
@@ -196,12 +193,12 @@ public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
     }
 
     /** Sets the given bit. */
-    public final BitField<E> set(E bit) {
+    public BitField<E> set(E bit) {
         return set(bit, true);
     }
 
     /** Clears the given bit. */
-    public final BitField<E> clear(E bit) {
+    public BitField<E> clear(E bit) {
         return set(bit, false);
     }
 
@@ -231,7 +228,7 @@ public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
      * {@code BitField} and contains the same bits.
      */
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (o == this)
             return true;
         if (!(o instanceof BitField))
@@ -241,7 +238,7 @@ public class BitField<E extends Enum<E>> implements Iterable<E>, Cloneable {
 
     /** Returns a hash code which is consistent with {@link #equals}. */
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return bits.hashCode();
     }
 
