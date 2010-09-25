@@ -23,7 +23,7 @@
     <artifactId>truezip-core</artifactId>
     <version>7.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>TrueZIP Core ${pom.version}</name>
+    <name>TrueZIP Core ${project.version}</name>
     <description>TrueZIP is a Java based Virtual File System (VFS) to enable
 transparent, multi-threaded read/write access to archive files
 (ZIP, TAR etc.) as if they were directories.
@@ -164,8 +164,40 @@ limitations under the License.
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.7</version>
                 <configuration>
+                    <author>true</author>
+                    <doctitle>TrueZIP Core API&lt;br/&gt;Version ${project.version}</doctitle>
+                    <groups>
+                        <group>
+                            <title>High Level API For Accessing Archive Files</title>
+                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample</packages>
+                        </group>
+                        <group>
+                            <title>GUI For Accessing Archive Files</title>
+                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
+                        </group>
+                        <group>
+                            <title>Low Level API For Accessing ZIP Files</title>
+                            <packages>de.schlichtherle.truezip.io.zip</packages>
+                        </group>
+                        <group>
+                            <title>Low Level API For Accessing RAES Files</title>
+                            <packages>de.schlichtherle.truezip.crypto.io.raes:de.schlichtherle.truezip.key*</packages>
+                        </group>
+                        <group>
+                            <title>SPI And Implementations For Pluggable Archive Drivers</title>
+                            <packages>de.schlichtherle.truezip.io.archive*</packages>
+                        </group>
+                    </groups>
+                    <header>&lt;b&gt;TrueZIP Core ${project.version}&lt;/b&gt;</header>
+                    <links>
+                        <link>http://www.bouncycastle.org/docs/docs1.5/</link>
+                    </links>
                     <nohelp>true</nohelp>
+                    <quiet>true</quiet>
                     <show>private</show>
+                    <splitindex>true</splitindex>
+                    <version>true</version>
+                    <windowtitle>TrueZIP Core ${project.version}</windowtitle>
                 </configuration>
             </plugin>
             <plugin>
@@ -214,48 +246,6 @@ limitations under the License.
             </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <author>true</author>
-                    <doctitle>TrueZIP Core API&lt;br/&gt;Version ${pom.version}</doctitle>
-                    <groups>
-                        <group>
-                            <title>High Level API For Accessing Archive Files</title>
-                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample</packages>
-                        </group>
-                        <group>
-                            <title>GUI For Accessing Archive Files</title>
-                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
-                        </group>
-                        <group>
-                            <title>Low Level API For Accessing ZIP Files</title>
-                            <packages>de.schlichtherle.truezip.io.zip</packages>
-                        </group>
-                        <group>
-                            <title>Low Level API For Accessing RAES Files</title>
-                            <packages>de.schlichtherle.truezip.crypto.io.raes:de.schlichtherle.truezip.key*</packages>
-                        </group>
-                        <group>
-                            <title>SPI And Implementations For Pluggable Archive Drivers</title>
-                            <packages>de.schlichtherle.truezip.io.archive*</packages>
-                        </group>
-                    </groups>
-                    <header>&lt;b&gt;TrueZIP Core ${pom.version}&lt;/b&gt;</header>
-                    <links>
-                        <link>http://www.bouncycastle.org/docs/docs1.5/</link>
-                    </links>
-                    <quiet>true</quiet>
-                    <splitindex>true</splitindex>
-                    <version>true</version>
-                    <windowtitle>TrueZIP Core ${pom.version}</windowtitle>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
     <profiles>
         <profile>
             <id>release</id>
