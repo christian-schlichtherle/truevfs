@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.io;
 
-import java.net.URI;
-
 /**
  * Provides static utility methods for path names.
  * This class cannot get instantiated outside its package.
@@ -125,8 +123,7 @@ public class Paths {
                     return 0;
             } else if (0 < collapse) {
                 notCollapsed = normalize(collapse - 1, next);
-                if (1 == collapse)
-                    slashify();
+                slashify();
                 return notCollapsed;
             } else {
                 assert 0 == collapse;
