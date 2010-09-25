@@ -87,6 +87,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
     protected String suffix;
     
     /** The temporary file to use as an archive file. */
+    private java.io.File _archive;
     protected File archive;
     
     protected IOFileTestCase(String testName) {
@@ -113,8 +114,9 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         if (suffix == null)
             suffix = ".zip";
         if (archive == null) {
-            archive = new File(createTempFile(prefix, suffix));
-            assertTrue(archive.delete());
+            _archive = createTempFile(prefix, suffix);
+            assertTrue(_archive.delete());
+            archive = new File(_archive);
         }
 
         File.setLenient(true); // Restore default
@@ -127,12 +129,11 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         prefix = null;
         suffix = null;
 
-        if (archive != null) {
-            final boolean deleted = archive.delete();
-            if (!deleted && archive.exists())
-                logger.log(Level.WARNING, "{0} (could not delete)", archive);
-            archive = null;
-        }
+        if (archive != null)
+            archive.delete(); // archive, not _archive!
+        if (_archive.exists() && !_archive.delete())
+            logger.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
+        _archive = archive = null;
 
         // sync now to delete temps and free memory.
         // This prevents subsequent warnings about left over temporary files
@@ -170,7 +171,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         Thread.sleep(100);
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
-        in = null;
+        in = null; // leaves file!
         System.gc();
         System.runFinalization();
         Thread.sleep(100);
@@ -187,7 +188,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertNotNull(ref.get());
         OutputStream out = new FileOutputStream(path);
         out.close();
-        out = null;
+        out = null; // leaves file!
         System.gc();
         System.runFinalization();
         Thread.sleep(100);
