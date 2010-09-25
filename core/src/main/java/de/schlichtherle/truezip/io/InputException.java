@@ -42,7 +42,7 @@ public class InputException extends IOException {
         super(cause != null ? cause.toString() : null);
         if (cause instanceof FileNotFoundException)
             throw new IllegalArgumentException(cause);
-        initCause(cause);
+        super.initCause(cause);
     }
 
     /**
