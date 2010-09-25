@@ -297,7 +297,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (inFile == null) {
-                unwrap( getEnclController(), getEnclPath(ROOT),
+                unwrap( getEnclArchive(), getEnclPath(ROOT),
                         autoCreate, createParents);
             } else {
                 // The enclosed archive file has already been updated and the
@@ -324,7 +324,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     // a bug.
                     assert false : "We should never get here! Please read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
-                            getEnclController(), getEnclPath(ROOT), ex);
+                            getEnclArchive(), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
                 // because we are reusing a file which has been previously
@@ -404,7 +404,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             // enclosing controller.
             if (controller.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // just created - pass on
-            unwrap( controller.getEnclController(),
+            unwrap( controller.getEnclArchive(),
                     controller.getEnclPath(path),
                     autoCreate, createParents);
         }
@@ -1013,10 +1013,10 @@ extends FileSystemArchiveController<AE, AI, AO> {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclController(), getEnclPath(ROOT));
+                wrap(getEnclArchive(), getEnclPath(ROOT));
             } catch (IOException ex) {
                 throw handler.fail(new ArchiveSyncException(
-                        getEnclController(),
+                        getEnclArchive(),
                         "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
                         ex));
             }

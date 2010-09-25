@@ -55,7 +55,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     public int getTopLevelArchivesTotal() {
         int result = 0;
         for (ArchiveController c : ArchiveControllers.getAll())
-            if (c.getEnclController() == null)
+            if (c.getEnclArchive() == null)
                 result++;
         return result;
     }
@@ -65,7 +65,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
         for (final BasicArchiveController c : ArchiveControllers.getAll()) {
             c.readLock().lock();
             try {
-                if (c.getEnclController() == null && c.isTouched()) {
+                if (c.getEnclArchive() == null && c.isTouched()) {
                     result++;
                 }
             } finally {

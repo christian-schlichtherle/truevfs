@@ -268,7 +268,7 @@ implements  ArchiveController,
     }
 
     @Override
-    public final BasicArchiveController<?, ?, ?> getEnclController() {
+    public final BasicArchiveController<?, ?, ?> getEnclArchive() {
         return enclController;
     }
 
@@ -319,7 +319,7 @@ implements  ArchiveController,
 
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final BasicArchiveController enclController = getEnclController();
+        final BasicArchiveController enclController = getEnclArchive();
         return enclController == null
                 || enclController.getTarget().isDirectory();
     }
@@ -465,7 +465,7 @@ implements  ArchiveController,
         try {
             return getInputSocket0(options, path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getInputSocket(options, getEnclPath(path));
+            return getEnclArchive().getInputSocket(options, getEnclPath(path));
         }
     }
 
@@ -556,7 +556,7 @@ implements  ArchiveController,
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ?!?! archive entry not found is not really an archive entry false positive ?!?!
-                    return getEnclController().getInputSocket(
+                    return getEnclArchive().getInputSocket(
                             options, getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
@@ -580,7 +580,7 @@ implements  ArchiveController,
         try {
             return getOutputSocket0(options, path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getOutputSocket(
+            return getEnclArchive().getOutputSocket(
                     options, getEnclPath(path));
         }
     }
@@ -699,7 +699,7 @@ implements  ArchiveController,
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
-                    return getEnclController().getOutputSocket(
+                    return getEnclArchive().getOutputSocket(
                             options, getEnclPath(path));
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
@@ -719,7 +719,7 @@ implements  ArchiveController,
         try {
             return getOpenIcon0();
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getOpenIcon();
+            return getEnclArchive().getOpenIcon();
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -744,7 +744,7 @@ implements  ArchiveController,
         try {
             return getClosedIcon0();
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getClosedIcon();
+            return getEnclArchive().getClosedIcon();
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -769,7 +769,7 @@ implements  ArchiveController,
         try {
             return isReadOnly0();
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isReadOnly();
+            return getEnclArchive().isReadOnly();
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -793,7 +793,7 @@ implements  ArchiveController,
         try {
             return getEntry0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getEntry(getEnclPath(path));
+            return getEnclArchive().getEntry(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -809,7 +809,7 @@ implements  ArchiveController,
         } catch (FileArchiveEntryFalsePositiveException ex) {
             /** @see ArchiveDriver#newInput! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return new SpecialFileEntry(getEnclController()
+                return new SpecialFileEntry(getEnclArchive()
                         .getEntry(getEnclPath(path))
                         .getTarget()); // the exception asserts that the entry exists as a file!
             throw ex;
@@ -848,7 +848,7 @@ implements  ArchiveController,
         try {
             return isReadable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isReadable(getEnclPath(path));
+            return getEnclArchive().isReadable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -872,7 +872,7 @@ implements  ArchiveController,
         try {
             return isWritable0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isWritable(getEnclPath(path));
+            return getEnclArchive().isWritable(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -896,7 +896,7 @@ implements  ArchiveController,
         try {
             setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            getEnclController().setReadOnly(getEnclPath(path));
+            getEnclArchive().setReadOnly(getEnclPath(path));
         } catch (IOException ex) {
             return false;
         }
@@ -921,7 +921,7 @@ implements  ArchiveController,
         try {
             return setLastModified0(path, time);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().setLastModified(getEnclPath(path), time);
+            return getEnclArchive().setLastModified(getEnclPath(path), time);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -950,7 +950,7 @@ implements  ArchiveController,
         try {
             return createNewFile0(path, createParents);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().createNewFile(
+            return getEnclArchive().createNewFile(
                     getEnclPath(path), createParents);
         }
     }
@@ -989,7 +989,7 @@ implements  ArchiveController,
             mkdir0(path, createParents);
             return true;
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().mkdir(getEnclPath(path), createParents);
+            return getEnclArchive().mkdir(getEnclPath(path), createParents);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1028,17 +1028,17 @@ implements  ArchiveController,
             delete0(path);
             return true;
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclController().delete(getEnclPath(path));
+            return getEnclArchive().delete(getEnclPath(path));
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             /** @see ArchiveDriver#newInput! */
             if (isRoot(path)) {
-                final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
+                final ArchiveFileSystemEntry entry = getEnclArchive().getEntry(getEnclPath(path));
                 if (null == entry || entry.getType() != DIRECTORY
                     && ex.getCause() instanceof FileNotFoundException)
                     return false;
             }
-            return getEnclController().delete(getEnclPath(path));
+            return getEnclArchive().delete(getEnclPath(path));
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -1094,7 +1094,7 @@ implements  ArchiveController,
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    getEnclController().delete(getEnclPath(path));
+                    getEnclArchive().delete(getEnclPath(path));
                 }
             } else { // !isRoot(entryName)
                 autoMount().unlink(path);
