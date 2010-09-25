@@ -23,7 +23,7 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveDescriptor {
+public interface ArchiveDescriptor {
 
     /**
      * Returns an absolute, hierarchical and normalized Unique Resource
@@ -46,11 +46,5 @@ public abstract class ArchiveDescriptor {
      * @return A non-{@code null} URI for the mount point of the target archive
      *         file.
      */
-    public abstract URI getMountPoint();
-
-    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
-    @Override
-    public final String toString() {
-        return getMountPoint().toString();
-    }
+    URI getMountPoint();
 }

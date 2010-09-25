@@ -20,9 +20,6 @@ import de.schlichtherle.truezip.io.socket.common.input.CommonInput;
 import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
@@ -118,8 +115,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 abstract class BasicArchiveController<  AE extends ArchiveEntry,
                                         AI extends CommonInput<AE>,
                                         AO extends CommonOutput<AE>>
-extends     ArchiveController
-implements  CommonInputSocketProvider<AE>,
+implements  ArchiveController,
+            CommonInputSocketProvider<AE>,
             CommonOutputSocketProvider<AE> {
 
     /**
@@ -277,11 +274,15 @@ implements  CommonInputSocketProvider<AE>,
 
     @Override
     public final String getEnclPath(final String path) {
-        final String result = isRoot(path)
+        return isRoot(path)
                 ? cutTrailingSeparators(enclPath.toString(), SEPARATOR_CHAR)
                 : enclPath.resolve(path).toString();
-        assert super.getEnclPath(path).equals(result);
-        return result;
+    }
+
+    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
+    @Override
+    public final String toString() {
+        return getMountPoint().toString();
     }
 
     /**
@@ -455,7 +456,7 @@ implements  CommonInputSocketProvider<AE>,
     throws ArchiveSyncException;
 
     @Override
-    public CommonInputSocket<?> getInputSocket(
+    public CommonInputSocket<? extends ArchiveEntry> getInputSocket(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
@@ -468,27 +469,14 @@ implements  CommonInputSocketProvider<AE>,
         }
     }
 
-    private CommonInputSocket<?> getInputSocket0(
+    private CommonInputSocket<? extends ArchiveEntry> getInputSocket0(
             final BitField<ArchiveIOOption> options, // currently unused
             final String path)
     throws IOException {
         class Input extends CommonInputSocket<AE> {
             private IOReference<AE> local = this;
 
-            @Override
-            public CommonInputSocket<AE> peer(
-                    final OutputSocket<? extends CommonEntry, ? super AE> newPeer) {
-                super.peer(newPeer);
-                getPeerTarget();
-                return this;
-            }
-
-            @Override
-            protected void beforePeeringComplete() {
-                local = this; // reset local target reference
-            }
-
-            private AE entry() throws IOException {
+            private AE load() throws IOException {
                 if (hasNewData(path)) {
                     local = this;
                     class AutoSync implements IOOperation {
@@ -510,11 +498,21 @@ implements  CommonInputSocketProvider<AE>,
             }
 
             @Override
+            protected void beforePeeringComplete() {
+                local = this; // reset local target reference
+            }
+
+            @Override
+            protected void afterPeeringComplete() {
+                getTarget();
+            }
+
+            @Override
             public AE getTarget() {
                 readLock().lock();
                 try {
                     try {
-                        return entry();
+                        return load();
                     } catch (IOException resolveToNull) {
                         return null; // FIXME: interface contract violation
                     }
@@ -528,7 +526,7 @@ implements  CommonInputSocketProvider<AE>,
             throws IOException {
                 readLock().lock();
                 try {
-                    final AE entry = entry();
+                    final AE entry = load();
                     if (null != entry && DIRECTORY == entry.getType())
                         throw new ArchiveEntryNotFoundException(
                                 BasicArchiveController.this, path,
@@ -573,7 +571,7 @@ implements  CommonInputSocketProvider<AE>,
     }
 
     @Override
-    public CommonOutputSocket<?> getOutputSocket(
+    public CommonOutputSocket<? extends ArchiveEntry> getOutputSocket(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
@@ -587,27 +585,14 @@ implements  CommonInputSocketProvider<AE>,
         }
     }
 
-    private CommonOutputSocket<?> getOutputSocket0(
+    private CommonOutputSocket<? extends ArchiveEntry> getOutputSocket0(
             final BitField<ArchiveIOOption> options,
             final String path)
     throws IOException {
         class Output extends CommonOutputSocket<AE> {
             private Link<AE> local;
 
-            @Override
-            public CommonOutputSocket<AE> peer(
-                    final InputSocket<? extends CommonEntry, ? super AE> newPeer) {
-                super.peer(newPeer);
-                getPeerTarget();
-                return this;
-            }
-
-            @Override
-            protected void beforePeeringComplete() {
-                local = null; // reset local target reference
-            }
-
-            private AE entry() throws IOException {
+            private AE load() throws IOException {
                 if (hasNewData(path)) {
                     local = null;
                     autoSync(path);
@@ -630,13 +615,23 @@ implements  CommonInputSocketProvider<AE>,
             }
 
             @Override
+            protected void beforePeeringComplete() {
+                local = null; // reset local target reference
+            }
+
+            @Override
+            protected void afterPeeringComplete() {
+                getTarget();
+            }
+
+            @Override
             public AE getTarget() {
                 class GetTarget implements IOOperation {
                     AE entry;
 
                     @Override
                     public void run() throws IOException {
-                        entry = entry();
+                        entry = load();
                     }
                 }
                 try {
@@ -654,7 +649,7 @@ implements  CommonInputSocketProvider<AE>,
 
                     @Override
                     public void run() throws IOException {
-                        final AE entry = entry();
+                        final AE entry = load();
                         final CommonOutputSocket<AE> output
                                 = getOutputSocket(entry);
                         final boolean append = options.get(APPEND);
