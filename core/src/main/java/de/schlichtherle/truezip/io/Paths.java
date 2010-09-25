@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io;
 
+import java.net.URI;
+
 /**
  * Provides static utility methods for path names.
  * This class cannot get instantiated outside its package.
@@ -38,19 +40,20 @@ public class Paths {
     public static class Normalizer {
         private final char separatorChar;
         private String path;
-        private final StringBuilder builder;
+        private final StringBuilder buffer;
 
         public Normalizer(final char separatorChar) {
             this.separatorChar = separatorChar;
-            builder = new StringBuilder();
+            buffer = new StringBuilder();
         }
 
         /**
          * Removes all redundant separators, dot directories ({@code "."}) and
          * dot-dot directories ({@code ".."}) from the path name and returns
          * the result.
-         * Trailing separator characters are removed and a single {@code "."}
-         * gets truncated to an empty path.
+         * If present, a single trailing separator character is retained,
+         * except after a dot-dot directory which couldn't get erased.
+         * A resulting single dot-directory is truncated to an empty path.
          * <p>
          * On Windows, a path may be prefixed by a drive letter followed by a
          * colon.
@@ -58,62 +61,87 @@ public class Paths {
          * to indicate a UNC, although this is currently only supported on
          * Windows.
          *
-         * @param  path the path name to normalize.
+         * @param  path the non-{@code null} path name to normalize.
          * @return {@code path} if it was already in normalized form.
          *         Otherwise, a new String with the normalized form of the
          *         given path name.
          * @throws NullPointerException if {@code path} is {@code null}.
          */
         public String normalize(final String path) {
-            final int prefixLength = prefixLength(path, separatorChar);
-            final int pathLength = path.length();
-            this.path = path.substring(prefixLength, pathLength);
-            builder.setLength(0);
-            normalize(0, pathLength - prefixLength);
-            builder.insert(0, path.substring(0, prefixLength));
-            final int builderLength = builder.length();
+            final int prefixLen = prefixLength(path, separatorChar);
+            final int pathLen = path.length();
+            this.path = path.substring(prefixLen, pathLen);
+            buffer.setLength(0);
+            buffer.ensureCapacity(pathLen);
+            normalize(0, pathLen - prefixLen);
+            buffer.insert(0, path.substring(0, prefixLen));
+            int bufferLen = buffer.length();
             String result;
-            if (builderLength == path.length()) {
-                assert path.equals(builder.toString());
+            if (    pathLen > 0 && path.charAt(pathLen - 1) == separatorChar ||
+                    pathLen > 1 && path.charAt(pathLen - 2) == separatorChar &&
+                                   path.charAt(pathLen - 1) == '.') {
+                slashify();
+                bufferLen = buffer.length();
+            }
+            if (bufferLen == path.length()) {
+                assert path.equals(buffer.toString());
                 result = path;
             } else {
-                result = builder.toString();
+                result = buffer.toString();
                 if (path.startsWith(result))
-                    result = path.substring(0, builderLength);
+                    result = path.substring(0, bufferLen);
             }
             assert !result.equals(path) || result == path; // postcondition
             return result;
         }
 
-        private int normalize(final int skip, final int end) {
-            assert skip >= 0;
-            if (end <= 0)
-                return 0;
+        /**
+         * This is a recursive call: The top level call should provide
+         * {@code 0} as the {@code skip} parameter, the length
+         * of the path as the {@code end} parameter and an empty string
+         * buffer as the {@code result} parameter.
+         *
+         * @param  collapse the number of adjacent <i>dir/..</i> segments in
+         *         the path to collapse.
+         *         This value must not be negative.
+         * @param  end the current position in {@code path}.
+         *         Only the string to the left of this index is considered.
+         *         If not positive, nothing happens.
+         * @return The number of adjacent segments in the path which have
+         *         <em>not</em> been collapsed at this position.
+         */
+        private int normalize(final int collapse, final int end) {
+            assert collapse >= 0;
+            if (0 >= end)
+                return collapse;
             final int next = path.lastIndexOf(separatorChar, end - 1);
             final String base = path.substring(next + 1, end);
-            final int skipped;
-            if (base.length() == 0 || ".".equals(base)) {
-                return normalize(skip, next);
+            int notCollapsed;
+            if (0 >= base.length() || ".".equals(base)) {
+                return normalize(collapse, next);
             } else if ("..".equals(base)) {
-                final int toSkip = skip + 1;
-                skipped = normalize(toSkip, next);
-                assert skipped <= toSkip;
-                if (skipped == toSkip)
-                    return skip;
-            } else if (skip > 0) {
-                return normalize(skip - 1, next) + 1;
+                notCollapsed = normalize(collapse + 1, next) - 1;
+                if (0 > notCollapsed)
+                    return 0;
+            } else if (0 < collapse) {
+                notCollapsed = normalize(collapse - 1, next);
+                if (1 == collapse)
+                    slashify();
+                return notCollapsed;
             } else {
-                assert skip == 0;
-                skipped = normalize(skip, next);
-                assert skipped == 0;
+                assert 0 == collapse;
+                notCollapsed = normalize(0, next);
+                assert 0 == notCollapsed;
             }
-            final int builderLength = builder.length();
-            if (builderLength > 0) {
-                assert builder.charAt(builderLength - 1) != separatorChar;
-                builder.append(separatorChar);
-            }
-            builder.append(base);
-            return skipped;
+            slashify();
+            buffer.append(base);
+            return notCollapsed;
+        }
+
+        private void slashify() {
+            final int bufferLen = buffer.length();
+            if (bufferLen > 0 && buffer.charAt(bufferLen - 1) != separatorChar)
+                buffer.append(separatorChar);
         }
     } // class Normalizer
 
@@ -269,7 +297,7 @@ public class Paths {
             }
         }
         if (pathLength > len && path.charAt(len) == separatorChar)
-            len++; // leading separator is considered part of prefix
+            len++; // next separator is considered part of prefix
         return len;
     }
 

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import java.net.URI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class FilesTest extends TestCase {
         assertEquals("/dir", cutTrailingSeparators("/dir//", '/'));
         assertEquals("/dir", cutTrailingSeparators("/dir///", '/'));
 
-        path = new String("/");
+        path = new String("/"); // need new object!
         assertSame(path, cutTrailingSeparators(path, '/'));
         assertEquals("/", cutTrailingSeparators("//", '/'));
         assertEquals("/", cutTrailingSeparators("///", '/'));
@@ -183,7 +184,7 @@ public class FilesTest extends TestCase {
         testNormalize("../..", "a/./././.././././.././././..");
 
         testNormalize("a/b", "a/b");
-        testNormalize("a",   "a/b/..");
+        testNormalize("a/",   "a/b/..");
         testNormalize("",   "a/b/../..");
         testNormalize("..",  "a/b/../../..");
         testNormalize("..",  "a/b/./.././.././..");
@@ -191,28 +192,28 @@ public class FilesTest extends TestCase {
         testNormalize("..",  "a/b/./././.././././.././././..");
 
         testNormalize("a/b/c", "a/b/c");
-        testNormalize("a/b",   "a/b/c/..");
-        testNormalize("a",     "a/b/c/../..");
+        testNormalize("a/b/",   "a/b/c/..");
+        testNormalize("a/",     "a/b/c/../..");
         testNormalize("",     "a/b/c/../../..");
         testNormalize("",     "a/b/c/./.././.././..");
         testNormalize("",     "a/b/c/././../././../././..");
         testNormalize("",     "a/b/c/./././.././././.././././..");
 
         testNormalize("a/b/c/d", "a/b/c/d");
-        testNormalize("a/b/c",   "a/b/c/d/..");
-        testNormalize("a/b",     "a/b/c/d/../..");
-        testNormalize("a",       "a/b/c/d/../../..");
-        testNormalize("a",       "a/b/c/d/./.././.././..");
-        testNormalize("a",       "a/b/c/d/././../././../././..");
-        testNormalize("a",       "a/b/c/d/./././.././././.././././..");
+        testNormalize("a/b/c/",   "a/b/c/d/..");
+        testNormalize("a/b/",     "a/b/c/d/../..");
+        testNormalize("a/",       "a/b/c/d/../../..");
+        testNormalize("a/",       "a/b/c/d/./.././.././..");
+        testNormalize("a/",       "a/b/c/d/././../././../././..");
+        testNormalize("a/",       "a/b/c/d/./././.././././.././././..");
 
         testNormalize("a/b/c/d", "a//b//c//d");
         testNormalize("a/b/c/d", "a///b///c///d");
         testNormalize("a/b/c/d", "a////b////c////d");
-        testNormalize("a/b/c",   "a////b////c////d////..");
-        testNormalize("a/b",     "a////b////c////d////..////..");
-        testNormalize("a/b",     "a//.//b/.///c///./d//.//.././//..");
-        testNormalize("a/b",     "a/////b/////c/////d/////../////..");
+        testNormalize("a/b/c/",   "a////b////c////d////..");
+        testNormalize("a/b/",     "a////b////c////d////..////..");
+        testNormalize("a/b/",     "a//.//b/.///c///./d//.//.././//..");
+        testNormalize("a/b/",     "a/////b/////c/////d/////../////..");
 
         testNormalize("a",       "x/../a");
         testNormalize("a/b",     "x/../a/y/../b");
@@ -252,11 +253,11 @@ public class FilesTest extends TestCase {
         testNormalize("/", "/./");
 
         testNormalize("/..", "/..");
-        testNormalize("/..", "/../.");
+        testNormalize("/../", "/../.");
         testNormalize("/../..", "/.././..");
-        testNormalize("/../..", "/.././../.");
+        testNormalize("/../../", "/.././../.");
 
-        testNormalize("\\\\host", "\\\\host", '\\');
+        /*testNormalize("\\\\host", "\\\\host", '\\');
         testNormalize("\\\\host", "\\\\\\host", '\\');
         testNormalize("\\\\host", "\\\\\\\\host", '\\');
 
@@ -270,56 +271,57 @@ public class FilesTest extends TestCase {
 
         testNormalize("C:dir", "C:.\\dir", '\\');
         testNormalize("C:dir", "C:.\\dir\\.", '\\');
-        testNormalize("C:dir", "C:.\\dir\\.\\.", '\\');
+        testNormalize("C:dir", "C:.\\dir\\.\\.", '\\');*/
 
         testNormalize("", ".");
         testNormalize("", "./");
         testNormalize("..", "..");
-        testNormalize("..", "../");
+        testNormalize("../", "../");
         testNormalize("a", "./a");
-        testNormalize("a", "./a/");
+        testNormalize("a/", "./a/");
         testNormalize("../a", "../a");
-        testNormalize("../a", "../a/");
+        testNormalize("../a/", "../a/");
         testNormalize("a/b", "./a/./b");
-        testNormalize("a/b", "./a/./b/");
+        testNormalize("a/b/", "./a/./b/");
         testNormalize("../a/b", "../a/./b");
-        testNormalize("../a/b", "../a/./b/");
+        testNormalize("../a/b/", "../a/./b/");
         testNormalize("b", "./a/../b");
-        testNormalize("b", "./a/../b/");
+        testNormalize("b/", "./a/../b/");
         testNormalize("../b", "../a/../b");
-        testNormalize("../b", "../a/../b/");
+        testNormalize("../b/", "../a/../b/");
 
         testNormalize("", ".//");
         testNormalize("", ".///");
         testNormalize("", ".////");
-        testNormalize("..", "..//");
-        testNormalize("a", ".//a//");
+        testNormalize("../", "..//");
+        testNormalize("a/", ".//a//");
         testNormalize("../a", "..//a");
-        testNormalize("../a", "..//a//");
+        testNormalize("../a/", "..//a//");
         testNormalize("a/b", ".//a//.//b");
-        testNormalize("a/b", ".//a//.//b//");
+        testNormalize("a/b/", ".//a//.//b//");
         testNormalize("../a/b", "..//a//.//b");
-        testNormalize("../a/b", "..//a//.//b//");
-        testNormalize("b", ".//a//..//b//");
+        testNormalize("../a/b/", "..//a//.//b//");
+        testNormalize("b/", ".//a//..//b//");
         testNormalize("../b", "..//a//..//b");
-        testNormalize("../b", "..//a//..//b//");
+        testNormalize("../b/", "..//a//..//b//");
     }
 
     private void testNormalize(String result, final String path) {
         testNormalize(result, path, '/');
     }
 
-    private void testNormalize(String expected, final String path, final char separatorChar) {
+    private void testNormalize(
+            final String expected,
+            final String path,
+            final char separatorChar) {
+        assertEquals(URI
+                .create(path.replace(separatorChar, '/'))
+                .normalize()
+                .toString()
+                .replace('/', separatorChar), expected);
         final String result = normalize(path, separatorChar);
         assertEquals(expected, result);
         assertTrue(!result.equals(path) || result == path);
-        if (path.length() > 0 && !path.endsWith(separatorChar + "")) {
-            String appended = path;
-            for (int i = 0; i < 3; i++) {
-                appended += separatorChar + ".";
-                assertEquals(expected, normalize(appended, separatorChar));
-            }
-        }
     }
 
     public void testNormalize2() {

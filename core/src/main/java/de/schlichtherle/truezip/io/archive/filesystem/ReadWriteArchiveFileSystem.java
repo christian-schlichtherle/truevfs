@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.io.Paths.Normalizer;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -42,7 +41,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.Paths.normalize;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * A read/write archive file system.
@@ -123,7 +122,7 @@ implements ArchiveFileSystem<AE> {
         master = new LinkedHashMap<String, BaseEntry<AE>>(
                 (int) (container.size() / 0.75f) + 1);
 
-        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
+        final Normalizer normalizer = new Normalizer();
         // Load entries from input archive.
         for (final AE entry : container) {
             final String path = normalizer.normalize(entry.getName());
@@ -148,6 +147,18 @@ implements ArchiveFileSystem<AE> {
         }
 
         this.vetoableTouchListener = vetoableTouchListener;
+    }
+
+    private static class Normalizer
+    extends de.schlichtherle.truezip.io.Paths.Normalizer {
+        Normalizer() {
+            super(SEPARATOR_CHAR);
+        }
+
+        @Override
+        public String normalize(String path) {
+            return cutTrailingSeparators(super.normalize(path), SEPARATOR_CHAR);
+        }
     }
 
     /**
@@ -211,7 +222,7 @@ implements ArchiveFileSystem<AE> {
         if (isRoot(name))
             return true;
 
-        if (name != normalize(name, SEPARATOR_CHAR)) // mind contract!
+        if (name != new Normalizer().normalize(name)) // mind contract!
             return false;
 
         final int length = name.length();
