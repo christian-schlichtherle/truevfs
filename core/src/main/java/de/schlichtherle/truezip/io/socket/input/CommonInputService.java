@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
 
 /**
- * A common entry container which provides common input sockets.
+ * A container and input socket provider for common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.

@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
 import java.io.IOException;
 
 /**
- * Provides {@link OutputSocket}s for write access to common entries.
+ * Provides {@link CommonOutputSocket}s for write access to common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
