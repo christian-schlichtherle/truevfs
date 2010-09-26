@@ -16,12 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
@@ -34,10 +36,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -57,7 +59,7 @@ class ReadWriteArchiveFileSystem<AE extends ArchiveEntry>
 implements ArchiveFileSystem<AE> {
 
     /** The controller that this filesystem belongs to. */
-    private final ArchiveEntryFactory<? extends AE> factory;
+    private final CommonEntryFactory<? extends AE> factory;
 
     /**
      * The map of archive entries in this file system.
@@ -93,7 +95,7 @@ implements ArchiveFileSystem<AE> {
      * @throws NullPointerException If {@code factory} is {@code null}.
      */
     ReadWriteArchiveFileSystem(
-            final ArchiveEntryFactory<AE> factory,
+            final CommonEntryFactory<AE> factory,
             final VetoableTouchListener vetoableTouchListener)
     throws ArchiveFileSystemException {
         assert factory != null;
@@ -102,21 +104,19 @@ implements ArchiveFileSystem<AE> {
         master = new LinkedHashMap<String, BaseEntry<AE>>(64);
 
         // Setup root.
-        root = newEntry(ROOT, DIRECTORY);
-        root.getTarget().setTime(System.currentTimeMillis());
+        root = newEntryUnchecked(ROOT, DIRECTORY, null);
+        for (Access access : BitField.allOf(Access.class))
+            root.getTarget().setTime(access, System.currentTimeMillis());
         master.put(ROOT, root);
 
         this.vetoableTouchListener = vetoableTouchListener;
         touch();
     }
 
-    /**
-     * @see ArchiveFileSystems#newArchiveFileSystem(CommonEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
-     */
     ReadWriteArchiveFileSystem(
             final CommonEntryContainer<AE> container,
-            final long rootTime,
-            final ArchiveEntryFactory<AE> factory,
+            final CommonEntryFactory<AE> factory,
+            final CommonEntry rootTemplate,
             final VetoableTouchListener vetoableTouchListener) {
         this.factory = factory;
         master = new LinkedHashMap<String, BaseEntry<AE>>(
@@ -131,8 +131,7 @@ implements ArchiveFileSystem<AE> {
 
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        root = newEntry(ROOT, DIRECTORY);
-        root.getTarget().setTime(rootTime); // do NOT yet touch the file system!
+        root = newEntryUnchecked(ROOT, DIRECTORY, rootTemplate);
         master.put(ROOT, root);
 
         // Now perform a file system check to create missing parent directories
@@ -169,9 +168,12 @@ implements ArchiveFileSystem<AE> {
      * @throws AssertionError if a {@link CharConversionException} occurs.
      *         The original exception is wrapped as its cause.
      */
-    private BaseEntry<AE> newEntry(final String path, final Type type) {
+    private BaseEntry<AE> newEntryUnchecked(
+            final String path,
+            final Type type,
+            final CommonEntry template) {
         try {
-            return newEntry(path, type, null);
+            return newEntry(path, type, template);
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -179,8 +181,8 @@ implements ArchiveFileSystem<AE> {
 
     /**
      * Returns a new file system entry for this virtual archive file system.
-     * The returned file system entry is not yet linked into this virtual
-     * archive file system.
+     * This is only a factory method, i.e. the returned file system entry is
+     * not yet linked into this virtual archive file system.
      *
      * @see    #mknod
      * @param  path the non-{@code null} path name of the new file system entry.
@@ -188,7 +190,7 @@ implements ArchiveFileSystem<AE> {
      * @param  type the non-{@code null} type of the new file system entry.
      * @param  template if not {@code null}, then the new file system entry
      *         shall inherit as much properties from this archive entry
-     *         as possible (with the exception of its entry name).
+     *         as possible (with the exception of its entry name and type).
      *         This is typically used for copy operations.
      * @return A non-{@code null} file system entry.
      * @throws CharConversionException if {@code path} contains characters
@@ -202,7 +204,6 @@ implements ArchiveFileSystem<AE> {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
-        assert template == null || type == template.getType();
         assert !(template instanceof BaseEntry);
 
         return wrap(factory.newEntry(path, type, template));
@@ -215,7 +216,7 @@ implements ArchiveFileSystem<AE> {
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
-     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
+     * @see    CommonEntryFactory#newEntry Common Requirements For EntryOperation Names
      * @param  name a non-{@code null} path name.
      */
     private static boolean isValidPath(final String name) {
@@ -316,7 +317,7 @@ implements ArchiveFileSystem<AE> {
             final String baseName = getBaseName();
             BaseEntry<AE> parent = master.get(parentPath);
             if (parent == null) {
-                parent = newEntry(parentPath, DIRECTORY);
+                parent = newEntryUnchecked(parentPath, DIRECTORY, null);
                 master.put(parentPath, parent);
             }
             parent.add(baseName);
@@ -498,7 +499,7 @@ implements ArchiveFileSystem<AE> {
     } // class DirectoryEntry
 
     @Override
-    public Link<AE> mknod(
+    public EntryOperation<AE> mknod(
             final String path,
             final Type type,
             final CommonEntry template,
@@ -507,7 +508,7 @@ implements ArchiveFileSystem<AE> {
         return new PathLink(path, type, template, createParents);
     }
 
-    private final class PathLink implements Link<AE> {
+    private final class PathLink implements EntryOperation<AE> {
         final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<AE>[] links;
@@ -597,13 +598,13 @@ implements ArchiveFileSystem<AE> {
                 final String base = link.base;
                 assert parent.getType() == DIRECTORY;
                 master.put(path, entry);
-                if (parent.add(base) && parent.getTime() != UNKNOWN) // never touch ghosts!
-                    parent.getTarget().setTime(time);
+                if (parent.add(base) && parent.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+                    parent.getTarget().setTime(Access.WRITE, time);
                 parent = entry;
             }
             final AE entry = getTarget().getTarget();
-            if (entry.getTime() == UNKNOWN)
-                entry.setTime(time);
+            if (entry.getTime(Access.WRITE) == UNKNOWN)
+                entry.setTime(Access.WRITE, time);
         }
 
         @Override
@@ -613,7 +614,7 @@ implements ArchiveFileSystem<AE> {
     } // class PathLink
 
     /**
-     * A data class which represents a path name segment for use by
+     * A data class which represents a segment for use by
      * {@link PathLink}.
      */
     private static final class SegmentLink<AE extends ArchiveEntry>
@@ -675,8 +676,8 @@ implements ArchiveFileSystem<AE> {
         assert ok : "The parent directory of \"" + path
                     + "\" does not contain this entry - archive file system is corrupted!";
         touch();
-        if (parent.getTime() != UNKNOWN) // never touch ghosts!
-            parent.getTarget().setTime(System.currentTimeMillis());
+        if (parent.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+            parent.getTarget().setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     private Type getType(final String path) {
@@ -698,9 +699,12 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public boolean setLastModified(final String path, final long time)
+    public boolean setTime(
+            final String path,
+            final BitField<Access> types,
+            final long value)
     throws ArchiveFileSystemException {
-        if (time < 0)
+        if (value < 0)
             throw new IllegalArgumentException(path +
                     " (negative entry modification time)");
         final BaseEntry<AE> entry = master.get(path);
@@ -708,7 +712,8 @@ implements ArchiveFileSystem<AE> {
             return false;
         // Order is important here!
         touch();
-        entry.getTarget().setTime(time);
+        for (Access type : types)
+            entry.getTarget().setTime(type, value);
         return true;
     }
 }

@@ -16,8 +16,10 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
 import java.util.Collection;
@@ -31,8 +33,9 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -51,17 +54,20 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -1115,10 +1121,10 @@ public class File extends java.io.File {
      *         {@code closeOutputStreams} is {@code true}.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void sync(BitField<ArchiveSyncOption> options)
+    public static void sync(BitField<SyncOption> options)
     throws ArchiveSyncException {
         ArchiveControllers.sync(
-                null, options, new DefaultArchiveSyncExceptionBuilder());
+                null, new DefaultArchiveSyncExceptionBuilder(), options);
     }
 
     /**
@@ -1194,7 +1200,7 @@ public class File extends java.io.File {
      */
     public static void sync(
             final File archive,
-            final BitField<ArchiveSyncOption> options)
+            final BitField<SyncOption> options)
     throws ArchiveSyncException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
@@ -1202,8 +1208,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
         ArchiveControllers.sync(
                 archive.getCanOrAbsFile().toURI(),
-                options,
-                new DefaultArchiveSyncExceptionBuilder());
+                new DefaultArchiveSyncExceptionBuilder(), options);
     }
 
     /**
@@ -1276,7 +1281,7 @@ public class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(   BitField.noneOf(ArchiveSyncOption.class)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
@@ -1285,14 +1290,14 @@ public class File extends java.io.File {
      */
     public static void update(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(ArchiveSyncOption.class)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(   BitField.noneOf(ArchiveSyncOption.class)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
@@ -1305,7 +1310,7 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(ArchiveSyncOption.class)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
@@ -1329,7 +1334,7 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.noneOf(ArchiveSyncOption.class)
+                BitField.noneOf(SyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
      * }.
@@ -1339,7 +1344,7 @@ public class File extends java.io.File {
     public static void update(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(ArchiveSyncOption.class)
+                BitField.noneOf(SyncOption.class)
                 .set(CLOSE_INPUT_STREAMS, closeStreams)
                 .set(CLOSE_OUTPUT_STREAMS, closeStreams));
     }
@@ -1347,7 +1352,7 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.noneOf(ArchiveSyncOption.class)
+                BitField.noneOf(SyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
@@ -1362,7 +1367,7 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(ArchiveSyncOption.class)
+                BitField.noneOf(SyncOption.class)
                 .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
                 .set(CLOSE_INPUT_STREAMS, closeInputStreams)
                 .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
@@ -2441,8 +2446,8 @@ public class File extends java.io.File {
                 // indicate an unknown time.
                 // As this is not specified in the contract of this class,
                 // 0 is returned in this case instead.
-                final long time = entry.getTime();
-                return time >= 0 ? time : 0;
+                final long time = entry.getTime(Access.WRITE);
+                return 0 <= time ? time : 0;
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -2476,7 +2481,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .setLastModified(getInnerEntryName(),time);
+                        .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2749,8 +2754,10 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null)
-                return enclArchive.getArchiveController()
-                        .createNewFile(enclEntryName, isLenient());
+                return enclArchive.getArchiveController().createNewFile(
+                        enclEntryName,
+                        BitField.noneOf(IOOption.class)
+                            .set(CREATE_PARENTS, isLenient()));
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2798,8 +2805,10 @@ public class File extends java.io.File {
     public boolean mkdir() {
         try {
             if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .mkdir( getInnerEntryName(), isLenient());
+                return innerArchive.getArchiveController().mkdir(
+                        getInnerEntryName(),
+                        BitField.noneOf(IOOption.class)
+                            .set(CREATE_PARENTS, isLenient()));
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2822,7 +2831,8 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
-                        .delete(getInnerEntryName());
+                        .delete(getInnerEntryName(),
+                            BitField.noneOf(IOOption.class));
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";

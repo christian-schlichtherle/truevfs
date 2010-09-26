@@ -16,11 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.util.BitField;
 
 /**
  * A read-only archive file system.
@@ -34,14 +36,11 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
 extends ReadWriteArchiveFileSystem<AE> {
 
-    /**
-     * @see ArchiveFileSystems#newArchiveFileSystem(CommonEntryContainer, long, ArchiveEntryFactory, VetoableTouchListener, boolean)
-     */
     ReadOnlyArchiveFileSystem(
         final CommonEntryContainer<AE> container,
-        final long rootTime,
-        final ArchiveEntryFactory<AE> factory) {
-        super(container, rootTime, factory, null);
+        final CommonEntryFactory<AE> factory,
+        final CommonEntry rootTemplate) {
+        super(container, factory, rootTemplate, null);
     }
 
     /** The implementation in this class returns {@code true}. */
@@ -57,7 +56,7 @@ extends ReadWriteArchiveFileSystem<AE> {
     }
 
     @Override
-    public Link<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    public EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
@@ -68,7 +67,7 @@ extends ReadWriteArchiveFileSystem<AE> {
     }
 
     @Override
-    public boolean setLastModified(String path, long time)
+    public boolean setTime(String path, BitField<Access> types, long value)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

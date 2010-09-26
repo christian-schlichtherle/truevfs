@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
@@ -36,7 +36,7 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 
 /**

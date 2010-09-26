@@ -89,6 +89,11 @@ public interface CommonEntry {
         SPECIAL
     }
 
+    enum Access {
+        WRITE,
+        READ,
+    }
+
     /**
      * Returns the non-{@code null} <i>common entry name</i>.
      * A common entry name must meet the following requirements:
@@ -131,8 +136,8 @@ public interface CommonEntry {
     long getSize();
 
     /**
-     * Returns the last modification time of this archive entry since the
-     * epoch or {@value #UNKNOWN}.
+     * Returns the last time of the given access type for this archive entry
+     * in milliseconds since the epoch or {@value #UNKNOWN}.
      */
-    long getTime();
+    long getTime(Access type);
 }

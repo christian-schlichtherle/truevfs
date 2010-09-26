@@ -16,14 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.ConcurrentCommonOutputSocketService;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Link;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOSocket;
@@ -48,13 +51,13 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.CLOSE_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.REASSEMBLE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveSyncOption.WAIT_FOR_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -214,11 +217,11 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private ArchiveFileSystem newArchiveFileSystem(
-            long rootTime,
+            CommonEntry rootTemplate,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
-                unwrap(input), rootTime, getDriver(),
-                vetoableTouchListener, readOnly);
+                unwrap(input), getDriver(),
+                rootTemplate, vetoableTouchListener, readOnly);
     }
 
     @Override
@@ -267,8 +270,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             // Test modification time BEFORE opening the input file!
             if (inFile == null)
                 inFile = getTarget();
-            final long time = inFile.lastModified();
-            if (time != 0) {
+            if (inFile.exists()) {
                 // The archive file isExisting.
                 // Thoroughly test read-only status BEFORE opening
                 // the device file!
@@ -280,7 +282,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
                     // that it can access the target in the real file system.
                     throw new FalsePositiveException(this, ROOT, ex);
                 }
-                setFileSystem(newArchiveFileSystem(time, isReadOnly));
+                setFileSystem(newArchiveFileSystem(
+                        new FileEntry(inFile), isReadOnly));
             } else if (autoCreate) {
                 // The archive file does NOT exist, but we may create
                 // it automatically.
@@ -334,13 +337,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 // its virtual root directory.
                 // Nice trick, isn't it?!
                 setFileSystem(newArchiveFileSystem(
-                        inFile.lastModified(), false));
+                        new FileEntry(inFile), false));
             }
         }
     }
 
     private void unwrap(
-            final BasicArchiveController controller,
+            final BasicArchiveController<?, ?, ?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -411,7 +414,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrapFromLockedController(
-            final BasicArchiveController controller,
+            final BasicArchiveController<?, ?, ?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -422,9 +425,9 @@ extends FileSystemArchiveController<AE, AI, AO> {
         assert !isRoot(path);
         assert inFile == null;
 
-        final ArchiveFileSystem<AE> controllerFileSystem
+        final ArchiveFileSystem<?> controllerFileSystem
                 = controller.autoMount(createParents);
-        final Entry<AE> entry = controllerFileSystem.getEntry(path);
+        final Entry<?> entry = controllerFileSystem.getEntry(path);
         final Type type = null == entry ? null : entry.getType();
         if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
@@ -442,7 +445,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 // TODO: Use InputSocket.newReadOnlyFile()!
                 Streams.copy(
                         controller
-                            .getInputSocket(BitField.noneOf(ArchiveIOOption.class), path)
+                            .getInputSocket(path)
                             .connect(null)
                             .newInputStream(),
                         new java.io.FileOutputStream(tmp));
@@ -455,8 +458,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
-                        controllerFileSystem.getEntry(path).getTime(),
-                        controllerFileSystem.isReadOnly()));
+                        entry.getTarget(), controllerFileSystem.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
@@ -476,7 +478,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
-            final Link link = controllerFileSystem.mknod(
+            final EntryOperation link = controllerFileSystem.mknod(
                     path, FILE, null, createParents);
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
@@ -666,8 +668,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     public void sync(
-            final BitField<ArchiveSyncOption> options,
-            final ArchiveSyncExceptionBuilder builder)
+            final ArchiveSyncExceptionBuilder builder, final BitField<SyncOption> options)
     throws ArchiveSyncException {
         assert options.get(CLOSE_INPUT_STREAMS) || !options.get(CLOSE_OUTPUT_STREAMS); // closeOutputStreams => closeInputStreams
         assert !options.get(UMOUNT) || options.get(REASSEMBLE); // sync => reassemble
@@ -698,7 +699,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void sync0(
-            final BitField<ArchiveSyncOption> options,
+            final BitField<SyncOption> options,
             final ArchiveSyncExceptionBuilder builder)
     throws ArchiveSyncException {
         // Check output streams first, because closeInputStreams may be
@@ -849,7 +850,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             }
         } // class FilterExceptionHandler
 
-        final long rootTime = getFileSystem().getEntry(ROOT).getTime();
+        final long rootTime = getFileSystem().getEntry(ROOT).getTime(Access.WRITE);
         try {
             try {
                 shutdownStep1(handler);
@@ -934,7 +935,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 if (e.getType() == DIRECTORY) {
                     if (root == e)
                         continue; // never write the virtual root directory
-                    if (e.getTime() < 0)
+                    if (e.getTime(Access.WRITE) < 0)
                         continue; // never write ghost directories
                     out.getOutputSocket(e).connect(null).newOutputStream().close();
                 } else if (in != null && in.getEntry(n) != null) {

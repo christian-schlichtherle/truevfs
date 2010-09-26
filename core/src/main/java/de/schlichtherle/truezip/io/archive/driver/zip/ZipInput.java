@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;

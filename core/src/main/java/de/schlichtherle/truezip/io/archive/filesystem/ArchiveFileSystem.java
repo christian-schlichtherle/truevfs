@@ -17,11 +17,13 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.util.BitField;
 
 /**
  * A virtual file system for archive entries.
@@ -41,6 +43,22 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
     }
 
     /**
+     * Represents an I/O operation on a chain of one or more archive file
+     * system entries.
+     * The operation is run by its {@link #run} method and the head of the
+     * chain can be obtained by its {@link #getTarget} method.
+     *
+     * @see #mknod
+     */
+    interface EntryOperation<AE extends ArchiveEntry>
+    extends IOOperation, IOReference<Entry<AE>> {
+
+        /** Executes this archive file system entry chain operation. */
+        @Override
+        void run() throws ArchiveFileSystemException;
+    }
+
+    /**
      * Returns {@code true} if and only if this archive file system is
      * read-only.
      */
@@ -51,21 +69,6 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      * modified since its time of creation.
      */
     boolean isTouched();
-
-    /**
-     * An I/O operation for linking an entry into an archive file system.
-     * The linked entry may replace an existing entry.
-     *
-     * @see #mknod
-     */
-    interface Link<AE extends ArchiveEntry>
-    extends IOOperation, IOReference<Entry<AE>> {
-
-        /** Links an entry into an archive file system. */
-        @Override
-        void run()
-        throws ArchiveFileSystemException;
-    }
 
     /**
      * Begins a &quot;create and link target&quot; transaction to ensure that
@@ -117,7 +120,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *         <li>One of the target's parents denotes a file.
      *         </ul>
      */
-    Link<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**
@@ -135,7 +138,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
     void unlink(String path)
     throws ArchiveFileSystemException;
 
-    boolean setLastModified(String path, long time)
+    boolean setTime(String path, BitField<Access> types, long value)
     throws ArchiveFileSystemException;
 
     boolean isWritable(String path);

@@ -15,8 +15,12 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
@@ -26,14 +30,15 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveE
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.common.file.FileIOSocketProvider;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -378,36 +383,12 @@ class Files {
                     throw ex; // not my job - pass on!
             }
 
-            final long time;
-            final InputStream in;
-            /*srcController.readLock().lock();
-            try {*/
-                in = srcController
-                        .getInputSocket( // detects false positives!
-                            BitField.noneOf(ArchiveIOOption.class),
-                            srcPath)
-                        .connect(null)
-                        .newInputStream();
-                time = srcController.getEntry(srcPath).getTime();
-            /*} finally {
-                srcController.readLock().unlock();
-            }*/
-
-            // Treat the destination like a regular file.
-            final OutputStream out;
-            try {
-                out = new java.io.FileOutputStream(dst);
-            } catch (IOException ex) {
-                try {
-                    in.close();
-                } catch (IOException inFailure) {
-                    throw new InputException(inFailure);
-                }
-                throw ex;
-            }
-
-            Streams.copy(in, out);
-            if (preserve && !dst.setLastModified(time))
+            final CommonInputSocket<? extends CommonEntry> input
+                    = srcController.getInputSocket(srcPath);
+            final CommonOutputSocket<? extends CommonEntry> output
+                    = FileIOSocketProvider.get().getOutputSocket(new FileEntry(dst));
+            IOSocket.copy(input, output);
+            if (preserve && !dst.setLastModified(input.getTarget().getTime(Access.WRITE)))
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {

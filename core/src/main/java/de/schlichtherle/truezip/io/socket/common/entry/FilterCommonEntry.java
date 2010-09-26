@@ -48,7 +48,7 @@ implements CommonEntry {
     }
 
     @Override
-    public long getTime() {
-        return target.getTime();
+    public long getTime(Access type) {
+        return target.getTime(type);
     }
 }

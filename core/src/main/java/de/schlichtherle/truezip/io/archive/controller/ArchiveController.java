@@ -16,12 +16,15 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import javax.swing.Icon;
 
@@ -57,6 +60,129 @@ import javax.swing.Icon;
 public interface ArchiveController extends ArchiveDescriptor {
 
     /**
+     * Defines the available options for archive file system operations.
+     * Not all available options may be applicable for all operations and
+     * certain combinations may be useless or even illegal.
+     * It's up to the particular operation to define which available options
+     * are applicable for it and which combinations are supported.
+     */
+    enum IOOption {
+        /**
+         * Whether or not any missing parent directory entries within an
+         * archive file shall get created automatically.
+         * If set, client applications do not need to call
+         * {@link ArchiveController#mkdir} to create the parent directory
+         * entries of a file entry within an archive file before they can write
+         * to it.
+         */
+        CREATE_PARENTS,
+        /**
+         * Whether or not an operation is recursive.
+         * This option affects only files and directories <em>below</em> the
+         * operated node in the file system tree.
+         */
+        //RECURSIVE,
+        /**
+         * Whether or not a copy operation shall preserve as much attributes
+         * of a file or directory entry within an archive file as possible.
+         */
+        PRESERVE,
+        /**
+         * Whether or not a write operation shall append to or replace the
+         * contents of a file entry within an archive file.
+         */
+        APPEND,
+    }
+
+    /**
+     * Defines the available options for archive synchronization operations, i.e.
+     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
+     * and {@link ArchiveController#sync(ArchiveSyncExceptionBuilder, BitField)}.
+     */
+    public enum SyncOption {
+        /**
+         * Suppose any other thread has still one or more archive entry input
+         * streams open to an archive controller's target file.
+         * Then if and only if this property is {@code true}, the respective
+         * archive controller will wait until all other threads have closed
+         * their archive entry input streams before proceeding with the update
+         * of the target archive file.
+         * Archive entry input streams opened (and not yet closed) by the
+         * current thread are always ignored.
+         * If the current thread gets interrupted while waiting, it will
+         * stop waiting and proceed normally as if this property is
+         * {@code false}.
+         * <p>
+         * Beware: If a stream has not been closed because the client
+         * application does not always properly close its streams, even on an
+         * {@link IOException} (which is a typical bug in many Java
+         * applications), then the respective archive controller will not
+         * return from the update until the current thread gets interrupted!
+         */
+        WAIT_FOR_INPUT_STREAMS,
+        /**
+         * Suppose there are any open input streams for any archive entries of
+         * an archive controller's target file because the client application
+         * has forgot to {@link InputStream#close()} all {@code InputStream}
+         * objects or another thread is still busy doing I/O on the target
+         * archive file.
+         * Then if this property is {@code true}, the respective archive
+         * controller will proceed to update the target archive file anyway and
+         * finally throw an {@link ArchiveBusyWarningException} to indicate
+         * that any subsequent operations on these streams will fail with an
+         * {@link CommonEntryStreamClosedException} because they have been
+         * forced to close.
+         * <p>
+         * If this property is {@code false}, the target archive file is
+         * <em>not</em> updated and an {@link ArchiveBusyException} is thrown
+         * to indicate that the application must close all entry input streams
+         * first.
+         */
+        CLOSE_INPUT_STREAMS,
+        /**
+         * Similar to {@code waitInputStreams},
+         * but applies to archive entry output streams instead.
+         */
+        WAIT_FOR_OUTPUT_STREAMS,
+        /**
+         * Similar to {@code closeInputStreams},
+         * but applies to archive entry output streams instead.
+         * <p>
+         * If this parameter is {@code true}, then
+         * {@code closeInputStreams} must be {@code true}, too.
+         * Otherwise, an {@code IllegalArgumentException} is thrown.
+         */
+        CLOSE_OUTPUT_STREAMS,
+        /**
+         * If this property is {@code true}, the archive controller's target
+         * file is completely released in order to enable subsequent read/write
+         * access to it for third parties such as other processes
+         * <em>before</em> TrueZIP can be used again to read from or write to
+         * the target archive file.
+         * <p>
+         * If this property is {@code true}, some temporary files might be
+         * retained for caching in order to enable faster subsequent access to
+         * the archive file again.
+         * <p>
+         * Note that temporary files are always deleted by TrueZIP unless the
+         * JVM is terminated unexpectedly. This property solely exists to
+         * control cooperation with third parties or enabling faster access.
+         */
+        UMOUNT,
+        /**
+         * Let's assume an archive controller's target file is enclosed in
+         * another archive file.
+         * Then if this property is {@code true}, the updated target archive
+         * file is also written to its enclosing archive file.
+         * Note that this property <em>must</em> be set to {@code true} if the
+         * property {@code umount} is set to {@code true} as well.
+         * Failing to comply to this requirement may throw an
+         * {@link AssertionError} and will incur loss of data!
+         */
+        REASSEMBLE,
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Where the methods of this class accept a path name string as a
@@ -83,11 +209,18 @@ public interface ArchiveController extends ArchiveDescriptor {
 
     boolean isReadOnly() throws FalsePositiveException;
 
+    boolean setReadOnly(String path)
+    throws FalsePositiveException;
+
     boolean isReadable(String path) throws FalsePositiveException;
 
     boolean isWritable(String path) throws FalsePositiveException;
 
     ArchiveFileSystemEntry getEntry(String path) throws FalsePositiveException;
+
+    /** Currently supports no options. */
+    boolean setTime(String path, BitField<Access> types, long value)
+    throws FalsePositiveException;
 
     /**
      * Returns an archive input socket for reading the given entry from the
@@ -98,7 +231,7 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     CommonInputSocket<? extends CommonEntry>
-    getInputSocket(BitField<ArchiveIOOption> options, String path)
+    getInputSocket(String path)
     throws IOException;
 
     /**
@@ -110,22 +243,19 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     CommonOutputSocket<? extends CommonEntry>
-    getOutputSocket(BitField<ArchiveIOOption> options, String path)
+    getOutputSocket(String path, BitField<IOOption> options)
     throws IOException;
 
-    boolean createNewFile(String path, boolean createParents)
+    /** Currently only supports the CREATE_PARENTS option. */
+    boolean createNewFile(String path, BitField<IOOption> options)
     throws IOException;
 
-    boolean mkdir(String path, boolean createParents)
+    /** Currently only supports the CREATE_PARENTS option. */
+    boolean mkdir(String path, BitField<IOOption> options)
     throws FalsePositiveException;
 
-    boolean delete(String path)
-    throws FalsePositiveException;
-
-    boolean setLastModified(String path, long time)
-    throws FalsePositiveException;
-
-    boolean setReadOnly(String path)
+    /** Currently supports no options. */
+    boolean delete(String path, BitField<IOOption> options)
     throws FalsePositiveException;
 
     /**
@@ -136,13 +266,14 @@ public interface ArchiveController extends ArchiveDescriptor {
      * This method requires external synchronization on this controller's write
      * lock!
      *
-     * @param options The non-{@code null} options for processing.
+     * @param  options The non-{@code null} options for processing.
      * @throws NullPointerException if {@code options} or {@code builder} is
-     * {@code null}.
+     *         {@code null}.
      * @throws ArchiveSyncException if any exceptional condition occurs
-     * throughout the processing of the target archive file.
-     * @see ArchiveControllers#sync(URI, BitField, ArchiveSyncExceptionBuilder)
+     *         throughout the processing of the target archive file.
+     * @see    ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)
      */
-    void sync(BitField<ArchiveSyncOption> options, ArchiveSyncExceptionBuilder builder)
+    public abstract void sync(  ArchiveSyncExceptionBuilder builder,
+                                BitField<SyncOption> options)
     throws ArchiveSyncException;
 }

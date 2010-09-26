@@ -16,12 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
 import java.io.IOException;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 
 /**
  * Provides static utility methods for archive file systems.
@@ -50,7 +52,7 @@ public class ArchiveFileSystems {
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
-            ArchiveEntryFactory<AE> factory,
+            CommonEntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener)
     throws IOException {
         return new ReadWriteArchiveFileSystem<AE>(factory, vetoableTouchListener);
@@ -73,31 +75,35 @@ public class ArchiveFileSystems {
      * Note that the entries in the file system are shared with the given
      * archive entry {@code container}.
      *
-     * @param container The archive entry container to read the entries for
-     *        the population of the file system.
-     * @param rootTime The last modification time of the root of the populated
-     *        file system in milliseconds since the epoch.
-     * @param factory the archive entry factory to use.
-     * @param vetoableTouchListener the nullable listener for touch events.
-     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
-     *        method will be called whenever a client class changes the state
-     *        of the archive file system.
-     * @param readOnly If and only if {@code true}, any subsequent
-     *        modifying operation on the file system will result in a
-     *        {@link ReadOnlyArchiveFileSystemException}.
-     * @throws NullPointerException If {@code factory} or {@code archive}
+     * @param  container The archive entry container to read the entries for
+     *         the population of the file system.
+     * @param  rootTemplate The last modification time of the root of the populated
+     *         file system in milliseconds since the epoch.
+     * @param  factory the archive entry factory to use.
+     * @param  vetoableTouchListener the nullable listener for touch events.
+     *         If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *         method will be called whenever a client class changes the state
+     *         of the archive file system.
+     * @param  readOnly If and only if {@code true}, any subsequent
+     *         modifying operation on the file system will result in a
+     *         {@link ReadOnlyArchiveFileSystemException}.
+     * @throws IllegalArgumentException if {@code rootTemplate} is {@code null}
+     *         or an instance of {@link Entry}.
+     * @throws NullPointerException If {@code container} or {@code factory}
      *         is {@code null}.
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
             CommonEntryContainer<AE> container,
-            long rootTime,
-            ArchiveEntryFactory<AE> factory,
+            CommonEntryFactory<AE> factory,
+            CommonEntry rootTemplate,
             VetoableTouchListener vetoableTouchListener,
             boolean readOnly) {
+        if (null == rootTemplate || rootTemplate instanceof Entry)
+            throw new IllegalArgumentException();
         return readOnly
-            ? new ReadOnlyArchiveFileSystem<AE>(container, rootTime, factory)
-            : new ReadWriteArchiveFileSystem<AE>(container, rootTime, factory, vetoableTouchListener);
+            ? new ReadOnlyArchiveFileSystem<AE>(container, factory, rootTemplate)
+            : new ReadWriteArchiveFileSystem<AE>(container, factory, rootTemplate, vetoableTouchListener);
     }
 
     /**

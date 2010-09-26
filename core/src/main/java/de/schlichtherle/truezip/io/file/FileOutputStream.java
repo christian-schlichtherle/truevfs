@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
@@ -28,8 +28,8 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.APPEND;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveIOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -165,10 +165,10 @@ public class FileOutputStream extends FilterOutputStream {
                     return archive
                             .getArchiveController()
                             .getOutputSocket(
-                                BitField.noneOf(ArchiveIOOption.class)
+                                path,
+                                BitField.noneOf(IOOption.class)
                                     .set(APPEND, append)
-                                    .set(CREATE_PARENTS, File.isLenient()),
-                                path)
+                                    .set(CREATE_PARENTS, File.isLenient()))
                             .connect(null)
                             .newOutputStream();
                 }

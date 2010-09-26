@@ -73,7 +73,12 @@ public class FileEntry implements CommonEntry {
 
     /** Returns the file's last modification time. */
     @Override
-    public long getTime() {
-        return file.lastModified();
+    public long getTime(Access type) {
+        return Access.WRITE == type ? file.lastModified() : UNKNOWN;
+    }
+
+    public void setTime(Access type, long value) {
+        if (Access.WRITE == type)
+            file.setLastModified(value);
     }
 }
