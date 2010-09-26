@@ -102,7 +102,7 @@ extends CommonEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  out the {@link OutputStream} to write the archive entries to
      *         - {@code null} is not permitted.
-     * @param  source the source {@link CommonInputSocketService} if
+     * @param  source the nullable {@link CommonInputSocketService} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
      *         of this driver's {@link #newInput} method.

@@ -2753,11 +2753,15 @@ public class File extends java.io.File {
     @Override
     public boolean createNewFile() throws IOException {
         try {
-            if (enclArchive != null)
-                return enclArchive.getArchiveController().createNewFile(
-                        enclEntryName,
+            if (enclArchive != null) {
+                final ArchiveController controller = enclArchive.getArchiveController();
+                if (controller.getEntry(enclEntryName) != null)
+                    return false;
+                controller.mknod(enclEntryName, FILE, null,
                         BitField.noneOf(IOOption.class)
                             .set(CREATE_PARENTS, isLenient()));
+                return true;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2804,15 +2808,21 @@ public class File extends java.io.File {
     @Override
     public boolean mkdir() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController().mkdir(
+            if (innerArchive != null) {
+                innerArchive.getArchiveController().mknod(
                         getInnerEntryName(),
+                        DIRECTORY,
+                        null,
                         BitField.noneOf(IOOption.class)
                             .set(CREATE_PARENTS, isLenient()));
+                return true;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
+        } catch (IOException ex) {
+            return false;
         }
         return delegate.mkdir();
     }

@@ -17,13 +17,19 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.CharConversionException;
+import java.io.IOException;
 
 /**
  * A virtual file system for archive entries.
@@ -47,6 +53,9 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      * system entries.
      * The operation is run by its {@link #run} method and the head of the
      * chain can be obtained by its {@link #getTarget} method.
+     * <p>
+     * Note that the state of the archive file system will not change until
+     * the {@link #run} method is called!
      *
      * @see #mknod
      */
@@ -71,54 +80,44 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
     boolean isTouched();
 
     /**
-     * Begins a &quot;create and link target&quot; transaction to ensure that
-     * either a new target for the given {@code path} will be created or an
-     * existing target is replaced within this archive file system.
+     * Begins a <i>transaction</i> to create or replace and finally link a
+     * chain of one or more archive entries for the given {@code path} into
+     * this archive file system.
      * <p>
-     * This is the first step of a two-step process to create an archive target
-     * and link it into this virtual archive file system.
-     * To commit the transaction, call {@link IOOperation#run} on the
-     * returned object after you have successfully conducted the operations
-     * which compose the transaction.
-     * <p>
-     * Upon a {@code run} operation, the last modification time of
-     * the newly created and linked entries will be set to the system's
-     * current time at the moment the transaction has begun and the file
-     * system will be marked as touched at the moment the transaction has
-     * been committed.
-     * <p>
-     * Note that there is no rollback operation: After this method returns,
-     * nothing in the virtual file system has changed yet and all information
-     * required to commit the transaction is contained in the returned object.
-     * Hence, if the operations which compose the transaction fails, the
-     * returned object may be safely collected by the garbage collector,
+     * To commit the transaction, call {@link EntryOperation#run} on the
+     * returned object, which will mark this archive file system as
+     * {@link #isTouched() touched} and set the last modification time of the
+     * created and linked archive file system entries to the system's current
+     * time at the moment of the call to this method.
      *
-     * @param  path The relative path name of the target to create or replace.
-     * @param  template If not {@code null}, then the newly created or
-     *         replaced target shall inherit as much properties from this
-     *         instance as possible (with the exception of the name).
-     *         This is typically used for archive copy operations and requires
-     *         some support by the archive driver.
-     * @param  createParents If {@code true}, any missing parent
-     *         directory will be created in this file system with its last
-     *         modification time set to the system's current time.
-     * @return An I/O operation. You must call its {@link IOOperation#run}
-     *         method in order to link the newly created target into this
-     *         archive file system.
-     * @throws ArchiveReadOnlyExceptionn If this virtual archive file system
-     *         is read only.
+     * @param  path a non-{@code null} relative path name.
+     * @param  type a non-{@code null} common entry type.
+     * @param  template if not {@code null}, then the archive file system entry
+     *         at the end of the chain shall inherit as much properties from
+     *         this common entry as possible - with the exception of its name
+     *         and type.
+     * @param  createParents if {@code true}, any missing parent directories
+     *         will be created and linked into this archive file system with
+     *         its last modification time set to the system's current time.
+     * @throws NullPointerException if {@code path} or {@code type} are
+     *         {@code null}.
+     * @throws ArchiveReadOnlyExceptionn If this archive file system is read
+     *         only.
      * @throws ArchiveFileSystemException If one of the following is true:
      *         <ul>
      *         <li>{@code path} contains characters which are not
-     *             supported by the archive file.
-     *         <li>The target name indicates a directory (trailing {@code /})
-     *             and its target does already exist within this file system.
-     *         <li>The target is a file or directory and does already exist as
-     *             the respective other type within this file system.
-     *         <li>The parent directory does not exist and
-     *             {@code createParents} is {@code false}.
-     *         <li>One of the target's parents denotes a file.
+     *             supported by the archive file.</li>
+     *         <li>FIXME: type is not {@code FILE} or {@code DIRECTORY}.</li>
+     *         <li>The new entry already exists as a directory.</li>
+     *         <li>The new entry shall be a directory, but already exists.</li>
+     *         <li>A parent entry exists but is not a directory.</li>
+     *         <li>A parent entry is missing and {@code createParents} is
+     *             {@code false}.</li>
      *         </ul>
+     * @return A new I/O operation on a chain of one or more archive file
+     *         system entries for the given path name which will be linked
+     *         into this archive file system upon a call to its
+     *         {@link EntryOperation#run} method.
      */
     EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
@@ -145,4 +144,10 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
 
     void setReadOnly(String path)
     throws ArchiveFileSystemException;
+
+    public <E extends Exception> void copy(
+            CommonInputSocketService<AE> input,
+            CommonOutputSocketService<AE> output,
+            ExceptionHandler<? super IOException, E> handler)
+    throws E;
 }

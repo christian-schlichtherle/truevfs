@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.util.Collections;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
@@ -48,6 +49,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,6 +92,37 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * - should <em>not</em> be {@code null} for enhanced unit tests.
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
+
+    private static class DummyInput<CE extends CommonEntry>
+    implements CommonInputSocketService<CE> {
+
+        @Override
+        public void close() throws IOException {
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public Iterator<CE> iterator() {
+            return Collections.emptyIterator();
+        }
+
+        @Override
+        public CE getEntry(String name) {
+            return null;
+        }
+
+        @Override
+        public CommonInputSocket<CE> getInputSocket(CE target)
+        throws IOException {
+            if (target == null)
+                throw new NullPointerException();
+            throw new FileNotFoundException();
+        }
+    }
 
     /**
      * This member class makes an archive controller object strongly reachable
@@ -179,35 +212,16 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     /**
-     * Returns a new concurrent archive input which decorates (wraps) the
-     * given non-{@code null} archive input.
-     */
-    private Input wrap(AI archive) {
-        return new Input(archive);
-    }
-
-    /**
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    private AI unwrap(Input proxy) {
-        return proxy != null ? proxy.getTarget() : null;
+    // TODO: Return CommonInputSocketService<AE>
+    private AI getNullableInputTarget() {
+        return null == input ? null : input.getTarget();
     }
 
-    /**
-     * Returns a new concurrent archive input which decorates (wraps) the
-     * given non-{@code null} archive input.
-     */
-    private Output wrap(AO archive) {
-        return new Output(archive);
-    }
-
-    /**
-     * Returns the wrapped archive input or {@code null} if and only if
-     * {@code proxy} is {@code null}.
-     */
-    private AO unwrap(Output proxy) {
-        return proxy != null ? proxy.getTarget() : null;
+    private CommonInputSocketService<AE> getNonNullInputTarget() {
+        return null == input ? new DummyInput<AE>() : input.getTarget();
     }
 
     private ArchiveFileSystem newArchiveFileSystem()
@@ -220,7 +234,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             CommonEntry rootTemplate,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
-                unwrap(input), getDriver(),
+                input.getTarget(), getDriver(),
                 rootTemplate, vetoableTouchListener, readOnly);
     }
 
@@ -534,7 +548,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             try {
                 if (isHostFileSystemEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                input = wrap(getDriver().newInput(this, rof));
+                input = new Input(getDriver().newInput(this, rof));
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -582,7 +596,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
 
-        if (output != null)
+        if (null != output)
             return;
 
         java.io.File tmp = outFile;
@@ -626,8 +640,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    output = wrap(getDriver().newOutput(
-                                this, out, unwrap(input)));
+                    output = new Output(getDriver().newOutput(
+                                this, out, getNullableInputTarget()));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -918,43 +932,10 @@ extends FileSystemArchiveController<AE, AI, AO> {
         return true;
     }
 
-    public <E extends Exception>
-    void copy(final ExceptionHandler<IOException, E> h)
+    private <E extends Exception>
+    void copy(final ExceptionHandler<IOException, E> handler)
     throws E {
-        final CommonInputSocketService in = unwrap(input);
-        final CommonOutputSocketService out = unwrap(output);
-        final ArchiveFileSystem<AE> fs = getFileSystem();
-        final AE root = fs.getEntry(ROOT).getTarget();
-        assert root != null;
-        for (final Entry<AE> fse : fs) {
-            final AE e = fse.getTarget();
-            final String n = e.getName();
-            if (out.getEntry(n) != null)
-                continue; // we have already written this entry
-            try {
-                if (e.getType() == DIRECTORY) {
-                    if (root == e)
-                        continue; // never write the virtual root directory
-                    if (e.getTime(Access.WRITE) < 0)
-                        continue; // never write ghost directories
-                    out.getOutputSocket(e).connect(null).newOutputStream().close();
-                } else if (in != null && in.getEntry(n) != null) {
-                    assert e == in.getEntry(n);
-                    IOSocket.copy(  in.getInputSocket(e),
-                                    out.getOutputSocket(e));
-                } else {
-                    // The file system entry is an archive file which has been
-                    // newly created and not yet been reassembled
-                    // into this (potentially new) archive file.
-                    // Write an empty file system entry now as a marker in
-                    // order to recreate the file system entry when the file
-                    // system gets remounted from the archive file.
-                    out.getOutputSocket(e).connect(null).newOutputStream().close();
-                }
-            } catch (IOException ex) {
-                h.warn(ex);
-            }
-        }
+        getFileSystem().copy(getNonNullInputTarget(), output.getTarget(), handler);
     }
 
     /**

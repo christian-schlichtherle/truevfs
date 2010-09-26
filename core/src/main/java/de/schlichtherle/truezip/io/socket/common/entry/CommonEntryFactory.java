@@ -29,20 +29,21 @@ import java.io.CharConversionException;
 public interface CommonEntryFactory<CE extends CommonEntry> {
 
     /**
-     * Returns a new common entry for the given
-     * {@link CommonEntry#getName() common entry name}.
+     * Returns a new common entry for the given name.
      * The implementation may need to fix this name in order to 
-     * form a valid entry name for their particular requirements.
+     * form a valid {@link CommonEntry#getName() entry name} for their
+     * particular requirements.
      *
-     * @param  name a non-{@code null} <i>common entry name</i>.
+     * @param  name a non-{@code null} entry name.
      * @param  type a non-{@code null} entry type.
-     * @param  template if not {@code null}, then the new common entry shall
-     *         inherit as much properties from this common entry as possible
-     *         - with the exception of the common entry name and type.
-     *         This parameter is typically used for copy operations.
-     * @return A new common entry.
+     * @param  template if not {@code null}, then the new archive file system
+     *         entry shall inherit as much properties from this common entry
+     *         as possible - with the exception of its name and type.
+     * @return A new common entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
+     * @throws NullPointerException if {@code name} or {@code type} are
+     *         {@code null}.
      */
     CE newEntry(String name, Type type, CommonEntry template)
     throws CharConversionException;

@@ -91,7 +91,7 @@ public interface CommonEntry {
 
     enum Access {
         WRITE,
-        READ,
+        READ, // FIXME: This is not yet fully supported!
     }
 
     /**

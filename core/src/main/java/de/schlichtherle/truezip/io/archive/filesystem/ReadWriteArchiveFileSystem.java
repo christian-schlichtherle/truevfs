@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
+import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
@@ -81,19 +85,6 @@ implements ArchiveFileSystem<AE> {
 
     private final VetoableTouchListener vetoableTouchListener;
 
-    /**
-     * Constructs a new archive file system and ensures its integrity.
-     * The root directory is created with its last modification time set to
-     * the system's current time.
-     * The file system is modifiable and marked as touched!
-     * 
-     * @param factory the archive entry factory to use.
-     * @param vetoableTouchListener the nullable listener for touch events.
-     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
-     *        method will be called at the end of this constructor and whenever
-     *        a client class changes the state of this archive file system.
-     * @throws NullPointerException If {@code factory} is {@code null}.
-     */
     ReadWriteArchiveFileSystem(
             final CommonEntryFactory<AE> factory,
             final VetoableTouchListener vetoableTouchListener)
@@ -118,15 +109,22 @@ implements ArchiveFileSystem<AE> {
             final CommonEntryFactory<AE> factory,
             final CommonEntry rootTemplate,
             final VetoableTouchListener vetoableTouchListener) {
+        if (null == rootTemplate)
+            throw new NullPointerException();
+        if (rootTemplate instanceof Entry)
+            throw new IllegalArgumentException();
+
         this.factory = factory;
         master = new LinkedHashMap<String, BaseEntry<AE>>(
                 (int) (container.size() / 0.75f) + 1);
 
-        final Normalizer normalizer = new Normalizer();
         // Load entries from input archive.
+        final Normalizer normalizer = new Normalizer();
         for (final AE entry : container) {
             final String path = normalizer.normalize(entry.getName());
-            master.put(path, wrap(entry));
+            // TODO: Consider ignoring invalid path names and change copying
+            // algorithm accordingly - see copy()!
+            master.put(path, newBaseEntry(entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -185,16 +183,8 @@ implements ArchiveFileSystem<AE> {
      * not yet linked into this virtual archive file system.
      *
      * @see    #mknod
-     * @param  path the non-{@code null} path name of the new file system entry.
+     * @param  path the non-{@code null} path name of the archive file system entry.
      *         This is always a {@link #isValidPath(String) valid path name}.
-     * @param  type the non-{@code null} type of the new file system entry.
-     * @param  template if not {@code null}, then the new file system entry
-     *         shall inherit as much properties from this archive entry
-     *         as possible (with the exception of its entry name and type).
-     *         This is typically used for copy operations.
-     * @return A non-{@code null} file system entry.
-     * @throws CharConversionException if {@code path} contains characters
-     *         which are not supported by the archive file.
      */
     private BaseEntry<AE> newEntry(
             final String path,
@@ -204,9 +194,9 @@ implements ArchiveFileSystem<AE> {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
-        assert !(template instanceof BaseEntry);
+        assert !(template instanceof Entry);
 
-        return wrap(factory.newEntry(path, type, template));
+        return newBaseEntry(factory.newEntry(path, type, template));
     }
 
     /**
@@ -397,7 +387,7 @@ implements ArchiveFileSystem<AE> {
      * @throws NullPointerException If {@code entry} is {@code null}.
      */
     private static <AE extends ArchiveEntry>
-    BaseEntry<AE> wrap(final AE entry) {
+    BaseEntry<AE> newBaseEntry(final AE entry) {
         return entry.getType() == DIRECTORY
                 ? new DirectoryEntry(entry)
                 : new      FileEntry(entry);
@@ -502,9 +492,22 @@ implements ArchiveFileSystem<AE> {
     public EntryOperation<AE> mknod(
             final String path,
             final Type type,
-            final CommonEntry template,
+            CommonEntry template,
             final boolean createParents)
     throws ArchiveFileSystemException {
+        if (isRoot(path))
+            throw new ArchiveFileSystemException(path,
+                    "cannot replace virtual root directory entry");
+        if (!isValidPath(path))
+            throw new ArchiveFileSystemException(path,
+                    "is not a valid path name");
+        if (null == type)
+            throw new NullPointerException();
+        if (FILE != type && DIRECTORY != type)
+            throw new ArchiveFileSystemException(path,
+                    "only FILE and DIRECTORY entries are currently supported");
+        while (template instanceof Entry)
+            template = ((Entry<?>) template).getTarget();
         return new PathLink(path, type, template, createParents);
     }
 
@@ -519,15 +522,6 @@ implements ArchiveFileSystem<AE> {
                 final CommonEntry template,
                 final boolean createParents)
         throws ArchiveFileSystemException {
-            if (isRoot(entryPath))
-                throw new ArchiveFileSystemException(entryPath,
-                        "cannot replace virtual root directory entry");
-            if (!isValidPath(entryPath))
-                throw new ArchiveFileSystemException(entryPath,
-                        "is not a valid path name");
-            if (entryType != FILE && entryType != DIRECTORY)
-                throw new ArchiveFileSystemException(entryPath,
-                        "only FILE and DIRECTORY entries are currently supported");
             this.createParents = createParents;
             try {
                 links = newSegmentLinks(entryPath, entryType, template, 1);
@@ -715,5 +709,48 @@ implements ArchiveFileSystem<AE> {
         for (Access type : types)
             entry.getTarget().setTime(type, value);
         return true;
+    }
+
+    @Override
+    public <E extends Exception>
+    void copy(
+            final CommonInputSocketService<AE> input,
+            final CommonOutputSocketService<AE> output,
+            final ExceptionHandler<? super IOException, E> handler)
+    throws E {
+        final AE root = getEntry(ROOT).getTarget();
+        assert root != null;
+        // TODO: Consider iterating over input instead, normalizing the input
+        // entry name and checking with master map and output.
+        // Consider the effect for absolute entry names, too.
+        for (final Entry<AE> fse : master.values()) {
+            final AE e = fse.getTarget();
+            final String n = e.getName();
+            if (output.getEntry(n) != null)
+                continue; // we have already written this entry
+            try {
+                if (e.getType() == DIRECTORY) {
+                    if (root == e)
+                        continue; // never write the virtual root directory
+                    if (e.getTime(Access.WRITE) < 0)
+                        continue; // never write ghost directories
+                    output.getOutputSocket(e).connect(null).newOutputStream().close();
+                } else if (input.getEntry(n) != null) {
+                    assert e == input.getEntry(n);
+                    IOSocket.copy(  input.getInputSocket(e),
+                                    output.getOutputSocket(e));
+                } else {
+                    // The file system entry is an archive file which has been
+                    // newly created and not yet been reassembled
+                    // into this (potentially new) archive file.
+                    // Write an empty file system entry now as a marker in
+                    // order to recreate the file system entry when the file
+                    // system gets remounted from the archive file.
+                    output.getOutputSocket(e).connect(null).newOutputStream().close();
+                }
+            } catch (IOException ex) {
+                handler.warn(ex);
+            }
+        }
     }
 }
