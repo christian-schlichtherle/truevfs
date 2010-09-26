@@ -17,18 +17,18 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import java.util.Collections;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
-import de.schlichtherle.truezip.io.socket.common.input.ConcurrentCommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.output.ConcurrentCommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
+import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -36,11 +36,11 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -60,8 +60,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
@@ -75,8 +75,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 final class UpdatingArchiveController<
         AE extends ArchiveEntry,
-        AI extends CommonInputSocketService<AE>,
-        AO extends CommonOutputSocketService<AE>>
+        AI extends CommonInputShop<AE>,
+        AO extends CommonOutputShop<AE>>
 extends FileSystemArchiveController<AE, AI, AO> {
 
     private static final String CLASS_NAME
@@ -93,8 +93,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
 
-    private static class DummyInput<CE extends CommonEntry>
-    implements CommonInputSocketService<CE> {
+    private static class DummyInputService<CE extends CommonEntry>
+    implements CommonInputShop<CE> {
 
         @Override
         public void close() throws IOException {
@@ -132,7 +132,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
      *
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
-    private final class Input extends ConcurrentCommonInputSocketService<AE> {
+    private final class Input extends ConcurrentInputShop<AE> {
         Input(AI target) {
             super(target);
         }
@@ -150,7 +150,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
      *
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
-    private final class Output extends ConcurrentCommonOutputSocketService<AE> {
+    private final class Output extends ConcurrentOutputShop<AE> {
         Output(AO target) {
             super(target);
         }
@@ -215,13 +215,13 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    // TODO: Return CommonInputSocketService<AE>
+    // TODO: Return CommonInputShop<AE>
     private AI getNullableInputTarget() {
         return null == input ? null : input.getTarget();
     }
 
-    private CommonInputSocketService<AE> getNonNullInputTarget() {
-        return null == input ? new DummyInput<AE>() : input.getTarget();
+    private CommonInputShop<AE> getNonNullInputTarget() {
+        return null == input ? new DummyInputService<AE>() : input.getTarget();
     }
 
     private ArchiveFileSystem newArchiveFileSystem()
@@ -533,7 +533,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
     /**
      * Initializes {@code inArchive} with a newly created
-     * {@link CommonInputSocketService} for reading {@code inFile}.
+     * {@link CommonInputShop} for reading {@code inFile}.
      *
      * @throws IOException On any I/O related issue with {@code inFile}.
      */
@@ -620,7 +620,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
 
     /**
      * Initializes {@code outArchive} with a newly created
-     * {@link CommonOutputSocketService} for writing {@code outFile}.
+     * {@link CommonOutputShop} for writing {@code outFile}.
      * This method will delete {@code outFile} if it has successfully
      * opened it for overwriting, but failed to write the archive file header.
      *
@@ -872,7 +872,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
-                // normal case) have been modified by the CommonOutputSocketService
+                // normal case) have been modified by the CommonOutputShop
                 // and thus cannot get used anymore to access the input;
                 // and (2) if there has been any IOException on the
                 // output archive there is no way to recover from it.
@@ -1152,8 +1152,8 @@ extends FileSystemArchiveController<AE, AI, AO> {
         // to output archive as the "source" when it was created and may
         // be using the input archive when its closing to retrieve some
         // meta data information.
-        // E.g. with ZIP archive files, the CommonOutputSocketService copies the postamble
-        // from the CommonInputSocketService when it closes.
+        // E.g. with ZIP archive files, the CommonOutputShop copies the postamble
+        // from the CommonInputShop when it closes.
         try {
             if (output != null) {
                 try {

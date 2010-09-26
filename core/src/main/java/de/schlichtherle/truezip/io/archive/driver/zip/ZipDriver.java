@@ -17,14 +17,14 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
@@ -48,7 +48,7 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver<ZipEntry, ZipInput, CommonOutputSocketService<ZipEntry>>
+extends AbstractArchiveDriver<ZipEntry, ZipInputShop, CommonOutputShop<ZipEntry>>
 implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
@@ -202,16 +202,16 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInput}.
      */
     @Override
-    public ZipInput newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    public ZipInputShop newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
         return newZipInput(archive, rof);
     }
 
-    protected ZipInput newZipInput(
+    protected ZipInputShop newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new ZipInput(
+        return new ZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
     }
 
@@ -220,20 +220,20 @@ implements ZipEntryFactory<ZipEntry> {
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
      * {@link #newZipOutput} and wraps the result in a new
-     * {@link MultiplexedArchiveOutput}.
+     * {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputSocketService<ZipEntry> newOutput(
-            ArchiveDescriptor archive, OutputStream out, ZipInput source)
+    public CommonOutputShop<ZipEntry> newOutput(
+            ArchiveDescriptor archive, OutputStream out, ZipInputShop source)
     throws IOException {
-        return new MultiplexedArchiveOutput<ZipEntry>(
+        return new MultiplexedArchiveOutputShop<ZipEntry>(
                 newZipOutput(archive, out, source));
-        //return newZipOutput(archive, out, (ZipInput) source);
+        //return newZipOutput(archive, out, (ZipInputShop) source);
     }
 
-    protected ZipOutput newZipOutput(
-            ArchiveDescriptor archive, OutputStream out, ZipInput source)
+    protected ZipOutputShop newZipOutput(
+            ArchiveDescriptor archive, OutputStream out, ZipInputShop source)
     throws IOException {
-        return new ZipOutput(out, getCharset(), level, source);
+        return new ZipOutputShop(out, getCharset(), level, source);
     }
 }

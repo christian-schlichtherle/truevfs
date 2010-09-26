@@ -18,13 +18,13 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class TarDriver
-extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutputSocketService<TarEntry>> {
+extends AbstractArchiveDriver<TarEntry, TarInputShop, CommonOutputShop<TarEntry>> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -120,7 +120,7 @@ extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutputSocketService<TarE
      * {@link #newTarInput(ArchiveDescriptor, InputStream)}.
      */
     @Override
-    public TarInput newInput(
+    public TarInputShop newInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -151,39 +151,39 @@ extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutputSocketService<TarE
     }
 
     /**
-     * Returns a new {@code TarInput} to read the contents from
+     * Returns a new {@code TarInputShop} to read the contents from
      * the given {@code InputStream}.
      * The implementation in this class simply returns
-     * {@code new TarInput(in)}.
+     * {@code new TarInputShop(in)}.
      */
-    protected TarInput newTarInput(
+    protected TarInputShop newTarInput(
             ArchiveDescriptor archive,
             InputStream in)
     throws IOException {
-        return new TarInput(in);
+        return new TarInputShop(in);
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * This implementation forwards the call to {@link #newTarOutput}
-     * and wraps the result in a new {@link MultiplexedArchiveOutput}.
+     * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputSocketService<TarEntry> newOutput(
+    public CommonOutputShop<TarEntry> newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
-            TarInput source)
+            TarInputShop source)
     throws IOException {
-        return new MultiplexedArchiveOutput<TarEntry>(newTarOutput(
-                archive, out, (TarInput) source));
+        return new MultiplexedArchiveOutputShop<TarEntry>(newTarOutput(
+                archive, out, (TarInputShop) source));
     }
 
-    protected TarOutput newTarOutput(
+    protected TarOutputShop newTarOutput(
             ArchiveDescriptor archive,
             OutputStream out,
-            TarInput source)
+            TarInputShop source)
     throws IOException {
-        return new TarOutput(out);
+        return new TarOutputShop(out);
     }
 }

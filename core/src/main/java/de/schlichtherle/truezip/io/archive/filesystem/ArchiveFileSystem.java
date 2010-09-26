@@ -17,18 +17,16 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.input.CommonInputService;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.CharConversionException;
 import java.io.IOException;
 
 /**
@@ -146,8 +144,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
     throws ArchiveFileSystemException;
 
     public <E extends Exception> void copy(
-            CommonInputSocketService<AE> input,
-            CommonOutputSocketService<AE> output,
+            CommonInputService<AE> input,
+            CommonOutputService<AE> output,
             ExceptionHandler<? super IOException, E> handler)
     throws E;
 }

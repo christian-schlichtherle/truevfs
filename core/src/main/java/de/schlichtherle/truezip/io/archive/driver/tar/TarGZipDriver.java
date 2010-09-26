@@ -109,10 +109,10 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected TarOutput newTarOutput(
+    protected TarOutputShop newTarOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
-            final TarInput source)
+            final TarInputShop source)
     throws IOException {
         return super.newTarOutput(
                 archive,

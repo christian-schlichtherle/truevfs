@@ -15,19 +15,19 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketProvider;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketProvider;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputProvider;
+import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -59,9 +59,9 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -116,11 +116,11 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<  AE extends ArchiveEntry,
-                                        AI extends CommonInputSocketService<AE>,
-                                        AO extends CommonOutputSocketService<AE>>
+                                        AI extends CommonInputShop<AE>,
+                                        AO extends CommonOutputShop<AE>>
 implements  ArchiveController,
-            CommonInputSocketProvider<AE>,
-            CommonOutputSocketProvider<AE> {
+            CommonInputProvider<AE>,
+            CommonOutputProvider<AE> {
 
     /**
      * A weak reference to this archive controller.

@@ -16,18 +16,18 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.socket.input.CommonInputService;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.entry.FilterCommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
@@ -44,8 +44,8 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
@@ -714,8 +714,8 @@ implements ArchiveFileSystem<AE> {
     @Override
     public <E extends Exception>
     void copy(
-            final CommonInputSocketService<AE> input,
-            final CommonOutputSocketService<AE> output,
+            final CommonInputService<AE> input,
+            final CommonOutputService<AE> output,
             final ExceptionHandler<? super IOException, E> handler)
     throws E {
         final AE root = getEntry(ROOT).getTarget();

@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.FileBusyException;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
@@ -31,7 +31,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.common.file.FileIOSocketProvider;
+import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -386,7 +386,7 @@ class Files {
             final CommonInputSocket<? extends CommonEntry> input
                     = srcController.getInputSocket(srcPath);
             final CommonOutputSocket<? extends CommonEntry> output
-                    = FileIOSocketProvider.get().getOutputSocket(new FileEntry(dst));
+                    = FileIOProvider.get().getOutputSocket(new FileEntry(dst));
             IOSocket.copy(input, output);
             if (preserve && !dst.setLastModified(input.getTarget().getTime(Access.WRITE)))
                 throw new IOException(dst.getPath()
