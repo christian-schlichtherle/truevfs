@@ -87,10 +87,10 @@ public class ArchiveFileSystems {
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link ReadOnlyArchiveFileSystemException}.
-     * @throws IllegalArgumentException if {@code rootTemplate} is {@code null}
-     *         or an instance of {@link Entry}.
-     * @throws NullPointerException If {@code container} or {@code factory}
-     *         is {@code null}.
+     * @throws NullPointerException If {@code container}, {@code factory} or
+     *         {@code rootTemplate} are {@code null}.
+     * @throws IllegalArgumentException If {@code rootTemplate} is an instance
+     *         of {@link Entry}.
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
@@ -99,8 +99,6 @@ public class ArchiveFileSystems {
             CommonEntry rootTemplate,
             VetoableTouchListener vetoableTouchListener,
             boolean readOnly) {
-        if (null == rootTemplate || rootTemplate instanceof Entry)
-            throw new IllegalArgumentException();
         return readOnly
             ? new ReadOnlyArchiveFileSystem<AE>(container, factory, rootTemplate)
             : new ReadWriteArchiveFileSystem<AE>(container, factory, rootTemplate, vetoableTouchListener);

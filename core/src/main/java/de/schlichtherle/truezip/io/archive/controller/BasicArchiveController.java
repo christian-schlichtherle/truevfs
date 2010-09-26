@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
@@ -943,60 +945,30 @@ implements  ArchiveController,
     }
 
     @Override
-    public final boolean createNewFile(
+    public final void mknod(
             final String path,
+            final Type type,
+            final CommonEntry template, // FIXME: What if instanceof Entry?
             final BitField<IOOption> options)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         try {
-            return createNewFile0(path, options);
+            mknod0(path, type, template, options);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclArchive().createNewFile(
-                    getEnclPath(path), options);
-        }
-    }
-
-    private boolean createNewFile0(
-            final String path,
-            final BitField<IOOption> options)
-    throws FalsePositiveException, IOException {
-        assert !isRoot(path);
-
-        writeLock().lock();
-        try {
-            if (autoMount(options.get(CREATE_PARENTS)).getEntry(path) != null)
-                return false;
-            // If we got here without an exception, write an empty file now.
-            getOutputSocket0(path, options)
-                    .connect(null)
-                    .newOutputStream()
-                    .close();
-            return true;
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    @Override
-    public final boolean mkdir(
-            final String path,
-            final BitField<IOOption> options)
-    throws FalsePositiveException {
-        try {
-            mkdir0(path, options);
-            return true;
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclArchive().mkdir(getEnclPath(path), options);
+            getEnclArchive().mknod(getEnclPath(path), type, template, options);
         } catch (FalsePositiveException ex) {
             throw ex;
-        } catch (IOException ex) {
-            return false;
         }
     }
 
-    private void mkdir0(
+    private void mknod0(
             final String path,
+            final Type type,
+            final CommonEntry template, // FIXME: What if instanceof Entry?
             final BitField<IOOption> options)
     throws FalsePositiveException, IOException {
+        if (FILE != type && DIRECTORY != type)
+            throw new ArchiveEntryNotFoundException(this, path,
+                    "not yet supported: mknod " + type);
         writeLock().lock();
         try {
             if (isRoot(path)) {
@@ -1005,16 +977,36 @@ implements  ArchiveController,
                 } catch (FalsePositiveException ex) {
                     throw ex;
                 } catch (ArchiveEntryNotFoundException ex) {
-                    autoMount(true, options.get(CREATE_PARENTS));
+                    switch (type) {
+                        case FILE:
+                            if (isRoot(ex.getPath()))
+                                throw new FalsePositiveException(this, path, ex);
+                            // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
+                            getEnclArchive().mknod(
+                                    getEnclPath(path), type, template, options);
+                            break;
+
+                        case DIRECTORY:
+                            autoMount(true, options.get(CREATE_PARENTS));
+                    }
                     return;
                 }
                 throw new ArchiveEntryNotFoundException(this, path,
                         "directory exists already");
             } else { // !isRoot(entryName)
-                // This is going to be a regular directory archive entry.
-                autoMount(options.get(CREATE_PARENTS))
-                        .mknod(path, DIRECTORY, null, options.get(CREATE_PARENTS))
-                        .run();
+                switch (type) {
+                    case FILE:
+                        getOutputSocket0(path, options)
+                                .connect(null)
+                                .newOutputStream()
+                                .close();
+                        break;
+
+                    case DIRECTORY:
+                        autoMount(options.get(CREATE_PARENTS))
+                                .mknod(path, DIRECTORY, null, options.get(CREATE_PARENTS))
+                                .run();
+                }
             }
         } finally {
             writeLock().unlock();

@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
@@ -71,7 +72,7 @@ public interface ArchiveController extends ArchiveDescriptor {
          * Whether or not any missing parent directory entries within an
          * archive file shall get created automatically.
          * If set, client applications do not need to call
-         * {@link ArchiveController#mkdir} to create the parent directory
+         * {@link ArchiveController#mknod} to create the parent directory
          * entries of a file entry within an archive file before they can write
          * to it.
          */
@@ -226,8 +227,10 @@ public interface ArchiveController extends ArchiveDescriptor {
      * Returns an archive input socket for reading the given entry from the
      * target archive file.
      *
-     * @param  path a non-{@code null} entry in the virtual archive file
-     *         system.
+     * @param  path a non-{@code null} relative path name.
+     * @throws FalsePositiveException if the target archive file is a false
+     *         positive.
+     * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     CommonInputSocket<? extends CommonEntry>
@@ -238,21 +241,50 @@ public interface ArchiveController extends ArchiveDescriptor {
      * Returns an archive output socket for writing the given entry to the
      * target archive file.
      *
-     * @param  path a non-{@code null} entry in the virtual archive file
-     *         system.
+     * @param  path a non-{@code null} relative path name.
+     * @throws FalsePositiveException if the target archive file is a false
+     *         positive.
+     * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     CommonOutputSocket<? extends CommonEntry>
     getOutputSocket(String path, BitField<IOOption> options)
     throws IOException;
 
-    /** Currently only supports the CREATE_PARENTS option. */
-    boolean createNewFile(String path, BitField<IOOption> options)
+    /**
+     * Creates or replaces and finally links a chain of one or more archive
+     * entries for the given {@code path} into the archive file system.
+     *
+     * @param  path a non-{@code null} relative path name.
+     * @param  type a non-{@code null} common entry type.
+     * @param  template if not {@code null}, then the archive file system entry
+     *         at the end of the chain shall inherit as much properties from
+     *         this common entry as possible - with the exception of its name
+     *         and type.
+     * @param  options if {@code CREATE_PARENTS} is set, any missing parent
+     *         directories will be created and linked into this archive file
+     *         system with its last modification time set to the system's
+     *         current time.
+     * @throws NullPointerException if {@code path} or {@code type} are
+     *         {@code null}.
+     * @throws FalsePositiveException if the target archive file is a false
+     *         positive.
+     * @throws IOException for some other I/O related reason, including but
+     *         not exclusively upon one or more of the following conditions:
+     *         <ul>
+     *         <li>The archive file system is read only.</li>
+     *         <li>{@code path} contains characters which are not
+     *             supported by the archive file.</li>
+     *         <li>FIXME: type is not {@code FILE} or {@code DIRECTORY}.</li>
+     *         <li>The new entry already exists as a directory.</li>
+     *         <li>The new entry shall be a directory, but already exists.</li>
+     *         <li>A parent entry exists but is not a directory.</li>
+     *         <li>A parent entry is missing and {@code createParents} is
+     *             {@code false}.</li>
+     *         </ul>
+     */
+    void mknod(String path, Type type, CommonEntry template, BitField<IOOption> options)
     throws IOException;
-
-    /** Currently only supports the CREATE_PARENTS option. */
-    boolean mkdir(String path, BitField<IOOption> options)
-    throws FalsePositiveException;
 
     /** Currently supports no options. */
     boolean delete(String path, BitField<IOOption> options)

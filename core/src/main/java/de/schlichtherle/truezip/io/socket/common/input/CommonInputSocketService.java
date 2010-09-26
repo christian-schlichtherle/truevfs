@@ -22,17 +22,17 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import java.io.Closeable;
 
 /**
- * A closeable archive entry container which provides archive entry input
- * sockets.
+ * A common entry container which provides common entry input sockets.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the archive entries.
+ * @param   <CE> The type of the common entries.
  * @see     CommonOutputSocketService
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Move Closeable to ArchiveInput!
 public interface CommonInputSocketService<CE extends CommonEntry>
 extends Closeable,
         CommonEntryContainer<CE>,
