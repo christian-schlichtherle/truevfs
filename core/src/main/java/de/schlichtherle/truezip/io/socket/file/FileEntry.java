@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.socket.file;
 
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
@@ -30,55 +29,52 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry implements CommonEntry {
-    private final File file;
+public class FileEntry extends File implements CommonEntry {
+    private static final long serialVersionUID = 5263276267534643646L;
 
     /**
      * Constructs a new {@code FileEntry}.
-     * 
+     *
+     * @param path A non-{@code null} path name.
+     * @throws NullPointerException If {@code path} is {@code null}.
+     */
+    public FileEntry(final String path) {
+        super(path);
+    }
+
+    /**
+     * Constructs a new {@code FileEntry}.
+     *
      * @param file A non-{@code null} file.
      * @throws NullPointerException If {@code file} is {@code null}.
      */
     public FileEntry(final File file) {
-        if (file == null)
-            throw new NullPointerException();
-        this.file = file;
-    }
-
-    /** Returns the adapted file. */
-    File getFile() {
-        return file;
-    }
-
-    /** Returns the name provided to the constructor. */
-    @Override
-    public String getName() {
-        return file.getName();
+        super(file.getPath());
     }
 
     /** Returns whether the file is a directory or not. */
     @Override
     public Type getType() {
-        return file.isDirectory() ? DIRECTORY
-                : file.isFile() ? FILE
-                : file.exists() ? SPECIAL
+        return isDirectory() ? DIRECTORY
+                : isFile() ? FILE
+                : exists() ? SPECIAL
                 : null;
     }
 
     /** Returns the file size. */
     @Override
     public long getSize() {
-        return file.length();
+        return length();
     }
 
     /** Returns the file's last modification time. */
     @Override
     public long getTime(Access type) {
-        return Access.WRITE == type ? file.lastModified() : UNKNOWN;
+        return Access.WRITE == type ? lastModified() : UNKNOWN;
     }
 
     public void setTime(Access type, long value) {
         if (Access.WRITE == type)
-            file.setLastModified(value);
+            setLastModified(value);
     }
 }
