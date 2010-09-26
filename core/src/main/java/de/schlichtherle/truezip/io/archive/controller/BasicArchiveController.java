@@ -18,8 +18,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -115,9 +113,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<  AE extends ArchiveEntry,
-                                        AI extends CommonInputShop<AE>,
-                                        AO extends CommonOutputShop<AE>>
+abstract class BasicArchiveController<AE extends ArchiveEntry>
 implements  ArchiveController,
             CommonInputProvider<AE>,
             CommonOutputProvider<AE> {
@@ -133,7 +129,7 @@ implements  ArchiveController,
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final BasicArchiveController<?, ?, ?> enclController;
+    private final BasicArchiveController<?> enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -144,7 +140,7 @@ implements  ArchiveController,
     /**
      * The {@link ArchiveDriver} to use for this controller's target file.
      */
-    private final ArchiveDriver<AE, AI, AO> driver;
+    private final ArchiveDriver<AE> driver;
 
     /**
      * The canonicalized or at least normalized absolute path name
@@ -176,7 +172,7 @@ implements  ArchiveController,
     BasicArchiveController(
             final URI mountPoint,
             final URI enclMountPoint,
-            final ArchiveDriver<AE, AI, AO> driver) {
+            final ArchiveDriver<AE> driver) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -269,7 +265,7 @@ implements  ArchiveController,
     }
 
     @Override
-    public final BasicArchiveController<?, ?, ?> getEnclArchive() {
+    public final BasicArchiveController<?> getEnclArchive() {
         return enclController;
     }
 
@@ -294,7 +290,7 @@ implements  ArchiveController,
      * @return A valid reference to an {@link ArchiveDriver} object
      *         - never {@code null}.
      */
-    final ArchiveDriver<AE, AI, AO> getDriver() {
+    final ArchiveDriver<AE> getDriver() {
         return driver;
     }
 
@@ -807,7 +803,7 @@ implements  ArchiveController,
         try {
             return autoMount().getEntry(path);
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            /** @see ArchiveDriver#newInput! */
+            /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
                 return new SpecialFileEntry(getEnclArchive()
                         .getEntry(getEnclPath(path))
@@ -1025,7 +1021,7 @@ implements  ArchiveController,
             return getEnclArchive().delete(getEnclPath(path), options);
         } catch (FileArchiveEntryFalsePositiveException ex) {
             // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
-            /** @see ArchiveDriver#newInput! */
+            /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path)) {
                 final ArchiveFileSystemEntry entry = getEnclArchive().getEntry(getEnclPath(path));
                 if (null == entry || entry.getType() != DIRECTORY

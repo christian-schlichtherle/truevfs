@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import java.net.URI;
-import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -73,11 +72,8 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController<
-        AE extends ArchiveEntry,
-        AI extends CommonInputShop<AE>,
-        AO extends CommonOutputShop<AE>>
-extends FileSystemArchiveController<AE, AI, AO> {
+final class UpdatingArchiveController<AE extends ArchiveEntry>
+extends FileSystemArchiveController<AE> {
 
     private static final String CLASS_NAME
             = UpdatingArchiveController.class.getName();
@@ -133,12 +129,12 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Input extends ConcurrentInputShop<AE> {
-        Input(AI target) {
+        Input(CommonInputShop<AE> target) {
             super(target);
         }
 
-        AI getTarget() {
-            return (AI) target;
+        CommonInputShop<AE> getTarget() {
+            return (CommonInputShop<AE>) target;
         }
     }
 
@@ -151,12 +147,12 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
-        Output(AO target) {
+        Output(CommonOutputShop<AE> target) {
             super(target);
         }
 
-        AO getTarget() {
-            return (AO) target;
+        CommonOutputShop<AE> getTarget() {
+            return (CommonOutputShop<AE>) target;
         }
     }
 
@@ -216,7 +212,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
      * {@code proxy} is {@code null}.
      */
     // TODO: Return CommonInputShop<AE>
-    private AI getNullableInputTarget() {
+    private CommonInputShop<AE> getNullableInputTarget() {
         return null == input ? null : input.getTarget();
     }
 
@@ -357,7 +353,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrap(
-            final BasicArchiveController<?, ?, ?> controller,
+            final BasicArchiveController<?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -428,7 +424,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void unwrapFromLockedController(
-            final BasicArchiveController<?, ?, ?> controller,
+            final BasicArchiveController<?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -548,7 +544,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
             try {
                 if (isHostFileSystemEntryTarget())
                     rof = new CountingReadOnlyFile(rof);
-                input = new Input(getDriver().newInput(this, rof));
+                input = new Input(getDriver().newInputShop(this, rof));
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
                 // similar if the class path is not set up correctly.
@@ -640,7 +636,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
                 if (outFile == getTarget())
                     out = new CountingOutputStream(out);
                 try {
-                    output = new Output(getDriver().newOutput(
+                    output = new Output(getDriver().newOutputShop(
                                 this, out, getNullableInputTarget()));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
@@ -1006,7 +1002,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrap(
-            final BasicArchiveController controller,
+            final BasicArchiveController<?> controller,
             final String path)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
@@ -1026,7 +1022,7 @@ extends FileSystemArchiveController<AE, AI, AO> {
     }
 
     private void wrapToWriteLockedController(
-            final BasicArchiveController controller,
+            final BasicArchiveController<?> controller,
             final String path)
     throws IOException {
         assert controller != null;

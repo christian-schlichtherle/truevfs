@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -48,7 +49,7 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
  * @version $Id$
  */
 public class ZipDriver
-extends AbstractArchiveDriver<ZipEntry, ZipInputShop, CommonOutputShop<ZipEntry>>
+extends AbstractArchiveDriver<ZipEntry>
 implements ZipEntryFactory<ZipEntry> {
 
     private static final long serialVersionUID = -7061546656075796996L;
@@ -202,7 +203,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInput}.
      */
     @Override
-    public ZipInputShop newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    public ZipInputShop newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException {
         return newZipInput(archive, rof);
     }
@@ -223,11 +224,11 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputShop<ZipEntry> newOutput(
-            ArchiveDescriptor archive, OutputStream out, ZipInputShop source)
+    public CommonOutputShop<ZipEntry> newOutputShop(
+            ArchiveDescriptor archive, OutputStream out, CommonInputShop<ZipEntry> source)
     throws IOException {
         return new MultiplexedArchiveOutputShop<ZipEntry>(
-                newZipOutput(archive, out, source));
+                newZipOutput(archive, out, (ZipInputShop) source));
         //return newZipOutput(archive, out, (ZipInputShop) source);
     }
 

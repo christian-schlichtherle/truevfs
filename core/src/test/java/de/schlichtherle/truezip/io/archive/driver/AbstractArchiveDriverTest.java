@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.BitField;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
@@ -183,7 +182,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonInputShop newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+        public CommonInputShop newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
@@ -196,7 +195,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonOutputShop newOutput(ArchiveDescriptor archive, OutputStream out, CommonInputShop source)
+        public CommonOutputShop newOutputShop(ArchiveDescriptor archive, OutputStream out, CommonInputShop source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");

@@ -52,15 +52,10 @@ import javax.swing.Icon;
  * </ul>
  *
  * @param <AE> The type of the archive entries.
- * @param <CIS> The type of the common input shop.
- * @param <COS> The type of the common output shop.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDriver<
-        AE extends ArchiveEntry,
-        CIS extends CommonInputShop<AE>,
-        COS extends CommonOutputShop<AE>>
+public interface ArchiveDriver<AE extends ArchiveEntry>
 extends CommonEntryFactory<AE> {
 
     /**
@@ -90,7 +85,7 @@ extends CommonEntryFactory<AE> {
      *         the client application to recognize the archive file as a
      *         <i>regular</i> file.
      */
-    CIS newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    CommonInputShop<AE> newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
@@ -105,7 +100,7 @@ extends CommonEntryFactory<AE> {
      * @param  source the nullable {@link CommonInputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInput} method.
+     *         of this driver's {@link #newInputShop} method.
      *         This may be used to copy some meta data which is specific to
      *         the type of archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
@@ -120,7 +115,7 @@ extends CommonEntryFactory<AE> {
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
      */
-    COS newOutput(ArchiveDescriptor archive, OutputStream out, CIS source)
+    CommonOutputShop<AE> newOutputShop(ArchiveDescriptor archive, OutputStream out, CommonInputShop<AE> source)
     throws IOException;
 
     /**
