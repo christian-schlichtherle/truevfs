@@ -16,7 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
@@ -30,8 +31,8 @@ import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.F
  * @version $Id$
  */
 public class TarEntry
-extends     org.apache.tools.tar.TarEntry
-implements  ArchiveEntry {
+extends    org.apache.tools.tar.TarEntry
+implements ArchiveEntry {
 
     public TarEntry(final String entryName) {
         super(entryName, true);
@@ -73,14 +74,17 @@ implements  ArchiveEntry {
     }
 
     @Override
-    public long getTime() {
+    public long getTime(Access type) {
+        if (Access.WRITE != type)
+            return UNKNOWN;
         long time = super.getModTime().getTime();
-        return time >= 0 ? time : UNKNOWN;
+        return 0 <= time ? time : UNKNOWN;
     }
 
     @Override
-    public void setTime(long time) {
-        super.setModTime(time);
+    public void setTime(Access type, long value) {
+        if (Access.WRITE == type)
+            super.setModTime(value);
     }
 
     /** Returns {@link #getName()}. */

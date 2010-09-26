@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.FilterCommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
@@ -23,7 +25,6 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
@@ -41,7 +42,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
@@ -270,8 +271,9 @@ extends FilterCommonOutputSocketService<AE, CommonOutputSocketService<AE>> {
                 final CommonEntry srcEntry = input.getTarget();
                 if (dstEntry.getSize() == UNKNOWN)
                     dstEntry.setSize(srcEntry.getSize());
-                if (dstEntry.getTime() == UNKNOWN)
-                    dstEntry.setTime(srcEntry.getTime());
+                for (Access access : BitField.allOf(Access.class))
+                    if (UNKNOWN == dstEntry.getTime(access))
+                        dstEntry.setTime(access, srcEntry.getTime(access));
                 storeTemps();
             }
         }

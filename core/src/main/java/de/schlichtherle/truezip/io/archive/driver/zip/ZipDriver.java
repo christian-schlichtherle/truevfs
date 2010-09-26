@@ -16,11 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -175,7 +177,7 @@ implements ZipEntryFactory<ZipEntry> {
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
-                entry.setTime(template.getTime());
+                entry.setTime(template.getTime(Access.WRITE));
                 entry.setSize(template.getSize());
             }
         } else {

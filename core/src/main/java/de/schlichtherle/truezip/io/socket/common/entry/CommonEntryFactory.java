@@ -14,40 +14,36 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.socket.common.entry;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
 import java.io.CharConversionException;
 
 /**
- * An immutable, thread-safe factory for archive entries.
+ * An immutable, thread-safe factory for common entries.
  *
- * @param <AE> The type of the created archive entries.
+ * @param <CE> The type of the common entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveEntryFactory<AE extends ArchiveEntry> {
+public interface CommonEntryFactory<CE extends CommonEntry> {
 
     /**
-     * Returns a new archive entry for the given
+     * Returns a new common entry for the given
      * {@link CommonEntry#getName() common entry name}.
      * The implementation may need to fix this name in order to 
-     * form a valid {@link ArchiveEntry#getName() archive entry name} for
-     * their particular archive type.
+     * form a valid entry name for their particular requirements.
      *
      * @param  name a non-{@code null} <i>common entry name</i>.
      * @param  type a non-{@code null} entry type.
-     * @param  template if not {@code null}, then the new archive entry shall
+     * @param  template if not {@code null}, then the new common entry shall
      *         inherit as much properties from this common entry as possible
-     *         - with the exception of the archive entry name.
-     *         Furthermore, its {@link ArchiveEntry#getType()} method must
-     *         return the {@code type} parameter.
+     *         - with the exception of the common entry name and type.
      *         This parameter is typically used for copy operations.
-     * @return A new archive entry.
+     * @return A new common entry.
      * @throws CharConversionException if {@code name} contains characters
-     *         which are not valid in the archive file.
+     *         which are invalid.
      */
-    AE newEntry(String name, Type type, CommonEntry template)
+    CE newEntry(String name, Type type, CommonEntry template)
     throws CharConversionException;
 }

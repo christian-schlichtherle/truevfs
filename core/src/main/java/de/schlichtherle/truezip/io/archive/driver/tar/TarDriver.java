@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutput;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +94,7 @@ extends AbstractArchiveDriver<TarEntry, TarInput, CommonOutputSocketService<TarE
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
-                entry.setTime(template.getTime());
+                entry.setModTime(template.getTime(Access.WRITE));
                 entry.setSize(template.getSize());
             }
         } else {

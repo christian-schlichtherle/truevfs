@@ -18,8 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
@@ -53,20 +52,20 @@ import javax.swing.Icon;
  * </ul>
  *
  * @param <AE> The type of the archive entries.
- * @param <AI> The type of the archive input.
- * @param <AO> The type of the archive output.
+ * @param <CISS> The type of the common input socket service.
+ * @param <COSS> The type of the common output socket service.
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveDriver<
         AE extends ArchiveEntry,
-        AI extends CommonInputSocketService<AE>,
-        AO extends CommonOutputSocketService<AE>>
-extends ArchiveEntryFactory<AE> {
+        CISS extends CommonInputSocketService<AE>,
+        COSS extends CommonOutputSocketService<AE>>
+extends CommonEntryFactory<AE> {
 
     /**
-     * Creates a new archive input for the given {@code archive} in order to
-     * read the given read only file.
+     * Creates a new common input socket service for the given {@code archive}
+     * in order to read the given read only file.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link ArchiveController} is processing
@@ -77,7 +76,7 @@ extends ArchiveEntryFactory<AE> {
      *         Hint: If you'ld prefer to have an {@link InputStream},
      *         you could decorate this parameter with a
      *         {@link ReadOnlyFileInputStream}.
-     * @return A non-{@code null} reference to a new input archive object.
+     * @return A non-{@code null} reference to a new common input socket service.
      * @throws TransientIOException If calling this method for the same
      *         archive file again could possibly succeed.
      *         This exception is associated with another {@link IOException}
@@ -91,11 +90,11 @@ extends ArchiveEntryFactory<AE> {
      *         the client application to recognize the archive file as a
      *         <i>regular</i> file.
      */
-    AI newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    CISS newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
-     * Creates a new archive output for {@code archive}
+     * Creates a new common output socket service for teh given {@code archive}
      * from the given output stream.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
@@ -121,7 +120,7 @@ extends ArchiveEntryFactory<AE> {
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
      */
-    AO newOutput(ArchiveDescriptor archive, OutputStream out, AI source)
+    COSS newOutput(ArchiveDescriptor archive, OutputStream out, CISS source)
     throws IOException;
 
     /**

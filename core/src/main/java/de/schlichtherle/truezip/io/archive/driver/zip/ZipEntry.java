@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 
 import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
@@ -31,8 +31,8 @@ import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.F
  * @version $Id$
  */
 public class ZipEntry
-        extends de.schlichtherle.truezip.io.zip.ZipEntry
-        implements ArchiveEntry {
+extends de.schlichtherle.truezip.io.zip.ZipEntry
+implements ArchiveEntry {
 
     static {
         assert de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN
@@ -60,5 +60,19 @@ public class ZipEntry
     @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.ZIP;
+    }
+
+    @Override
+    public long getTime(Access type) {
+        if (Access.WRITE != type)
+            return ArchiveEntry.UNKNOWN;
+        long time = super.getTime();
+        return 0 <= time ? time : ArchiveEntry.UNKNOWN;
+    }
+
+    @Override
+    public void setTime(Access type, long value) {
+        if (Access.WRITE == type)
+            super.setTime(value);
     }
 }

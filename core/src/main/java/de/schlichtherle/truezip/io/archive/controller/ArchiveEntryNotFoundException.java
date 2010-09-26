@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -27,7 +28,7 @@ import java.net.URI;
  * May be thrown by {@link ArchiveController#getInputSocket} or
  * {@link ArchiveController#getOutputSocket}.
  */
-public final class ArchiveEntryNotFoundException extends FileNotFoundException {
+public class ArchiveEntryNotFoundException extends FileNotFoundException {
 
     private static final long serialVersionUID = 2972350932856838564L;
 
@@ -42,6 +43,18 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(msg);
         assert path != null;
         assert msg != null;
+        this.mountPoint = archive.getMountPoint();
+        this.path = path;
+    }
+
+    ArchiveEntryNotFoundException(
+            final ArchiveDescriptor archive,
+            final String path,
+            final IOException cause) {
+        super(cause == null ? null : cause.toString());
+        assert path != null;
+        assert cause != null;
+        super.initCause(cause);
         this.mountPoint = archive.getMountPoint();
         this.path = path;
     }

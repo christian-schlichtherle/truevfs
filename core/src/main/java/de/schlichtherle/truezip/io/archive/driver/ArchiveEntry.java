@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.entry;
+package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
 
@@ -67,11 +67,12 @@ public interface ArchiveEntry extends CommonEntry {
     /**
      * Sets the last modification time of this archive entry.
      *
-     * @param  time the last modification time of this archive entry in
-     *         milliseconds since the epoch or
+     * @param  type the access type.
+     * @param  value the last time of the given access type for this archive
+     *         entry in milliseconds since the epoch or
      *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
      *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
      */
-    void setTime(long time);
+    void setTime(Access type, long value);
 }

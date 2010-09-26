@@ -19,9 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
 import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntryFactory;
+import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -184,7 +183,7 @@ implements ArchiveDriver<AE, AI, AO>, Serializable {
      * <p>
      * First, {@link #ensureEncodable(String) ensureEncodable(path)} is called.
      *
-     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
+     * @see    CommonEntryFactory#newEntry Common Requirements For Path Names
      * @param  path a non-{@code null} <i>path name</i>.
      * @param  type a non-{@code null} entry type.
      * @return A non-{@code null} <i>entry name</i>.
@@ -208,9 +207,9 @@ implements ArchiveDriver<AE, AI, AO>, Serializable {
      * Ensures that the given path name can be encoded by this driver's
      * character set.
      * Should be called by sub classes in their implementation of the method
-     * {@link ArchiveEntryFactory#newEntry}.
+     * {@link CommonEntryFactory#newEntry}.
      * 
-     * @see    ArchiveEntryFactory#newEntry Common Requirements For Path Names
+     * @see    CommonEntryFactory#newEntry Common Requirements For Path Names
      * @param  path a non-{@code null} path name.
      * @see    #getCharset
      * @throws CharConversionException If the path name contains characters
