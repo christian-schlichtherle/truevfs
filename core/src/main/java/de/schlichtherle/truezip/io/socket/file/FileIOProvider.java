@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket.file;
 
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
@@ -30,8 +32,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class FileIOProvider
-implements  CommonInputProvider<FileEntry>,
-            CommonOutputProvider<FileEntry> {
+implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
 
     private static final FileIOProvider singleton
             = new FileIOProvider();
@@ -55,7 +56,12 @@ implements  CommonInputProvider<FileEntry>,
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return new FileInputStream(target.getFile());
+                return new FileInputStream(target);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return new SimpleReadOnlyFile(target);
             }
         }
         return new Input();
@@ -73,7 +79,7 @@ implements  CommonInputProvider<FileEntry>,
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                return new FileOutputStream(target.getFile());
+                return new FileOutputStream(target);
             }
         }
         return new Output();
