@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.ByteArrayInputStream;
@@ -183,7 +183,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonInputSocketService newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+        public CommonInputShop newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
@@ -196,7 +196,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonOutputSocketService newOutput(ArchiveDescriptor archive, OutputStream out, CommonInputSocketService source)
+        public CommonOutputShop newOutput(ArchiveDescriptor archive, OutputStream out, CommonInputShop source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");

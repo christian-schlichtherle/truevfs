@@ -17,8 +17,8 @@
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInput;
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipInput;
+import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputShop;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 
@@ -91,8 +91,8 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * {@inheritDoc}
      * <p>
      * If the net file length of the archive is larger than the authentication
-     * trigger, then a {@link CheckedZipInput} for CRC-32
-     * authentication is returned, otherwise a plain {@link ZipInput}
+     * trigger, then a {@link CheckedZipInputShop} for CRC-32
+     * authentication is returned, otherwise a plain {@link ZipInputShop}
      * which doesn't do any authentication.
      * <p>
      * This complements the behaviour of the
@@ -105,7 +105,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInput newZipInput(
+    protected ZipInputShop newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -116,7 +116,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
         // Hence, checking the CRC-32 value of the plain text ZIP file is
         // redundant.
         return rof.length() > getAuthenticationTrigger()
-                ? new CheckedZipInput(
+                ? new CheckedZipInputShop(
                     rof, getCharset(), getPreambled(), getPostambled(), this)
                 : super.newZipInput(archive, rof);
     }

@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryStreamClosedException;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
 
 /**
  * Indicates that an archive file has been successfully updated, but some

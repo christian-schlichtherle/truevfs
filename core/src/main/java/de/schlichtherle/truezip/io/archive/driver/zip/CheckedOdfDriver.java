@@ -40,7 +40,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * 
  * @author Christian Schlichtherle
  * @version $Id$
- * @see CheckedZipInput
+ * @see CheckedZipInputShop
  */
 public class CheckedOdfDriver extends OdfDriver {
     private static final long serialVersionUID = -6546216832168462491L;
@@ -70,11 +70,11 @@ public class CheckedOdfDriver extends OdfDriver {
     }
 
     @Override
-    protected ZipInput newZipInput(
+    protected ZipInputShop newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInput(
+        return new CheckedZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
     }
 }

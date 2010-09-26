@@ -71,10 +71,10 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
     }
 
     @Override
-    protected ZipOutput newZipOutput(
+    protected ZipOutputShop newZipOutput(
             ArchiveDescriptor archive,
             OutputStream out,
-            ZipInput source)
+            ZipInputShop source)
     throws IOException {
         throw new FileNotFoundException(
                 "driver class does not support creating or modifying SFX archives");

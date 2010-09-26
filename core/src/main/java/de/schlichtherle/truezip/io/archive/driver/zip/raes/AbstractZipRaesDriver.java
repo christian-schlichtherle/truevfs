@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
@@ -25,12 +25,12 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipInput;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -103,7 +103,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public ZipInput newInput(
+    public ZipInputShop newInput(
             final ArchiveDescriptor archive,
             final ReadOnlyFile rof)
     throws IOException {
@@ -157,10 +157,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *        the destination.
      */
     @Override
-    public CommonOutputSocketService newOutput(
+    public CommonOutputShop newOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
-            final ZipInput source)
+            final ZipInputShop source)
     throws IOException {
         final RaesOutputStream ros;
         try {

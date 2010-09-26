@@ -127,17 +127,17 @@ public class TarBZip2Driver extends TarDriver {
         if (in.read() != 'B' || in.read() != 'Z')
             throw new IOException("Not a BZIP2 compressed input stream!");
         final byte[] magic = new byte[2];
-        final InputStream vin = TarInput.readAhead(in, magic);
+        final InputStream vin = TarInputShop.readAhead(in, magic);
         if (magic[0] != 'h' || magic[1] < '1' || '9' < magic[1])
             throw new IOException("Not a BZIP2 compressed input stream!");
         return new CBZip2InputStream(new BufferedInputStream(vin, BUFSIZE));
     }
 
     @Override
-    protected TarOutput newTarOutput(
+    protected TarOutputShop newTarOutput(
             final ArchiveDescriptor archive,
             final OutputStream out,
-            final TarInput source)
+            final TarInputShop source)
     throws IOException {
         // Produce the first two magic bytes. This is required for the
         // CBZip2OutputStream class.

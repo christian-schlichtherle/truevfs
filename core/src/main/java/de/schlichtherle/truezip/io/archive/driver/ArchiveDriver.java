@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocketService;
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
@@ -52,19 +52,19 @@ import javax.swing.Icon;
  * </ul>
  *
  * @param <AE> The type of the archive entries.
- * @param <CISS> The type of the common input socket service.
- * @param <COSS> The type of the common output socket service.
+ * @param <CIS> The type of the common input shop.
+ * @param <COS> The type of the common output shop.
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveDriver<
         AE extends ArchiveEntry,
-        CISS extends CommonInputSocketService<AE>,
-        COSS extends CommonOutputSocketService<AE>>
+        CIS extends CommonInputShop<AE>,
+        COS extends CommonOutputShop<AE>>
 extends CommonEntryFactory<AE> {
 
     /**
-     * Creates a new common input socket service for the given {@code archive}
+     * Creates a new common input shop for the given {@code archive}
      * in order to read the given read only file.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
@@ -76,7 +76,7 @@ extends CommonEntryFactory<AE> {
      *         Hint: If you'ld prefer to have an {@link InputStream},
      *         you could decorate this parameter with a
      *         {@link ReadOnlyFileInputStream}.
-     * @return A non-{@code null} reference to a new common input socket service.
+     * @return A non-{@code null} reference to a new common input shop.
      * @throws TransientIOException If calling this method for the same
      *         archive file again could possibly succeed.
      *         This exception is associated with another {@link IOException}
@@ -90,11 +90,11 @@ extends CommonEntryFactory<AE> {
      *         the client application to recognize the archive file as a
      *         <i>regular</i> file.
      */
-    CISS newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
+    CIS newInput(ArchiveDescriptor archive, ReadOnlyFile rof)
     throws IOException;
 
     /**
-     * Creates a new common output socket service for teh given {@code archive}
+     * Creates a new common output shop for the given {@code archive}
      * from the given output stream.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
@@ -102,7 +102,7 @@ extends CommonEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  out the {@link OutputStream} to write the archive entries to
      *         - {@code null} is not permitted.
-     * @param  source the nullable {@link CommonInputSocketService} if
+     * @param  source the nullable {@link CommonInputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
      *         of this driver's {@link #newInput} method.
@@ -120,7 +120,7 @@ extends CommonEntryFactory<AE> {
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
      */
-    COSS newOutput(ArchiveDescriptor archive, OutputStream out, CISS source)
+    COS newOutput(ArchiveDescriptor archive, OutputStream out, CIS source)
     throws IOException;
 
     /**

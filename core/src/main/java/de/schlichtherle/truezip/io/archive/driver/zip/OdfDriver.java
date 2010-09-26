@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocketService;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -43,7 +43,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * <p>
  * Instances of this class are immutable.
  *
- * @see OdfOutput
+ * @see OdfOutputShop
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -75,11 +75,11 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public CommonOutputSocketService<ZipEntry> newOutput(
+    public CommonOutputShop<ZipEntry> newOutput(
             ArchiveDescriptor archive,
             OutputStream out,
-            ZipInput source)
+            ZipInputShop source)
     throws IOException {
-        return new OdfOutput(newZipOutput(archive, out, source));
+        return new OdfOutputShop(newZipOutput(archive, out, source));
     }
 }

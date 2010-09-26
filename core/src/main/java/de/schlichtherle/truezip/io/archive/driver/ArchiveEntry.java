@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 
 /**
  * Represents an entry in an archive file.
@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.common.entry.CommonEntry;
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value
- * {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}
+ * {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}
  * or {@code null} respectively.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
@@ -58,9 +58,9 @@ public interface ArchiveEntry extends CommonEntry {
      * Sets the (uncompressed) size of this archive entry in bytes.
      *
      * @param  size the (uncompressed) size of this archive entry in bytes or
-     *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code size} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      */
     void setSize(long size);
 
@@ -70,9 +70,9 @@ public interface ArchiveEntry extends CommonEntry {
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
-     *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.common.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      */
     void setTime(Access type, long value);
 }

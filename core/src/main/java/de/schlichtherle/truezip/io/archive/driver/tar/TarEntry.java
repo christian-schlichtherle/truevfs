@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.common.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 
 /**
  * An entry in a TAR archive which implements the {@code ArchiveEntry}

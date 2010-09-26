@@ -41,7 +41,7 @@ import static java.util.zip.Deflater.BEST_COMPRESSION;
  * @author Christian Schlichtherle
  * @version $Id$
  * @see ReadWriteSfxDriver
- * @see CheckedZipInput
+ * @see CheckedZipInputShop
  */
 public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     private static final long serialVersionUID = -940108057195872802L;
@@ -79,11 +79,11 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     }
     
     @Override
-    protected ZipInput newZipInput(
+    protected ZipInputShop newZipInput(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new CheckedZipInput(
+        return new CheckedZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
     }
 }

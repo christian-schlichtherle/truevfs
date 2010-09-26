@@ -21,10 +21,10 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOpti
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.common.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.common.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.common.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.common.file.FileIOSocketProvider;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.Streams;
@@ -504,7 +504,7 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final CommonInputSocket<?> input = FileIOSocketProvider
+            final CommonInputSocket<?> input = FileIOProvider
                     .get()
                     .getInputSocket(new FileEntry(src));
             final OutputStream out = dstController
