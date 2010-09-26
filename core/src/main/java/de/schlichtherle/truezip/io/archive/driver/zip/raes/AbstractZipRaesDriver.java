@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
@@ -24,7 +25,6 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
@@ -103,7 +103,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public ZipInputShop newInput(
+    public ZipInputShop newInputShop(
             final ArchiveDescriptor archive,
             final ReadOnlyFile rof)
     throws IOException {
@@ -120,7 +120,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             // ordinary file which may be read, written or deleted.
             rrof.authenticate();
         }
-        return super.newInput(archive, rrof);
+        return super.newInputShop(archive, rrof);
     }
 
     /**
@@ -157,10 +157,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *        the destination.
      */
     @Override
-    public CommonOutputShop newOutput(
+    public CommonOutputShop newOutputShop(
             final ArchiveDescriptor archive,
             final OutputStream out,
-            final ZipInputShop source)
+            final CommonInputShop<ZipEntry> source)
     throws IOException {
         final RaesOutputStream ros;
         try {
@@ -168,7 +168,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
         } catch (RaesKeyException failure) {
             throw new TransientIOException(failure);
         }
-        return super.newOutput(archive, ros, source);
+        return super.newOutputShop(archive, ros, source);
     }
 
     /**

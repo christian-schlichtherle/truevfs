@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +40,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class TarDriver
-extends AbstractArchiveDriver<TarEntry, TarInputShop, CommonOutputShop<TarEntry>> {
+extends AbstractArchiveDriver<TarEntry> {
 
     private static final long serialVersionUID = 6622746562629104174L;
 
@@ -120,7 +120,7 @@ extends AbstractArchiveDriver<TarEntry, TarInputShop, CommonOutputShop<TarEntry>
      * {@link #newTarInput(ArchiveDescriptor, InputStream)}.
      */
     @Override
-    public TarInputShop newInput(
+    public TarInputShop newInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -141,7 +141,7 @@ extends AbstractArchiveDriver<TarEntry, TarInputShop, CommonOutputShop<TarEntry>
      * <p>
      * Note that the returned stream should support marking for best
      * performance and will <em>always</em> be closed early by
-     * {@link #newInput(ArchiveDescriptor, ReadOnlyFile)}.
+     * {@link #newInputShop(ArchiveDescriptor, ReadOnlyFile)}.
      */
     protected InputStream newInputStream(
             ArchiveDescriptor archive,
@@ -170,10 +170,10 @@ extends AbstractArchiveDriver<TarEntry, TarInputShop, CommonOutputShop<TarEntry>
      * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputShop<TarEntry> newOutput(
+    public CommonOutputShop<TarEntry> newOutputShop(
             ArchiveDescriptor archive,
             OutputStream out,
-            TarInputShop source)
+            CommonInputShop<TarEntry> source)
     throws IOException {
         return new MultiplexedArchiveOutputShop<TarEntry>(newTarOutput(
                 archive, out, (TarInputShop) source));
