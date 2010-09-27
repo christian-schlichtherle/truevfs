@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -205,7 +205,7 @@ public interface ArchiveController extends ArchiveDescriptor {
 
     boolean isWritable(String path) throws FalsePositiveException;
 
-    ArchiveFileSystemEntry getEntry(String path) throws FalsePositiveException;
+    Entry<?> getEntry(String path) throws FalsePositiveException;
 
     void setTime(String path, BitField<Access> types, long value)
     throws IOException;

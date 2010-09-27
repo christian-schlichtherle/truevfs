@@ -42,7 +42,7 @@ public interface ArchiveFileSystem<AE extends ArchiveEntry>
 extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
 
     /** An archive file system entry which refers to an archive entry. */
-    public interface Entry<AE extends ArchiveEntry>
+    interface Entry<AE extends ArchiveEntry>
     extends ArchiveFileSystemEntry, IOReference<AE> {
     }
 

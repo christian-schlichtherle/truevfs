@@ -72,9 +72,9 @@ public class ArchiveControllers {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private static final Comparator<ArchiveContext> REVERSE_CONTEXTS
-            = new Comparator<ArchiveContext>() {
-        public int compare(ArchiveContext l, ArchiveContext r) {
+    private static final Comparator<ArchiveModel> REVERSE_MODELS
+            = new Comparator<ArchiveModel>() {
+        public int compare(ArchiveModel l, ArchiveModel r) {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
@@ -86,8 +86,7 @@ public class ArchiveControllers {
      * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Object> contexts
-            = new WeakHashMap<URI, Object>();
+    private static final Map<URI, Object> models = new WeakHashMap<URI, Object>();
 
     private ArchiveControllers() {
     }
@@ -98,12 +97,12 @@ public class ArchiveControllers {
         // VALUE in the map meanwhile, but not yet removed from the map,
         // are counted as well.
         // But hey, this is only statistics, right?
-        return contexts.size();
+        return models.size();
     }
 
     public static ArchiveController getController(URI mountPoint) {
-        ArchiveContext context = getContext(mountPoint, null, null);
-        return null == context ? null : context.getController();
+        ArchiveModel model = getModel(mountPoint, null, null);
+        return null == model ? null : model.getController();
     }
 
     /**
@@ -123,10 +122,10 @@ public class ArchiveControllers {
      */
     public static ArchiveController getController(
             URI mountPoint, URI enclMountPoint, ArchiveDriver driver) {
-        return getContext(mountPoint, enclMountPoint, driver).getController();
+        return getModel(mountPoint, enclMountPoint, driver).getController();
     }
 
-    static ArchiveContext getContext(
+    static ArchiveModel getModel(
             URI mountPoint,
             final URI enclMountPoint,
             final ArchiveDriver driver) {
@@ -135,19 +134,19 @@ public class ArchiveControllers {
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        synchronized (contexts) {
-            final Object value = contexts.get(mountPoint);
+        synchronized (models) {
+            final Object value = models.get(mountPoint);
             if (value instanceof Reference) {
-                final ArchiveContext context
-                        = (ArchiveContext) ((Reference) value).get();
+                final ArchiveModel model
+                        = (ArchiveModel) ((Reference) value).get();
                 // Check that the controller hasn't been garbage collected
                 // meanwhile!
-                if (context != null) {
+                if (model != null) {
                     // If required, reconfiguration of the ArchiveController
                     // must be deferred until we have released the lock on
                     // controllers in order to prevent dead locks.
                     //reconfigure = driver != null && driver != controller.getDriver();
-                    return context;
+                    return model;
                 }
                 // Fall through!
             } else if (value != null) {
@@ -164,7 +163,7 @@ public class ArchiveControllers {
                 //     archive file as either the file itself or one of its
                 //     ancestors is created with a different
                 //     ArchiveDetector.
-                return (ArchiveContext) value;
+                return (ArchiveModel) value;
             }
             if (driver == null) // pure lookup operation?
                 return null;
@@ -175,8 +174,8 @@ public class ArchiveControllers {
         }
     }
 
-    static ArchiveContext getContext(URI mountPoint) {
-        return getContext(mountPoint, null, null);
+    static ArchiveModel getModel(URI mountPoint) {
+        return getModel(mountPoint, null, null);
     }
 
     /**
@@ -195,8 +194,8 @@ public class ArchiveControllers {
         assert controller instanceof ArchiveController
             || ((WeakReference) controller).get() instanceof ArchiveController;
 
-        synchronized (contexts) {
-            contexts.put(mountPoint, controller);
+        synchronized (models) {
+            models.put(mountPoint, controller);
         }
     }
 
@@ -257,8 +256,8 @@ public class ArchiveControllers {
                 // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                for (final ArchiveContext c
-                        : getContexts(prefix, REVERSE_CONTEXTS)) {
+                for (final ArchiveModel c
+                        : getModels(prefix, REVERSE_MODELS)) {
                         try {
                             c.writeLock().lock();
                             try {
@@ -294,21 +293,21 @@ public class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<ArchiveContext> getContexts() {
-        return getContexts(null, null);
+    static Iterable<ArchiveModel> getModels() {
+        return getModels(null, null);
     }
 
-    static Iterable<ArchiveContext> getContexts(
+    static Iterable<ArchiveModel> getModels(
             URI prefix,
             final Comparator c) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
-        final Set<ArchiveContext> snapshot;
-        synchronized (contexts) {
+        final Set<ArchiveModel> snapshot;
+        synchronized (models) {
             snapshot = c != null
                     ? new TreeSet(c)
-                    : new HashSet((int) (contexts.size() / 0.75f));
-            for (Object value : contexts.values()) {
+                    : new HashSet((int) (models.size() / 0.75f));
+            for (Object value : models.values()) {
                 if (value instanceof Reference) {
                     value = ((Reference) value).get(); // dereference
                     if (value == null) {
@@ -321,9 +320,9 @@ public class ArchiveControllers {
                     }
                 }
                 assert value != null;
-                final ArchiveContext context = (ArchiveContext) value;
-                if (context.getMountPoint().toString().startsWith(prefix.toString()))
-                    snapshot.add(context);
+                final ArchiveModel model = (ArchiveModel) value;
+                if (model.getMountPoint().toString().startsWith(prefix.toString()))
+                    snapshot.add(model);
             }
         }
         return snapshot;

@@ -15,24 +15,27 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.File;
+import java.io.IOException;
 
 /**
- * Describes the controller context of an archive file.
+ * Defines the common object for accessing and updating an archive file.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveContext extends ArchiveDescriptor {
+interface ArchiveModel extends ArchiveDescriptor {
 
     /**
-     * Returns the context for the enclosing archive file of this
-     * context's target archive file or {@code null} if it's not enclosed in
+     * Returns the model for the enclosing archive file of this
+     * model's target archive file or {@code null} if it's not enclosed in
      * another archive file.
      */
-    ArchiveContext getEnclContext();
+    ArchiveModel getEnclModel();
 
     /**
      * Resolves the given relative {@code path} against the relative path of
@@ -58,4 +61,16 @@ interface ArchiveContext extends ArchiveDescriptor {
     void setTouched(boolean touched);
 
     File getTarget();
+
+    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
+    ArchiveFileSystem<?> autoMount(boolean autoCreate) throws IOException;
+
+    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
+    <O extends IOOperation> O runWriteLocked(O operation) throws IOException;
+
+    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
+    boolean hasNewData(String path);
+
+    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
+    void autoSync(final String path) throws ArchiveSyncException;
 }
