@@ -43,9 +43,9 @@ implements CommonInputShop<CE> {
     }
 
     @Override
-    public CommonInputSocket<CE> getInputSocket(CE entry)
+    public CommonInputSocket<CE> newInputSocket(CE entry)
     throws IOException {
-        return target.getInputSocket(entry);
+        return target.newInputSocket(entry);
     }
 
     @Override

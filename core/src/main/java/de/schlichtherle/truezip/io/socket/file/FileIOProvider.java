@@ -34,8 +34,7 @@ import java.io.OutputStream;
 public class FileIOProvider
 implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
 
-    private static final FileIOProvider singleton
-            = new FileIOProvider();
+    private static final FileIOProvider singleton = new FileIOProvider();
 
     public static FileIOProvider get() {
         return singleton;
@@ -45,7 +44,7 @@ implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
     }
 
     @Override
-    public CommonInputSocket<FileEntry> getInputSocket(final FileEntry target)
+    public CommonInputSocket<FileEntry> newInputSocket(final FileEntry target)
     throws IOException {
         class Input extends CommonInputSocket<FileEntry> {
             @Override
@@ -68,7 +67,7 @@ implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
     }
 
     @Override
-    public CommonOutputSocket<FileEntry> getOutputSocket(final FileEntry target)
+    public CommonOutputSocket<FileEntry> newOutputSocket(final FileEntry target)
     throws IOException {
         class Output extends CommonOutputSocket<FileEntry> {
             @Override

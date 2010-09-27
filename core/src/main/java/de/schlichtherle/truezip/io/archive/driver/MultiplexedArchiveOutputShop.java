@@ -16,14 +16,16 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.socket.output.FilterOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -131,35 +133,31 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     }
 
     @Override
-    public CommonOutputSocket<AE> getOutputSocket(final AE entry)
+    public CommonOutputSocket<AE> newOutputSocket(final AE entry)
     throws IOException {
-        final CommonOutputSocket<AE> output = super.getOutputSocket(entry);
-        class OutputSocket extends CommonOutputSocket<AE> {
-            @Override
-            public AE getTarget() {
-                return entry;
+        class OutputSocket extends FilterOutputSocket<AE> {
+            OutputSocket() throws IOException {
+                super(MultiplexedArchiveOutputShop.super.newOutputSocket(entry));
             }
 
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                return newOutputStream(output.chain(this));
+                final CommonEntry peer = getPeerTarget();
+                if (peer != null) {
+                    final AE local = getTarget();
+                    local.setSize(peer.getSize()); // data may be compressed!
+                }
+                return isTargetBusy()
+                        ? new TempEntryOutputStream(
+                            createTempFile(
+                                TEMP_FILE_PREFIX),
+                                target.chain(this),
+                                peer)
+                        : new EntryOutputStream(super.newOutputStream());
             }
         }
         return new OutputSocket();
-    }
-
-    protected OutputStream newOutputStream(final CommonOutputSocket<AE> output)
-    throws IOException {
-        final CommonEntry peer = output.getPeerTarget();
-        if (peer != null) {
-            final AE local = output.getTarget();
-            local.setSize(peer.getSize()); // data may be compressed!
-        }
-        return isTargetBusy()
-                ? new TempEntryOutputStream(
-                    createTempFile(TEMP_FILE_PREFIX), output, peer)
-                : new EntryOutputStream(output.newOutputStream());
     }
 
     /**
@@ -215,19 +213,18 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     extends FileOutputStream
     implements IOReference<AE> {
         private final File temp;
-        private final OutputSocket<? extends AE, CommonEntry> output;
-        private final InputSocket<CommonEntry, CommonEntry> input;
+        private final CommonOutputSocket<? extends AE> output;
+        private final CommonInputSocket<CommonEntry> input;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final File temp,
-                final OutputSocket<? extends AE, CommonEntry> output,
+                final CommonOutputSocket<? extends AE> output,
                 final CommonEntry peer)
         throws IOException {
             super(temp);
-            class TempInputSocket
-            extends InputSocket<CommonEntry, CommonEntry> {
+            class TempInputSocket extends CommonInputSocket<CommonEntry> {
                 private final CommonEntry target
                         = null != peer ? peer : new FileEntry(temp);
 
@@ -237,9 +234,13 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
                 }
 
                 @Override
-                public InputStream newInputStream()
-                throws IOException {
+                public InputStream newInputStream() throws IOException {
                     return new FileInputStream(temp);
+                }
+
+                @Override
+                public ReadOnlyFile newReadOnlyFile() throws IOException {
+                    return new SimpleReadOnlyFile(temp);
                 }
             }
             this.temp = temp;

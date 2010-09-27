@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.rof;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -28,7 +28,7 @@ import java.io.RandomAccessFile;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ReadOnlyFile {
+public interface ReadOnlyFile extends Closeable {
 
     /**
      * Returns the length of the file in bytes.
@@ -104,5 +104,6 @@ public interface ReadOnlyFile {
      * Closes this read-only file and releases any non-heap resources
      * allocated for it.
      */
+    @Override
     void close() throws IOException;
 }

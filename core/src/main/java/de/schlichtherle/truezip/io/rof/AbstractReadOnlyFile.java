@@ -22,8 +22,6 @@ import java.io.IOException;
 /**
  * A base class for {@code ReadOnlyFile} implementations which
  * implements the common boilerplate.
- * <p>
- * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -41,11 +39,11 @@ public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
     public void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
         int total = 0;
-	do {
-	    final int read = read(buf, off + total, len - total);
-	    if (read < 0)
-		throw new EOFException();
-	    total += read;
-	} while (total < len);
+        do {
+            final int read = read(buf, off + total, len - total);
+            if (read < 0)
+                throw new EOFException();
+            total += read;
+        } while (total < len);
     }
 }

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -467,10 +468,10 @@ implements  ArchiveController,
     private CommonInputSocket<? extends ArchiveEntry> getInputSocket0(
             final String path)
     throws IOException {
-        class Input extends CommonInputSocket<AE> {
-            private IOReference<AE> link = this;
+        class InputSocket extends CommonInputSocket<AE> {
+            IOReference<AE> link = this;
 
-            private AE load() throws IOException {
+            AE getEntry() throws IOException {
                 if (hasNewData(path)) {
                     link = this;
                     class AutoSync implements IOOperation {
@@ -491,6 +492,21 @@ implements  ArchiveController,
                 return IOReferences.deref(link);
             }
 
+            CommonInputSocket<AE> getInputSocket() throws IOException {
+                final AE entry = getEntry();
+                if (null != entry && DIRECTORY == entry.getType())
+                    throw new ArchiveEntryNotFoundException(
+                            BasicArchiveController.this, path,
+                            "cannot read directories");
+                final CommonInputSocket<AE> input;
+                if (null == entry ||
+                        null == (input = BasicArchiveController.this.newInputSocket(entry)))
+                    throw new ArchiveEntryNotFoundException(
+                            BasicArchiveController.this, path,
+                            "no such file or directory");
+                return input.chain(this);
+            }
+
             @Override
             protected void beforeConnectComplete() {
                 link = this; // reset local target reference
@@ -506,7 +522,7 @@ implements  ArchiveController,
                 readLock().lock();
                 try {
                     try {
-                        return load();
+                        return getEntry();
                     } catch (IOException resolveToNull) {
                         return null; // FIXME: interface contract violation
                     }
@@ -520,18 +536,17 @@ implements  ArchiveController,
             throws IOException {
                 readLock().lock();
                 try {
-                    final AE entry = load();
-                    if (null != entry && DIRECTORY == entry.getType())
-                        throw new ArchiveEntryNotFoundException(
-                                BasicArchiveController.this, path,
-                                "cannot read directories");
-                    final CommonInputSocket<AE> input;
-                    if (null == entry ||
-                            null == (input = getInputSocket(entry)))
-                        throw new ArchiveEntryNotFoundException(
-                                BasicArchiveController.this, path,
-                                "no such file or directory");
-                    return input.chain(this).newInputStream();
+                    return getInputSocket().newInputStream();
+                } finally {
+                    readLock().unlock();
+                }
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                readLock().lock();
+                try {
+                    return getInputSocket().newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
@@ -557,12 +572,22 @@ implements  ArchiveController,
                         "cannot read directories");
             } else {
                 autoMount(); // detect false positives!
-                return new Input();
+                return new InputSocket();
             }
         } finally {
             readLock().unlock();
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * As an amendment to its interface contract, this method returns
+     * {@code null} if no archive input is present.
+     */
+    @Override
+    public abstract CommonInputSocket<AE> newInputSocket(AE target)
+    throws IOException;
 
     @Override
     public CommonOutputSocket<? extends ArchiveEntry> getOutputSocket(
@@ -583,10 +608,10 @@ implements  ArchiveController,
             final String path,
             final BitField<IOOption> options)
     throws IOException {
-        class Output extends CommonOutputSocket<AE> {
-            private EntryOperation<AE> link;
+        class OutputSocket extends CommonOutputSocket<AE> {
+            EntryOperation<AE> link;
 
-            private AE load() throws IOException {
+            AE getEntry() throws IOException {
                 if (hasNewData(path)) {
                     link = null;
                     autoSync(path);
@@ -620,12 +645,14 @@ implements  ArchiveController,
 
             @Override
             public AE getTarget() {
+                if (options.get(APPEND))
+                    return null;
                 class GetTarget implements IOOperation {
                     AE entry;
 
                     @Override
                     public void run() throws IOException {
-                        entry = load();
+                        entry = getEntry();
                     }
                 }
                 try {
@@ -643,20 +670,15 @@ implements  ArchiveController,
 
                     @Override
                     public void run() throws IOException {
-                        final AE entry = load();
+                        final AE entry = getEntry();
                         final CommonOutputSocket<AE> output
-                                = getOutputSocket(entry);
-                        final boolean append = options.get(APPEND);
-                        final InputStream in = append
-                                ? getInputSocket(entry)
-                                    .connect(null)
-                                    .newInputStream()
+                                = newOutputSocket(entry);
+                        final InputStream in = options.get(APPEND)
+                                ? newInputSocket(entry).newInputStream()
                                 : null;
                         try {
                             out = output
-                                    .chain(append
-                                        ? null
-                                        : Output.this)
+                                    .chain(null != in ? null : OutputSocket.this)
                                     .newOutputStream();
                             try {
                                 link.run();
@@ -676,7 +698,6 @@ implements  ArchiveController,
                             }
                         }
                     }
-
                 }
                 return runWriteLocked(new NewOutputStream()).out;
             }
@@ -702,12 +723,16 @@ implements  ArchiveController,
                         "cannot write directories");
             } else {
                 autoMount(options.get(CREATE_PARENTS)); // detect false positives!
-                return new Output();
+                return new OutputSocket();
             }
         } finally {
             writeLock().unlock();
         }
     }
+
+    @Override
+    public abstract CommonOutputSocket<AE> newOutputSocket(AE target)
+    throws IOException;
 
     @Override
     public final Icon getOpenIcon()
@@ -887,20 +912,17 @@ implements  ArchiveController,
     }
 
     @Override
-    public final boolean setReadOnly(final String path)
-    throws FalsePositiveException {
+    public final void setReadOnly(final String path)
+    throws IOException {
         try {
             setReadOnly0(path);
         } catch (ArchiveEntryFalsePositiveException ex) {
             getEnclArchive().setReadOnly(getEnclPath(path));
-        } catch (IOException ex) {
-            return false;
         }
-        return true;
     }
 
     private void setReadOnly0(final String path)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         writeLock().lock();
         try {
             autoMount().setReadOnly(path);
@@ -910,31 +932,27 @@ implements  ArchiveController,
     }
 
     @Override
-    public final boolean setTime(
+    public final void setTime(
             final String path,
             final BitField<Access> types,
             final long value)
-    throws FalsePositiveException {
+    throws IOException {
         try {
-            return setTime0(path, types, value);
+            setTime0(path, types, value);
         } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclArchive().setTime(getEnclPath(path), types, value);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
+            getEnclArchive().setTime(getEnclPath(path), types, value);
         }
     }
 
-    private boolean setTime0(
+    private void setTime0(
             final String path,
             final BitField<Access> types,
             final long value)
-    throws FalsePositiveException, IOException {
+    throws IOException {
         writeLock().lock();
         try {
             autoSync(path);
-            return autoMount().setTime(path, types, value);
+            autoMount().setTime(path, types, value);
         } finally {
             writeLock().unlock();
         }
@@ -1010,34 +1028,31 @@ implements  ArchiveController,
     }
 
     @Override
-    public final boolean delete(
-            final String path
-            , final BitField<IOOption> options)
-    throws FalsePositiveException {
+    @SuppressWarnings("ThrowableInitCause")
+    public final void unlink(
+            final String path,
+            final BitField<IOOption> options)
+    throws IOException {
         try {
-            delete0(path, options);
-            return true;
+            unlink0(path, options);
         } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            return getEnclArchive().delete(getEnclPath(path), options);
+            getEnclArchive().unlink(getEnclPath(path), options);
         } catch (FileArchiveEntryFalsePositiveException ex) {
-            // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             /** @see ArchiveDriver#newInputShop! */
+            // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
                 final ArchiveFileSystemEntry entry = getEnclArchive().getEntry(getEnclPath(path));
                 if (null == entry || entry.getType() != DIRECTORY
-                    && ex.getCause() instanceof FileNotFoundException)
-                    return false;
+                    && ex.getCause() instanceof FileNotFoundException) {
+                    throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
+                }
             }
-            return getEnclArchive().delete(getEnclPath(path), options);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
+            getEnclArchive().unlink(getEnclPath(path), options);
         }
     }
 
-    private void delete0(final String path, final BitField<IOOption> options)
-    throws FalsePositiveException, IOException {
+    private void unlink0(final String path, final BitField<IOOption> options)
+    throws IOException {
         writeLock().lock();
         try {
             autoSync(path);
@@ -1084,7 +1099,7 @@ implements  ArchiveController,
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    getEnclArchive().delete(getEnclPath(path), options);
+                    getEnclArchive().unlink(getEnclPath(path), options);
                 }
             } else { // !isRoot(path)
                 autoMount().unlink(path);

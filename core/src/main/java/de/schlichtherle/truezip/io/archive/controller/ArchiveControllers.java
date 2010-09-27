@@ -506,7 +506,7 @@ public class ArchiveControllers {
         try {
             final CommonInputSocket<?> input = FileIOProvider
                     .get()
-                    .getInputSocket(new FileEntry(src));
+                    .newInputSocket(new FileEntry(src));
             final OutputStream out = dstController
                     .getOutputSocket(
                         dstPath, BitField.noneOf(IOOption.class).set(PRESERVE, preserve).set(CREATE_PARENTS, createParents))

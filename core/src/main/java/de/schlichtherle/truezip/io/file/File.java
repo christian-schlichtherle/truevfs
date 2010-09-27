@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -65,9 +65,7 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -2362,8 +2360,9 @@ public class File extends java.io.File {
     public boolean setReadOnly() {
         try {
             if (innerArchive != null) {
-                return innerArchive.getArchiveController()
+                innerArchive.getArchiveController()
                         .setReadOnly(getInnerEntryName());
+                return true;
             }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
@@ -2479,13 +2478,17 @@ public class File extends java.io.File {
     @Override
     public boolean setLastModified(final long time) {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
+            if (innerArchive != null) {
+                innerArchive.getArchiveController()
                         .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
+                return true;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
+        } catch (IOException ex) {
+            return false;
         }
         return delegate.setLastModified(time);
     }
@@ -2839,10 +2842,12 @@ public class File extends java.io.File {
     @Override
     public boolean delete() {
         try {
-            if (innerArchive != null)
-                return innerArchive.getArchiveController()
-                        .delete(getInnerEntryName(),
+            if (innerArchive != null) {
+                innerArchive.getArchiveController()
+                        .unlink(getInnerEntryName(),
                             BitField.noneOf(IOOption.class));
+                return true;
+            }
         } catch (FalsePositiveException isNotArchive) {
             assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
                     : "Must be handled by ArchiveController!";
@@ -2853,6 +2858,8 @@ public class File extends java.io.File {
             && !delegate.isDirectory()
             && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
+        } catch (IOException ex) {
+            return false;
         }
         return delegate.delete();
     }

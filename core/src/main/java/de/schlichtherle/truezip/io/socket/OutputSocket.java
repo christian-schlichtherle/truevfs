@@ -63,6 +63,10 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
+    protected final InputSocket<? extends PT, ? super LT> getPeer() {
+        return peer;
+    }
+
     /**
      * Returns the nullable <i>peer target</i> for I/O operations.
      * <p>

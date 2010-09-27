@@ -210,8 +210,7 @@ public interface ArchiveController extends ArchiveDescriptor {
 
     boolean isReadOnly() throws FalsePositiveException;
 
-    boolean setReadOnly(String path)
-    throws FalsePositiveException;
+    void setReadOnly(String path) throws IOException;
 
     boolean isReadable(String path) throws FalsePositiveException;
 
@@ -220,8 +219,8 @@ public interface ArchiveController extends ArchiveDescriptor {
     ArchiveFileSystemEntry getEntry(String path) throws FalsePositiveException;
 
     /** Currently supports no options. */
-    boolean setTime(String path, BitField<Access> types, long value)
-    throws FalsePositiveException;
+    void setTime(String path, BitField<Access> types, long value)
+    throws IOException;
 
     /**
      * Returns an archive input socket for reading the given entry from the
@@ -287,8 +286,8 @@ public interface ArchiveController extends ArchiveDescriptor {
     throws IOException;
 
     /** Currently supports no options. */
-    boolean delete(String path, BitField<IOOption> options)
-    throws FalsePositiveException;
+    void unlink(String path, BitField<IOOption> options)
+    throws IOException;
 
     /**
      * Writes all changes to the contents of the target archive file to the

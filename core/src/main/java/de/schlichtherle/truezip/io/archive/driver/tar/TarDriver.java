@@ -26,6 +26,8 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,9 +124,9 @@ extends AbstractArchiveDriver<TarEntry> {
     @Override
     public TarInputShop newInputShop(
             ArchiveDescriptor archive,
-            ReadOnlyFile rof)
+            CommonInputSocket<?> input)
     throws IOException {
-        final InputStream in = newInputStream(archive, rof);
+        final InputStream in = newInputStream(archive, input.newReadOnlyFile());
         try {
             return newTarInput(archive, in);
         } finally {
@@ -141,7 +143,7 @@ extends AbstractArchiveDriver<TarEntry> {
      * <p>
      * Note that the returned stream should support marking for best
      * performance and will <em>always</em> be closed early by
-     * {@link #newInputShop(ArchiveDescriptor, ReadOnlyFile)}.
+     * {@link #newInputShop(ArchiveDescriptor, CommonInputSocket)}.
      */
     protected InputStream newInputStream(
             ArchiveDescriptor archive,
@@ -151,14 +153,12 @@ extends AbstractArchiveDriver<TarEntry> {
     }
 
     /**
-     * Returns a new {@code TarInputShop} to read the contents from
-     * the given {@code InputStream}.
+     * Returns a new tar input shop to read the contents from the given input
+     * stream.
      * The implementation in this class simply returns
      * {@code new TarInputShop(in)}.
      */
-    protected TarInputShop newTarInput(
-            ArchiveDescriptor archive,
-            InputStream in)
+    protected TarInputShop newTarInput(ArchiveDescriptor archive, InputStream in)
     throws IOException {
         return new TarInputShop(in);
     }
@@ -172,11 +172,17 @@ extends AbstractArchiveDriver<TarEntry> {
     @Override
     public CommonOutputShop<TarEntry> newOutputShop(
             ArchiveDescriptor archive,
-            OutputStream out,
+            CommonOutputSocket<?> output,
             CommonInputShop<TarEntry> source)
     throws IOException {
-        return new MultiplexedArchiveOutputShop<TarEntry>(newTarOutput(
-                archive, out, (TarInputShop) source));
+        final OutputStream out = output.newOutputStream();
+        try {
+            return new MultiplexedArchiveOutputShop<TarEntry>(newTarOutput(
+                    archive, out, (TarInputShop) source));
+        } catch (IOException ex) {
+            out.close();
+            throw ex;
+        }
     }
 
     protected TarOutputShop newTarOutput(

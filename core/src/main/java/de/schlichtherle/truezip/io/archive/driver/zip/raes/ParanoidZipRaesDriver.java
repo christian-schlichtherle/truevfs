@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
@@ -89,15 +90,21 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
     @Override
     public CommonOutputShop newOutputShop(
             final ArchiveDescriptor archive,
-            final OutputStream out,
+            final CommonOutputSocket<?> output,
             final CommonInputShop<ZipEntry> source)
     throws IOException {
-        final RaesOutputStream ros;
+        final OutputStream out = output.newOutputStream();
         try {
-            ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
-        } catch (RaesKeyException failure) {
-            throw new TransientIOException(failure);
+            final RaesOutputStream ros;
+            try {
+                ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
+            } catch (RaesKeyException failure) {
+                throw new TransientIOException(failure);
+            }
+            return newZipOutput(archive, ros, (ZipInputShop) source);
+        } catch (IOException ex) {
+            out.close();
+            throw ex;
         }
-        return newZipOutput(archive, ros, (ZipInputShop) source);
     }
 }

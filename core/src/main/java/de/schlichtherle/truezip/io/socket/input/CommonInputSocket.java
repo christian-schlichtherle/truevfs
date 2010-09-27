@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket.input;
 
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -76,4 +77,19 @@ extends InputSocket<CE, CommonEntry> {
      */
     @Override
     public abstract InputStream newInputStream() throws IOException;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws CommonInputBusyException if the socket's source is currently
+     *         busy with input.
+     *         This exception is guaranteed to be recoverable, meaning it
+     *         should be possible to read the common entry again as soon as
+     *         the socket's source is not busy anymore.
+     * @throws FileNotFoundException if the common entry does not exist or
+     *         is not accessible for some reason.
+     * @throws IOException on any other exceptional condition.
+     */
+    @Override
+    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 }

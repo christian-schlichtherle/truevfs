@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
 import java.util.Collections;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
@@ -41,7 +42,8 @@ import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.FileNotFoundException;
@@ -112,7 +114,7 @@ extends FileSystemArchiveController<AE> {
         }
 
         @Override
-        public CommonInputSocket<CE> getInputSocket(CE target)
+        public CommonInputSocket<CE> newInputSocket(CE target)
         throws IOException {
             if (target == null)
                 throw new NullPointerException();
@@ -540,19 +542,20 @@ extends FileSystemArchiveController<AE> {
 
         logger.log(Level.FINEST, "initInArchive.try", inFile); // NOI18N
         try {
-            ReadOnlyFile rof = new SimpleReadOnlyFile(inFile);
-            try {
-                if (isHostFileSystemEntryTarget())
-                    rof = new CountingReadOnlyFile(rof);
-                input = new Input(getDriver().newInputShop(this, rof));
-            } finally {
-                // An archive driver could throw a NoClassDefFoundError or
-                // similar if the class path is not set up correctly.
-                // We are checking success to make sure that we always delete
-                // the newly created temp file in case of an error.
-                if (input == null)
-                    rof.close();
+            class InputSocket extends FilterInputSocket<FileEntry> {
+                InputSocket() throws IOException {
+                    super(FileIOProvider.get().newInputSocket(new FileEntry(inFile)));
+                }
+
+                @Override
+                public ReadOnlyFile newReadOnlyFile() throws IOException {
+                    final ReadOnlyFile rof = super.newReadOnlyFile();
+                    return isHostFileSystemEntryTarget()
+                            ? new CountingReadOnlyFile(rof)
+                            : rof;
+                }
             }
+            input = new Input(getDriver().newInputShop(this, new InputSocket()));
         } catch (IOException ex) {
             logger.log(Level.FINEST, "initInArchive.catch", ex); // NOI18N
 
@@ -567,25 +570,19 @@ extends FileSystemArchiveController<AE> {
         assert input != null;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * As an amendment to its interface contract, this method returns
-     * {@code null} if no archive input is present.
-     */
     @Override
-    public CommonInputSocket<AE> getInputSocket(final AE target)
+    public CommonInputSocket<AE> newInputSocket(final AE target)
     throws IOException {
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
-        return null == input ? null : input.getInputSocket(target);
+        return null == input ? null : input.newInputSocket(target);
     }
 
     @Override
-    public CommonOutputSocket<AE> getOutputSocket(final AE target)
+    public CommonOutputSocket<AE> newOutputSocket(final AE target)
     throws IOException {
         assert writeLock().isHeldByCurrentThread();
         ensureOutArchive();
-        return output.getOutputSocket(target);
+        return output.newOutputSocket(target);
     }
 
     private void ensureOutArchive()
@@ -629,15 +626,27 @@ extends FileSystemArchiveController<AE> {
 
         logger.log(Level.FINEST, "initOutArchive.try", outFile); // NOI18N
         try {
-            OutputStream out = new java.io.FileOutputStream(outFile);
+            final FileEntry entry = new FileEntry(outFile);
+            final CommonOutputSocket<FileEntry> fileInput
+                    = FileIOProvider.get().newOutputSocket(entry);
+            class OutputSocket extends CommonOutputSocket<FileEntry> {
+                @Override
+                public FileEntry getTarget() {
+                    return entry;
+                }
+
+                @Override
+                public OutputStream newOutputStream() throws IOException {
+                    final OutputStream out = fileInput.newOutputStream();
+                    return outFile == UpdatingArchiveController.this.getTarget()
+                            ? new CountingOutputStream(out)
+                            : out;
+                }
+            }
             try {
-                // If we are actually writing to the target file,
-                // we want to log the byte count.
-                if (outFile == getTarget())
-                    out = new CountingOutputStream(out);
                 try {
                     output = new Output(getDriver().newOutputShop(
-                                this, out, getNullableInputTarget()));
+                                this, new OutputSocket(), getNullableInputTarget()));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -650,7 +659,6 @@ extends FileSystemArchiveController<AE> {
                 // We are checking success to make sure that we always delete
                 // the newly created temp file in case of an error.
                 if (output == null) {
-                    out.close();
                     if (!outFile.delete())
                         throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)");
                 }

@@ -90,7 +90,7 @@ implements CommonOutputShop<TarEntry> {
     }
 
     @Override
-    public CommonOutputSocket<TarEntry> getOutputSocket(final TarEntry entry)
+    public CommonOutputSocket<TarEntry> newOutputSocket(final TarEntry entry)
     throws FileNotFoundException {
         class OutputSocket extends CommonOutputSocket<TarEntry> {
             @Override
@@ -98,34 +98,27 @@ implements CommonOutputShop<TarEntry> {
                 return entry;
             }
 
-            public OutputStream newOutputStream()
-            throws IOException {
-                return TarOutputShop.this.newOutputStream(entry, getPeerTarget());
+            public OutputStream newOutputStream() throws IOException {
+                if (isBusy())
+                    throw new CommonOutputBusyException(entry);
+                if (entry.isDirectory()) {
+                    entry.setSize(0);
+                    return new EntryOutputStream(entry);
+                }
+                final CommonEntry peer = getPeerTarget();
+                if (peer != null) {
+                    entry.setSize(peer.getSize());
+                    return new EntryOutputStream(entry);
+                }
+                // The source entry does not exist or cannot support DDC
+                // to the destination entry.
+                // So we need to buffer the output in a temporary file and write
+                // it upon close().
+                return new TempEntryOutputStream(
+                        createTempFile(TEMP_FILE_PREFIX), entry);
             }
         }
         return new OutputSocket();
-    }
-
-    protected OutputStream newOutputStream(
-            final TarEntry target,
-            final CommonEntry peer)
-    throws IOException {
-        if (isBusy())
-            throw new CommonOutputBusyException(target);
-        if (target.isDirectory()) {
-            target.setSize(0);
-            return new EntryOutputStream(target);
-        }
-        if (peer != null) {
-            target.setSize(peer.getSize());
-            return new EntryOutputStream(target);
-        }
-        // The source entry does not exist or cannot support DDC
-        // to the destination entry.
-        // So we need to buffer the output in a temporary file and write
-        // it upon close().
-        return new TempEntryOutputStream(
-                createTempFile(TEMP_FILE_PREFIX), target);
     }
 
     /**
@@ -141,7 +134,7 @@ implements CommonOutputShop<TarEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #newOutputStream}.
+     * These preconditions are checked by {@link #newOutputSocket(TarEntry)}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;

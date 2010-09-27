@@ -43,9 +43,9 @@ implements CommonOutputShop<CE> {
     }
 
     @Override
-    public CommonOutputSocket<CE> getOutputSocket(CE entry)
+    public CommonOutputSocket<CE> newOutputSocket(CE entry)
     throws IOException {
-        return target.getOutputSocket(entry);
+        return target.newOutputSocket(entry);
     }
 
     @Override

@@ -57,8 +57,8 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      * in case a sloppy client application has forgot to close a stream before
      * the common output gets closed.
      */
-    private final Map<EntryOutputStream, Thread> streams
-            = new WeakHashMap<EntryOutputStream, Thread>();
+    private final Map<DoCloseable, Thread> streams
+            = new WeakHashMap<DoCloseable, Thread>();
 
     private volatile boolean stopped;
 
@@ -68,25 +68,21 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     }
 
     @Override
-    public CommonOutputSocket<CE> getOutputSocket(final CE entry)
+    public CommonOutputSocket<CE> newOutputSocket(final CE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
-        // TODO: Consider synchronization!
-        final CommonOutputSocket<CE> output = target.getOutputSocket(entry);
-        class OutputSocket extends CommonOutputSocket<CE> {
-            @Override
-            public CE getTarget() {
-                return entry;
+        class OutputSocket extends FilterOutputSocket<CE> {
+            OutputSocket() throws IOException {
+                // TODO: Check: Synchronization required?
+                super(ConcurrentOutputShop.super.newOutputSocket(entry));
             }
 
             @Override
-            public OutputStream newOutputStream()
-            throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 synchronized (ConcurrentOutputShop.this) {
-                    return new EntryOutputStream(
-                            output.chain(this).newOutputStream());
+                    return new EntryOutputStream(super.newOutputStream());
                 }
             }
         }
@@ -156,7 +152,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     throws E {
         assert !stopped;
         stopped = true;
-        for (final Iterator<EntryOutputStream> it = streams.keySet().iterator();
+        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -170,6 +166,10 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
         }
     }
 
+    private interface DoCloseable {
+        void doClose() throws IOException;
+    }
+
     /**
      * An {@link OutputStream} to write the entry data to an
      * {@link CommonOutputShop}.
@@ -177,7 +177,9 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      * {@link IOException} on any subsequent attempt to write data after
      * {@link #closeAllOutputStreams} has been called.
      */
-    private final class EntryOutputStream extends SynchronizedOutputStream {
+    private final class EntryOutputStream
+    extends SynchronizedOutputStream
+    implements DoCloseable {
         private /*volatile*/ boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
@@ -250,7 +252,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
          * @throws IOException If an I/O exception occurs.
          */
         @Override
-        protected void doClose() throws IOException {
+        public void doClose() throws IOException {
             assert !closed;
             /*if (closed)
                 return;*/
