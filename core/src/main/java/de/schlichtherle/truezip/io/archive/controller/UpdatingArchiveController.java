@@ -42,7 +42,6 @@ import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
@@ -128,7 +127,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, URI, ArchiveDriver)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(CommonInputShop<AE> target) {
@@ -146,7 +145,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#get(URI, URI, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, URI, ArchiveDriver)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(CommonOutputShop<AE> target) {
@@ -311,7 +310,7 @@ extends FileSystemArchiveController<AE> {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (inFile == null) {
-                unwrap( getEnclArchive(), getEnclPath(ROOT),
+                unwrap( getEnclController(), getEnclPath(ROOT),
                         autoCreate, createParents);
             } else {
                 // The enclosed archive file has already been updated and the
@@ -338,7 +337,7 @@ extends FileSystemArchiveController<AE> {
                     // a bug.
                     assert false : "We should never get here! Please read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
-                            getEnclArchive(), getEnclPath(ROOT), ex);
+                            getEnclController(), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
                 // because we are reusing a file which has been previously
@@ -418,7 +417,7 @@ extends FileSystemArchiveController<AE> {
             // enclosing controller.
             if (controller.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // just created - pass on
-            unwrap( controller.getEnclArchive(),
+            unwrap( controller.getEnclController(),
                     controller.getEnclPath(path),
                     autoCreate, createParents);
         }
@@ -997,10 +996,10 @@ extends FileSystemArchiveController<AE> {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclArchive(), getEnclPath(ROOT));
+                wrap(getEnclController(), getEnclPath(ROOT));
             } catch (IOException ex) {
                 throw handler.fail(new ArchiveSyncException(
-                        getEnclArchive(),
+                        getEnclController(),
                         "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
                         ex));
             }

@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryNotFoundException;
 import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -723,7 +722,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = ArchiveControllers.get(
+        this.controller = ArchiveControllers.getController(
                 target.toURI(),
                 enclArchive == null ? null : enclArchive.getArchiveController().getMountPoint(),
                 detector.getArchiveDriver(target.getPath()));
@@ -1386,7 +1385,7 @@ public class File extends java.io.File {
      * This delay increases if the system is under heavy load.
      */
     public static ArchiveStatistics getLiveArchiveStatistics() {
-        return ArchiveControllers.getLiveArchiveStatistics();
+        return ArchiveControllers.getLiveStatistics();
     }
 
     /**

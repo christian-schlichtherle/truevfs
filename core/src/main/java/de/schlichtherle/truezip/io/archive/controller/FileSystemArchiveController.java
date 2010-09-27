@@ -48,7 +48,7 @@ extends BasicArchiveController<AE> {
     }
 
     @Override
-    final boolean isTouched() {
+    public final boolean isTouched() {
         final ArchiveFileSystem fileSystem = getFileSystem();
         return fileSystem != null && fileSystem.isTouched();
     }
