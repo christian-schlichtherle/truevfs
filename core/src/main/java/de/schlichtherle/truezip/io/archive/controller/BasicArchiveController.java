@@ -115,8 +115,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
-implements  ArchiveModel, // TODO: Make this a property!
-            ArchiveController,
+extends     ArchiveController
+implements  ArchiveModel, // TODO: Remove this and make it a property!
             CommonInputProvider<AE>,
             CommonOutputProvider<AE> {
 
@@ -131,7 +131,7 @@ implements  ArchiveModel, // TODO: Make this a property!
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final ArchiveModel enclModel;
+    private final ArchiveController enclController;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -183,11 +183,11 @@ implements  ArchiveModel, // TODO: Make this a property!
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
         if (enclMountPoint != null) {
-            this.enclModel = ArchiveControllers.getModel(enclMountPoint);
-            assert this.enclModel != null;
+            this.enclController = ArchiveControllers.getController(enclMountPoint);
+            assert this.enclController != null;
             this.enclPath = enclMountPoint.relativize(mountPoint);
         } else {
-            this.enclModel = null;
+            this.enclController = null;
             this.enclPath = null;
         }
         this.driver = driver;
@@ -197,6 +197,11 @@ implements  ArchiveModel, // TODO: Make this a property!
         setTouched(false);
 
         assert this.enclPath == null || this.enclPath.getPath().endsWith(SEPARATOR);
+    }
+
+    @Override
+    ArchiveModel getModel() {
+        return this;
     }
 
     @Override
@@ -255,17 +260,14 @@ implements  ArchiveModel, // TODO: Make this a property!
     }
 
     @Override
-    public final ArchiveModel getEnclModel() {
-        return enclModel;
+    final ArchiveController getEnclController() {
+        return enclController;
     }
 
     @Override
-    public final ArchiveController getController() {
-        return this;
-    }
-
-    final ArchiveController getEnclController() {
-        return null == enclModel ? null : (BasicArchiveController) enclModel.getController(); // FIXME: Cast is a hack!
+    public final URI getEnclMountPoint() {
+        final ArchiveController enclController = getEnclController();
+        return null == enclController ? null : enclController.getMountPoint();
     }
 
     @Override
@@ -273,12 +275,6 @@ implements  ArchiveModel, // TODO: Make this a property!
         return isRoot(path)
                 ? cutTrailingSeparators(enclPath.toString(), SEPARATOR_CHAR)
                 : enclPath.resolve(path).toString();
-    }
-
-    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
-    @Override
-    public final String toString() {
-        return getMountPoint().toString();
     }
 
     /**
@@ -316,9 +312,9 @@ implements  ArchiveModel, // TODO: Make this a property!
 
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final ArchiveModel enclModel = getEnclModel();
-        return enclModel == null
-                || enclModel.getTarget().isDirectory();
+        final ArchiveController enclController = getEnclController();
+        return enclController == null
+                || enclController.getModel().getTarget().isDirectory();
     }
 
     /**
