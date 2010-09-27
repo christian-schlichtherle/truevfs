@@ -127,7 +127,6 @@ public class FileInputStream extends FilterInputStream {
                     return archive
                             .getArchiveController()
                             .getInputSocket(path)
-                            .connect(null)
                             .newInputStream();
                 }
             }

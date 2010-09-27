@@ -28,7 +28,6 @@ import java.io.IOException;
 public class CommonEntryStreamClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     
-    // TODO: Make this package private!
     public CommonEntryStreamClosedException() {
         super("common entry stream has been forced to close()");
     }

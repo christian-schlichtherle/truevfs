@@ -274,7 +274,7 @@ public interface ArchiveController extends ArchiveDescriptor {
      *         <li>The archive file system is read only.</li>
      *         <li>{@code path} contains characters which are not
      *             supported by the archive file.</li>
-     *         <li>FIXME: type is not {@code FILE} or {@code DIRECTORY}.</li>
+     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.</li>
      *         <li>The new entry already exists as a directory.</li>
      *         <li>The new entry shall be a directory, but already exists.</li>
      *         <li>A parent entry exists but is not a directory.</li>

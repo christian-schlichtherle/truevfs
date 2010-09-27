@@ -29,8 +29,7 @@ extends ArchiveBusyWarningException {
 
     private static final long serialVersionUID = 965098472652287563L;
 
-    // TODO: Make this package private!
-    public ArchiveInputBusyWarningException(ArchiveDescriptor archive, int numStreams) {
+    ArchiveInputBusyWarningException(ArchiveDescriptor archive, int numStreams) {
         super(archive, numStreams);
     }
 }

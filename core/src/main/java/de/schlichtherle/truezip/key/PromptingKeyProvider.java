@@ -319,8 +319,8 @@ extends AbstractKeyProvider<K> {
      * @throws IllegalStateException If this instance is already mapped for
      *         another resource identifier or mapping is prohibited
      *         by a constraint in a subclass.
+     * @deprecated TODO: This method is not failsafe and will be removed!
      */
-    // TODO: Make this redundant: It's not failsafe!
     @Override
     protected synchronized KeyProvider<?> addToKeyManager(final URI resource)
     throws NullPointerException, IllegalStateException {
@@ -344,8 +344,8 @@ extends AbstractKeyProvider<K> {
      * @throws IllegalStateException If this instance is already mapped for
      *         another resource identifier or mapping is prohibited
      *         by a constraint in a subclass.
+     * @deprecated TODO: This method is not failsafe and will be removed!
      */
-    // TODO: Make this redundant: It's not failsafe!
     @Override
     protected synchronized KeyProvider<?> removeFromKeyManager(
             final URI resource)

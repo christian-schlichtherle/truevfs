@@ -656,7 +656,7 @@ implements  ArchiveController,
                     }
                 }
                 try {
-                    return runWriteLocked(new GetTarget()).entry;
+                    return (AE) runWriteLocked(new GetTarget()).entry;
                 } catch (IOException ex) {
                     return null; // FIXME: interface contract violation
                 }
@@ -962,7 +962,7 @@ implements  ArchiveController,
     public final void mknod(
             final String path,
             final Type type,
-            final CommonEntry template, // FIXME: What if instanceof Entry?
+            final CommonEntry template,
             final BitField<IOOption> options)
     throws IOException {
         try {
@@ -977,7 +977,7 @@ implements  ArchiveController,
     private void mknod0(
             final String path,
             final Type type,
-            final CommonEntry template, // FIXME: What if instanceof Entry?
+            final CommonEntry template,
             final BitField<IOOption> options)
     throws FalsePositiveException, IOException {
         if (FILE != type && DIRECTORY != type)
@@ -1011,14 +1011,13 @@ implements  ArchiveController,
                 switch (type) {
                     case FILE:
                         getOutputSocket0(path, options)
-                                .connect(null)
                                 .newOutputStream()
                                 .close();
                         break;
 
                     case DIRECTORY:
                         autoMount(options.get(CREATE_PARENTS))
-                                .mknod(path, DIRECTORY, null, options.get(CREATE_PARENTS))
+                                .mknod(path, DIRECTORY, template, options.get(CREATE_PARENTS))
                                 .run();
                 }
             }

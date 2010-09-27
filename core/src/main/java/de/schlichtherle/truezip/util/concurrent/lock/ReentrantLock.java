@@ -30,13 +30,13 @@ package de.schlichtherle.truezip.util.concurrent.lock;
 public interface ReentrantLock {
 
     /** Returns the number of times the current thread has acquired this lock. */
-    int getHoldCount(); // TODO: Rename to getHoldCount()?
+    int getHoldCount();
 
     /**
      * Returns {@code true} if and only if the current thread has
      * acquired this lock.
      */
-    boolean isHeldByCurrentThread(); // TODO: Rename to isHeldByCurrentThread()!
+    boolean isHeldByCurrentThread();
 
     /** Acquires this lock by the current thread, eventually blocking. */
     void lock();

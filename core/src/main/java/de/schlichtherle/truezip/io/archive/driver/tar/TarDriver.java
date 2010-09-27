@@ -78,10 +78,6 @@ extends AbstractArchiveDriver<TarEntry> {
         super(charset);
     }
 
-    //
-    // Factory methods:
-    //
-
     @Override
     public TarEntry newEntry(
             String name,
@@ -126,19 +122,19 @@ extends AbstractArchiveDriver<TarEntry> {
             ArchiveDescriptor archive,
             CommonInputSocket<?> input)
     throws IOException {
-        final ReadOnlyFile rof = input.newReadOnlyFile();
+        final InputStream in = input.newInputStream();
         try {
-            return newTarInputShop(archive, rof);
+            return newTarInputShop(archive, in);
         } finally {
-            rof.close();
+            in.close();
         }
     }
 
     protected TarInputShop newTarInputShop(
             ArchiveDescriptor archive,
-            ReadOnlyFile rof)
+            InputStream in)
     throws IOException {
-        return new TarInputShop(new ReadOnlyFileInputStream(rof));
+        return new TarInputShop(in);
     }
 
     /**

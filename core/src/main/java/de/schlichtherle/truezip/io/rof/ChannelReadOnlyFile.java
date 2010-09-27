@@ -50,11 +50,12 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
         return channel.position();
     }
 
+    @SuppressWarnings("ThrowableInitCause")
     public void seek(long fp) throws IOException {
         try {
             channel.position(fp);
-        } catch (IllegalArgumentException iae) {
-            throw new IOException(iae);
+        } catch (IllegalArgumentException ex) {
+            throw (IOException) new IOException(ex.toString()).initCause(ex);
         }
     }
 

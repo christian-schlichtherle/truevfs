@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.ByteArrayInputStream;
@@ -33,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import junit.framework.TestCase;
@@ -191,7 +189,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public ArchiveEntry newEntry(String name, Type type, CommonEntry template)
+        public CommonEntry newEntry(String name, Type type, CommonEntry template)
         throws CharConversionException {
             return new DummyEntry(new File("foo/bar"));
         }

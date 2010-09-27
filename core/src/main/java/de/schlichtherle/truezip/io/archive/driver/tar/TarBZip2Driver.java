@@ -118,10 +118,9 @@ public class TarBZip2Driver extends TarDriver {
      */
     @Override
     protected TarInputShop newTarInputShop(
-            ArchiveDescriptor archive,
-            ReadOnlyFile rof)
+            final ArchiveDescriptor archive,
+            final InputStream in)
     throws IOException {
-        final InputStream in = new ReadOnlyFileInputStream(rof);
         // Consume and check the first two magic bytes. This is required for
         // the CBZip2InputStream class.
         if (in.read() != 'B' || in.read() != 'Z')

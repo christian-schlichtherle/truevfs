@@ -109,7 +109,7 @@ public class ArchiveFileSystems {
      * directory.
      */
     public static boolean isRoot(String path) {
-        assert ROOT.isEmpty();
-        return path.isEmpty();
+        assert 0 == ROOT.length();
+        return 0 == path.length();
     }
 }

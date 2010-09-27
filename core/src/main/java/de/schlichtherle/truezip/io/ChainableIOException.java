@@ -107,7 +107,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     public ChainableIOException(Throwable cause) {
-        super(cause != null ? cause.toString() : null);
+        super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }
 
@@ -126,7 +126,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     public ChainableIOException(Throwable cause, int priority) {
-        super(cause != null ? cause.toString() : null);
+        super(null == cause ? null : cause.toString());
         super.initCause(cause);
         this.priority = priority;
     }
@@ -176,7 +176,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      * {@link #initPredecessor(ChainableIOException) initialized} yet.
      */
     public final ChainableIOException getPredecessor() {
-        return predecessor == this ? null : predecessor;
+        return this == predecessor ? null : predecessor;
     }
 
     private void setPredecessor(
@@ -334,9 +334,8 @@ public class ChainableIOException extends IOException implements Cloneable {
      */
     public void printStackTrace(final PrintStream s, int maxExceptions) {
         maxExceptions--;
-
         final ChainableIOException predecessor = getPredecessor();
-        if (predecessor != null) {
+        if (null != predecessor) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
                 s.println("followed, but not caused by:");
@@ -344,13 +343,12 @@ public class ChainableIOException extends IOException implements Cloneable {
                 s.println("(omitting " + predecessor.getNumExceptions() + " exception(s) at the start of this list)");
             }
         }
-
         super.printStackTrace(s);
     }
 
     private int getNumExceptions() {
         final ChainableIOException predecessor = getPredecessor();
-        return predecessor != null ? predecessor.getNumExceptions() + 1 : 1;
+        return null != predecessor ? predecessor.getNumExceptions() + 1 : 1;
     }
 
     /**

@@ -40,10 +40,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.ROOT;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -734,7 +734,7 @@ implements ArchiveFileSystem<AE> {
                         continue; // never write the virtual root directory
                     if (e.getTime(Access.WRITE) < 0)
                         continue; // never write ghost directories
-                    output.newOutputSocket(e).connect(null).newOutputStream().close();
+                    output.newOutputSocket(e).newOutputStream().close();
                 } else if (input.getEntry(n) != null) {
                     assert e == input.getEntry(n);
                     IOSocket.copy(  input.newInputSocket(e),
@@ -746,7 +746,7 @@ implements ArchiveFileSystem<AE> {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    output.newOutputSocket(e).connect(null).newOutputStream().close();
+                    output.newOutputSocket(e).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 handler.warn(ex);

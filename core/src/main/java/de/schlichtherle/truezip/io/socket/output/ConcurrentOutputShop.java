@@ -75,7 +75,6 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
 
         class OutputSocket extends FilterOutputSocket<CE> {
             OutputSocket() throws IOException {
-                // TODO: Check: Synchronization required?
                 super(ConcurrentOutputShop.super.newOutputSocket(entry));
             }
 
@@ -86,6 +85,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 }
             }
         }
+        // TODO: Check: Synchronization required?
         return new OutputSocket();
     }
 

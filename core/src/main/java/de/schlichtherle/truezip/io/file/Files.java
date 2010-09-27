@@ -49,9 +49,6 @@ import static de.schlichtherle.truezip.io.Files.contains;
  * class accept and return plain {@code java.io.File} instances.
  * Full advantage is taken if a parameter is actually an instance of the
  * {@code File} class in this package, however.
- * <p>
- * <b>TODO:</b> Consider making this class public in TrueZIP 7 and remove the
- * stub methods for the same purpose in {@link File}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -228,10 +225,9 @@ class Files {
             try {
                 if (src instanceof File) {
                     final File srcFile = (File) src;
-                    srcFile.ensureNotVirtualRoot("cannot read");
-                    final File srcArchive = srcFile.getEnclArchive();
+                    final File srcArchive = srcFile.getInnerArchive();
                     if (srcArchive != null) {
-                        final String srcPath = srcFile.getEnclEntryName();
+                        final String srcPath = srcFile.getInnerEntryName();
                         assert srcPath != null;
                         copy0(  preserve,
                                 srcArchive.getArchiveController(),
@@ -294,10 +290,9 @@ class Files {
         try {
             if (dst instanceof File) {
                 final File dstFile = (File) dst;
-                dstFile.ensureNotVirtualRoot("cannot write");
-                final File dstArchive = dstFile.getEnclArchive();
+                final File dstArchive = dstFile.getInnerArchive();
                 if (dstArchive != null) {
-                    final String dstPath = dstFile.getEnclEntryName();
+                    final String dstPath = dstFile.getInnerEntryName();
                     assert dstPath != null;
                     ArchiveControllers.copy(
                             preserve, File.isLenient(),
@@ -359,10 +354,9 @@ class Files {
             try {
                 if (dst instanceof File) {
                     final File dstFile = (File) dst;
-                    dstFile.ensureNotVirtualRoot("cannot write");
-                    final File dstArchive = dstFile.getEnclArchive();
+                    final File dstArchive = dstFile.getInnerArchive();
                     if (dstArchive != null) {
-                        final String dstPath = dstFile.getEnclEntryName();
+                        final String dstPath = dstFile.getInnerEntryName();
                         assert dstPath != null;
                         ArchiveControllers.copy(
                                 preserve, File.isLenient(),
