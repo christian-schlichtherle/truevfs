@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
@@ -193,17 +193,6 @@ public interface ArchiveController extends ArchiveDescriptor {
     @Override
     URI getMountPoint();
 
-    ArchiveController getEnclArchive();
-
-    /**
-     * Resolves the given relative {@code path} against the relative path of
-     * the target archive file within its enclosing archive file.
-     *
-     * @throws NullPointerException if the target archive file is not enclosed
-     *         within another archive file.
-     */
-    String getEnclPath(final String path);
-
     Icon getOpenIcon() throws FalsePositiveException;
 
     Icon getClosedIcon() throws FalsePositiveException;
@@ -218,7 +207,6 @@ public interface ArchiveController extends ArchiveDescriptor {
 
     ArchiveFileSystemEntry getEntry(String path) throws FalsePositiveException;
 
-    /** Currently supports no options. */
     void setTime(String path, BitField<Access> types, long value)
     throws IOException;
 

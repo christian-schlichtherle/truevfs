@@ -72,6 +72,13 @@ public class ArchiveControllers {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
+    private static final Comparator<ArchiveContext> REVERSE_CONTEXTS
+            = new Comparator<ArchiveContext>() {
+        public int compare(ArchiveContext l, ArchiveContext r) {
+            return  r.getMountPoint().compareTo(l.getMountPoint());
+        }
+    };
+
     /**
      * The map of all archive controllers.
      * The keys are plain {@link URI} instances and the values are either
@@ -79,15 +86,11 @@ public class ArchiveControllers {
      * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Object> controllers
+    private static final Map<URI, Object> contexts
             = new WeakHashMap<URI, Object>();
 
-    private static final Comparator<BasicArchiveController> REVERSE_CONTROLLERS
-            = new Comparator<BasicArchiveController>() {
-        public int compare(BasicArchiveController l, BasicArchiveController r) {
-            return  r.getTarget().compareTo(l.getTarget());
-        }
-    };
+    private ArchiveControllers() {
+    }
 
     static int getArchivesTotal() {
         // This is not 100% accurate:
@@ -95,14 +98,12 @@ public class ArchiveControllers {
         // VALUE in the map meanwhile, but not yet removed from the map,
         // are counted as well.
         // But hey, this is only statistics, right?
-        return controllers.size();
+        return contexts.size();
     }
 
-    ArchiveControllers() {
-    }
-
-    static BasicArchiveController get(URI mountPoint) {
-        return (BasicArchiveController) get(mountPoint, null, null);
+    public static ArchiveController getController(URI mountPoint) {
+        ArchiveContext context = getContext(mountPoint, null, null);
+        return null == context ? null : context.getController();
     }
 
     /**
@@ -120,7 +121,12 @@ public class ArchiveControllers {
      *     not a valid name for an archive file</li>
      * </ul>
      */
-    public static ArchiveController get(
+    public static ArchiveController getController(
+            URI mountPoint, URI enclMountPoint, ArchiveDriver driver) {
+        return getContext(mountPoint, enclMountPoint, driver).getController();
+    }
+
+    static ArchiveContext getContext(
             URI mountPoint,
             final URI enclMountPoint,
             final ArchiveDriver driver) {
@@ -129,19 +135,19 @@ public class ArchiveControllers {
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        synchronized (controllers) {
-            final Object value = controllers.get(mountPoint);
+        synchronized (contexts) {
+            final Object value = contexts.get(mountPoint);
             if (value instanceof Reference) {
-                final ArchiveController controller
-                        = (ArchiveController) ((Reference) value).get();
+                final ArchiveContext context
+                        = (ArchiveContext) ((Reference) value).get();
                 // Check that the controller hasn't been garbage collected
                 // meanwhile!
-                if (controller != null) {
+                if (context != null) {
                     // If required, reconfiguration of the ArchiveController
                     // must be deferred until we have released the lock on
                     // controllers in order to prevent dead locks.
                     //reconfigure = driver != null && driver != controller.getDriver();
-                    return controller;
+                    return context;
                 }
                 // Fall through!
             } else if (value != null) {
@@ -158,7 +164,7 @@ public class ArchiveControllers {
                 //     archive file as either the file itself or one of its
                 //     ancestors is created with a different
                 //     ArchiveDetector.
-                return (ArchiveController) value;
+                return (ArchiveContext) value;
             }
             if (driver == null) // pure lookup operation?
                 return null;
@@ -167,6 +173,10 @@ public class ArchiveControllers {
             return new UpdatingArchiveController(
                     mountPoint, enclMountPoint, driver);
         }
+    }
+
+    static ArchiveContext getContext(URI mountPoint) {
+        return getContext(mountPoint, null, null);
     }
 
     /**
@@ -185,8 +195,8 @@ public class ArchiveControllers {
         assert controller instanceof ArchiveController
             || ((WeakReference) controller).get() instanceof ArchiveController;
 
-        synchronized (controllers) {
-            controllers.put(mountPoint, controller);
+        synchronized (contexts) {
+            contexts.put(mountPoint, controller);
         }
     }
 
@@ -247,8 +257,8 @@ public class ArchiveControllers {
                 // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                for (final BasicArchiveController c
-                        : getAll(prefix, REVERSE_CONTROLLERS)) {
+                for (final ArchiveContext c
+                        : getContexts(prefix, REVERSE_CONTEXTS)) {
                         try {
                             c.writeLock().lock();
                             try {
@@ -257,7 +267,7 @@ public class ArchiveControllers {
                                 // Upon return, some new ArchiveWarningException's may
                                 // have been generated. We need to remember them for
                                 // later throwing.
-                                c.sync(builder, options);
+                                c.getController().sync(builder, options);
                             } finally {
                                 c.writeLock().unlock();
                             }
@@ -284,21 +294,21 @@ public class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<BasicArchiveController> getAll() {
-        return getAll(null, null);
+    static Iterable<ArchiveContext> getContexts() {
+        return getContexts(null, null);
     }
 
-    static Iterable<BasicArchiveController> getAll(
+    static Iterable<ArchiveContext> getContexts(
             URI prefix,
             final Comparator c) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
-        final Set<BasicArchiveController> snapshot;
-        synchronized (controllers) {
+        final Set<ArchiveContext> snapshot;
+        synchronized (contexts) {
             snapshot = c != null
                     ? new TreeSet(c)
-                    : new HashSet((int) (controllers.size() / 0.75f));
-            for (Object value : controllers.values()) {
+                    : new HashSet((int) (contexts.size() / 0.75f));
+            for (Object value : contexts.values()) {
                 if (value instanceof Reference) {
                     value = ((Reference) value).get(); // dereference
                     if (value == null) {
@@ -311,9 +321,9 @@ public class ArchiveControllers {
                     }
                 }
                 assert value != null;
-                assert value instanceof BasicArchiveController;
-                if (((BasicArchiveController) value).getMountPoint().toString().startsWith(prefix.toString()))
-                    snapshot.add((BasicArchiveController) value);
+                final ArchiveContext context = (ArchiveContext) value;
+                if (context.getMountPoint().toString().startsWith(prefix.toString()))
+                    snapshot.add(context);
             }
         }
         return snapshot;
@@ -332,7 +342,7 @@ public class ArchiveControllers {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static ArchiveStatistics getLiveArchiveStatistics() {
+    public static ArchiveStatistics getLiveStatistics() {
         return LiveArchiveStatistics.SINGLETON;
     }
 
@@ -455,13 +465,12 @@ public class ArchiveControllers {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
             // find out which controller actually detected the false positive.
-            final URI mountPoint = ex.getMountPoint();
+            final URI enclMountPoint = ex.getMountPoint();
             if (!dstController.getMountPoint().toString().startsWith(ex.getCanonicalPath()))
                 throw ex; // not my job - pass on!
-            final ArchiveController enclController
-                    = ArchiveControllers.get(mountPoint);
-            final String enclPath = mountPoint.relativize(
-                    mountPoint
+            final ArchiveController enclController = getController(enclMountPoint);
+            final String enclPath = enclMountPoint.relativize(
+                    enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
                     .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing archive controller.
@@ -518,11 +527,10 @@ public class ArchiveControllers {
                 out.close();
             }
         } catch (ArchiveEntryFalsePositiveException ex) {
-            final URI mountPoint = ex.getMountPoint();
-            final ArchiveController enclController
-                    = ArchiveControllers.get(mountPoint);
-            final String enclPath = mountPoint.relativize(
-                    mountPoint
+            final URI enclMountPoint = ex.getMountPoint();
+            final ArchiveController enclController = getController(enclMountPoint);
+            final String enclPath = enclMountPoint.relativize(
+                    enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
                     .resolve(dstPath)).toString();
             // Reroute call to the destination's enclosing ArchiveController.

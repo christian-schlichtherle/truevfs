@@ -104,7 +104,7 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
      *
      * @return A new read only file.
      * @throws UnsupportedOperationException to indicate that this operation
-     *         is not (yet) supported.
+     *         is not supported.
      */
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 }

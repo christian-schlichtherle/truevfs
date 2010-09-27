@@ -386,11 +386,11 @@ class Files {
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
         } catch (ArchiveEntryFalsePositiveException ex) {
-            final URI mountPoint = ex.getMountPoint();
+            final URI enclMountPoint = ex.getMountPoint();
             final ArchiveController enclController
-                    = ArchiveControllers.get(mountPoint, null, null); // FIXME: Redesign delegation strategy!
-            final String enclPath = mountPoint.relativize(
-                    mountPoint
+                    = ArchiveControllers.getController(enclMountPoint); // FIXME: Redesign delegation strategy!
+            final String enclPath = enclMountPoint.relativize(
+                    enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
                     .resolve(srcPath)).toString();
             // Reroute call to the source's enclosing archive controller.
