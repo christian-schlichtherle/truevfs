@@ -115,7 +115,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
-implements  ArchiveContext, // TODO: Make this a property!
+implements  ArchiveModel, // TODO: Make this a property!
             ArchiveController,
             CommonInputProvider<AE>,
             CommonOutputProvider<AE> {
@@ -131,7 +131,7 @@ implements  ArchiveContext, // TODO: Make this a property!
     /**
      * The archive controller of the enclosing archive, if any.
      */
-    private final ArchiveContext enclContext;
+    private final ArchiveModel enclModel;
 
     /**
      * The relative path name of the entry for the target archive in its
@@ -183,11 +183,11 @@ implements  ArchiveContext, // TODO: Make this a property!
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
         if (enclMountPoint != null) {
-            this.enclContext = ArchiveControllers.getContext(enclMountPoint);
-            assert this.enclContext != null;
+            this.enclModel = ArchiveControllers.getModel(enclMountPoint);
+            assert this.enclModel != null;
             this.enclPath = enclMountPoint.relativize(mountPoint);
         } else {
-            this.enclContext = null;
+            this.enclModel = null;
             this.enclPath = null;
         }
         this.driver = driver;
@@ -223,7 +223,7 @@ implements  ArchiveContext, // TODO: Make this a property!
      * @param  operation the operation to run while the write lock is acquired.
      * @return {@code operation}
      */
-    final <O extends IOOperation> O runWriteLocked(O operation)
+    public final <O extends IOOperation> O runWriteLocked(O operation)
     throws IOException {
         assert operation != null;
 
@@ -255,8 +255,8 @@ implements  ArchiveContext, // TODO: Make this a property!
     }
 
     @Override
-    public final ArchiveContext getEnclContext() {
-        return enclContext;
+    public final ArchiveModel getEnclModel() {
+        return enclModel;
     }
 
     @Override
@@ -264,8 +264,8 @@ implements  ArchiveContext, // TODO: Make this a property!
         return this;
     }
 
-    final BasicArchiveController<?> getEnclController() {
-        return null == enclContext ? null : (BasicArchiveController) enclContext.getController(); // FIXME: Cast is a hack!
+    final ArchiveController getEnclController() {
+        return null == enclModel ? null : (BasicArchiveController) enclModel.getController(); // FIXME: Cast is a hack!
     }
 
     @Override
@@ -316,9 +316,9 @@ implements  ArchiveContext, // TODO: Make this a property!
 
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final ArchiveContext enclContext = getEnclContext();
-        return enclContext == null
-                || enclContext.getTarget().isDirectory();
+        final ArchiveModel enclModel = getEnclModel();
+        return enclModel == null
+                || enclModel.getTarget().isDirectory();
     }
 
     /**
@@ -372,7 +372,7 @@ implements  ArchiveContext, // TODO: Make this a property!
     abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException;
 
-    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
+    public final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
     throws IOException {
         return autoMount(autoCreate, autoCreate);
     }
@@ -390,7 +390,7 @@ implements  ArchiveContext, // TODO: Make this a property!
      * Note that for directories this method will always return
      * {@code false}!
      */
-    abstract boolean hasNewData(String path);
+    public abstract boolean hasNewData(String path);
 
     /**
      * Synchronizes the archive file only if the archive file has already new
@@ -410,7 +410,7 @@ implements  ArchiveContext, // TODO: Make this a property!
      * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    final void autoSync(final String path)
+    public final void autoSync(final String path)
     throws ArchiveSyncException {
         assert writeLock().isHeldByCurrentThread();
         if (hasNewData(path)) {
@@ -453,7 +453,7 @@ implements  ArchiveContext, // TODO: Make this a property!
     throws ArchiveSyncException;
 
     @Override
-    public CommonInputSocket<? extends ArchiveEntry> getInputSocket(String path)
+    public CommonInputSocket<? extends CommonEntry> getInputSocket(String path)
     throws IOException {
         assert path != null;
 
@@ -464,7 +464,7 @@ implements  ArchiveContext, // TODO: Make this a property!
         }
     }
 
-    private CommonInputSocket<? extends ArchiveEntry> getInputSocket0(
+    private CommonInputSocket<? extends CommonEntry> getInputSocket0(
             final String path)
     throws IOException {
         class InputSocket extends CommonInputSocket<AE> {
@@ -589,7 +589,7 @@ implements  ArchiveContext, // TODO: Make this a property!
     throws IOException;
 
     @Override
-    public CommonOutputSocket<? extends ArchiveEntry> getOutputSocket(
+    public CommonOutputSocket<? extends CommonEntry> getOutputSocket(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -603,7 +603,7 @@ implements  ArchiveContext, // TODO: Make this a property!
         }
     }
 
-    private CommonOutputSocket<? extends ArchiveEntry> getOutputSocket0(
+    private CommonOutputSocket<? extends CommonEntry> getOutputSocket0(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -808,7 +808,7 @@ implements  ArchiveContext, // TODO: Make this a property!
     }
 
     @Override
-    public final Entry<? extends ArchiveEntry> getEntry(final String path)
+    public final Entry<?> getEntry(final String path)
     throws FalsePositiveException {
         try {
             return getEntry0(path);

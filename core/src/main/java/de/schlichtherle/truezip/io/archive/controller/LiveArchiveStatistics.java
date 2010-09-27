@@ -39,7 +39,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
 
     public int getArchivesTouched() {
         int result = 0;
-        for (final ArchiveContext c : ArchiveControllers.getContexts()) {
+        for (final ArchiveModel c : ArchiveControllers.getModels()) {
             c.readLock().lock();
             try {
                 if (c.isTouched()) {
@@ -54,18 +54,18 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
 
     public int getTopLevelArchivesTotal() {
         int result = 0;
-        for (ArchiveContext c : ArchiveControllers.getContexts())
-            if (c.getEnclContext() == null)
+        for (ArchiveModel c : ArchiveControllers.getModels())
+            if (c.getEnclModel() == null)
                 result++;
         return result;
     }
 
     public int getTopLevelArchivesTouched() {
         int result = 0;
-        for (final ArchiveContext c : ArchiveControllers.getContexts()) {
+        for (final ArchiveModel c : ArchiveControllers.getModels()) {
             c.readLock().lock();
             try {
-                if (c.getEnclContext() == null && c.isTouched()) {
+                if (c.getEnclModel() == null && c.isTouched()) {
                     result++;
                 }
             } finally {
