@@ -71,7 +71,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
     }
 
     @Override
-    protected ZipOutputShop newZipOutput(
+    protected ZipOutputShop newZipOutputShop(
             ArchiveDescriptor archive,
             OutputStream out,
             ZipInputShop source)

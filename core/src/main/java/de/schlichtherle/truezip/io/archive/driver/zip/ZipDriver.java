@@ -199,22 +199,23 @@ implements ZipEntryFactory<ZipEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipDriver} simply forwards the
-     * call to {@link #newZipInput}.
+     * The implementation in the class {@link ZipDriver} acquires a read only
+     * file from the given socket and forwards the call to
+     * {@link #newZipInputShop}.
      */
     @Override
     public ZipInputShop newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newZipInput(archive, rof);
+            return newZipInputShop(archive, rof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
         }
     }
 
-    protected ZipInputShop newZipInput(
+    protected ZipInputShop newZipInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -226,7 +227,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #newZipOutput} and wraps the result in a new
+     * {@link #newZipOutputShop} and wraps the result in a new
      * {@link MultiplexedArchiveOutputShop}.
      */
     @Override
@@ -236,14 +237,14 @@ implements ZipEntryFactory<ZipEntry> {
         final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedArchiveOutputShop<ZipEntry>(
-                    newZipOutput(archive, out, (ZipInputShop) source));
+                    newZipOutputShop(archive, out, (ZipInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
         }
     }
 
-    protected ZipOutputShop newZipOutput(
+    protected ZipOutputShop newZipOutputShop(
             ArchiveDescriptor archive, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source);

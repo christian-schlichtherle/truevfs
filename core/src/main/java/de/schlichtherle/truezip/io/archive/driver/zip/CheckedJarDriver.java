@@ -70,7 +70,7 @@ public class CheckedJarDriver extends JarDriver {
     }
 
     @Override
-    protected ZipInputShop newZipInput(
+    protected ZipInputShop newZipInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {

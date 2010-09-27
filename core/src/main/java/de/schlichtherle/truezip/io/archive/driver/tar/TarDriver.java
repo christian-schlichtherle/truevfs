@@ -117,56 +117,34 @@ extends AbstractArchiveDriver<TarEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation calls {@link #newInputStream(ArchiveDescriptor, ReadOnlyFile)
-     * newInputStream(archive, rof)} and passes the resulting stream to
-     * {@link #newTarInput(ArchiveDescriptor, InputStream)}.
+     * The implementation in the class {@link TarDriver} acquires a read only
+     * file from the given socket and forwards the call to
+     * {@link #newTarInputShop}.
      */
     @Override
     public TarInputShop newInputShop(
             ArchiveDescriptor archive,
             CommonInputSocket<?> input)
     throws IOException {
-        final InputStream in = newInputStream(archive, input.newReadOnlyFile());
+        final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newTarInput(archive, in);
+            return newTarInputShop(archive, rof);
         } finally {
-            in.close();
+            rof.close();
         }
     }
 
-    /**
-     * Returns a new {@code InputStream} to read the contents from the
-     * given {@code ReadOnlyFile} from.
-     * Override this method in order to decorate the stream returned by the
-     * implementation in this class in order to have the driver read the TAR
-     * file from wrapper file formats such as GZIP or BZIP2.
-     * <p>
-     * Note that the returned stream should support marking for best
-     * performance and will <em>always</em> be closed early by
-     * {@link #newInputShop(ArchiveDescriptor, CommonInputSocket)}.
-     */
-    protected InputStream newInputStream(
+    protected TarInputShop newTarInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
-        return new ReadOnlyFileInputStream(rof);
-    }
-
-    /**
-     * Returns a new tar input shop to read the contents from the given input
-     * stream.
-     * The implementation in this class simply returns
-     * {@code new TarInputShop(in)}.
-     */
-    protected TarInputShop newTarInput(ArchiveDescriptor archive, InputStream in)
-    throws IOException {
-        return new TarInputShop(in);
+        return new TarInputShop(new ReadOnlyFileInputStream(rof));
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation forwards the call to {@link #newTarOutput}
+     * This implementation forwards the call to {@link #newTarOutputShop}
      * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
      */
     @Override
@@ -177,15 +155,15 @@ extends AbstractArchiveDriver<TarEntry> {
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
-            return new MultiplexedArchiveOutputShop<TarEntry>(newTarOutput(
-                    archive, out, (TarInputShop) source));
+            return new MultiplexedArchiveOutputShop<TarEntry>(
+                    newTarOutputShop(archive, out, (TarInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
         }
     }
 
-    protected TarOutputShop newTarOutput(
+    protected TarOutputShop newTarOutputShop(
             ArchiveDescriptor archive,
             OutputStream out,
             TarInputShop source)

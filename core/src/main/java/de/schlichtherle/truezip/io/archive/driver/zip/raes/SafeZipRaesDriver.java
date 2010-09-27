@@ -105,7 +105,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInputShop newZipInput(
+    protected ZipInputShop newZipInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
@@ -118,6 +118,6 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
         return rof.length() > getAuthenticationTrigger()
                 ? new CheckedZipInputShop(
                     rof, getCharset(), getPreambled(), getPostambled(), this)
-                : super.newZipInput(archive, rof);
+                : super.newZipInputShop(archive, rof);
     }
 }

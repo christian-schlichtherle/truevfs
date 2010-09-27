@@ -85,7 +85,7 @@ public class OdfDriver extends JarDriver {
         final OutputStream out = output.newOutputStream();
         try {
             return new OdfOutputShop(
-                    newZipOutput(archive, out, (ZipInputShop) source));
+                    newZipOutputShop(archive, out, (ZipInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
