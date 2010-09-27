@@ -6,3 +6,5 @@
 glob:*/target/
 glob:**/*.log
 glob:**/*.log.xml
+glob:core/nb-configuration.xml
+glob:core/nbactions.xml
