@@ -169,7 +169,6 @@ public class FileOutputStream extends FilterOutputStream {
                                 BitField.noneOf(IOOption.class)
                                     .set(APPEND, append)
                                     .set(CREATE_PARENTS, File.isLenient()))
-                            .connect(null)
                             .newOutputStream();
                 }
             }

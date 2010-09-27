@@ -135,10 +135,6 @@ implements ZipEntryFactory<ZipEntry> {
         this.postambled = postambled;
         this.level = level;
     }
-
-    //
-    // Properties:
-    //
     
     /**
      * Returns the value of the property {@code preambled} which was 
@@ -204,7 +200,9 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
+    public ZipInputShop newInputShop(
+            ArchiveDescriptor archive,
+            CommonInputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {

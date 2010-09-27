@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException
 import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -77,7 +76,6 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
 
         class InputSocket extends FilterInputSocket<CE> {
             InputSocket() throws IOException {
-                // TODO: Check: Synchronization required?
                 super(ConcurrentInputShop.super.newInputSocket(entry));
             }
 
@@ -95,6 +93,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 }
             }
         }
+        // TODO: Check: Synchronization required?
         return new InputSocket();
     }
 

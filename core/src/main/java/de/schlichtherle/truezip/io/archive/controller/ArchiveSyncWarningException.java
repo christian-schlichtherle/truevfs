@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import java.io.IOException;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
@@ -38,11 +39,11 @@ extends ArchiveSyncException {
         super(archive, message, -1);
     }
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive, Throwable cause) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive, IOException cause) {
         super(archive, cause, -1);
     }
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive, String message, Throwable cause) {
+    ArchiveSyncWarningException(ArchiveDescriptor archive, String message, IOException cause) {
         super(archive, message, cause, -1);
     }
 }

@@ -37,7 +37,7 @@ final class ExtraFields implements Cloneable {
      * Must not be {@code null}, but may be empty if no Extra Fields are used.
      * The map is sorted by Header IDs in ascending order.
      */
-    private Map extra = new TreeMap();
+    private Map<Integer, ExtraField> extra = new TreeMap<Integer, ExtraField>();
 
     /** Returns a shallow clone of this collection. */
     @Override
@@ -69,8 +69,7 @@ final class ExtraFields implements Cloneable {
      */
     public ExtraField get(final int headerID) {
         UShort.check(headerID);
-        // TODO: For JSE 5: final ExtraField ef = (ExtraField) extra.get(Integer.valueOf(headerID));
-        final ExtraField ef = (ExtraField) extra.get(new Integer(headerID));
+        final ExtraField ef = extra.get(headerID);
         assert ef == null || headerID == ef.getHeaderID();
         return ef;
     }
@@ -93,8 +92,7 @@ final class ExtraFields implements Cloneable {
             throw new NullPointerException("ef");
         final int headerID = ef.getHeaderID();
         UShort.check(headerID);
-        // TODO: For JSE 5: return (ExtraField) extra.put(Integer.valueOf(headerID), ef);
-        return (ExtraField) extra.put(new Integer(headerID), ef);
+        return extra.put(headerID, ef);
     }
 
     /**
@@ -109,8 +107,7 @@ final class ExtraFields implements Cloneable {
      */
     public ExtraField remove(final int headerID) {
         UShort.check(headerID);
-        // TODO: For JSE 5: final ExtraField ef = (ExtraField) extra.remove(Integer.valueOf(headerID));
-        final ExtraField ef = (ExtraField) extra.remove(new Integer(headerID));
+        final ExtraField ef = extra.remove(headerID);
         assert ef == null || headerID == ef.getHeaderID();
         return ef;
     }
@@ -182,8 +179,7 @@ final class ExtraFields implements Cloneable {
                 final ExtraField ef = ExtraField.create(headerID);
                 ef.readFrom(data, off, dataSize);
                 off += dataSize;
-                // TODO: For JSE 5: map.put(Integer.valueOf(headerID), ef);
-                map.put(new Integer(headerID), ef);
+                map.put(headerID, ef);
             }
             assert off == end;
         }

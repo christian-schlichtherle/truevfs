@@ -35,7 +35,8 @@ abstract class ExtraField {
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
     public static final int ZIP64_HEADER_ID = 0x0001;
 
-    private static final Map registry = new HashMap();
+    private static final Map<Integer, Class> registry
+            = new HashMap<Integer, Class>();
 
     /**
      * Registers a concrete implementation of this abstract base class for
@@ -58,8 +59,7 @@ abstract class ExtraField {
         }
         final int headerID = ef.getHeaderID();
         UShort.check(headerID, "Header ID out of range", null);
-        // TODO: For JSE 5: registry.put(Integer.valueOf(headerID), c);
-        registry.put(new Integer(headerID), c);
+        registry.put(headerID, c);
     }
 
     /**
@@ -77,8 +77,7 @@ abstract class ExtraField {
      */
     public static ExtraField create(final int headerID) {
         UShort.check(headerID, "Header ID out of range", null);
-        // TODO: For JSE 5: final Class c = (Class) registry.get(Integer.valueOf(headerID));
-        final Class c = (Class) registry.get(new Integer(headerID));
+        final Class c = registry.get(headerID);
         final ExtraField ef;
         try {
             ef = c != null

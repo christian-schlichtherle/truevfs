@@ -2181,28 +2181,6 @@ public class File extends java.io.File {
     }
 
     /**
-     * Throws an {@code ArchiveEntryNotFoundException} if and only if this
-     * file is a true archive file, not just a false positive, including
-     * RAES encrypted ZIP files for which key prompting has been cancelled
-     * or disabled.
-     *
-     * @deprecated
-     */
-    final void ensureNotVirtualRoot(final String prefix)
-    throws ArchiveEntryNotFoundException {
-        if (isArchive() && (isDirectory() || (exists() && !isFile()))) {
-            String msg = "virtual root directory";
-            if (prefix != null)
-                msg = prefix + " " + msg;
-            throw new ArchiveEntryNotFoundException(getArchiveController(), ROOT, msg);
-        }
-    }
-
-    //
-    // File system operations:
-    //
-
-    /**
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>

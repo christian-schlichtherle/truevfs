@@ -35,8 +35,7 @@ public class ArchiveEntryNotFoundException extends FileNotFoundException {
     private final URI mountPoint;
     private final String path;
 
-    // TODO: Make this package private!
-    public ArchiveEntryNotFoundException(
+    ArchiveEntryNotFoundException(
             final ArchiveDescriptor archive,
             final String path,
             final String msg) {

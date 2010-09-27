@@ -64,6 +64,6 @@ extends AbstractExceptionBuilder<E, E> {
      */
     @Override
     protected final E post(E assembly) {
-        return assembly != null ? (E) assembly.sortPriority() : null;
+        return null == assembly ? null : (E) assembly.sortPriority();
     }
 }

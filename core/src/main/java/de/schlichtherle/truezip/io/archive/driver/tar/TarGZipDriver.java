@@ -16,9 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,18 +95,12 @@ public class TarGZipDriver extends TarDriver {
         return level;
     }
 
-    //
-    // Driver implementation:
-    //
-
     @Override
     protected TarInputShop newTarInputShop(
             ArchiveDescriptor archive,
-            ReadOnlyFile rof)
+            InputStream in)
     throws IOException {
-        return new TarInputShop(
-                new GZIPInputStream(
-                    new ReadOnlyFileInputStream(rof), BUFSIZE));
+        return new TarInputShop(new GZIPInputStream(in, BUFSIZE));
     }
 
     @Override

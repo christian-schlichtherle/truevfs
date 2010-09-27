@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.ChainableIOException;
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -41,12 +42,12 @@ public class ArchiveSyncException extends ChainableIOException {
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, Throwable cause) {
+    ArchiveSyncException(ArchiveDescriptor archive, IOException cause) {
         super(cause);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message, Throwable cause) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message, IOException cause) {
         super(message, cause);
         this.mountPoint = archive.getMountPoint();
     }
@@ -61,12 +62,12 @@ public class ArchiveSyncException extends ChainableIOException {
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, Throwable cause, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, IOException cause, int priority) {
         super(cause, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message, Throwable cause, int priority) {
+    ArchiveSyncException(ArchiveDescriptor archive, String message, IOException cause, int priority) {
         super(message, cause, priority);
         this.mountPoint = archive.getMountPoint();
     }

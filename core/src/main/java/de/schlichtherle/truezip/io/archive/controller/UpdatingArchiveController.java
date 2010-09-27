@@ -105,7 +105,7 @@ extends FileSystemArchiveController<AE> {
 
         @Override
         public Iterator<CE> iterator() {
-            return Collections.emptyIterator();
+            return (Iterator) Collections.emptyList().iterator();
         }
 
         @Override
@@ -213,7 +213,6 @@ extends FileSystemArchiveController<AE> {
      * Returns the wrapped archive input or {@code null} if and only if
      * {@code proxy} is {@code null}.
      */
-    // TODO: Return CommonInputShop<AE>
     private CommonInputShop<AE> getNullableInputTarget() {
         return null == input ? null : input.getTarget();
     }
@@ -454,11 +453,10 @@ extends FileSystemArchiveController<AE> {
             //tmp.deleteOnExit();
             try {
                 // Now extract the entry to the temporary file.
-                // TODO: Use InputSocket.newReadOnlyFile()!
+                // TODO: Try InputSocket.newReadOnlyFile()!
                 Streams.copy(
                         controller
                             .getInputSocket(path)
-                            .connect(null)
                             .newInputStream(),
                         new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
@@ -707,7 +705,7 @@ extends FileSystemArchiveController<AE> {
         };
         logger.log(Level.FINER, "sync.try", stats); // NOI18N
         try {
-            sync0(options, builder);
+            sync0(builder, options);
         } catch (ArchiveSyncException ex) {
             logger.log(Level.FINER, "sync.catch", ex); // NOI18N
             throw ex;
@@ -717,8 +715,8 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void sync0(
-            final BitField<SyncOption> options,
-            final ArchiveSyncExceptionBuilder builder)
+            final ArchiveSyncExceptionBuilder builder,
+            final BitField<SyncOption> options)
     throws ArchiveSyncException {
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
@@ -872,7 +870,7 @@ extends FileSystemArchiveController<AE> {
         try {
             try {
                 shutdownStep1(handler);
-                copy(new FilterExceptionHandler(handler));
+                copy((ExceptionHandler<IOException, ArchiveSyncException>) new FilterExceptionHandler(handler));
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
                 // filesystem which were successfully written (this is the
@@ -1127,17 +1125,17 @@ extends FileSystemArchiveController<AE> {
             }
 
             public void warn(IOException cause) throws ArchiveSyncException {
-                if (cause == null)
+                if (null == cause)
                     throw new NullPointerException();
                 handler.warn(new ArchiveSyncWarningException(
                         UpdatingArchiveController.this, cause));
             }
         } // class FilterExceptionHandler
-        final FilterExceptionHandler decoratedHandler = new FilterExceptionHandler();
+        final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
         if (output != null)
-            output.closeAllOutputStreams(decoratedHandler);
+            output.closeAllOutputStreams((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
         if (input != null)
-            input.closeAllInputStreams(decoratedHandler);
+            input.closeAllInputStreams((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
     }
 
     /**
