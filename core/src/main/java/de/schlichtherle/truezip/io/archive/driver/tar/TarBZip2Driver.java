@@ -18,11 +18,13 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.bzip2.CBZip2OutputStream;
 
@@ -107,10 +109,6 @@ public class TarBZip2Driver extends TarDriver {
         return inBlockSize;
     }
 
-    //
-    // Driver implementation:
-    //
-
     /**
      * Returns a newly created and verified {@link CBZip2InputStream}.
      * This method performs a simple verification by computing the checksum
@@ -119,22 +117,26 @@ public class TarBZip2Driver extends TarDriver {
      * unfortunately does not do sufficient verification!
      */
     @Override
-    protected InputStream newInputStream(ArchiveDescriptor archive, ReadOnlyFile rof)
+    protected TarInputShop newTarInputShop(
+            ArchiveDescriptor archive,
+            ReadOnlyFile rof)
     throws IOException {
-        final InputStream in = super.newInputStream(archive, rof);
+        final InputStream in = new ReadOnlyFileInputStream(rof);
         // Consume and check the first two magic bytes. This is required for
-        // the CBZip2InputStream class. Bad design, I think...
+        // the CBZip2InputStream class.
         if (in.read() != 'B' || in.read() != 'Z')
             throw new IOException("Not a BZIP2 compressed input stream!");
         final byte[] magic = new byte[2];
         final InputStream vin = TarInputShop.readAhead(in, magic);
         if (magic[0] != 'h' || magic[1] < '1' || '9' < magic[1])
             throw new IOException("Not a BZIP2 compressed input stream!");
-        return new CBZip2InputStream(new BufferedInputStream(vin, BUFSIZE));
+        return new TarInputShop(
+                new CBZip2InputStream(
+                    new BufferedInputStream(vin, BUFSIZE)));
     }
 
     @Override
-    protected TarOutputShop newTarOutput(
+    protected TarOutputShop newTarOutputShop(
             final ArchiveDescriptor archive,
             final OutputStream out,
             final TarInputShop source)
@@ -142,7 +144,7 @@ public class TarBZip2Driver extends TarDriver {
         // Produce the first two magic bytes. This is required for the
         // CBZip2OutputStream class.
         out.write(new byte[] { 'B', 'Z' });
-        return super.newTarOutput(
+        return super.newTarOutputShop(
                 archive,
                 new CBZip2OutputStream(
                     new BufferedOutputStream(out, BUFSIZE),

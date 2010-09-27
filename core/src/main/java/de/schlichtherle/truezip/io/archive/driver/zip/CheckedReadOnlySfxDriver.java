@@ -79,7 +79,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     }
     
     @Override
-    protected ZipInputShop newZipInput(
+    protected ZipInputShop newZipInputShop(
             ArchiveDescriptor archive,
             ReadOnlyFile rof)
     throws IOException {
