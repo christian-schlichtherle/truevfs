@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -88,7 +89,9 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
      *
      * @return A new input stream.
      */
-    public abstract InputStream newInputStream() throws IOException;
+    public InputStream newInputStream() throws IOException {
+        return new ReadOnlyFileInputStream(newReadOnlyFile());
+    }
 
     /**
      * <b>Optional:</b> Returns a new read only file for reading bytes from the
@@ -103,7 +106,5 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
      * @throws UnsupportedOperationException to indicate that this operation
      *         is not (yet) supported.
      */
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 }

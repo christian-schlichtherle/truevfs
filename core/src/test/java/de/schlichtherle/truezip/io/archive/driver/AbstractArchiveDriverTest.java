@@ -23,6 +23,8 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
@@ -182,7 +184,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonInputShop newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
+        public CommonInputShop newInputShop(ArchiveDescriptor archive, CommonInputSocket input)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
@@ -195,7 +197,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonOutputShop newOutputShop(ArchiveDescriptor archive, OutputStream out, CommonInputShop source)
+        public CommonOutputShop newOutputShop(ArchiveDescriptor archive, CommonOutputSocket output, CommonInputShop source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
@@ -213,6 +215,8 @@ public class AbstractArchiveDriverTest extends TestCase {
     }
 
     private static class DummyEntry extends FileEntry implements ArchiveEntry {
+        private static final long serialVersionUID = 9650827654L;
+
         DummyEntry(File file) {
             super(file);
         }

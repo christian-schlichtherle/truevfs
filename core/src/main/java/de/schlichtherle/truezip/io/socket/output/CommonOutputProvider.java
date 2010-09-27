@@ -35,21 +35,20 @@ import java.io.IOException;
 public interface CommonOutputProvider<CE extends CommonEntry> {
 
     /**
-     * Returns a non-{@code null} output socket for write access to the
+     * Returns a new non-{@code null} output socket for write access to the
      * given local target.
      * <p>
-     * The implementation must not assume that the returned output socket will
-     * ever be used and must tolerate changes to all settable properties of the
-     * local target object.
-     * <p>
-     * Multiple invocations with the same parameter may return the same
-     * object again.
+     * When called on the returned common output socket, the method
+     * {@link OutputSocket#getTarget()} <em>must</em> return an object which
+     * {@link Object#equals(Object) compares equal} to the given local target
+     * but is not necessarily the same.
      *
      * @param  target the non-{@code null} local target.
-     * @return A non-{@code null} output socket for writing to the local target.
+     * @return A new non-{@code null} output socket for writing to the local
+     *         target.
      * @throws IOException If the local target
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    CommonOutputSocket<CE> getOutputSocket(CE target) throws IOException;
+    CommonOutputSocket<CE> newOutputSocket(CE target) throws IOException;
 }

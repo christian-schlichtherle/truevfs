@@ -35,21 +35,20 @@ import java.io.IOException;
 public interface CommonInputProvider<CE extends CommonEntry> {
 
     /**
-     * Returns a non-{@code null} input socket for read access to the
+     * Returns a new non-{@code null} input socket for read access to the
      * given local target.
-     * Multiple invocations with the same parameter may return the same
-     * object again.
      * <p>
-     * The method {@link InputSocket#getTarget()} must return an object
-     * which {@link Object#equals(Object) compares equal} to the given local
-     * target when called on the returned input socket.
+     * When called on the returned common input socket, the method
+     * {@link InputSocket#getTarget()} <em>must</em> return an object which
+     * {@link Object#equals(Object) compares equal} to the given local target
+     * but is not necessarily the same.
      *
      * @param  target the non-{@code null} local target.
-     * @return A non-{@code null} input socket for reading from the local
+     * @return A new non-{@code null} input socket for reading from the local
      *         target.
      * @throws IOException If the local target does not exist or
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    CommonInputSocket<CE> getInputSocket(CE target) throws IOException;
+    CommonInputSocket<CE> newInputSocket(CE target) throws IOException;
 }

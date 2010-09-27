@@ -123,7 +123,7 @@ implements CommonOutputShop<ZipEntry> {
     }
 
     @Override
-    public CommonOutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
+    public CommonOutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         class OutputSocket extends CommonOutputSocket<ZipEntry> {
             @Override
@@ -134,65 +134,56 @@ implements CommonOutputShop<ZipEntry> {
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                return ZipOutputShop.this.newOutputStream(entry, getPeerTarget());
+                if (isBusy())
+                    throw new CommonOutputBusyException(entry);
+                if (entry.isDirectory()) {
+                    entry.setMethod(STORED);
+                    entry.setCrc(0);
+                    entry.setCompressedSize(0);
+                    entry.setSize(0);
+                    return new EntryOutputStream(entry);
+                }
+                final CommonEntry peer = getPeerTarget();
+                if (peer != null) {
+                    entry.setSize(peer.getSize());
+                    if (peer instanceof ZipEntry) {
+                        // Set up entry attributes for Direct Data Copying (DDC).
+                        // A preset method in the entry takes priority.
+                        // The ZIP.RAES drivers use this feature to enforce
+                        // deflation for enhanced authentication security.
+                        final ZipEntry srcZipEntry = (ZipEntry) peer;
+                        if (entry.getMethod() == UNKNOWN)
+                            entry.setMethod(srcZipEntry.getMethod());
+                        if (entry.getMethod() == srcZipEntry.getMethod())
+                            entry.setCompressedSize(srcZipEntry.getCompressedSize());
+                        entry.setCrc(srcZipEntry.getCrc());
+                        return new EntryOutputStream(
+                                entry, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
+                    }
+                }
+                switch (entry.getMethod()) {
+                    case UNKNOWN:
+                        entry.setMethod(DEFLATED);
+                        break;
+
+                    case STORED:
+                        if (entry.getCrc() == UNKNOWN
+                                || entry.getCompressedSize() == UNKNOWN
+                                || entry.getSize() == UNKNOWN)
+                            return new TempEntryOutputStream(
+                                    createTempFile(TEMP_FILE_PREFIX), entry);
+                        break;
+
+                    case DEFLATED:
+                        break;
+
+                    default:
+                        assert false : "unsupported method";
+                }
+                return new EntryOutputStream(entry);
             }
         }
         return new OutputSocket();
-    }
-
-    protected OutputStream newOutputStream(
-            final ZipEntry target,
-            final CommonEntry peer)
-    throws IOException {
-        if (isBusy())
-            throw new CommonOutputBusyException(target);
-
-        if (target.isDirectory()) {
-            target.setMethod(STORED);
-            target.setCrc(0);
-            target.setCompressedSize(0);
-            target.setSize(0);
-            return new EntryOutputStream(target);
-        }
-
-        if (peer != null) {
-            target.setSize(peer.getSize());
-            if (peer instanceof ZipEntry) {
-                // Set up entry attributes for Direct Data Copying (DDC).
-                // A preset method in the entry takes priority.
-                // The ZIP.RAES drivers use this feature to enforce deflation
-                // for enhanced authentication security.
-                final ZipEntry srcZipEntry = (ZipEntry) peer;
-                if (target.getMethod() == UNKNOWN)
-                    target.setMethod(srcZipEntry.getMethod());
-                if (target.getMethod() == srcZipEntry.getMethod())
-                    target.setCompressedSize(srcZipEntry.getCompressedSize());
-                target.setCrc(srcZipEntry.getCrc());
-                return new EntryOutputStream(
-                        target, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
-            }
-        }
-
-        switch (target.getMethod()) {
-            case UNKNOWN:
-                target.setMethod(DEFLATED);
-                break;
-
-            case STORED:
-                if (target.getCrc() == UNKNOWN
-                        || target.getCompressedSize() == UNKNOWN
-                        || target.getSize() == UNKNOWN)
-                    return new TempEntryOutputStream(
-                            createTempFile(TEMP_FILE_PREFIX), target);
-                break;
-
-            case DEFLATED:
-                break;
-
-            default:
-                assert false : "unsupported method";
-        }
-        return new EntryOutputStream(target);
     }
 
     /**
@@ -209,7 +200,7 @@ implements CommonOutputShop<ZipEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #newOutputStream}.
+     * These preconditions are checked by {@link #newOutputSocket(ZipEntry) t}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         EntryOutputStream(ZipEntry entry) throws IOException {

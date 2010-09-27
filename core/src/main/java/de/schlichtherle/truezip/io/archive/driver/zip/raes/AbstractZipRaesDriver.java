@@ -16,6 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -31,7 +36,6 @@ import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -105,22 +109,38 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     @Override
     public ZipInputShop newInputShop(
             final ArchiveDescriptor archive,
-            final ReadOnlyFile rof)
+            final CommonInputSocket<?> input)
     throws IOException {
-        final RaesReadOnlyFile rrof;
-        try {
-            rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(archive));
-        } catch (RaesKeyException failure) {
-            throw new TransientIOException(failure);
+        class InputSocket extends FilterInputSocket<CommonEntry> {
+            InputSocket() {
+                super(input);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                final ReadOnlyFile rof = super.newReadOnlyFile();
+                try {
+                    final RaesReadOnlyFile rrof;
+                    try {
+                        rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(archive));
+                    } catch (RaesKeyException failure) {
+                        throw new TransientIOException(failure);
+                    }
+                    if (rof.length() <= getAuthenticationTrigger()) { // intentionally compares rof, not rrof!
+                        // Note: If authentication fails, this is reported through some
+                        // sort of IOException, not a FileNotFoundException!
+                        // This allows the client to treat the tampered archive like an
+                        // ordinary file which may be read, written or deleted.
+                        rrof.authenticate();
+                    }
+                    return rrof;
+                } catch (IOException ex) {
+                    rof.close();
+                    throw ex;
+                }
+            }
         }
-        if (rof.length() <= getAuthenticationTrigger()) { // intentionally compares rof, not rrof!
-            // Note: If authentication fails, this is reported through some
-            // sort of IOException, not a FileNotFoundException!
-            // This allows the client to treat the tampered archive like an
-            // ordinary file which may be read, written or deleted.
-            rrof.authenticate();
-        }
-        return super.newInputShop(archive, rrof);
+        return super.newInputShop(archive, new InputSocket());
     }
 
     /**
@@ -145,30 +165,37 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     /**
-     * The implementation in this class calls {@link #getRaesParameters}
-     * and decorates the given {@link OutputStream} with a new
-     * {@link RaesOutputStream} before passing the result to the super class
-     * implementation.
-     *
-     * @param archive The archive to write.
-     * @param out The {@link OutputStream} to decorate with a
-     *        {@link RaesOutputStream}.
-     * @param source The source from which archive entries will be copied to
-     *        the destination.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link AbstractZipRaesDriver} calls
+     * {@link #getRaesParameters} for authentication.
      */
     @Override
     public CommonOutputShop newOutputShop(
             final ArchiveDescriptor archive,
-            final OutputStream out,
+            final CommonOutputSocket<?> output,
             final CommonInputShop<ZipEntry> source)
     throws IOException {
-        final RaesOutputStream ros;
-        try {
-            ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
-        } catch (RaesKeyException failure) {
-            throw new TransientIOException(failure);
+        class OutputSocket extends FilterOutputSocket<CommonEntry> {
+            OutputSocket() {
+                super(output);
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                final OutputStream out = super.newOutputStream();
+                try {
+                    return RaesOutputStream.getInstance(out, getRaesParameters(archive));
+                } catch (RaesKeyException failure) {
+                    out.close();
+                    throw new TransientIOException(failure);
+                } catch (IOException ex) {
+                    out.close();
+                    throw ex;
+                }
+            }
         }
-        return super.newOutputShop(archive, ros, source);
+        return super.newOutputShop(archive, new OutputSocket(), source);
     }
 
     /**

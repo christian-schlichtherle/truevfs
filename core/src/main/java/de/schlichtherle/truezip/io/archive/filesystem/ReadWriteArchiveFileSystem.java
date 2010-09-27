@@ -217,7 +217,7 @@ implements ArchiveFileSystem<AE> {
             return false;
 
         final int length = name.length();
-        assert length > 0 || isRoot(name) : "Definition of ROOT changed!?";
+        assert length > 0 || isRoot(name);
         switch (name.charAt(0)) {
         case SEPARATOR_CHAR:
             return false; // not a relative path name
@@ -653,7 +653,7 @@ implements ArchiveFileSystem<AE> {
         final BaseEntry<AE> entry = master.remove(path);
         if (entry == null)
             throw new ArchiveFileSystemException(path,
-                    "entry does not exist");
+                    "archive entry does not exist");
         assert entry != root;
         if (entry.getType() == DIRECTORY && entry.list().size() > 0) {
             master.put(path, entry); // Restore file system
@@ -693,22 +693,22 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public boolean setTime(
+    public void setTime(
             final String path,
             final BitField<Access> types,
             final long value)
     throws ArchiveFileSystemException {
-        if (value < 0)
+        if (0 > value)
             throw new IllegalArgumentException(path +
-                    " (negative entry modification time)");
+                    " (negative access time)");
         final BaseEntry<AE> entry = master.get(path);
         if (entry == null)
-            return false;
+            throw new ArchiveFileSystemException(path,
+                    "archive entry not found");
         // Order is important here!
         touch();
         for (Access type : types)
             entry.getTarget().setTime(type, value);
-        return true;
     }
 
     @Override
@@ -734,11 +734,11 @@ implements ArchiveFileSystem<AE> {
                         continue; // never write the virtual root directory
                     if (e.getTime(Access.WRITE) < 0)
                         continue; // never write ghost directories
-                    output.getOutputSocket(e).connect(null).newOutputStream().close();
+                    output.newOutputSocket(e).connect(null).newOutputStream().close();
                 } else if (input.getEntry(n) != null) {
                     assert e == input.getEntry(n);
-                    IOSocket.copy(  input.getInputSocket(e),
-                                    output.getOutputSocket(e));
+                    IOSocket.copy(  input.newInputSocket(e),
+                                    output.newOutputSocket(e));
                 } else {
                     // The file system entry is an archive file which has been
                     // newly created and not yet been reassembled
@@ -746,7 +746,7 @@ implements ArchiveFileSystem<AE> {
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the archive file.
-                    output.getOutputSocket(e).connect(null).newOutputStream().close();
+                    output.newOutputSocket(e).connect(null).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 handler.warn(ex);

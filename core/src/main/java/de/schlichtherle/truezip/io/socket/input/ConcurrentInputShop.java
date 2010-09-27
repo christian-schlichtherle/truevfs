@@ -17,10 +17,13 @@
 package de.schlichtherle.truezip.io.socket.input;
 
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.SynchronizedReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -56,8 +59,8 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * in case a sloppy client application has forgot to close a stream before
      * the common input gets closed.
      */
-    private final Map<EntryInputStream, Thread> streams
-            = new WeakHashMap<EntryInputStream, Thread>();
+    private final Map<DoCloseable, Thread> streams
+            = new WeakHashMap<DoCloseable, Thread>();
 
     private volatile boolean stopped;
 
@@ -67,25 +70,28 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     }
 
     @Override
-    public CommonInputSocket<CE> getInputSocket(final CE entry)
+    public CommonInputSocket<CE> newInputSocket(final CE entry)
     throws IOException {
         assert !stopped;
         assert entry != null;
 
-        // TODO: Consider synchronization!
-        final CommonInputSocket<CE> input = target.getInputSocket(entry);
-        class InputSocket extends CommonInputSocket<CE> {
-            @Override
-            public CE getTarget() {
-                return entry;
+        class InputSocket extends FilterInputSocket<CE> {
+            InputSocket() throws IOException {
+                // TODO: Check: Synchronization required?
+                super(ConcurrentInputShop.super.newInputSocket(entry));
             }
 
             @Override
-            public InputStream newInputStream()
-            throws IOException {
+            public InputStream newInputStream() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
-                    return new EntryInputStream(
-                            input.chain(this).newInputStream());
+                    return new EntryInputStream(super.newInputStream());
+                }
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                synchronized (ConcurrentInputShop.this) {
+                    return new EntryReadOnlyFile(super.newReadOnlyFile());
                 }
             }
         }
@@ -153,7 +159,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     throws E {
         assert !stopped;
         stopped = true;
-        for (final Iterator<EntryInputStream> it = streams.keySet().iterator();
+        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -167,6 +173,10 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
         }
     }
 
+    private interface DoCloseable {
+        void doClose() throws IOException;
+    }
+
     /**
      * An {@link InputStream} to read the entry data from an
      * {@link CommonInputShop}.
@@ -174,7 +184,148 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * {@link IOException} on any subsequent attempt to read data after
      * {@link #closeAllInputStreams} has been called.
      */
-    private final class EntryInputStream extends SynchronizedInputStream {
+    private final class EntryReadOnlyFile
+    extends SynchronizedReadOnlyFile
+    implements DoCloseable {
+        private /*volatile*/ boolean closed;
+
+        @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
+        private EntryReadOnlyFile(final ReadOnlyFile rof) {
+            super(rof, ConcurrentInputShop.this);
+            assert rof != null;
+            streams.put(this, Thread.currentThread());
+            ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
+        }
+
+        private void ensureNotStopped() throws IOException {
+            if (stopped)
+                throw new CommonEntryStreamClosedException();
+        }
+
+        @Override
+        public long length() throws IOException {
+            ensureNotStopped();
+            return super.length();
+        }
+
+        @Override
+        public long getFilePointer() throws IOException {
+            ensureNotStopped();
+            return super.getFilePointer();
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            ensureNotStopped();
+            super.seek(pos);
+        }
+
+        @Override
+        public int read() throws IOException {
+            ensureNotStopped();
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            ensureNotStopped();
+            return super.read(b);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            ensureNotStopped();
+            return super.read(b, off, len);
+        }
+
+        @Override
+        public void readFully(byte[] b) throws IOException {
+            ensureNotStopped();
+            super.readFully(b);
+        }
+
+        @Override
+        public void readFully(byte[] b, int off, int len) throws IOException {
+            ensureNotStopped();
+            super.readFully(b, off, len);
+        }
+
+        /**
+         * Closes this common entry stream and releases any resources
+         * associated with it.
+         * This method tolerates multiple calls to it: Only the first
+         * invocation closes the underlying stream.
+         *
+         * @throws IOException If an I/O exception occurs.
+         */
+        @Override
+        public final void close() throws IOException {
+            assert ConcurrentInputShop.this == lock;
+            synchronized (ConcurrentInputShop.this) {
+                if (closed)
+                    return;
+                // Order is important!
+                try {
+                    doClose();
+                } finally {
+                    streams.remove(this);
+                    ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
+                }
+            }
+        }
+
+        /**
+         * Closes the underlying stream and marks this stream as being closed.
+         * It is an fail to call this method on an already closed stream.
+         * This method does <em>not</em> remove this stream from the pool.
+         * This method is not synchronized!
+         *
+         * @throws IOException If an I/O exception occurs.
+         */
+        @Override
+        public void doClose() throws IOException {
+            assert !closed;
+            /*if (closed)
+                return;*/
+            // Order is important!
+            closed = true;
+            super.doClose();
+        }
+
+        /**
+         * The finalizer in this class forces this common entry input stream
+         * to close.
+         * This ensures that a common input can be updated although the client
+         * application may have "forgot" to close this input stream before.
+         */
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                if (closed)
+                    return;
+                logger.finer("finalize.open");
+                try {
+                    doClose();
+                } catch (IOException failure) {
+                    logger.log(Level.FINE, "finalize.catch", failure);
+                }
+            } finally {
+                super.finalize();
+            }
+        }
+    } // class EntryReadOnlyFile
+
+    /**
+     * An {@link InputStream} to read the entry data from an
+     * {@link CommonInputShop}.
+     * This input stream provides support for finalization and throws an
+     * {@link IOException} on any subsequent attempt to read data after
+     * {@link #closeAllInputStreams} has been called.
+     */
+    private final class EntryInputStream
+    extends SynchronizedInputStream
+    implements DoCloseable {
         private /*volatile*/ boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
@@ -270,7 +421,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
          * @throws IOException If an I/O exception occurs.
          */
         @Override
-        protected void doClose() throws IOException {
+        public void doClose() throws IOException {
             assert !closed;
             /*if (closed)
                 return;*/

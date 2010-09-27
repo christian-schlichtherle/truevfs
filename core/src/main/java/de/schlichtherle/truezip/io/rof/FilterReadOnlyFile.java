@@ -57,7 +57,7 @@ import java.io.IOException;
  * in {@link FilterReadOnlyFile}.
  * </blockquote>
  * <p>
- * This class <em>is</em> thread-safe.
+ * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$

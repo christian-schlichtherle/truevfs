@@ -135,7 +135,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
     void unlink(String path)
     throws ArchiveFileSystemException;
 
-    boolean setTime(String path, BitField<Access> types, long value)
+    void setTime(String path, BitField<Access> types, long value)
     throws ArchiveFileSystemException;
 
     boolean isWritable(String path);

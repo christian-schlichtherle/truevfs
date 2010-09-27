@@ -16,10 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,16 +46,25 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
     }
 
     @Override
-    protected OutputStream newOutputStream(
-            final CommonOutputSocket<ZipEntry> output)
+    public CommonOutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
     throws IOException {
-        final ZipEntry local = output.getTarget();
-        if (MIMETYPE.equals(local.getName())) {
-            mimetype = true;
-            if (local.getMethod() == UNKNOWN)
-                local.setMethod(STORED);
+        class OutputSocket extends FilterOutputSocket<ZipEntry> {
+            OutputSocket() throws IOException {
+                super(OdfOutputShop.super.newOutputSocket(entry));
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                final ZipEntry local = getTarget();
+                if (MIMETYPE.equals(local.getName())) {
+                    mimetype = true;
+                    if (local.getMethod() == UNKNOWN)
+                        local.setMethod(STORED);
+                }
+                return super.newOutputStream();
+            }
         }
-        return super.newOutputStream(output);
+        return new OutputSocket();
     }
 
     @Override

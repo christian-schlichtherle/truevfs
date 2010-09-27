@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,19 +61,15 @@ public interface ArchiveDriver<AE extends ArchiveEntry>
 extends CommonEntryFactory<AE> {
 
     /**
-     * Creates a new common input shop for the given {@code archive}
-     * in order to read the given read only file.
+     * Creates a new common input shop for reading the archive entries of the
+     * the described {@code archive} from the given {@code input} socket's
+     * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link ArchiveController} is processing
      *         - {@code null} is not permitted.
-     * @param  rof the {@link ReadOnlyFile} to read the actual archive contents
-     *         from
-     *         - {@code null} is not permitted.
-     *         Hint: If you'ld prefer to have an {@link InputStream},
-     *         you could decorate this parameter with a
-     *         {@link ReadOnlyFileInputStream}.
-     * @return A non-{@code null} reference to a new common input shop.
+     * @param  input the non-{@code null} common input socket for reading
+     *         the contents of the described archive from its target.
      * @throws TransientIOException If calling this method for the same
      *         archive file again could possibly succeed.
      *         This exception is associated with another {@link IOException}
@@ -84,19 +82,21 @@ extends CommonEntryFactory<AE> {
      *         when reading the input archive and the implementation would like
      *         the client application to recognize the archive file as a
      *         <i>regular</i> file.
+     * @return A non-{@code null} reference to a new common input shop.
      */
-    CommonInputShop<AE> newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
+    CommonInputShop<AE> newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
     throws IOException;
 
     /**
-     * Creates a new common output shop for the given {@code archive}
-     * from the given output stream.
+     * Creates a new common output shop for writing archive entries to the
+     * the described {@code archive} to the given {@code output} socket's
+     * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link ArchiveController} is processing
      *         - {@code null} is not permitted.
-     * @param  out the {@link OutputStream} to write the archive entries to
-     *         - {@code null} is not permitted.
+     * @param  output the non-{@code null} common output socket for writing
+     *         the contents of the described archive to its target.
      * @param  source the nullable {@link CommonInputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
@@ -115,7 +115,7 @@ extends CommonEntryFactory<AE> {
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
      */
-    CommonOutputShop<AE> newOutputShop(ArchiveDescriptor archive, OutputStream out, CommonInputShop<AE> source)
+    CommonOutputShop<AE> newOutputShop(ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<AE> source)
     throws IOException;
 
     /**

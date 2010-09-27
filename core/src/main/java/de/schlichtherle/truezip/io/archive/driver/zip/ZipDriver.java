@@ -16,14 +16,14 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -199,13 +199,19 @@ implements ZipEntryFactory<ZipEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in {@link ZipDriver} simply forwards the call to
-     * {@link #newZipInput}.
+     * The implementation in the class {@link ZipDriver} simply forwards the
+     * call to {@link #newZipInput}.
      */
     @Override
-    public ZipInputShop newInputShop(ArchiveDescriptor archive, ReadOnlyFile rof)
+    public ZipInputShop newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
     throws IOException {
-        return newZipInput(archive, rof);
+        final ReadOnlyFile rof = input.newReadOnlyFile();
+        try {
+            return newZipInput(archive, rof);
+        } catch (IOException ex) {
+            rof.close();
+            throw ex;
+        }
     }
 
     protected ZipInputShop newZipInput(
@@ -225,11 +231,16 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public CommonOutputShop<ZipEntry> newOutputShop(
-            ArchiveDescriptor archive, OutputStream out, CommonInputShop<ZipEntry> source)
+            ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<ZipEntry> source)
     throws IOException {
-        return new MultiplexedArchiveOutputShop<ZipEntry>(
-                newZipOutput(archive, out, (ZipInputShop) source));
-        //return newZipOutput(archive, out, (ZipInputShop) source);
+        final OutputStream out = output.newOutputStream();
+        try {
+            return new MultiplexedArchiveOutputShop<ZipEntry>(
+                    newZipOutput(archive, out, (ZipInputShop) source));
+        } catch (IOException ex) {
+            out.close();
+            throw ex;
+        }
     }
 
     protected ZipOutputShop newZipOutput(

@@ -17,8 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.RawZipFile;
@@ -55,7 +53,7 @@ implements CommonInputShop<ZipEntry> {
     }
 
     @Override
-    public CommonInputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
+    public CommonInputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         assert getEntry(entry.getName()) == entry : "interface contract violation";
         class InputSocket extends CommonInputSocket<ZipEntry> {
@@ -65,17 +63,18 @@ implements CommonInputShop<ZipEntry> {
             }
 
             @Override
-            public InputStream newInputStream()
-            throws IOException {
-                return ZipInputShop.this.newInputStream(entry, getPeerTarget());
+            public InputStream newInputStream() throws IOException {
+                return ZipInputShop.this.getInputStream(
+                        entry.getName(),
+                        false,
+                        !(getPeerTarget() instanceof ZipEntry));
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                throw new UnsupportedOperationException();
             }
         }
         return new InputSocket();
-    }
-
-    protected InputStream newInputStream(ZipEntry target, CommonEntry peer)
-    throws IOException {
-        return super.getInputStream(    target.getName(), false,
-                                        !(peer instanceof ZipEntry));
     }
 }
