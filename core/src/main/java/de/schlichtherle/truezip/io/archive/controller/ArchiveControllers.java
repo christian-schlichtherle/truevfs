@@ -86,7 +86,7 @@ public class ArchiveControllers {
      * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Object> models = new WeakHashMap<URI, Object>();
+    private static final Map<URI, Object> controllers = new WeakHashMap<URI, Object>();
 
     private ArchiveControllers() {
     }
@@ -97,12 +97,11 @@ public class ArchiveControllers {
         // VALUE in the map meanwhile, but not yet removed from the map,
         // are counted as well.
         // But hey, this is only statistics, right?
-        return models.size();
+        return controllers.size();
     }
 
     public static ArchiveController getController(URI mountPoint) {
-        ArchiveModel model = getModel(mountPoint, null, null);
-        return null == model ? null : model.getController();
+        return getController(mountPoint, null, null);
     }
 
     /**
@@ -121,11 +120,6 @@ public class ArchiveControllers {
      * </ul>
      */
     public static ArchiveController getController(
-            URI mountPoint, URI enclMountPoint, ArchiveDriver driver) {
-        return getModel(mountPoint, enclMountPoint, driver).getController();
-    }
-
-    static ArchiveModel getModel(
             URI mountPoint,
             final URI enclMountPoint,
             final ArchiveDriver driver) {
@@ -134,19 +128,19 @@ public class ArchiveControllers {
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        synchronized (models) {
-            final Object value = models.get(mountPoint);
+        synchronized (controllers) {
+            final Object value = controllers.get(mountPoint);
             if (value instanceof Reference) {
-                final ArchiveModel model
-                        = (ArchiveModel) ((Reference) value).get();
+                final ArchiveController controller
+                        = (ArchiveController) ((Reference) value).get();
                 // Check that the controller hasn't been garbage collected
                 // meanwhile!
-                if (model != null) {
+                if (controller != null) {
                     // If required, reconfiguration of the ArchiveController
                     // must be deferred until we have released the lock on
                     // controllers in order to prevent dead locks.
                     //reconfigure = driver != null && driver != controller.getDriver();
-                    return model;
+                    return controller;
                 }
                 // Fall through!
             } else if (value != null) {
@@ -163,7 +157,7 @@ public class ArchiveControllers {
                 //     archive file as either the file itself or one of its
                 //     ancestors is created with a different
                 //     ArchiveDetector.
-                return (ArchiveModel) value;
+                return (ArchiveController) value;
             }
             if (driver == null) // pure lookup operation?
                 return null;
@@ -172,10 +166,6 @@ public class ArchiveControllers {
             return new UpdatingArchiveController(
                     mountPoint, enclMountPoint, driver);
         }
-    }
-
-    static ArchiveModel getModel(URI mountPoint) {
-        return getModel(mountPoint, null, null);
     }
 
     /**
@@ -194,8 +184,8 @@ public class ArchiveControllers {
         assert controller instanceof ArchiveController
             || ((WeakReference) controller).get() instanceof ArchiveController;
 
-        synchronized (models) {
-            models.put(mountPoint, controller);
+        synchronized (controllers) {
+            controllers.put(mountPoint, controller);
         }
     }
 
@@ -256,19 +246,20 @@ public class ArchiveControllers {
                 // call the sync() method on each respective archive controller.
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
-                for (final ArchiveModel c
-                        : getModels(prefix, REVERSE_MODELS)) {
+                for (final ArchiveController controller
+                        : getControllers(prefix, REVERSE_MODELS)) {
+                    final ArchiveModel model = controller.getModel();
                         try {
-                            c.writeLock().lock();
+                            model.writeLock().lock();
                             try {
-                                if (c.isTouched())
+                                if (model.isTouched())
                                     touched++;
                                 // Upon return, some new ArchiveWarningException's may
                                 // have been generated. We need to remember them for
                                 // later throwing.
-                                c.getController().sync(builder, options);
+                                controller.sync(builder, options);
                             } finally {
-                                c.writeLock().unlock();
+                                model.writeLock().unlock();
                             }
                         } catch (ArchiveSyncException exception) {
                             // Updating the archive file or wrapping it back into
@@ -293,21 +284,21 @@ public class ArchiveControllers {
                 new Object[] { total, touched });
     }
 
-    static Iterable<ArchiveModel> getModels() {
-        return getModels(null, null);
+    static Iterable<ArchiveController> getControllers() {
+        return getControllers(null, null);
     }
 
-    static Iterable<ArchiveModel> getModels(
+    static Iterable<ArchiveController> getControllers(
             URI prefix,
             final Comparator c) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
-        final Set<ArchiveModel> snapshot;
-        synchronized (models) {
+        final Set<ArchiveController> snapshot;
+        synchronized (controllers) {
             snapshot = c != null
                     ? new TreeSet(c)
-                    : new HashSet((int) (models.size() / 0.75f));
-            for (Object value : models.values()) {
+                    : new HashSet((int) (controllers.size() / 0.75f));
+            for (Object value : controllers.values()) {
                 if (value instanceof Reference) {
                     value = ((Reference) value).get(); // dereference
                     if (value == null) {
@@ -320,9 +311,9 @@ public class ArchiveControllers {
                     }
                 }
                 assert value != null;
-                final ArchiveModel model = (ArchiveModel) value;
-                if (model.getMountPoint().toString().startsWith(prefix.toString()))
-                    snapshot.add(model);
+                final ArchiveController controller = (ArchiveController) value;
+                if (controller.getMountPoint().toString().startsWith(prefix.toString()))
+                    snapshot.add(controller);
             }
         }
         return snapshot;

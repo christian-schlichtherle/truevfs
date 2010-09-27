@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * Defines the common object for accessing and updating an archive file.
@@ -35,7 +36,7 @@ interface ArchiveModel extends ArchiveDescriptor {
      * model's target archive file or {@code null} if it's not enclosed in
      * another archive file.
      */
-    ArchiveModel getEnclModel();
+    URI getEnclMountPoint();
 
     /**
      * Resolves the given relative {@code path} against the relative path of
@@ -45,8 +46,6 @@ interface ArchiveModel extends ArchiveDescriptor {
      *         within another archive file.
      */
     String getEnclPath(final String path);
-
-    ArchiveController getController();
 
     ReentrantLock readLock();
 
@@ -61,16 +60,4 @@ interface ArchiveModel extends ArchiveDescriptor {
     void setTouched(boolean touched);
 
     File getTarget();
-
-    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
-    ArchiveFileSystem<?> autoMount(boolean autoCreate) throws IOException;
-
-    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
-    <O extends IOOperation> O runWriteLocked(O operation) throws IOException;
-
-    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
-    boolean hasNewData(String path);
-
-    /** @deprecated This is a transitional feature helping to refactor the code to an MVC pattern. */
-    void autoSync(final String path) throws ArchiveSyncException;
 }

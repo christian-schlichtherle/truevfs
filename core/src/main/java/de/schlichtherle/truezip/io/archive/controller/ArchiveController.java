@@ -15,7 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -58,7 +60,29 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveController extends ArchiveDescriptor {
+public abstract class ArchiveController
+implements  ArchiveDescriptor { // TODO: Should this really be implemented?
+
+    ArchiveController() {
+    }
+
+    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
+    @Override
+    public final String toString() {
+        return getMountPoint().toString();
+    }
+
+    abstract ArchiveModel getModel();
+
+    abstract ArchiveController getEnclController();
+
+    abstract <O extends IOOperation> O runWriteLocked(O operation) throws IOException;
+
+    abstract ArchiveFileSystem<?> autoMount(boolean autoCreate) throws IOException;
+
+    abstract boolean hasNewData(String path);
+
+    abstract void autoSync(final String path) throws ArchiveSyncException;
 
     /**
      * Defines the available options for archive file system operations.
@@ -67,7 +91,7 @@ public interface ArchiveController extends ArchiveDescriptor {
      * It's up to the particular operation to define which available options
      * are applicable for it and which combinations are supported.
      */
-    enum IOOption {
+    public enum IOOption {
         /**
          * Whether or not any missing parent directory entries within an
          * archive file shall get created automatically.
@@ -191,23 +215,23 @@ public interface ArchiveController extends ArchiveDescriptor {
      * against this mount point.
      */
     @Override
-    URI getMountPoint();
+    public abstract URI getMountPoint();
 
-    Icon getOpenIcon() throws FalsePositiveException;
+    public abstract Icon getOpenIcon() throws FalsePositiveException;
 
-    Icon getClosedIcon() throws FalsePositiveException;
+    public abstract Icon getClosedIcon() throws FalsePositiveException;
 
-    boolean isReadOnly() throws FalsePositiveException;
+    public abstract boolean isReadOnly() throws FalsePositiveException;
 
-    void setReadOnly(String path) throws IOException;
+    public abstract void setReadOnly(String path) throws IOException;
 
-    boolean isReadable(String path) throws FalsePositiveException;
+    public abstract boolean isReadable(String path) throws FalsePositiveException;
 
-    boolean isWritable(String path) throws FalsePositiveException;
+    public abstract boolean isWritable(String path) throws FalsePositiveException;
 
-    Entry<?> getEntry(String path) throws FalsePositiveException;
+    public abstract Entry<?> getEntry(String path) throws FalsePositiveException;
 
-    void setTime(String path, BitField<Access> types, long value)
+    public abstract void setTime(String path, BitField<Access> types, long value)
     throws IOException;
 
     /**
@@ -220,7 +244,7 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
-    CommonInputSocket<? extends CommonEntry>
+    public abstract CommonInputSocket<? extends CommonEntry>
     getInputSocket(String path)
     throws IOException;
 
@@ -234,7 +258,7 @@ public interface ArchiveController extends ArchiveDescriptor {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
-    CommonOutputSocket<? extends CommonEntry>
+    public abstract CommonOutputSocket<? extends CommonEntry>
     getOutputSocket(String path, BitField<IOOption> options)
     throws IOException;
 
@@ -270,11 +294,11 @@ public interface ArchiveController extends ArchiveDescriptor {
      *             {@code false}.</li>
      *         </ul>
      */
-    void mknod(String path, Type type, CommonEntry template, BitField<IOOption> options)
+    public abstract void mknod(String path, Type type, CommonEntry template, BitField<IOOption> options)
     throws IOException;
 
     /** Currently supports no options. */
-    void unlink(String path, BitField<IOOption> options)
+    public abstract void unlink(String path, BitField<IOOption> options)
     throws IOException;
 
     /**
