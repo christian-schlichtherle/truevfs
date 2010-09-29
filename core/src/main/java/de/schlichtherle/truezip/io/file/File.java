@@ -724,8 +724,8 @@ public class File extends java.io.File {
         final java.io.File target = getRealFile(delegate);
         this.controller = ArchiveControllers.getController(
                 target.toURI(),
-                null == enclArchive ? null : enclArchive.getArchiveController(),
-                detector.getArchiveDriver(target.getPath()));
+                detector.getArchiveDriver(target.getPath()),
+                null == enclArchive ? null : enclArchive.getArchiveController());
     }
 
     /**

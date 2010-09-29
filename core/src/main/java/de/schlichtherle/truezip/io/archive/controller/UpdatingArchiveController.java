@@ -126,7 +126,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#getController(URI, ArchiveController, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(CommonInputShop<AE> target) {
@@ -144,7 +144,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#getController(URI, ArchiveController, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(CommonOutputShop<AE> target) {
@@ -160,7 +160,7 @@ extends FileSystemArchiveController<AE> {
         @Override
         public void touch() throws IOException {
             ensureOutArchive();
-            setTouched(true);
+            schedule(true);
         }
     }
 
@@ -200,8 +200,8 @@ extends FileSystemArchiveController<AE> {
      */
     private boolean needsReassembly;
 
-    UpdatingArchiveController(ArchiveModel<AE> model, ArchiveDriver driver) {
-        super(model, driver);
+    UpdatingArchiveController(ArchiveModel<AE> model) {
+        super(model);
     }
 
     /**
@@ -797,7 +797,7 @@ extends FileSystemArchiveController<AE> {
         } catch (IOException ex) {
             throw builder.fail(new ArchiveSyncException(this, ex));
         } finally {
-            setTouched(needsReassembly);
+            schedule(needsReassembly);
         }
 
         builder.check();
@@ -1069,7 +1069,7 @@ extends FileSystemArchiveController<AE> {
             shutdownStep2(handler);
         }
         shutdownStep3(true);
-        setTouched(false);
+        schedule(false);
     }
 
     @Override

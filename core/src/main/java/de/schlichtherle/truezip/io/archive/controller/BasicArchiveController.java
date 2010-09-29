@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -39,22 +37,16 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Operation;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.URI;
 import java.util.Set;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
@@ -115,146 +107,8 @@ extends     ArchiveController<AE>
 implements  CommonInputProvider<AE>,
             CommonOutputProvider<AE> {
 
-    /**
-     * A weak reference to this archive controller.
-     * This field is for exclusive use by {@link #setTouched(boolean)}.
-     */
-    final WeakReference weakThis = new WeakReference(this);
-
-    /** The {@link ArchiveDriver} to use for this controller's target file. */
-    private final ArchiveDriver<AE> driver;
-
-    /**
-     * This constructor schedules this controller to be thrown away if the
-     * client application holds no more references to it.
-     * The subclass must update this schedule according to the controller's
-     * state.
-     * For example, if the controller has started to update some entry data,
-     * it must call {@link #setTouched(boolean)} in order to force the
-     * controller to be updated on the next call to
-     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
-     * even if the client application holds no more references to it.
-     * Otherwise, all changes may get lost!
-     * 
-     * @see #setTouched(boolean)
-     */
-    BasicArchiveController(
-            final ArchiveModel<AE> model,
-            final ArchiveDriver<AE> driver) {
+    BasicArchiveController(ArchiveModel<AE> model) {
         super(model);
-        assert driver != null;
-
-        this.driver = driver;
-        setTouched(false);
-    }
-
-    /**
-     * Returns the driver instance which is used for the target archive.
-     * All access to this method must be externally synchronized on this
-     * controller's read lock!
-     *
-     * @return A valid reference to an {@link ArchiveDriver} object
-     *         - never {@code null}.
-     */
-    final ArchiveDriver<AE> getDriver() {
-        return driver;
-    }
-
-    /**
-     * Sets the <i>touch status</i> of the virtual file system and
-     * (re)schedules this archive controller for the synchronization of its
-     * archive contents to the target archive file in the real file system
-     * upon the next call to
-     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
-     * according to the given touch status:
-     * <p>
-     * If set to {@code true}, the archive contents of this controller are
-     * guaranteed to get synced to the target archive file in the real file
-     * system even if there are no other objects referring to it.
-     * <p>
-     * If set to {@code false}, this controller is only conditionally
-     * scheduled to get synced, i.e. it gets automatically removed from the
-     * controllers weak hash map and discarded once the last file object
-     * directly or indirectly referring to it has been discarded unless
-     * {@code setTouched(true)} has been called again meanwhile.
-     * <p>
-     * Call this method if the archive controller has been newly created or
-     * successfully updated.
-     *
-     * @param touched The touch status of the virtual file system.
-     */
-    public final void setTouched(final boolean touched) {
-        assert weakThis.get() != null || !touched; // (garbage collected => no scheduling) == (scheduling => not garbage collected)
-        ArchiveControllers.map(getMountPoint(), touched ? this : weakThis);
-    }
-
-    /**
-     * Returns the virtual archive file system mounted from the target file.
-     * This method is reentrant with respect to any exceptions it may throw.
-     * <p>
-     * <b>Warning:</b> Either the read or the write lock of this controller
-     * must be acquired while this method is called!
-     * If only a read lock is acquired, but a write lock is required, this
-     * method will temporarily release all locks, so any preconditions must be
-     * checked again upon return to protect against concurrent modifications!
-     * 
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @return A valid archive file system - {@code null} is never returned.
-     * @throws FalsePositiveException
-     * @throws IOException On any other I/O related issue with the target file
-     *         or the target file of any enclosing archive file's controller.
-     */
-    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-    throws IOException;
-
-    public final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
-    throws IOException {
-        return autoMount(autoCreate, autoCreate);
-    }
-
-    final ArchiveFileSystem<AE> autoMount()
-    throws IOException {
-        return autoMount(false, false);
-    }
-
-    /**
-     * Tests if the file system entry with the given path name has received or
-     * is currently receiving new data via an output stream.
-     * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #sync}.
-     * Note that for directories this method will always return
-     * {@code false}!
-     */
-    public abstract boolean hasNewData(String path);
-
-    /**
-     * Synchronizes the archive file only if the archive file has already new
-     * data for the file system entry with the given path name.
-     * <p>
-     * <b>Warning:</b> As a side effect, all data structures returned by this
-     * controller get reset (filesystem, entries, streams, etc.)!
-     * As an implication, this method requires external synchronization on
-     * this controller's write lock!
-     * <p>
-     * <b>TODO:</b> Consider adding configuration switch to allow overwriting
-     * an archive entry to the same output archive multiple times, whereby
-     * only the last written entry would be added to the central directory
-     * of the archive (unless the archive type doesn't support this).
-     *
-     * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
-     * @throws ArchiveSyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
-     */
-    public final void autoSync(final String path)
-    throws ArchiveSyncException {
-        assert writeLock().isHeldByCurrentThread();
-        if (hasNewData(path)) {
-            sync(   new DefaultArchiveSyncExceptionBuilder(),
-                    BitField.of(WAIT_FOR_INPUT_STREAMS, WAIT_FOR_OUTPUT_STREAMS));
-        }
     }
 
     // TODO: Document this!

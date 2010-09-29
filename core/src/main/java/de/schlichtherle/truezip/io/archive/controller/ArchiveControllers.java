@@ -121,8 +121,8 @@ public class ArchiveControllers {
      */
     public static <AE extends ArchiveEntry> ArchiveController getController(
             URI mountPoint,
-            final ArchiveController<?> enclController,
-            final ArchiveDriver<AE> driver) {
+            final ArchiveDriver<AE> driver,
+            final ArchiveController<?> enclController) {
         if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
         if (mountPoint.isOpaque()) throw new IllegalArgumentException();
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
@@ -163,30 +163,19 @@ public class ArchiveControllers {
                 return null;
             // TODO: Refactor this to a more flexible design which supports
             // different sync strategies, like update or append.
-            final ArchiveModel model = new ArchiveModel<AE>(mountPoint,
-                    null == enclController ? null : enclController.getMountPoint());
-            return new UpdatingArchiveController<AE>(model , driver);
+            final ArchiveModel model = new ArchiveModel<AE>(
+                    mountPoint,
+                    null == enclController ? null : enclController.getMountPoint(),
+                    driver);
+            return new UpdatingArchiveController<AE>(model);
         }
     }
 
-    /**
-     * Associates the given archive controller to its mount point.
-     *
-     * @param mountPoint the non-{@code null} URI for the mount point of the
-     *        target archive file.
-     * @param controller An {@link ArchiveController} or a
-     *        {@link WeakReference} to an {@link ArchiveController}.
-     * @see   ArchiveDescriptor#getMountPoint()
-     */
-    static void map(URI mountPoint, final Object controller) {
-        assert mountPoint.isAbsolute();
-        assert !mountPoint.isOpaque();
-        assert mountPoint.equals(URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize());
-        assert controller instanceof ArchiveController
-            || ((WeakReference) controller).get() instanceof ArchiveController;
-
+    /** Maps the given archive controller strongly or weakly. */
+    static void map(final ArchiveController controller, final boolean strongly) {
         synchronized (controllers) {
-            controllers.put(mountPoint, controller);
+            controllers.put(controller.getMountPoint(),
+                    strongly ? controller : new WeakReference(controller));
         }
     }
 

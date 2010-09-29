@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -33,6 +34,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import javax.swing.Icon;
+
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
 
 /**
  * Provides multi-threaded read/write access to its <i>target archive file</i>
@@ -71,6 +75,20 @@ implements ArchiveDescriptor {
     /** The archive controller of the enclosing archive, if any. */
     private final ArchiveController<?> enclController;
 
+    /**
+     * This constructor schedules this controller to be thrown away if the
+     * client application holds no more references to it.
+     * The subclass must update this schedule according to the controller's
+     * state.
+     * For example, if the controller has started to update some entry data,
+     * it must call {@link #schedule(boolean)} in order to force the
+     * controller to be updated on the next call to
+     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
+     * even if the client application holds no more references to it.
+     * Otherwise, all changes may get lost!
+     *
+     * @see #schedule(boolean)
+     */
     ArchiveController(final ArchiveModel<AE> model) {
         assert model != null;
 
@@ -80,6 +98,36 @@ implements ArchiveDescriptor {
                 ? null
                 : ArchiveControllers.getController(enclMountPoint);
         assert (null == enclMountPoint) == (null == enclController);
+        schedule(false);
+    }
+
+    /**
+     * Schedules this archive controller for the synchronization of its
+     * archive contents to the target archive file in the host file system
+     * upon the next call to
+     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
+     * according to the given parameter:
+     * <p>
+     * If set to {@code true}, this controller gets unconditionally scheduled,
+     * i.e. its archive contents will get synchonized to the target archive
+     * file in the host file system even if there are no other objects
+     * referring to it.
+     * <p>
+     * If set to {@code false}, this controller gets only conditionally
+     * scheduled, i.e. its archive contents will get synchonized to the target
+     * archive file in the host file system if and only if another file or
+     * stream object is still directly or indirectly referring to it or if
+     * {@code schedule(true)} has been called again meanwhile.
+     * <p>
+     * Call this method if the archive controller has been newly created or
+     * successfully updated.
+     *
+     * @param unconditional Whether or not this archive controller shall get
+     *        unconditionally scheduled for synchronization of its archive
+     *        contents to the host file system.
+     */
+    final void schedule(final boolean unconditional) {
+        ArchiveControllers.map(this, unconditional);
     }
 
     final ArchiveModel<AE> getModel() {
@@ -132,6 +180,18 @@ implements ArchiveDescriptor {
                 || enclController.getTarget().isDirectory();
     }
 
+    /**
+     * Returns the driver instance which is used for the target archive.
+     * All access to this method must be externally synchronized on this
+     * controller's read lock!
+     *
+     * @return A valid reference to an {@link ArchiveDriver} object
+     *         - never {@code null}.
+     */
+    final ArchiveDriver<AE> getDriver() {
+        return getModel().getDriver();
+    }
+
     final ReentrantLock readLock() {
         return getModel().readLock();
     }
@@ -180,11 +240,74 @@ implements ArchiveDescriptor {
         return operation;
     }
 
-    abstract ArchiveFileSystem<?> autoMount(boolean autoCreate) throws IOException;
+    final ArchiveFileSystem<AE> autoMount()
+    throws IOException {
+        return autoMount(false, false);
+    }
 
+    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
+    throws IOException {
+        return autoMount(autoCreate, autoCreate);
+    }
+
+    /**
+     * Returns the virtual archive file system mounted from the target file.
+     * This method is reentrant with respect to any exceptions it may throw.
+     * <p>
+     * <b>Warning:</b> Either the read or the write lock of this controller
+     * must be acquired while this method is called!
+     * If only a read lock is acquired, but a write lock is required, this
+     * method will temporarily release all locks, so any preconditions must be
+     * checked again upon return to protect against concurrent modifications!
+     *
+     * @param autoCreate If the archive file does not exist and this is
+     *        {@code true}, a new file system with only a virtual root
+     *        directory is created with its last modification time set to the
+     *        system's current time.
+     * @return A valid archive file system - {@code null} is never returned.
+     * @throws FalsePositiveException
+     * @throws IOException On any other I/O related issue with the target file
+     *         or the target file of any enclosing archive file's controller.
+     */
+    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
+    throws IOException;
+
+    /**
+     * Tests if the file system entry with the given path name has received or
+     * is currently receiving new data via an output stream.
+     * As an implication, the entry cannot receive new data from another
+     * output stream before the next call to {@link #sync}.
+     * Note that for directories this method will always return
+     * {@code false}!
+     */
     abstract boolean hasNewData(String path);
 
-    abstract void autoSync(final String path) throws ArchiveSyncException;
+    /**
+     * Synchronizes the archive file only if the archive file has already new
+     * data for the file system entry with the given path name.
+     * <p>
+     * <b>Warning:</b> As a side effect, all data structures returned by this
+     * controller get reset (filesystem, entries, streams, etc.)!
+     * As an implication, this method requires external synchronization on
+     * this controller's write lock!
+     * <p>
+     * <b>TODO:</b> Consider adding configuration switch to allow overwriting
+     * an archive entry to the same output archive multiple times, whereby
+     * only the last written entry would be added to the central directory
+     * of the archive (unless the archive type doesn't support this).
+     *
+     * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
+     * @throws ArchiveSyncException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
+     */
+    final void autoSync(final String path)
+    throws ArchiveSyncException {
+        assert writeLock().isHeldByCurrentThread();
+        if (hasNewData(path)) {
+            sync(   new DefaultArchiveSyncExceptionBuilder(),
+                    BitField.of(WAIT_FOR_INPUT_STREAMS, WAIT_FOR_OUTPUT_STREAMS));
+        }
+    }
 
     /**
      * Defines the available options for archive file system operations.
