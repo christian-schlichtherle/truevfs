@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -38,9 +40,6 @@ import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Operation;
-import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,13 +55,10 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.I
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -115,43 +111,18 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @version $Id$
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
-extends     ArchiveController
-implements  ArchiveModel, // TODO: Remove this and make it a property!
-            CommonInputProvider<AE>,
+extends     ArchiveController<AE>
+implements  CommonInputProvider<AE>,
             CommonOutputProvider<AE> {
 
     /**
      * A weak reference to this archive controller.
      * This field is for exclusive use by {@link #setTouched(boolean)}.
      */
-    private final WeakReference weakThis = new WeakReference(this);
+    final WeakReference weakThis = new WeakReference(this);
 
-    private final URI mountPoint;
-
-    /**
-     * The archive controller of the enclosing archive, if any.
-     */
-    private final ArchiveController enclController;
-
-    /**
-     * The relative path name of the entry for the target archive in its
-     * enclosing archive, if any.
-     */
-    private final URI enclPath;
-
-    /**
-     * The {@link ArchiveDriver} to use for this controller's target file.
-     */
+    /** The {@link ArchiveDriver} to use for this controller's target file. */
     private final ArchiveDriver<AE> driver;
-
-    /**
-     * The canonicalized or at least normalized absolute path name
-     * representation of the target archive file.
-     */
-    private final File target;
-
-    private final ReentrantLock  readLock;
-    private final ReentrantLock writeLock;
 
     /**
      * This constructor schedules this controller to be thrown away if the
@@ -168,113 +139,13 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
      * @see #setTouched(boolean)
      */
     BasicArchiveController(
-            final URI mountPoint,
-            final URI enclMountPoint,
+            final ArchiveModel<AE> model,
             final ArchiveDriver<AE> driver) {
-        assert "file".equals(mountPoint.getScheme());
-        assert !mountPoint.isOpaque();
-        assert mountPoint.getPath().endsWith(SEPARATOR);
-        assert mountPoint.equals(mountPoint.normalize());
-        assert enclMountPoint == null || "file".equals(enclMountPoint.getScheme());
-        assert enclMountPoint == null || mountPoint.getPath().startsWith(enclMountPoint.getPath());
-        //assert enclMountPoint == null || enclMountPoint.getPath().endsWith(SEPARATOR);
+        super(model);
         assert driver != null;
 
-        this.mountPoint = mountPoint;
-        this.target = new File(mountPoint);
-        if (enclMountPoint != null) {
-            this.enclController = ArchiveControllers.getController(enclMountPoint);
-            assert this.enclController != null;
-            this.enclPath = enclMountPoint.relativize(mountPoint);
-        } else {
-            this.enclController = null;
-            this.enclPath = null;
-        }
         this.driver = driver;
-        final ReadWriteLock rwl = new ReentrantReadWriteLock();
-        this.readLock  = rwl.readLock();
-        this.writeLock = rwl.writeLock();
         setTouched(false);
-
-        assert this.enclPath == null || this.enclPath.getPath().endsWith(SEPARATOR);
-    }
-
-    @Override
-    ArchiveModel getModel() {
-        return this;
-    }
-
-    @Override
-    public final ReentrantLock readLock() {
-        return readLock;
-    }
-
-    @Override
-    public final ReentrantLock writeLock() {
-        return writeLock;
-    }
-
-    /**
-     * Runs the given {@link Operation} while this controller has
-     * acquired its write lock regardless of the state of its read lock.
-     * You must use this method if this controller may have acquired a
-     * read lock in order to prevent a dead lock.
-     * <p>
-     * <b>Warning:</b> This method temporarily releases the read lock
-     * before the write lock is acquired and the runnable is run!
-     * Hence, the runnable must retest the state of the controller
-     * before it proceeds with any write operations.
-     *
-     * @param  operation the operation to run while the write lock is acquired.
-     * @return {@code operation}
-     */
-    public final <O extends IOOperation> O runWriteLocked(O operation)
-    throws IOException {
-        assert operation != null;
-
-        // A read lock cannot get upgraded to a write lock.
-        // Hence the following mess is required.
-        // Note that this is not just a limitation of the current
-        // implementation in JSE 5: If automatic upgrading were implemented,
-        // two threads holding a read lock try to upgrade concurrently,
-        // they would dead lock each other!
-        final int holdCount = readLock().getHoldCount();
-        for (int c = holdCount; c-- > 0; )
-                readLock().unlock();
-        // The current thread may get blocked here!
-        writeLock().lock();
-        try {
-            // First restore lock count to protect agains exceptions.
-            for (int c = holdCount; c-- > 0; )
-                readLock().lock();
-            operation.run();
-        } finally {
-            writeLock().unlock(); // downgrade the lock
-        }
-        return operation;
-    }
-
-    @Override
-    public final URI getMountPoint() {
-        return mountPoint;
-    }
-
-    @Override
-    final ArchiveController getEnclController() {
-        return enclController;
-    }
-
-    @Override
-    public final URI getEnclMountPoint() {
-        final ArchiveController enclController = getEnclController();
-        return null == enclController ? null : enclController.getMountPoint();
-    }
-
-    @Override
-    public final String getEnclPath(final String path) {
-        return isRoot(path)
-                ? cutTrailingSeparators(enclPath.toString(), SEPARATOR_CHAR)
-                : enclPath.resolve(path).toString();
     }
 
     /**
@@ -287,34 +158,6 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
      */
     final ArchiveDriver<AE> getDriver() {
         return driver;
-    }
-
-    /**
-     * Returns the canonical or at least normalized absolute file for the
-     * target archive file.
-     */
-    @Override
-    public final File getTarget() {
-        return target;
-    }
-
-    /**
-     * Returns {@code true} if and only if the target file of this
-     * controller should be considered to be a file or directory in the host
-     * file system.
-     * Note that the target doesn't need to exist for this method to return
-     * {@code true}.
-     */
-    // TODO: Move to UpdatingArchiveController and declare private.
-    final boolean isHostFileSystemEntryTarget() {
-        // May be called from FileOutputStream while unlocked!
-        //assert readLock().isLocked() || writeLock().isLocked();
-
-        // True iff not enclosed or the enclosing archive file is actually
-        // a plain directory.
-        final ArchiveController enclController = getEnclController();
-        return enclController == null
-                || enclController.getModel().getTarget().isDirectory();
     }
 
     /**
@@ -339,7 +182,6 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
      * successfully updated.
      *
      * @param touched The touch status of the virtual file system.
-     * @see #isTouched
      */
     public final void setTouched(final boolean touched) {
         assert weakThis.get() != null || !touched; // (garbage collected => no scheduling) == (scheduling => not garbage collected)
@@ -825,7 +667,7 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
         } catch (FileArchiveEntryFalsePositiveException ex) {
             /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return new SpecialFileEntry(getEnclController()
+                return new SpecialFileEntry<ArchiveEntry>(getEnclController()
                         .getEntry(getEnclPath(path))
                         .getTarget()); // the exception asserts that the entry exists as a file!
             throw ex;
@@ -834,10 +676,10 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
         }
     }
 
-    private static final class SpecialFileEntry
-    extends FilterCommonEntry<ArchiveEntry>
-    implements Entry<ArchiveEntry> {
-        SpecialFileEntry(ArchiveEntry target) {
+    private static final class SpecialFileEntry<AE extends ArchiveEntry>
+    extends FilterCommonEntry<AE>
+    implements Entry<AE> {
+        SpecialFileEntry(AE target) {
             super(target);
         }
 
@@ -853,7 +695,7 @@ implements  ArchiveModel, // TODO: Remove this and make it a property!
         }
 
         @Override
-        public ArchiveEntry getTarget() {
+        public AE getTarget() {
             return target;
         }
     }

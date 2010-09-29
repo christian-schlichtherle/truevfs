@@ -724,7 +724,7 @@ public class File extends java.io.File {
         final java.io.File target = getRealFile(delegate);
         this.controller = ArchiveControllers.getController(
                 target.toURI(),
-                enclArchive == null ? null : enclArchive.getArchiveController().getMountPoint(),
+                null == enclArchive ? null : enclArchive.getArchiveController(),
                 detector.getArchiveDriver(target.getPath()));
     }
 
@@ -1834,7 +1834,7 @@ public class File extends java.io.File {
      * archive file, or {@code null} otherwise.
      */
     final ArchiveController getArchiveController() {
-        assert (controller != null) == isArchive();
+        assert (null != controller) == isArchive();
         return controller;
     }
 

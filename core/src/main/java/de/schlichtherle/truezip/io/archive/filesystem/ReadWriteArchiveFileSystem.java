@@ -80,8 +80,8 @@ implements ArchiveFileSystem<AE> {
     /** The file system entry for the virtual root of this file system. */
     private final BaseEntry<AE> root;
 
-    /** The number of times this file system has been modified (touched). */
-    private long touched;
+    /** Whether or not this file system has been modified (touched). */
+    private boolean touched;
 
     private final VetoableTouchListener vetoableTouchListener;
 
@@ -323,7 +323,7 @@ implements ArchiveFileSystem<AE> {
 
     @Override
     public boolean isTouched() {
-        return touched != 0;
+        return touched;
     }
 
     /**
@@ -337,15 +337,17 @@ implements ArchiveFileSystem<AE> {
      *         controller fails for some reason.
      */
     private void touch() throws ArchiveFileSystemException {
+        if (touched)
+            return;
         // Order is important here because of exceptions!
-        if (touched == 0 && vetoableTouchListener != null) {
+        if (vetoableTouchListener != null) {
             try {
                 vetoableTouchListener.touch();
             } catch (IOException ex) {
                 throw new ArchiveFileSystemException(null, "touch vetoed", ex);
             }
         }
-        touched++;
+        touched = true;
     }
 
     @Override

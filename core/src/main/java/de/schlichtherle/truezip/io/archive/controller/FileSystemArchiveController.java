@@ -40,17 +40,13 @@ extends BasicArchiveController<AE> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(
-            URI mountPoint,
-            URI enclMountPoint,
-            ArchiveDriver driver) {
-        super(mountPoint, enclMountPoint, driver);
+    FileSystemArchiveController(ArchiveModel<AE> model, ArchiveDriver driver) {
+        super(model, driver);
     }
 
-    @Override
-    public final boolean isTouched() {
+    final boolean isTouched() {
         final ArchiveFileSystem fileSystem = getFileSystem();
-        return fileSystem != null && fileSystem.isTouched();
+        return null != fileSystem && fileSystem.isTouched();
     }
 
     @Override
@@ -145,22 +141,20 @@ extends BasicArchiveController<AE> {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends AutoMounter {
-        private final ArchiveFileSystem<AE> fileSystem;
-
         private MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem == null)
                 throw new NullPointerException();
-            this.fileSystem = fileSystem;
+            getModel().setFileSystem(fileSystem);
         }
 
         @Override
         ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents) {
-            return fileSystem;
+            return getModel().getFileSystem();
         }
 
         @Override
         ArchiveFileSystem<AE> getFileSystem() {
-            return fileSystem;
+            return getModel().getFileSystem();
         }
 
         @Override

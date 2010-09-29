@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import java.net.URI;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
@@ -127,7 +126,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#getController(URI, URI, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, ArchiveController, ArchiveDriver)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(CommonInputShop<AE> target) {
@@ -145,7 +144,7 @@ extends FileSystemArchiveController<AE> {
      * This is required in order to ensure that for any prospective archive
      * file at most one archive controller object exists at any time.
      *
-     * @see ArchiveControllers#getController(URI, URI, ArchiveDriver)
+     * @see ArchiveControllers#getController(URI, ArchiveController, ArchiveDriver)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(CommonOutputShop<AE> target) {
@@ -201,11 +200,8 @@ extends FileSystemArchiveController<AE> {
      */
     private boolean needsReassembly;
 
-    UpdatingArchiveController(
-            URI mountPoint,
-            URI enclMountPoint,
-            ArchiveDriver driver) {
-        super(mountPoint, enclMountPoint, driver);
+    UpdatingArchiveController(ArchiveModel<AE> model, ArchiveDriver driver) {
+        super(model, driver);
     }
 
     /**
