@@ -210,8 +210,7 @@ extends BasicArchiveController<AE> {
     abstract void mount(boolean autoCreate, boolean createParents)
     throws IOException;
 
-    @Override
-    void reset(final ArchiveSyncExceptionHandler handler)
+    final void reset(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
         setFileSystem(null);
     }

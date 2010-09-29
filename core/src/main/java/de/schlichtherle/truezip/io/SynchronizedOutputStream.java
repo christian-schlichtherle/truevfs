@@ -22,41 +22,43 @@ import java.io.OutputStream;
  * A decorator which synchronizes all access to an {@link OutputStream}
  * via an object provided to its constructor.
  *
+ * @see SynchronizedInputStream
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class SynchronizedOutputStream extends OutputStream {
+
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
 
     /** The decorated output stream. */
-    protected OutputStream out;
+    protected OutputStream target;
 
     /**
      * Constructs a new synchronized output stream.
      * This object will synchronize on itself.
      *
-     * @param out The output stream to wrap in this decorator.
+     * @param target The output stream to wrap in this decorator.
      */
-    public SynchronizedOutputStream(final OutputStream out) {
-    	this(out, null);
+    public SynchronizedOutputStream(final OutputStream target) {
+    	this(target, null);
     }
 
     /**
      * Constructs a new synchronized output stream.
      *
-     * @param out The output stream to wrap in this decorator.
+     * @param target The output stream to wrap in this decorator.
      * @param lock The object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedOutputStream(final OutputStream out, final Object lock) {
-        this.out = out;
-        this.lock = lock != null ? lock : this;
+    public SynchronizedOutputStream(final OutputStream target, final Object lock) {
+        this.target = target;
+        this.lock = null == lock ? this : lock;
     }
 
     public void write(int b) throws IOException {
         synchronized (lock) {
-            out.write(b);
+            target.write(b);
         }
     }
 
@@ -70,7 +72,7 @@ public class SynchronizedOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            out.write(b, off, len);
+            target.write(b, off, len);
         }
     }
 
@@ -87,7 +89,7 @@ public class SynchronizedOutputStream extends OutputStream {
      * This method is <em>not</em> synchronized!
      */
     protected void doFlush() throws IOException {
-        out.flush();
+        target.flush();
     }
 
     /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
@@ -106,7 +108,7 @@ public class SynchronizedOutputStream extends OutputStream {
         try {
             doFlush();
         } finally {
-            out.close();
+            target.close();
         }
     }
 }

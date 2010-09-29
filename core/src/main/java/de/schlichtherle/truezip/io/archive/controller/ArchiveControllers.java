@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
@@ -49,12 +48,13 @@ import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -210,19 +210,22 @@ public class ArchiveControllers {
     public static void sync(
             final URI prefix,
             final ArchiveSyncExceptionBuilder builder,
-            BitField<SyncOption> options)
+            final BitField<SyncOption> options)
     throws ArchiveSyncException {
-        if (!options.get(CLOSE_INPUT_STREAMS) && options.get(CLOSE_OUTPUT_STREAMS))
+        if (options.get(CLOSE_OUTPUT) && !options.get(CLOSE_INPUT))
             throw new IllegalArgumentException();
-        options = options.set(REASSEMBLE);
+        if (options.get(ABORT_CHANGES))
+            throw new IllegalArgumentException();
+        if (!options.get(REASSEMBLE))
+            throw new IllegalArgumentException();
 
         int total = 0, touched = 0;
         logger.log(Level.FINE, "sync.try", new Object[] { // NOI18N
             prefix,
-            options.get(WAIT_FOR_INPUT_STREAMS),
-            options.get(CLOSE_INPUT_STREAMS),
-            options.get(WAIT_FOR_OUTPUT_STREAMS),
-            options.get(CLOSE_OUTPUT_STREAMS),
+            options.get(WAIT_CLOSE_INPUT),
+            options.get(CLOSE_INPUT),
+            options.get(WAIT_CLOSE_OUTPUT),
+            options.get(CLOSE_OUTPUT),
             options.get(UMOUNT),
         });
         try {
@@ -393,7 +396,7 @@ public class ArchiveControllers {
                     try {
                         ArchiveControllers.sync(
                                 null,
-                                new DefaultArchiveSyncExceptionBuilder(), BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS, UMOUNT));
+                                new DefaultArchiveSyncExceptionBuilder(), BitField.of(CLOSE_INPUT, CLOSE_OUTPUT, UMOUNT));
                     } catch (ArchiveSyncException ouch) {
                         ouch.printStackTrace();
                     }

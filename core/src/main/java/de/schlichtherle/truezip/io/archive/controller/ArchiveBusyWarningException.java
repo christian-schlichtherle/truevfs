@@ -17,15 +17,16 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
+import de.schlichtherle.truezip.io.socket.input.CommonInputClosedException;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
 
 /**
  * Indicates that an archive file has been successfully updated, but some
- * input or output streams for its entries have been forced to close.
+ * input or output for its entries have been forced to close.
  * <p>
  * With the exception of their {@code close()} method, any subsequent
- * I/O operation on the closed entry streams will throw an
- * {@link CommonEntryStreamClosedException}.
+ * I/O operation on the closed inputs or outputs will throw a
+ * {@link CommonInputClosedException} or a {@link CommonOutputClosedException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
