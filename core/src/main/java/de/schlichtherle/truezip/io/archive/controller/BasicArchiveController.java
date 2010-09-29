@@ -47,6 +47,7 @@ import javax.swing.Icon;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
@@ -111,39 +112,6 @@ implements  CommonInputProvider<AE>,
         super(model);
     }
 
-    // TODO: Document this!
-    abstract int waitAllInputStreamsByOtherThreads(long timeout);
-
-    // TODO: Document this!
-    abstract int waitAllOutputStreamsByOtherThreads(long timeout);
-
-    /**
-     * Resets the archive controller to its initial state - all changes to the
-     * archive file which have not yet been updated get lost!
-     * Thereafter, the archive controller will behave as if it has just been
-     * created and any subsequent operations on its entries will remount
-     * the virtual file system from the archive file again.
-     */
-    final void reset() throws ArchiveSyncException {
-        final ArchiveSyncExceptionBuilder builder
-                = new DefaultArchiveSyncExceptionBuilder();
-        reset(builder);
-        builder.check();
-    }
-
-    /**
-     * Resets the archive controller to its initial state - all changes to the
-     * archive file which have not yet been updated get lost!
-     * Thereafter, the archive controller will behave as if it has just been
-     * created and any subsequent operations on its entries will remount
-     * the virtual file system from the archive file again.
-     * <p>
-     * This method should be overridden by subclasses, but must still be
-     * called when doing so.
-     */
-    abstract void reset(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException;
-
     @Override
     public CommonInputSocket<? extends CommonEntry> getInputSocket(String path)
     throws IOException {
@@ -186,13 +154,13 @@ implements  CommonInputProvider<AE>,
             CommonInputSocket<AE> getInputSocket() throws IOException {
                 final AE entry = getEntry();
                 if (null != entry && DIRECTORY == entry.getType())
-                    throw new ArchiveEntryNotFoundException(
+                    throw new EntryNotFoundException(
                             BasicArchiveController.this, path,
                             "cannot read directories");
                 final CommonInputSocket<AE> input;
                 if (null == entry ||
                         null == (input = BasicArchiveController.this.newInputSocket(entry)))
-                    throw new ArchiveEntryNotFoundException(
+                    throw new EntryNotFoundException(
                             BasicArchiveController.this, path,
                             "no such file or directory");
                 return input.chain(this);
@@ -253,13 +221,13 @@ implements  CommonInputProvider<AE>,
                     autoMount(); // detect false positives!
                 } catch (FalsePositiveException ex) {
                     throw ex;
-                } catch (ArchiveEntryNotFoundException ex) {
+                } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ?!?! archive entry not found is not really an archive entry false positive ?!?!
                     return getEnclController().getInputSocket(getEnclPath(path));
                 }
-                throw new ArchiveEntryNotFoundException(this, path,
+                throw new EntryNotFoundException(this, path,
                         "cannot read directories");
             } else {
                 autoMount(); // detect false positives!
@@ -403,14 +371,14 @@ implements  CommonInputProvider<AE>,
                     autoMount(); // detect false positives!
                 } catch (FalsePositiveException ex) {
                     throw ex;
-                } catch (ArchiveEntryNotFoundException ex) {
+                } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
                     // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
                     return getEnclController().getOutputSocket(
                             getEnclPath(path), options);
                 }
-                throw new ArchiveEntryNotFoundException(this, path,
+                throw new EntryNotFoundException(this, path,
                         "cannot write directories");
             } else {
                 autoMount(options.get(CREATE_PARENTS)); // detect false positives!
@@ -672,7 +640,7 @@ implements  CommonInputProvider<AE>,
             final BitField<IOOption> options)
     throws FalsePositiveException, IOException {
         if (FILE != type && DIRECTORY != type)
-            throw new ArchiveEntryNotFoundException(this, path,
+            throw new EntryNotFoundException(this, path,
                     "not yet supported: mknod " + type);
         writeLock().lock();
         try {
@@ -681,7 +649,7 @@ implements  CommonInputProvider<AE>,
                     autoMount(); // detect false positives!
                 } catch (FalsePositiveException ex) {
                     throw ex;
-                } catch (ArchiveEntryNotFoundException ex) {
+                } catch (EntryNotFoundException ex) {
                     switch (type) {
                         case FILE:
                             if (isRoot(ex.getPath()))
@@ -696,7 +664,7 @@ implements  CommonInputProvider<AE>,
                     }
                     return;
                 }
-                throw new ArchiveEntryNotFoundException(this, path,
+                throw new EntryNotFoundException(this, path,
                         "directory exists already");
             } else { // !isRoot(entryName)
                 switch (type) {
@@ -755,7 +723,8 @@ implements  CommonInputProvider<AE>,
                     // The File instance is going to delete the target file
                     // anyway, so we need to reset now.
                     try {
-                        reset();
+                        sync(   new DefaultArchiveSyncExceptionBuilder(),
+                                BitField.of(ABORT_CHANGES));
                     } catch (ArchiveSyncException cannotHappen) {
                         throw new AssertionError(cannotHappen);
                     }
@@ -764,15 +733,8 @@ implements  CommonInputProvider<AE>,
                 // We are actually working on the controller's target file.
                 if (!fileSystem.getEntry(path).list().isEmpty())
                     throw new IOException("archive file system not empty!");
-                final int outputStreams = waitAllOutputStreamsByOtherThreads(50);
-                // TODO: Review: This policy may be changed - see method start.
-                assert outputStreams <= 0
-                        : "Entries for open output streams should not be deletable!";
-                // Note: CommonEntry for open input streams ARE deletable!
-                final int inputStreams = waitAllInputStreamsByOtherThreads(50);
-                if (inputStreams > 0 || outputStreams > 0)
-                    throw new IOException("archive file has open streams!");
-                reset();
+                sync(   new DefaultArchiveSyncExceptionBuilder(),
+                        BitField.of(ABORT_CHANGES));
                 // Just in case our target is an RAES encrypted ZIP file,
                 // forget it's password as well.
                 // TODO: Review: This is an archive driver dependency!
@@ -781,7 +743,7 @@ implements  CommonInputProvider<AE>,
                 PromptingKeyManager.resetKeyProvider(getMountPoint());
                 // Delete the target file or the entry in the enclosing
                 // archive file, too.
-                if (isHostFileSystemEntryTarget()) { // FIXME: Do not use this method!
+                if (isHostFileSystemEntryTarget()) { // FIXME: Don't use this method!
                     // The target file of the controller is NOT enclosed
                     // in another archive file.
                     if (!getTarget().delete())

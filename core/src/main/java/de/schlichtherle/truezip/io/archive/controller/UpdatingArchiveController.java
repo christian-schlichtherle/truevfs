@@ -34,7 +34,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -52,12 +51,13 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
@@ -195,8 +195,8 @@ extends FileSystemArchiveController<AE> {
     private Output output;
 
     /**
-     * Whether or not nesting this archive file to its enclosing
-     * archive file has been deferred.
+     * Whether or not updating the archive entry in the enclosing archive file
+     * after the target archive file has been successfully updated is postponed.
      */
     private boolean needsReassembly;
 
@@ -299,7 +299,7 @@ extends FileSystemArchiveController<AE> {
 
                 // The archive file does not exist and we may not create it
                 // automatically.
-                throw new ArchiveEntryNotFoundException(
+                throw new EntryNotFoundException(
                         this, ROOT, "may not create archive file");
             }
         } else {
@@ -518,7 +518,7 @@ extends FileSystemArchiveController<AE> {
 
             // The entry does NOT exist in the enclosing archive
             // file and we may not create it automatically.
-            throw new ArchiveEntryNotFoundException(
+            throw new EntryNotFoundException(
                     controller, path, "may not create archive file");
         }
     }
@@ -679,23 +679,24 @@ extends FileSystemArchiveController<AE> {
         return entry != null && output.getEntry(entry.getName()) != null;
     }
 
-    public void sync(
-            final ArchiveSyncExceptionBuilder builder, final BitField<SyncOption> options)
-    throws ArchiveSyncException {
-        assert options.get(CLOSE_INPUT_STREAMS) || !options.get(CLOSE_OUTPUT_STREAMS); // closeOutputStreams => closeInputStreams
-        assert !options.get(UMOUNT) || options.get(REASSEMBLE); // sync => reassemble
-        assert writeLock().isHeldByCurrentThread();
-        assert input == null || inFile != null; // input archive => input file
-        assert !isTouched() || output != null; // file system touched => output archive
-        assert output == null || outFile != null; // output archive => output file
+    final int waitCloseOtherInputs(long timeout) {
+        return null == input ? 0 : input.waitCloseOthers(timeout);
+    }
 
+    final int waitCloseOtherOutputs(long timeout) {
+        return null == output ? 0 : output.waitCloseOthers(timeout);
+    }
+
+    public void sync(   final ArchiveSyncExceptionBuilder builder,
+                        final BitField<SyncOption> options)
+    throws ArchiveSyncException {
         // Do the logging part and leave the work to sync0.
         final Object[] stats = new Object[] {
             getMountPoint(),
-            options.get(WAIT_FOR_INPUT_STREAMS),
-            options.get(CLOSE_INPUT_STREAMS),
-            options.get(WAIT_FOR_OUTPUT_STREAMS),
-            options.get(CLOSE_OUTPUT_STREAMS),
+            options.get(WAIT_CLOSE_INPUT),
+            options.get(CLOSE_INPUT),
+            options.get(WAIT_CLOSE_OUTPUT),
+            options.get(CLOSE_OUTPUT),
             options.get(UMOUNT),
             options.get(REASSEMBLE),
         };
@@ -710,19 +711,28 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private void sync0(
-            final ArchiveSyncExceptionBuilder builder,
-            final BitField<SyncOption> options)
+    private void sync0( final ArchiveSyncExceptionBuilder builder,
+                        final BitField<SyncOption> options)
     throws ArchiveSyncException {
+        assert writeLock().isHeldByCurrentThread();
+        assert input == null || inFile != null; // input archive => input file
+        assert !isTouched() || output != null; // file system touched => output archive
+        assert output == null || outFile != null; // output archive => output file
+
+        if (options.get(CLOSE_OUTPUT) && !options.get(CLOSE_INPUT))
+            throw new IllegalArgumentException();
+        if (options.get(UMOUNT) && !options.get(REASSEMBLE))
+            throw new IllegalArgumentException();
+
         // Check output streams first, because closeInputStreams may be
         // true and closeOutputStreams may be false in which case we
         // don't even need to check open input streams if there are
         // some open output streams.
         if (output != null) {
-            final int outStreams = output.waitCloseAllOutputStreams(
-                    options.get(WAIT_FOR_OUTPUT_STREAMS) ? 0 : 50);
+            final int outStreams = output.waitCloseOthers(
+                    options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
-                if (!options.get(CLOSE_OUTPUT_STREAMS))
+                if (!options.get(CLOSE_OUTPUT))
                     throw builder.fail(new ArchiveOutputBusyException(
                             this, outStreams));
                 builder.warn(new ArchiveOutputBusyWarningException(
@@ -730,10 +740,10 @@ extends FileSystemArchiveController<AE> {
             }
         }
         if (input != null) {
-            final int inStreams = input.waitCloseAllInputStreams(
-                    options.get(WAIT_FOR_INPUT_STREAMS) ? 0 : 50);
+            final int inStreams = input.waitCloseOthers(
+                    options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
-                if (!options.get(CLOSE_INPUT_STREAMS))
+                if (!options.get(CLOSE_INPUT))
                     throw builder.fail(new ArchiveInputBusyException(
                             this, inStreams));
                 builder.warn(new ArchiveInputBusyWarningException(
@@ -747,9 +757,16 @@ extends FileSystemArchiveController<AE> {
                      waitOutputStreams, closeOutputStreams,
                      sync, reassemble);*/
 
-        // Now update the archive.
+        // Now update the target archive file.
         try {
-            if (isTouched()) {
+            if (options.get(ABORT_CHANGES)) {
+                try {
+                    //shutdownStep1(builder);
+                } finally {
+                    shutdownStep2(builder);
+                }
+                shutdownStep3(true); // TODO: Check: Why not in another finally-block?
+            } else if (isTouched()) {
                 needsReassembly = true;
                 try {
                     update(builder);
@@ -801,18 +818,6 @@ extends FileSystemArchiveController<AE> {
         }
 
         builder.check();
-    }
-
-    final int waitAllInputStreamsByOtherThreads(long timeout) {
-        return input != null
-                ? input.waitCloseAllInputStreams(timeout)
-                : 0;
-    }
-
-    final int waitAllOutputStreamsByOtherThreads(long timeout) {
-        return output != null
-                ? output.waitCloseAllOutputStreams(timeout)
-                : 0;
     }
 
     /**
@@ -873,7 +878,7 @@ extends FileSystemArchiveController<AE> {
                 // normal case) have been modified by the CommonOutputShop
                 // and thus cannot get used anymore to access the input;
                 // and (2) if there has been any IOException on the
-                // output archive there is no way to recover from it.
+                // output archive there is no way to recover.
                 shutdownStep2(handler);
             }
         } catch (ArchiveSyncWarningException ex) {
@@ -1046,32 +1051,6 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    /**
-     * Resets the archive controller to its initial state - all changes to the
-     * archive file which have not yet been updated get lost!
-     * <p>
-     * Thereafter, the archive controller will behave as if it has just been
-     * created and any subsequent operations on its entries will remount
-     * the virtual file system from the archive file again.
-     *
-     * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveSyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
-     */
-    @Override
-    void reset(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException {
-        assert writeLock().isHeldByCurrentThread();
-
-        try {
-            shutdownStep1(handler);
-        } finally {
-            shutdownStep2(handler);
-        }
-        shutdownStep3(true);
-        schedule(false);
-    }
-
     @Override
     @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
@@ -1092,7 +1071,7 @@ extends FileSystemArchiveController<AE> {
                 logger.log(Level.SEVERE, "finalize.invalidState", getMountPoint());
             final ArchiveSyncExceptionBuilder handler
                     = new DefaultArchiveSyncExceptionBuilder();
-            shutdownStep1(handler);
+            //shutdownStep1(handler);
             shutdownStep2(handler);
             shutdownStep3(true);
         } catch (IOException ex) {
@@ -1129,9 +1108,9 @@ extends FileSystemArchiveController<AE> {
         } // class FilterExceptionHandler
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
         if (output != null)
-            output.closeAllOutputStreams((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
+            output.closeAll((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
         if (input != null)
-            input.closeAllInputStreams((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
+            input.closeAll((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
     }
 
     /**
@@ -1185,25 +1164,27 @@ extends FileSystemArchiveController<AE> {
      */
     private void shutdownStep3(final boolean deleteOutFile) {
         if (inFile != null) {
-            if (inFile != getTarget()) {
-                boolean deleted = inFile.delete();
+            final java.io.File file = inFile;
+            inFile = null;
+            if (file != getTarget()) {
+                boolean deleted = file.delete();
                 assert deleted;
             }
-            inFile = null;
         }
 
         if (outFile != null) {
+            final java.io.File file = outFile;
+            outFile = null;
             if (deleteOutFile) {
-                if (outFile != getTarget()) {
-                    boolean deleted = outFile.delete();
+                if (file != getTarget()) {
+                    boolean deleted = file.delete();
                     assert deleted;
                 }
             } else {
-                //assert outFile != target; // may have been newly created
-                assert outFile.isFile();
-                inFile = outFile;
+                //assert file != target; // may have been newly created
+                inFile = file;
+                assert file.isFile();
             }
-            outFile = null;
         }
 
         if (deleteOutFile)

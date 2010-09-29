@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.socket.output;
 
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -34,13 +33,17 @@ import java.util.logging.Logger;
  * synchronization for all output streams created by the target common
  * output.
  *
+ * @see     ConcurrentInputShop
  * @param   <CE> The type of the common entries.
- * @see ConcurrentInputShop
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class ConcurrentOutputShop<CE extends CommonEntry>
 extends FilterOutputShop<CE, CommonOutputShop<CE>> {
+
+    private interface DoCloseable {
+        void doClose() throws IOException;
+    }
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
@@ -90,8 +93,8 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     }
 
     /**
-     * Waits until all entry streams which have been opened (and not yet closed)
-     * by all <em>other threads</em> are closed or a timeout occurs.
+     * Waits until all entry output streams which have been opened by <em>other
+     * threads</em> get closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
      * a warn message is logged using {@code java.util.logging} and
      * this method returns.
@@ -103,7 +106,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      *
      * @return The number of all open streams.
      */
-    public synchronized int waitCloseAllOutputStreams(final long timeout) {
+    public synchronized int waitCloseOthers(final long timeout) {
         assert !stopped;
 
         final long start = System.currentTimeMillis();
@@ -142,32 +145,38 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     }
 
     /**
-     * Closes and disconnects <em>all</em> entry streams from this common output.
+     * Closes and disconnects <em>all</em> entry output streams created by this
+     * common output shop.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
     public synchronized <E extends Exception>
-    void closeAllOutputStreams(final ExceptionHandler<IOException, E> handler)
+    void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
         assert !stopped;
-        stopped = true;
-        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
-        it.hasNext(); ) {
-            try {
+        try {
+            for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+            it.hasNext(); ) {
                 try {
-                    it.next().doClose();
-                } finally {
-                    it.remove();
+                    try {
+                        it.next().doClose();
+                    } finally {
+                        it.remove();
+                    }
+                } catch (IOException ioe) {
+                    handler.warn(ioe);
                 }
-            } catch (IOException ioe) {
-                handler.warn(ioe);
             }
+        } finally {
+            stopped = true;
         }
     }
 
-    private interface DoCloseable {
-        void doClose() throws IOException;
+    @Override
+    public void close() throws IOException {
+        stopped = true;
+        super.close();
     }
 
     /**
@@ -175,7 +184,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      * {@link CommonOutputShop}.
      * This output stream provides support for finalization and throws an
      * {@link IOException} on any subsequent attempt to write data after
-     * {@link #closeAllOutputStreams} has been called.
+     * {@link #closeAll} has been called.
      */
     private final class EntryOutputStream
     extends SynchronizedOutputStream
@@ -192,7 +201,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
 
         private void ensureNotStopped() throws IOException {
             if (stopped)
-                throw new CommonEntryStreamClosedException();
+                throw new CommonOutputClosedException();
         }
 
         @Override
@@ -258,7 +267,8 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            super.doClose();
+            if (!stopped)
+                super.doClose();
         }
 
         /**

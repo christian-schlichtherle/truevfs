@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.socket.input;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SynchronizedReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
 import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -35,13 +34,17 @@ import java.util.logging.Logger;
  * Decorates an {@code CommonInputShop} to add accounting and multithreading
  * synchronization for all input streams created by the target common input.
  *
+ * @see     ConcurrentOutputShop
  * @param   <CE> The type of the common entries.
- * @see ConcurrentOutputShop
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class ConcurrentInputShop<CE extends CommonEntry>
 extends FilterInputShop<CE, CommonInputShop<CE>> {
+
+    private interface DoCloseable {
+        void doClose() throws IOException;
+    }
 
     private static final String CLASS_NAME
             = ConcurrentInputShop.class.getName();
@@ -98,8 +101,8 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     }
 
     /**
-     * Waits until all entry streams which have been opened (and not yet closed)
-     * by all <em>other threads</em> are closed or a timeout occurs.
+     * Waits until all entry input streams and read only files which have been
+     * opened by <em>other threads</em> get closed or a timeout occurs.
      * If the current thread is interrupted while waiting,
      * a warning message is logged using {@code java.util.logging} and
      * this method returns.
@@ -111,7 +114,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      *
      * @return The number of all open streams.
      */
-    public synchronized int waitCloseAllInputStreams(final long timeout) {
+    public synchronized int waitCloseOthers(final long timeout) {
         assert !stopped;
 
         final long start = System.currentTimeMillis();
@@ -148,32 +151,38 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     }
 
     /**
-     * Closes and disconnects <em>all</em> entry streams from this common input.
+     * Closes and disconnects <em>all</em> entry input streams and read only
+     * file created by this common input shop.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
     public synchronized <E extends Exception>
-    void closeAllInputStreams(final ExceptionHandler<IOException, E> handler)
+    void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
         assert !stopped;
-        stopped = true;
-        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
-        it.hasNext(); ) {
-            try {
+        try {
+            for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+            it.hasNext(); ) {
                 try {
-                    it.next().doClose();
-                } finally {
-                    it.remove();
+                    try {
+                        it.next().doClose();
+                    } finally {
+                        it.remove();
+                    }
+                } catch (IOException ioe) {
+                    handler.warn(ioe);
                 }
-            } catch (IOException ioe) {
-                handler.warn(ioe);
             }
+        } finally {
+            stopped = true;
         }
     }
 
-    private interface DoCloseable {
-        void doClose() throws IOException;
+    @Override
+    public void close() throws IOException {
+        stopped = true;
+        super.close();
     }
 
     /**
@@ -181,7 +190,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * {@link CommonInputShop}.
      * This input stream provides support for finalization and throws an
      * {@link IOException} on any subsequent attempt to read data after
-     * {@link #closeAllInputStreams} has been called.
+     * {@link #closeAll} has been called.
      */
     private final class EntryReadOnlyFile
     extends SynchronizedReadOnlyFile
@@ -198,7 +207,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
 
         private void ensureNotStopped() throws IOException {
             if (stopped)
-                throw new CommonEntryStreamClosedException();
+                throw new CommonInputClosedException();
         }
 
         @Override
@@ -288,7 +297,8 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            super.doClose();
+            if (!stopped)
+                super.doClose();
         }
 
         /**
@@ -320,7 +330,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * {@link CommonInputShop}.
      * This input stream provides support for finalization and throws an
      * {@link IOException} on any subsequent attempt to read data after
-     * {@link #closeAllInputStreams} has been called.
+     * {@link #closeAll} has been called.
      */
     private final class EntryInputStream
     extends SynchronizedInputStream
@@ -337,7 +347,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
 
         private void ensureNotStopped() throws IOException {
             if (stopped)
-                throw new CommonEntryStreamClosedException();
+                throw new CommonInputClosedException();
         }
 
         @Override
@@ -426,7 +436,8 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            super.doClose();
+            if (!stopped)
+                super.doClose();
         }
 
         /**

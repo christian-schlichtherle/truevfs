@@ -120,7 +120,10 @@
 	is thrown. If the entry streams are forced to close however, the archive file 
 	is unmounted and an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException}
 	is thrown to indicate that subsequent I/O operations on these entry streams 
-	(other than {@code close()}) will fail with an {@link de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException}.
+	(other than {@code close()}) will fail with an
+    {@link de.schlichtherle.truezip.io.socket.input.CommonInputClosedException}
+    or
+    {@link de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException}
 	Neither solution is optimal.</li>
         </ul>
         <p>In order to prevent these exceptions, TrueZIP automatically closes entry streams

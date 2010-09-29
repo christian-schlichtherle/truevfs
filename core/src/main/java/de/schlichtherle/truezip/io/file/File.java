@@ -53,11 +53,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
@@ -1126,39 +1127,39 @@ public class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+        sync(BitField.of(UMOUNT, CLOSE_INPUT, CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(BitField)
      */
     public static void umount()
     throws ArchiveSyncException {
-        sync(BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+        sync(BitField.of(REASSEMBLE, UMOUNT, CLOSE_INPUT, CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
         sync(   BitField.of(UMOUNT)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
      * }.
      *
      * @see #sync(BitField)
      */
     public static void umount(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(UMOUNT)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+        sync(   BitField.of(REASSEMBLE, UMOUNT)
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
         sync(   BitField.of(UMOUNT)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
      * }.
      *
      * @see #sync(BitField)
@@ -1167,11 +1168,11 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(UMOUNT)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+        sync(   BitField.of(REASSEMBLE, UMOUNT)
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**
@@ -1211,7 +1212,7 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+                BitField.of(UMOUNT, CLOSE_INPUT, CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1219,15 +1220,15 @@ public class File extends java.io.File {
     public static void umount(File archive)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(UMOUNT, CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+                BitField.of(REASSEMBLE, UMOUNT, CLOSE_INPUT, CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
                 BitField.of(UMOUNT)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1235,19 +1236,19 @@ public class File extends java.io.File {
     public static void umount(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(UMOUNT)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                BitField.of(REASSEMBLE, UMOUNT)
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
                 BitField.of(UMOUNT)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1257,48 +1258,48 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(UMOUNT)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                BitField.of(REASSEMBLE, UMOUNT)
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+        sync(BitField.of(CLOSE_INPUT, CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(BitField)
      */
     public static void update()
     throws ArchiveSyncException {
-        sync(BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+        sync(BitField.of(REASSEMBLE, CLOSE_INPUT, CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
         sync(   BitField.noneOf(SyncOption.class)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
      * }.
      *
      * @see #sync(BitField)
      */
     public static void update(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(SyncOption.class)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+        sync(   BitField.of(REASSEMBLE)
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
         sync(   BitField.noneOf(SyncOption.class)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
      * }.
      *
      * @see #sync(BitField)
@@ -1307,17 +1308,17 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.noneOf(SyncOption.class)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+        sync(   BitField.of(REASSEMBLE)
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+                BitField.of(CLOSE_INPUT, CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1325,15 +1326,15 @@ public class File extends java.io.File {
     public static void update(File archive)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(CLOSE_INPUT_STREAMS, CLOSE_OUTPUT_STREAMS));
+                BitField.of(REASSEMBLE, CLOSE_INPUT, CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1341,19 +1342,19 @@ public class File extends java.io.File {
     public static void update(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
-                .set(CLOSE_INPUT_STREAMS, closeStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeStreams));
+                BitField.of(REASSEMBLE)
+                .set(CLOSE_INPUT, closeStreams)
+                .set(CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1364,11 +1365,11 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
-                .set(WAIT_FOR_INPUT_STREAMS, waitForInputStreams)
-                .set(CLOSE_INPUT_STREAMS, closeInputStreams)
-                .set(WAIT_FOR_OUTPUT_STREAMS, waitForOutputStreams)
-                .set(CLOSE_OUTPUT_STREAMS, closeOutputStreams));
+                BitField.of(REASSEMBLE)
+                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(CLOSE_INPUT, closeInputStreams)
+                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(CLOSE_OUTPUT, closeOutputStreams));
     }
 
     /**

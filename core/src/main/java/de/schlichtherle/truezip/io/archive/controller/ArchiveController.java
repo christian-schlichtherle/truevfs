@@ -24,19 +24,19 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException;
+import de.schlichtherle.truezip.io.socket.input.CommonInputClosedException;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_INPUT_STREAMS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_FOR_OUTPUT_STREAMS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 
 /**
  * Provides multi-threaded read/write access to its <i>target archive file</i>
@@ -305,7 +305,7 @@ implements ArchiveDescriptor {
         assert writeLock().isHeldByCurrentThread();
         if (hasNewData(path)) {
             sync(   new DefaultArchiveSyncExceptionBuilder(),
-                    BitField.of(WAIT_FOR_INPUT_STREAMS, WAIT_FOR_OUTPUT_STREAMS));
+                    BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         }
     }
 
@@ -351,17 +351,16 @@ implements ArchiveDescriptor {
      */
     public enum SyncOption {
         /**
-         * Suppose any other thread has still one or more archive entry input
-         * streams open to an archive controller's target file.
-         * Then if and only if this property is {@code true}, the respective
-         * archive controller will wait until all other threads have closed
-         * their archive entry input streams before proceeding with the update
-         * of the target archive file.
-         * Archive entry input streams opened (and not yet closed) by the
-         * current thread are always ignored.
+         * Suppose there are any open input streams or read only files for any
+         * archive entries of an archive controller's target archive file.
+         * Then if this option is set, the archive controller waits until all
+         * <em>other</em> threads have closed their archive entry input streams
+         * and read only files before proceeding with the update of the target
+         * archive file.
+         * Archive input streams and read only files opened by the
+         * <em>current</em> thread are always ignored.
          * If the current thread gets interrupted while waiting, it will
-         * stop waiting and proceed normally as if this property is
-         * {@code false}.
+         * stop waiting and proceed normally as if this options wasn't set.
          * <p>
          * Beware: If a stream has not been closed because the client
          * application does not always properly close its streams, even on an
@@ -369,48 +368,57 @@ implements ArchiveDescriptor {
          * applications), then the respective archive controller will not
          * return from the update until the current thread gets interrupted!
          */
-        WAIT_FOR_INPUT_STREAMS,
+        WAIT_CLOSE_INPUT,
+
         /**
-         * Suppose there are any open input streams for any archive entries of
-         * an archive controller's target file because the client application
-         * has forgot to {@link InputStream#close()} all {@code InputStream}
-         * objects or another thread is still busy doing I/O on the target
-         * archive file.
-         * Then if this property is {@code true}, the respective archive
-         * controller will proceed to update the target archive file anyway and
-         * finally throw an {@link ArchiveBusyWarningException} to indicate
-         * that any subsequent operations on these streams will fail with an
-         * {@link CommonEntryStreamClosedException} because they have been
-         * forced to close.
+         * Suppose there are any open input streams or read only files for any
+         * archive entries of an archive controller's target archive file.
+         * Then if this option is set, the archive controller will proceed to
+         * update the target archive file anyway and finally throw an
+         * {@link ArchiveBusyWarningException} to indicate that any subsequent
+         * operations on these streams will fail with an
+         * {@link CommonInputClosedException} because they have been forced to
+         * close.
          * <p>
-         * If this property is {@code false}, the target archive file is
-         * <em>not</em> updated and an {@link ArchiveBusyException} is thrown
-         * to indicate that the application must close all entry input streams
-         * first.
+         * If this option is not set, the target archive file is <em>not</em>
+         * updated and an {@link ArchiveBusyException} is thrown to indicate
+         * that the application must close all entry input streams and read
+         * only files first.
          */
-        CLOSE_INPUT_STREAMS,
+        CLOSE_INPUT,
+
         /**
-         * Similar to {@code waitInputStreams},
+         * Similar to {@link #WAIT_CLOSE_INPUT},
          * but applies to archive entry output streams instead.
          */
-        WAIT_FOR_OUTPUT_STREAMS,
+        WAIT_CLOSE_OUTPUT,
+
         /**
-         * Similar to {@code closeInputStreams},
-         * but applies to archive entry output streams instead.
+         * Similar to {@link #CLOSE_INPUT},
+         * but applies to archive entry output streams and may throw a
+         * {@link CommonOutputClosedException} instead.
          * <p>
-         * If this parameter is {@code true}, then
-         * {@code closeInputStreams} must be {@code true}, too.
+         * If this option is set, then
+         * {@link #CLOSE_INPUT} must be set, too.
          * Otherwise, an {@code IllegalArgumentException} is thrown.
          */
-        CLOSE_OUTPUT_STREAMS,
+        CLOSE_OUTPUT,
+
         /**
-         * If this property is {@code true}, the archive controller's target
-         * file is completely released in order to enable subsequent read/write
+         * If this option is set, all pending changes are aborted.
+         * This option will leave a corrupted target archive file and is only
+         * meaningful before the target archive file is deleted.
+         */
+        ABORT_CHANGES,
+
+        /**
+         * If this options is set, the archive controller's target file is
+         * completely released in order to enable subsequent read/write
          * access to it for third parties such as other processes
          * <em>before</em> TrueZIP can be used again to read from or write to
          * the target archive file.
          * <p>
-         * If this property is {@code true}, some temporary files might be
+         * If this option is <em>not</em> set, some temporary files might be
          * retained for caching in order to enable faster subsequent access to
          * the archive file again.
          * <p>
@@ -419,15 +427,15 @@ implements ArchiveDescriptor {
          * control cooperation with third parties or enabling faster access.
          */
         UMOUNT,
+
         /**
-         * Let's assume an archive controller's target file is enclosed in
+         * Suppose an archive controller's target archive file is enclosed in
          * another archive file.
-         * Then if this property is {@code true}, the updated target archive
-         * file is also written to its enclosing archive file.
-         * Note that this property <em>must</em> be set to {@code true} if the
-         * property {@code umount} is set to {@code true} as well.
-         * Failing to comply to this requirement may throw an
-         * {@link AssertionError} and will incur loss of data!
+         * Then if this options is set, the updated target archive file is
+         * also written to its enclosing archive file.
+         * Note that this option <em>must</em> be set if the property
+         * {@code umount} is set, too.
+         * Otherwise, an {@code IllegalArgumentException} is thrown.
          */
         REASSEMBLE,
     }
