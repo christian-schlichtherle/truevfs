@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
@@ -40,12 +41,13 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final URI mountPoint;
     private final URI enclMountPoint;
     private final URI enclPath;
+    private final File target; // TODO: make this support other virtual file systems.
+    private final ArchiveDriver<AE> driver;
     private final ReentrantLock  readLock;
     private final ReentrantLock writeLock;
-    private final File target;
     private ArchiveFileSystem<AE> fileSystem;
 
-    ArchiveModel(final URI mountPoint, final URI enclMountPoint) {
+    ArchiveModel(final URI mountPoint, final URI enclMountPoint, final ArchiveDriver<AE> driver) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -53,6 +55,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
         assert enclMountPoint == null || "file".equals(enclMountPoint.getScheme());
         assert enclMountPoint == null || mountPoint.getPath().startsWith(enclMountPoint.getPath());
         //assert enclMountPoint == null || enclMountPoint.getPath().endsWith(SEPARATOR);
+        assert driver != null;
 
         this.mountPoint = mountPoint;
         this.enclMountPoint = enclMountPoint;
@@ -62,6 +65,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
         final ReadWriteLock rwl = new ReentrantReadWriteLock();
         this.readLock  = rwl.readLock();
         this.writeLock = rwl.writeLock();
+        this.driver = driver;
     }
 
     @Override
@@ -97,20 +101,24 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
                 : enclPath.resolve(path).toString();
     }
 
-    ReentrantLock readLock() {
-        return readLock;
-    }
-
-    ReentrantLock writeLock() {
-        return writeLock;
-    }
-
     /**
      * Returns the canonical or at least normalized absolute file for the
      * target archive file.
      */
     File getTarget() {
         return target;
+    }
+
+    ArchiveDriver<AE> getDriver() {
+        return driver;
+    }
+
+    ReentrantLock readLock() {
+        return readLock;
+    }
+
+    ReentrantLock writeLock() {
+        return writeLock;
     }
 
     ArchiveFileSystem<AE> getFileSystem() {

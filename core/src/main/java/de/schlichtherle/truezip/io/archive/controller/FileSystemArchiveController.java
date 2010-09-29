@@ -17,11 +17,9 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * This archive controller implements the automounting functionality.
@@ -40,8 +38,8 @@ extends BasicArchiveController<AE> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(ArchiveModel<AE> model, ArchiveDriver driver) {
-        super(model, driver);
+    FileSystemArchiveController(ArchiveModel<AE> model) {
+        super(model);
     }
 
     final boolean isTouched() {
@@ -54,6 +52,7 @@ extends BasicArchiveController<AE> {
             final boolean autoCreate,
             final boolean createParents)
     throws IOException {
+        assert !createParents || autoCreate;
         assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return autoMounter.autoMount(autoCreate, createParents);
     }
