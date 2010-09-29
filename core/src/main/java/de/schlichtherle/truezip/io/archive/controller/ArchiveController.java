@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -26,6 +27,8 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntryStreamClosedException
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -60,23 +63,122 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveController
-implements  ArchiveDescriptor { // TODO: Should this really be implemented?
+public abstract class ArchiveController<AE extends ArchiveEntry>
+implements ArchiveDescriptor {
 
-    ArchiveController() {
+    private final ArchiveModel<AE> model;
+
+    /** The archive controller of the enclosing archive, if any. */
+    private final ArchiveController<?> enclController;
+
+    ArchiveController(final ArchiveModel<AE> model) {
+        assert model != null;
+
+        this.model = model;
+        final URI enclMountPoint = model.getEnclMountPoint();
+        enclController = null == enclMountPoint
+                ? null
+                : ArchiveControllers.getController(enclMountPoint);
+        assert (null == enclMountPoint) == (null == enclController);
     }
 
-    /** Returns {@link #getMountPoint()}{@code .}{@link Object#toString()}. */
+    final ArchiveModel<AE> getModel() {
+        return model;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Where the methods of this class accept a path name string as a
+     * parameter, this must be a relative, hierarchical URI which is resolved
+     * against this mount point.
+     */
+    @Override
+    public final URI getMountPoint() {
+        return getModel().getMountPoint();
+    }
+
+    /** Returns {@code "controller:" + }{@link #getMountPoint()}{@code .}{@link Object#toString()}. */
     @Override
     public final String toString() {
-        return getMountPoint().toString();
+        return "controller:" + getMountPoint().toString();
     }
 
-    abstract ArchiveModel getModel();
+    final ArchiveController<?> getEnclController() {
+        return enclController;
+    }
 
-    abstract ArchiveController getEnclController();
+    final String getEnclPath(String path) {
+        return getModel().getEnclPath(path);
+    }
 
-    abstract <O extends IOOperation> O runWriteLocked(O operation) throws IOException;
+    final File getTarget() {
+        return getModel().getTarget();
+    }
+
+    /**
+     * Returns {@code true} if and only if the target file of this
+     * controller should be considered to be a file or directory in the host
+     * file system.
+     * Note that the target doesn't need to exist for this method to return
+     * {@code true}.
+     */
+    // TODO: Move to UpdatingArchiveController and declare private.
+    final boolean isHostFileSystemEntryTarget() {
+        // True iff not enclosed or the enclosing archive file is actually
+        // a plain directory.
+        final ArchiveController enclController = getEnclController();
+        return null == enclController
+                || enclController.getTarget().isDirectory();
+    }
+
+    final ReentrantLock readLock() {
+        return getModel().readLock();
+    }
+
+    final ReentrantLock writeLock() {
+        return getModel().writeLock();
+    }
+
+    /**
+     * Runs the given I/O operation while this controller has acquired its
+     * write lock regardless of the state of its read lock.
+     * You must use this method if this controller may have acquired a
+     * read lock in order to prevent a dead lock.
+     * <p>
+     * <b>Warning:</b> This method temporarily releases the read lock
+     * before the write lock is acquired and the runnable is run!
+     * Hence, the runnable must retest the state of the controller
+     * before it proceeds with any write operations.
+     *
+     * @param  operation the operation to run while the write lock is acquired.
+     * @return {@code operation}
+     */
+    final <O extends IOOperation> O runWriteLocked(final O operation)
+    throws IOException {
+        assert operation != null;
+
+        // A read lock cannot get upgraded to a write lock.
+        // Hence the following mess is required.
+        // Note that this is not just a limitation of the current
+        // implementation in JSE 5: If automatic upgrading were implemented,
+        // two threads holding a read lock try to upgrade concurrently,
+        // they would dead lock each other!
+        final int holdCount = readLock().getHoldCount();
+        for (int c = holdCount; c-- > 0; )
+                readLock().unlock();
+        // The current thread may get blocked here!
+        writeLock().lock();
+        try {
+            // First restore lock count to protect agains exceptions.
+            for (int c = holdCount; c-- > 0; )
+                readLock().lock();
+            operation.run();
+        } finally {
+            writeLock().unlock(); // downgrade the lock
+        }
+        return operation;
+    }
 
     abstract ArchiveFileSystem<?> autoMount(boolean autoCreate) throws IOException;
 
@@ -206,16 +308,6 @@ implements  ArchiveDescriptor { // TODO: Should this really be implemented?
          */
         REASSEMBLE,
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Where the methods of this class accept a path name string as a
-     * parameter, this must be a relative, hierarchical URI which is resolved
-     * against this mount point.
-     */
-    @Override
-    public abstract URI getMountPoint();
 
     public abstract Icon getOpenIcon() throws FalsePositiveException;
 

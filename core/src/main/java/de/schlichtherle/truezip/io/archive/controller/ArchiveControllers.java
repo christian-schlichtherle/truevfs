@@ -72,9 +72,9 @@ public class ArchiveControllers {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
-    private static final Comparator<ArchiveModel> REVERSE_MODELS
-            = new Comparator<ArchiveModel>() {
-        public int compare(ArchiveModel l, ArchiveModel r) {
+    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
+            = new Comparator<ArchiveController>() {
+        public int compare(ArchiveController l, ArchiveController r) {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
@@ -119,10 +119,10 @@ public class ArchiveControllers {
      *     not a valid name for an archive file</li>
      * </ul>
      */
-    public static ArchiveController getController(
+    public static <AE extends ArchiveEntry> ArchiveController getController(
             URI mountPoint,
-            final URI enclMountPoint,
-            final ArchiveDriver driver) {
+            final ArchiveController<?> enclController,
+            final ArchiveDriver<AE> driver) {
         if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
         if (mountPoint.isOpaque()) throw new IllegalArgumentException();
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
@@ -163,8 +163,9 @@ public class ArchiveControllers {
                 return null;
             // TODO: Refactor this to a more flexible design which supports
             // different sync strategies, like update or append.
-            return new UpdatingArchiveController(
-                    mountPoint, enclMountPoint, driver);
+            final ArchiveModel model = new ArchiveModel<AE>(mountPoint,
+                    null == enclController ? null : enclController.getMountPoint());
+            return new UpdatingArchiveController<AE>(model , driver);
         }
     }
 
@@ -247,7 +248,7 @@ public class ArchiveControllers {
                 // This ensures that an archive file will always be updated
                 // before its enclosing archive file.
                 for (final ArchiveController controller
-                        : getControllers(prefix, REVERSE_MODELS)) {
+                        : getControllers(prefix, REVERSE_CONTROLLERS)) {
                     final ArchiveModel model = controller.getModel();
                         try {
                             model.writeLock().lock();
@@ -290,13 +291,13 @@ public class ArchiveControllers {
 
     static Iterable<ArchiveController> getControllers(
             URI prefix,
-            final Comparator c) {
+            final Comparator<ArchiveController> comparator) {
         if (prefix == null)
             prefix = URI.create(""); // catch all
         final Set<ArchiveController> snapshot;
         synchronized (controllers) {
-            snapshot = c != null
-                    ? new TreeSet(c)
+            snapshot = null != comparator
+                    ? new TreeSet(comparator)
                     : new HashSet((int) (controllers.size() / 0.75f));
             for (Object value : controllers.values()) {
                 if (value instanceof Reference) {
