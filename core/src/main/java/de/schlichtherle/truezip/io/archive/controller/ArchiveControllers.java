@@ -43,8 +43,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
@@ -53,8 +51,6 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -74,6 +70,31 @@ public class ArchiveControllers {
         }
     };
 
+    private interface Pointer<T> {
+        T get();
+    }
+
+    private static class StrongPointer<T>
+    implements Pointer<T> {
+        final T target;
+
+        StrongPointer(final T target) {
+            this.target = target;
+        }
+
+        public T get() {
+            return target;
+        }
+    }
+
+    private static class WeakPointer<T>
+    extends WeakReference<T>
+    implements Pointer<T> {
+        WeakPointer(T target) {
+            super(target);
+        }
+    }
+
     /**
      * The map of all archive controllers.
      * The keys are plain {@link URI} instances and the values are either
@@ -81,7 +102,8 @@ public class ArchiveControllers {
      * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Object> controllers = new WeakHashMap<URI, Object>();
+    private static final Map<URI, Pointer<ArchiveController<?>>> controllers
+            = new WeakHashMap<URI, Pointer<ArchiveController<?>>>();
 
     private ArchiveControllers() {
     }
@@ -124,10 +146,10 @@ public class ArchiveControllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         synchronized (controllers) {
-            final Object value = controllers.get(mountPoint);
-            if (value instanceof Reference) {
-                final ArchiveController controller
-                        = (ArchiveController) ((Reference) value).get();
+            final Pointer<ArchiveController<?>> pointer
+                    = controllers.get(mountPoint);
+            if (pointer != null) {
+                final ArchiveController<?> controller = pointer.get();
                 // Check that the controller hasn't been garbage collected
                 // meanwhile!
                 if (controller != null) {
@@ -138,21 +160,6 @@ public class ArchiveControllers {
                     return controller;
                 }
                 // Fall through!
-            } else if (value != null) {
-                // Do NOT reconfigure this ArchiveController with another
-                // ArchiveDetector: This controller is touched, i.e. it
-                // most probably has mounted the virtual file system and
-                // using another ArchiveDetector could potentially break
-                // the sync process.
-                // Effectively, this means that the reconfiguration of a
-                // previously created ArchiveController is only guaranteed
-                // to happen if
-                // (1) sync(*) has been called and
-                // (2) a new File object referring to the previously used
-                //     archive file as either the file itself or one of its
-                //     ancestors is created with a different
-                //     ArchiveDetector.
-                return (ArchiveController) value;
             }
             if (driver == null) // pure lookup operation?
                 return null;
@@ -167,7 +174,7 @@ public class ArchiveControllers {
                         model,
                         new UpdatingArchiveController<AE>(model));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                                new WeakReference(controller));
+                                new WeakPointer<ArchiveController<?>>(controller));
             return controller;
         }
     }
@@ -178,18 +185,18 @@ public class ArchiveControllers {
      */
     static void scheduleSync(final URI mountPoint, final boolean unconditionally) {
         synchronized (controllers) {
-            Object value = controllers.get(mountPoint);
-            if (null == value) {
+            Pointer<ArchiveController<?>> pointer = controllers.get(mountPoint);
+            if (null == pointer) {
                 if (unconditionally)
                     throw new IllegalStateException();
                 return;
             }
-            if (value instanceof Reference)
-                value = ((Reference) value).get(); // dereference
-            final ArchiveController controller = (ArchiveController) value;
+            final ArchiveController controller = pointer.get();
             controllers.put(
                     controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                    unconditionally ? controller : new WeakReference(controller));
+                    unconditionally
+                        ? new StrongPointer<ArchiveController<?>>(controller)
+                        : new WeakPointer<ArchiveController<?>>(controller));
         }
     }
 
@@ -283,27 +290,24 @@ public class ArchiveControllers {
     static Iterable<ArchiveController> getControllers(
             URI prefix,
             final Comparator<ArchiveController> comparator) {
-        if (prefix == null)
+        if (null == prefix)
             prefix = URI.create(""); // catch all
         final Set<ArchiveController> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
                     ? new TreeSet(comparator)
                     : new HashSet((int) (controllers.size() / 0.75f));
-            for (Object value : controllers.values()) {
-                if (value instanceof Reference) {
-                    value = ((Reference) value).get(); // dereference
-                    if (value == null) {
-                        // This may happen if there are no more strong
-                        // references to the controller and it has been
-                        // removed from the weak reference in the hash
-                        // map's value before it's been removed from the
-                        // hash map's key (shit happens)!
-                        continue;
-                    }
+            for (final Pointer<ArchiveController<?>> pointer
+                    : controllers.values()) {
+                final ArchiveController<?> controller
+                        = null == pointer ? null : pointer.get();
+                if (null == controller) {
+                    // This may happen if there are no more strong references
+                    // to the archive controller and it has been removed from
+                    // the weak reference in the hash map's value before it's
+                    // been removed from the hash map's key - shit happens!
+                    continue;
                 }
-                assert value != null;
-                final ArchiveController controller = (ArchiveController) value;
                 if (controller.getMountPoint().toString().startsWith(prefix.toString()))
                     snapshot.add(controller);
             }
