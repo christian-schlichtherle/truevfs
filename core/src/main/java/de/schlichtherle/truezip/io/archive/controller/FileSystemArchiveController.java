@@ -70,20 +70,27 @@ extends BasicArchiveController<AE> {
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private abstract class AutoMounter {
+        AutoMounter(final ArchiveFileSystem<AE> fileSystem) {
+            getModel().setFileSystem(fileSystem);
+        }
 
         abstract ArchiveFileSystem<AE> autoMount(
                 boolean autoCreate,
                 boolean createParents)
         throws IOException;
 
-        ArchiveFileSystem<AE> getFileSystem() {
-            return null;
+        final ArchiveFileSystem<AE> getFileSystem() {
+            return getModel().getFileSystem();
         }
 
         abstract void setFileSystem(ArchiveFileSystem<AE> fileSystem);
     } // class AutoMounter
 
     private class ResetFileSystem extends AutoMounter {
+        ResetFileSystem() {
+            super(null);
+        }
+
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
         throws IOException {
@@ -140,19 +147,14 @@ extends BasicArchiveController<AE> {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends AutoMounter {
-        private MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
+        MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
+            super(fileSystem);
             if (fileSystem == null)
                 throw new NullPointerException();
-            getModel().setFileSystem(fileSystem);
         }
 
         @Override
         ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents) {
-            return getModel().getFileSystem();
-        }
-
-        @Override
-        ArchiveFileSystem<AE> getFileSystem() {
             return getModel().getFileSystem();
         }
 
@@ -168,6 +170,7 @@ extends BasicArchiveController<AE> {
         private final FalsePositiveException exception;
 
         private FalsePositiveFileSystem(final FalsePositiveException exception) {
+            super(null);
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -209,9 +212,4 @@ extends BasicArchiveController<AE> {
      */
     abstract void mount(boolean autoCreate, boolean createParents)
     throws IOException;
-
-    final void reset(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException {
-        setFileSystem(null);
-    }
 }
