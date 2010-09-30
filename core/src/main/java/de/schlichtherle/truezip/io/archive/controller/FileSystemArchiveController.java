@@ -66,6 +66,29 @@ extends BasicArchiveController<AE> {
     }
 
     /**
+     * Mounts the virtual file system from the target file.
+     * This method is called while the write lock to mount the file system
+     * for this controller is acquired.
+     * <p>
+     * Upon normal termination, this method is expected to have called
+     * {@link setFileSystem} to assign the fully initialized file system
+     * to this controller.
+     * Other than this, the method must not have any side effects on the
+     * state of this class or its super class.
+     * It may, however, have side effects on the state of the sub class.
+     *
+     * @param autoCreate If the archive file does not exist and this is
+     *        {@code true}, a new file system with only a virtual root
+     *        directory is created with its last modification time set to the
+     *        system's current time.
+     * @throws FalsePositiveException
+     * @throws IOException On any other I/O related issue with the target file
+     *         or the target file of any enclosing archive file's controller.
+     */
+    abstract void mount(boolean autoCreate, boolean createParents)
+    throws IOException;
+
+    /**
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
@@ -189,27 +212,4 @@ extends BasicArchiveController<AE> {
             autoMounter = new ResetFileSystem();
         }
     } // class FalsePositiveFileSystem
-
-    /**
-     * Mounts the virtual file system from the target file.
-     * This method is called while the write lock to mount the file system
-     * for this controller is acquired.
-     * <p>
-     * Upon normal termination, this method is expected to have called
-     * {@link setFileSystem} to assign the fully initialized file system
-     * to this controller.
-     * Other than this, the method must not have any side effects on the
-     * state of this class or its super class.
-     * It may, however, have side effects on the state of the sub class.
-     *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @throws FalsePositiveException
-     * @throws IOException On any other I/O related issue with the target file
-     *         or the target file of any enclosing archive file's controller.
-     */
-    abstract void mount(boolean autoCreate, boolean createParents)
-    throws IOException;
 }
