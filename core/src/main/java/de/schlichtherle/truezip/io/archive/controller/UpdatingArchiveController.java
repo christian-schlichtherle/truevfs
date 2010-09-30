@@ -48,8 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
@@ -74,11 +72,6 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 final class UpdatingArchiveController<AE extends ArchiveEntry>
 extends FileSystemArchiveController<AE> {
-
-    private static final String CLASS_NAME
-            = UpdatingArchiveController.class.getName();
-    private static final Logger logger
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /** Prefix for temporary files created by this class. */
     static final String TEMP_FILE_PREFIX = "tzp-ctrl";
@@ -245,9 +238,6 @@ extends FileSystemArchiveController<AE> {
         assert output == null;
         assert getFileSystem() == null;
 
-        // Do the logging part and leave the work to mount0.
-        final Object stats[] = { getMountPoint(), autoCreate, createParents };
-        logger.log(Level.FINER, "mount.try", stats); // NOI18N
         try {
             mount0(autoCreate, createParents);
 
@@ -257,9 +247,6 @@ extends FileSystemArchiveController<AE> {
             assert autoCreate || output == null;
             assert getFileSystem() != null;
         } catch (IOException ex) {
-            // Log at FINER level. This is mostly because of false positives.
-            logger.log(Level.FINER, "mount.catch", ex); // NOI18N
-
             assert writeLock().isHeldByCurrentThread();
             assert input == null;
             assert outFile == null;
@@ -267,8 +254,6 @@ extends FileSystemArchiveController<AE> {
             assert getFileSystem() == null;
 
             throw ex;
-        } finally {
-            logger.log(Level.FINER, "mount.finally", stats); // NOI18N
         }
     }
 
@@ -540,7 +525,6 @@ extends FileSystemArchiveController<AE> {
         assert writeLock().isHeldByCurrentThread();
         assert input == null;
 
-        logger.log(Level.FINEST, "initInArchive.try", inFile); // NOI18N
         try {
             class InputSocket extends FilterInputSocket<FileEntry> {
                 InputSocket() throws IOException {
@@ -557,16 +541,10 @@ extends FileSystemArchiveController<AE> {
             }
             input = new Input(getDriver().newInputShop(this, new InputSocket()));
         } catch (IOException ex) {
-            logger.log(Level.FINEST, "initInArchive.catch", ex); // NOI18N
-
             assert input == null;
 
             throw ex;
-        } finally {
-            logger.log(Level.FINEST, "initInArchive.finally",
-                    input == null ? 0 : input.size()); // NOI18N
         }
-
         assert input != null;
     }
 
@@ -624,7 +602,6 @@ extends FileSystemArchiveController<AE> {
         assert writeLock().isHeldByCurrentThread();
         assert output == null;
 
-        logger.log(Level.FINEST, "initOutArchive.try", outFile); // NOI18N
         try {
             final FileEntry entry = new FileEntry(outFile);
             final CommonOutputSocket<FileEntry> fileInput
@@ -664,13 +641,9 @@ extends FileSystemArchiveController<AE> {
                 }
             }
         } catch (IOException ex) {
-            logger.log(Level.FINEST, "initOutArchive.catch", ex); // NOI18N
-
             assert output == null;
 
             throw ex;
-        } finally {
-            logger.log(Level.FINEST, "initOutArchive.finally"); // NOI18N
         }
 
         assert output != null;
@@ -694,30 +667,6 @@ extends FileSystemArchiveController<AE> {
     }
 
     public void sync(   final ArchiveSyncExceptionBuilder builder,
-                        final BitField<SyncOption> options)
-    throws ArchiveSyncException {
-        // Do the logging part and leave the work to sync0.
-        final Object[] stats = new Object[] {
-            getMountPoint(),
-            options.get(WAIT_CLOSE_INPUT),
-            options.get(CLOSE_INPUT),
-            options.get(WAIT_CLOSE_OUTPUT),
-            options.get(CLOSE_OUTPUT),
-            options.get(UMOUNT),
-            options.get(REASSEMBLE),
-        };
-        logger.log(Level.FINER, "sync.try", stats); // NOI18N
-        try {
-            sync0(builder, options);
-        } catch (ArchiveSyncException ex) {
-            logger.log(Level.FINER, "sync.catch", ex); // NOI18N
-            throw ex;
-        } finally {
-            logger.log(Level.FINER, "sync.finally", stats); // NOI18N
-        }
-    }
-
-    private void sync0( final ArchiveSyncExceptionBuilder builder,
                         final BitField<SyncOption> options)
     throws ArchiveSyncException {
         assert writeLock().isHeldByCurrentThread();
@@ -1060,31 +1009,13 @@ extends FileSystemArchiveController<AE> {
     @Override
     @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
-        logger.log(Level.FINEST, "finalize.try", getMountPoint()); // NOI18N
         try {
-            // Note: If fileSystem or inArchive are not null, then the controller
-            // has been used to perform read operations.
-            // If outArchive is not null, the controller has been used to perform
-            // write operations, but however, all file system transactions
-            // must have failed.
-            // Otherwise, the fileSystem would have been marked as touched and
-            // this object should never be made elegible for finalization!
-            // Tactical note: Assertions don't work in a finalizer, so we use
-            // logging.
-            if (    isTouched()
-                    || readLock().isHeldByCurrentThread()
-                    || writeLock().isHeldByCurrentThread())
-                logger.log(Level.SEVERE, "finalize.invalidState", getMountPoint());
             final ArchiveSyncExceptionBuilder handler
                     = new DefaultArchiveSyncExceptionBuilder();
             //shutdownStep1(handler);
             shutdownStep2(handler);
             shutdownStep3(true);
-        } catch (IOException ex) {
-            logger.log(Level.FINEST, "finalize.catch", ex);
         } finally {
-            logger.log(Level.FINEST, "finalize.finally", getMountPoint());
-
             super.finalize();
         }
     }

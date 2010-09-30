@@ -67,11 +67,6 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  */
 public class ArchiveControllers {
 
-    private static final String CLASS_NAME
-            = ArchiveControllers.class.getName();
-    private static final Logger logger
-            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
-
     private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
             = new Comparator<ArchiveController>() {
         public int compare(ArchiveController l, ArchiveController r) {
@@ -239,61 +234,46 @@ public class ArchiveControllers {
             throw new IllegalArgumentException();
 
         int total = 0, touched = 0;
-        logger.log(Level.FINE, "sync.try", new Object[] { // NOI18N
-            prefix,
-            options.get(WAIT_CLOSE_INPUT),
-            options.get(CLOSE_INPUT),
-            options.get(WAIT_CLOSE_OUTPUT),
-            options.get(CLOSE_OUTPUT),
-            options.get(UMOUNT),
-        });
+        // Reset statistics if it hasn't happened yet.
+        CountingReadOnlyFile.init();
+        CountingOutputStream.init();
         try {
-            // Reset statistics if it hasn't happened yet.
-            CountingReadOnlyFile.init();
-            CountingOutputStream.init();
-            try {
-                // The general algorithm is to sort the targets in descending order
-                // of their pathnames (considering the system's default name
-                // separator character) and then walk the array in reverse order to
-                // call the sync() method on each respective archive controller.
-                // This ensures that an archive file will always be updated
-                // before its enclosing archive file.
-                for (final ArchiveController controller
-                        : getControllers(prefix, REVERSE_CONTROLLERS)) {
-                    final ArchiveModel model = controller.getModel();
+            // The general algorithm is to sort the targets in descending order
+            // of their pathnames (considering the system's default name
+            // separator character) and then walk the array in reverse order to
+            // call the sync() method on each respective archive controller.
+            // This ensures that an archive file will always be updated
+            // before its enclosing archive file.
+            for (final ArchiveController controller
+                    : getControllers(prefix, REVERSE_CONTROLLERS)) {
+                final ArchiveModel model = controller.getModel();
+                    try {
+                        model.writeLock().lock();
                         try {
-                            model.writeLock().lock();
-                            try {
-                                if (model.isTouched())
-                                    touched++;
-                                // Upon return, some new ArchiveWarningException's may
-                                // have been generated. We need to remember them for
-                                // later throwing.
-                                controller.sync(builder, options);
-                            } finally {
-                                model.writeLock().unlock();
-                            }
-                        } catch (ArchiveSyncException exception) {
-                            // Updating the archive file or wrapping it back into
-                            // one of it's enclosing archive files resulted in an
-                            // exception for some reason.
-                            // We are bullheaded and store the exception chain for
-                            // later throwing only and continue updating the rest.
-                            builder.warn(exception);
+                            if (model.isTouched())
+                                touched++;
+                            // Upon return, some new ArchiveWarningException's may
+                            // have been generated. We need to remember them for
+                            // later throwing.
+                            controller.sync(builder, options);
+                        } finally {
+                            model.writeLock().unlock();
                         }
-                    total++;
-                }
-                builder.check();
-            } finally {
-                CountingReadOnlyFile.resetOnInit();
-                CountingOutputStream.resetOnInit();
+                    } catch (ArchiveSyncException exception) {
+                        // Updating the archive file or wrapping it back into
+                        // one of it's enclosing archive files resulted in an
+                        // exception for some reason.
+                        // We are bullheaded and store the exception chain for
+                        // later throwing only and continue updating the rest.
+                        builder.warn(exception);
+                    }
+                total++;
             }
-        } catch (ArchiveSyncException ex) {
-            logger.log(Level.FINE, "sync.catch", ex);// NOI18N
-            throw ex;
+            builder.check();
+        } finally {
+            CountingReadOnlyFile.resetOnInit();
+            CountingOutputStream.resetOnInit();
         }
-        logger.log(Level.FINE, "sync.return", // NOI18N
-                new Object[] { total, touched });
     }
 
     static Iterable<ArchiveController> getControllers() {
