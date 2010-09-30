@@ -1128,7 +1128,7 @@ extends FileSystemArchiveController<AE> {
      */
     private void shutdownStep2(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        super.reset(handler); // discard file system
+        setFileSystem(null);
 
         // The output archive must be closed BEFORE the input archive is
         // closed. This is because the input archive has been presented
