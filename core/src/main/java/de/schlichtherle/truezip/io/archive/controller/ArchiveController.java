@@ -72,33 +72,9 @@ implements ArchiveDescriptor {
 
     private final ArchiveModel<AE> model;
 
-    /** The archive controller of the enclosing archive, if any. */
-    private final ArchiveController<?> enclController;
-
-    /**
-     * This constructor schedules this controller to be thrown away if the
-     * client application holds no more references to it.
-     * The subclass must update this schedule according to the controller's
-     * state.
-     * For example, if the controller has started to update some entry data,
-     * it must call {@link #schedule(boolean)} in order to force the
-     * controller to be updated on the next call to
-     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
-     * even if the client application holds no more references to it.
-     * Otherwise, all changes may get lost!
-     *
-     * @see #schedule(boolean)
-     */
     ArchiveController(final ArchiveModel<AE> model) {
         assert model != null;
-
         this.model = model;
-        final URI enclMountPoint = model.getEnclMountPoint();
-        enclController = null == enclMountPoint
-                ? null
-                : ArchiveControllers.getController(enclMountPoint);
-        assert (null == enclMountPoint) == (null == enclController);
-        schedule(false);
     }
 
     /**
@@ -109,7 +85,7 @@ implements ArchiveDescriptor {
      * according to the given parameter:
      * <p>
      * If set to {@code true}, this controller gets unconditionally scheduled,
-     * i.e. its archive contents will get synchonized to the target archive
+     * i.e. its archive contents will get synchronized to the target archive
      * file in the host file system even if there are no other objects
      * referring to it.
      * <p>
@@ -117,17 +93,17 @@ implements ArchiveDescriptor {
      * scheduled, i.e. its archive contents will get synchonized to the target
      * archive file in the host file system if and only if another file or
      * stream object is still directly or indirectly referring to it or if
-     * {@code schedule(true)} has been called again meanwhile.
+     * {@code scheduleSync(true)} has been called again meanwhile.
      * <p>
      * Call this method if the archive controller has been newly created or
      * successfully updated.
      *
-     * @param unconditional Whether or not this archive controller shall get
+     * @param sticky Whether or not this archive controller shall get
      *        unconditionally scheduled for synchronization of its archive
      *        contents to the host file system.
      */
-    final void schedule(final boolean unconditional) {
-        ArchiveControllers.map(this, unconditional);
+    final void setSticky(final boolean sticky) {
+        ArchiveControllers.scheduleSync(getMountPoint(), sticky);
     }
 
     final ArchiveModel<AE> getModel() {
@@ -152,10 +128,6 @@ implements ArchiveDescriptor {
         return "controller:" + getMountPoint().toString();
     }
 
-    final ArchiveController<?> getEnclController() {
-        return enclController;
-    }
-
     final String getEnclPath(String path) {
         return getModel().getEnclPath(path);
     }
@@ -175,9 +147,9 @@ implements ArchiveDescriptor {
     final boolean isHostFileSystemEntryTarget() {
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final ArchiveController enclController = getEnclController();
-        return null == enclController
-                || enclController.getTarget().isDirectory();
+        final ArchiveModel enclModel = getModel().getEnclModel();
+        return null == enclModel
+                || enclModel.getTarget().isDirectory();
     }
 
     /**

@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.IOException;
 
 /**
- * Indicates a false positive archive entry which actually exists as a
- * directory entry in an enclosing archive file.
+ * Indicates a false positive archive entry which does exist as a directory
+ * entry in an enclosing archive file.
  * <p>
  * Instances of this class are always associated with an {@code IOException}
  * as their cause.

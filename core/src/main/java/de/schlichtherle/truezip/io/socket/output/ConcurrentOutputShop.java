@@ -63,7 +63,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     private final Map<DoCloseable, Thread> streams
             = new WeakHashMap<DoCloseable, Thread>();
 
-    private volatile boolean stopped;
+    private volatile boolean shopClosed;
 
     /** Constructs a new {@code ConcurrentOutputShop}. */
     public ConcurrentOutputShop(final CommonOutputShop<CE> target) {
@@ -73,7 +73,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     @Override
     public CommonOutputSocket<CE> newOutputSocket(final CE entry)
     throws IOException {
-        assert !stopped;
+        assert !shopClosed;
         assert entry != null;
 
         class OutputSocket extends FilterOutputSocket<CE> {
@@ -107,7 +107,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      * @return The number of all open streams.
      */
     public synchronized int waitCloseOthers(final long timeout) {
-        assert !stopped;
+        assert !shopClosed;
 
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
@@ -154,7 +154,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     public synchronized <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
-        assert !stopped;
+        assert !shopClosed;
         try {
             for (final Iterator<DoCloseable> it = streams.keySet().iterator();
             it.hasNext(); ) {
@@ -169,13 +169,13 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 }
             }
         } finally {
-            stopped = true;
+            shopClosed = true;
         }
     }
 
     @Override
     public void close() throws IOException {
-        stopped = true;
+        shopClosed = true;
         super.close();
     }
 
@@ -199,32 +199,32 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
             ConcurrentOutputShop.this.notify(); // there can be only one waiting thread!
         }
 
-        private void ensureNotStopped() throws IOException {
-            if (stopped)
+        private void ensureNotShopClosed() throws IOException {
+            if (shopClosed)
                 throw new CommonOutputClosedException();
         }
 
         @Override
         public void write(int b) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.write(b);
         }
 
         @Override
         public void write(byte[] b) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.flush();
         }
 
@@ -267,7 +267,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!stopped)
+            if (!shopClosed)
                 super.doClose();
         }
 

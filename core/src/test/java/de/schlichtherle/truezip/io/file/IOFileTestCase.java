@@ -162,18 +162,19 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         archive = null;
         assertTrue(new File(path).createNewFile());
         File.umount();
-        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
-        assertNotNull(ref.get());
         InputStream in = new FileInputStream(path);
+        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        System.gc();
+        Thread.sleep(100);
+        assertNotNull(ref.get());
         in.close();
         System.gc();
-        System.runFinalization();
         Thread.sleep(100);
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         in = null; // leaves file!
+        File.umount();
         System.gc();
-        System.runFinalization();
         Thread.sleep(100);
         assertNull(ref.get());
     }
@@ -184,19 +185,19 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         archive = null;
         assertTrue(new File(path).createNewFile());
         File.umount();
-        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
-        assertNotNull(ref.get());
         OutputStream out = new FileOutputStream(path);
+        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        System.gc();
+        Thread.sleep(100);
+        assertNotNull(ref.get());
         out.close();
         out = null; // leaves file!
         System.gc();
-        System.runFinalization();
         Thread.sleep(100);
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         File.umount();
         System.gc();
-        System.runFinalization();
         Thread.sleep(100);
         assertNull(ref.get());
     }

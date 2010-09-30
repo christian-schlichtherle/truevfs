@@ -32,33 +32,33 @@ public class SynchronizedOutputStream extends OutputStream {
     protected final Object lock;
 
     /** The decorated output stream. */
-    protected OutputStream target;
+    protected OutputStream out;
 
     /**
      * Constructs a new synchronized output stream.
      * This object will synchronize on itself.
      *
-     * @param target The output stream to wrap in this decorator.
+     * @param out The output stream to wrap in this decorator.
      */
-    public SynchronizedOutputStream(final OutputStream target) {
-    	this(target, null);
+    public SynchronizedOutputStream(final OutputStream out) {
+    	this(out, null);
     }
 
     /**
      * Constructs a new synchronized output stream.
      *
-     * @param target The output stream to wrap in this decorator.
+     * @param out The output stream to wrap in this decorator.
      * @param lock The object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedOutputStream(final OutputStream target, final Object lock) {
-        this.target = target;
+    public SynchronizedOutputStream(final OutputStream out, final Object lock) {
+        this.out = out;
         this.lock = null == lock ? this : lock;
     }
 
     public void write(int b) throws IOException {
         synchronized (lock) {
-            target.write(b);
+            out.write(b);
         }
     }
 
@@ -72,7 +72,7 @@ public class SynchronizedOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            target.write(b, off, len);
+            out.write(b, off, len);
         }
     }
 
@@ -89,7 +89,7 @@ public class SynchronizedOutputStream extends OutputStream {
      * This method is <em>not</em> synchronized!
      */
     protected void doFlush() throws IOException {
-        target.flush();
+        out.flush();
     }
 
     /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
@@ -108,7 +108,7 @@ public class SynchronizedOutputStream extends OutputStream {
         try {
             doFlush();
         } finally {
-            target.close();
+            out.close();
         }
     }
 }

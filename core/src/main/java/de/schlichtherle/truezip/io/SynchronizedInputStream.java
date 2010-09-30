@@ -30,33 +30,33 @@ public class SynchronizedInputStream extends InputStream {
     protected final Object lock;
 
     /** The decorated input stream. */
-    protected InputStream target;
+    protected InputStream in;
 
     /**
      * Constructs a new synchronized input stream.
      * This object will synchronize on itself.
      *
-     * @param target The input stream to wrap in this decorator.
+     * @param in The input stream to wrap in this decorator.
      */
-    public SynchronizedInputStream(final InputStream target) {
-        this(target, null);
+    public SynchronizedInputStream(final InputStream in) {
+        this(in, null);
     }
 
     /**
      * Constructs a new synchronized input stream.
      *
-     * @param target The input stream to wrap in this decorator.
+     * @param in The input stream to wrap in this decorator.
      * @param lock The object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
-    public SynchronizedInputStream(final InputStream target, final Object lock) {
-        this.target = target;
+    public SynchronizedInputStream(final InputStream in, final Object lock) {
+        this.in = in;
         this.lock = lock != null ? lock : this;
     }
 
     public int read() throws IOException {
         synchronized (lock) {
-            return target.read();
+            return in.read();
         }
     }
 
@@ -70,21 +70,21 @@ public class SynchronizedInputStream extends InputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            return target.read(b, off, len);
+            return in.read(b, off, len);
         }
     }
 
     @Override
     public long skip(long n) throws IOException {
         synchronized (lock) {
-            return target.skip(n);
+            return in.skip(n);
         }
     }
 
     @Override
     public int available() throws IOException {
         synchronized (lock) {
-            return target.available();
+            return in.available();
         }
     }
 
@@ -101,27 +101,27 @@ public class SynchronizedInputStream extends InputStream {
      * This method is <em>not</em> synchronized!
      */
     protected void doClose() throws IOException {
-        target.close();
+        in.close();
     }
 
     @Override
     public void mark(int readlimit) {
         synchronized (lock) {
-            target.mark(readlimit);
+            in.mark(readlimit);
         }
     }
 
     @Override
     public void reset() throws IOException {
         synchronized (lock) {
-            target.reset();
+            in.reset();
         }
     }
 
     @Override
     public boolean markSupported() {
         synchronized (lock) {
-            return target.markSupported();
+            return in.markSupported();
         }
     }
 }

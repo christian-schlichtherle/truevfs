@@ -131,6 +131,7 @@ extends FileSystemArchiveController<AE> {
     private final class Input extends ConcurrentInputShop<AE> {
         Input(CommonInputShop<AE> target) {
             super(target);
+            setSticky(true); // FIXME: This is a hack: It will prevent an archive controller from being garbage collected even if only input was done!
         }
 
         CommonInputShop<AE> getTarget() {
@@ -149,6 +150,7 @@ extends FileSystemArchiveController<AE> {
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(CommonOutputShop<AE> target) {
             super(target);
+            setSticky(true);
         }
 
         CommonOutputShop<AE> getTarget() {
@@ -160,7 +162,6 @@ extends FileSystemArchiveController<AE> {
         @Override
         public void touch() throws IOException {
             ensureOutArchive();
-            schedule(true);
         }
     }
 
@@ -228,6 +229,11 @@ extends FileSystemArchiveController<AE> {
         return ArchiveFileSystems.newArchiveFileSystem(
                 input.getTarget(), getDriver(),
                 rootTemplate, vetoableTouchListener, readOnly);
+    }
+
+    // FIXME: Remove this hack!
+    private static ArchiveController getEnclController(ArchiveController controller) {
+        return ArchiveControllers.getController(controller.getModel().getEnclMountPoint());
     }
 
     @Override
@@ -306,7 +312,7 @@ extends FileSystemArchiveController<AE> {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (inFile == null) {
-                unwrap( getEnclController(), getEnclPath(ROOT),
+                unwrap( getEnclController(this), getEnclPath(ROOT),
                         autoCreate, createParents);
             } else {
                 // The enclosed archive file has already been updated and the
@@ -333,7 +339,7 @@ extends FileSystemArchiveController<AE> {
                     // a bug.
                     assert false : "We should never get here! Please read the source code comments for full details.";
                     throw new FileArchiveEntryFalsePositiveException(
-                            getEnclController(), getEnclPath(ROOT), ex);
+                            getEnclController(this), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
                 // because we are reusing a file which has been previously
@@ -414,7 +420,7 @@ extends FileSystemArchiveController<AE> {
             // enclosing controller.
             if (model.getMountPoint().equals(ex.getMountPoint()))
                 throw ex; // just created - pass on
-            unwrap( controller.getEnclController(),
+            unwrap( getEnclController(controller),
                     model.getEnclPath(path),
                     autoCreate, createParents);
         }
@@ -814,7 +820,7 @@ extends FileSystemArchiveController<AE> {
         } catch (IOException ex) {
             throw builder.fail(new ArchiveSyncException(this, ex));
         } finally {
-            schedule(needsReassembly);
+            setSticky(needsReassembly);
         }
 
         builder.check();
@@ -998,10 +1004,10 @@ extends FileSystemArchiveController<AE> {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclController(), getEnclPath(ROOT));
+                wrap(getEnclController(this), getEnclPath(ROOT));
             } catch (IOException ex) {
                 throw handler.fail(new ArchiveSyncException(
-                        getEnclController(),
+                        getEnclController(this),
                         "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
                         ex));
             }
