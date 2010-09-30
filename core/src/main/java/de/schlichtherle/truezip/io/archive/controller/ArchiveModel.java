@@ -39,7 +39,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
 
     private final URI mountPoint;
-    private final URI enclMountPoint;
+    private final ArchiveModel<?> enclModel;
     private final URI enclPath;
     private final File target; // TODO: make this support other virtual file systems.
     private final ArchiveDriver<AE> driver;
@@ -47,20 +47,21 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final ReentrantLock writeLock;
     private ArchiveFileSystem<AE> fileSystem;
 
-    ArchiveModel(final URI mountPoint, final URI enclMountPoint, final ArchiveDriver<AE> driver) {
+    ArchiveModel(final URI mountPoint, final ArchiveModel<?> enclModel, final ArchiveDriver<AE> driver) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
-        assert enclMountPoint == null || "file".equals(enclMountPoint.getScheme());
-        assert enclMountPoint == null || mountPoint.getPath().startsWith(enclMountPoint.getPath());
-        //assert enclMountPoint == null || enclMountPoint.getPath().endsWith(SEPARATOR);
         assert driver != null;
 
         this.mountPoint = mountPoint;
-        this.enclMountPoint = enclMountPoint;
-        this.enclPath = null == enclMountPoint
-                ? null : enclMountPoint.relativize(mountPoint);
+        if (null == enclModel) {
+            this.enclModel = null;
+            this.enclPath = null;
+        } else {
+            this.enclModel = enclModel; // TODO: Do not use ArchiveControllers - breaks loos coupling!
+            this.enclPath = enclModel.getMountPoint().relativize(mountPoint);
+        }
         this.target = new File(mountPoint);
         final ReadWriteLock rwl = new ReentrantReadWriteLock();
         this.readLock  = rwl.readLock();
@@ -79,13 +80,17 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
         return "model:" + getMountPoint().toString();
     }
 
+    ArchiveModel getEnclModel() {
+        return enclModel;
+    }
+
     /**
      * Returns the model for the enclosing archive file of this
      * model's target archive file or {@code null} if it's not enclosed in
      * another archive file.
      */
     URI getEnclMountPoint() {
-        return enclMountPoint;
+        return null == enclModel ? null : enclModel.getMountPoint();
     }
 
     /**

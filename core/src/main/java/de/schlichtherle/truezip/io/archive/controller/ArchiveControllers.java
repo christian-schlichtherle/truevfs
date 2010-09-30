@@ -165,17 +165,36 @@ public class ArchiveControllers {
             // different sync strategies, like update or append.
             final ArchiveModel model = new ArchiveModel<AE>(
                     mountPoint,
-                    null == enclController ? null : enclController.getMountPoint(),
+                    null == enclController ? null : enclController.getModel(),
                     driver);
-            return new UpdatingArchiveController<AE>(model);
+            final ArchiveController controller
+                    = new DelegatingArchiveController<AE>(
+                        model,
+                        new UpdatingArchiveController<AE>(model));
+            controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
+                                new WeakReference(controller));
+            return controller;
         }
     }
 
-    /** Maps the given archive controller strongly or weakly. */
-    static void map(final ArchiveController controller, final boolean strongly) {
+    /**
+     * Schedules the archive controller for the given mount point for
+     * synchronization strongly or weakly.
+     */
+    static void scheduleSync(final URI mountPoint, final boolean unconditionally) {
         synchronized (controllers) {
-            controllers.put(controller.getMountPoint(),
-                    strongly ? controller : new WeakReference(controller));
+            Object value = controllers.get(mountPoint);
+            if (null == value) {
+                if (unconditionally)
+                    throw new IllegalStateException();
+                return;
+            }
+            if (value instanceof Reference)
+                value = ((Reference) value).get(); // dereference
+            final ArchiveController controller = (ArchiveController) value;
+            controllers.put(
+                    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
+                    unconditionally ? controller : new WeakReference(controller));
         }
     }
 

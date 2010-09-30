@@ -19,8 +19,6 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputProvider;
@@ -37,11 +35,9 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Set;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
@@ -50,7 +46,6 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.I
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 
 /**
@@ -113,18 +108,7 @@ implements  CommonInputProvider<AE>,
     }
 
     @Override
-    public CommonInputSocket<? extends CommonEntry> getInputSocket(String path)
-    throws IOException {
-        assert path != null;
-
-        try {
-            return getInputSocket0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getInputSocket(getEnclPath(path));
-        }
-    }
-
-    private CommonInputSocket<? extends CommonEntry> getInputSocket0(
+    public final CommonInputSocket<? extends CommonEntry> getInputSocket(
             final String path)
     throws IOException {
         class InputSocket extends CommonInputSocket<AE> {
@@ -224,8 +208,7 @@ implements  CommonInputProvider<AE>,
                 } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
-                    // TODO: throw new ArchiveEntryFalsePositiveException(ex); ?!?! archive entry not found is not really an archive entry false positive ?!?!
-                    return getEnclController().getInputSocket(getEnclPath(path));
+                    throw new ArchiveEntryFalsePositiveException(this, path, ex);
                 }
                 throw new EntryNotFoundException(this, path,
                         "cannot read directories");
@@ -249,21 +232,7 @@ implements  CommonInputProvider<AE>,
     throws IOException;
 
     @Override
-    public CommonOutputSocket<? extends CommonEntry> getOutputSocket(
-            final String path,
-            final BitField<IOOption> options)
-    throws IOException {
-        assert path != null;
-
-        try {
-            return getOutputSocket0(path, options);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getOutputSocket(
-                    getEnclPath(path), options);
-        }
-    }
-
-    private CommonOutputSocket<? extends CommonEntry> getOutputSocket0(
+    public final CommonOutputSocket<? extends CommonEntry> getOutputSocket(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -374,9 +343,7 @@ implements  CommonInputProvider<AE>,
                 } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
                         throw new FalsePositiveException(this, path, ex);
-                    // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
-                    return getEnclController().getOutputSocket(
-                            getEnclPath(path), options);
+                    throw new ArchiveEntryFalsePositiveException(this, path, ex);
                 }
                 throw new EntryNotFoundException(this, path,
                         "cannot write directories");
@@ -396,23 +363,14 @@ implements  CommonInputProvider<AE>,
     @Override
     public final Icon getOpenIcon()
     throws FalsePositiveException {
-        try {
-            return getOpenIcon0();
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getOpenIcon();
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private Icon getOpenIcon0()
-    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             autoMount(); // detect false positives!
             return getDriver().getOpenIcon(this);
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
         } finally {
             readLock().unlock();
         }
@@ -421,23 +379,14 @@ implements  CommonInputProvider<AE>,
     @Override
     public final Icon getClosedIcon()
     throws FalsePositiveException {
-        try {
-            return getClosedIcon0();
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getClosedIcon();
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private Icon getClosedIcon0()
-    throws FalsePositiveException, IOException {
         readLock().lock();
         try {
             autoMount(); // detect false positives!
             return getDriver().getClosedIcon(this);
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
         } finally {
             readLock().unlock();
         }
@@ -446,22 +395,13 @@ implements  CommonInputProvider<AE>,
     @Override
     public final boolean isReadOnly()
     throws FalsePositiveException {
+        readLock().lock();
         try {
-            return isReadOnly0();
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isReadOnly();
+            return autoMount().isReadOnly();
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return true;
-        }
-    }
-
-    private boolean isReadOnly0()
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().isReadOnly();
         } finally {
             readLock().unlock();
         }
@@ -470,77 +410,28 @@ implements  CommonInputProvider<AE>,
     @Override
     public final Entry<?> getEntry(final String path)
     throws FalsePositiveException {
+        readLock().lock();
         try {
-            return getEntry0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().getEntry(getEnclPath(path));
+            return autoMount().getEntry(path);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
-        }
-    }
-
-    private Entry<?> getEntry0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().getEntry(path);
-        } catch (FileArchiveEntryFalsePositiveException ex) {
-            /** @see ArchiveDriver#newInputShop! */
-            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return new SpecialFileEntry<ArchiveEntry>(getEnclController()
-                        .getEntry(getEnclPath(path))
-                        .getTarget()); // the exception asserts that the entry exists as a file!
-            throw ex;
         } finally {
             readLock().unlock();
-        }
-    }
-
-    private static final class SpecialFileEntry<AE extends ArchiveEntry>
-    extends FilterCommonEntry<AE>
-    implements Entry<AE> {
-        SpecialFileEntry(AE target) {
-            super(target);
-        }
-
-        @Override
-        public Type getType() {
-            assert FILE == super.getType();
-            return SPECIAL;
-        }
-
-        @Override
-        public Set<String> list() {
-            return null;
-        }
-
-        @Override
-        public AE getTarget() {
-            return target;
         }
     }
 
     @Override
     public final boolean isReadable(final String path)
     throws FalsePositiveException {
+        readLock().lock();
         try {
-            return isReadable0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isReadable(getEnclPath(path));
+            return autoMount().getEntry(path) != null;
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
-        }
-    }
-
-    private boolean isReadable0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().getEntry(path) != null;
         } finally {
             readLock().unlock();
         }
@@ -549,22 +440,13 @@ implements  CommonInputProvider<AE>,
     @Override
     public final boolean isWritable(final String path)
     throws FalsePositiveException {
+        readLock().lock();
         try {
-            return isWritable0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            return getEnclController().isWritable(getEnclPath(path));
+            return autoMount().isWritable(path);
         } catch (FalsePositiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
-        }
-    }
-
-    private boolean isWritable0(final String path)
-    throws FalsePositiveException, IOException {
-        readLock().lock();
-        try {
-            return autoMount().isWritable(path);
         } finally {
             readLock().unlock();
         }
@@ -572,15 +454,6 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final void setReadOnly(final String path)
-    throws IOException {
-        try {
-            setReadOnly0(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            getEnclController().setReadOnly(getEnclPath(path));
-        }
-    }
-
-    private void setReadOnly0(final String path)
     throws IOException {
         writeLock().lock();
         try {
@@ -592,18 +465,6 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final void setTime(
-            final String path,
-            final BitField<Access> types,
-            final long value)
-    throws IOException {
-        try {
-            setTime0(path, types, value);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            getEnclController().setTime(getEnclPath(path), types, value);
-        }
-    }
-
-    private void setTime0(
             final String path,
             final BitField<Access> types,
             final long value)
@@ -624,21 +485,6 @@ implements  CommonInputProvider<AE>,
             final CommonEntry template,
             final BitField<IOOption> options)
     throws IOException {
-        try {
-            mknod0(path, type, template, options);
-        } catch (ArchiveEntryFalsePositiveException ex) {
-            getEnclController().mknod(getEnclPath(path), type, template, options);
-        } catch (FalsePositiveException ex) {
-            throw ex;
-        }
-    }
-
-    private void mknod0(
-            final String path,
-            final Type type,
-            final CommonEntry template,
-            final BitField<IOOption> options)
-    throws FalsePositiveException, IOException {
         if (FILE != type && DIRECTORY != type)
             throw new EntryNotFoundException(this, path,
                     "not yet supported: mknod " + type);
@@ -654,10 +500,7 @@ implements  CommonInputProvider<AE>,
                         case FILE:
                             if (isRoot(ex.getPath()))
                                 throw new FalsePositiveException(this, path, ex);
-                            // TODO: throw new ArchiveEntryFalsePositiveException(ex); ??? not found is not really a false positive ???
-                            getEnclController().mknod(
-                                    getEnclPath(path), type, template, options);
-                            break;
+                            throw new ArchiveEntryFalsePositiveException(this, path, ex);
 
                         case DIRECTORY:
                             autoMount(true, options.get(CREATE_PARENTS));
@@ -669,7 +512,7 @@ implements  CommonInputProvider<AE>,
             } else { // !isRoot(entryName)
                 switch (type) {
                     case FILE:
-                        getOutputSocket0(path, options)
+                        getOutputSocket(path, options)
                                 .newOutputStream()
                                 .close();
                         break;
@@ -690,26 +533,6 @@ implements  CommonInputProvider<AE>,
     public final void unlink(
             final String path,
             final BitField<IOOption> options)
-    throws IOException {
-        try {
-            unlink0(path, options);
-        } catch (DirectoryArchiveEntryFalsePositiveException ex) {
-            getEnclController().unlink(getEnclPath(path), options);
-        } catch (FileArchiveEntryFalsePositiveException ex) {
-            /** @see ArchiveDriver#newInputShop! */
-            // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
-            if (isRoot(path)) {
-                final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
-                if (null == entry || entry.getType() != DIRECTORY
-                    && ex.getCause() instanceof FileNotFoundException) {
-                    throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
-                }
-            }
-            getEnclController().unlink(getEnclPath(path), options);
-        }
-    }
-
-    private void unlink0(final String path, final BitField<IOOption> options)
     throws IOException {
         writeLock().lock();
         try {
@@ -751,7 +574,7 @@ implements  CommonInputProvider<AE>,
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    getEnclController().unlink(getEnclPath(path), options);
+                    throw new ArchiveEntryFalsePositiveException(this, path, new IOException());
                 }
             } else { // !isRoot(path)
                 autoMount().unlink(path);

@@ -64,7 +64,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     private final Map<DoCloseable, Thread> streams
             = new WeakHashMap<DoCloseable, Thread>();
 
-    private volatile boolean stopped;
+    private volatile boolean shopClosed;
 
     /** Constructs a new {@code ConcurrentInputShop}. */
     public ConcurrentInputShop(final CommonInputShop<CE> target) {
@@ -74,7 +74,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     @Override
     public CommonInputSocket<CE> newInputSocket(final CE entry)
     throws IOException {
-        assert !stopped;
+        assert !shopClosed;
         assert entry != null;
 
         class InputSocket extends FilterInputSocket<CE> {
@@ -115,7 +115,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * @return The number of all open streams.
      */
     public synchronized int waitCloseOthers(final long timeout) {
-        assert !stopped;
+        assert !shopClosed;
 
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
@@ -160,7 +160,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     public synchronized <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
-        assert !stopped;
+        assert !shopClosed;
         try {
             for (final Iterator<DoCloseable> it = streams.keySet().iterator();
             it.hasNext(); ) {
@@ -175,13 +175,13 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 }
             }
         } finally {
-            stopped = true;
+            shopClosed = true;
         }
     }
 
     @Override
     public void close() throws IOException {
-        stopped = true;
+        shopClosed = true;
         super.close();
     }
 
@@ -205,56 +205,56 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
             ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
         }
 
-        private void ensureNotStopped() throws IOException {
-            if (stopped)
+        private void ensureNotShopClosed() throws IOException {
+            if (shopClosed)
                 throw new CommonInputClosedException();
         }
 
         @Override
         public long length() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read();
         }
 
         @Override
         public int read(byte[] b) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read(b);
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read(b, off, len);
         }
 
         @Override
         public void readFully(byte[] b) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.readFully(b);
         }
 
         @Override
         public void readFully(byte[] b, int off, int len) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.readFully(b, off, len);
         }
 
@@ -297,7 +297,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!stopped)
+            if (!shopClosed)
                 super.doClose();
         }
 
@@ -345,56 +345,56 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
             ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
         }
 
-        private void ensureNotStopped() throws IOException {
-            if (stopped)
+        private void ensureNotShopClosed() throws IOException {
+            if (shopClosed)
                 throw new CommonInputClosedException();
         }
 
         @Override
         public int read() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read();
         }
 
         @Override
         public int read(byte[] b) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read(b);
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             return super.available();
         }
 
         @Override
         public void mark(int readlimit) {
-            if (!stopped)
+            if (!shopClosed)
                 super.mark(readlimit);
         }
 
         @Override
         public void reset() throws IOException {
-            ensureNotStopped();
+            ensureNotShopClosed();
             super.reset();
         }
 
         @Override
         public boolean markSupported() {
-            return !stopped && super.markSupported();
+            return !shopClosed && super.markSupported();
         }
 
         /**
@@ -436,7 +436,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!stopped)
+            if (!shopClosed)
                 super.doClose();
         }
 
