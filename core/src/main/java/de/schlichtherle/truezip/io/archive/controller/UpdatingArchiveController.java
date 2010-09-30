@@ -277,7 +277,7 @@ extends FileSystemArchiveController<AE> {
                 } catch (IOException ex) {
                     // Wrap cause so that a matching catch block can assume
                     // that it can access the target in the real file system.
-                    throw new FalsePositiveException(this, ROOT, ex);
+                    throw new FalsePositiveEntryException(this, ROOT, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
                         new FileEntry(inFile), isReadOnly));
@@ -323,7 +323,7 @@ extends FileSystemArchiveController<AE> {
                     // When assertions are enabled, we prefer to treat this as
                     // a bug.
                     assert false : "We should never get here! Please read the source code comments for full details.";
-                    throw new FileArchiveEntryFalsePositiveException(
+                    throw new FalsePositiveEnclosedFileException(
                             getEnclController(this), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
@@ -397,7 +397,7 @@ extends FileSystemArchiveController<AE> {
             } finally {
                 lock.unlock();
             }
-        } catch (DirectoryArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedDirectoryException ex) {
             // We could as well have catched this exception in the inner
             // try-catch block where we access the controller's file system,
             // but then we would still hold the lock on controller, which
@@ -451,7 +451,7 @@ extends FileSystemArchiveController<AE> {
                 try {
                     initInArchive(tmp);
                 } catch (IOException ex) {
-                    throw new FileArchiveEntryFalsePositiveException(
+                    throw new FalsePositiveEnclosedFileException(
                             controller, path, ex);
                 }
                 setFileSystem(newArchiveFileSystem(
@@ -467,7 +467,7 @@ extends FileSystemArchiveController<AE> {
             }
         } else if (type != null) {
             assert type == DIRECTORY : "Only file or directory entries are supported!";
-            throw new DirectoryArchiveEntryFalsePositiveException(
+            throw new FalsePositiveEnclosedDirectoryException(
                     controller, path,
                     new FileNotFoundException("cannot read directories"));
         } else if (autoCreate) {
@@ -716,7 +716,7 @@ extends FileSystemArchiveController<AE> {
         try {
             if (options.get(ABORT_CHANGES)) {
                 try {
-                    //shutdownStep1(builder);
+                    shutdownStep1(builder);
                 } finally {
                     shutdownStep2(builder);
                 }
@@ -999,7 +999,7 @@ extends FileSystemArchiveController<AE> {
         final InputStream in = new java.io.FileInputStream(outFile);
         try {
             ArchiveControllers.copy(true, false, outFile, in, controller, path);
-        } catch (FalsePositiveException cannotHappen) {
+        } catch (FalsePositiveEntryException cannotHappen) {
             throw new AssertionError(cannotHappen);
         } finally {
             in.close();

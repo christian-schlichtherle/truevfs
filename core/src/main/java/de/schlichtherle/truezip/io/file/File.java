@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.util.BitField;
 import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
@@ -2191,8 +2191,8 @@ public class File extends java.io.File {
             if (enclArchive != null)
                 return enclArchive.getArchiveController()
                         .getEntry(enclEntryName) != null;
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2215,8 +2215,8 @@ public class File extends java.io.File {
                         .getArchiveController().getEntry(getInnerEntryName());
                 return null != entry && entry.getType() == FILE;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
             // See ArchiveDriver#newInput!
@@ -2252,8 +2252,8 @@ public class File extends java.io.File {
                         .getArchiveController().getEntry(getInnerEntryName());
                 return null != entry && entry.getType() == DIRECTORY;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2270,8 +2270,8 @@ public class File extends java.io.File {
         try {
             if (innerArchive == this)
                 return getArchiveController().getOpenIcon();
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2288,8 +2288,8 @@ public class File extends java.io.File {
         try {
             if (innerArchive == this)
                 return getArchiveController().getClosedIcon();
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2303,8 +2303,8 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .isReadable(getInnerEntryName());
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2317,8 +2317,8 @@ public class File extends java.io.File {
             if (innerArchive != null)
                 return innerArchive.getArchiveController()
                         .isWritable(getInnerEntryName());
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2342,8 +2342,8 @@ public class File extends java.io.File {
                         .setReadOnly(getInnerEntryName());
                 return true;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         } catch (IOException ex) {
@@ -2390,8 +2390,8 @@ public class File extends java.io.File {
                 final long length = entry.getSize();
                 return length >= 0 ? length : 0;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2426,8 +2426,8 @@ public class File extends java.io.File {
                 final long time = entry.getTime(Access.WRITE);
                 return 0 <= time ? time : 0;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2461,8 +2461,8 @@ public class File extends java.io.File {
                         .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
                 return true;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         } catch (IOException ex) {
@@ -2493,8 +2493,8 @@ public class File extends java.io.File {
                 return members == null
                         ? null : members.toArray(new String[members.size()]);
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2533,8 +2533,8 @@ public class File extends java.io.File {
                         filtered.add(member);
                 return filtered.toArray(new String[filtered.size()]);
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2618,8 +2618,8 @@ public class File extends java.io.File {
                         filtered.add(factory.createFile(File.this, member));
                 return filtered.toArray(new File[filtered.size()]);
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2686,8 +2686,8 @@ public class File extends java.io.File {
                 }
                 return filtered.toArray(new File[filtered.size()]);
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         }
@@ -2743,8 +2743,8 @@ public class File extends java.io.File {
                             .set(CREATE_PARENTS, isLenient()));
                 return true;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         } catch (IOException ex) {
@@ -2798,8 +2798,8 @@ public class File extends java.io.File {
                             .set(CREATE_PARENTS, isLenient()));
                 return true;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         } catch (IOException ex) {
@@ -2826,8 +2826,8 @@ public class File extends java.io.File {
                             BitField.noneOf(IOOption.class));
                 return true;
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
             // See ArchiveDriver#newInput!

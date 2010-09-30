@@ -120,6 +120,8 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         }
 
         File.setLenient(true); // Restore default
+        File.umount();
+        Thread.interrupted();
     }
 
     @Override

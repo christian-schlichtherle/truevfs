@@ -71,7 +71,7 @@ extends ArchiveController<AE> {
     throws IOException {
         try {
             return target.getInputSocket(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getInputSocket(getEnclPath(path));
         }
     }
@@ -83,53 +83,53 @@ extends ArchiveController<AE> {
     throws IOException {
         try {
             return target.getOutputSocket(path, options);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getOutputSocket(getEnclPath(path), options);
         }
     }
 
     @Override
     public Icon getOpenIcon()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.getOpenIcon();
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getOpenIcon();
         }
     }
 
     @Override
     public Icon getClosedIcon()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.getClosedIcon();
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getClosedIcon();
         }
     }
 
     @Override
     public final boolean isReadOnly()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.isReadOnly();
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isReadOnly();
         }
     }
 
     @Override
     public final Entry<?> getEntry(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.getEntry(path);
-        } catch (FileArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
                 return new SpecialFileEntry<ArchiveEntry>(getEnclController()
                         .getEntry(getEnclPath(path))
                         .getTarget()); // the exception asserts that the entry exists as a file!
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
         }
         return getEnclController().getEntry(getEnclPath(path));
     }
@@ -160,20 +160,20 @@ extends ArchiveController<AE> {
 
     @Override
     public final boolean isReadable(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.isReadable(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isReadable(getEnclPath(path));
         }
     }
 
     @Override
     public final boolean isWritable(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         try {
             return target.isWritable(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isWritable(getEnclPath(path));
         }
     }
@@ -183,7 +183,7 @@ extends ArchiveController<AE> {
     throws IOException {
         try {
             target.setReadOnly(path);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
         }
     }
@@ -196,7 +196,7 @@ extends ArchiveController<AE> {
     throws IOException {
         try {
             target.setTime(path, types, value);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().setTime(getEnclPath(path), types, value);
         }
     }
@@ -210,7 +210,7 @@ extends ArchiveController<AE> {
     throws IOException {
         try {
             target.mknod(path, type, template, options);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().mknod(getEnclPath(path), type, template, options);
         }
     }
@@ -224,7 +224,7 @@ extends ArchiveController<AE> {
         try {
             target.unlink(path, options);
             return;
-        } catch (FileArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
             // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
@@ -234,7 +234,7 @@ extends ArchiveController<AE> {
                     throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
                 }
             }
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
         }
         getEnclController().unlink(getEnclPath(path), options);
     }

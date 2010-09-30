@@ -22,11 +22,11 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.FileBusyException;
 import java.net.URI;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
@@ -236,8 +236,8 @@ class Files {
                         return;
                     }
                 }
-            } catch (FalsePositiveException isNotArchive) {
-                assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+            } catch (FalsePositiveEntryException isNotArchive) {
+                assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                         : "must be handled in try-block!";
                 // Fall through!
             }
@@ -303,8 +303,8 @@ class Files {
                     return;
                 }
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "must be handled in try-block!";
             // Fall through!
         }
@@ -331,7 +331,7 @@ class Files {
      * to prevent dead locks by two threads copying archive entries to the
      * other's source archive concurrently!
      *
-     * @throws FalsePositiveException If the source or the destination is a
+     * @throws FalsePositiveEntryException If the source or the destination is a
      *         false positive and the exception
      *         cannot get resolved within this method.
      * @throws InputException If copying the data fails because of an
@@ -344,7 +344,7 @@ class Files {
             final ArchiveController srcController,
             final String srcPath,
             final java.io.File dst)
-    throws FalsePositiveException, IOException {
+    throws FalsePositiveEntryException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !srcController.readLock().isLocked();
@@ -367,9 +367,9 @@ class Files {
                         return;
                     }
                 }
-            } catch (ArchiveEntryFalsePositiveException ex) {
+            } catch (FalsePositiveEnclosedEntryException ex) {
                 throw ex;
-            } catch (FalsePositiveException ex) {
+            } catch (FalsePositiveEntryException ex) {
                 // Both the source and/or the destination may be false positives,
                 // so we need to use the exception's additional information to
                 // find out which controller actually detected the false positive.
@@ -385,7 +385,7 @@ class Files {
             if (preserve && !dst.setLastModified(input.getTarget().getTime(Access.WRITE)))
                 throw new IOException(dst.getPath()
                         + " (cannot preserve last modification time)");
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             final URI enclMountPoint = ex.getMountPoint();
             final ArchiveController enclController
                     = ArchiveControllers.getController(enclMountPoint); // FIXME: Redesign delegation strategy!

@@ -20,18 +20,18 @@ import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import java.io.IOException;
 
 /**
- * Indicates a false positive archive entry which does exist as a file
- * entry in an enclosing archive file.
+ * Indicates a false positive archive entry which may exist as an entry in an
+ * enclosing archive file.
  * <p>
  * Instances of this class are always associated with an {@code IOException}
  * as their cause.
  */
-public final class FileArchiveEntryFalsePositiveException
-extends ArchiveEntryFalsePositiveException {
+public class FalsePositiveEnclosedEntryException
+extends FalsePositiveEntryException {
 
-    private static final long serialVersionUID = 2846364592164215345L;
+    private static final long serialVersionUID = 1234592343828746533L;
 
-    FileArchiveEntryFalsePositiveException(
+    FalsePositiveEnclosedEntryException(
             ArchiveDescriptor archive,
             String path,
             IOException cause) {

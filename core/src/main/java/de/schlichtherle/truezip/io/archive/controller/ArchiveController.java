@@ -237,7 +237,7 @@ implements ArchiveDescriptor {
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
-     * @throws FalsePositiveException
+     * @throws FalsePositiveEntryException
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
@@ -412,19 +412,19 @@ implements ArchiveDescriptor {
         REASSEMBLE,
     }
 
-    public abstract Icon getOpenIcon() throws FalsePositiveException;
+    public abstract Icon getOpenIcon() throws FalsePositiveEntryException;
 
-    public abstract Icon getClosedIcon() throws FalsePositiveException;
+    public abstract Icon getClosedIcon() throws FalsePositiveEntryException;
 
-    public abstract boolean isReadOnly() throws FalsePositiveException;
+    public abstract boolean isReadOnly() throws FalsePositiveEntryException;
 
     public abstract void setReadOnly(String path) throws IOException;
 
-    public abstract boolean isReadable(String path) throws FalsePositiveException;
+    public abstract boolean isReadable(String path) throws FalsePositiveEntryException;
 
-    public abstract boolean isWritable(String path) throws FalsePositiveException;
+    public abstract boolean isWritable(String path) throws FalsePositiveEntryException;
 
-    public abstract Entry<?> getEntry(String path) throws FalsePositiveException;
+    public abstract Entry<?> getEntry(String path) throws FalsePositiveEntryException;
 
     public abstract void setTime(String path, BitField<Access> types, long value)
     throws IOException;
@@ -434,7 +434,7 @@ implements ArchiveDescriptor {
      * target archive file.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws FalsePositiveException if the target archive file is a false
+     * @throws FalsePositiveEntryException if the target archive file is a false
      *         positive.
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
@@ -448,7 +448,7 @@ implements ArchiveDescriptor {
      * target archive file.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws FalsePositiveException if the target archive file is a false
+     * @throws FalsePositiveEntryException if the target archive file is a false
      *         positive.
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
@@ -473,7 +473,7 @@ implements ArchiveDescriptor {
      *         current time.
      * @throws NullPointerException if {@code path} or {@code type} are
      *         {@code null}.
-     * @throws FalsePositiveException if the target archive file is a false
+     * @throws FalsePositiveEntryException if the target archive file is a false
      *         positive.
      * @throws IOException for some other I/O related reason, including but
      *         not exclusively upon one or more of the following conditions:
