@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveEntryFalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveException;
+import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
@@ -130,8 +130,8 @@ public class FileInputStream extends FilterInputStream {
                             .newInputStream();
                 }
             }
-        } catch (FalsePositiveException isNotArchive) {
-            assert !(isNotArchive instanceof ArchiveEntryFalsePositiveException)
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
             // Fall through!
         } catch (ArchiveBusyException ex) {

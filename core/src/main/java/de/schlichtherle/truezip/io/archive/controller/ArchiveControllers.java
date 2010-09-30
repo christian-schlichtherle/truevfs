@@ -414,7 +414,7 @@ public class ArchiveControllers {
      * We know that the source and destination both appear to be entries in an
      * archive file.
      *
-     * @throws FalsePositiveException If the source or the destination is a
+     * @throws FalsePositiveEntryException If the source or the destination is a
      *         false positive and the exception for the destination
      *         cannot get resolved within this method.
      * @throws InputException If copying the data fails because of an
@@ -430,7 +430,7 @@ public class ArchiveControllers {
             final String srcPath,
             final ArchiveController dstController,
             final String dstPath)
-    throws FalsePositiveException, IOException {
+    throws FalsePositiveEntryException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !srcController.readLock().isLocked();
@@ -447,7 +447,7 @@ public class ArchiveControllers {
             final CommonOutputSocket<?> output
                     = dstController.getOutputSocket(dstPath, options);
             IOSocket.copy(input, output);
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             // Both the source and/or the destination may be false positives,
             // so we need to use the exception's additional information to
             // find out which controller actually detected the false positive.
@@ -477,7 +477,7 @@ public class ArchiveControllers {
      * to prevent dead locks by two threads copying archive entries to the
      * other's source archive concurrently!
      *
-     * @throws FalsePositiveException If the destination is a
+     * @throws FalsePositiveEntryException If the destination is a
      *         false positive and the exception
      *         cannot get resolved within this method.
      * @throws InputException If copying the data fails because of an
@@ -492,7 +492,7 @@ public class ArchiveControllers {
             final InputStream in,
             final ArchiveController dstController,
             final String dstPath)
-    throws FalsePositiveException, IOException {
+    throws FalsePositiveEntryException, IOException {
         // Do not assume anything about the lock status of the controller:
         // This method may be called from a subclass while a lock is acquired!
         //assert !dstController.readLock().isLocked();
@@ -512,7 +512,7 @@ public class ArchiveControllers {
             } finally {
                 out.close();
             }
-        } catch (ArchiveEntryFalsePositiveException ex) {
+        } catch (FalsePositiveEnclosedEntryException ex) {
             final URI enclMountPoint = ex.getMountPoint();
             final ArchiveController enclController = getController(enclMountPoint);
             final String enclPath = enclMountPoint.relativize(

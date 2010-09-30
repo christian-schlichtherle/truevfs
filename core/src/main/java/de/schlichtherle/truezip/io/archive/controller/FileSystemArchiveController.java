@@ -81,7 +81,7 @@ extends BasicArchiveController<AE> {
      *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
-     * @throws FalsePositiveException
+     * @throws FalsePositiveEntryException
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
@@ -134,7 +134,7 @@ extends BasicArchiveController<AE> {
                     }
                 } // class Mounter
                 runWriteLocked(new Mounter());
-            } catch (FalsePositiveException ex) {
+            } catch (FalsePositiveEntryException ex) {
                 // Catch and cache exceptions for non-transient false positives.
                 // The state is reset when File.delete() is called on the false
                 // positive archive file or File.update() or File.sync().
@@ -190,9 +190,9 @@ extends BasicArchiveController<AE> {
     } // class MountedFileSystem
 
     private class FalsePositiveFileSystem extends AutoMounter {
-        private final FalsePositiveException exception;
+        private final FalsePositiveEntryException exception;
 
-        private FalsePositiveFileSystem(final FalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FalsePositiveEntryException exception) {
             super(null);
             if (exception == null)
                 throw new NullPointerException();
@@ -201,7 +201,7 @@ extends BasicArchiveController<AE> {
 
         @Override
         ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-        throws FalsePositiveException {
+        throws FalsePositiveEntryException {
             throw exception;
         }
 

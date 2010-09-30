@@ -128,7 +128,7 @@ implements  CommonInputProvider<AE>,
                 if (this == link) {
                     try {
                         link = autoMount().getEntry(path);
-                    } catch (FalsePositiveException alreadyDetected) {
+                    } catch (FalsePositiveEntryException alreadyDetected) {
                         throw new AssertionError(alreadyDetected);
                     }
                 }
@@ -203,12 +203,12 @@ implements  CommonInputProvider<AE>,
             if (isRoot(path)) {
                 try {
                     autoMount(); // detect false positives!
-                } catch (FalsePositiveException ex) {
+                } catch (FalsePositiveEntryException ex) {
                     throw ex;
                 } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
-                        throw new FalsePositiveException(this, path, ex);
-                    throw new ArchiveEntryFalsePositiveException(this, path, ex);
+                        throw new FalsePositiveEntryException(this, path, ex);
+                    throw new FalsePositiveEnclosedEntryException(this, path, ex);
                 }
                 throw new EntryNotFoundException(this, path,
                         "cannot read directories");
@@ -254,7 +254,7 @@ implements  CommonInputProvider<AE>,
                                         ? getPeerTarget()
                                         : null,
                                     options.get(CREATE_PARENTS));
-                    } catch (FalsePositiveException alreadyDetected) {
+                    } catch (FalsePositiveEntryException alreadyDetected) {
                         throw new AssertionError(alreadyDetected);
                     }
                 }
@@ -338,12 +338,12 @@ implements  CommonInputProvider<AE>,
             if (isRoot(path)) {
                 try {
                     autoMount(); // detect false positives!
-                } catch (FalsePositiveException ex) {
+                } catch (FalsePositiveEntryException ex) {
                     throw ex;
                 } catch (EntryNotFoundException ex) {
                     if (isRoot(ex.getPath()))
-                        throw new FalsePositiveException(this, path, ex);
-                    throw new ArchiveEntryFalsePositiveException(this, path, ex);
+                        throw new FalsePositiveEntryException(this, path, ex);
+                    throw new FalsePositiveEnclosedEntryException(this, path, ex);
                 }
                 throw new EntryNotFoundException(this, path,
                         "cannot write directories");
@@ -362,12 +362,12 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final Icon getOpenIcon()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             autoMount(); // detect false positives!
             return getDriver().getOpenIcon(this);
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -378,12 +378,12 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final Icon getClosedIcon()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             autoMount(); // detect false positives!
             return getDriver().getClosedIcon(this);
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -394,11 +394,11 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final boolean isReadOnly()
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             return autoMount().isReadOnly();
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return true;
@@ -409,11 +409,11 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final Entry<?> getEntry(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             return autoMount().getEntry(path);
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -424,11 +424,11 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final boolean isReadable(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             return autoMount().getEntry(path) != null;
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -439,11 +439,11 @@ implements  CommonInputProvider<AE>,
 
     @Override
     public final boolean isWritable(final String path)
-    throws FalsePositiveException {
+    throws FalsePositiveEntryException {
         readLock().lock();
         try {
             return autoMount().isWritable(path);
-        } catch (FalsePositiveException ex) {
+        } catch (FalsePositiveEntryException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -493,14 +493,14 @@ implements  CommonInputProvider<AE>,
             if (isRoot(path)) {
                 try {
                     autoMount(); // detect false positives!
-                } catch (FalsePositiveException ex) {
+                } catch (FalsePositiveEntryException ex) {
                     throw ex;
                 } catch (EntryNotFoundException ex) {
                     switch (type) {
                         case FILE:
                             if (isRoot(ex.getPath()))
-                                throw new FalsePositiveException(this, path, ex);
-                            throw new ArchiveEntryFalsePositiveException(this, path, ex);
+                                throw new FalsePositiveEntryException(this, path, ex);
+                            throw new FalsePositiveEnclosedEntryException(this, path, ex);
 
                         case DIRECTORY:
                             autoMount(true, options.get(CREATE_PARENTS));
@@ -542,7 +542,7 @@ implements  CommonInputProvider<AE>,
                 final ArchiveFileSystem<AE> fileSystem;
                 try {
                     fileSystem = autoMount();
-                } catch (FalsePositiveException ex) {
+                } catch (FalsePositiveEntryException ex) {
                     // The File instance is going to delete the target file
                     // anyway, so we need to reset now.
                     try {
@@ -574,7 +574,7 @@ implements  CommonInputProvider<AE>,
                 } else {
                     // The target file of the controller IS enclosed in
                     // another archive file.
-                    throw new ArchiveEntryFalsePositiveException(this, path, new IOException());
+                    throw new FalsePositiveEnclosedEntryException(this, path, new IOException());
                 }
             } else { // !isRoot(path)
                 autoMount().unlink(path);
