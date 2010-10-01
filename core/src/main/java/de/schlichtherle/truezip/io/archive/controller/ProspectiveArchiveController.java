@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import java.util.Set;
-import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -42,19 +41,16 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class DelegatingArchiveController<AE extends ArchiveEntry>
-extends ArchiveController<AE> {
-
-    private final ArchiveController<AE> target;
+final class ProspectiveArchiveController<AE extends ArchiveEntry>
+extends FilterArchiveController<AE> {
 
     /** The archive controller of the enclosing archive file, if any. */
     private final ArchiveController<?> enclController;
 
-    DelegatingArchiveController(
+    ProspectiveArchiveController(
             ArchiveModel<AE> model,
             ArchiveController<AE> target) {
-        super(model);
-        this.target = target;
+        super(model, target);
         final ArchiveModel<?> enclModel = model.getEnclModel();
         enclController = null == enclModel
                 ? null
@@ -67,24 +63,24 @@ extends ArchiveController<AE> {
     }
 
     @Override
-    public CommonInputSocket<? extends CommonEntry> getInputSocket(String path)
+    public CommonInputSocket<? extends CommonEntry> newInputSocket(String path)
     throws IOException {
         try {
-            return target.getInputSocket(path);
+            return target.newInputSocket(path);
         } catch (FalsePositiveEnclosedEntryException ex) {
-            return getEnclController().getInputSocket(getEnclPath(path));
+            return getEnclController().newInputSocket(getEnclPath(path));
         }
     }
 
     @Override
-    public CommonOutputSocket<? extends CommonEntry> getOutputSocket(
+    public CommonOutputSocket<? extends CommonEntry> newOutputSocket(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
         try {
-            return target.getOutputSocket(path, options);
+            return target.newOutputSocket(path, options);
         } catch (FalsePositiveEnclosedEntryException ex) {
-            return getEnclController().getOutputSocket(getEnclPath(path), options);
+            return getEnclController().newOutputSocket(getEnclPath(path), options);
         }
     }
 
@@ -237,22 +233,5 @@ extends ArchiveController<AE> {
         } catch (FalsePositiveEnclosedEntryException ex) {
         }
         getEnclController().unlink(getEnclPath(path), options);
-    }
-
-    @Override
-    ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-    throws IOException {
-        return target.autoMount(autoCreate, createParents);
-    }
-
-    @Override
-    boolean hasNewData(String path) {
-        return target.hasNewData(path);
-    }
-
-    @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
-    throws ArchiveSyncException {
-        target.sync(builder, options);
     }
 }

@@ -164,7 +164,7 @@ public class FileOutputStream extends FilterOutputStream {
                     assert path != null;
                     return archive
                             .getArchiveController()
-                            .getOutputSocket(
+                            .newOutputSocket(
                                 path,
                                 BitField.noneOf(IOOption.class)
                                     .set(APPEND, append)

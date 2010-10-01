@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.IOException;
@@ -53,7 +52,6 @@ extends BasicArchiveController<AE> {
             final boolean createParents)
     throws IOException {
         assert !createParents || autoCreate;
-        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return autoMounter.autoMount(autoCreate, createParents);
     }
 
@@ -117,23 +115,9 @@ extends BasicArchiveController<AE> {
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
         throws IOException {
+            ensureWriteLockedByCurrentThread();
             try {
-                class Mounter implements IOOperation {
-                    @Override
-                    public void run() throws IOException {
-                        // Check state again: Another thread may have changed
-                        // it while we released all read locks in order to
-                        // acquire the write lock!
-                        if (autoMounter == ResetFileSystem.this) {
-                            mount(autoCreate, createParents);
-                            //assert autoMounter instanceof MountedFileSystem;
-                        } else {
-                            assert autoMounter != null;
-                            //assert !(autoMounter instanceof ResetFileSystem);
-                        }
-                    }
-                } // class Mounter
-                runWriteLocked(new Mounter());
+                mount(autoCreate, createParents);
             } catch (FalsePositiveEntryException ex) {
                 // Catch and cache exceptions for non-transient false positives.
                 // The state is reset when File.delete() is called on the false

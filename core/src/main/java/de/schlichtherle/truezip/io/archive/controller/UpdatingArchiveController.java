@@ -28,11 +28,9 @@ import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
@@ -42,13 +40,13 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
@@ -232,7 +230,6 @@ extends FileSystemArchiveController<AE> {
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
         assert input == null;
         assert outFile == null;
         assert output == null;
@@ -241,13 +238,11 @@ extends FileSystemArchiveController<AE> {
         try {
             mount0(autoCreate, createParents);
 
-            assert writeLock().isHeldByCurrentThread();
             assert autoCreate || input != null;
             assert autoCreate || outFile == null;
             assert autoCreate || output == null;
             assert getFileSystem() != null;
         } catch (IOException ex) {
-            assert writeLock().isHeldByCurrentThread();
             assert input == null;
             assert outFile == null;
             assert output == null;
@@ -296,7 +291,7 @@ extends FileSystemArchiveController<AE> {
         } else {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
-            if (inFile == null) {
+            if (null == inFile) {
                 unwrap( getEnclController(this), getEnclPath(ROOT),
                         autoCreate, createParents);
             } else {
@@ -346,86 +341,17 @@ extends FileSystemArchiveController<AE> {
             final boolean createParents)
     throws IOException {
         assert controller != null;
-        //assert !controller.readLock().isLocked();
-        //assert !controller.writeLock().isLocked();
         assert path != null;
         assert !isRoot(path);
         assert inFile == null;
 
-        final ArchiveModel model = controller.getModel();
+        CommonInputSocket<?> input;
         try {
-            // We want to allow as much concurrency as possible, so we will
-            // write lock the controller only if we need to update it first
-            // or the controller's target shall be automatically created.
-            final ReentrantLock lock = autoCreate
-                    ? model.writeLock()
-                    : model.readLock();
-            model.readLock().lock();
-            if (controller.hasNewData(path) || autoCreate) {
-                model.readLock().unlock();
-                class Locker implements IOOperation {
-                    @Override
-                    public void run() throws IOException {
-                        // Update controller if the entry already has new data.
-                        // This needs to be done first before we can access the
-                        // file system since controller.newInputStream(entryName)
-                        // would do the same and controller.update() would
-                        // invalidate the file system reference.
-                        controller.autoSync(path);
-
-                        // Keep a lock for the actual unwrapping.
-                        // If this is an ordinary mounting procedure where the
-                        // file system shall not be created automatically, then
-                        // we MUST NOT hold a write lock while unwrapping and
-                        // mounting the file system.
-                        // This is to prevent dead locks when using RAES
-                        // encrypted ZIP files with JFileChooser where the user
-                        // may be prompted for a password by the EDT while one
-                        // of JFileChooser's background file loading threads is
-                        // holding a read lock for the same controller and
-                        // waiting for the EDT to be accessible in order to
-                        // prompt the user for the same controller's target file,
-                        // too.
-                        lock.lock(); // keep lock upon return
-                    }
-                }
-                controller.runWriteLocked(new Locker());
-            }
-            try {
-                unwrapFromLockedController( controller, path,
-                                            autoCreate, createParents);
-            } finally {
-                lock.unlock();
-            }
-        } catch (FalsePositiveEnclosedDirectoryException ex) {
-            // We could as well have catched this exception in the inner
-            // try-catch block where we access the controller's file system,
-            // but then we would still hold the lock on controller, which
-            // is not necessary while accessing the file system of its
-            // enclosing controller.
-            if (model.getMountPoint().equals(ex.getMountPoint()))
-                throw ex; // just created - pass on
-            unwrap( getEnclController(controller),
-                    model.getEnclPath(path),
-                    autoCreate, createParents);
+            input = controller.newInputSocket(path);
+        } catch (EntryNotFoundException ex) {
+            input = null;
         }
-    }
-
-    private void unwrapFromLockedController(
-            final ArchiveController controller,
-            final String path,
-            final boolean autoCreate,
-            final boolean createParents)
-    throws IOException {
-        assert controller != null;
-        assert controller.getModel().readLock().isHeldByCurrentThread() || controller.getModel().writeLock().isHeldByCurrentThread();
-        assert path != null;
-        assert !isRoot(path);
-        assert inFile == null;
-
-        final ArchiveFileSystem<?> controllerFileSystem
-                = controller.autoMount(createParents);
-        final Entry<?> entry = controllerFileSystem.getEntry(path);
+        final CommonEntry entry = null == input ? null : input.getTarget();
         final Type type = null == entry ? null : entry.getType();
         if (type == FILE) {
             // This archive file DOES exist in the enclosing archive.
@@ -441,11 +367,8 @@ extends FileSystemArchiveController<AE> {
             try {
                 // Now extract the entry to the temporary file.
                 // TODO: Try InputSocket.newReadOnlyFile()!
-                Streams.copy(
-                        controller
-                            .getInputSocket(path)
-                            .newInputStream(),
-                        new java.io.FileOutputStream(tmp));
+                Streams.copy(   input.newInputStream(),
+                                new java.io.FileOutputStream(tmp));
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
                 try {
@@ -454,8 +377,7 @@ extends FileSystemArchiveController<AE> {
                     throw new FalsePositiveEnclosedFileException(
                             controller, path, ex);
                 }
-                setFileSystem(newArchiveFileSystem(
-                        entry.getTarget(), controllerFileSystem.isReadOnly()));
+                setFileSystem(newArchiveFileSystem(entry, controller.isReadOnly()));
                 inFile = tmp; // init on success only!
             } finally {
                 // An archive driver could throw a NoClassDefFoundError or
@@ -471,22 +393,18 @@ extends FileSystemArchiveController<AE> {
                     controller, path,
                     new FileNotFoundException("cannot read directories"));
         } else if (autoCreate) {
-            assert controller.getModel().writeLock().isHeldByCurrentThread();
-
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
-            final EntryOperation link = controllerFileSystem.mknod(
-                    path, FILE, null, createParents);
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            //ensureOutArchive(); // side effect of the following
             final ArchiveFileSystem fileSystem = newArchiveFileSystem();
             assert outFile != null;
             assert output != null;
             // Now try to create the entry in the enclosing controller.
             try {
-                link.run();
+                controller.mknod(path, FILE, null,
+                        BitField.noneOf(IOOption.class).set(CREATE_PARENTS, createParents));
             } catch (IOException ex) {
                 // The delta on the *enclosing* controller failed.
                 // Hence, we need to revert our state changes.
@@ -522,7 +440,6 @@ extends FileSystemArchiveController<AE> {
      */
     private void initInArchive(final java.io.File inFile)
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
         assert input == null;
 
         try {
@@ -551,22 +468,18 @@ extends FileSystemArchiveController<AE> {
     @Override
     public CommonInputSocket<AE> newInputSocket(final AE target)
     throws IOException {
-        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         return null == input ? null : input.newInputSocket(target);
     }
 
     @Override
     public CommonOutputSocket<AE> newOutputSocket(final AE target)
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
         ensureOutArchive();
         return output.newOutputSocket(target);
     }
 
     private void ensureOutArchive()
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
-
         if (null != output)
             return;
 
@@ -599,7 +512,6 @@ extends FileSystemArchiveController<AE> {
      */
     private void initOutArchive(final java.io.File outFile)
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
         assert output == null;
 
         try {
@@ -651,7 +563,6 @@ extends FileSystemArchiveController<AE> {
 
     @Override
     public boolean hasNewData(String path) {
-        assert readLock().isHeldByCurrentThread() || writeLock().isHeldByCurrentThread();
         if (output == null)
             return false;
         final Entry entry = getFileSystem().getEntry(path);
@@ -669,7 +580,6 @@ extends FileSystemArchiveController<AE> {
     public void sync(   final ArchiveSyncExceptionBuilder builder,
                         final BitField<SyncOption> options)
     throws ArchiveSyncException {
-        assert writeLock().isHeldByCurrentThread();
         assert input == null || inFile != null; // input archive => input file
         assert !isTouched() || output != null; // file system touched => output archive
         assert output == null || outFile != null; // output archive => output file
@@ -787,7 +697,6 @@ extends FileSystemArchiveController<AE> {
      */
     private void update(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        assert writeLock().isHeldByCurrentThread();
         assert isTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData(handler);
@@ -909,8 +818,6 @@ extends FileSystemArchiveController<AE> {
      */
     private void reassemble(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        assert writeLock().isHeldByCurrentThread();
-
         if (isHostFileSystemEntryTarget()) {
             // The archive file managed by this object is NOT enclosed in
             // another archive file.
@@ -967,31 +874,11 @@ extends FileSystemArchiveController<AE> {
             final ArchiveController controller,
             final String path)
     throws IOException {
-        assert writeLock().isHeldByCurrentThread();
         assert controller != null;
-        //assert !controller.readLock().isLocked();
-        //assert !controller.writeLock().isLocked();
         assert path != null;
         assert !isRoot(path);
 
-        class Wrapper implements IOOperation {
-            @Override
-            public void run() throws IOException {
-                wrapToWriteLockedController(controller, path);
-            }
-        }
-        controller.runWriteLocked(new Wrapper());
-    }
-
-    private void wrapToWriteLockedController(
-            final ArchiveController controller,
-            final String path)
-    throws IOException {
-        assert controller != null;
-        assert controller.getModel().writeLock().isHeldByCurrentThread();
-        assert path != null;
-        assert !isRoot(path);
-
+        ensureWriteLockedByCurrentThread();
         // Write the updated output archive file as an entry
         // to its enclosing archive file, preserving the
         // last modification time of the root directory as the last

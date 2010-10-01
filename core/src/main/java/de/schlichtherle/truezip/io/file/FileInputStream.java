@@ -126,7 +126,7 @@ public class FileInputStream extends FilterInputStream {
                     assert path != null;
                     return archive
                             .getArchiveController()
-                            .getInputSocket(path)
+                            .newInputSocket(path)
                             .newInputStream();
                 }
             }

@@ -60,10 +60,6 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     private int writeLockCount; // exclusive
     private int  readLockCount; // shared
 
-    //
-    // Methods.
-    //
-
     /**
      * Returns the lock for reading.
      * Like its cousin in JSE 1.5, the returned lock does <em>not</em>
@@ -96,10 +92,12 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      *
      * @param  operation a non-{@code null} operation to run while the write
      *         lock is acquired.
-     * @throws NullPointerException If {@code operation} is {@code null}.
+     * @throws NullPointerException if {@code operation} is {@code null}.
      * @throws Exception upon the discretion of {@code operation}.
+     * @return {@code operation}
      */
-    public <E extends Exception> void runWriteLocked(final Operation<E> operation)
+    public <E extends Exception, O extends Operation<E>> O runWriteLocked(
+            final O operation)
     throws E {
         if (operation == null)
             throw new NullPointerException();
@@ -128,14 +126,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
                 writeLock.unlock();
             }
         }
+        return operation;
     }
-
-    //
-    // Private implementation:
-    // The code repetetition in these methods isn't elegant, but it's
-    // faster than the use of the strategy pattern and performance is
-    // critical in this class.
-    //
 
     private void lockRead() {
         final int writeHoldCount = writeLock.getHoldCount();
@@ -247,10 +239,6 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
         writeLockCount--;
         notifyAll();
     }
-
-    //
-    // Inner classes:
-    //
 
     private static abstract class AbstractLock
             extends ThreadLocal<Integer>

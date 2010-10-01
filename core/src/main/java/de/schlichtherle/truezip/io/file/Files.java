@@ -378,7 +378,7 @@ class Files {
             }
 
             final CommonInputSocket<? extends CommonEntry> input
-                    = srcController.getInputSocket(srcPath);
+                    = srcController.newInputSocket(srcPath);
             final CommonOutputSocket<? extends CommonEntry> output
                     = FileIOProvider.get().newOutputSocket(new FileEntry(dst));
             IOSocket.copy(input, output);
