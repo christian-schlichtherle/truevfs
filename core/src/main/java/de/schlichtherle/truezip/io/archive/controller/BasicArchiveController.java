@@ -146,13 +146,6 @@ implements  CommonInputProvider<AE>,
             }
 
             @Override
-            public CommonInputSocket<AE> connect(
-                    OutputSocket<? extends CommonEntry, ? super AE> peer) {
-                super.connect(peer);
-                return this;
-            }
-
-            @Override
             protected void beforeConnectComplete() {
                 link = this; // reset local target reference
             }
@@ -239,13 +232,6 @@ implements  CommonInputProvider<AE>,
                     }
                 }
                 return link.getTarget().getTarget();
-            }
-
-            @Override
-            public CommonOutputSocket<AE> connect(
-                    InputSocket<? extends CommonEntry, ? super AE> peer) {
-                super.connect(peer);
-                return this;
             }
 
             @Override
