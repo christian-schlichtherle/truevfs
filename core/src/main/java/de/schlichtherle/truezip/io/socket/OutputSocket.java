@@ -37,20 +37,31 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
     private InputSocket<? extends PT, ? super LT> peer;
 
     public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> output) {
-        return connect(output.peer);
+        connect(output.peer);
+        return this;
     }
 
     public OutputSocket<LT, PT> connect(
             final InputSocket<? extends PT, ? super LT> newPeer) {
+        connect0(newPeer);
+        return this;
+    }
+
+    void connect0(
+            final InputSocket<? extends PT, ? super LT> newPeer) {
         final InputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             peer = newPeer;
-            beforeConnectComplete();
-            if (null != newPeer)
-                newPeer.connect(this);
-            afterConnectComplete();
+            try {
+                beforeConnectComplete();
+                if (null != newPeer)
+                    newPeer.connect0(this);
+                afterConnectComplete();
+            } catch (RuntimeException ex) {
+                peer = oldPeer;
+                throw ex;
+            }
         }
-        return this;
     }
 
     protected void beforeConnectComplete() {

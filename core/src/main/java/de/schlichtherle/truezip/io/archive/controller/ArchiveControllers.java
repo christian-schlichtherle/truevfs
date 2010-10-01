@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Collection;
@@ -170,9 +169,9 @@ public class ArchiveControllers {
                     null == enclController ? null : enclController.getModel(),
                     driver);
             final ArchiveController controller
-                    = new DelegatingArchiveController<AE>(
-                        model,
-                        new UpdatingArchiveController<AE>(model));
+                    = new ProspectiveArchiveController<AE>(model,
+                        new LockingArchiveController<AE>(model,
+                            new UpdatingArchiveController<AE>(model)));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
                                 new WeakPointer<ArchiveController<?>>(controller));
             return controller;
@@ -443,9 +442,9 @@ public class ArchiveControllers {
                     .set(PRESERVE, preserve)
                     .set(CREATE_PARENTS, createParents);
             final CommonInputSocket<?> input
-                    = srcController.getInputSocket(srcPath);
+                    = srcController.newInputSocket(srcPath);
             final CommonOutputSocket<?> output
-                    = dstController.getOutputSocket(dstPath, options);
+                    = dstController.newOutputSocket(dstPath, options);
             IOSocket.copy(input, output);
         } catch (FalsePositiveEnclosedEntryException ex) {
             // Both the source and/or the destination may be false positives,
@@ -503,7 +502,7 @@ public class ArchiveControllers {
                     .get()
                     .newInputSocket(new FileEntry(src));
             final OutputStream out = dstController
-                    .getOutputSocket(
+                    .newOutputSocket(
                         dstPath, BitField.noneOf(IOOption.class).set(PRESERVE, preserve).set(CREATE_PARENTS, createParents))
                     .connect(input)
                     .newOutputStream();

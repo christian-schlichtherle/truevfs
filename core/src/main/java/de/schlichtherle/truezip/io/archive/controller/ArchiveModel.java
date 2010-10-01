@@ -15,13 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
-import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.File;
 import java.net.URI;
 
@@ -38,13 +37,13 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  */
 final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
 
+    private final ReentrantLock readLock;
+    private final ReentrantLock writeLock;
     private final URI mountPoint;
     private final ArchiveModel<?> enclModel;
     private final URI enclPath;
     private final File target; // TODO: make this support other virtual file systems.
     private final ArchiveDriver<AE> driver;
-    private final ReentrantLock  readLock;
-    private final ReentrantLock writeLock;
     private ArchiveFileSystem<AE> fileSystem;
 
     ArchiveModel(final URI mountPoint, final ArchiveModel<?> enclModel, final ArchiveDriver<AE> driver) {
@@ -63,10 +62,38 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
             this.enclPath = enclModel.getMountPoint().relativize(mountPoint);
         }
         this.target = new File(mountPoint);
-        final ReadWriteLock rwl = new ReentrantReadWriteLock();
-        this.readLock  = rwl.readLock();
-        this.writeLock = rwl.writeLock();
         this.driver = driver;
+
+        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        readLock = lock.readLock();
+        writeLock = lock.writeLock();
+    }
+
+    ReentrantLock readLock() {
+        return readLock;
+    }
+
+    /**
+     * @throws NotWriteLockedByCurrentThreadException if the read lock is
+     *         held by the current thread.
+     */
+    void ensureNotReadLockedByCurrentThread(
+            final NotWriteLockedByCurrentThreadException ex) {
+        if (readLock.isHeldByCurrentThread())
+            throw new NotWriteLockedByCurrentThreadException(ex);
+    }
+
+    ReentrantLock writeLock() {
+        return writeLock;
+    }
+
+    /**
+     * @throws NotWriteLockedByCurrentThreadException if the write lock is not
+     *         held by the current thread.
+     */
+    void ensureWriteLockedByCurrentThread() {
+        if (!writeLock.isHeldByCurrentThread())
+            throw new NotWriteLockedByCurrentThreadException();
     }
 
     @Override
@@ -116,14 +143,6 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
 
     ArchiveDriver<AE> getDriver() {
         return driver;
-    }
-
-    ReentrantLock readLock() {
-        return readLock;
-    }
-
-    ReentrantLock writeLock() {
-        return writeLock;
     }
 
     ArchiveFileSystem<AE> getFileSystem() {
