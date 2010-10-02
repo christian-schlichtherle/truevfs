@@ -266,7 +266,7 @@ implements  CommonInputProvider<AE>,
                         : null;
                 try {
                     final OutputStream out = output
-                            .chain(null != in ? null : OutputSocket.this)
+                            .chain(null == in ? this : null)
                             .newOutputStream();
                     try {
                         link.run();
