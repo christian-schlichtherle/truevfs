@@ -144,10 +144,8 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 final CommonEntry peer = getPeerTarget();
-                if (peer != null) {
-                    final AE local = getTarget();
-                    local.setSize(peer.getSize()); // data may be compressed!
-                }
+                if (peer != null)
+                    getTarget().setSize(peer.getSize()); // data may be compressed!
                 return isTargetBusy()
                         ? new TempEntryOutputStream(
                             createTempFile(
