@@ -953,7 +953,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(a.delete());
         assertTrue(b.delete());
     }
-    
+
     public void testListPerformance()
     throws IOException {
         assertTrue(archive.mkdir());
