@@ -15,16 +15,14 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.IOReferences;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputProvider;
-import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocketFactory;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocketFactory;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -101,8 +99,8 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
 extends     ArchiveController<AE>
-implements  CommonInputProvider<AE>,
-            CommonOutputProvider<AE> {
+implements  CommonInputSocketFactory<AE>,
+            CommonOutputSocketFactory<AE> {
 
     BasicArchiveController(ArchiveModel<AE> model) {
         super(model);
@@ -113,21 +111,13 @@ implements  CommonInputProvider<AE>,
             final String path)
     throws IOException {
         class InputSocket extends CommonInputSocket<AE> {
-            IOReference<AE> link = this;
-
             AE getEntry() throws IOException {
-                if (hasNewData(path)) {
-                    link = this;
-                    autoSync(path);
+                autoSync(path);
+                try {
+                    return IOReferences.deref(autoMount().getEntry(path));
+                } catch (FalsePositiveEntryException alreadyDetected) {
+                    throw new AssertionError(alreadyDetected);
                 }
-                if (this == link) {
-                    try {
-                        link = autoMount().getEntry(path);
-                    } catch (FalsePositiveEntryException alreadyDetected) {
-                        throw new AssertionError(alreadyDetected);
-                    }
-                }
-                return IOReferences.deref(link);
             }
 
             CommonInputSocket<AE> getInputSocket() throws IOException {
@@ -146,19 +136,14 @@ implements  CommonInputProvider<AE>,
             }
 
             @Override
-            protected void beforeConnectComplete() {
-                link = this; // reset local target reference
-            }
-
-            @Override
-            protected void afterConnectComplete() {
-                getPeerTarget();
+            protected void afterPeering() {
+                getPeerTarget(); // TODO: This can't get removed! Why?
             }
 
             @Override
             public AE getTarget() {
                 try {
-                    return getEntry();
+                    return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
                 } catch (IOException resolveToNull) {
                     return null; // FIXME: interface contract violation
                 }
@@ -192,7 +177,7 @@ implements  CommonInputProvider<AE>,
             autoMount(); // detect false positives!
             return new InputSocket();
         }
-    }
+    } // class InputSocket
 
     /**
      * {@inheritDoc}
@@ -219,14 +204,14 @@ implements  CommonInputProvider<AE>,
                 }
                 if (null == link) {
                     try {
+                        final CommonEntry template = options.get(PRESERVE)
+                                ? getPeerTarget()
+                                : null;
                         // Start creating or overwriting the archive entry.
                         // This will fail if the entry already exists as a directory.
                         link = autoMount(options.get(CREATE_PARENTS))
-                                .mknod(path, FILE,
-                                    options.get(PRESERVE)
-                                        ? getPeerTarget()
-                                        : null,
-                                    options.get(CREATE_PARENTS));
+                                .mknod( path, FILE, template,
+                                        options.get(CREATE_PARENTS));
                     } catch (FalsePositiveEntryException alreadyDetected) {
                         throw new AssertionError(alreadyDetected);
                     }
@@ -235,13 +220,13 @@ implements  CommonInputProvider<AE>,
             }
 
             @Override
-            protected void beforeConnectComplete() {
+            protected void beforePeering() {
                 link = null; // reset local target reference
             }
 
             @Override
-            protected void afterConnectComplete() {
-                getPeerTarget();
+            protected void afterPeering() {
+                getPeerTarget(); // TODO: This can't get removed! Why?
             }
 
             @Override
@@ -287,7 +272,7 @@ implements  CommonInputProvider<AE>,
                     }
                 }
             }
-        }
+        } // class OutputSocket
 
         //ensureWriteLockedByCurrentThread();
         if (isRoot(path)) {

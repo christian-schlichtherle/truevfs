@@ -31,29 +31,29 @@ import java.io.InputStream;
 public class FilterInputSocket<CE extends CommonEntry>
 extends CommonInputSocket<CE> {
 
-    protected CommonInputSocket<? extends CE> target;
+    protected CommonInputSocket<? extends CE> input;
 
     protected FilterInputSocket(final CommonInputSocket<? extends CE> target) {
-        this.target = target;
+        this.input = target;
     }
 
     @Override
     public CE getTarget() {
-        return target.chain(this).getTarget();
+        return input.chain(this).getTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() {
-        return target.chain(this).getPeerTarget();
+        return input.chain(this).getPeerTarget();
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return target.chain(this).newInputStream();
+        return input.chain(this).newInputStream();
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return target.chain(this).newReadOnlyFile();
+        return input.chain(this).newReadOnlyFile();
     }
 }

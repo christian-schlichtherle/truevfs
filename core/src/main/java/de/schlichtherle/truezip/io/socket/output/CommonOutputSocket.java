@@ -39,15 +39,15 @@ public abstract class CommonOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE, CommonEntry> {
 
     @Override
-    public CommonOutputSocket<CE> chain(OutputSocket<? super CE, ? extends CommonEntry> output) {
-        super.chain(output);
+    public CommonOutputSocket<CE> chain(OutputSocket<? super CE, ? extends CommonEntry> from) {
+        super.chain(from);
         return this;
     }
 
     @Override
     public CommonOutputSocket<CE> connect(
-            InputSocket<? extends CommonEntry, ? super CE> peer) {
-        super.connect(peer);
+            InputSocket<? extends CommonEntry, ? super CE> newPeer) {
+        super.connect(newPeer);
         return this;
     }
 

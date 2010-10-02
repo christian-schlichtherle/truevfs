@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.InputException;
@@ -214,7 +215,8 @@ implements CommonInputShop<TarEntry> {
     @Override
     public CommonInputSocket<TarEntry> newInputSocket(final TarEntry entry)
     throws FileNotFoundException {
-        assert getEntry(entry.getName()) == entry : "violation of contract for InputArchive";
+        if (getEntry(entry.getName()) != entry)
+            throw new IllegalArgumentException("interface contract violation");
         class InputSocket extends CommonInputSocket<TarEntry> {
             @Override
             public TarEntry getTarget() {
@@ -229,7 +231,7 @@ implements CommonInputShop<TarEntry> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException();
+                return new SimpleReadOnlyFile(entry.getFile());
             }
         }
         return new InputSocket();

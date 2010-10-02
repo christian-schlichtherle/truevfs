@@ -120,8 +120,8 @@ extends FileSystemArchiveController<AE> {
      * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
      */
     private final class Input extends ConcurrentInputShop<AE> {
-        Input(CommonInputShop<AE> target) {
-            super(target);
+        Input(CommonInputShop<AE> input) {
+            super(input);
             setSticky(true); // FIXME: This is a hack: It will prevent an archive controller from being garbage collected even if only input was done!
         }
 
@@ -139,8 +139,8 @@ extends FileSystemArchiveController<AE> {
      * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
-        Output(CommonOutputShop<AE> target) {
-            super(target);
+        Output(CommonOutputShop<AE> output) {
+            super(output);
             setSticky(true);
         }
 
@@ -462,20 +462,23 @@ extends FileSystemArchiveController<AE> {
 
             throw ex;
         }
-        assert input != null;
+        assert null != input;
     }
 
     @Override
-    public CommonInputSocket<AE> newInputSocket(final AE target)
+    public CommonInputSocket<AE> newInputSocket(final AE entry)
     throws IOException {
-        return null == input ? null : input.newInputSocket(target);
+        assert getEntry(entry.getName()).getTarget() == entry : "interface contract violation";
+        assert input.getEntry(entry.getName()) == entry : "interface contract violation";
+        return null == input ? null : input.newInputSocket(entry);
     }
 
     @Override
-    public CommonOutputSocket<AE> newOutputSocket(final AE target)
+    public CommonOutputSocket<AE> newOutputSocket(final AE entry)
     throws IOException {
+        assert null != entry;
         ensureOutArchive();
-        return output.newOutputSocket(target);
+        return output.newOutputSocket(entry);
     }
 
     private void ensureOutArchive()

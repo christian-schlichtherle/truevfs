@@ -26,29 +26,29 @@ public class FilterCommonEntry<CE extends CommonEntry>
 implements CommonEntry {
 
     /** The decorated file system entry. */
-    protected CE target;
+    protected CE entry;
 
     protected FilterCommonEntry(final CE target) {
-        this.target = target;
+        this.entry = target;
     }
 
     @Override
     public String getName() {
-        return target.getName();
+        return entry.getName();
     }
 
     @Override
     public Type getType() {
-        return target.getType();
+        return entry.getType();
     }
 
     @Override
     public long getSize() {
-        return target.getSize();
+        return entry.getSize();
     }
 
     @Override
     public long getTime(Access type) {
-        return target.getTime(type);
+        return entry.getTime(type);
     }
 }

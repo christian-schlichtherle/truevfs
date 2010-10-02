@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket.output;
+package de.schlichtherle.truezip.io.socket.input;
 
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocketFactory;
 import java.io.IOException;
 
 /**
- * Provides {@link CommonOutputSocket}s for write access to common entries.
+ * A factory for common input sockets.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
  * @param   <CE> The type of the common entries.
- * @see     CommonInputProvider
+ * @see     CommonOutputSocketFactory
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonOutputProvider<CE extends CommonEntry> {
+public interface CommonInputSocketFactory<CE extends CommonEntry> {
 
     /**
-     * Returns a new non-{@code null} output socket for write access to the
+     * Returns a new non-{@code null} input socket for read access to the
      * given local target.
      * <p>
-     * When called on the returned common output socket, the method
-     * {@link OutputSocket#getTarget()} <em>must</em> return an object which
+     * When called on the returned common input socket, the method
+     * {@link InputSocket#getTarget()} <em>must</em> return an object which
      * {@link Object#equals(Object) compares equal} to the given local target
      * but is not necessarily the same.
      *
      * @param  target the non-{@code null} local target.
-     * @return A new non-{@code null} output socket for writing to the local
+     * @return A new non-{@code null} input socket for reading from the local
      *         target.
-     * @throws IOException If the local target
+     * @throws IOException If the local target does not exist or
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    CommonOutputSocket<CE> newOutputSocket(CE target) throws IOException;
+    CommonInputSocket<CE> newInputSocket(CE target) throws IOException;
 }

@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
-import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 
 /**
@@ -28,23 +26,23 @@ import java.io.IOException;
 abstract class FilterArchiveController<AE extends ArchiveEntry>
 extends ArchiveController<AE> {
 
-    protected ArchiveController<AE> target;
+    protected ArchiveController<AE> controller;
 
     FilterArchiveController(
             ArchiveModel<AE> model,
-            ArchiveController<AE> target) {
+            ArchiveController<AE> controller) {
         super(model);
-        this.target = target;
+        this.controller = controller;
     }
 
     @Override
     final ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException {
-        return target.autoMount(autoCreate, createParents);
+        return controller.autoMount(autoCreate, createParents);
     }
 
     @Override
     final boolean hasNewData(String path) {
-        return target.hasNewData(path);
+        return controller.hasNewData(path);
     }
 }
