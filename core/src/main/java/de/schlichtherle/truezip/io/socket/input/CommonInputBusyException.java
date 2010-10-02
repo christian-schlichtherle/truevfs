@@ -21,7 +21,8 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputBusyException;
 
 /**
  * Indicates that a {@link CommonInputSocket common input socket} or its
- * {@link CommonInputProvider common input provider} is busy on input.
+ * {@link CommonInputSocketFactory common input socket factory} is busy on
+ * input.
  * This exception is guaranteed to be recoverable, meaning it should be
  * possible to read the same common entry again as soon as the source is
  * not busy anymore and unless another exceptional condition applies.
