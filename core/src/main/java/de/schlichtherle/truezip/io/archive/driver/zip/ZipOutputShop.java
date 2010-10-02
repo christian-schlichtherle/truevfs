@@ -151,14 +151,14 @@ implements CommonOutputShop<ZipEntry> {
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipEntry srcZipEntry = (ZipEntry) peer;
+                        final ZipEntry peerZipEntry = (ZipEntry) peer;
                         if (entry.getMethod() == UNKNOWN)
-                            entry.setMethod(srcZipEntry.getMethod());
-                        if (entry.getMethod() == srcZipEntry.getMethod())
-                            entry.setCompressedSize(srcZipEntry.getCompressedSize());
-                        entry.setCrc(srcZipEntry.getCrc());
+                            entry.setMethod(peerZipEntry.getMethod());
+                        if (entry.getMethod() == peerZipEntry.getMethod())
+                            entry.setCompressedSize(peerZipEntry.getCompressedSize());
+                        entry.setCrc(peerZipEntry.getCrc());
                         return new EntryOutputStream(
-                                entry, srcZipEntry.getMethod() != ZipEntry.DEFLATED);
+                                entry, peerZipEntry.getMethod() != ZipEntry.DEFLATED);
                     }
                 }
                 switch (entry.getMethod()) {
