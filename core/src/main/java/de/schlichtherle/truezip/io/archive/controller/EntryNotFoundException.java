@@ -25,8 +25,8 @@ import java.net.URI;
  * Indicates that an <i>archive entry</i>
  * does not exist or is not accessible.
  * <p>
- * May be thrown by {@link ArchiveController#getInputSocket} or
- * {@link ArchiveController#getOutputSocket}.
+ * May be thrown by {@link ArchiveController#newInputSocket} or
+ * {@link ArchiveController#newOutputSocket}.
  */
 public class EntryNotFoundException extends FileNotFoundException {
 

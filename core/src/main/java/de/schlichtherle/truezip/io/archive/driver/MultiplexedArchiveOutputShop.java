@@ -87,9 +87,9 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
      * @param output the decorated output archive.
      * @throws NullPointerException iff {@code output} is {@code null}.
      */
-    public MultiplexedArchiveOutputShop(final CommonOutputShop<AE> target) {
-        super(target);
-        if (target == null)
+    public MultiplexedArchiveOutputShop(final CommonOutputShop<AE> output) {
+        super(output);
+        if (output == null)
             throw new NullPointerException();
     }
 
