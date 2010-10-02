@@ -311,7 +311,7 @@ implements ArchiveDescriptor {
          * that the application must close all entry input streams and read
          * only files first.
          */
-        CLOSE_INPUT,
+        FORCE_CLOSE_INPUT,
 
         /**
          * Similar to {@link #WAIT_CLOSE_INPUT},
@@ -320,15 +320,15 @@ implements ArchiveDescriptor {
         WAIT_CLOSE_OUTPUT,
 
         /**
-         * Similar to {@link #CLOSE_INPUT},
+         * Similar to {@link #FORCE_CLOSE_INPUT},
          * but applies to archive entry output streams and may throw a
          * {@link CommonOutputClosedException} instead.
          * <p>
          * If this option is set, then
-         * {@link #CLOSE_INPUT} must be set, too.
+         * {@link #FORCE_CLOSE_INPUT} must be set, too.
          * Otherwise, an {@code IllegalArgumentException} is thrown.
          */
-        CLOSE_OUTPUT,
+        FORCE_CLOSE_OUTPUT,
 
         /**
          * If this option is set, all pending changes are aborted.

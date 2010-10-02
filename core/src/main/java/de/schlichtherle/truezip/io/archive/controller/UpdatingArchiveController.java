@@ -48,8 +48,8 @@ import java.util.Iterator;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
@@ -584,7 +584,7 @@ extends FileSystemArchiveController<AE> {
         assert !isTouched() || output != null; // file system touched => output archive
         assert output == null || outFile != null; // output archive => output file
 
-        if (options.get(CLOSE_OUTPUT) && !options.get(CLOSE_INPUT))
+        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         if (options.get(UMOUNT) && !options.get(REASSEMBLE))
             throw new IllegalArgumentException();
@@ -597,7 +597,7 @@ extends FileSystemArchiveController<AE> {
             final int outStreams = output.waitCloseOthers(
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
-                if (!options.get(CLOSE_OUTPUT))
+                if (!options.get(FORCE_CLOSE_OUTPUT))
                     throw builder.fail(new ArchiveOutputBusyException(
                             this, outStreams));
                 builder.warn(new ArchiveOutputBusyWarningException(
@@ -608,7 +608,7 @@ extends FileSystemArchiveController<AE> {
             final int inStreams = input.waitCloseOthers(
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
-                if (!options.get(CLOSE_INPUT))
+                if (!options.get(FORCE_CLOSE_INPUT))
                     throw builder.fail(new ArchiveInputBusyException(
                             this, inStreams));
                 builder.warn(new ArchiveInputBusyWarningException(
@@ -626,7 +626,7 @@ extends FileSystemArchiveController<AE> {
         try {
             if (options.get(ABORT_CHANGES)) {
                 try {
-                    shutdownStep1(builder);
+                    shutdownStep1(builder); // FIXME: Commenting this out causes some unit tests to fail, but only if ALL of them are running - why?
                 } finally {
                     shutdownStep2(builder);
                 }
@@ -654,7 +654,11 @@ extends FileSystemArchiveController<AE> {
                 assert outFile == null; // isTouched() otherwise!
                 assert inFile != null; // !needsReassembly otherwise!
                 // Beware: inArchive or fileSystem may be initialized!
-                shutdownStep2(builder);
+                try {
+                    shutdownStep1(builder);
+                } finally {
+                    shutdownStep2(builder);
+                }
                 outFile = inFile;
                 inFile = null;
                 try {
@@ -666,7 +670,11 @@ extends FileSystemArchiveController<AE> {
             } else if (options.get(UMOUNT)) {
                 assert options.get(REASSEMBLE);
                 assert !needsReassembly;
-                shutdownStep2(builder);
+                try {
+                    shutdownStep1(builder);
+                } finally {
+                    shutdownStep2(builder);
+                }
                 shutdownStep3(true);
             } else {
                 // This may happen if File.update() or File.sync() has
@@ -878,7 +886,6 @@ extends FileSystemArchiveController<AE> {
         assert path != null;
         assert !isRoot(path);
 
-        ensureWriteLockedByCurrentThread();
         // Write the updated output archive file as an entry
         // to its enclosing archive file, preserving the
         // last modification time of the root directory as the last
