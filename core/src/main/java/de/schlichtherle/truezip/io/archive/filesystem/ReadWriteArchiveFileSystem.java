@@ -647,8 +647,6 @@ implements ArchiveFileSystem<AE> {
 
     @Override
     public void unlink(final String path) throws ArchiveFileSystemException {
-        assert isRoot(path) || path.charAt(0) != SEPARATOR_CHAR;
-
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
                     "virtual root directory cannot get unlinked");
