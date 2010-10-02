@@ -46,8 +46,8 @@ import java.util.WeakHashMap;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
@@ -232,7 +232,7 @@ public class ArchiveControllers {
             final ArchiveSyncExceptionBuilder builder,
             final BitField<SyncOption> options)
     throws ArchiveSyncException {
-        if (options.get(CLOSE_OUTPUT) && !options.get(CLOSE_INPUT))
+        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
@@ -398,7 +398,7 @@ public class ArchiveControllers {
                     try {
                         ArchiveControllers.sync(
                                 null,
-                                new DefaultArchiveSyncExceptionBuilder(), BitField.of(CLOSE_INPUT, CLOSE_OUTPUT, UMOUNT));
+                                new DefaultArchiveSyncExceptionBuilder(), BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT, UMOUNT));
                     } catch (ArchiveSyncException ouch) {
                         ouch.printStackTrace();
                     }
@@ -453,7 +453,7 @@ public class ArchiveControllers {
             final URI enclMountPoint = ex.getMountPoint();
             if (!dstController.getMountPoint().toString().startsWith(ex.getCanonicalPath()))
                 throw ex; // not my job - pass on!
-            final ArchiveController enclController = getController(enclMountPoint);
+            final ArchiveController enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
             final String enclPath = enclMountPoint.relativize(
                     enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
@@ -513,7 +513,7 @@ public class ArchiveControllers {
             }
         } catch (FalsePositiveEnclosedEntryException ex) {
             final URI enclMountPoint = ex.getMountPoint();
-            final ArchiveController enclController = getController(enclMountPoint);
+            final ArchiveController enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
             final String enclPath = enclMountPoint.relativize(
                     enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
