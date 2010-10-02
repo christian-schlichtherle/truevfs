@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import java.util.Set;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -58,7 +57,7 @@ extends FilterArchiveController<AE> {
         assert (null == enclModel) == (null == enclController);
     }
 
-    final ArchiveController<?> getEnclController() {
+    ArchiveController<?> getEnclController() {
         return enclController;
     }
 
@@ -105,7 +104,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isReadOnly()
+    public boolean isReadOnly()
     throws FalsePositiveEntryException {
         try {
             return target.isReadOnly();
@@ -115,7 +114,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final Entry<?> getEntry(final String path)
+    public Entry<?> getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
             return target.getEntry(path);
@@ -155,7 +154,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isReadable(final String path)
+    public boolean isReadable(final String path)
     throws FalsePositiveEntryException {
         try {
             return target.isReadable(path);
@@ -165,7 +164,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isWritable(final String path)
+    public boolean isWritable(final String path)
     throws FalsePositiveEntryException {
         try {
             return target.isWritable(path);
@@ -175,7 +174,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void setReadOnly(final String path)
+    public void setReadOnly(final String path)
     throws IOException {
         try {
             target.setReadOnly(path);
@@ -185,7 +184,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void setTime(
+    public void setTime(
             final String path,
             final BitField<Access> types,
             final long value)
@@ -198,7 +197,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void mknod(
+    public void mknod(
             final String path,
             final Type type,
             final CommonEntry template,
@@ -213,7 +212,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     @SuppressWarnings("ThrowableInitCause")
-    public final void unlink(
+    public void unlink(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -233,5 +232,11 @@ extends FilterArchiveController<AE> {
         } catch (FalsePositiveEnclosedEntryException ex) {
         }
         getEnclController().unlink(getEnclPath(path), options);
+    }
+
+    @Override
+    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
+    throws ArchiveSyncException {
+        target.sync(builder, options);
     }
 }

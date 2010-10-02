@@ -38,19 +38,13 @@ extends ArchiveController<AE> {
     }
 
     @Override
-    ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
+    final ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException {
         return target.autoMount(autoCreate, createParents);
     }
 
     @Override
-    boolean hasNewData(String path) {
+    final boolean hasNewData(String path) {
         return target.hasNewData(path);
-    }
-
-    @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
-    throws ArchiveSyncException {
-        target.sync(builder, options);
     }
 }

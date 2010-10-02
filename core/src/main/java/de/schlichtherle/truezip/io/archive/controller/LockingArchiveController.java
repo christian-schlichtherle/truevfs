@@ -45,15 +45,15 @@ extends FilterArchiveController<AE> {
         super(model, target);
     }
 
-    final ReentrantLock readLock() {
+    ReentrantLock readLock() {
         return getModel().readLock();
     }
 
-    final ReentrantLock writeLock() {
+    ReentrantLock writeLock() {
         return getModel().writeLock();
     }
 
-    final void ensureNotReadLockedByCurrentThread(
+    void ensureNotReadLockedByCurrentThread(
             final NotWriteLockedByCurrentThreadException ex) {
         getModel().ensureNotReadLockedByCurrentThread(ex);
     }
@@ -64,7 +64,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return new LockingInputSocket(target.newInputSocket(path));
+                return new InputSocket(target.newInputSocket(path));
             } finally {
                 readLock().unlock();
             }
@@ -72,17 +72,17 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return new LockingInputSocket(target.newInputSocket(path));
+                return new InputSocket(target.newInputSocket(path));
             } finally {
                 writeLock().unlock();
             }
         }
     }
 
-    private class LockingInputSocket
+    private class InputSocket
     extends FilterInputSocket<CommonEntry> {
 
-        protected LockingInputSocket(
+        protected InputSocket(
                 final CommonInputSocket<? extends CommonEntry> target) {
             super(target);
         }
@@ -106,26 +106,6 @@ extends FilterArchiveController<AE> {
                 }
             }
         }
-
-        /*@Override
-        public CommonEntry getPeerTarget() {
-            try {
-                readLock().lock();
-                try {
-                    return target.chain(this).getPeerTarget();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
-                ensureNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return target.chain(this).getPeerTarget();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
-        }*/
 
         @Override
         public InputStream newInputStream() throws IOException {
@@ -176,16 +156,16 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return new LockingOutputSocket(target.newOutputSocket(path, options));
+            return new OutputSocket(target.newOutputSocket(path, options));
         } finally {
             writeLock().unlock();
         }
     }
 
-    private class LockingOutputSocket
+    private class OutputSocket
     extends FilterOutputSocket<CommonEntry> {
 
-        protected LockingOutputSocket(
+        protected OutputSocket(
                 final CommonOutputSocket<? extends CommonEntry> target) {
             super(target);
         }
@@ -200,17 +180,6 @@ extends FilterArchiveController<AE> {
                 writeLock().unlock();
             }
         }
-
-        /*@Override
-        public CommonEntry getPeerTarget() {
-            ensureNotReadLockedByCurrentThread();
-            writeLock().lock();
-            try {
-                return target.chain(this).getPeerTarget();
-            } finally {
-                writeLock().unlock();
-            }
-        }*/
 
         @Override
         public OutputStream newOutputStream() throws IOException {
@@ -267,7 +236,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isReadOnly()
+    public boolean isReadOnly()
     throws FalsePositiveEntryException {
         try {
             readLock().lock();
@@ -288,7 +257,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final Entry<?> getEntry(final String path)
+    public Entry<?> getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
             readLock().lock();
@@ -309,7 +278,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isReadable(final String path)
+    public boolean isReadable(final String path)
     throws FalsePositiveEntryException {
         try {
             readLock().lock();
@@ -330,7 +299,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final boolean isWritable(final String path)
+    public boolean isWritable(final String path)
     throws FalsePositiveEntryException {
         try {
             readLock().lock();
@@ -351,7 +320,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void setReadOnly(final String path)
+    public void setReadOnly(final String path)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
@@ -363,7 +332,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void setTime(
+    public void setTime(
             final String path,
             final BitField<Access> types,
             final long value)
@@ -378,7 +347,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public final void mknod(
+    public void mknod(
             final String path,
             final Type type,
             final CommonEntry template,
@@ -395,7 +364,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     @SuppressWarnings("ThrowableInitCause")
-    public final void unlink(
+    public void unlink(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -403,6 +372,18 @@ extends FilterArchiveController<AE> {
         writeLock().lock();
         try {
             target.unlink(path, options);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
+    throws ArchiveSyncException {
+        ensureNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            target.sync(builder, options);
         } finally {
             writeLock().unlock();
         }
