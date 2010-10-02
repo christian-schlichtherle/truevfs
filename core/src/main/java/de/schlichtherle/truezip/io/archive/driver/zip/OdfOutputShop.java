@@ -55,11 +55,10 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final ZipEntry local = getTarget();
-                if (MIMETYPE.equals(local.getName())) {
+                if (MIMETYPE.equals(entry.getName())) {
                     mimetype = true;
-                    if (local.getMethod() == UNKNOWN)
-                        local.setMethod(STORED);
+                    if (entry.getMethod() == UNKNOWN)
+                        entry.setMethod(STORED);
                 }
                 return super.newOutputStream();
             }
