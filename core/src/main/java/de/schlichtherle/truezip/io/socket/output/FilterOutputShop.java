@@ -38,8 +38,8 @@ public class FilterOutputShop<
 extends FilterCommonEntryContainer<CE, CO>
 implements CommonOutputShop<CE> {
 
-    protected FilterOutputShop(final CO target) {
-        super(target);
+    protected FilterOutputShop(final CO output) {
+        super(output);
     }
 
     @Override

@@ -48,8 +48,8 @@ extends FilterArchiveController<AE> {
 
     ProspectiveArchiveController(
             ArchiveModel<AE> model,
-            ArchiveController<AE> target) {
-        super(model, target);
+            ArchiveController<AE> controller) {
+        super(model, controller);
         final ArchiveModel<?> enclModel = model.getEnclModel();
         enclController = null == enclModel
                 ? null
@@ -65,7 +65,7 @@ extends FilterArchiveController<AE> {
     public CommonInputSocket<? extends CommonEntry> newInputSocket(String path)
     throws IOException {
         try {
-            return target.newInputSocket(path);
+            return controller.newInputSocket(path);
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().newInputSocket(getEnclPath(path));
         }
@@ -77,7 +77,7 @@ extends FilterArchiveController<AE> {
             final BitField<IOOption> options)
     throws IOException {
         try {
-            return target.newOutputSocket(path, options);
+            return controller.newOutputSocket(path, options);
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().newOutputSocket(getEnclPath(path), options);
         }
@@ -87,7 +87,7 @@ extends FilterArchiveController<AE> {
     public Icon getOpenIcon()
     throws FalsePositiveEntryException {
         try {
-            return target.getOpenIcon();
+            return controller.getOpenIcon();
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getOpenIcon();
         }
@@ -97,7 +97,7 @@ extends FilterArchiveController<AE> {
     public Icon getClosedIcon()
     throws FalsePositiveEntryException {
         try {
-            return target.getClosedIcon();
+            return controller.getClosedIcon();
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().getClosedIcon();
         }
@@ -107,7 +107,7 @@ extends FilterArchiveController<AE> {
     public boolean isReadOnly()
     throws FalsePositiveEntryException {
         try {
-            return target.isReadOnly();
+            return controller.isReadOnly();
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isReadOnly();
         }
@@ -117,7 +117,7 @@ extends FilterArchiveController<AE> {
     public Entry<?> getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
-            return target.getEntry(path);
+            return controller.getEntry(path);
         } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
@@ -132,8 +132,8 @@ extends FilterArchiveController<AE> {
     private static final class SpecialFileEntry<AE extends ArchiveEntry>
     extends FilterCommonEntry<AE>
     implements Entry<AE> {
-        SpecialFileEntry(AE target) {
-            super(target);
+        SpecialFileEntry(AE entry) {
+            super(entry);
         }
 
         @Override
@@ -149,7 +149,7 @@ extends FilterArchiveController<AE> {
 
         @Override
         public AE getTarget() {
-            return target;
+            return entry;
         }
     }
 
@@ -157,7 +157,7 @@ extends FilterArchiveController<AE> {
     public boolean isReadable(final String path)
     throws FalsePositiveEntryException {
         try {
-            return target.isReadable(path);
+            return controller.isReadable(path);
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isReadable(getEnclPath(path));
         }
@@ -167,7 +167,7 @@ extends FilterArchiveController<AE> {
     public boolean isWritable(final String path)
     throws FalsePositiveEntryException {
         try {
-            return target.isWritable(path);
+            return controller.isWritable(path);
         } catch (FalsePositiveEnclosedEntryException ex) {
             return getEnclController().isWritable(getEnclPath(path));
         }
@@ -177,7 +177,7 @@ extends FilterArchiveController<AE> {
     public void setReadOnly(final String path)
     throws IOException {
         try {
-            target.setReadOnly(path);
+            controller.setReadOnly(path);
         } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
         }
@@ -190,7 +190,7 @@ extends FilterArchiveController<AE> {
             final long value)
     throws IOException {
         try {
-            target.setTime(path, types, value);
+            controller.setTime(path, types, value);
         } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().setTime(getEnclPath(path), types, value);
         }
@@ -204,7 +204,7 @@ extends FilterArchiveController<AE> {
             final BitField<IOOption> options)
     throws IOException {
         try {
-            target.mknod(path, type, template, options);
+            controller.mknod(path, type, template, options);
         } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().mknod(getEnclPath(path), type, template, options);
         }
@@ -217,7 +217,7 @@ extends FilterArchiveController<AE> {
             final BitField<IOOption> options)
     throws IOException {
         try {
-            target.unlink(path, options);
+            controller.unlink(path, options);
             return;
         } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
@@ -237,6 +237,6 @@ extends FilterArchiveController<AE> {
     @Override
     public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
     throws ArchiveSyncException {
-        target.sync(builder, options);
+        controller.sync(builder, options);
     }
 }

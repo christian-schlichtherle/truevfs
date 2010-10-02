@@ -30,24 +30,24 @@ import java.io.OutputStream;
 public class FilterOutputSocket<CE extends CommonEntry>
 extends CommonOutputSocket<CE> {
 
-    protected CommonOutputSocket<? extends CE> target;
+    protected CommonOutputSocket<? extends CE> output;
 
     protected FilterOutputSocket(final CommonOutputSocket<? extends CE> target) {
-        this.target = target;
+        this.output = target;
     }
 
     @Override
     public CE getTarget() {
-        return target.chain(this).getTarget();
+        return output.chain(this).getTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() {
-        return target.chain(this).getPeerTarget();
+        return output.chain(this).getPeerTarget();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return target.chain(this).newOutputStream();
+        return output.chain(this).newOutputStream();
     }
 }

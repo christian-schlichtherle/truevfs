@@ -38,13 +38,15 @@ public class FilterInputShop<
 extends    FilterCommonEntryContainer<CE, CI>
 implements CommonInputShop<CE> {
 
-    protected FilterInputShop(final CI target) {
-        super(target);
+    protected FilterInputShop(final CI input) {
+        super(input);
     }
 
     @Override
     public CommonInputSocket<CE> newInputSocket(CE entry)
     throws IOException {
+        if (getEntry(entry.getName()) != entry)
+            throw new IllegalArgumentException("interface contract violation");
         return target.newInputSocket(entry);
     }
 

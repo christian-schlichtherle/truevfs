@@ -41,8 +41,8 @@ extends FilterArchiveController<AE> {
 
     LockingArchiveController(
             ArchiveModel<AE> model,
-            ArchiveController<AE> target) {
-        super(model, target);
+            ArchiveController<AE> controller) {
+        super(model, controller);
     }
 
     ReentrantLock readLock() {
@@ -64,7 +64,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return new InputSocket(target.newInputSocket(path));
+                return new InputSocket(controller.newInputSocket(path));
             } finally {
                 readLock().unlock();
             }
@@ -72,7 +72,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return new InputSocket(target.newInputSocket(path));
+                return new InputSocket(controller.newInputSocket(path));
             } finally {
                 writeLock().unlock();
             }
@@ -92,7 +92,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return target.chain(this).getTarget();
+                    return input.chain(this).getTarget();
                 } finally {
                     readLock().unlock();
                 }
@@ -100,7 +100,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return target.chain(this).getTarget();
+                    return input.chain(this).getTarget();
                 } finally {
                     writeLock().unlock();
                 }
@@ -112,7 +112,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return target.chain(this).newInputStream();
+                    return input.chain(this).newInputStream();
                 } finally {
                     readLock().unlock();
                 }
@@ -120,7 +120,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return target.chain(this).newInputStream();
+                    return input.chain(this).newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
@@ -132,7 +132,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return target.chain(this).newReadOnlyFile();
+                    return input.chain(this).newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
@@ -140,7 +140,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return target.chain(this).newReadOnlyFile();
+                    return input.chain(this).newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
                 }
@@ -156,7 +156,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return new OutputSocket(target.newOutputSocket(path, options));
+            return new OutputSocket(controller.newOutputSocket(path, options));
         } finally {
             writeLock().unlock();
         }
@@ -175,7 +175,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return target.chain(this).getTarget();
+                return output.chain(this).getTarget();
             } finally {
                 writeLock().unlock();
             }
@@ -186,7 +186,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return target.chain(this).newOutputStream();
+                return output.chain(this).newOutputStream();
             } finally {
                 writeLock().unlock();
             }
@@ -199,7 +199,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.getOpenIcon();
+                return controller.getOpenIcon();
             } finally {
                 readLock().unlock();
             }
@@ -207,7 +207,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.getOpenIcon();
+                return controller.getOpenIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -220,7 +220,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.getClosedIcon();
+                return controller.getClosedIcon();
             } finally {
                 readLock().unlock();
             }
@@ -228,7 +228,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.getClosedIcon();
+                return controller.getClosedIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -241,7 +241,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.isReadOnly();
+                return controller.isReadOnly();
             } finally {
                 readLock().unlock();
             }
@@ -249,7 +249,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.isReadOnly();
+                return controller.isReadOnly();
             } finally {
                 writeLock().unlock();
             }
@@ -262,7 +262,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.getEntry(path);
+                return controller.getEntry(path);
             } finally {
                 readLock().unlock();
             }
@@ -270,7 +270,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.getEntry(path);
+                return controller.getEntry(path);
             } finally {
                 writeLock().unlock();
             }
@@ -283,7 +283,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.isReadable(path);
+                return controller.isReadable(path);
             } finally {
                 readLock().unlock();
             }
@@ -291,7 +291,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.isReadable(path);
+                return controller.isReadable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -304,7 +304,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return target.isWritable(path);
+                return controller.isWritable(path);
             } finally {
                 readLock().unlock();
             }
@@ -312,7 +312,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return target.isWritable(path);
+                return controller.isWritable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -325,7 +325,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            target.setReadOnly(path);
+            controller.setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
@@ -340,7 +340,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            target.setTime(path, types, value);
+            controller.setTime(path, types, value);
         } finally {
             writeLock().unlock();
         }
@@ -356,7 +356,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            target.mknod(path, type, template, options);
+            controller.mknod(path, type, template, options);
         } finally {
             writeLock().unlock();
         }
@@ -371,7 +371,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            target.unlink(path, options);
+            controller.unlink(path, options);
         } finally {
             writeLock().unlock();
         }
@@ -383,7 +383,7 @@ extends FilterArchiveController<AE> {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            target.sync(builder, options);
+            controller.sync(builder, options);
         } finally {
             writeLock().unlock();
         }

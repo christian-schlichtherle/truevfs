@@ -109,11 +109,11 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     @Override
     public ZipInputShop newInputShop(
             final ArchiveDescriptor archive,
-            final CommonInputSocket<?> input)
+            final CommonInputSocket<?> target)
     throws IOException {
         class InputSocket extends FilterInputSocket<CommonEntry> {
             InputSocket() {
-                super(input);
+                super(target);
             }
 
             @Override
@@ -173,12 +173,12 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     @Override
     public CommonOutputShop newOutputShop(
             final ArchiveDescriptor archive,
-            final CommonOutputSocket<?> output,
+            final CommonOutputSocket<?> target,
             final CommonInputShop<ZipEntry> source)
     throws IOException {
         class OutputSocket extends FilterOutputSocket<CommonEntry> {
             OutputSocket() {
-                super(output);
+                super(target);
             }
 
             @Override

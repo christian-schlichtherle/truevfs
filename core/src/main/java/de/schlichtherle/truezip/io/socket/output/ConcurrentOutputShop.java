@@ -66,8 +66,8 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     private volatile boolean shopClosed;
 
     /** Constructs a new {@code ConcurrentOutputShop}. */
-    public ConcurrentOutputShop(final CommonOutputShop<CE> target) {
-        super(target);
+    public ConcurrentOutputShop(final CommonOutputShop<CE> output) {
+        super(output);
     }
 
     @Override

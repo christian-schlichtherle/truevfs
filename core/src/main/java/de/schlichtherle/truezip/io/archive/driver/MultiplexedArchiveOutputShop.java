@@ -50,10 +50,10 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
 /**
  * Decorates an {@code CommonOutputShop} in order to support a virtually
  * unlimited number of entries which may be written concurrently while
- * actually at most one entry is written concurrently to the target archive
+ * actually at most one entry is written concurrently to the output archive
  * output.
  * If there is more than one entry to be written concurrently, the additional
- * entries are actually written to temp files and copied to the target
+ * entries are actually written to temp files and copied to the output
  * output archive upon a call to their {@link OutputStream#close()} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
@@ -73,7 +73,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
 
     /**
      * The map of temporary archive entries which have not yet been written
-     * to the target output archive.
+     * to the output output archive.
      */
     private final Map<String, TempEntryOutputStream> temps
             = new LinkedHashMap<String, TempEntryOutputStream>();
@@ -84,8 +84,8 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     /**
      * Constructs a new {@code MultiplexedArchiveOutputShop}.
      * 
-     * @param target the decorated output archive.
-     * @throws NullPointerException iff {@code target} is {@code null}.
+     * @param output the decorated output archive.
+     * @throws NullPointerException iff {@code output} is {@code null}.
      */
     public MultiplexedArchiveOutputShop(final CommonOutputShop<AE> target) {
         super(target);
@@ -150,7 +150,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
                         ? new TempEntryOutputStream(
                             createTempFile(
                                 TEMP_FILE_PREFIX),
-                                target.chain(this),
+                                output.chain(this),
                                 peer)
                         : new EntryOutputStream(super.newOutputStream());
             }
@@ -159,7 +159,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     }
 
     /**
-     * Returns whether the target output archive is busy writing an archive
+     * Returns whether the output output archive is busy writing an archive
      * entry or not.
      */
     public boolean isTargetBusy() {
@@ -167,7 +167,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     }
 
     /**
-     * This entry output stream writes directly to the target output archive.
+     * This entry output stream writes directly to the output output archive.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
@@ -204,7 +204,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     /**
      * This entry output stream writes the archive entry to a temporary file.
      * When the stream is closed, the temporary file is then copied to the
-     * target output archive and finally deleted unless the target output
+     * output output archive and finally deleted unless the output output
      * archive is still busy.
      */
     private class TempEntryOutputStream

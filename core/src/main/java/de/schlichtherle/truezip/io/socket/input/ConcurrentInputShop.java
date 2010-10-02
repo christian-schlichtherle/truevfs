@@ -67,16 +67,16 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     private volatile boolean shopClosed;
 
     /** Constructs a new {@code ConcurrentInputShop}. */
-    public ConcurrentInputShop(final CommonInputShop<CE> target) {
-        super(target);
+    public ConcurrentInputShop(final CommonInputShop<CE> input) {
+        super(input);
     }
 
     @Override
     public CommonInputSocket<CE> newInputSocket(final CE entry)
     throws IOException {
         assert !shopClosed;
-        assert entry != null;
-
+        if (getEntry(entry.getName()) != entry)
+            throw new IllegalArgumentException("interface contract violation");
         class InputSocket extends FilterInputSocket<CE> {
             InputSocket() throws IOException {
                 super(ConcurrentInputShop.super.newInputSocket(entry));

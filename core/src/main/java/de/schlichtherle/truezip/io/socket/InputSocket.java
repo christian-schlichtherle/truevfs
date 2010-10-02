@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates input streams for reading bytes from its
+ * Creates input streams and read only files for reading bytes from its
  * {@link #getTarget local target}.
  * An input socket can also get {@link #connect connected} to a
  * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
@@ -38,9 +38,23 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
 
     private OutputSocket<? extends PT, ? super LT> peer;
 
-    public InputSocket<LT, PT> chain(InputSocket<? super LT, ? extends PT> input) {
-        connect(input.peer);
+    public InputSocket<LT, PT> chain(InputSocket<? super LT, ? extends PT> from) {
+        chain0(from.peer);
         return this;
+    }
+
+    private void chain0(final OutputSocket<? extends PT, ? super LT> newPeer) {
+        final OutputSocket<? extends PT, ? super LT> oldPeer = peer;
+        if (!equal(oldPeer, newPeer)) {
+            beforePeering();
+            try {
+                peer = newPeer;
+                afterPeering();
+            } catch (RuntimeException ex) {
+                peer = oldPeer;
+                throw ex;
+            }
+        }
     }
 
     public InputSocket<LT, PT> connect(
@@ -49,27 +63,31 @@ public abstract class InputSocket<LT, PT> extends IOSocket<LT> {
         return this;
     }
 
-    void connect0(
-            final OutputSocket<? extends PT, ? super LT> newPeer) {
+    void connect0(final OutputSocket<? extends PT, ? super LT> newPeer) {
         final OutputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
-            peer = newPeer;
             try {
-                beforeConnectComplete();
+                peer = null;
+                if (null != oldPeer)
+                    oldPeer.connect0(null);
+                beforePeering();
+                peer = newPeer;
                 if (null != newPeer)
                     newPeer.connect0(this);
-                afterConnectComplete();
+                afterPeering();
             } catch (RuntimeException ex) {
                 peer = oldPeer;
+                if (null != oldPeer)
+                    oldPeer.connect0(this);
                 throw ex;
             }
         }
     }
 
-    protected void beforeConnectComplete() {
+    protected void beforePeering() {
     }
 
-    protected void afterConnectComplete() {
+    protected void afterPeering() {
     }
 
     private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {

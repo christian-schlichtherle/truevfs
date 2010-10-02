@@ -36,9 +36,23 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
 
     private InputSocket<? extends PT, ? super LT> peer;
 
-    public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> output) {
-        connect(output.peer);
+    public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> from) {
+        chain0(from.peer);
         return this;
+    }
+
+    private void chain0(final InputSocket<? extends PT, ? super LT> newPeer) {
+        final InputSocket<? extends PT, ? super LT> oldPeer = peer;
+        if (!equal(oldPeer, newPeer)) {
+            beforePeering();
+            try {
+                peer = newPeer;
+                afterPeering();
+            } catch (RuntimeException ex) {
+                peer = oldPeer;
+                throw ex;
+            }
+        }
     }
 
     public OutputSocket<LT, PT> connect(
@@ -47,27 +61,31 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         return this;
     }
 
-    void connect0(
-            final InputSocket<? extends PT, ? super LT> newPeer) {
+    void connect0(final InputSocket<? extends PT, ? super LT> newPeer) {
         final InputSocket<? extends PT, ? super LT> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
-            peer = newPeer;
             try {
-                beforeConnectComplete();
+                peer = null;
+                if (null != oldPeer)
+                    oldPeer.connect0(null);
+                beforePeering();
+                peer = newPeer;
                 if (null != newPeer)
                     newPeer.connect0(this);
-                afterConnectComplete();
+                afterPeering();
             } catch (RuntimeException ex) {
                 peer = oldPeer;
+                if (null != oldPeer)
+                    oldPeer.connect0(this);
                 throw ex;
             }
         }
     }
 
-    protected void beforeConnectComplete() {
+    protected void beforePeering() {
     }
 
-    protected void afterConnectComplete() {
+    protected void afterPeering() {
     }
 
     private static boolean equal(Object o1, Object o2) {

@@ -411,12 +411,12 @@ implements ArchiveFileSystem<AE> {
 
         /**
          * Adds the given base name to the set of members of this directory
-         * if and only if this file system target is a directory.
+         * if and only if this file system entry is a directory.
          *
          * @param  member The non-{@code null} base name of the member to add.
          * @return Whether the member has been added or an equal member was
          *         already present in the directory.
-         * @throws UnsupportedOperationException if this file system target is
+         * @throws UnsupportedOperationException if this file system entry is
          *         not a directory.
          */
         boolean add(final String member) {
@@ -426,13 +426,13 @@ implements ArchiveFileSystem<AE> {
         /**
          * Removes the given base name from the set of members of this
          * directory
-         * if and only if this file system target is a directory.
+         * if and only if this file system entry is a directory.
          *
          * @param  member The non-{@code null} base name of the member to
          *         remove.
          * @return Whether the member has been removed or no equal member was
          *         present in the directory.
-         * @throws UnsupportedOperationException if this file system target is
+         * @throws UnsupportedOperationException if this file system entry is
          *         not a directory.
          */
         boolean remove(final String member) {
@@ -442,7 +442,7 @@ implements ArchiveFileSystem<AE> {
         /** Returns the decorated archive entry. */
         @Override
         public final AE getTarget() {
-            return target;
+            return entry;
         }
     } // class CommonEntry
 
@@ -543,7 +543,7 @@ implements ArchiveFileSystem<AE> {
             final String baseName = split[1];
             final SegmentLink<AE>[] elements;
 
-            // Lookup parent target, creating it where necessary and allowed.
+            // Lookup parent entry, creating it where necessary and allowed.
             final BaseEntry<AE> parentEntry = master.get(parentPath);
             final BaseEntry<AE> newEntry;
             if (parentEntry != null) {

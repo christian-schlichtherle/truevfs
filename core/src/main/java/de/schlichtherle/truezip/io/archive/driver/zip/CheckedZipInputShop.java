@@ -62,7 +62,8 @@ public class CheckedZipInputShop extends ZipInputShop {
     @Override
     public CommonInputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
-        assert getEntry(entry.getName()) == entry : "interface contract violation";
+        if (getEntry(entry.getName()) != entry)
+            throw new IllegalArgumentException("interface contract violation");
         class InputSocket extends CommonInputSocket<ZipEntry> {
             @Override
             public ZipEntry getTarget() {

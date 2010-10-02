@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.socket.file;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputProvider;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocketFactory;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputProvider;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocketFactory;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,7 +32,8 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class FileIOProvider
-implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
+implements  CommonInputSocketFactory<FileEntry>,
+            CommonOutputSocketFactory<FileEntry> {
 
     private static final FileIOProvider singleton = new FileIOProvider();
 
@@ -46,7 +47,7 @@ implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
     @Override
     public CommonInputSocket<FileEntry> newInputSocket(final FileEntry target)
     throws IOException {
-        class Input extends CommonInputSocket<FileEntry> {
+        class InputSocket extends CommonInputSocket<FileEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;
@@ -63,13 +64,13 @@ implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
                 return new SimpleReadOnlyFile(target);
             }
         }
-        return new Input();
+        return new InputSocket();
     }
 
     @Override
     public CommonOutputSocket<FileEntry> newOutputSocket(final FileEntry target)
     throws IOException {
-        class Output extends CommonOutputSocket<FileEntry> {
+        class OutputSocket extends CommonOutputSocket<FileEntry> {
             @Override
             public FileEntry getTarget() {
                 return target;
@@ -81,6 +82,6 @@ implements CommonInputProvider<FileEntry>, CommonOutputProvider<FileEntry> {
                 return new FileOutputStream(target);
             }
         }
-        return new Output();
+        return new OutputSocket();
     }
 }
