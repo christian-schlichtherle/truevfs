@@ -59,141 +59,6 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public CommonInputSocket<? extends CommonEntry> newInputSocket(String path)
-    throws IOException {
-        try {
-            readLock().lock();
-            try {
-                return new InputSocket(controller.newInputSocket(path));
-            } finally {
-                readLock().unlock();
-            }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
-            ensureNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
-            try {
-                return new InputSocket(controller.newInputSocket(path));
-            } finally {
-                writeLock().unlock();
-            }
-        }
-    }
-
-    private class InputSocket
-    extends FilterInputSocket<CommonEntry> {
-
-        protected InputSocket(
-                final CommonInputSocket<? extends CommonEntry> target) {
-            super(target);
-        }
-
-        @Override
-        public CommonEntry getTarget() {
-            try {
-                readLock().lock();
-                try {
-                    return input.chain(this).getTarget();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
-                ensureNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return input.chain(this).getTarget();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            try {
-                readLock().lock();
-                try {
-                    return input.chain(this).newInputStream();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
-                ensureNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return input.chain(this).newInputStream();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            try {
-                readLock().lock();
-                try {
-                    return input.chain(this).newReadOnlyFile();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
-                ensureNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return input.chain(this).newReadOnlyFile();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
-        }
-    }
-
-    @Override
-    public CommonOutputSocket<? extends CommonEntry> newOutputSocket(
-            final String path,
-            final BitField<IOOption> options)
-    throws IOException {
-        ensureNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            return new OutputSocket(controller.newOutputSocket(path, options));
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    private class OutputSocket
-    extends FilterOutputSocket<CommonEntry> {
-
-        protected OutputSocket(
-                final CommonOutputSocket<? extends CommonEntry> target) {
-            super(target);
-        }
-
-        @Override
-        public CommonEntry getTarget() {
-            ensureNotReadLockedByCurrentThread(null);
-            writeLock().lock();
-            try {
-                return output.chain(this).getTarget();
-            } finally {
-                writeLock().unlock();
-            }
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            ensureNotReadLockedByCurrentThread(null);
-            writeLock().lock();
-            try {
-                return output.chain(this).newOutputStream();
-            } finally {
-                writeLock().unlock();
-            }
-        }
-    }
-
-    @Override
     public Icon getOpenIcon()
     throws FalsePositiveEntryException {
         try {
@@ -343,6 +208,141 @@ extends FilterArchiveController<AE> {
             controller.setTime(path, types, value);
         } finally {
             writeLock().unlock();
+        }
+    }
+
+    @Override
+    public CommonInputSocket<?> newInputSocket(String path)
+    throws IOException {
+        try {
+            readLock().lock();
+            try {
+                return new InputSocket(controller.newInputSocket(path));
+            } finally {
+                readLock().unlock();
+            }
+        } catch (NotWriteLockedByCurrentThreadException ex) {
+            ensureNotReadLockedByCurrentThread(ex);
+            writeLock().lock();
+            try {
+                return new InputSocket(controller.newInputSocket(path));
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    }
+
+    private class InputSocket
+    extends FilterInputSocket<CommonEntry> {
+
+        protected InputSocket(
+                final CommonInputSocket<? extends CommonEntry> target) {
+            super(target);
+        }
+
+        @Override
+        public CommonEntry getTarget() {
+            try {
+                readLock().lock();
+                try {
+                    return input.chain(this).getTarget();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (NotWriteLockedByCurrentThreadException ex) {
+                ensureNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return input.chain(this).getTarget();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return input.chain(this).newInputStream();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (NotWriteLockedByCurrentThreadException ex) {
+                ensureNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return input.chain(this).newInputStream();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return input.chain(this).newReadOnlyFile();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (NotWriteLockedByCurrentThreadException ex) {
+                ensureNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return input.chain(this).newReadOnlyFile();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+    }
+
+    @Override
+    public CommonOutputSocket<?> newOutputSocket(
+            final String path,
+            final BitField<IOOption> options)
+    throws IOException {
+        ensureNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            return new OutputSocket(controller.newOutputSocket(path, options));
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    private class OutputSocket
+    extends FilterOutputSocket<CommonEntry> {
+
+        protected OutputSocket(
+                final CommonOutputSocket<? extends CommonEntry> target) {
+            super(target);
+        }
+
+        @Override
+        public CommonEntry getTarget() {
+            ensureNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return output.chain(this).getTarget();
+            } finally {
+                writeLock().unlock();
+            }
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            ensureNotReadLockedByCurrentThread(null);
+            writeLock().lock();
+            try {
+                return output.chain(this).newOutputStream();
+            } finally {
+                writeLock().unlock();
+            }
         }
     }
 

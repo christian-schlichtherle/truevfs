@@ -62,28 +62,6 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public CommonInputSocket<? extends CommonEntry> newInputSocket(String path)
-    throws IOException {
-        try {
-            return controller.newInputSocket(path);
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            return getEnclController().newInputSocket(getEnclPath(path));
-        }
-    }
-
-    @Override
-    public CommonOutputSocket<? extends CommonEntry> newOutputSocket(
-            final String path,
-            final BitField<IOOption> options)
-    throws IOException {
-        try {
-            return controller.newOutputSocket(path, options);
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            return getEnclController().newOutputSocket(getEnclPath(path), options);
-        }
-    }
-
-    @Override
     public Icon getOpenIcon()
     throws FalsePositiveEntryException {
         try {
@@ -193,6 +171,28 @@ extends FilterArchiveController<AE> {
             controller.setTime(path, types, value);
         } catch (FalsePositiveEnclosedEntryException ex) {
             getEnclController().setTime(getEnclPath(path), types, value);
+        }
+    }
+
+    @Override
+    public CommonInputSocket<?> newInputSocket(String path)
+    throws IOException {
+        try {
+            return controller.newInputSocket(path);
+        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getEnclController().newInputSocket(getEnclPath(path));
+        }
+    }
+
+    @Override
+    public CommonOutputSocket<?> newOutputSocket(
+            final String path,
+            final BitField<IOOption> options)
+    throws IOException {
+        try {
+            return controller.newOutputSocket(path, options);
+        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getEnclController().newOutputSocket(getEnclPath(path), options);
         }
     }
 

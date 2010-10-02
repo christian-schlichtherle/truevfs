@@ -79,35 +79,6 @@ implements ArchiveDescriptor {
         getModel().ensureWriteLockedByCurrentThread();
     }
 
-    /**
-     * Schedules this archive controller for the synchronization of its
-     * archive contents to the target archive file in the host file system
-     * upon the next call to
-     * {@link ArchiveControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}
-     * according to the given parameter:
-     * <p>
-     * If set to {@code true}, this controller gets unconditionally scheduled,
-     * i.e. its archive contents will get synchronized to the target archive
-     * file in the host file system even if there are no other objects
-     * referring to it.
-     * <p>
-     * If set to {@code false}, this controller gets only conditionally
-     * scheduled, i.e. its archive contents will get synchonized to the target
-     * archive file in the host file system if and only if another file or
-     * stream object is still directly or indirectly referring to it or if
-     * {@code scheduleSync(true)} has been called again meanwhile.
-     * <p>
-     * Call this method if the archive controller has been newly created or
-     * successfully updated.
-     *
-     * @param sticky Whether or not this archive controller shall get
-     *        unconditionally scheduled for synchronization of its archive
-     *        contents to the host file system.
-     */
-    final void setSticky(final boolean sticky) {
-        ArchiveControllers.scheduleSync(getMountPoint(), sticky);
-    }
-
     final ArchiveModel<AE> getModel() {
         return model;
     }
@@ -372,13 +343,13 @@ implements ArchiveDescriptor {
 
     public abstract boolean isReadOnly() throws FalsePositiveEntryException;
 
-    public abstract void setReadOnly(String path) throws IOException;
+    public abstract Entry<?> getEntry(String path) throws FalsePositiveEntryException;
 
     public abstract boolean isReadable(String path) throws FalsePositiveEntryException;
 
     public abstract boolean isWritable(String path) throws FalsePositiveEntryException;
 
-    public abstract Entry<?> getEntry(String path) throws FalsePositiveEntryException;
+    public abstract void setReadOnly(String path) throws IOException;
 
     public abstract void setTime(String path, BitField<Access> types, long value)
     throws IOException;
@@ -393,8 +364,7 @@ implements ArchiveDescriptor {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
-    public abstract CommonInputSocket<? extends CommonEntry>
-    newInputSocket(String path)
+    public abstract CommonInputSocket<?> newInputSocket(String path)
     throws IOException;
 
     /**
@@ -407,8 +377,8 @@ implements ArchiveDescriptor {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
-    public abstract CommonOutputSocket<? extends CommonEntry>
-    newOutputSocket(String path, BitField<IOOption> options)
+    public abstract CommonOutputSocket<?> newOutputSocket(
+            String path, BitField<IOOption> options)
     throws IOException;
 
     /**
@@ -443,7 +413,8 @@ implements ArchiveDescriptor {
      *             {@code false}.</li>
      *         </ul>
      */
-    public abstract void mknod(String path, Type type, CommonEntry template, BitField<IOOption> options)
+    public abstract void mknod( String path, Type type, CommonEntry template,
+                                BitField<IOOption> options)
     throws IOException;
 
     /** Currently supports no options. */

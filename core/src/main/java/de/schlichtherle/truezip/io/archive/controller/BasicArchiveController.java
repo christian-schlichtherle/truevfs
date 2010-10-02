@@ -31,7 +31,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
@@ -107,7 +106,99 @@ implements  CommonInputSocketFactory<AE>,
     }
 
     @Override
-    public final CommonInputSocket<? extends CommonEntry> newInputSocket(
+    public final Icon getOpenIcon()
+    throws FalsePositiveEntryException {
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getOpenIcon(this);
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public final Icon getClosedIcon()
+    throws FalsePositiveEntryException {
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getClosedIcon(this);
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public final boolean isReadOnly()
+    throws FalsePositiveEntryException {
+        try {
+            return autoMount().isReadOnly();
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return true;
+        }
+    }
+
+    @Override
+    public final Entry<?> getEntry(final String path)
+    throws FalsePositiveEntryException {
+        try {
+            return autoMount().getEntry(path);
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public final boolean isReadable(final String path)
+    throws FalsePositiveEntryException {
+        try {
+            return autoMount().getEntry(path) != null;
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public final boolean isWritable(final String path)
+    throws FalsePositiveEntryException {
+        try {
+            return autoMount().isWritable(path);
+        } catch (FalsePositiveEntryException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public final void setReadOnly(final String path)
+    throws IOException {
+        //ensureWriteLockedByCurrentThread();
+        autoMount().setReadOnly(path);
+    }
+
+    @Override
+    public final void setTime(
+            final String path,
+            final BitField<Access> types,
+            final long value)
+    throws IOException {
+        //ensureWriteLockedByCurrentThread();
+        autoSync(path);
+        autoMount().setTime(path, types, value);
+    }
+
+    @Override
+    public final CommonInputSocket<?> newInputSocket(
             final String path)
     throws IOException {
         class InputSocket extends CommonInputSocket<AE> {
@@ -190,7 +281,7 @@ implements  CommonInputSocketFactory<AE>,
     throws IOException;
 
     @Override
-    public final CommonOutputSocket<? extends CommonEntry> newOutputSocket(
+    public final CommonOutputSocket<?> newOutputSocket(
             final String path,
             final BitField<IOOption> options)
     throws IOException {
@@ -296,98 +387,6 @@ implements  CommonInputSocketFactory<AE>,
     @Override
     public abstract CommonOutputSocket<AE> newOutputSocket(AE target)
     throws IOException;
-
-    @Override
-    public final Icon getOpenIcon()
-    throws FalsePositiveEntryException {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getOpenIcon(this);
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public final Icon getClosedIcon()
-    throws FalsePositiveEntryException {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getClosedIcon(this);
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public final boolean isReadOnly()
-    throws FalsePositiveEntryException {
-        try {
-            return autoMount().isReadOnly();
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return true;
-        }
-    }
-
-    @Override
-    public final Entry<?> getEntry(final String path)
-    throws FalsePositiveEntryException {
-        try {
-            return autoMount().getEntry(path);
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public final boolean isReadable(final String path)
-    throws FalsePositiveEntryException {
-        try {
-            return autoMount().getEntry(path) != null;
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    @Override
-    public final boolean isWritable(final String path)
-    throws FalsePositiveEntryException {
-        try {
-            return autoMount().isWritable(path);
-        } catch (FalsePositiveEntryException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    @Override
-    public final void setReadOnly(final String path)
-    throws IOException {
-        //ensureWriteLockedByCurrentThread();
-        autoMount().setReadOnly(path);
-    }
-
-    @Override
-    public final void setTime(
-            final String path,
-            final BitField<Access> types,
-            final long value)
-    throws IOException {
-        //ensureWriteLockedByCurrentThread();
-        autoSync(path);
-        autoMount().setTime(path, types, value);
-    }
 
     @Override
     public final void mknod(

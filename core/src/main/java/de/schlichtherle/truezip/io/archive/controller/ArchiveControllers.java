@@ -170,8 +170,9 @@ public class ArchiveControllers {
                     driver);
             final ArchiveController controller
                     = new ProspectiveArchiveController<AE>(model,
-                        new LockingArchiveController<AE>(model,
-                            new UpdatingArchiveController<AE>(model)));
+                        new StickyArchiveController<AE>(model,
+                            new LockingArchiveController<AE>(model,
+                                new UpdatingArchiveController<AE>(model))));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
                                 new WeakPointer<ArchiveController<?>>(controller));
             return controller;

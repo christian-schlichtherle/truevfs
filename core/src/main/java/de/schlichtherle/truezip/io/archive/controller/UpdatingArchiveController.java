@@ -122,7 +122,6 @@ extends FileSystemArchiveController<AE> {
     private final class Input extends ConcurrentInputShop<AE> {
         Input(CommonInputShop<AE> input) {
             super(input);
-            setSticky(true); // FIXME: This is a hack: It will prevent an archive controller from being garbage collected even if only input was done!
         }
 
         CommonInputShop<AE> getTarget() {
@@ -141,7 +140,6 @@ extends FileSystemArchiveController<AE> {
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(CommonOutputShop<AE> output) {
             super(output);
-            setSticky(true);
         }
 
         CommonOutputShop<AE> getTarget() {
@@ -689,8 +687,6 @@ extends FileSystemArchiveController<AE> {
             throw ex;
         } catch (IOException ex) {
             throw builder.fail(new ArchiveSyncException(this, ex));
-        } finally {
-            setSticky(needsReassembly);
         }
 
         builder.check();
