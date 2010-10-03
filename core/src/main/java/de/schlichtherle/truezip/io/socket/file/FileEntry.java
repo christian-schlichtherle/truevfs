@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket.file;
 
+import java.net.URI;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import java.io.File;
 
@@ -35,11 +36,21 @@ public class FileEntry extends File implements CommonEntry {
     /**
      * Constructs a new {@code FileEntry}.
      *
-     * @param path A non-{@code null} path name.
+     * @param path a non-{@code null} path name.
      * @throws NullPointerException if {@code path} is {@code null}.
      */
     public FileEntry(final String path) {
         super(path);
+    }
+
+    /**
+     * Constructs a new {@code FileEntry}.
+     *
+     * @param uri a non-{@code null} {@code file:} URI
+     * @throws NullPointerException if {@code uri} is {@code null}.
+     */
+    public FileEntry(final URI uri) {
+        super(uri);
     }
 
     /**

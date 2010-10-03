@@ -105,26 +105,6 @@ implements ArchiveDescriptor {
         return getModel().getEnclPath(path);
     }
 
-    final File getTarget() {
-        return getModel().getTarget();
-    }
-
-    /**
-     * Returns {@code true} if and only if the target file of this
-     * controller should be considered to be a file or directory in the host
-     * file system.
-     * Note that the target doesn't need to exist for this method to return
-     * {@code true}.
-     */
-    // TODO: Move to UpdatingArchiveController and declare private.
-    final boolean isHostFileSystemEntryTarget() {
-        // True iff not enclosed or the enclosing archive file is actually
-        // a plain directory.
-        final ArchiveModel enclModel = getModel().getEnclModel();
-        return null == enclModel
-                || enclModel.getTarget().isDirectory();
-    }
-
     /**
      * Returns the driver instance which is used for the target archive.
      * All access to this method must be externally synchronized on this

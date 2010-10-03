@@ -466,8 +466,8 @@ implements     CommonInputSocketFactory <AE                     >,
             if (isHostFileSystemEntryTarget()) { // FIXME: Don't use this method!
                 // The target file of the controller is NOT enclosed
                 // in another archive file.
-                if (!getTarget().delete())
-                    throw new IOException("couldn't delete archive file!");
+                if (!getModel().getTarget().delete())
+                    throw new IOException("couldn't delete target archive file!");
             } else {
                 // The target file of the controller IS enclosed in
                 // another archive file.
@@ -476,5 +476,21 @@ implements     CommonInputSocketFactory <AE                     >,
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }
+    }
+
+    /**
+     * Returns {@code true} if and only if the target file of this
+     * controller should be considered to be a file or directory in the host
+     * file system.
+     * Note that the target doesn't need to exist for this method to return
+     * {@code true}.
+     */
+    // TODO: Move to UpdatingArchiveController and declare private.
+    final boolean isHostFileSystemEntryTarget() {
+        // True iff not enclosed or the enclosing archive file is actually
+        // a plain directory.
+        final ArchiveModel enclModel = getModel().getEnclModel();
+        return null == enclModel
+                || enclModel.getTarget().isDirectory();
     }
 }

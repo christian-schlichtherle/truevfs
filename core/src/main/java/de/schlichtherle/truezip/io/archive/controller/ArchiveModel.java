@@ -15,13 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import java.io.File;
 import java.net.URI;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -42,7 +42,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final URI mountPoint;
     private final ArchiveModel<?> enclModel;
     private final URI enclPath;
-    private final File target; // TODO: make this support other virtual file systems.
+    private final FileEntry target; // TODO: make this support other virtual file systems.
     private final ArchiveDriver<AE> driver;
     private ArchiveFileSystem<AE> fileSystem;
 
@@ -61,7 +61,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
             this.enclModel = enclModel; // TODO: Do not use ArchiveControllers - breaks loos coupling!
             this.enclPath = enclModel.getMountPoint().relativize(mountPoint);
         }
-        this.target = new File(mountPoint);
+        this.target = new FileEntry(mountPoint);
         this.driver = driver;
 
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -137,7 +137,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
      * Returns the canonical or at least normalized absolute file for the
      * target archive file.
      */
-    File getTarget() {
+    FileEntry getTarget() {
         return target;
     }
 
