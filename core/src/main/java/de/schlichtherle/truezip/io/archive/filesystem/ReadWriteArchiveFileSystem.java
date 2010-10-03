@@ -16,10 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.socket.input.CommonInputService;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
-import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
@@ -709,48 +705,5 @@ implements ArchiveFileSystem<AE> {
         touch();
         for (Access type : types)
             entry.getTarget().setTime(type, value);
-    }
-
-    @Override
-    public <E extends Exception>
-    void copy(
-            final CommonInputService<AE> input,
-            final CommonOutputService<AE> output,
-            final ExceptionHandler<? super IOException, E> handler)
-    throws E {
-        final AE root = getEntry(ROOT).getTarget();
-        assert root != null;
-        // TODO: Consider iterating over input instead, normalizing the input
-        // entry name and checking with master map and output.
-        // Consider the effect for absolute entry names, too.
-        for (final Entry<AE> fse : master.values()) {
-            final AE e = fse.getTarget();
-            final String n = e.getName();
-            if (output.getEntry(n) != null)
-                continue; // we have already written this entry
-            try {
-                if (e.getType() == DIRECTORY) {
-                    if (root == e)
-                        continue; // never write the virtual root directory
-                    if (e.getTime(Access.WRITE) < 0)
-                        continue; // never write ghost directories
-                    output.newOutputSocket(e).newOutputStream().close();
-                } else if (input.getEntry(n) != null) {
-                    assert e == input.getEntry(n);
-                    IOSocket.copy(  input.newInputSocket(e),
-                                    output.newOutputSocket(e));
-                } else {
-                    // The file system entry is an archive file which has been
-                    // newly created and not yet been reassembled
-                    // into this (potentially new) archive file.
-                    // Write an empty file system entry now as a marker in
-                    // order to recreate the file system entry when the file
-                    // system gets remounted from the archive file.
-                    output.newOutputSocket(e).newOutputStream().close();
-                }
-            } catch (IOException ex) {
-                handler.warn(ex);
-            }
-        }
     }
 }
