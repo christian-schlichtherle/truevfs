@@ -508,8 +508,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private boolean isTouched() {
-        final ArchiveFileSystem fileSystem = getFileSystem();
-        return null != fileSystem && fileSystem.isTouched();
+        return getModel().isTouched();
     }
 
     boolean autoSync(String path) throws ArchiveSyncException {

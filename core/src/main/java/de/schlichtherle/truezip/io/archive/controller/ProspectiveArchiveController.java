@@ -41,7 +41,9 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @version $Id$
  */
 final class ProspectiveArchiveController<AE extends ArchiveEntry>
-extends FilterArchiveController<AE> {
+extends ArchiveController<AE> {
+
+    private final ArchiveController<AE> controller;
 
     /** The archive controller of the enclosing archive file, if any. */
     private final ArchiveController<?> enclController;
@@ -49,7 +51,8 @@ extends FilterArchiveController<AE> {
     ProspectiveArchiveController(
             ArchiveModel<AE> model,
             ArchiveController<AE> controller) {
-        super(model, controller);
+        super(model);
+        this.controller = controller;
         final ArchiveModel<?> enclModel = model.getEnclModel();
         enclController = null == enclModel
                 ? null

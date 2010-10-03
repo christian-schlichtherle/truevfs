@@ -37,12 +37,15 @@ import javax.swing.Icon;
  * @version $Id$
  */
 final class LockingArchiveController<AE extends ArchiveEntry>
-extends FilterArchiveController<AE> {
+extends ArchiveController<AE> {
+
+    private final ArchiveController<AE> controller;
 
     LockingArchiveController(
             ArchiveModel<AE> model,
             ArchiveController<AE> controller) {
-        super(model, controller);
+        super(model);
+        this.controller = controller;
     }
 
     ReentrantLock readLock() {

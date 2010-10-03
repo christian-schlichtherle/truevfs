@@ -16,9 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -31,9 +29,6 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.net.URI;
 import javax.swing.Icon;
-
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 
 /**
  * Provides multi-threaded read/write access to its <i>target archive file</i>
@@ -99,50 +94,6 @@ implements ArchiveDescriptor {
     final String getEnclPath(String path) {
         return getModel().getEnclPath(path);
     }
-
-    /**
-     * Returns the driver instance which is used for the target archive.
-     * All access to this method must be externally synchronized on this
-     * controller's read lock!
-     *
-     * @return A valid reference to an {@link ArchiveDriver} object
-     *         - never {@code null}.
-     */
-    final ArchiveDriver<AE> getDriver() {
-        return getModel().getDriver();
-    }
-
-    final ArchiveFileSystem<AE> autoMount()
-    throws IOException {
-        return autoMount(false, false);
-    }
-
-    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
-    throws IOException {
-        return autoMount(autoCreate, autoCreate);
-    }
-
-    /**
-     * Returns the virtual archive file system mounted from the target file.
-     * This method is reentrant with respect to any exceptions it may throw.
-     * <p>
-     * <b>Warning:</b> Either the read or the write lock of this controller
-     * must be acquired while this method is called!
-     * If only a read lock is acquired, but a write lock is required, this
-     * method will temporarily release all locks, so any preconditions must be
-     * checked again upon return to protect against concurrent modifications!
-     *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
-     * @return A valid archive file system - {@code null} is never returned.
-     * @throws FalsePositiveEntryException
-     * @throws IOException On any other I/O related issue with the target file
-     *         or the target file of any enclosing archive file's controller.
-     */
-    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-    throws IOException;
 
     /**
      * Defines the available options for archive file system operations.

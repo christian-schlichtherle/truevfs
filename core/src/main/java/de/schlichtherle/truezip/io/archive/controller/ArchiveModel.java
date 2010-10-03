@@ -15,13 +15,15 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.file.FileInputSocket;
+import de.schlichtherle.truezip.io.socket.file.FileOutputSocket;
 import java.net.URI;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -35,7 +37,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
+final class ArchiveModel<AE extends ArchiveEntry>
+implements ArchiveDescriptor {
 
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
@@ -46,7 +49,9 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final ArchiveDriver<AE> driver;
     private ArchiveFileSystem<AE> fileSystem;
 
-    ArchiveModel(final URI mountPoint, final ArchiveModel<?> enclModel, final ArchiveDriver<AE> driver) {
+    ArchiveModel(   final URI mountPoint,
+                    final ArchiveDriver<AE> driver,
+                    final ArchiveModel<?> enclModel) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -58,7 +63,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
             this.enclModel = null;
             this.enclPath = null;
         } else {
-            this.enclModel = enclModel; // TODO: Do not use ArchiveControllers - breaks loos coupling!
+            this.enclModel = enclModel;
             this.enclPath = enclModel.getMountPoint().relativize(mountPoint);
         }
         this.target = new FileEntry(mountPoint);
@@ -140,6 +145,14 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     FileEntry getTarget() {
         return target;
     }
+
+    /*FileInputSocket newInputSocket() {
+        return new FileInputSocket(target);
+    }
+
+    FileOutputSocket newOutputSocket() {
+        return new FileOutputSocket(target);
+    }*/
 
     ArchiveDriver<AE> getDriver() {
         return driver;
