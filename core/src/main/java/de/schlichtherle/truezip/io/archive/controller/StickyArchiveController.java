@@ -38,7 +38,7 @@ final class StickyArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
     private ArchiveController<AE> head;
-    private Pointer.Type last;
+    private Pointer.Type oldGrade;
 
     StickyArchiveController(
             ArchiveModel<AE> model,
@@ -46,24 +46,27 @@ extends FilterArchiveController<AE> {
         super(model, controller);
     }
 
-    private void upgradeTo(Pointer.Type type) {
-        if (null == head) {
-            head = ArchiveControllers.getController(getMountPoint());
-        } else {
-            if (last.ordinal() >= type.ordinal())
-                return;
-        }
-        ArchiveControllers.scheduleSync(head, last = type);
+    private void upgradeTo(Pointer.Type grade) {
+        schedule(true, grade);
     }
 
-    private void downgradeTo(Pointer.Type type) {
+    private void downgradeTo(Pointer.Type grade) {
+        schedule(false, grade);
+    }
+
+    private void schedule(final boolean upgrade, final Pointer.Type newGrade) {
         if (null == head) {
             head = ArchiveControllers.getController(getMountPoint());
         } else {
-            if (last.ordinal() <= type.ordinal())
-                return;
+            if (upgrade) {
+                if (oldGrade.ordinal() >= newGrade.ordinal())
+                    return;
+            } else {
+                if (oldGrade.ordinal() <= newGrade.ordinal())
+                    return;
+            }
         }
-        ArchiveControllers.scheduleSync(head, last = type);
+        ArchiveControllers.scheduleSync(head, oldGrade = newGrade);
     }
 
     @Override
