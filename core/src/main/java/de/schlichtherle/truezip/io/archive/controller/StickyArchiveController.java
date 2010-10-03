@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.util.Pointer;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -38,6 +37,9 @@ import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
 final class StickyArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
+    private ArchiveController<AE> head;
+    private Pointer.Type last;
+
     StickyArchiveController(
             ArchiveModel<AE> model,
             ArchiveController<AE> controller) {
@@ -45,11 +47,23 @@ extends FilterArchiveController<AE> {
     }
 
     private void upgradeTo(Pointer.Type type) {
-        ArchiveControllers.scheduleSync(getMountPoint(), true, type);
+        if (null == head) {
+            head = ArchiveControllers.getController(getMountPoint());
+        } else {
+            if (last.ordinal() >= type.ordinal())
+                return;
+        }
+        ArchiveControllers.scheduleSync(head, last = type);
     }
 
     private void downgradeTo(Pointer.Type type) {
-        ArchiveControllers.scheduleSync(getMountPoint(), false, type);
+        if (null == head) {
+            head = ArchiveControllers.getController(getMountPoint());
+        } else {
+            if (last.ordinal() <= type.ordinal())
+                return;
+        }
+        ArchiveControllers.scheduleSync(head, last = type);
     }
 
     @Override
@@ -121,8 +135,8 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public void mknod(  String path, Type type, CommonEntry template,
-                        BitField options)
+    public void mknod(  String path, CommonEntry.Type type,
+                        CommonEntry template, BitField options)
     throws IOException {
         controller.mknod(path, type, template, options);
         upgradeTo(STRONG);

@@ -137,7 +137,7 @@ public class ArchiveControllers {
                 }
                 // Fall through!
             }
-            if (driver == null) // pure lookup operation?
+            if (null == driver) // pure lookup operation?
                 return null;
             // TODO: Refactor this to a more flexible design which supports
             // different sync strategies, like update or append.
@@ -161,25 +161,9 @@ public class ArchiveControllers {
      * synchronization strongly or weakly.
      */
     static void scheduleSync(
-            final URI mountPoint,
-            final boolean upgrade,
+            final ArchiveController<?> controller,
             final Type type) {
         synchronized (controllers) {
-            Pointer<ArchiveController<?>> pointer = controllers.get(mountPoint);
-            if (null == pointer) {
-                assert false;
-                if (STRONG == type)
-                    throw new IllegalStateException();
-                return;
-            }
-            if (upgrade) {
-                if (type.ordinal() <= pointer.getType().ordinal())
-                    return;
-            } else {
-                if (type.ordinal() >= pointer.getType().ordinal())
-                    return;
-            }
-            final ArchiveController<?> controller = pointer.get();
             controllers.put(
                     controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
                     (Pointer) type.newPointer(controller));
