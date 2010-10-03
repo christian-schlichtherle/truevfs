@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;

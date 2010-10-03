@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputBusyException;
 import java.io.File;

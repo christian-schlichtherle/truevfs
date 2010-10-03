@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import junit.framework.TestCase;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 
 /**
  * Tests archive type independent features of the {@link File} class.

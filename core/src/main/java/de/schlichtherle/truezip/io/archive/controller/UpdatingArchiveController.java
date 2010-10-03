@@ -25,7 +25,7 @@ import java.util.Collections;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
@@ -42,7 +42,7 @@ import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
+import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,7 +58,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -413,7 +413,7 @@ extends FileSystemArchiveController<AE> {
     private Input<AE> newInput(final File file) throws IOException {
         class InputSocket extends FilterInputSocket<FileEntry> {
             InputSocket() throws IOException {
-                super(FileIOProvider.get().newInputSocket(new FileEntry(file)));
+                super(FileSocketFactory.get().newInputSocket(new FileEntry(file)));
             }
 
             @Override
@@ -470,7 +470,7 @@ extends FileSystemArchiveController<AE> {
     private Output<AE> newOutput(final File file) throws IOException {
         class OutputSocket extends FilterOutputSocket<FileEntry> {
             OutputSocket() throws IOException {
-                super(FileIOProvider.get().newOutputSocket(new FileEntry(file)));
+                super(FileSocketFactory.get().newOutputSocket(new FileEntry(file)));
             }
 
             @Override
@@ -568,11 +568,11 @@ extends FileSystemArchiveController<AE> {
         try {
             if (options.get(ABORT_CHANGES)) {
                 try {
-                    shutdownStep1(builder);
+                    reset1(builder);
                 } finally {
-                    shutdownStep2(builder);
+                    reset2(builder);
                 }
-                shutdownStep3(true); // TODO: Check: Why not in another finally-block?
+                reset3(true); // TODO: Check: Why not in another finally-block?
             } else if (isTouched()) {
                 needsReassembly = true;
                 try {
@@ -588,7 +588,7 @@ extends FileSystemArchiveController<AE> {
                         needsReassembly = false;
                     }
                 } finally {
-                    shutdownStep3(options.get(UMOUNT) && !needsReassembly);
+                    reset3(options.get(UMOUNT) && !needsReassembly);
                 }
             } else if (options.get(REASSEMBLE) && needsReassembly) {
                 // Nesting this archive file to its enclosing archive file
@@ -597,9 +597,9 @@ extends FileSystemArchiveController<AE> {
                 assert inFile != null; // !needsReassembly otherwise!
                 // Beware: inArchive or fileSystem may be initialized!
                 try {
-                    shutdownStep1(builder);
+                    reset1(builder);
                 } finally {
-                    shutdownStep2(builder);
+                    reset2(builder);
                 }
                 outFile = inFile;
                 inFile = null;
@@ -607,17 +607,17 @@ extends FileSystemArchiveController<AE> {
                     reassemble(builder);
                     needsReassembly = false;
                 } finally {
-                    shutdownStep3(options.get(UMOUNT) && !needsReassembly);
+                    reset3(options.get(UMOUNT) && !needsReassembly);
                 }
             } else if (options.get(UMOUNT)) {
                 assert options.get(REASSEMBLE);
                 assert !needsReassembly;
                 try {
-                    shutdownStep1(builder);
+                    reset1(builder);
                 } finally {
-                    shutdownStep2(builder);
+                    reset2(builder);
                 }
-                shutdownStep3(true);
+                reset3(true);
             } else {
                 // This may happen if File.update() or File.sync() has
                 // been called and no modifications have been applied to
@@ -682,7 +682,7 @@ extends FileSystemArchiveController<AE> {
         final long rootTime = getFileSystem().getEntry(ROOT).getTime(Access.WRITE);
         try {
             try {
-                shutdownStep1(handler);
+                reset1(handler);
                 copy((ExceptionHandler<IOException, ArchiveSyncException>) new FilterExceptionHandler(handler));
             } finally {
                 // We MUST do cleanup here because (1) any entries in the
@@ -691,7 +691,7 @@ extends FileSystemArchiveController<AE> {
                 // and thus cannot get used anymore to access the input;
                 // and (2) if there has been any IOException on the
                 // output archive there is no way to recover.
-                shutdownStep2(handler);
+                reset2(handler);
             }
         } catch (ArchiveSyncWarningException ex) {
             throw ex;
@@ -892,8 +892,8 @@ extends FileSystemArchiveController<AE> {
             final ArchiveSyncExceptionBuilder handler
                     = new DefaultArchiveSyncExceptionBuilder();
             //shutdownStep1(handler);
-            shutdownStep2(handler);
-            shutdownStep3(true);
+            reset2(handler);
+            reset3(true);
         } finally {
             super.finalize();
         }
@@ -907,7 +907,7 @@ extends FileSystemArchiveController<AE> {
      * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep1(final ArchiveSyncExceptionHandler handler)
+    private void reset1(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, ArchiveSyncException> {
@@ -936,7 +936,7 @@ extends FileSystemArchiveController<AE> {
      * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void shutdownStep2(final ArchiveSyncExceptionHandler handler)
+    private void reset2(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
         setFileSystem(null);
 
@@ -978,7 +978,7 @@ extends FileSystemArchiveController<AE> {
      *        the target archive file (i.e. unless the archive file has been
      *        newly created).
      */
-    private void shutdownStep3(final boolean deleteOutFile) {
+    private void reset3(final boolean deleteOutFile) {
         if (inFile != null) {
             final java.io.File file = inFile;
             inFile = null;

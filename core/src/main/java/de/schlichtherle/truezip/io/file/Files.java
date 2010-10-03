@@ -31,14 +31,14 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
+import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -380,7 +380,7 @@ class Files {
             final CommonInputSocket<? extends CommonEntry> input
                     = srcController.newInputSocket(srcPath);
             final CommonOutputSocket<? extends CommonEntry> output
-                    = FileIOProvider.get().newOutputSocket(new FileEntry(dst));
+                    = FileSocketFactory.get().newOutputSocket(new FileEntry(dst));
             IOSocket.copy(input, output);
             if (preserve && !dst.setLastModified(input.getTarget().getTime(Access.WRITE)))
                 throw new IOException(dst.getPath()

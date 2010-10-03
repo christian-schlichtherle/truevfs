@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.socket.input.CommonInputSocketFactory;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.InputException;
@@ -96,10 +96,10 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<AE extends ArchiveEntry>
-extends     ArchiveController<AE>
-implements  CommonInputSocketFactory<AE>,
-            CommonOutputSocketFactory<AE> {
+abstract class BasicArchiveController   <AE extends ArchiveEntry>
+extends        ArchiveController        <AE                     >
+implements     CommonInputSocketFactory <AE                     >,
+               CommonOutputSocketFactory<AE                     > {
 
     BasicArchiveController(ArchiveModel<AE> model) {
         super(model);
@@ -182,7 +182,6 @@ implements  CommonInputSocketFactory<AE>,
     @Override
     public final void setReadOnly(final String path)
     throws IOException {
-        //ensureWriteLockedByCurrentThread();
         autoMount().setReadOnly(path);
     }
 
@@ -192,7 +191,6 @@ implements  CommonInputSocketFactory<AE>,
             final BitField<Access> types,
             final long value)
     throws IOException {
-        //ensureWriteLockedByCurrentThread();
         autoSync(path);
         autoMount().setTime(path, types, value);
     }
@@ -228,7 +226,7 @@ implements  CommonInputSocketFactory<AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed! Why?
+                getPeerTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
@@ -236,7 +234,7 @@ implements  CommonInputSocketFactory<AE>,
                 try {
                     return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
                 } catch (IOException resolveToNull) {
-                    return null; // FIXME: interface contract violation
+                    return null; // TODO: interface contract violation!
                 }
             }
 
@@ -317,7 +315,7 @@ implements  CommonInputSocketFactory<AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed! Why?
+                getPeerTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
@@ -327,7 +325,7 @@ implements  CommonInputSocketFactory<AE>,
                 try {
                     return getEntry();
                 } catch (IOException ex) {
-                    return null; // FIXME: interface contract violation
+                    return null; // TODO: interface contract violation!
                 }
             }
 
@@ -364,7 +362,6 @@ implements  CommonInputSocketFactory<AE>,
             }
         } // class OutputSocket
 
-        //ensureWriteLockedByCurrentThread();
         if (isRoot(path)) {
             try {
                 autoMount(); // detect false positives!
@@ -394,7 +391,6 @@ implements  CommonInputSocketFactory<AE>,
             final CommonEntry template,
             final BitField<IOOption> options)
     throws IOException {
-        //ensureWriteLockedByCurrentThread();
         if (FILE != type && DIRECTORY != type)
             throw new EntryNotFoundException(this, path,
                     "not yet supported: mknod " + type);
@@ -437,7 +433,6 @@ implements  CommonInputSocketFactory<AE>,
             final String path,
             final BitField<IOOption> options)
     throws IOException {
-        //ensureWriteLockedByCurrentThread();
         autoSync(path);
         if (isRoot(path)) {
             // Get the file system or die trying!

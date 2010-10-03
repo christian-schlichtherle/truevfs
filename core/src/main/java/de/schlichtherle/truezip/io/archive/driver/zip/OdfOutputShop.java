@@ -18,11 +18,11 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.archive.driver.MultiplexedArchiveOutputShop;
+import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**

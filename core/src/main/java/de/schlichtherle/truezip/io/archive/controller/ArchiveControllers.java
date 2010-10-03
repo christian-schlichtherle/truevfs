@@ -15,15 +15,16 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.statistics.ArchiveStatistics;
 import de.schlichtherle.truezip.util.Pointer;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.file.FileIOProvider;
+import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.Streams;
@@ -51,8 +52,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
 import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 
 /**
  * Provides static utility methods for {@link ArchiveController}s.
@@ -63,9 +64,9 @@ import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_
  */
 public class ArchiveControllers {
 
-    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
-            = new Comparator<ArchiveController>() {
-        public int compare(ArchiveController l, ArchiveController r) {
+    private static final Comparator<ArchiveController<?>> REVERSE_CONTROLLERS
+            = new Comparator<ArchiveController<?>>() {
+        public int compare(ArchiveController<?> l, ArchiveController<?> r) {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
@@ -81,15 +82,6 @@ public class ArchiveControllers {
             = new WeakHashMap<URI, Pointer<ArchiveController<?>>>();
 
     private ArchiveControllers() {
-    }
-
-    static int getArchivesTotal() {
-        // This is not 100% accurate:
-        // Controllers which have been removed from the WeakReference
-        // VALUE in the map meanwhile, but not yet removed from the map,
-        // are counted as well.
-        // But hey, this is only statistics, right?
-        return controllers.size();
     }
 
     public static ArchiveController getController(URI mountPoint) {
@@ -252,16 +244,16 @@ public class ArchiveControllers {
         }
     }
 
-    static Iterable<ArchiveController> getControllers() {
+    static Set<ArchiveController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Iterable<ArchiveController> getControllers(
+    static Set<ArchiveController<?>> getControllers(
             URI prefix,
-            final Comparator<ArchiveController> comparator) {
+            final Comparator<ArchiveController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<ArchiveController> snapshot;
+        final Set<ArchiveController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
                     ? new TreeSet(comparator)
@@ -297,7 +289,7 @@ public class ArchiveControllers {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static ArchiveStatistics getLiveStatistics() {
+    public static ArchiveStatistics getStatistics() {
         return LiveArchiveStatistics.SINGLETON;
     }
 
@@ -468,7 +460,7 @@ public class ArchiveControllers {
         //assert !dstController.writeLock().isLocked();
 
         try {
-            final CommonInputSocket<?> input = FileIOProvider
+            final CommonInputSocket<FileEntry> input = FileSocketFactory
                     .get()
                     .newInputSocket(new FileEntry(src));
             final OutputStream out = dstController

@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.statistics.ArchiveStatistics;
+
 final class LiveArchiveStatistics implements ArchiveStatistics {
 
     /** The singleton instance of this class. */
@@ -25,27 +27,30 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     private LiveArchiveStatistics() {
     }
 
+    @Override
     public long getUpdateTotalByteCountRead() {
         return CountingReadOnlyFile.getTotal();
     }
 
+    @Override
     public long getUpdateTotalByteCountWritten() {
         return CountingOutputStream.getTotal();
     }
 
+    @Override
     public int getArchivesTotal() {
-        return ArchiveControllers.getArchivesTotal();
+        return ArchiveControllers.getControllers().size();
     }
 
+    @Override
     public int getArchivesTouched() {
         int result = 0;
         for (final ArchiveController controller : ArchiveControllers.getControllers()) {
             final ArchiveModel model = controller.getModel();
             model.readLock().lock();
             try {
-                if (model.isTouched()) {
+                if (model.isTouched())
                     result++;
-                }
             } finally {
                 model.readLock().unlock();
             }
@@ -53,6 +58,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
         return result;
     }
 
+    @Override
     public int getTopLevelArchivesTotal() {
         int result = 0;
         for (ArchiveController controller : ArchiveControllers.getControllers())
@@ -61,15 +67,15 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
         return result;
     }
 
+    @Override
     public int getTopLevelArchivesTouched() {
         int result = 0;
         for (final ArchiveController controller : ArchiveControllers.getControllers()) {
             final ArchiveModel model = controller.getModel();
             model.readLock().lock();
             try {
-                if (controller.getModel().getEnclMountPoint() == null && model.isTouched()) {
+                if (controller.getModel().getEnclMountPoint() == null && model.isTouched())
                     result++;
-                }
             } finally {
                 model.readLock().unlock();
             }

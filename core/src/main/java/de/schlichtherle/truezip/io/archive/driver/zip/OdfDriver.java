@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.IOException;

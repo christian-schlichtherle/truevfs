@@ -43,12 +43,12 @@ public interface CommonInputSocketFactory<CE extends CommonEntry> {
      * {@link Object#equals(Object) compares equal} to the given local target
      * but is not necessarily the same.
      *
-     * @param  target the non-{@code null} local target.
+     * @param  entry the non-{@code null} local target.
      * @return A new non-{@code null} input socket for reading from the local
      *         target.
      * @throws IOException If the local target does not exist or
      *         is not accessible for some reason.
      * @throws NullPointerException if {@code target} is {@code null}.
      */
-    CommonInputSocket<CE> newInputSocket(CE target) throws IOException;
+    CommonInputSocket<CE> newInputSocket(CE entry) throws IOException;
 }

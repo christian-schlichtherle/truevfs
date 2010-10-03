@@ -36,7 +36,7 @@ public class FileEntry extends File implements CommonEntry {
      * Constructs a new {@code FileEntry}.
      *
      * @param path A non-{@code null} path name.
-     * @throws NullPointerException If {@code path} is {@code null}.
+     * @throws NullPointerException if {@code path} is {@code null}.
      */
     public FileEntry(final String path) {
         super(path);
@@ -45,20 +45,20 @@ public class FileEntry extends File implements CommonEntry {
     /**
      * Constructs a new {@code FileEntry}.
      *
-     * @param file A non-{@code null} file.
-     * @throws NullPointerException If {@code file} is {@code null}.
+     * @param file a non-{@code null} file.
+     * @throws NullPointerException if {@code file} is {@code null}.
      */
     public FileEntry(final File file) {
         super(file.getPath());
     }
 
-    /** Returns whether the file is a directory or not. */
+    /** Returns the type of this file entry. */
     @Override
     public Type getType() {
         return isDirectory() ? DIRECTORY
-                : isFile() ? FILE
-                : exists() ? SPECIAL
-                : null;
+                :   isFile() ? FILE
+                :   exists() ? SPECIAL
+                :              null;
     }
 
     /** Returns the file size. */

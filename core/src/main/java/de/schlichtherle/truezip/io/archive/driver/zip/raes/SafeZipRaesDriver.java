@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
