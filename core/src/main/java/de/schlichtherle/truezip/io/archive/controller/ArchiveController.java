@@ -223,17 +223,13 @@ implements ArchiveDescriptor {
          * to it.
          */
         CREATE_PARENTS,
-        /**
-         * Whether or not an operation is recursive.
-         * This option affects only files and directories <em>below</em> the
-         * operated node in the file system tree.
-         */
-        //RECURSIVE,
+
         /**
          * Whether or not a copy operation shall preserve as much attributes
          * of a file or directory entry within an archive file as possible.
          */
         PRESERVE,
+
         /**
          * Whether or not a write operation shall append to or replace the
          * contents of a file entry within an archive file.

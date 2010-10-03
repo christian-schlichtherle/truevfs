@@ -335,8 +335,7 @@ implements  CommonInputSocketFactory<AE>,
             public OutputStream newOutputStream()
             throws IOException {
                 final AE entry = getEntry();
-                final CommonOutputSocket<AE> output
-                        = newOutputSocket(entry);
+                final CommonOutputSocket<AE> output = newOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
                         ? newInputSocket(entry).newInputStream()
                         : null;
@@ -421,9 +420,7 @@ implements  CommonInputSocketFactory<AE>,
         } else { // !isRoot(entryName)
             switch (type) {
                 case FILE:
-                    newOutputSocket(path, options)
-                            .newOutputStream()
-                            .close();
+                    newOutputSocket(path, options).newOutputStream().close();
                     break;
 
                 case DIRECTORY:

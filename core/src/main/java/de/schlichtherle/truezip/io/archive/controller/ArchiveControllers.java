@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.Pointer;
-import de.schlichtherle.truezip.util.Pointer.Type;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -51,7 +50,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.util.Pointer.Type.STRONG;
+import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -151,18 +150,18 @@ public class ArchiveControllers {
                             new LockingArchiveController<AE>(model,
                                 new UpdatingArchiveController<AE>(model))));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                                (Pointer) Type.WEAK.newPointer(controller));
+                                (Pointer) WEAK.newPointer(controller));
             return controller;
         }
     }
 
     /**
-     * Schedules the archive controller for the given mount point for
-     * synchronization strongly or weakly.
+     * Schedules the given archive controller for synchronization according to
+     * the given Pointer Type.
      */
     static void scheduleSync(
             final ArchiveController<?> controller,
-            final Type type) {
+            final Pointer.Type type) {
         synchronized (controllers) {
             controllers.put(
                     controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
