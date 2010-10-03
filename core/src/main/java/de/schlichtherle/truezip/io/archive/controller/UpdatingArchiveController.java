@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
 import java.util.Collections;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -80,7 +80,7 @@ extends FileSystemArchiveController<AE> {
      */
     static final String TEMP_FILE_SUFFIX = ".tmp";
 
-    private static class DummyInputService<CE extends CommonEntry>
+    private static final class DummyInputService<CE extends CommonEntry>
     implements CommonInputShop<CE> {
 
         @Override
@@ -111,39 +111,27 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    /**
-     * This member class makes an archive controller object strongly reachable
-     * from any input stream created by instances of this class.
-     * This is required in order to ensure that for any prospective archive
-     * file at most one archive controller object exists at any time.
-     *
-     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
-     */
-    private final class Input extends ConcurrentInputShop<AE> {
-        Input(CommonInputShop<AE> input) {
+    private static final class Input<CE extends CommonEntry>
+    extends ConcurrentInputShop<CE> {
+        Input(CommonInputShop<CE> input) {
             super(input);
         }
 
-        CommonInputShop<AE> getTarget() {
-            return (CommonInputShop<AE>) target;
+        /** Returns the product of the archive driver this input is wrapping. */
+        CommonInputShop<CE> getDriverProduct() {
+            return target;
         }
     }
 
-    /**
-     * This member class makes an archive controller object strongly reachable
-     * from any output stream created by instances of this class.
-     * This is required in order to ensure that for any prospective archive
-     * file at most one archive controller object exists at any time.
-     *
-     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
-     */
-    private final class Output extends ConcurrentOutputShop<AE> {
-        Output(CommonOutputShop<AE> output) {
+    private static final class Output<CE extends CommonEntry>
+    extends ConcurrentOutputShop<CE> {
+        Output(CommonOutputShop<CE> output) {
             super(output);
         }
 
-        CommonOutputShop<AE> getTarget() {
-            return (CommonOutputShop<AE>) target;
+        /** Returns the product of the archive driver this output is wrapping. */
+        CommonOutputShop<CE> getDriverProduct() {
+            return target;
         }
     }
 
@@ -170,7 +158,7 @@ extends FileSystemArchiveController<AE> {
      * An {@link Input} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private Input input;
+    private Input<AE> input;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -182,7 +170,7 @@ extends FileSystemArchiveController<AE> {
      * The (possibly temporary) {@link Output} we are writing newly
      * created or modified entries to.
      */
-    private Output output;
+    private Output<AE> output;
 
     /**
      * Whether or not updating the archive entry in the enclosing archive file
@@ -192,18 +180,6 @@ extends FileSystemArchiveController<AE> {
 
     UpdatingArchiveController(ArchiveModel<AE> model) {
         super(model);
-    }
-
-    /**
-     * Returns the wrapped archive input or {@code null} if and only if
-     * {@code proxy} is {@code null}.
-     */
-    private CommonInputShop<AE> getNullableInputTarget() {
-        return null == input ? null : input.getTarget();
-    }
-
-    private CommonInputShop<AE> getNonNullInputTarget() {
-        return null == input ? new DummyInputService<AE>() : input.getTarget();
     }
 
     private ArchiveFileSystem newArchiveFileSystem()
@@ -216,7 +192,7 @@ extends FileSystemArchiveController<AE> {
             CommonEntry rootTemplate,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
-                input.getTarget(), getDriver(),
+                input.getDriverProduct(), getDriver(),
                 rootTemplate, vetoableTouchListener, readOnly);
     }
 
@@ -454,7 +430,8 @@ extends FileSystemArchiveController<AE> {
                             : rof;
                 }
             }
-            input = new Input(getDriver().newInputShop(this, new InputSocket()));
+            input = new Input<AE>(
+                    getDriver().newInputShop(this, new InputSocket()));
         } catch (IOException ex) {
             assert input == null;
 
@@ -517,9 +494,11 @@ extends FileSystemArchiveController<AE> {
 
         try {
             final FileEntry entry = new FileEntry(outFile);
-            final CommonOutputSocket<FileEntry> fileInput
-                    = FileIOProvider.get().newOutputSocket(entry);
-            class OutputSocket extends CommonOutputSocket<FileEntry> {
+            class OutputSocket extends FilterOutputSocket<FileEntry> {
+                OutputSocket() throws IOException {
+                    super(FileIOProvider.get().newOutputSocket(entry));
+                }
+
                 @Override
                 public FileEntry getTarget() {
                     return entry;
@@ -527,16 +506,17 @@ extends FileSystemArchiveController<AE> {
 
                 @Override
                 public OutputStream newOutputStream() throws IOException {
-                    final OutputStream out = fileInput.newOutputStream();
+                    final OutputStream out = super.newOutputStream();
                     return outFile == UpdatingArchiveController.this.getTarget()
                             ? new CountingOutputStream(out)
                             : out;
                 }
-            }
+            } // class OutputSocket
             try {
                 try {
-                    output = new Output(getDriver().newOutputShop(
-                                this, new OutputSocket(), getNullableInputTarget()));
+                    output = new Output<AE>(getDriver().newOutputShop(
+                                this, new OutputSocket(),
+                                null == input ? null : input.getDriverProduct()));
                 } catch (TransientIOException ex) {
                     // Currently we do not have any use for this wrapper exception
                     // when creating output archives, so we unwrap the transient
@@ -809,7 +789,10 @@ extends FileSystemArchiveController<AE> {
     private <E extends Exception>
     void copy(final ExceptionHandler<IOException, E> handler)
     throws E {
-        getFileSystem().copy(getNonNullInputTarget(), output.getTarget(), handler);
+        getFileSystem().copy(
+                null == input ? new DummyInputService<AE>() : input.getDriverProduct(),
+                output.getDriverProduct(),
+                handler);
     }
 
     /**

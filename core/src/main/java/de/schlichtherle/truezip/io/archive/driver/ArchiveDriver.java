@@ -22,14 +22,10 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import javax.swing.Icon;
 
@@ -100,9 +96,9 @@ extends CommonEntryFactory<AE> {
      * @param  source the nullable {@link CommonInputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputShop} method.
-     *         This may be used to copy some meta data which is specific to
-     *         the type of archive this driver supports.
+     *         of this driver's {@link #newInputShop} method, which may be
+     *         used to copy some meta data which is specific to the type of
+     *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
      * @return A non-{@code null} reference to a new output archive object.
