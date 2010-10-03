@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
@@ -121,7 +120,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
 
         File.setLenient(true); // Restore default
         File.umount();
-        Thread.interrupted();
     }
 
     @Override
@@ -167,17 +165,14 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         InputStream in = new FileInputStream(path);
         Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
         System.gc();
-        Thread.sleep(100);
         assertNotNull(ref.get());
         in.close();
         System.gc();
-        Thread.sleep(100);
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         in = null; // leaves file!
         File.umount();
         System.gc();
-        Thread.sleep(100);
         assertNull(ref.get());
     }
 
@@ -190,17 +185,14 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         OutputStream out = new FileOutputStream(path);
         Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
         System.gc();
-        Thread.sleep(100);
         assertNotNull(ref.get());
         out.close();
         out = null; // leaves file!
         System.gc();
-        Thread.sleep(100);
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         File.umount();
         System.gc();
-        Thread.sleep(100);
         assertNull(ref.get());
     }
 
