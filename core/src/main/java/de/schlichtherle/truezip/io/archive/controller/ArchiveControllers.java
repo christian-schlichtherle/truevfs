@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.Pointer;
+import de.schlichtherle.truezip.util.Pointer.Type;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -50,6 +51,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
+import static de.schlichtherle.truezip.util.Pointer.Type.STRONG;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
 
@@ -68,31 +70,6 @@ public class ArchiveControllers {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
-
-    private interface Pointer<T> {
-        T get();
-    }
-
-    private static class StrongPointer<T>
-    implements Pointer<T> {
-        final T target;
-
-        StrongPointer(final T target) {
-            this.target = target;
-        }
-
-        public T get() {
-            return target;
-        }
-    }
-
-    private static class WeakPointer<T>
-    extends WeakReference<T>
-    implements Pointer<T> {
-        WeakPointer(T target) {
-            super(target);
-        }
-    }
 
     /**
      * The map of all archive controllers.
@@ -174,7 +151,7 @@ public class ArchiveControllers {
                             new LockingArchiveController<AE>(model,
                                 new UpdatingArchiveController<AE>(model))));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                                new WeakPointer<ArchiveController<?>>(controller));
+                                (Pointer) Type.WEAK.newPointer(controller));
             return controller;
         }
     }
@@ -183,20 +160,29 @@ public class ArchiveControllers {
      * Schedules the archive controller for the given mount point for
      * synchronization strongly or weakly.
      */
-    static void scheduleSync(final URI mountPoint, final boolean unconditionally) {
+    static void scheduleSync(
+            final URI mountPoint,
+            final boolean upgrade,
+            final Type type) {
         synchronized (controllers) {
             Pointer<ArchiveController<?>> pointer = controllers.get(mountPoint);
             if (null == pointer) {
-                if (unconditionally)
+                assert false;
+                if (STRONG == type)
                     throw new IllegalStateException();
                 return;
             }
-            final ArchiveController controller = pointer.get();
+            if (upgrade) {
+                if (type.ordinal() <= pointer.getType().ordinal())
+                    return;
+            } else {
+                if (type.ordinal() >= pointer.getType().ordinal())
+                    return;
+            }
+            final ArchiveController<?> controller = pointer.get();
             controllers.put(
                     controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                    unconditionally
-                        ? new StrongPointer<ArchiveController<?>>(controller)
-                        : new WeakPointer<ArchiveController<?>>(controller));
+                    (Pointer) type.newPointer(controller));
         }
     }
 

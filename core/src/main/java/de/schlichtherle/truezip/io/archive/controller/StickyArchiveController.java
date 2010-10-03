@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.Pointer;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -26,6 +27,9 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
+import static de.schlichtherle.truezip.util.Pointer.Type.SOFT;
+import static de.schlichtherle.truezip.util.Pointer.Type.STRONG;
+import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
 
 /**
  * @author Christian Schlichtherle
@@ -40,12 +44,12 @@ extends FilterArchiveController<AE> {
         super(model, controller);
     }
 
-    private void stick() {
-        ArchiveControllers.scheduleSync(getMountPoint(), true);
+    private void upgradeTo(Pointer.Type type) {
+        ArchiveControllers.scheduleSync(getMountPoint(), true, type);
     }
 
-    private void unstick() {
-        ArchiveControllers.scheduleSync(getMountPoint(), false);
+    private void downgradeTo(Pointer.Type type) {
+        ArchiveControllers.scheduleSync(getMountPoint(), false, type);
     }
 
     @Override
@@ -82,14 +86,14 @@ extends FilterArchiveController<AE> {
     public void setReadOnly(String path)
     throws IOException {
         controller.setReadOnly(path);
-        stick();
+        upgradeTo(STRONG);
     }
 
     @Override
     public Entry<?> getEntry(String path)
     throws FalsePositiveEntryException {
         Entry<?> entry = controller.getEntry(path);
-        stick();
+        upgradeTo(STRONG);
         return entry;
     }
 
@@ -97,14 +101,14 @@ extends FilterArchiveController<AE> {
     public void setTime(String path, BitField types, long value)
     throws IOException {
         controller.setTime(path, types, value);
-        stick();
+        upgradeTo(STRONG);
     }
 
     @Override
     public CommonInputSocket<?> newInputSocket(String path)
     throws IOException {
         CommonInputSocket<?> input = controller.newInputSocket(path);
-        stick(); // FIXME: Make this redundant!
+        upgradeTo(SOFT); // FIXME: Make this redundant!
         return input;
     }
 
@@ -112,7 +116,7 @@ extends FilterArchiveController<AE> {
     public CommonOutputSocket<?> newOutputSocket(String path, BitField options)
     throws IOException {
         CommonOutputSocket<?> output = controller.newOutputSocket(path, options);
-        stick();
+        upgradeTo(STRONG);
         return output;
     }
 
@@ -121,14 +125,14 @@ extends FilterArchiveController<AE> {
                         BitField options)
     throws IOException {
         controller.mknod(path, type, template, options);
-        stick();
+        upgradeTo(STRONG);
     }
 
     @Override
     public void unlink(String path, BitField options)
     throws IOException {
         controller.unlink(path, options);
-        stick();
+        upgradeTo(STRONG);
     }
 
     @Override
@@ -136,6 +140,6 @@ extends FilterArchiveController<AE> {
     throws ArchiveSyncException {
         controller.sync(builder, options);
         if (options.get(REASSEMBLE))
-            unstick();
+            downgradeTo(WEAK);
     }
 }

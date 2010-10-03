@@ -627,7 +627,7 @@ extends FileSystemArchiveController<AE> {
         try {
             if (options.get(ABORT_CHANGES)) {
                 try {
-                    shutdownStep1(builder); // FIXME: Commenting this out causes some unit tests to fail, but only if ALL of them are running - why?
+                    shutdownStep1(builder);
                 } finally {
                     shutdownStep2(builder);
                 }
