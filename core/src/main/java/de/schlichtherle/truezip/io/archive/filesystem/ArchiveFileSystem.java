@@ -23,11 +23,7 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.input.CommonInputService;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.IOException;
 
 /**
  * A virtual file system for archive entries.
@@ -142,10 +138,4 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
 
     void setReadOnly(String path)
     throws ArchiveFileSystemException;
-
-    public <E extends Exception> void copy(
-            CommonInputService<AE> input,
-            CommonOutputService<AE> output,
-            ExceptionHandler<? super IOException, E> handler)
-    throws E;
 }
