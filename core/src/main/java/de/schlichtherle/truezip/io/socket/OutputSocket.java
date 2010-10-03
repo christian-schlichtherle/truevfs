@@ -24,25 +24,39 @@ import java.io.OutputStream;
  * An output socket can also get {@link #connect connected} to a
  * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
  *
- * @param   <LT> The type of the {@link #getTarget local target} for I/O
+ * @param   <LT> the type of the {@link #getTarget local target} for I/O
  *          operations.
- * @param   <PT> The type of the {@link #getPeerTarget peer target} for I/O
+ * @param   <PT> the type of the {@link #getPeerTarget peer target} for I/O
  *          operations.
+ * @param   <OS> a subclass of this class to which {@code this} is cast upon
+ *          return from the methods {@link #chain} and {@link #connect}.
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
+public abstract class OutputSocket<LT, PT, OS extends OutputSocket<LT, PT, OS>>
+extends IOSocket<LT> {
 
-    private InputSocket<? extends PT, ? super LT> peer;
+    private InputSocket<? extends PT, ? super LT, ?> peer;
 
-    public OutputSocket<LT, PT> chain(OutputSocket<? super LT, ? extends PT> from) {
-        chain0(from.peer);
-        return this;
+    /**
+     * Makes this output socket sharing the peering with the given output
+     * socket.
+     *
+     * @param  with the non-{@code null} output socket which has a peering to
+     *         share.
+     * @throws NullPointerException if {@code with} is {@code null}.
+     * @return This output socket, cast to {@code OS}.
+     * @see    #beforePeering
+     * @see    #afterPeering
+     */
+    public final OS chain(OutputSocket<? super LT, ? extends PT, ?> with) {
+        chain0(with.peer);
+        return (OS) this;
     }
 
-    private void chain0(final InputSocket<? extends PT, ? super LT> newPeer) {
-        final InputSocket<? extends PT, ? super LT> oldPeer = peer;
+    private void chain0(final InputSocket<? extends PT, ? super LT, ?> newPeer) {
+        final InputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
             try {
@@ -55,14 +69,21 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         }
     }
 
-    public OutputSocket<LT, PT> connect(
-            final InputSocket<? extends PT, ? super LT> newPeer) {
-        connect0(newPeer);
-        return this;
+    /**
+     * Connects this output socket to the given input socket.
+     *
+     * @param  peer the nullable input socket to connect to.
+     * @return This output socket, cast to {@code OS}.
+     * @see    #beforePeering
+     * @see    #afterPeering
+     */
+    public final OS connect(InputSocket<? extends PT, ? super LT, ?> peer) {
+        connect0(peer);
+        return (OS) this;
     }
 
-    void connect0(final InputSocket<? extends PT, ? super LT> newPeer) {
-        final InputSocket<? extends PT, ? super LT> oldPeer = peer;
+    void connect0(final InputSocket<? extends PT, ? super LT, ?> newPeer) {
+        final InputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
                 peer = null;
@@ -82,9 +103,17 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         }
     }
 
+    /**
+     * Called by {@link #chain} and {@link #connect} after a peering has been
+     * initiated, but before it has been completed.
+     */
     protected void beforePeering() {
     }
 
+    /**
+     * Called by {@link #chain} and {@link #connect} after a peering has been
+     * completed.
+     */
     protected void afterPeering() {
     }
 
@@ -92,12 +121,8 @@ public abstract class OutputSocket<LT, PT> extends IOSocket<LT> {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
-    protected final InputSocket<? extends PT, ? super LT> getPeer() {
-        return peer;
-    }
-
     /**
-     * Returns the nullable <i>peer target</i> for I/O operations.
+     * Returns the <i>peer target</i> for I/O operations.
      * <p>
      * The result of changing the state of the peer target is undefined.
      * In particular, a subsequent I/O operation may not reflect the change

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 
 /**
  * Indicates that an archive file could not get updated because some input or

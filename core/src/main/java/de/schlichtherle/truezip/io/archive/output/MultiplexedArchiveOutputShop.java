@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package de.schlichtherle.truezip.io.archive.driver;
+package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
@@ -31,6 +30,7 @@ import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**

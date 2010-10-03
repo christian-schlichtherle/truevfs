@@ -30,35 +30,16 @@ import java.io.OutputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the {@link #getTarget() local target} common entry.
+ * @param   <CE> the type of the {@link #getTarget() local target} common entry.
  * @see     CommonInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class CommonOutputSocket<CE extends CommonEntry>
-extends OutputSocket<CE, CommonEntry> {
-
-    @Override
-    public CommonOutputSocket<CE> chain(OutputSocket<? super CE, ? extends CommonEntry> from) {
-        super.chain(from);
-        return this;
-    }
-
-    @Override
-    public CommonOutputSocket<CE> connect(
-            InputSocket<? extends CommonEntry, ? super CE> newPeer) {
-        super.connect(newPeer);
-        return this;
-    }
+extends OutputSocket<CE, CommonEntry, CommonOutputSocket<CE>> {
 
     /**
-     * Returns the non-{@code null} local target common entry.
-     * <p>
-     * Implementations must reflect any changes to the state of the returned
-     * common entry by the client applications before a call to the method
-     * {@link #newOutputStream()}.
-     * The effect of any subsequent changes to the state of the returned
-     * common entry is undefined.
+     * Returns the non-{@code null} local common entry target.
      *
      * @return The non-{@code null} local common entry target.
      */

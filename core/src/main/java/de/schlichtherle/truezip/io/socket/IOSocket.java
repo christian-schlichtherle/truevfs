@@ -24,7 +24,7 @@ import java.io.OutputStream;
 /**
  * References a target for I/O operations.
  *
- * @param   <LT> The type of the {@link #getTarget() local target} for I/O
+ * @param   <LT> the type of the {@link #getTarget() local target} for I/O
  *          operations.
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -63,16 +63,10 @@ public abstract class IOSocket<LT> implements IOReference<LT> {
      *         {@code IOException} thrown by the <em>output</em> stream.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static <T> void copy(
-            final InputSocket <? extends T, T> input,
-            final OutputSocket<? extends T, T> output)
+    public static <T> void copy(final InputSocket <? extends T, T, ?> input,
+                                final OutputSocket<? extends T, T, ?> output)
     throws IOException {
-        final InputStream in;
-        //try {
-            in = input.connect(output).newInputStream();
-        /*} catch (IOException ex) {
-            throw new InputException(ex); // DONT WRAP THE CAUSE: would break false positive archive file detection!
-        }*/
+        final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
         try {
             out = output.connect(input).newOutputStream();

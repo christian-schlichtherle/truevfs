@@ -16,10 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;

@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;

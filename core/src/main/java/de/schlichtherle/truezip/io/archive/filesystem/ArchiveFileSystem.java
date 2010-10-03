@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;

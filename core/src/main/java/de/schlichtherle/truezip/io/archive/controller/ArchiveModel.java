@@ -18,14 +18,14 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.File;
 import java.net.URI;
 
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 

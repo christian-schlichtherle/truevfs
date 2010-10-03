@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;

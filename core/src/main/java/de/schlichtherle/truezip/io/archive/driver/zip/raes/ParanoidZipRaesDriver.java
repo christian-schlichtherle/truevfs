@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;

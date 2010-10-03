@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.schlichtherle.truezip.io.archive.statistics;
 
-package de.schlichtherle.truezip.io.archive.controller;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 
 /**
- * A proxy interface which encapsulates statistics about the total set of
- * archives accessed by this package.
+ * Provides statistics about the total set of archive files accessed.
  * Client applications should never implement this interface because (a)
  * there is no need to and (b) it may get extended over time.
  *

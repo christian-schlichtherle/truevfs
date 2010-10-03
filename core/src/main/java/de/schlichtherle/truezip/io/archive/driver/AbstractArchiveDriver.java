@@ -16,7 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
 import java.io.CharConversionException;

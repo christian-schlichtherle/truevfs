@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 
 /**
  * Like its super class, but indicates the existance of open output streams.

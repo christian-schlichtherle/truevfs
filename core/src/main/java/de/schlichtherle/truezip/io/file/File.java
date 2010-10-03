@@ -27,12 +27,12 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
+import de.schlichtherle.truezip.io.archive.statistics.ArchiveStatistics;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import java.io.FileFilter;
@@ -59,7 +59,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.driver.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
@@ -1386,7 +1386,7 @@ public class File extends java.io.File {
      * This delay increases if the system is under heavy load.
      */
     public static ArchiveStatistics getLiveArchiveStatistics() {
-        return ArchiveControllers.getLiveStatistics();
+        return ArchiveControllers.getStatistics();
     }
 
     /**
