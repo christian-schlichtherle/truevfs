@@ -35,15 +35,17 @@ import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
  * @version $Id$
  */
 final class StickyArchiveController<AE extends ArchiveEntry>
-extends FilterArchiveController<AE> {
+extends ArchiveController<AE> {
 
+    private final ArchiveController<AE> controller;
     private ArchiveController<AE> cachedHead;
     private Pointer.Type oldGrade;
 
     StickyArchiveController(
             ArchiveModel<AE> model,
             ArchiveController<AE> controller) {
-        super(model, controller);
+        super(model);
+        this.controller = controller;
     }
 
     private void upgradeTo(Pointer.Type grade) {

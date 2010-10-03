@@ -132,15 +132,13 @@ public class ArchiveControllers {
                 return null;
             // TODO: Refactor this to a more flexible design which supports
             // different sync strategies, like update or append.
-            final ArchiveModel model = new ArchiveModel<AE>(
-                    mountPoint,
-                    null == enclController ? null : enclController.getModel(),
-                    driver);
+            final ArchiveModel model = new ArchiveModel<AE>(mountPoint, driver,
+                    null == enclController ? null : enclController.getModel());
             final ArchiveController controller
-                    = new ProspectiveArchiveController<AE>(model,
-                        new StickyArchiveController<AE>(model,
-                            new LockingArchiveController<AE>(model,
-                                new UpdatingArchiveController<AE>(model))));
+                    = new ProspectiveArchiveController<AE>(         model,
+                        new StickyArchiveController<AE>(            model,
+                            new LockingArchiveController<AE>(       model,
+                                new UpdatingArchiveController<AE>(  model))));
             controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
                                 (Pointer) WEAK.newPointer(controller));
             return controller;
