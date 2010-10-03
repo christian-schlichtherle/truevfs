@@ -37,7 +37,7 @@ import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
 final class StickyArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
-    private ArchiveController<AE> head;
+    private ArchiveController<AE> cachedHead;
     private Pointer.Type oldGrade;
 
     StickyArchiveController(
@@ -55,8 +55,8 @@ extends FilterArchiveController<AE> {
     }
 
     private void schedule(final boolean upgrade, final Pointer.Type newGrade) {
-        if (null == head) {
-            head = ArchiveControllers.getController(getMountPoint());
+        if (null == cachedHead) {
+            cachedHead = ArchiveControllers.getController(getMountPoint());
         } else {
             if (upgrade) {
                 if (oldGrade.ordinal() >= newGrade.ordinal())
@@ -66,7 +66,7 @@ extends FilterArchiveController<AE> {
                     return;
             }
         }
-        ArchiveControllers.scheduleSync(head, oldGrade = newGrade);
+        ArchiveControllers.scheduleSync(cachedHead, oldGrade = newGrade);
     }
 
     @Override
@@ -153,7 +153,8 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
+    public void sync(   ArchiveSyncExceptionBuilder builder,
+                        BitField<SyncOption> options)
     throws ArchiveSyncException {
         controller.sync(builder, options);
         if (options.get(REASSEMBLE))
