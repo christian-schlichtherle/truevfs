@@ -507,20 +507,21 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    @Override
-    public boolean hasNewData(final String path) {
-        if (output == null)
+    private boolean isTouched() {
+        final ArchiveFileSystem fileSystem = getFileSystem();
+        return null != fileSystem && fileSystem.isTouched();
+    }
+
+    boolean autoSync(String path) throws ArchiveSyncException {
+        if (null == output)
             return false;
         final Entry entry = getFileSystem().getEntry(path);
-        return entry != null && output.getEntry(entry.getName()) != null;
-    }
-
-    final int waitCloseOtherInputs(long timeout) {
-        return null == input ? 0 : input.waitCloseOthers(timeout);
-    }
-
-    final int waitCloseOtherOutputs(long timeout) {
-        return null == output ? 0 : output.waitCloseOthers(timeout);
+        if (null == entry || null == output.getEntry(entry.getName()))
+            return false;
+        ensureWriteLockedByCurrentThread();
+        sync(   new DefaultArchiveSyncExceptionBuilder(),
+                BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
+        return true;
     }
 
     public void sync(   final ArchiveSyncExceptionBuilder builder,

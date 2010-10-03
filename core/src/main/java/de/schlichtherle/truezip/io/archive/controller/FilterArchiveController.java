@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 
 /**
@@ -40,10 +39,5 @@ extends ArchiveController<AE> {
     final ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException {
         return controller.autoMount(autoCreate, createParents);
-    }
-
-    @Override
-    final boolean hasNewData(String path) {
-        return controller.hasNewData(path);
     }
 }

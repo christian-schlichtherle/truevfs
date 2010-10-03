@@ -28,7 +28,6 @@ import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import javax.swing.Icon;
@@ -73,10 +72,6 @@ implements ArchiveDescriptor {
     ArchiveController(final ArchiveModel<AE> model) {
         assert model != null;
         this.model = model;
-    }
-
-    final void ensureWriteLockedByCurrentThread() {
-        getModel().ensureWriteLockedByCurrentThread();
     }
 
     final ArchiveModel<AE> getModel() {
@@ -148,43 +143,6 @@ implements ArchiveDescriptor {
      */
     abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException;
-
-    /**
-     * Synchronizes the archive file only if the archive file has already new
-     * data for the file system entry with the given path name.
-     * <p>
-     * <b>Warning:</b> As a side effect, all data structures returned by this
-     * controller get reset (filesystem, entries, streams, etc.)!
-     * As an implication, this method requires external synchronization on
-     * this controller's write lock!
-     * <p>
-     * <b>TODO:</b> Consider adding configuration switch to allow overwriting
-     * an archive entry to the same output archive multiple times, whereby
-     * only the last written entry would be added to the central directory
-     * of the archive (unless the archive type doesn't support this).
-     *
-     * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
-     * @throws ArchiveSyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
-     */
-    final void autoSync(final String path)
-    throws ArchiveSyncException {
-        if (hasNewData(path)) {
-            ensureWriteLockedByCurrentThread();
-            sync(   new DefaultArchiveSyncExceptionBuilder(),
-                    BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
-        }
-    }
-
-    /**
-     * Tests if the file system entry with the given path name has received or
-     * is currently receiving new data via an output stream.
-     * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #sync}.
-     * Note that for directories this method will always return
-     * {@code false}!
-     */
-    abstract boolean hasNewData(String path);
 
     /**
      * Defines the available options for archive file system operations.
@@ -313,19 +271,26 @@ implements ArchiveDescriptor {
         REASSEMBLE,
     }
 
-    public abstract Icon getOpenIcon() throws FalsePositiveEntryException;
+    public abstract Icon getOpenIcon()
+    throws FalsePositiveEntryException;
 
-    public abstract Icon getClosedIcon() throws FalsePositiveEntryException;
+    public abstract Icon getClosedIcon()
+    throws FalsePositiveEntryException;
 
-    public abstract boolean isReadOnly() throws FalsePositiveEntryException;
+    public abstract boolean isReadOnly()
+    throws FalsePositiveEntryException;
 
-    public abstract Entry<?> getEntry(String path) throws FalsePositiveEntryException;
+    public abstract Entry<?> getEntry(String path)
+    throws FalsePositiveEntryException;
 
-    public abstract boolean isReadable(String path) throws FalsePositiveEntryException;
+    public abstract boolean isReadable(String path)
+    throws FalsePositiveEntryException;
 
-    public abstract boolean isWritable(String path) throws FalsePositiveEntryException;
+    public abstract boolean isWritable(String path)
+    throws FalsePositiveEntryException;
 
-    public abstract void setReadOnly(String path) throws IOException;
+    public abstract void setReadOnly(String path)
+    throws IOException;
 
     public abstract void setTime(String path, BitField<Access> types, long value)
     throws IOException;
@@ -400,10 +365,9 @@ implements ArchiveDescriptor {
     /**
      * Writes all changes to the contents of the target archive file to the
      * underlying file system.
-     * As a side effect, all data structures returned by this controller get
-     * reset (filesystem, entries, streams etc.)!
-     * This method requires external synchronization on this controller's write
-     * lock!
+     * As a side effect,
+     * all data structures get reset (filesystem, entries, streams etc.)!
+     * This method requires synchronization on the write lock!
      *
      * @param  options The non-{@code null} options for processing.
      * @throws NullPointerException if {@code options} or {@code builder} is

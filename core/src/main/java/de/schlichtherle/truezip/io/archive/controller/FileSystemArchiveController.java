@@ -41,9 +41,8 @@ extends BasicArchiveController<AE> {
         super(model);
     }
 
-    final boolean isTouched() {
-        final ArchiveFileSystem fileSystem = getFileSystem();
-        return null != fileSystem && fileSystem.isTouched();
+    final void ensureWriteLockedByCurrentThread() {
+        getModel().ensureWriteLockedByCurrentThread();
     }
 
     @Override

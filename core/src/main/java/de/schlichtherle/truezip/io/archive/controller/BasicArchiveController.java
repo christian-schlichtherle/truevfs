@@ -287,10 +287,8 @@ implements     CommonInputSocketFactory <AE                     >,
             EntryOperation<AE> link;
 
             AE getEntry() throws IOException {
-                if (hasNewData(path)) {
+                if (autoSync(path))
                     link = null;
-                    autoSync(path);
-                }
                 if (null == link) {
                     try {
                         final CommonEntry template = options.get(PRESERVE)
@@ -379,6 +377,16 @@ implements     CommonInputSocketFactory <AE                     >,
             return new OutputSocket();
         }
     }
+
+    /**
+     * Tests if the file system entry with the given path name has received or
+     * is currently receiving new data via an output stream.
+     * As an implication, the entry cannot receive new data from another
+     * output stream before the next call to {@link #sync}.
+     * Note that for directories this method will always return
+     * {@code false}!
+     */
+    //abstract boolean hasNewData(String path);
 
     @Override
     public abstract CommonOutputSocket<AE> newOutputSocket(AE target)
@@ -489,8 +497,23 @@ implements     CommonInputSocketFactory <AE                     >,
     final boolean isHostFileSystemEntryTarget() {
         // True iff not enclosed or the enclosing archive file is actually
         // a plain directory.
-        final ArchiveModel enclModel = getModel().getEnclModel();
-        return null == enclModel
-                || enclModel.getTarget().isDirectory();
+        ArchiveModel enclModel = getModel().getEnclModel();
+        return null == enclModel || enclModel.getTarget().isDirectory();
     }
+
+    /**
+     * Synchronizes the archive file only if the archive file has new data for
+     * the file system entry with the given path name.
+     * <p>
+     * <b>Warning:</b> As a side effect,
+     * all data structures may get reset (filesystem, entries, streams, etc.)!
+     * This method may require synchronization on the write lock!
+     *
+     * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
+     * @throws ArchiveSyncException If any exceptional condition occurs
+     *         throughout the synchronization of the target archive file.
+     * @throws NotWriteLockedByCurrentThreadException
+     * @return Whether or not a synchronization has been performed.
+     */
+    abstract boolean autoSync(String path) throws ArchiveSyncException;
 }
