@@ -156,7 +156,7 @@ extends FileSystemArchiveController<AE> {
      * Note that this will be set to a tempory file if the archive file is
      * enclosed within another archive file.
      */
-    private java.io.File inFile;
+    private FileEntry inFile;
 
     /**
      * An {@link Input} object used to mount the virtual file system
@@ -168,7 +168,7 @@ extends FileSystemArchiveController<AE> {
      * Plain {@code java.io.File} object used for temporary output.
      * Maybe identical to {@code inFile}.
      */
-    private java.io.File outFile;
+    private FileEntry outFile;
 
     /**
      * The (possibly temporary) {@link Output} we are writing newly
@@ -184,6 +184,10 @@ extends FileSystemArchiveController<AE> {
 
     UpdatingArchiveController(ArchiveModel<AE> model) {
         super(model);
+    }
+
+    private FileEntry getTarget() {
+        return getModel().getTarget();
     }
 
     private ArchiveFileSystem newArchiveFileSystem()
@@ -335,8 +339,8 @@ extends FileSystemArchiveController<AE> {
             // This archive file DOES exist in the enclosing archive.
             // The input file is only temporarily used for the
             // archive file entry.
-            final java.io.File tmp = createTempFile(
-                    TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+            final FileEntry tmp = new FileEntry(createTempFile(
+                    TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX));
             // We do properly delete our temps, so this is not required.
             // In addition, this would be dangerous as the deletion
             // could happen before our shutdown hook has a chance to
@@ -448,13 +452,13 @@ extends FileSystemArchiveController<AE> {
         if (null != output)
             return;
 
-        java.io.File tmp = outFile;
+        FileEntry tmp = outFile;
         if (tmp == null) {
             if (isHostFileSystemEntryTarget() && !getTarget().isFile()) {
                 tmp = getTarget();
             } else {
                 // Use a new temporary file as the output archive file.
-                tmp = createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+                tmp = new FileEntry(createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX));
                 // We do properly delete our temps, so this is not required.
                 // In addition, this would be dangerous as the deletion
                 // could happen before our shutdown hook has a chance to
@@ -504,7 +508,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    public boolean hasNewData(String path) {
+    public boolean hasNewData(final String path) {
         if (output == null)
             return false;
         final Entry entry = getFileSystem().getEntry(path);
@@ -989,7 +993,7 @@ extends FileSystemArchiveController<AE> {
         }
 
         if (outFile != null) {
-            final java.io.File file = outFile;
+            final FileEntry file = outFile;
             outFile = null;
             if (deleteOutFile) {
                 if (file != getTarget()) {
