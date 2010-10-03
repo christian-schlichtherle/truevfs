@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.io.File;
 import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
 import java.util.Collections;
@@ -242,7 +243,7 @@ extends FileSystemArchiveController<AE> {
                 // the device file!
                 final boolean isReadOnly = !isWritableOrCreatable(inFile);
                 try {
-                    initInArchive(inFile);
+                    input = newInput(inFile);
                 } catch (IOException ex) {
                     // Wrap cause so that a matching catch block can assume
                     // that it can access the target in the real file system.
@@ -275,7 +276,7 @@ extends FileSystemArchiveController<AE> {
                 // of searching for the right enclosing archive controller
                 // to extract the entry which is our target archive file.
                 try {
-                    initInArchive(inFile);
+                    input = newInput(inFile);
                 } catch (IOException ex) {
                     // This is very unlikely unless someone has tampered with
                     // the temporary file or this controller is managing an
@@ -346,7 +347,7 @@ extends FileSystemArchiveController<AE> {
                 // Don't keep tmp if this fails: our caller couldn't reproduce
                 // the proper exception on a second try!
                 try {
-                    initInArchive(tmp);
+                    this.input = newInput(tmp);
                 } catch (IOException ex) {
                     throw new FalsePositiveEnclosedFileException(
                             controller, path, ex);
@@ -406,38 +407,21 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    /**
-     * Initializes {@code inArchive} with a newly created
-     * {@link CommonInputShop} for reading {@code inFile}.
-     *
-     * @throws IOException On any I/O related issue with {@code inFile}.
-     */
-    private void initInArchive(final java.io.File inFile)
-    throws IOException {
-        assert input == null;
-
-        try {
-            class InputSocket extends FilterInputSocket<FileEntry> {
-                InputSocket() throws IOException {
-                    super(FileIOProvider.get().newInputSocket(new FileEntry(inFile)));
-                }
-
-                @Override
-                public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    final ReadOnlyFile rof = super.newReadOnlyFile();
-                    return isHostFileSystemEntryTarget()
-                            ? new CountingReadOnlyFile(rof)
-                            : rof;
-                }
+    private Input<AE> newInput(final File file) throws IOException {
+        class InputSocket extends FilterInputSocket<FileEntry> {
+            InputSocket() throws IOException {
+                super(FileIOProvider.get().newInputSocket(new FileEntry(file)));
             }
-            input = new Input<AE>(
-                    getDriver().newInputShop(this, new InputSocket()));
-        } catch (IOException ex) {
-            assert input == null;
 
-            throw ex;
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                final ReadOnlyFile rof = super.newReadOnlyFile();
+                return isHostFileSystemEntryTarget()
+                        ? new CountingReadOnlyFile(rof)
+                        : rof;
+            }
         }
-        assert null != input;
+        return new Input<AE>(getDriver().newInputShop(this, new InputSocket()));
     }
 
     @Override
@@ -476,70 +460,44 @@ extends FileSystemArchiveController<AE> {
             }
         }
 
-        initOutArchive(tmp);
+        output = newOutput(tmp);
         outFile = tmp; // init outFile on success only!
     }
 
-    /**
-     * Initializes {@code outArchive} with a newly created
-     * {@link CommonOutputShop} for writing {@code outFile}.
-     * This method will delete {@code outFile} if it has successfully
-     * opened it for overwriting, but failed to write the archive file header.
-     *
-     * @throws IOException On any I/O related issue with {@code outFile}.
-     */
-    private void initOutArchive(final java.io.File outFile)
-    throws IOException {
-        assert output == null;
-
-        try {
-            final FileEntry entry = new FileEntry(outFile);
-            class OutputSocket extends FilterOutputSocket<FileEntry> {
-                OutputSocket() throws IOException {
-                    super(FileIOProvider.get().newOutputSocket(entry));
-                }
-
-                @Override
-                public FileEntry getTarget() {
-                    return entry;
-                }
-
-                @Override
-                public OutputStream newOutputStream() throws IOException {
-                    final OutputStream out = super.newOutputStream();
-                    return outFile == UpdatingArchiveController.this.getTarget()
-                            ? new CountingOutputStream(out)
-                            : out;
-                }
-            } // class OutputSocket
-            try {
-                try {
-                    output = new Output<AE>(getDriver().newOutputShop(
-                                this, new OutputSocket(),
-                                null == input ? null : input.getDriverProduct()));
-                } catch (TransientIOException ex) {
-                    // Currently we do not have any use for this wrapper exception
-                    // when creating output archives, so we unwrap the transient
-                    // cause here.
-                    throw ex.getCause();
-                }
-            } finally {
-                // An archive driver could throw a NoClassDefFoundError or
-                // similar if the class path is not set up correctly.
-                // We are checking success to make sure that we always delete
-                // the newly created temp file in case of an error.
-                if (output == null) {
-                    if (!outFile.delete())
-                        throw new IOException(outFile.getPath() + " (couldn't delete corrupted output file)");
-                }
+    private Output<AE> newOutput(final File file) throws IOException {
+        class OutputSocket extends FilterOutputSocket<FileEntry> {
+            OutputSocket() throws IOException {
+                super(FileIOProvider.get().newOutputSocket(new FileEntry(file)));
             }
-        } catch (IOException ex) {
-            assert output == null;
 
-            throw ex;
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                final OutputStream out = super.newOutputStream();
+                return file == UpdatingArchiveController.this.getTarget()
+                        ? new CountingOutputStream(out)
+                        : out;
+            }
+        } // class OutputSocket
+        Output output = null;
+        try {
+            return output = new Output<AE>(getDriver().newOutputShop(
+                        this, new OutputSocket(),
+                        null == input ? null : input.getDriverProduct()));
+        } catch (TransientIOException ex) {
+            // Currently we do not have any use for this wrapper exception
+            // when creating output archives, so we unwrap the transient
+            // cause here.
+            throw ex.getCause();
+        } finally {
+            // An archive driver could throw a NoClassDefFoundError or
+            // similar if the class path is not set up correctly.
+            // We are checking success to make sure that we always delete
+            // the newly created temp file in case of an error.
+            if (output == null) {
+                if (!file.delete())
+                    throw new IOException(file.getPath() + " (couldn't delete corrupted output file)");
+            }
         }
-
-        assert output != null;
     }
 
     @Override
