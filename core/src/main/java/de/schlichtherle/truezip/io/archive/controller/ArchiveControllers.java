@@ -229,7 +229,7 @@ public class ArchiveControllers {
                         // Updating the archive file or wrapping it back into
                         // one of it's enclosing archive files resulted in an
                         // exception for some reason.
-                        // We are bullheaded and store the exception chain for
+                        // We are bullheaded and store the exception share for
                         // later throwing only and continue updating the rest.
                         builder.warn(exception);
                     }

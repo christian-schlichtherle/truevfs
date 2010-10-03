@@ -498,8 +498,8 @@ extends FileSystemArchiveController<AE> {
         } finally {
             // An archive driver could throw a NoClassDefFoundError or
             // similar if the class path is not set up correctly.
-            // We are checking success to make sure that we always delete
-            // the newly created temp file in case of an error.
+            // We are checking success to make sure that we delete the newly
+            // created temp file in case of ANY throwable.
             if (output == null) {
                 if (!file.delete())
                     throw new IOException(file.getPath() + " (couldn't delete corrupted output file)");

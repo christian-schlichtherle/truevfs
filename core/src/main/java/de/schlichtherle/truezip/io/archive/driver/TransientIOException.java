@@ -45,19 +45,15 @@ public final class TransientIOException
 extends IOException {
 
     /**
-     * @param cause The transient cause of this exception.
-     * @throws NullPointerException If {@code cause} is {@code null}.
+     * Constructs a new transient I/O exception.
+     *
+     * @param cause The nullable transient cause of this exception.
      */
     public TransientIOException(IOException cause) {
-        if (cause == null)
-            throw new NullPointerException();
         super.initCause(cause);
     }
 
-    /**
-     * Returns the transient cause of this exception as an
-     * {@code IOException} - {@code null} is never returned.
-     */
+    /** Returns the nullable transient cause of this exception. */
     @Override
     public IOException getCause() {
         return (IOException) super.getCause();

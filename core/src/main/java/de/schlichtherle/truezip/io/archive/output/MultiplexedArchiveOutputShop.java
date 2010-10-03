@@ -150,7 +150,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
                         ? new TempEntryOutputStream(
                             createTempFile(
                                 TEMP_FILE_PREFIX),
-                                output.chain(this),
+                                output.share(this),
                                 peer)
                         : new EntryOutputStream(super.newOutputStream());
             }

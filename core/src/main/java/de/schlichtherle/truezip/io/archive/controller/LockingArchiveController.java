@@ -248,7 +248,7 @@ extends ArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return input.chain(this).getTarget();
+                    return input.share(this).getTarget();
                 } finally {
                     readLock().unlock();
                 }
@@ -256,7 +256,7 @@ extends ArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.chain(this).getTarget();
+                    return input.share(this).getTarget();
                 } finally {
                     writeLock().unlock();
                 }
@@ -268,7 +268,7 @@ extends ArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return input.chain(this).newInputStream();
+                    return input.share(this).newInputStream();
                 } finally {
                     readLock().unlock();
                 }
@@ -276,7 +276,7 @@ extends ArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.chain(this).newInputStream();
+                    return input.share(this).newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
@@ -288,7 +288,7 @@ extends ArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return input.chain(this).newReadOnlyFile();
+                    return input.share(this).newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
@@ -296,7 +296,7 @@ extends ArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.chain(this).newReadOnlyFile();
+                    return input.share(this).newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
                 }
@@ -331,7 +331,7 @@ extends ArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return output.chain(this).getTarget();
+                return output.share(this).getTarget();
             } finally {
                 writeLock().unlock();
             }
@@ -342,7 +342,7 @@ extends ArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return output.chain(this).newOutputStream();
+                return output.share(this).newOutputStream();
             } finally {
                 writeLock().unlock();
             }

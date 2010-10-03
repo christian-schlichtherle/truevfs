@@ -38,16 +38,16 @@ extends CommonOutputSocket<CE> {
 
     @Override
     public CE getTarget() {
-        return output.chain(this).getTarget();
+        return output.share(this).getTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() {
-        return output.chain(this).getPeerTarget();
+        return output.share(this).getPeerTarget();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return output.chain(this).newOutputStream();
+        return output.share(this).newOutputStream();
     }
 }

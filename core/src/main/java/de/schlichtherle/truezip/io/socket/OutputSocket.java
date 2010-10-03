@@ -29,7 +29,7 @@ import java.io.OutputStream;
  * @param   <PT> the type of the {@link #getPeerTarget peer target} for I/O
  *          operations.
  * @param   <OS> a subclass of this class to which {@code this} is cast upon
- *          return from the methods {@link #chain} and {@link #connect}.
+ *          return from the methods {@link #share} and {@link #connect}.
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -42,6 +42,7 @@ extends IOSocket<LT> {
     /**
      * Makes this output socket sharing the peering with the given output
      * socket.
+     * Note that this method does <em>not</em> change the peer's peer.
      *
      * @param  with the non-{@code null} output socket which has a peering to
      *         share.
@@ -50,7 +51,7 @@ extends IOSocket<LT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final OS chain(OutputSocket<? super LT, ? extends PT, ?> with) {
+    public final OS share(OutputSocket<? super LT, ? extends PT, ?> with) {
         chain0(with.peer);
         return (OS) this;
     }
@@ -71,6 +72,8 @@ extends IOSocket<LT> {
 
     /**
      * Connects this output socket to the given input socket.
+     * Note that this method <em>does</em> change the peer's peer to this
+     * instance.
      *
      * @param  peer the nullable input socket to connect to.
      * @return This output socket, cast to {@code OS}.
@@ -104,14 +107,14 @@ extends IOSocket<LT> {
     }
 
     /**
-     * Called by {@link #chain} and {@link #connect} after a peering has been
+     * Called by {@link #share} and {@link #connect} after a peering has been
      * initiated, but before it has been completed.
      */
     protected void beforePeering() {
     }
 
     /**
-     * Called by {@link #chain} and {@link #connect} after a peering has been
+     * Called by {@link #share} and {@link #connect} after a peering has been
      * completed.
      */
     protected void afterPeering() {
