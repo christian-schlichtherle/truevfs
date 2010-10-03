@@ -24,9 +24,6 @@ import java.io.IOException;
  * Indicates a false positive archive entry which actually exists as a
  * file or directory entry in the host file system or in an enclosing archive
  * file.
- * <p>
- * Instances of this class are always associated with an {@code IOException}
- * as their cause.
  */
 public class FalsePositiveEntryException extends EntryNotFoundException {
 
@@ -46,7 +43,6 @@ public class FalsePositiveEntryException extends EntryNotFoundException {
         // the real transient cause and act accordingly.
         trans = cause instanceof TransientIOException;
     }
-
 
     /**
      * Returns {@code true} if and only if this exception was created with a

@@ -39,21 +39,21 @@ extends CommonInputSocket<CE> {
 
     @Override
     public CE getTarget() {
-        return input.chain(this).getTarget();
+        return input.share(this).getTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() {
-        return input.chain(this).getPeerTarget();
+        return input.share(this).getPeerTarget();
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return input.chain(this).newInputStream();
+        return input.share(this).newInputStream();
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return input.chain(this).newReadOnlyFile();
+        return input.share(this).newReadOnlyFile();
     }
 }

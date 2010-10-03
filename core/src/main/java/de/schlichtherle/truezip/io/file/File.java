@@ -2218,12 +2218,12 @@ public class File extends java.io.File {
         } catch (FalsePositiveEntryException isNotArchive) {
             assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
-            // Fall through!
             // See ArchiveDriver#newInput!
             // FIXME: Check if needed anymore!
             if (isArchive()
                     && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
+            // Fall through!
         }
         return delegate.isFile();
     }
@@ -2631,11 +2631,9 @@ public class File extends java.io.File {
             final FileFactory factory) {
         if (files == null)
             return null; // no directory
-
         File[] results = new File[files.length];
         for (int i = files.length; 0 <= --i; )
             results[i] = factory.createFile(files[i]);
-
         return results;
     }
 
@@ -2829,13 +2827,13 @@ public class File extends java.io.File {
         } catch (FalsePositiveEntryException isNotArchive) {
             assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "Must be handled by ArchiveController!";
-            // Fall through!
             // See ArchiveDriver#newInput!
             // FIXME: Check if needed anymore!
             if (isArchive()
-            && !delegate.isDirectory()
-            && isNotArchive.getCause() instanceof FileNotFoundException)
+                    && !delegate.isDirectory()
+                    && isNotArchive.getCause() instanceof FileNotFoundException)
                 return false;
+            // Fall through!
         } catch (IOException ex) {
             return false;
         }

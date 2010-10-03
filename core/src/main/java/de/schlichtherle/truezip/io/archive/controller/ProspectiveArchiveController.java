@@ -105,6 +105,7 @@ extends ArchiveController<AE> {
                 return new SpecialFileEntry<ArchiveEntry>(getEnclController()
                         .getEntry(getEnclPath(path))
                         .getTarget()); // the exception asserts that the entry exists as a file!
+            // Fall through!
         } catch (FalsePositiveEnclosedEntryException ex) {
         }
         return getEnclController().getEntry(getEnclPath(path));
@@ -227,11 +228,12 @@ extends ArchiveController<AE> {
             // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
                 final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
-                if (null == entry || entry.getType() != DIRECTORY
+                if (null == entry || DIRECTORY != entry.getType() // TODO: Redundant check?
                     && ex.getCause() instanceof FileNotFoundException) {
                     throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
                 }
             }
+            // Fall through!
         } catch (FalsePositiveEnclosedEntryException ex) {
         }
         getEnclController().unlink(getEnclPath(path), options);

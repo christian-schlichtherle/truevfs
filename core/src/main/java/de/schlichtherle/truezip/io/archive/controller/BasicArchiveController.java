@@ -265,7 +265,7 @@ implements     CommonInputSocketFactory <AE                     >,
                     throw new EntryNotFoundException(
                             BasicArchiveController.this, path,
                             "no such file or directory");
-                return input.chain(this);
+                return input.share(this);
             }
 
             @Override
@@ -381,7 +381,7 @@ implements     CommonInputSocketFactory <AE                     >,
                         : null;
                 try {
                     final OutputStream out = output
-                            .chain(null == in ? this : null)
+                            .share(null == in ? this : null)
                             .newOutputStream();
                     try {
                         link.run();
@@ -515,16 +515,11 @@ implements     CommonInputSocketFactory <AE                     >,
             PromptingKeyManager.resetKeyProvider(getMountPoint());
             // Delete the target file or the entry in the enclosing
             // archive file, too.
-            if (isHostFileSystemEntryTarget()) { // FIXME: Don't use this method!
-                // The target file of the controller is NOT enclosed
-                // in another archive file.
-                if (!getModel().getTarget().delete())
-                    throw new IOException("couldn't delete target archive file!");
-            } else {
-                // The target file of the controller IS enclosed in
-                // another archive file.
-                throw new FalsePositiveEnclosedEntryException(this, path, new IOException());
-            }
+            throw isHostFileSystemEntryTarget() // FIXME: Don't use this method!
+                    ? new FalsePositiveEntryException(
+                        this, path, new IOException()) // TODO: Check: TransientIOException?
+                    : new FalsePositiveEnclosedEntryException(
+                        this, path, new IOException()); // dito
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }

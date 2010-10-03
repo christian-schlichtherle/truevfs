@@ -52,7 +52,6 @@ public class EntryNotFoundException extends FileNotFoundException {
             final IOException cause) {
         super(cause == null ? null : cause.toString());
         assert path != null;
-        assert cause != null;
         super.initCause(cause);
         this.mountPoint = archive.getMountPoint();
         this.path = path;
