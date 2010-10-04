@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- *
  * @see FilterInputSocket
  * @param   <CE> The type of the {@link #getTarget() local target} common entry.
  * @author  Christian Schlichtherle

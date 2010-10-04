@@ -171,6 +171,6 @@ implements ArchiveDescriptor {
      * touched, i.e. if an operation changed its state.
      */
     boolean isTouched() {
-        return null == fileSystem ? false : fileSystem.isTouched();
+        return null != fileSystem && fileSystem.isTouched();
     }
 }
