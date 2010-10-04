@@ -507,8 +507,9 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private boolean isTouched() {
-        return getModel().isTouched();
+    private boolean isFileSystemTouched() {
+        ArchiveFileSystem<AE> fileSystem = getModel().getFileSystem();
+        return null != fileSystem && fileSystem.isTouched();
     }
 
     boolean autoSync(String path) throws ArchiveSyncException {
@@ -527,7 +528,7 @@ extends FileSystemArchiveController<AE> {
                         final BitField<SyncOption> options)
     throws ArchiveSyncException {
         assert input == null || inFile != null; // input archive => input file
-        assert !isTouched() || output != null; // file system touched => output archive
+        assert !isFileSystemTouched() || output != null; // file system touched => output archive
         assert output == null || outFile != null; // output archive => output file
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
@@ -577,7 +578,7 @@ extends FileSystemArchiveController<AE> {
                     reset2(builder);
                 }
                 reset3(true); // TODO: Check: Why not in another finally-block?
-            } else if (isTouched()) {
+            } else if (isFileSystemTouched()) {
                 needsReassembly = true;
                 try {
                     update(builder);
@@ -649,7 +650,7 @@ extends FileSystemArchiveController<AE> {
      */
     private void update(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        assert isTouched();
+        assert isFileSystemTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData(handler);
 
@@ -726,7 +727,7 @@ extends FileSystemArchiveController<AE> {
     private boolean checkNoDeletedEntriesWithNewData(
             final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        assert isTouched();
+        assert isFileSystemTouched();
         assert getFileSystem() != null;
 
         // Check if we have written out any entries that have been
