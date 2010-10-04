@@ -49,13 +49,13 @@ extends InputSocket<CE, CommonEntry, CommonInputSocket<CE>> {
     /**
      * {@inheritDoc}
      *
-     * @throws CommonInputBusyException if the socket's source is currently
-     *         busy with input.
+     * @throws CommonInputBusyException if the local target is currently busy
+     *         on input.
      *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to read the common entry again as soon as
-     *         the socket's source is not busy anymore.
-     * @throws FileNotFoundException if the common entry does not exist or
-     *         is not accessible for some reason.
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
      * @throws IOException on any other exceptional condition.
      */
     @Override
@@ -64,13 +64,13 @@ extends InputSocket<CE, CommonEntry, CommonInputSocket<CE>> {
     /**
      * {@inheritDoc}
      *
-     * @throws CommonInputBusyException if the socket's source is currently
-     *         busy with input.
+     * @throws CommonInputBusyException if the local target is currently busy
+     *         on input.
      *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to read the common entry again as soon as
-     *         the socket's source is not busy anymore.
-     * @throws FileNotFoundException if the common entry does not exist or
-     *         is not accessible for some reason.
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
      * @throws IOException on any other exceptional condition.
      */
     @Override

@@ -48,12 +48,12 @@ extends OutputSocket<CE, CommonEntry, CommonOutputSocket<CE>> {
     /**
      * {@inheritDoc}
      *
-     * @throws CommonOuputBusyException if the socket's destination is
-     *         currently busy with output.
+     * @throws CommonOuputBusyException if the local target is currently busy
+     *         on output.
      *         This exception is guaranteed to be recoverable, meaning it
      *         should be possible to write the common entry again as soon as
-     *         the socket's destination is not busy anymore.
-     * @throws FileNotFoundException if the common entry is not accessible
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
      *         for some reason.
      * @throws IOException on any other exceptional condition.
      */

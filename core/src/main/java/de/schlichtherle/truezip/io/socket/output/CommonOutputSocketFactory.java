@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.socket.output;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocketFactory;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -44,11 +45,17 @@ public interface CommonOutputSocketFactory<CE extends CommonEntry> {
      * but is not necessarily the same.
      *
      * @param  entry the non-{@code null} local target.
+     * @throws NullPointerException if {@code target} is {@code null}.
+     * @throws CommonOuputBusyException if the local target is currently busy
+     *         on output.
+     *         This exception is guaranteed to be recoverable, meaning it
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
+     * @throws IOException on any other exceptional condition.
      * @return A new non-{@code null} output socket for writing to the local
      *         target.
-     * @throws IOException If the local target
-     *         is not accessible for some reason.
-     * @throws NullPointerException if {@code target} is {@code null}.
      */
     CommonOutputSocket<CE> newOutputSocket(CE entry) throws IOException;
 }

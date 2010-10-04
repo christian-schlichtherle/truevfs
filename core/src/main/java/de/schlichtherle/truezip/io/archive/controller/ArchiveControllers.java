@@ -358,6 +358,7 @@ public class ArchiveControllers {
          * directly called except for unit testing.
          */
         @Override
+        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
         public void run() {
             synchronized (PromptingKeyManager.class) {
                 try {
@@ -372,7 +373,8 @@ public class ArchiveControllers {
                     try {
                         ArchiveControllers.sync(
                                 null,
-                                new DefaultArchiveSyncExceptionBuilder(), BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT, UMOUNT));
+                                new DefaultArchiveSyncExceptionBuilder(),
+                                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT, UMOUNT));
                     } catch (ArchiveSyncException ouch) {
                         ouch.printStackTrace();
                     }

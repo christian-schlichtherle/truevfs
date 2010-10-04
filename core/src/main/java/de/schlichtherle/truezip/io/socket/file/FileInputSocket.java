@@ -22,10 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileInputSocket extends CommonInputSocket<FileEntry> {
+class FileInputSocket extends CommonInputSocket<FileEntry> {
     private final FileEntry entry;
 
-    public FileInputSocket(final FileEntry entry) {
+    FileInputSocket(final FileEntry entry) {
         this.entry = entry;
     }
 
