@@ -164,15 +164,15 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         File.umount();
         InputStream in = new FileInputStream(path);
         Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
-        System.gc();
+        gc();
         assertNotNull(ref.get());
         in.close();
-        System.gc();
+        gc();
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         in = null; // leaves file!
         File.umount();
-        System.gc();
+        gc();
         assertNull(ref.get());
     }
 
@@ -184,16 +184,25 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         File.umount();
         OutputStream out = new FileOutputStream(path);
         Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
-        System.gc();
+        gc();
         assertNotNull(ref.get());
         out.close();
         out = null; // leaves file!
-        System.gc();
+        gc();
         assertNotNull(ref.get());
         assertSame(ref.get(), new File(path).getInnerArchive().getArchiveController());
         File.umount();
-        System.gc();
+        gc();
         assertNull(ref.get());
+    }
+
+    private static void gc() {
+        System.gc();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(IOFileTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
+        }
     }
 
     public void testFalsePositives() throws IOException {
