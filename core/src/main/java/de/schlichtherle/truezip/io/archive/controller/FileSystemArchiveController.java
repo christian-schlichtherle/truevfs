@@ -111,9 +111,9 @@ extends BasicArchiveController<AE> {
                 mount(autoCreate, createParents);
             } catch (FalsePositiveEntryException ex) {
                 // Catch and cache exceptions for non-transient false positives.
-                // The state is reset when File.delete() is called on the false
-                // positive archive file or File.update() or File.sync().
-                //   This is an important optimization: When hitting a false
+                // The state is reset when unlink() is called on the false
+                // positive archive file or sync().
+                //   This is an important optimization: When accessing a false
                 // positive archive file, a client application might perform
                 // a lot of tests on it (isDirectory(), isFile(), isExisting(),
                 // getLength(), etc). If the exception were not cached, each call

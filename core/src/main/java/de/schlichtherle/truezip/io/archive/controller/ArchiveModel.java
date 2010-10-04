@@ -34,9 +34,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveModel<AE extends ArchiveEntry>
-implements ArchiveDescriptor {
-
+final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
     private final URI mountPoint;
