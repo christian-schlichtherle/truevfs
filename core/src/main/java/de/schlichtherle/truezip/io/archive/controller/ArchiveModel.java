@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.file.FileInputSocket;
-import de.schlichtherle.truezip.io.socket.file.FileOutputSocket;
 import java.net.URI;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
@@ -47,11 +44,13 @@ implements ArchiveDescriptor {
     private final URI enclPath;
     private final FileEntry target; // TODO: make this support other virtual file systems.
     private final ArchiveDriver<AE> driver;
-    private ArchiveFileSystem<AE> fileSystem;
+    private boolean touched;
+    private TouchListener touchListener;
 
     ArchiveModel(   final URI mountPoint,
                     final ArchiveDriver<AE> driver,
-                    final ArchiveModel<?> enclModel) {
+                    final ArchiveModel<?> enclModel,
+                    final TouchListener touchListener) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -68,7 +67,7 @@ implements ArchiveDescriptor {
         }
         this.target = new FileEntry(mountPoint);
         this.driver = driver;
-
+        this.touchListener = touchListener;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
@@ -146,31 +145,18 @@ implements ArchiveDescriptor {
         return target;
     }
 
-    /*FileInputSocket newInputSocket() {
-        return new FileInputSocket(target);
-    }
-
-    FileOutputSocket newOutputSocket() {
-        return new FileOutputSocket(target);
-    }*/
-
     ArchiveDriver<AE> getDriver() {
         return driver;
     }
 
-    ArchiveFileSystem<AE> getFileSystem() {
-        return fileSystem;
+    public boolean isTouched() {
+        return touched;
     }
 
-    void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
-        this.fileSystem = fileSystem;
-    }
-
-    /**
-     * Returns {@code true} if and only if the archive file system has been
-     * touched, i.e. if an operation changed its state.
-     */
-    boolean isTouched() {
-        return null != fileSystem && fileSystem.isTouched();
+    public void setTouched(final boolean newTouched) {
+        final boolean oldTouched = touched;
+        touched = newTouched;
+        if (null != touchListener && newTouched != oldTouched)
+            touchListener.setTouched(newTouched);
     }
 }

@@ -51,6 +51,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
+import static de.schlichtherle.truezip.util.Pointer.Type.STRONG;
 import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
@@ -130,18 +131,27 @@ public class ArchiveControllers {
             }
             if (null == driver) // pure lookup operation?
                 return null;
-            // TODO: Refactor this to a more flexible design which supports
-            // different sync strategies, like update or append.
+            final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
             final ArchiveModel model = new ArchiveModel<AE>(mountPoint, driver,
-                    null == enclController ? null : enclController.getModel());
-            final ArchiveController controller
-                    = new ProspectiveArchiveController<AE>(         model,
-                        new StickyArchiveController<AE>(            model,
-                            new LockingArchiveController<AE>(       model,
-                                new UpdatingArchiveController<AE>(  model))));
-            controllers.put(    controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                                (Pointer) WEAK.newPointer(controller));
-            return controller;
+                    null == enclController ? null : enclController.getModel(),
+                    syncScheduler);
+            // TODO: Support append strategy.
+            syncScheduler.controller
+                    = new ProspectiveArchiveController<AE>(     model,
+                        new LockingArchiveController<AE>(       model,
+                            new UpdatingArchiveController<AE>(  model)));
+            syncScheduler.setTouched(false);
+            return syncScheduler.controller;
+        }
+    }
+
+    private static class SyncScheduler<AE extends ArchiveEntry>
+    implements TouchListener {
+        ArchiveController<AE> controller;
+
+        @Override
+        public void setTouched(boolean touched) {
+            scheduleSync(controller, touched ? STRONG : WEAK);
         }
     }
 
