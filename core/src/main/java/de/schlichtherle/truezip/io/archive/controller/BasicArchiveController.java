@@ -260,8 +260,7 @@ implements     CommonInputSocketFactory <AE                     >,
                             BasicArchiveController.this, path,
                             "cannot read directories");
                 final CommonInputSocket<AE> input;
-                if (null == entry ||
-                        null == (input = BasicArchiveController.this.newInputSocket(entry)))
+                if (null == entry || null == (input = newInputSocket(entry)))
                     throw new EntryNotFoundException(
                             BasicArchiveController.this, path,
                             "no such file or directory");
@@ -312,12 +311,6 @@ implements     CommonInputSocketFactory <AE                     >,
         }
     } // class InputSocket
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * As an amendment to its interface contract, this method returns
-     * {@code null} if no archive input is present.
-     */
     @Override
     public abstract CommonInputSocket<AE> newInputSocket(AE target)
     throws IOException;
@@ -377,7 +370,7 @@ implements     CommonInputSocketFactory <AE                     >,
                 final AE entry = getEntry();
                 final CommonOutputSocket<AE> output = newOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
-                        ? newInputSocket(entry).newInputStream()
+                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes when on entry!
                         : null;
                 try {
                     final OutputStream out = output

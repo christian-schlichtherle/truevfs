@@ -17,23 +17,11 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.statistics.ArchiveStatistics;
 import de.schlichtherle.truezip.util.Pointer;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Collection;
@@ -44,8 +32,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
@@ -382,122 +368,4 @@ public class ArchiveControllers {
             }
         }
     } // class ShutdownHook
-
-    /**
-     * Copies a source file to a destination file, optionally preserving the
-     * source's last modification time.
-     * We know that the source and destination both appear to be entries in an
-     * archive file.
-     *
-     * @throws FalsePositiveEntryException If the source or the destination is a
-     *         false positive and the exception for the destination
-     *         cannot get resolved within this method.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
-     */
-    public static <SE extends ArchiveEntry, DE extends ArchiveEntry>
-    void copy(
-            final boolean preserve,
-            final boolean createParents,
-            final ArchiveController<?> srcController,
-            final String srcPath,
-            final ArchiveController<?> dstController,
-            final String dstPath)
-    throws FalsePositiveEntryException, IOException {
-        // Do not assume anything about the lock status of the controller:
-        // This method may be called from a subclass while a lock is acquired!
-        //assert !srcController.readLock().isLocked();
-        //assert !srcController.writeLock().isLocked();
-        //assert !dstController.readLock().isLocked();
-        //assert !dstController.writeLock().isLocked();
-
-        try {
-            final BitField<IOOption> options = BitField.noneOf(IOOption.class)
-                    .set(PRESERVE, preserve)
-                    .set(CREATE_PARENTS, createParents);
-            final CommonInputSocket<?> input
-                    = srcController.newInputSocket(srcPath);
-            final CommonOutputSocket<?> output
-                    = dstController.newOutputSocket(dstPath, options);
-            IOSocket.copy(input, output);
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            // Both the source and/or the destination may be false positives,
-            // so we need to use the exception's additional information to
-            // find out which controller actually detected the false positive.
-            final URI enclMountPoint = ex.getMountPoint();
-            if (!dstController.getMountPoint().toString().startsWith(ex.getCanonicalPath()))
-                throw ex; // not my job - pass on!
-            final ArchiveController<?> enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
-            final String enclPath = enclMountPoint.relativize(
-                    enclMountPoint
-                    .resolve(ex.getPath() + SEPARATOR_CHAR)
-                    .resolve(dstPath)).toString();
-            // Reroute call to the destination's enclosing archive controller.
-            copy(   preserve, createParents,
-                    srcController, srcPath,
-                    enclController, enclPath);
-        }
-    }
-
-    /**
-     * Copies a source file to a destination file, optionally preserving the
-     * source's last modification time.
-     * We already have an input stream to read the source file and the
-     * destination appears to be an entry in an archive file.
-     * Note that this method <em>never</em> closes the given input stream!
-     * <p>
-     * Note that this method synchronizes on the class object in order
-     * to prevent dead locks by two threads copying archive entries to the
-     * other's source archive concurrently!
-     *
-     * @throws FalsePositiveEntryException If the destination is a
-     *         false positive and the exception
-     *         cannot get resolved within this method.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
-     */
-    public static void copy(
-            final boolean preserve,
-            final boolean createParents,
-            final File src,
-            final InputStream in,
-            final ArchiveController<?> dstController,
-            final String dstPath)
-    throws FalsePositiveEntryException, IOException {
-        // Do not assume anything about the lock status of the controller:
-        // This method may be called from a subclass while a lock is acquired!
-        //assert !dstController.readLock().isLocked();
-        //assert !dstController.writeLock().isLocked();
-
-        try {
-            final CommonInputSocket<FileEntry> input = FileSocketFactory
-                    .get()
-                    .newInputSocket(new FileEntry(src));
-            final OutputStream out = dstController
-                    .newOutputSocket(
-                        dstPath, BitField.noneOf(IOOption.class).set(PRESERVE, preserve).set(CREATE_PARENTS, createParents))
-                    .connect(input)
-                    .newOutputStream();
-            try {
-                Streams.cat(in, out);
-            } finally {
-                out.close();
-            }
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            final URI enclMountPoint = ex.getMountPoint();
-            final ArchiveController<?> enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
-            final String enclPath = enclMountPoint.relativize(
-                    enclMountPoint
-                    .resolve(ex.getPath() + SEPARATOR_CHAR)
-                    .resolve(dstPath)).toString();
-            // Reroute call to the destination's enclosing ArchiveController.
-            copy(   preserve, createParents,
-                    src, in,
-                    enclController, enclPath);
-        }
-    }
 }

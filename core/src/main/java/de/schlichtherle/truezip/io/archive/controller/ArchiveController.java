@@ -107,7 +107,7 @@ implements ArchiveDescriptor {
      * It's up to the particular operation to define which available options
      * are applicable for it and which combinations are supported.
      */
-    public enum IOOption {
+    public enum IOOption { // FIXME: Make top level class!
         /**
          * Whether or not any missing parent directory entries within an
          * archive file shall get created automatically.

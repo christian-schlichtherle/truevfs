@@ -15,30 +15,29 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.FileBusyException;
-import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -210,49 +209,18 @@ class Files {
         copy0(preserve, src, dst);
     }
 
-    /**
-     * Unchecked parameters version.
-     */
+    /** Unchecked parameters version. */
     private static void copy0(
             final boolean preserve,
             final java.io.File src,
             final java.io.File dst)
     throws IOException {
-        assert src != null;
-        assert dst != null;
-
         try {
-            try {
-                if (src instanceof File) {
-                    final File srcFile = (File) src;
-                    final File srcArchive = srcFile.getInnerArchive();
-                    if (srcArchive != null) {
-                        final String srcPath = srcFile.getInnerEntryName();
-                        assert srcPath != null;
-                        copy0(  preserve,
-                                srcArchive.getArchiveController(),
-                                srcPath,
-                                dst);
-                        return;
-                    }
-                }
-            } catch (FalsePositiveEntryException isNotArchive) {
-                assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                        : "must be handled in try-block!";
-                // Fall through!
-            }
-
-            // Treat the source like a regular file.
-            final InputStream in = new java.io.FileInputStream(src);
-            try {
-                copy0(preserve, src, in, dst);
-            } finally {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    throw new InputException(ex);
-                }
-            }
+            IOSocket.copy(  newInputSocket(src),
+                            newOutputSocket(dst, BitField
+                                .noneOf(IOOption.class)
+                                .set(PRESERVE, preserve)
+                                .set(CREATE_PARENTS, File.isLenient())));
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (ArchiveBusyException ex) {
@@ -267,40 +235,18 @@ class Files {
         }
     }
 
-    /**
-     * Copies a source file to a destination file, optionally preserving the
-     * source's last modification time.
-     * We already have an input stream to read the source file,
-     * but we know nothing about the destination file yet.
-     * Note that this method <em>never</em> closes the given input stream!
-     *
-     * @throws FileNotFoundException If either the source or the destination
-     *         cannot get accessed.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
-     */
-    private static void copy0(
-            final boolean preserve,
-            final java.io.File src,
-            final InputStream in,
-            final java.io.File dst)
+    static CommonInputSocket<?> newInputSocket(final java.io.File src)
     throws IOException {
+        assert src != null;
+
         try {
-            if (dst instanceof File) {
-                final File dstFile = (File) dst;
-                final File dstArchive = dstFile.getInnerArchive();
-                if (dstArchive != null) {
-                    final String dstPath = dstFile.getInnerEntryName();
-                    assert dstPath != null;
-                    ArchiveControllers.copy(
-                            preserve, File.isLenient(),
-                            src,
-                            in,
-                            dstArchive.getArchiveController(),
-                            dstPath);
-                    return;
+            if (src instanceof File) {
+                final File srcFile = (File) src;
+                final File srcArchive = srcFile.getInnerArchive();
+                if (srcArchive != null) {
+                    final String srcPath = srcFile.getInnerEntryName();
+                    assert srcPath != null;
+                    return srcArchive.getArchiveController().newInputSocket(srcPath);
                 }
             }
         } catch (FalsePositiveEntryException isNotArchive) {
@@ -308,94 +254,61 @@ class Files {
                     : "must be handled in try-block!";
             // Fall through!
         }
-
-        // Treat the destination like a regular file.
-        final OutputStream out = new java.io.FileOutputStream(dst);
-        try {
-            Streams.cat(in, out);
-        } finally {
-            out.close();
-        }
-        if (preserve && !dst.setLastModified(src.lastModified()))
-            throw new IOException(dst.getPath()
-                    + " (cannot preserve last modification time)");
+        return FileSocketFactory.get().newInputSocket(new FileEntry(src));
     }
 
-    /**
-     * Copies a source file to a destination file, optionally preserving the
-     * source's last modification time.
-     * We know that the source file appears to be an entry in an archive
-     * file, but we know nothing about the destination file yet.
-     * <p>
-     * Note that this method synchronizes on the class object in order
-     * to prevent dead locks by two threads copying archive entries to the
-     * other's source archive concurrently!
-     *
-     * @throws FalsePositiveEntryException If the source or the destination is a
-     *         false positive and the exception
-     *         cannot get resolved within this method.
-     * @throws InputException If copying the data fails because of an
-     *         IOException in the source.
-     * @throws IOException If copying the data fails because of an
-     *         IOException in the destination.
-     */
-    private static void copy0(
-            final boolean preserve,
-            final ArchiveController<?> srcController,
-            final String srcPath,
-            final java.io.File dst)
-    throws FalsePositiveEntryException, IOException {
-        // Do not assume anything about the lock status of the controller:
-        // This method may be called from a subclass while a lock is acquired!
-        //assert !srcController.readLock().isLocked();
-        //assert !srcController.writeLock().isLocked();
+    static CommonOutputSocket<?> newOutputSocket(
+            final java.io.File dst,
+            final BitField<IOOption> options)
+    throws IOException {
+        assert dst != null;
 
         try {
-            try {
-                if (dst instanceof File) {
-                    final File dstFile = (File) dst;
-                    final File dstArchive = dstFile.getInnerArchive();
-                    if (dstArchive != null) {
-                        final String dstPath = dstFile.getInnerEntryName();
-                        assert dstPath != null;
-                        ArchiveControllers.copy(
-                                preserve, File.isLenient(),
-                                srcController,
-                                srcPath,
-                                dstArchive.getArchiveController(),
-                                dstPath);
-                        return;
-                    }
+            if (dst instanceof File) {
+                final File srcFile = (File) dst;
+                final File srcArchive = srcFile.getInnerArchive();
+                if (srcArchive != null) {
+                    final String srcPath = srcFile.getInnerEntryName();
+                    assert srcPath != null;
+                    return srcArchive.getArchiveController().newOutputSocket(srcPath, options);
                 }
-            } catch (FalsePositiveEnclosedEntryException ex) {
-                throw ex;
-            } catch (FalsePositiveEntryException ex) {
-                // Both the source and/or the destination may be false positives,
-                // so we need to use the exception's additional information to
-                // find out which controller actually detected the false positive.
-                if (srcController.getMountPoint().equals(ex.getMountPoint()))
-                    throw ex; // not my job - pass on!
+            }
+        } catch (FalsePositiveEntryException isNotArchive) {
+            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
+                    : "must be handled in try-block!";
+            // Fall through!
+        }
+        final FileEntry target = new FileEntry(dst);
+        class OutputSocket extends CommonOutputSocket<FileEntry> {
+            @Override
+            public FileEntry getTarget() {
+                return target;
             }
 
-            final CommonInputSocket<? extends CommonEntry> input
-                    = srcController.newInputSocket(srcPath);
-            final CommonOutputSocket<? extends CommonEntry> output
-                    = FileSocketFactory.get().newOutputSocket(new FileEntry(dst));
-            IOSocket.copy(input, output);
-            if (preserve && !dst.setLastModified(input.getTarget().getTime(Access.WRITE)))
-                throw new IOException(dst.getPath()
-                        + " (cannot preserve last modification time)");
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            final URI enclMountPoint = ex.getMountPoint();
-            final ArchiveController<?> enclController
-                    = ArchiveControllers.getController(enclMountPoint); // FIXME: Redesign delegation strategy!
-            final String enclPath = enclMountPoint.relativize(
-                    enclMountPoint
-                    .resolve(ex.getPath() + SEPARATOR_CHAR)
-                    .resolve(srcPath)).toString();
-            // Reroute call to the source's enclosing archive controller.
-            copy0(preserve, enclController, enclPath, dst);
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                class PreservingOutputStream extends FileOutputStream {
+                    PreservingOutputStream() throws FileNotFoundException {
+                        super(target, options.get(APPEND));
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        if (!options.get(PRESERVE))
+                            return;
+                        final CommonEntry peer = getPeerTarget();
+                        if (null != peer)
+                            for (final Access access : BitField.allOf(Access.class))
+                                if (UNKNOWN != peer.getTime(access))
+                                    target.setTime(access, peer.getTime(access));
+                    }
+                } // class EntryOutputStream
+                return new PreservingOutputStream();
+            }
+
         }
+        return new OutputSocket();
     }
 
     /**
