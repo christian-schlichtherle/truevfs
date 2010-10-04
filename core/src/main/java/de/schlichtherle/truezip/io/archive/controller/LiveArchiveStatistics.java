@@ -45,8 +45,8 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     @Override
     public int getArchivesTouched() {
         int result = 0;
-        for (final ArchiveController controller : ArchiveControllers.getControllers()) {
-            final ArchiveModel model = controller.getModel();
+        for (final ArchiveController<?> controller : ArchiveControllers.getControllers()) {
+            final ArchiveModel<?> model = controller.getModel();
             model.readLock().lock();
             try {
                 if (model.isTouched())
@@ -61,7 +61,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     @Override
     public int getTopLevelArchivesTotal() {
         int result = 0;
-        for (ArchiveController controller : ArchiveControllers.getControllers())
+        for (ArchiveController<?> controller : ArchiveControllers.getControllers())
             if (controller.getModel().getEnclMountPoint() == null)
                 result++;
         return result;
@@ -70,8 +70,8 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     @Override
     public int getTopLevelArchivesTouched() {
         int result = 0;
-        for (final ArchiveController controller : ArchiveControllers.getControllers()) {
-            final ArchiveModel model = controller.getModel();
+        for (final ArchiveController<?> controller : ArchiveControllers.getControllers()) {
+            final ArchiveModel<?> model = controller.getModel();
             model.readLock().lock();
             try {
                 if (controller.getModel().getEnclMountPoint() == null && model.isTouched())

@@ -57,8 +57,8 @@ public class PromptingKeyManager extends KeyManager {
      * Values may be instances of {@link PromptingKeyProviderUI} or
      * {@link Class}.
      */
-    private final Map<Class<? extends PromptingKeyProvider>, Object> uis
-            = new HashMap<Class<? extends PromptingKeyProvider>, Object>();
+    private final Map<Class<? extends PromptingKeyProvider<?>>, Object> uis
+            = new HashMap<Class<? extends PromptingKeyProvider<?>>, Object>();
 
     /**
      * Constructs a new {@code PromptingKeyManager}.
@@ -79,7 +79,8 @@ public class PromptingKeyManager extends KeyManager {
      * </tr>
      * </table>
      */
-    public PromptingKeyManager() {
+    @SuppressWarnings("unchecked")
+	public PromptingKeyManager() {
         mapKeyProviderType(KeyProvider.class, PromptingKeyProvider.class);
         mapKeyProviderType(AesKeyProvider.class, PromptingAesKeyProvider.class);
     }
@@ -199,7 +200,8 @@ public class PromptingKeyManager extends KeyManager {
      */
     public static void resetCancelledPrompts() {
         forEachKeyProvider(new KeyProviderCommand() {
-            public void run(URI resource, KeyProvider<?> provider) {
+            @Override
+			public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof PromptingKeyProvider)
                     ((PromptingKeyProvider<?>) provider).resetCancelledPrompt();
             }
@@ -226,10 +228,10 @@ public class PromptingKeyManager extends KeyManager {
      * @throws IllegalArgumentException If {@code uiClass} does not
      *         provide a public constructor with no parameters.
      */
-    protected final synchronized
+    protected final synchronized <K extends Cloneable>
     void mapPromptingKeyProviderUIType(
-            final Class<? extends PromptingKeyProvider> forType,
-            final Class<? extends PromptingKeyProviderUI> useType) {
+            final Class<? extends PromptingKeyProvider<K>> forType,
+            final Class<? extends PromptingKeyProviderUI<K, ? extends PromptingKeyProvider<K>>> useType) {
         if (forType == null)
             throw new NullPointerException();
         try {
@@ -251,10 +253,11 @@ public class PromptingKeyManager extends KeyManager {
      *
      * @see KeyManager#getKeyProvider(URI, Class)
      */
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public KeyProvider<?> getKeyProvider(
             final URI resource,
-            final Class<? extends KeyProvider> type)
+            final Class<? extends KeyProvider<?>> type)
     throws NullPointerException, ClassCastException, IllegalArgumentException {
         final KeyProvider<?> kp = super.getKeyProvider(resource, type);
         if (kp instanceof PromptingKeyProvider) {
@@ -264,14 +267,15 @@ public class PromptingKeyManager extends KeyManager {
         return kp;
     }
 
-    private synchronized
+    @SuppressWarnings("unchecked")
+	private synchronized
     PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> getUI(
-            final Class<? extends PromptingKeyProvider> forType) {
+            final Class<? extends PromptingKeyProvider<?>> forType) {
         final Object value = uis.get(forType);
         final PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>> ui;
-        if (value instanceof Class) {
+        if (value instanceof Class<?>) {
             try {
-                ui = (PromptingKeyProviderUI) ((Class) value).newInstance();
+                ui = (PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>>) ((Class<?>) value).newInstance();
             } catch (InstantiationException failure) {
                 throw new UndeclaredThrowableException(failure);
             } catch (IllegalAccessException failure) {
@@ -279,7 +283,7 @@ public class PromptingKeyManager extends KeyManager {
             }
             uis.put(forType, ui);
         } else if (value != null) {
-            ui = (PromptingKeyProviderUI) value;
+            ui = (PromptingKeyProviderUI<?, ? super PromptingKeyProvider<?>>) value;
         } else { // value == null
             throw new IllegalArgumentException(forType +
                     " (unknown user interface for PromptingKeyProvider)");

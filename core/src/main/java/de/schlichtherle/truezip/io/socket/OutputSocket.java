@@ -51,7 +51,8 @@ extends IOSocket<LT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final OS share(OutputSocket<? super LT, ? extends PT, ?> with) {
+    @SuppressWarnings("unchecked")
+	public final OS share(OutputSocket<? super LT, ? extends PT, ?> with) {
         chain0(with.peer);
         return (OS) this;
     }
@@ -80,7 +81,8 @@ extends IOSocket<LT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final OS connect(InputSocket<? extends PT, ? super LT, ?> peer) {
+    @SuppressWarnings("unchecked")
+	public final OS connect(InputSocket<? extends PT, ? super LT, ?> peer) {
         connect0(peer);
         return (OS) this;
     }

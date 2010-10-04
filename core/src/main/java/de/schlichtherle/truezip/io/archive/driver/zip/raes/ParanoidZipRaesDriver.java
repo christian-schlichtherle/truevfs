@@ -88,7 +88,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * buffering the written entries.
      */
     @Override
-    public CommonOutputShop newOutputShop(
+    public CommonOutputShop<ZipEntry> newOutputShop(
             final ArchiveDescriptor archive,
             final CommonOutputSocket<?> output,
             final CommonInputShop<ZipEntry> source)

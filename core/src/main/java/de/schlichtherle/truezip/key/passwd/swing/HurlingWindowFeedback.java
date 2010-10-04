@@ -88,7 +88,8 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
         final Point origin = window.getLocation();
         final long startTime = System.currentTimeMillis();
         final Timer timer = new Timer(1000 / fps, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 // Calculate elapsed time.
                 final long elapsed = System.currentTimeMillis() - startTime;
 

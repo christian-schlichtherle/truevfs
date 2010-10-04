@@ -60,8 +60,6 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 public abstract class RawZipFile<E extends ZipEntry>
 implements Iterable<E>, Closeable {
 
-    private static final long LONG_MSB = 0x8000000000000000L;
-
     private static final int LFH_FILE_NAME_LENGTH_OFF =
             /* local file header signature     */ 4 +
             /* version needed to extract       */ 2 +
@@ -106,7 +104,7 @@ implements Iterable<E>, Closeable {
     /** Maps offsets specified in the ZIP file to real offsets in the file. */
     private OffsetMapper mapper;
 
-    private final ZipEntryFactory<? extends E> factory;
+    private final ZipEntryFactory<E> factory;
 
     /**
      * Reads the given {@code archive} in order to provide random access
@@ -144,13 +142,12 @@ implements Iterable<E>, Closeable {
      *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected RawZipFile(
             final ReadOnlyFile archive,
             final String charset,
             boolean preambled,
             boolean postambled,
-            final ZipEntryFactory factory)
+            final ZipEntryFactory<E> factory)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,
@@ -163,7 +160,7 @@ implements Iterable<E>, Closeable {
     RawZipFile(
             final ReadOnlyFileSource source,
             final String charset,
-            final ZipEntryFactory<? extends E> zipEntryFactory,
+            final ZipEntryFactory<E> zipEntryFactory,
             boolean preambled,
             boolean postambled)
     throws IOException {
@@ -207,11 +204,13 @@ implements Iterable<E>, Closeable {
             this.rof = rof;
         }
 
-        public ReadOnlyFile fetch() {
+        @Override
+		public ReadOnlyFile fetch() {
             return rof;
         }
 
-        public void release(ReadOnlyFile rof) {
+        @Override
+		public void release(ReadOnlyFile rof) {
             assert this.rof == rof;
         }
     }
@@ -899,7 +898,6 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-        @SuppressWarnings("empty-statement")
         public void close() throws IOException {
             try {
                 while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
@@ -964,7 +962,6 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-        @SuppressWarnings("empty-statement")
         public int read()
         throws IOException {
             int read;
@@ -1005,8 +1002,8 @@ implements Iterable<E>, Closeable {
                 int inflated;
                 while ((inflated = inf.inflate(infBuf, 0, infBuf.length)) > 0)
                     crc.update(infBuf, 0, inflated);
-            } catch (DataFormatException dfe) {
-                throw new IOException(dfe);
+            } catch (DataFormatException ex) {
+                throw (IOException) new IOException(ex.toString()).initCause(ex);
             }
 
             // Check inflater invariants.
@@ -1023,7 +1020,6 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-        @SuppressWarnings("empty-statement")
         public void close() throws IOException {
             if (closed)
                 return;
@@ -1067,7 +1063,8 @@ implements Iterable<E>, Closeable {
      *
      * @throws IOException if an error occurs closing the file.
      */
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         // Order is important here!
         if (archive != null) {
             final ReadOnlyFile oldArchive = archive;
@@ -1101,7 +1098,8 @@ implements Iterable<E>, Closeable {
             fp = start;
         }
 
-        public int read()
+        @Override
+		public int read()
         throws IOException {
             ensureOpen();
 
@@ -1208,7 +1206,6 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
-        @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
                 close();

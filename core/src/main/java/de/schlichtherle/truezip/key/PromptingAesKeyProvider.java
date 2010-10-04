@@ -33,14 +33,16 @@ implements AesKeyProvider<K> {
 
     private int keyStrength = KEY_STRENGTH_256;
 
-    public int getKeyStrength() {
+    @Override
+	public int getKeyStrength() {
         assert keyStrength == KEY_STRENGTH_128
                 || keyStrength == KEY_STRENGTH_192
                 || keyStrength == KEY_STRENGTH_256;
         return keyStrength;
     }
 
-    public void setKeyStrength(int keyStrength) {
+    @Override
+	public void setKeyStrength(int keyStrength) {
         if (keyStrength != KEY_STRENGTH_128
                 && keyStrength != KEY_STRENGTH_192
                 && keyStrength != KEY_STRENGTH_256)
@@ -54,9 +56,10 @@ implements AesKeyProvider<K> {
      * The implementation in this class simply returns its class object,
      * {@code PromptingAesKeyProvider.class}.
      */
-    @Override
-    protected Class<? extends PromptingAesKeyProvider> getUITypeKey() {
-        return PromptingAesKeyProvider.class;
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+    protected Class<? extends PromptingAesKeyProvider<?>> getUITypeKey() {
+        return (Class) PromptingAesKeyProvider.class;
     }
 
     /** Resets the key strength to 256 bits. */

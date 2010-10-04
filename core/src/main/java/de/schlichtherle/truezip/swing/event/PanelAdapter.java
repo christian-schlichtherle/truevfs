@@ -25,9 +25,11 @@ package de.schlichtherle.truezip.swing.event;
  */
 public abstract class PanelAdapter implements PanelListener {
 
-    public void ancestorWindowShown(PanelEvent evt) {
+    @Override
+	public void ancestorWindowShown(PanelEvent evt) {
     }
 
-    public void ancestorWindowHidden(PanelEvent evt) {
+    @Override
+	public void ancestorWindowHidden(PanelEvent evt) {
     }
 }

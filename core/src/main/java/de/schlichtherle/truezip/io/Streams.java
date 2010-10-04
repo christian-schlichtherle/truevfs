@@ -49,7 +49,8 @@ public class Streams {
 
     private static class InputStreamReaderThreadFactory
     implements ThreadFactory {
-        public Thread newThread(Runnable r) {
+        @Override
+		public Thread newThread(Runnable r) {
             final Thread t = new Thread(r, "TrueZIP InputStream Reader");
             t.setDaemon(true);
             return t;
@@ -141,7 +142,8 @@ public class Streams {
             /** The IOException that happened in this task, if any. */
             volatile InputException exception;
 
-            public void run() {
+            @Override
+			public void run() {
                 // Cache some data for better performance.
                 final InputStream _in = in;
                 final Buffer[] _buffers = buffers;
@@ -262,8 +264,8 @@ public class Streams {
     private static Buffer[] allocateBuffers() {
         synchronized (Buffer.list) {
             Buffer[] buffers;
-            for (Iterator i = Buffer.list.iterator(); i.hasNext(); ) {
-                buffers = (Buffer[]) ((Reference) i.next()).get();
+            for (Iterator<Reference<Buffer[]>> i = Buffer.list.iterator(); i.hasNext(); ) {
+                buffers = (Buffer[]) ((Reference<Buffer[]>) i.next()).get();
                 i.remove();
                 if (buffers != null)
                     return buffers;
@@ -281,7 +283,7 @@ public class Streams {
 
     private static void releaseBuffers(Buffer[] buffers) {
         synchronized (Buffer.list) {
-            Buffer.list.add(new SoftReference(buffers));
+            Buffer.list.add(new SoftReference<Buffer[]>(buffers));
         }
     }
 
@@ -290,7 +292,7 @@ public class Streams {
          * Each entry in this list holds a soft reference to an array
          * initialized with instances of this class.
          */
-        static final List list = new LinkedList();
+        static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
 
         /** The byte buffer used for asynchronous reading and writing. */
         byte[] buf = new byte[64 * 1024]; // TODO: Reuse FLATER_BUF_LENGTH of de.schlichtherle.truezip.util.zip.ZipConstants

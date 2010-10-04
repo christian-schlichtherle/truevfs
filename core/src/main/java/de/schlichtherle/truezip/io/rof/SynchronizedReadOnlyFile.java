@@ -76,7 +76,8 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
         }
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         synchronized (lock) {
             return rof.read();
         }

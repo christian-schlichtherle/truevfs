@@ -48,7 +48,8 @@ public class ChainableIOExceptionTest extends TestCase {
         final int maxIndex = exc.maxIndex;
         assertEquals(max - 1, maxIndex);
         final Check indexCheck = new Check() {
-            public boolean equals(ChainableIOException e1, ChainableIOException e2) {
+            @Override
+			public boolean equals(ChainableIOException e1, ChainableIOException e2) {
                 //return Exception0.INDEX_COMP.compare(e1, e2) == 0;
                 return e1 == e2;
             }
@@ -60,7 +61,8 @@ public class ChainableIOExceptionTest extends TestCase {
         testChain(indexCheck, appearance, appearanceExc);
 
         final Check priorityCheck = new Check() {
-            public boolean equals(ChainableIOException e1, ChainableIOException e2) {
+            @Override
+			public boolean equals(ChainableIOException e1, ChainableIOException e2) {
                 return ChainableIOException.PRIORITY_COMP.compare(e1, e2) == 0;
             }
         };

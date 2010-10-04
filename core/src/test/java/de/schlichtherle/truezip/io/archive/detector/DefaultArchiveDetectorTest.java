@@ -104,16 +104,20 @@ public class DefaultArchiveDetectorTest extends TestCase {
                     { ArchiveDetector.NULL, new Object[] { "|.|", new ZipDriver() } }, // empty suffix set
                     { ArchiveDetector.NULL, new Object[] { "|.|.", new ZipDriver() } }, // empty suffix set
                     { ArchiveDetector.NULL, new Object[] { "anySuffix", "" } }, // empty class name
-                    { ArchiveDetector.NULL, new Object[] { ZipDriver.class, new ZipDriver() } }, // not a suffix list
-                    { ArchiveDetector.NULL, new Object[] { new ZipDriver(), new ZipDriver() } }, // not a suffix list
                     { ArchiveDetector.NULL, new Object[] { "anySuffix", new Object() } }, // not an archive driver
                     { ArchiveDetector.NULL, new Object[] { "anySuffix", Object.class } }, // not an archive driver class
         });
+
+        testIllegalConstructors(ClassCastException.class,
+                new Object[][] {
+                    { ArchiveDetector.NULL, new Object[] { ZipDriver.class, new ZipDriver() } }, // not a suffix list
+                    { ArchiveDetector.NULL, new Object[] { new ZipDriver(), new ZipDriver() } }, // not a suffix list
+        });
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    private void testIllegalConstructors(
-            final Class expected,
+    @SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored"})
+	private void testIllegalConstructors(
+            final Class<? extends Exception> expected,
             final Object[][] list) {
         for (int i = 0; i < list.length; i++) {
             final Object[] args = list[i];
@@ -132,11 +136,11 @@ public class DefaultArchiveDetectorTest extends TestCase {
                         if (arg0 != null) {
                             if (arg1 != null) {
                                 if (arg0 instanceof String)
-                                    new DefaultArchiveDetector((String) arg0, (ArchiveDriver) arg1);
+                                    new DefaultArchiveDetector((String) arg0, (ArchiveDriver<?>) arg1);
                                 else if (arg1 instanceof Object[])
                                     new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (Object[]) arg1);
                                 else
-                                    new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (Map) arg1);
+                                    new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (Map<String, Object>) arg1);
                                 fail("Index " + i);
                             } else {
                                 assert arg0 != null;
@@ -152,7 +156,7 @@ public class DefaultArchiveDetectorTest extends TestCase {
                                         assertTrue(expected.isAssignableFrom(failure.getClass()));
                                     }
                                     try {
-                                        new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (Map) null);
+                                        new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (Map<String, Object>) null);
                                         fail("Index " + i);
                                     } catch (Throwable failure) {
                                         assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -162,18 +166,18 @@ public class DefaultArchiveDetectorTest extends TestCase {
                         } else {
                             assert arg0 == null;
                             if (arg1 != null) {
-                                if (arg1 instanceof ArchiveDriver)
-                                    new DefaultArchiveDetector(null, (ArchiveDriver) arg1);
+                                if (arg1 instanceof ArchiveDriver<?>)
+                                    new DefaultArchiveDetector(null, (ArchiveDriver<?>) arg1);
                                 else if (arg1 instanceof Object[])
                                     new DefaultArchiveDetector(null, (Object[]) arg1);
                                 else
-                                    new DefaultArchiveDetector(null, (Map) arg1);
+                                    new DefaultArchiveDetector(null, (Map<String, Object>) arg1);
                                 fail("Index " + i);
                             } else {
                                 assert arg0 == null;
                                 assert arg1 == null;
                                 try {
-                                    new DefaultArchiveDetector((String) null, (ArchiveDriver) null);
+                                    new DefaultArchiveDetector((String) null, (ArchiveDriver<?>) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -185,7 +189,7 @@ public class DefaultArchiveDetectorTest extends TestCase {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
                                 }
                                 try {
-                                    new DefaultArchiveDetector((DefaultArchiveDetector) null, (Map) null);
+                                    new DefaultArchiveDetector((DefaultArchiveDetector) null, (Map<String, Object>) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
@@ -197,7 +201,7 @@ public class DefaultArchiveDetectorTest extends TestCase {
                     case 3:
                         arg1 = args[1];
                         arg2 = args[2];
-                        new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (String) arg1, (ArchiveDriver) arg2);
+                        new DefaultArchiveDetector((DefaultArchiveDetector) arg0, (String) arg1, (ArchiveDriver<?>) arg2);
                         fail("Index " + i);
                         break;
 
@@ -281,21 +285,15 @@ public class DefaultArchiveDetectorTest extends TestCase {
         for (int i = 0; i < args.length; i++) {
             final String expResult = args[i++];
             final String suffixList = args[i];
-            String result;
-
             DefaultArchiveDetector detector;
-
             detector = new DefaultArchiveDetector(suffixList);
             assertEquals(expResult, detector.getSuffixes());
-
             if (expResult.length() > 0) {
                 detector = new DefaultArchiveDetector(suffixList, new ZipDriver());
                 assertEquals(expResult, detector.getSuffixes());
-
                 detector = new DefaultArchiveDetector(
                         ArchiveDetector.NULL, suffixList, new ZipDriver());
                 assertEquals(expResult, detector.getSuffixes());
-
                 detector = new DefaultArchiveDetector(
                         ArchiveDetector.NULL,
                         new Object[] { suffixList, new ZipDriver() });
@@ -358,31 +356,31 @@ public class DefaultArchiveDetectorTest extends TestCase {
             null, "test.zip.raes",
         });
 
-        final ArchiveDriver earDriver = ArchiveDetector.ALL.getArchiveDriver("test.ear");
+        final ArchiveDriver<?> earDriver = ArchiveDetector.ALL.getArchiveDriver("test.ear");
         assertNotNull(earDriver);
-        final ArchiveDriver exeDriver = ArchiveDetector.ALL.getArchiveDriver("test.exe");
+        final ArchiveDriver<?> exeDriver = ArchiveDetector.ALL.getArchiveDriver("test.exe");
         assertNotNull(exeDriver);
-        final ArchiveDriver jarDriver = ArchiveDetector.ALL.getArchiveDriver("test.jar");
+        final ArchiveDriver<?> jarDriver = ArchiveDetector.ALL.getArchiveDriver("test.jar");
         assertNotNull(jarDriver);
-        final ArchiveDriver tarDriver = ArchiveDetector.ALL.getArchiveDriver("test.tar");
+        final ArchiveDriver<?> tarDriver = ArchiveDetector.ALL.getArchiveDriver("test.tar");
         assertNotNull(tarDriver);
-        final ArchiveDriver tarBz2Driver = ArchiveDetector.ALL.getArchiveDriver("test.tar.bz2");
+        final ArchiveDriver<?> tarBz2Driver = ArchiveDetector.ALL.getArchiveDriver("test.tar.bz2");
         assertNotNull(tarBz2Driver);
-        final ArchiveDriver tarGzDriver = ArchiveDetector.ALL.getArchiveDriver("test.tar.gz");
+        final ArchiveDriver<?> tarGzDriver = ArchiveDetector.ALL.getArchiveDriver("test.tar.gz");
         assertNotNull(tarGzDriver);
-        final ArchiveDriver tbz2Driver = ArchiveDetector.ALL.getArchiveDriver("test.tbz2");
+        final ArchiveDriver<?> tbz2Driver = ArchiveDetector.ALL.getArchiveDriver("test.tbz2");
         assertNotNull(tbz2Driver);
-        final ArchiveDriver tgzDriver = ArchiveDetector.ALL.getArchiveDriver("test.tgz");
+        final ArchiveDriver<?> tgzDriver = ArchiveDetector.ALL.getArchiveDriver("test.tgz");
         assertNotNull(tgzDriver);
-        final ArchiveDriver tzpDriver = ArchiveDetector.ALL.getArchiveDriver("test.tzp");
+        final ArchiveDriver<?> tzpDriver = ArchiveDetector.ALL.getArchiveDriver("test.tzp");
         assertNotNull(tzpDriver);
-        final ArchiveDriver warDriver = ArchiveDetector.ALL.getArchiveDriver("test.war");
+        final ArchiveDriver<?> warDriver = ArchiveDetector.ALL.getArchiveDriver("test.war");
         assertNotNull(warDriver);
-        final ArchiveDriver zipDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip");
+        final ArchiveDriver<?> zipDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip");
         assertNotNull(zipDriver);
-        final ArchiveDriver zipRaeDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip.rae");
+        final ArchiveDriver<?> zipRaeDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip.rae");
         assertNotNull(zipRaeDriver);
-        final ArchiveDriver zipRaesDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip.raes");
+        final ArchiveDriver<?> zipRaesDriver = ArchiveDetector.ALL.getArchiveDriver("test.zip.raes");
         assertNotNull(zipRaesDriver);
 
         testGetArchiveDriver(ArchiveDetector.DEFAULT, new Object[] {
@@ -493,12 +491,12 @@ public class DefaultArchiveDetectorTest extends TestCase {
         });
 
         for (int i = 0; i < args.length; i++) {
-            final ArchiveDriver expResult = (ArchiveDriver) args[i++];
+            final ArchiveDriver<?> expResult = (ArchiveDriver<?>) args[i++];
             final String path = (String) args[i];
             final String lPath = path.toLowerCase();
             final String uPath = path.toUpperCase();
 
-            ArchiveDriver driver;
+            ArchiveDriver<?> driver;
             driver = detector.getArchiveDriver(lPath);
             assertSame(expResult, driver);
 

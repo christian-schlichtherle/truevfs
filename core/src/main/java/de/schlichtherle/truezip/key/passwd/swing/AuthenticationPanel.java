@@ -173,10 +173,12 @@ public class AuthenticationPanel extends JPanel {
 
         keyFilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         keyFilePanel.addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
                 keyFilePanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
             }
         });
 
@@ -200,7 +202,8 @@ public class AuthenticationPanel extends JPanel {
         keyFileChooser.setToolTipText(resources.getString("selectKeyFile.toolTip")); // NOI18N
         keyFileChooser.setName("keyFileChooser");
         keyFileChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 keyFileChooserActionPerformed(evt);
             }
         });
@@ -268,17 +271,20 @@ public class AuthenticationPanel extends JPanel {
         // all the other insulting scatology which comes to my mind)!
         final Window window = evt.getAncestorWindow();
         window.addWindowFocusListener(new WindowFocusListener() {
-            public void windowGainedFocus(WindowEvent e) {
+            @Override
+			public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);
                 EventQueue.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         if (keyFile.requestFocusInWindow())
                             ((JTextComponent) keyFile.getEditor().getEditorComponent()).selectAll();
                     }
                 });
             }
 
-            public void windowLostFocus(WindowEvent e) {
+            @Override
+			public void windowLostFocus(WindowEvent e) {
             }
         });
     }//GEN-LAST:event_keyFilePanelAncestorWindowShown

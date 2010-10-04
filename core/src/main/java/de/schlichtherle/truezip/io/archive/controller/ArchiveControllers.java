@@ -67,7 +67,8 @@ public class ArchiveControllers {
 
     private static final Comparator<ArchiveController<?>> REVERSE_CONTROLLERS
             = new Comparator<ArchiveController<?>>() {
-        public int compare(ArchiveController<?> l, ArchiveController<?> r) {
+        @Override
+		public int compare(ArchiveController<?> l, ArchiveController<?> r) {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
@@ -85,7 +86,7 @@ public class ArchiveControllers {
     private ArchiveControllers() {
     }
 
-    public static ArchiveController getController(URI mountPoint) {
+    public static ArchiveController<?> getController(URI mountPoint) {
         return getController(mountPoint, null, null);
     }
 
@@ -104,7 +105,7 @@ public class ArchiveControllers {
      *     not a valid name for an archive file</li>
      * </ul>
      */
-    public static <AE extends ArchiveEntry> ArchiveController getController(
+    public static <AE extends ArchiveEntry> ArchiveController<?> getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
             final ArchiveController<?> enclController) {
@@ -132,7 +133,9 @@ public class ArchiveControllers {
             if (null == driver) // pure lookup operation?
                 return null;
             final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
-            final ArchiveModel model = new ArchiveModel<AE>(mountPoint, driver,
+            final ArchiveModel<AE> model = new ArchiveModel<AE>(
+            		mountPoint,
+            		driver,
                     null == enclController ? null : enclController.getModel(),
                     syncScheduler);
             // TODO: Support append strategy.
@@ -160,7 +163,8 @@ public class ArchiveControllers {
      * Schedules the given archive controller for synchronization according to
      * the given Pointer Type.
      */
-    static void scheduleSync(
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	static void scheduleSync(
             final ArchiveController<?> controller,
             final Pointer.Type type) {
         synchronized (controllers) {
@@ -221,9 +225,9 @@ public class ArchiveControllers {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its enclosing archive file.
-            for (final ArchiveController controller
+            for (final ArchiveController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
-                final ArchiveModel model = controller.getModel();
+                final ArchiveModel<?> model = controller.getModel();
                     try {
                         model.writeLock().lock();
                         try {
@@ -265,8 +269,8 @@ public class ArchiveControllers {
         final Set<ArchiveController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet(comparator)
-                    : new HashSet((int) (controllers.size() / 0.75f));
+                    ? new TreeSet<ArchiveController<?>>(comparator)
+                    : new HashSet<ArchiveController<?>>((int) (controllers.size() / 0.75f));
             for (final Pointer<ArchiveController<?>> pointer
                     : controllers.values()) {
                 final ArchiveController<?> controller
@@ -353,7 +357,6 @@ public class ArchiveControllers {
          * Note that this method is <em>not</em> re-entrant and should not be
          * directly called except for unit testing.
          */
-        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
         @Override
         public void run() {
             synchronized (PromptingKeyManager.class) {
@@ -396,9 +399,9 @@ public class ArchiveControllers {
     void copy(
             final boolean preserve,
             final boolean createParents,
-            final ArchiveController srcController,
+            final ArchiveController<?> srcController,
             final String srcPath,
-            final ArchiveController dstController,
+            final ArchiveController<?> dstController,
             final String dstPath)
     throws FalsePositiveEntryException, IOException {
         // Do not assume anything about the lock status of the controller:
@@ -424,7 +427,7 @@ public class ArchiveControllers {
             final URI enclMountPoint = ex.getMountPoint();
             if (!dstController.getMountPoint().toString().startsWith(ex.getCanonicalPath()))
                 throw ex; // not my job - pass on!
-            final ArchiveController enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
+            final ArchiveController<?> enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
             final String enclPath = enclMountPoint.relativize(
                     enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)
@@ -460,7 +463,7 @@ public class ArchiveControllers {
             final boolean createParents,
             final File src,
             final InputStream in,
-            final ArchiveController dstController,
+            final ArchiveController<?> dstController,
             final String dstPath)
     throws FalsePositiveEntryException, IOException {
         // Do not assume anything about the lock status of the controller:
@@ -484,7 +487,7 @@ public class ArchiveControllers {
             }
         } catch (FalsePositiveEnclosedEntryException ex) {
             final URI enclMountPoint = ex.getMountPoint();
-            final ArchiveController enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
+            final ArchiveController<?> enclController = getController(enclMountPoint); // FIXME: Redesign delegation strategy!
             final String enclPath = enclMountPoint.relativize(
                     enclMountPoint
                     .resolve(ex.getPath() + SEPARATOR_CHAR)

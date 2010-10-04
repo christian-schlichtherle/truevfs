@@ -51,7 +51,8 @@ public class ReentrantReadWriteLockTest extends TestCase {
         rl.lock();
         try {
             runWithTimeout(1000, new Operation<InterruptedException>() {
-                public void run() throws InterruptedException {
+                @Override
+				public void run() throws InterruptedException {
                     ReentrantLock wl = instance.writeLock();
                     // Upgrading a read lock blocks until interrupted.
                     wl.lockInterruptibly();
@@ -71,7 +72,8 @@ public class ReentrantReadWriteLockTest extends TestCase {
 
         wl.lock();
         runWithTimeout(1000, new Operation<InterruptedException>() {
-            public void run() throws InterruptedException {
+            @Override
+			public void run() throws InterruptedException {
                 ReentrantLock rl = instance.readLock();
                 // Downgrading a write lock returns immediately.
                 rl.lockInterruptibly();
@@ -85,7 +87,8 @@ public class ReentrantReadWriteLockTest extends TestCase {
     throws T {
         final Thread target = Thread.currentThread();
         final Thread observer = new Thread(new Runnable() {
-            @SuppressWarnings("CallToThreadDumpStack")
+            @Override
+			@SuppressWarnings("CallToThreadDumpStack")
             public void run() {
                 try {
                     Thread.sleep(timeout);

@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
@@ -295,19 +294,6 @@ implements CommonOutputShop<ZipEntry> {
             }
         }
     } // class TempEntryOutputStream
-
-    private static class Crc32OutputStream extends OutputStream {
-        private final CRC32 crc = new CRC32();
-
-        public void write(int b) {
-            crc.update(b);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) {
-            crc.update(b, off, len);
-        }
-    } // class Crc32OutputStream
 
     /**
      * Retain the postamble of the source ZIP archive, if any.

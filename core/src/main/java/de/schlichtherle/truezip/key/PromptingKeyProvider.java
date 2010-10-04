@@ -134,8 +134,9 @@ extends AbstractKeyProvider<K> {
      * The implementation in this class simply returns its class object,
      * {@code PromptingKeyProvider.class}.
      */
-    protected Class<? extends PromptingKeyProvider> getUITypeKey() {
-        return PromptingKeyProvider.class;
+    @SuppressWarnings({ "unchecked", "raw-types" })
+	protected Class<? extends PromptingKeyProvider<?>> getUITypeKey() {
+        return (Class) PromptingKeyProvider.class;
     }
 
     private synchronized
@@ -250,7 +251,8 @@ extends AbstractKeyProvider<K> {
      *
      * @see KeyProvider#invalidOpenKey
      */
-    protected final void invalidOpenKeyImpl() {
+    @Override
+	protected final void invalidOpenKeyImpl() {
         synchronized (lock) {
             getState().invalidOpenKey(this);
         }
@@ -321,14 +323,15 @@ extends AbstractKeyProvider<K> {
      *         by a constraint in a subclass.
      * @deprecated TODO: This method is not failsafe and will be removed!
      */
-    @Override
+    @Deprecated
+	@Override
     protected synchronized KeyProvider<?> addToKeyManager(final URI resource)
     throws NullPointerException, IllegalStateException {
         final URI oldResource = getResource();
         if (oldResource != null && !resource.equals(oldResource))
             throw new IllegalStateException(
                     "this provider is used for resource ID \"" + oldResource + "\"");
-        final KeyProvider provider = super.addToKeyManager(resource);
+        final KeyProvider<?> provider = super.addToKeyManager(resource);
         setResource(resource);
 
         return provider;
@@ -346,7 +349,8 @@ extends AbstractKeyProvider<K> {
      *         by a constraint in a subclass.
      * @deprecated TODO: This method is not failsafe and will be removed!
      */
-    @Override
+    @Deprecated
+	@Override
     protected synchronized KeyProvider<?> removeFromKeyManager(
             final URI resource)
     throws NullPointerException, IllegalStateException {
@@ -354,7 +358,7 @@ extends AbstractKeyProvider<K> {
         if (!resource.equals(oldResource))
             throw new IllegalStateException(
                     "this provider is used for resource ID \"" + oldResource + "\"");
-        final KeyProvider provider = super.removeFromKeyManager(resource);
+        final KeyProvider<?> provider = super.removeFromKeyManager(resource);
         assert provider == null || provider == this : "";
         setResource(null);
         return provider;
@@ -386,12 +390,14 @@ extends AbstractKeyProvider<K> {
     }
 
     private static class Reset extends State {
-        <K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
+        @Override
+		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException {
             return provider.promptCreateKey();
         }
 
-        <K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
+        @Override
+		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException {
             return provider.promptOpenKey(false);
         }
@@ -410,12 +416,14 @@ extends AbstractKeyProvider<K> {
     }
 
     private static class KeyProvided extends State {
-        <K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
+        @Override
+		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException {
             return provider.getKey();
         }
 
-        <K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider) {
+        @Override
+		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider) {
             return provider.getKey();
         }
 
@@ -440,12 +448,14 @@ extends AbstractKeyProvider<K> {
     }
 
     private static class Cancelled extends State {
-        <K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
+        @Override
+		<K extends Cloneable> K getCreateKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException {
             throw new KeyPromptingCancelledException();
         }
 
-        <K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
+        @Override
+		<K extends Cloneable> K getOpenKey(PromptingKeyProvider<K> provider)
         throws UnknownKeyException {
             throw new KeyPromptingCancelledException();
         }

@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.key.passwd.swing;
 import de.schlichtherle.truezip.awt.EventDispatchTimeoutException;
 import de.schlichtherle.truezip.awt.EventQueue;
 import de.schlichtherle.truezip.awt.Windows;
-import de.schlichtherle.truezip.key.KeyPromptingCancelledException;
 import de.schlichtherle.truezip.key.KeyPromptingInterruptedException;
 import de.schlichtherle.truezip.key.KeyPromptingTimeoutException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
@@ -183,20 +182,24 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         return null;
     }
 
-    public void promptCreateKey(final P provider)
+    @Override
+	public void promptCreateKey(final P provider)
     throws UnknownKeyException {
         final Runnable task = new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 promptCreateKey(provider, null);
             }
         };
         multiplexOnEDT(task); // synchronized on class instance!
     }
 
-    public boolean promptUnknownOpenKey(final P provider)
+    @Override
+	public boolean promptUnknownOpenKey(final P provider)
     throws UnknownKeyException {
         final BooleanRunnable task = new BooleanRunnable() {
-            public void run() {
+            @Override
+			public void run() {
                 result = promptOpenKey(provider, false, null);
             }
         };
@@ -204,10 +207,12 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
         return task.result;
     }
 
-    public boolean promptInvalidOpenKey(final P provider)
+    @Override
+	public boolean promptInvalidOpenKey(final P provider)
     throws UnknownKeyException {
         final BooleanRunnable task = new BooleanRunnable() {
-            public void run() {
+            @Override
+			public void run() {
                 result = promptOpenKey(provider, true, null);
             }
         };

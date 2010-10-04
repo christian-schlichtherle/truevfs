@@ -72,7 +72,8 @@ implements ExceptionBuilder<C, E> {
      * @see #update(Exception, Exception)
      * @see #post(Exception)
      */
-    public final E fail(C cause) {
+    @Override
+	public final E fail(C cause) {
         if (cause == null)
             throw new NullPointerException();
         assembly = update(assembly, cause);
@@ -84,7 +85,8 @@ implements ExceptionBuilder<C, E> {
      *
      * @see #update(Exception, Exception)
      */
-    public final void warn(C cause) {
+    @Override
+	public final void warn(C cause) {
         if (cause == null)
             throw new NullPointerException();
         assembly = update(assembly, cause);
@@ -95,7 +97,8 @@ implements ExceptionBuilder<C, E> {
      *
      * @see #post(Exception)
      */
-    public final void check() throws E {
+    @Override
+	public final void check() throws E {
         E t = post(checkout());
         if (t != null)
             throw t;

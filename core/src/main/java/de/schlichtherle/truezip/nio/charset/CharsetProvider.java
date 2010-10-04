@@ -54,11 +54,13 @@ public class CharsetProvider extends java.nio.charset.spi.CharsetProvider {
         return s.toLowerCase(Locale.ENGLISH);
     }
 
-    public Iterator<Charset> charsets() {
+    @Override
+	public Iterator<Charset> charsets() {
         return charsets.iterator();
     }
 
-    public Charset charsetForName(String charset) {
+    @Override
+	public Charset charsetForName(String charset) {
         return name2charset.get(lowerCase(charset));
     }
 }

@@ -26,7 +26,8 @@ public class IBM437CharsetTest extends OctetCharsetTestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         charset = new IBM437Charset();
     }
 }

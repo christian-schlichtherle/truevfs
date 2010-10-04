@@ -126,11 +126,12 @@ public class FileComboBoxBrowserUITest extends TestCase {
         assertEquals(filter(initials), asList(combo));
     }
 
-    private static List filter(final String initials) {
+    private static List<String> filter(final String initials) {
         final String[] entries = new File(".").list(new FilenameFilter() {
             final int l = initials.length();
 
-            public boolean accept(java.io.File dir, String name) {
+            @Override
+			public boolean accept(java.io.File dir, String name) {
                 if (name.length() >= l)
                     return initials.equalsIgnoreCase(name.substring(0, l));
                 else
@@ -149,10 +150,9 @@ public class FileComboBoxBrowserUITest extends TestCase {
         return list;
     }
 
+    // TODO: This is far from being a comprehensive test.
     public void testGUI() throws InterruptedException, InvocationTargetException {
         FileComboBoxPanel.main(new String[] { "." });
-
-        // TODO: This is far from being a comprehensive test.
 
         final JFrameOperator frame = new JFrameOperator();
         final JTextComponentOperator tc0 = new JTextComponentOperator(frame, 0);

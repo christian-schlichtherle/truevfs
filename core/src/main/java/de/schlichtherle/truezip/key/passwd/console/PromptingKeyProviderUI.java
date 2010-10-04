@@ -58,7 +58,8 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
      */
     private static URI lastResource = URI.create("null:/"); // NOI18N
 
-    public final void promptCreateKey(final P provider) {
+    @Override
+	public final void promptCreateKey(final P provider) {
         synchronized (lock) {
             final URI resource = provider.getResource();
             assert resource != null : "violation of contract for PromptingKeyProviderUI";
@@ -99,13 +100,15 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<char[], P> {
     protected void promptExtraData(P provider) {
     }
 
-    public final boolean promptUnknownOpenKey(P provider) {
+    @Override
+	public final boolean promptUnknownOpenKey(P provider) {
         synchronized (lock) {
             return promptOpenKey(provider, false);
         }
     }
 
-    public final boolean promptInvalidOpenKey(P provider) {
+    @Override
+	public final boolean promptInvalidOpenKey(P provider) {
         synchronized (lock) {
             return promptOpenKey(provider, true);
         }

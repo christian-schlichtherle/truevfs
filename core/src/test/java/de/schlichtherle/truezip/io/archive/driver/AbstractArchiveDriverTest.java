@@ -43,7 +43,7 @@ import junit.framework.TestCase;
  */
 public class AbstractArchiveDriverTest extends TestCase {
 
-    private AbstractArchiveDriver driver;
+    private AbstractArchiveDriver<ArchiveEntry> driver;
 
     public AbstractArchiveDriverTest(String testName) {
         super(testName);
@@ -58,7 +58,6 @@ public class AbstractArchiveDriverTest extends TestCase {
     protected void tearDown() throws Exception {
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructors() {
         try {
             new DummyArchiveDriver(null);
@@ -106,7 +105,8 @@ public class AbstractArchiveDriverTest extends TestCase {
         // Deserialize.
         final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         final ObjectInputStream in = new ObjectInputStream(bis);
-        final AbstractArchiveDriver driver2 = (AbstractArchiveDriver) in.readObject();
+        @SuppressWarnings("unchecked")
+		final AbstractArchiveDriver<ArchiveEntry> driver2 = (AbstractArchiveDriver<ArchiveEntry>) in.readObject();
         in.close();
         
         assertNotSame(driver, driver2);
@@ -168,7 +168,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
     }
 
-    private static class DummyArchiveDriver extends AbstractArchiveDriver {
+    private static class DummyArchiveDriver extends AbstractArchiveDriver<ArchiveEntry> {
         static final long serialVersionUID = 2382398676900721212L;
 
         static final Icon ICON = new ImageIcon(
@@ -183,20 +183,20 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonInputShop newInputShop(ArchiveDescriptor archive, CommonInputSocket input)
+        public CommonInputShop<ArchiveEntry> newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
         }
 
         @Override
-        public CommonEntry newEntry(String name, Type type, CommonEntry template)
+        public ArchiveEntry newEntry(String name, Type type, CommonEntry template)
         throws CharConversionException {
             return new DummyEntry(new File("foo/bar"));
         }
 
         @Override
-        public CommonOutputShop newOutputShop(ArchiveDescriptor archive, CommonOutputSocket output, CommonInputShop source)
+        public CommonOutputShop<ArchiveEntry> newOutputShop(ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<ArchiveEntry> source)
         throws IOException {
             throw new FileNotFoundException(
                     archive.getMountPoint() + " (inaccessible archive file)");
@@ -220,7 +220,8 @@ public class AbstractArchiveDriverTest extends TestCase {
             super(file);
         }
 
-        public void setSize(long size) {
+        @Override
+		public void setSize(long size) {
             throw new UnsupportedOperationException();
         }
     }

@@ -72,7 +72,7 @@ public class ManySmallEntriesTest extends TestCase {
         logger.log(Level.FINER, "Compressing {0} ZIP file entries to: {1}", new Object[]{n, zip.getPath()});
         logger.finer("Note that the max. number of entries supported by the ZIP File Format Spec. is 65535!");
 
-        final HashSet set = new HashSet();
+        final HashSet<String> set = new HashSet<String>();
 
         final ZipOutputStream zipOut
                 = new ZipOutputStream(new FileOutputStream(zip));
@@ -96,7 +96,7 @@ public class ManySmallEntriesTest extends TestCase {
         final ZipFile zipIn = new ZipFile(zip);
         try {
             final byte[] buf = new byte[data.length];
-            for (Enumeration e = zipIn.entries(); e.hasMoreElements(); ) {
+            for (Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
                 final ZipEntry entry = (ZipEntry) e.nextElement();
 
                 assertEquals(data.length, entry.getSize());

@@ -480,7 +480,6 @@ implements     CommonInputSocketFactory <AE                     >,
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
     public final void unlink(
             final String path,
             final BitField<IOOption> options)
@@ -519,7 +518,7 @@ implements     CommonInputSocketFactory <AE                     >,
                     ? new FalsePositiveEntryException(
                         this, path, new IOException()) // TODO: Consider TransientIOException!
                     : new FalsePositiveEnclosedEntryException(
-                        this, path, new IOException()); // dito
+                        this, path, new IOException());
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }
@@ -532,7 +531,7 @@ implements     CommonInputSocketFactory <AE                     >,
      */
     // TODO: Move to ArchiveModel or UpdatingArchiveController and declare private.
     final boolean isHostedDirectoryEntryTarget() {
-        ArchiveModel enclModel = getModel().getEnclModel();
+        ArchiveModel<?> enclModel = getModel().getEnclModel();
         return null == enclModel || DIRECTORY == enclModel.getTarget().getType();
     }
 

@@ -114,7 +114,8 @@ public class LEDataOutputStream
      * @param b The {@code boolean} value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeBoolean(boolean b) throws IOException {
+    @Override
+	public final void writeBoolean(boolean b) throws IOException {
 	out.write(b ? 1 : 0);
 	incCount(1);
     }
@@ -128,7 +129,8 @@ public class LEDataOutputStream
      * @param b The {@code byte} value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeByte(int b) throws IOException {
+    @Override
+	public final void writeByte(int b) throws IOException {
 	out.write(b);
         incCount(1);
     }
@@ -142,7 +144,8 @@ public class LEDataOutputStream
      * @param c The {@code char} value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeChar(int c) throws IOException {
+    @Override
+	public final void writeChar(int c) throws IOException {
         writeShort(c);
     }
 
@@ -155,7 +158,8 @@ public class LEDataOutputStream
      * @param s The short integer value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeShort(int s) throws IOException {
+    @Override
+	public final void writeShort(int s) throws IOException {
         buf[0] = (byte) s;
         s >>= 8;
         buf[1] = (byte) s;
@@ -172,7 +176,8 @@ public class LEDataOutputStream
      * @param i The integer value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeInt(int i) throws IOException {
+    @Override
+	public final void writeInt(int i) throws IOException {
         buf[0] = (byte) i;
         i >>= 8;
         buf[1] = (byte) i;
@@ -193,7 +198,8 @@ public class LEDataOutputStream
      * @param l The long integer value to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeLong(long l) throws IOException {
+    @Override
+	public final void writeLong(long l) throws IOException {
         buf[0] = (byte) l;
         l >>= 8;
         buf[1] = (byte) l;
@@ -225,7 +231,8 @@ public class LEDataOutputStream
      * @throws IOException If an I/O error occurs.
      * @see java.lang.Float#floatToIntBits(float)
      */
-    public final void writeFloat(float f) throws IOException {
+    @Override
+	public final void writeFloat(float f) throws IOException {
 	writeInt(Float.floatToIntBits(f));
     }
 
@@ -241,7 +248,8 @@ public class LEDataOutputStream
      * @throws IOException If an I/O error occurs.
      * @see java.lang.Double#doubleToLongBits(double)
      */
-    public final void writeDouble(double d) throws IOException {
+    @Override
+	public final void writeDouble(double d) throws IOException {
 	writeLong(Double.doubleToLongBits(d));
     }
 
@@ -255,7 +263,8 @@ public class LEDataOutputStream
      * @param s The string of bytes to be written.
      * @throws IOException If an I/O error occurs.
      */
-    public final void writeBytes(String s) throws IOException {
+    @Override
+	public final void writeBytes(String s) throws IOException {
 	final int len = s.length();
 	for (int i = 0 ; i < len ; i++)
 	    writeByte(s.charAt(i));
@@ -272,7 +281,8 @@ public class LEDataOutputStream
      * @throws IOException If an I/O error occurs.
      * @see java.io.DataOutputStream#writeChar(int)
      */
-    public final void writeChars(String s) throws IOException {
+    @Override
+	public final void writeChars(String s) throws IOException {
         final int len = s.length();
         for (int i = 0 ; i < len ; i++)
             writeShort(s.charAt(i));
@@ -283,7 +293,8 @@ public class LEDataOutputStream
      *
      * @throws UnsupportedOperationException Always.
      */
-    public void writeUTF(String str) throws IOException {
+    @Override
+	public void writeUTF(String str) throws IOException {
         throw new UnsupportedOperationException();
     }
 

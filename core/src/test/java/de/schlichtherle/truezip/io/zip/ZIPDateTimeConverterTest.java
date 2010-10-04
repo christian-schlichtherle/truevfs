@@ -36,7 +36,8 @@ public class ZIPDateTimeConverterTest extends DateTimeConverterTestCase {
         super(testName);
     }
 
-    protected DateTimeConverter getInstance() {
+    @Override
+	protected DateTimeConverter getInstance() {
         return DateTimeConverter.ZIP;
     }
 

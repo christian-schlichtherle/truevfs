@@ -42,21 +42,25 @@ final class DefaultExtraField extends ExtraField {
         this.headerID = headerID;
     }
 
-    public int getHeaderID() {
+    @Override
+	public int getHeaderID() {
         return headerID;
     }
 
-    int getDataSize() {
+    @Override
+	int getDataSize() {
         return data != null ? data.length : 0;
     }
 
-    void readFrom(final byte[] data, final int off, final int size) {
+    @Override
+	void readFrom(final byte[] data, final int off, final int size) {
         UShort.check(size, "Data Size out of range", null);
         this.data = new byte[size];
         System.arraycopy(data, off, this.data, 0, size);
     }
 
-    void writeTo(byte[] data, int off) {
+    @Override
+	void writeTo(byte[] data, int off) {
         if (this.data != null)
             System.arraycopy(this.data, 0, data, off, this.data.length);
     }

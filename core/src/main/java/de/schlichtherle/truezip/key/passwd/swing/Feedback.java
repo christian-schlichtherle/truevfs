@@ -53,5 +53,6 @@ public interface Feedback extends Runnable {
      * {@link javax.swing.Timer} class should be used to schedule timer events
      * for the animation.
      */
-    void run();
+    @Override
+	void run();
 }

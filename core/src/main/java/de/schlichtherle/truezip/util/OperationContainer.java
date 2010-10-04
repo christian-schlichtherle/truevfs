@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010 Schlichtherle IT Services
+ * Copyright 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,27 +27,28 @@ import java.util.Iterator;
  * @version $Id$
  * @deprecated This feature is currently unused.
  */
-public class OperationContainer<E extends Exception>
+@Deprecated
+public class OperationContainer<C extends Exception, E extends Exception>
 implements Operation<E> {
 
-    private final Iterable<? extends Operation<?>> operations;
-    private final ExceptionHandler<Exception, ? extends E> handler;
-    private final Class<?> type;
+    private final Iterable<? extends Operation<? extends C>> operations;
+    private final ExceptionHandler<C, E> handler;
+    private final Class<C> type;
     private final boolean remove;
 
     /**
      * @see #run
      */
-    public <C extends Exception> OperationContainer(
+    public OperationContainer(
             final Iterable<? extends Operation<? extends C>> operationsCollection,
             final boolean removeFromCollectionUponSuccess,
-            final ExceptionHandler<C, ? extends E> exceptionHandler,
+            final ExceptionHandler<C, E> exceptionHandler,
             final Class<C> exceptionType) {
         if (operationsCollection == null || exceptionHandler == null)
             throw new NullPointerException();
         this.operations = operationsCollection;
         this.type = exceptionType;
-        this.handler = (ExceptionHandler) exceptionHandler;
+        this.handler = exceptionHandler;
         this.remove = removeFromCollectionUponSuccess;
     }
 
@@ -80,16 +81,17 @@ implements Operation<E> {
      *         exception handler throws this exception in return.
      *         The remaining operations are <em>not<em> executed in this case!
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void run() throws E {
-        final Iterator<? extends Operation<?>> i = operations.iterator();
+        final Iterator<? extends Operation<? extends C>> i = operations.iterator();
         while (i.hasNext()) {
             try {
                 i.next().run();
             } catch (Exception ex) {
                 if (!type.isInstance(ex))
                     throw (RuntimeException) ex;
-                handler.warn(ex); // call bridge method
+                handler.warn((C) ex); // call bridge method
                 continue;
             }
             if (remove)

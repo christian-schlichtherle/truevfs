@@ -66,7 +66,8 @@ public class ChainableIOException extends IOException implements Cloneable {
     // Note: Not private for unit testing purposes only!
     static final Comparator<ChainableIOException> PRIORITY_COMP
             = new Comparator<ChainableIOException>() {
-        public int compare(ChainableIOException l, ChainableIOException r) {
+        @Override
+		public int compare(ChainableIOException l, ChainableIOException r) {
             final int cmp = l.priority - r.priority;
             return cmp != 0 ? cmp : INDEX_COMP.compare(l, r);
         }
@@ -79,7 +80,8 @@ public class ChainableIOException extends IOException implements Cloneable {
     // Note: Not private for unit testing purposes only!
     static final Comparator<ChainableIOException> INDEX_COMP
             = new Comparator<ChainableIOException>() {
-        public int compare(ChainableIOException l, ChainableIOException r) {
+        @Override
+		public int compare(ChainableIOException l, ChainableIOException r) {
             return l.index - r.index;
         }
     };

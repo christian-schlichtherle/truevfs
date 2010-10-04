@@ -98,7 +98,6 @@ implements ArchiveDriver<AE>, Serializable {
         assert invariants();
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private static UnsupportedEncodingException testJSE11Support(
             final String charset) {
         try {

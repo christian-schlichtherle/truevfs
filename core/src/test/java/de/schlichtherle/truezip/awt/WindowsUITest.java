@@ -37,7 +37,8 @@ public class WindowsUITest extends TestCase {
     throws InterruptedException, InvocationTargetException {
         EventQueue.invokeAndWait(new Runnable() {
 
-            public void run() {
+            @Override
+			public void run() {
                 Window result = Windows.getParentWindow();
                 assertNotNull(result);
                 assertFalse(result.isVisible());

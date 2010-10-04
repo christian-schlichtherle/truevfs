@@ -59,7 +59,8 @@ public class ReadOnlyFileInputStream extends InputStream {
         this.rof = rof;
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         return rof.read();
     }
 

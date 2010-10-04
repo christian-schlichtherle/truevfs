@@ -41,7 +41,8 @@ public abstract class IOSocket<LT> implements IOReference<LT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
-    public abstract LT getTarget();
+    @Override
+	public abstract LT getTarget();
 
     /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
     @Override

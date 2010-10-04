@@ -119,7 +119,8 @@ implements Iterable<E>, Cloneable {
     @Override
     public BitField<E> clone() {
         try {
-            final BitField<E> clone = (BitField<E>) super.clone();
+            @SuppressWarnings("unchecked")
+			final BitField<E> clone = (BitField<E>) super.clone();
             clone.bits = bits.clone();
             return clone;
         } catch (CloneNotSupportedException ex) {
@@ -231,9 +232,9 @@ implements Iterable<E>, Cloneable {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof BitField))
+        if (!(o instanceof BitField<?>))
             return false;
-        return bits.equals(((BitField) o).bits);
+        return bits.equals(((BitField<?>) o).bits);
     }
 
     /** Returns a hash code which is consistent with {@link #equals}. */

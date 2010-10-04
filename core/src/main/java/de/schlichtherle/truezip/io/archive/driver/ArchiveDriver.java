@@ -97,8 +97,8 @@ extends CommonEntryFactory<AE> {
      * @param  source the nullable {@link CommonInputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputShop} method, which may be
-     *         used to copy some meta data which is specific to the type of
+     *         of this driver's {@link #newInputShop} factor method, which may
+     *         be used to copy some meta data which is specific to the type of
      *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.

@@ -90,10 +90,8 @@ public class SuffixSetTest extends TestCase {
 
         for (int i = 0; i < sets.length; i++) {
             for (int j = 0; j < sets.length ; j++) {
-                for (final Iterator it = sets[i].iterator(); it.hasNext();) {
-                    final String s = (String) it.next();
+                for (final String s : sets[i])
                     assertTrue(sets[j].contains(s));
-                }
             }
         }
     }
@@ -103,7 +101,7 @@ public class SuffixSetTest extends TestCase {
 
         for (int i = 0; i < sets.length; i++) {
             for (int j = 0; j < sets.length ; j++) {
-                for (final Iterator it = sets[i].originalIterator(); it.hasNext();) {
+                for (final Iterator<String> it = sets[i].originalIterator(); it.hasNext();) {
                     final String s = (String) it.next();
                     assertTrue(sets[j].contains(s));
                 }

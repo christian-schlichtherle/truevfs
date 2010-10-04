@@ -42,16 +42,18 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
         channel = new FileInputStream(file).getChannel();
     }
 
-    public long length() throws IOException {
+    @Override
+	public long length() throws IOException {
         return channel.size();
     }
 
-    public long getFilePointer() throws IOException {
+    @Override
+	public long getFilePointer() throws IOException {
         return channel.position();
     }
 
-    @SuppressWarnings("ThrowableInitCause")
-    public void seek(long fp) throws IOException {
+    @Override
+	public void seek(long fp) throws IOException {
         try {
             channel.position(fp);
         } catch (IllegalArgumentException ex) {
@@ -59,7 +61,8 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
         }
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         singleByteBuffer.position(0);
         if (channel.read(singleByteBuffer) == 1)
             return singleByteBuffer.get(0) & 0xff;
@@ -67,11 +70,13 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
             return -1;
     }
 
-    public int read(byte[] buf, int off, int len) throws IOException {
+    @Override
+	public int read(byte[] buf, int off, int len) throws IOException {
         return channel.read(ByteBuffer.wrap(buf, off, len));
     }
 
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         channel.close();
     }
 }

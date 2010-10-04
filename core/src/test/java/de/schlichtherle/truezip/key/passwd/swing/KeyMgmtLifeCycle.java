@@ -58,7 +58,8 @@ public class KeyMgmtLifeCycle implements Runnable {
         this.id = id;
     }
 
-    public void run() {
+    @Override
+	public void run() {
         try {
             runIt();
         }  catch (Throwable t) {
@@ -98,8 +99,8 @@ public class KeyMgmtLifeCycle implements Runnable {
         createResourceHook(provider);
     }
 
-    protected KeyProvider getKeyProvider(KeyManager manager, URI id) {
-        return manager.getKeyProvider(id, KeyProvider.class);
+    protected KeyProvider<?> getKeyProvider(KeyManager manager, URI id) {
+        return manager.getKeyProvider(id, (Class) KeyProvider.class);
     }
 
     private void openResource() throws UnknownKeyException {
@@ -167,9 +168,9 @@ public class KeyMgmtLifeCycle implements Runnable {
                 Arrays.fill((byte[]) o, (byte) 0);
     }
 
-    protected void createResourceHook(KeyProvider provider) {
+    protected void createResourceHook(KeyProvider<?> provider) {
     }
 
-    protected void openResourceHook(KeyProvider provider) {
+    protected void openResourceHook(KeyProvider<?> provider) {
     }
 }

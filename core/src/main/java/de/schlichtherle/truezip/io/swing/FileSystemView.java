@@ -290,7 +290,8 @@ public class FileSystemView extends FilterFileSystemView {
         if (smartDir.isArchive() || smartDir.isEntry()) {
             // dir is a ZIP file or an entry in a ZIP file.
             return smartDir.listFiles(new FileFilter() {
-                public boolean accept(java.io.File file) {
+                @Override
+				public boolean accept(java.io.File file) {
                     return !useFileHiding || !isHiddenFile(file);
                 }
             });

@@ -110,5 +110,5 @@ public interface ArchiveDetector {
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
-    ArchiveDriver getArchiveDriver(String path);
+    ArchiveDriver<?> getArchiveDriver(String path);
 }

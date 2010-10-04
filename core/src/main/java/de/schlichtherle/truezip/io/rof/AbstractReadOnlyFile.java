@@ -28,15 +28,18 @@ import java.io.IOException;
  */
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 
-    public int read(byte[] b) throws IOException {
+    @Override
+	public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
-    public void readFully(byte[] b) throws IOException {
+    @Override
+	public void readFully(byte[] b) throws IOException {
         readFully(b, 0, b.length);
     }
 
-    public void readFully(final byte[] buf, final int off, final int len)
+    @Override
+	public void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
         int total = 0;
         do {

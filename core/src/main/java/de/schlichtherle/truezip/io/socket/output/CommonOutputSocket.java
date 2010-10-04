@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.socket.output;
 
-import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;

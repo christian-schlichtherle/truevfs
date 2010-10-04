@@ -56,7 +56,8 @@ public class SynchronizedOutputStream extends OutputStream {
         this.lock = null == lock ? this : lock;
     }
 
-    public void write(int b) throws IOException {
+    @Override
+	public void write(int b) throws IOException {
         synchronized (lock) {
             out.write(b);
         }

@@ -37,11 +37,13 @@ public abstract class BasicFeedback implements Feedback {
 
     private JPanel panel;
 
-    public JPanel getPanel() {
+    @Override
+	public JPanel getPanel() {
         return panel;
     }
 
-    public void setPanel(final JPanel panel) {
+    @Override
+	public void setPanel(final JPanel panel) {
         this.panel = panel;
     }
 
@@ -53,7 +55,8 @@ public abstract class BasicFeedback implements Feedback {
      * The implementation in this class calls {@link #startSound} and then
      * {@link #startAnimation}.
      */
-    public void run() {
+    @Override
+	public void run() {
         startSound();
         startAnimation();
     }

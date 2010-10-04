@@ -22,14 +22,16 @@ package de.schlichtherle.truezip.io.zip;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class DefaultZipEntryFactory implements ZipEntryFactory {
+class DefaultZipEntryFactory implements ZipEntryFactory<ZipEntry> {
 
-    static final ZipEntryFactory SINGLETON = new DefaultZipEntryFactory();
+    static final ZipEntryFactory<ZipEntry> SINGLETON
+    		= new DefaultZipEntryFactory();
 
     private DefaultZipEntryFactory() {
     }
 
-    public ZipEntry newEntry(String name) {
+    @Override
+	public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 }

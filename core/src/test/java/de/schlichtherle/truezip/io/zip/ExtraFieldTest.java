@@ -34,13 +34,7 @@ public class ExtraFieldTest extends TestCase {
         try {
             ExtraField.register(null);
             fail("Expected IllegalArgumentException!");
-        } catch (IllegalArgumentException expected) {
-        }
-
-        try {
-            ExtraField.register(Integer.class);
-            fail("Expected IllegalArgumentException!");
-        } catch (IllegalArgumentException expected) {
+        } catch (NullPointerException expected) {
         }
 
         try {
@@ -95,35 +89,35 @@ public class ExtraFieldTest extends TestCase {
         public NullExtraField() {
         }
 
-        public int getHeaderID() {
+        @Override
+		public int getHeaderID() {
             return 0x0000;
         }
 
-        int getDataSize() {
+        @Override
+		int getDataSize() {
             return 0;
         }
 
-        void readFrom(byte[] data, int off, int size) {
+        @Override
+		void readFrom(byte[] data, int off, int size) {
         }
 
-        void writeTo(byte[] data, int off) {
+        @Override
+		void writeTo(byte[] data, int off) {
         }
     }
 
     private static class TooSmallHeaderIDExtraField extends NullExtraField {
-        public TooSmallHeaderIDExtraField() {
-        }
-
-        public int getHeaderID() {
+        @Override
+		public int getHeaderID() {
             return UShort.MIN_VALUE - 1; // illegal return value
         }
     }
 
     private static class TooLargeHeaderIDExtraField extends NullExtraField {
-        public TooLargeHeaderIDExtraField() {
-        }
-
-        public int getHeaderID() {
+        @Override
+		public int getHeaderID() {
             return UShort.MAX_VALUE + 1; // illegal return value
         }
     }

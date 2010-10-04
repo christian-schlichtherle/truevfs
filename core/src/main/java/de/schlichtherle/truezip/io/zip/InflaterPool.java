@@ -74,7 +74,7 @@ class InflaterPool {
     static void release(Inflater inflater) {
         inflater.reset();
         synchronized (released) {
-            released.add(new SoftReference(inflater));
+            released.add(new SoftReference<Inflater>(inflater));
             allocated.remove(inflater);
         }
     }

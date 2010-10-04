@@ -163,7 +163,8 @@ implements Iterable<E>, Closeable, Flushable {
      *
      * @deprecated Use {@link #iterator()} instead.
      */
-    public Enumeration<? extends ZipEntry> entries() {
+ 	@Deprecated
+	public Enumeration<? extends ZipEntry> entries() {
         return Collections.enumeration(entries.values());
     }
 

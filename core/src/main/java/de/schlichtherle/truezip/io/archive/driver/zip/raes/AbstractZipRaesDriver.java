@@ -171,7 +171,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * {@link #getRaesParameters} for authentication.
      */
     @Override
-    public CommonOutputShop newOutputShop(
+    public CommonOutputShop<ZipEntry> newOutputShop(
             final ArchiveDescriptor archive,
             final CommonOutputSocket<?> target,
             final CommonInputShop<ZipEntry> source)

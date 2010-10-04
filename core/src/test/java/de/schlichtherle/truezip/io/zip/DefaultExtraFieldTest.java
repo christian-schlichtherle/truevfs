@@ -34,7 +34,8 @@ public class DefaultExtraFieldTest extends TestCase {
         super(testName);
     }            
 
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         def = new DefaultExtraField(0x0000);
     }

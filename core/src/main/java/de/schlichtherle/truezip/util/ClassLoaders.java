@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.util;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Enumeration;
 
 /**
@@ -48,7 +49,7 @@ public class ClassLoaders {
      * @throws ClassNotFoundException If loading the class failed for some
      *         reason.
      */
-    public static Class<?> loadClass(String classToLoad, Class loadingClass)
+    public static Class<?> loadClass(String classToLoad, Class<?> loadingClass)
     throws ClassNotFoundException {
         ClassLoader l1 = loadingClass.getClassLoader();
         if (l1 == null)
@@ -77,7 +78,7 @@ public class ClassLoaders {
      *         path.
      * @throws IOException If I/O errors occur.
      */
-    public static Enumeration getResources(String name, Class loadingClass)
+    public static Enumeration<URL> getResources(String name, Class<?> loadingClass)
     throws IOException {
         ClassLoader l1 = loadingClass.getClassLoader();
         if (l1 == null)
@@ -87,7 +88,7 @@ public class ClassLoaders {
             l2 = ClassLoader.getSystemClassLoader();
         return l1 == l2
                 ? l1.getResources(name)
-                : new JointEnumeration( l1.getResources(name),
-                                        l2.getResources(name));
+                : new JointEnumeration<URL>(l1.getResources(name),
+                                        	l2.getResources(name));
     }
 }

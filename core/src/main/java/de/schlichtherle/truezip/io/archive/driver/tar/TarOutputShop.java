@@ -98,7 +98,8 @@ implements CommonOutputShop<TarEntry> {
                 return entry;
             }
 
-            public OutputStream newOutputStream() throws IOException {
+            @Override
+			public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
                     throw new CommonOutputBusyException(entry);
                 if (entry.isDirectory()) {

@@ -95,18 +95,21 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      *
      * @deprecated Use {@link #iterator()} instead.
      */
-    @Override
+    @SuppressWarnings("dep-ann")
+	@Override
     public synchronized Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
             final Enumeration<? extends ZipEntry> e
                     = Collections.enumeration(Collections.list(
                         ZipOutputStream.super.entries()));
 
-            public boolean hasMoreElements() {
+            @Override
+			public boolean hasMoreElements() {
                 return e.hasMoreElements();
             }
 
-            public ZipEntry nextElement() {
+            @Override
+			public ZipEntry nextElement() {
                 return e.nextElement().clone();
             }
         }
@@ -135,15 +138,18 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
                 i = l.iterator();
             }
 
-            public boolean hasNext() {
+            @Override
+			public boolean hasNext() {
                 return i.hasNext();
             }
 
-            public ZipEntry next() {
+            @Override
+			public ZipEntry next() {
                 return i.next().clone();
             }
 
-            public void remove() {
+            @Override
+			public void remove() {
                 throw new UnsupportedOperationException();
             }
         }

@@ -119,7 +119,7 @@ implements ArchiveDetector {
      * {@link #DefaultArchiveDetector(DefaultArchiveDetector, String, ArchiveDriver)
      * DefaultArchiveDetector(ArchiveDetector.NULL, list, driver)}.
      */
-    public DefaultArchiveDetector(String list, ArchiveDriver driver) {
+    public DefaultArchiveDetector(String list, ArchiveDriver<?> driver) {
         super(list, driver);
     }
 
@@ -150,7 +150,7 @@ implements ArchiveDetector {
     public DefaultArchiveDetector(
             DefaultArchiveDetector delegate,
             String list,
-            ArchiveDriver driver) {
+            ArchiveDriver<?> driver) {
         super(delegate, list, driver);
     }
 
@@ -159,23 +159,26 @@ implements ArchiveDetector {
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      *
-     * @param delegate The {@code DefaultArchiveDetector} which's
-     *        configuration is to be virtually inherited.
-     * @param config An array of suffix lists and archive driver IDs.
-     *        Each key in this map must be a non-null, non-empty archive file
-     *        suffix list.
-     *        Each value must either be an archive driver instance, an archive
-     *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or {@code null}.
-     *        A {@code null} archive driver may be used to shadow a
-     *        mapping for the same archive driver in {@code delegate},
-     *        effectively removing it.
+     * @param  delegate The {@code DefaultArchiveDetector} which's
+     *         configuration is to be virtually inherited.
+     * @param  config An array of suffix lists and archive driver IDs.
+     *         Each key in this map must be a non-null, non-empty archive file
+     *         suffix list.
+     *         Each value must either be an archive driver instance, an archive
+     *         driver class, a string with the fully qualified name name of
+     *         an archive driver class, or {@code null}.
+     *         A {@code null} archive driver may be used to shadow a
+     *         mapping for the same archive driver in {@code delegate},
+     *         effectively removing it.
      * @throws NullPointerException If any parameter or configuration element
      *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
-     * @see SuffixSet Syntax definition for suffix lists.
+     * @throws ClassCastException if the keys are not {@link String}s or the
+     * 		   values are not {@link String}s, {@link Class}es or
+     *        {@link ArchiveDriver}s.
+     * @see    SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
             DefaultArchiveDetector delegate,
@@ -188,27 +191,29 @@ implements ArchiveDetector {
      * decorating the configuration of {@code delegate} with
      * mappings for all entries in {@code config}.
      *
-     * @param delegate The {@code DefaultArchiveDetector} which's
-     *        configuration is to be virtually inherited.
-     * @param config A map of suffix lists and archive drivers.
-     *        Each key in this map must be a non-null, non-empty archive file
-     *        suffix list.
-     *        Each value must either be an archive driver instance, an archive
-     *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or {@code null}.
-     *        A {@code null} archive driver may be used to shadow a
-     *        mapping for the same archive driver in {@code delegate},
-     *        effectively removing it.
+     * @param  delegate The {@code DefaultArchiveDetector} which's
+     *         configuration is to be virtually inherited.
+     * @param  config A map of suffix lists and archive drivers.
+     *         Each key in this map must be a non-null, non-empty archive file
+     *         suffix list.
+     *         Each value must either be an archive driver instance, an archive
+     *         driver class, a string with the fully qualified name name of
+     *         an archive driver class, or {@code null}.
+     *         A {@code null} archive driver may be used to shadow a
+     *         mapping for the same archive driver in {@code delegate},
+     *         effectively removing it.
      * @throws NullPointerException If any parameter or configuration element
      *         other than an archive driver is {@code null}.
      * @throws IllegalArgumentException If any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
-     * @see SuffixSet Syntax definition for suffix lists.
+     * @throws ClassCastException if the values are not {@link String}s,
+     *         {@link Class}es or {@link ArchiveDriver}s.
+     * @see    SuffixSet Syntax definition for suffix lists.
      */
     public DefaultArchiveDetector(
             DefaultArchiveDetector delegate,
-            Map config) {
+            Map<String, Object> config) {
         super(delegate, config);
     }
 

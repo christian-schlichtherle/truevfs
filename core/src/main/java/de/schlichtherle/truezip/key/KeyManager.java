@@ -73,8 +73,8 @@ public class KeyManager {
      * Maps key provider types (should be interfaces) to key provider types
      * (their implementing classes).
      */
-    private final Map<Class<? extends KeyProvider>, Class<? extends KeyProvider>>
-            types = new HashMap<Class<? extends KeyProvider>, Class<? extends KeyProvider>>();
+    private final Map<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>
+            types = new HashMap<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>();
     //private final Map types = new HashMap(); // look at the beauty of this instead!
 
     //
@@ -119,7 +119,7 @@ public class KeyManager {
         final String n = System.getProperty(KeyManager.class.getName(),
                 getDefaultKeyManagerClassName());
         try {
-            Class c = loadClass(n, KeyManager.class);
+            Class<?> c = loadClass(n, KeyManager.class);
             keyManager = (KeyManager) c.newInstance();
         } catch (RuntimeException ex) {
             throw ex;
@@ -212,11 +212,11 @@ public class KeyManager {
         if (provider instanceof AbstractKeyProvider) {
             final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
             akp.reset();
-            final KeyProvider result = akp.removeFromKeyManager(resource);
+            final KeyProvider<?> result = akp.removeFromKeyManager(resource);
             assert provider == result;
             return true;
         } else if (provider != null) {
-            final KeyProvider previous = mapKeyProvider(resource, null);
+            final KeyProvider<?> previous = mapKeyProvider(resource, null);
             assert provider == previous;
             return true;
         }
@@ -231,7 +231,8 @@ public class KeyManager {
      */
     public static void resetKeyProviders() {
         forEachKeyProvider(new KeyProviderCommand() {
-            public void run(URI resource, KeyProvider provider) {
+            @Override
+			public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof AbstractKeyProvider) {
                     ((AbstractKeyProvider<?>) provider).reset();
                 }
@@ -258,7 +259,8 @@ public class KeyManager {
         class ResetAndRemoveKeyProvider implements KeyProviderCommand {
             IllegalStateException ise = null;
 
-            public void run(URI resource, KeyProvider provider) {
+            @Override
+			public void run(URI resource, KeyProvider<?> provider) {
                 if (provider instanceof AbstractKeyProvider) {
                     final AbstractKeyProvider<?> akp
                             = (AbstractKeyProvider<?>) provider;
@@ -269,7 +271,7 @@ public class KeyManager {
                         ise = exc; // mark and forget any previous exception
                     }
                 } else {
-                    final KeyProvider previous = mapKeyProvider(resource, null);
+                    final KeyProvider<?> previous = mapKeyProvider(resource, null);
                     assert provider == previous;
                 }
             }
@@ -293,12 +295,13 @@ public class KeyManager {
         // ConcurrentModificationException.
         final Set<Map.Entry<URI, KeyProvider<?>>> entrySet = providers.entrySet();
         final int n = entrySet.size();
-        final Map.Entry<URI, KeyProvider<?>>[] entries
+        @SuppressWarnings("unchecked")
+		final Map.Entry<URI, KeyProvider<?>>[] entries
                 = entrySet.toArray(new Map.Entry[n]);
         for (int i = 0; i < n; i++) {
             final Map.Entry<URI, KeyProvider<?>> entry = entries[i];
             final URI resource = entry.getKey();
-            final KeyProvider provider = entry.getValue();
+            final KeyProvider<?> provider = entry.getValue();
             command.run(resource, provider);
         }
     }
@@ -471,14 +474,14 @@ public class KeyManager {
      */
     public synchronized KeyProvider<?> getKeyProvider(
             final URI resource,
-            Class<? extends KeyProvider> type)
+            Class<? extends KeyProvider<?>> type)
     throws NullPointerException, ClassCastException, IllegalArgumentException {
         if (resource == null)
             throw new NullPointerException();
         synchronized (KeyManager.class) {
             KeyProvider<?> kp = providers.get(resource);
             if (kp == null) {
-                final Class<? extends KeyProvider> subst = types.get(type);
+                final Class<? extends KeyProvider<?>> subst = types.get(type);
                 if (subst != null)
                     type = subst;
                 try {

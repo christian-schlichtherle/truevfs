@@ -31,7 +31,8 @@ public class OdfFileTest extends IOFileTestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         suffix = ".odf";
         File.setDefaultArchiveDetector(new DefaultArchiveDetector("odf"));
 

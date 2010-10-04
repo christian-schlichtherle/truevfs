@@ -35,12 +35,14 @@ public final class JointEnumeration<E> implements Enumeration<E> {
         this.e2 = e2;
     }
 
-    public boolean hasMoreElements() {
+    @Override
+	public boolean hasMoreElements() {
         return e1.hasMoreElements()
            || (e1 != e2 && (e1 = e2).hasMoreElements());
     }
 
-    public E nextElement() {
+    @Override
+	public E nextElement() {
         try {
             return e1.nextElement();
         } catch (NoSuchElementException ex) {

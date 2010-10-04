@@ -35,25 +35,28 @@ abstract class ExtraField {
     /** The Header ID of a ZIP64 Extended Information Extra Field. */
     public static final int ZIP64_HEADER_ID = 0x0001;
 
-    private static final Map<Integer, Class> registry
-            = new HashMap<Integer, Class>();
+    private static final Map<Integer, Class<? extends ExtraField>> registry
+            = new HashMap<Integer, Class<? extends ExtraField>>();
 
     /**
      * Registers a concrete implementation of this abstract base class for
      * use with the static factory method {@link #create}.
      * 
-     * @param c The implementation class of this abstract base class.
-     * @throws IllegalArgumentException If {@code c} is {@code null},
-     *         cannot get instantiated, is not a subclass of
-     *         {@code ExtraField} or its Header ID is out of range.
+     * @param  c the implementation class of this abstract base class.
+     * @throws NullPointerException if {@code c} is {@code null}.
+     * @throws IllegalArgumentException if {@code c} cannot get instantiated,
+     *         is not a subclass of {@code ExtraField} or its Header ID is out
+     *         of range.
      *         A more descriptive exception may be associated to it as its
      *         cause.
-     * @see #create
+     * @see    #create
      */
-    public static void register(final Class c) {
+    public static void register(final Class<? extends ExtraField> c) {
         final ExtraField ef;
         try {
             ef = (ExtraField) c.newInstance();
+        } catch (NullPointerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -77,7 +80,7 @@ abstract class ExtraField {
      */
     public static ExtraField create(final int headerID) {
         UShort.check(headerID, "Header ID out of range", null);
-        final Class c = registry.get(headerID);
+        final Class<? extends ExtraField> c = registry.get(headerID);
         final ExtraField ef;
         try {
             ef = c != null

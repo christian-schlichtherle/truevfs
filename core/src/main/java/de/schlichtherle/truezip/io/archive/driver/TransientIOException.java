@@ -41,6 +41,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@SuppressWarnings("serial")
 public final class TransientIOException
 extends IOException {
 

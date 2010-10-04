@@ -377,7 +377,7 @@ public class JFileTree extends JTree {
 
         for (int i = 0, l = paths.length; i < l; i++) {
             final TreePath path = paths[i];
-            final Enumeration expansions = getExpandedDescendants(path);
+            final Enumeration<TreePath> expansions = getExpandedDescendants(path);
             ftm.refresh((java.io.File) path.getLastPathComponent());
             setExpandedDescendants(expansions);
         }
@@ -388,7 +388,7 @@ public class JFileTree extends JTree {
         scrollPathToVisible(lead);
     }
 
-    private void setExpandedDescendants(final Enumeration expansions) {
+    private void setExpandedDescendants(final Enumeration<TreePath> expansions) {
         if (expansions == null)
             return;
         while (expansions.hasMoreElements())
@@ -572,7 +572,7 @@ public class JFileTree extends JTree {
         if (path == null)
             return false;
 
-        final Enumeration expansions;
+        final Enumeration<TreePath> expansions;
         final TreePath oldPath = ftm.newTreePath(oldNode);
         if (oldPath != null)
             expansions = getExpandedDescendants(oldPath);
@@ -693,19 +693,23 @@ public class JFileTree extends JTree {
             implements TreeExpansionListener, CellEditorListener, Serializable {
         private static final long serialVersionUID = 6027634928673290123L;
 
-        @java.lang.SuppressWarnings("deprecation")
+        @Override
+		@java.lang.SuppressWarnings("deprecation")
         public void treeCollapsed(TreeExpansionEvent evt) {
             ((FileTreeModel) getModel()).forget(
                     (java.io.File) evt.getPath().getLastPathComponent());
         }
 
-        public void treeExpanded(TreeExpansionEvent evt) {
+        @Override
+		public void treeExpanded(TreeExpansionEvent evt) {
         }
 
-        public void editingCanceled(ChangeEvent evt) {
+        @Override
+		public void editingCanceled(ChangeEvent evt) {
         }
 
-        public void editingStopped(ChangeEvent evt) {
+        @Override
+		public void editingStopped(ChangeEvent evt) {
             onEditingStopped(evt);
         }
     }
