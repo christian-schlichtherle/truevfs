@@ -57,7 +57,7 @@ extends ArchiveController<AE> {
     }
 
     void ensureNotReadLockedByCurrentThread(
-            final NotWriteLockedByCurrentThreadException ex) {
+            NotWriteLockedByCurrentThreadException ex) {
         getModel().ensureNotReadLockedByCurrentThread(ex);
     }
 

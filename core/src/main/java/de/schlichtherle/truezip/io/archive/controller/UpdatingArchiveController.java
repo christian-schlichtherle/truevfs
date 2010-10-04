@@ -222,11 +222,6 @@ extends     FileSystemArchiveController<AE> {
                 rootTemplate, vetoableTouchListener, readOnly);
     }
 
-    // FIXME: Remove this hack!
-    private static ArchiveController<?> getEnclController(ArchiveController<?> controller) {
-        return ArchiveControllers.getController(controller.getModel().getEnclMountPoint());
-    }
-
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
     throws IOException {
@@ -292,7 +287,7 @@ extends     FileSystemArchiveController<AE> {
             // The target file of this controller IS (or appears to be)
             // enclosed in another archive file.
             if (null == inFile) {
-                unwrap( getEnclController(this), getEnclPath(ROOT),
+                unwrap( getEnclController(), getEnclPath(ROOT),
                         autoCreate, createParents);
             } else {
                 // The enclosed archive file has already been updated and the
@@ -319,7 +314,7 @@ extends     FileSystemArchiveController<AE> {
                     // a bug.
                     assert false : "We should never get here! Please read the source code comments for full details.";
                     throw new FalsePositiveEnclosedFileException(
-                            getEnclController(this), getEnclPath(ROOT), ex);
+                            getEnclController(), getEnclPath(ROOT), ex);
                 }
                 // Note that the archive file system must be read-write
                 // because we are reusing a file which has been previously
@@ -892,10 +887,10 @@ extends     FileSystemArchiveController<AE> {
             // The archive file managed by this archive controller IS
             // enclosed in another archive file.
             try {
-                wrap(getEnclController(this), getEnclPath(ROOT));
+                wrap(getEnclController(), getEnclPath(ROOT));
             } catch (IOException ex) {
                 throw handler.fail(new ArchiveSyncException(
-                        getEnclController(this),
+                        getEnclController(),
                         "could not update archive entry '" + getEnclPath(ROOT) + "' - all changes are lost",
                         ex));
             }
