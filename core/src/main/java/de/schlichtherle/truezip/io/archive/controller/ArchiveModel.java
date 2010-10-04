@@ -45,7 +45,7 @@ implements ArchiveDescriptor {
     private final FileEntry target; // TODO: make this support other virtual file systems.
     private final ArchiveDriver<AE> driver;
     private boolean touched;
-    private TouchListener touchListener;
+    private final TouchListener touchListener;
 
     ArchiveModel(   final URI mountPoint,
                     final ArchiveDriver<AE> driver,
@@ -67,10 +67,11 @@ implements ArchiveDescriptor {
         }
         this.target = new FileEntry(mountPoint);
         this.driver = driver;
-        this.touchListener = touchListener;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
+        this.touchListener = touchListener;
+        notifyTouchListener();
     }
 
     ReentrantLock readLock() {
@@ -156,7 +157,12 @@ implements ArchiveDescriptor {
     public void setTouched(final boolean newTouched) {
         final boolean oldTouched = touched;
         touched = newTouched;
-        if (null != touchListener && newTouched != oldTouched)
-            touchListener.setTouched(newTouched);
+        if (newTouched != oldTouched)
+            notifyTouchListener();
+    }
+
+    private void notifyTouchListener() {
+        if (null != touchListener)
+            touchListener.setTouched(touched);
     }
 }

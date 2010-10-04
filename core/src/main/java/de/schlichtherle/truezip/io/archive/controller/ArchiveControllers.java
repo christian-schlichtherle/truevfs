@@ -151,7 +151,8 @@ public class ArchiveControllers {
 
         @Override
         public void setTouched(boolean touched) {
-            scheduleSync(controller, touched ? STRONG : WEAK);
+            if (null != controller)
+                scheduleSync(controller, touched ? STRONG : WEAK);
         }
     }
 
