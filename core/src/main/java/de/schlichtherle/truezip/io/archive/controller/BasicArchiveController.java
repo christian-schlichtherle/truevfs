@@ -515,9 +515,9 @@ implements     CommonInputSocketFactory <AE                     >,
             PromptingKeyManager.resetKeyProvider(getMountPoint());
             // Delete the target file or the entry in the enclosing
             // archive file, too.
-            throw isHostFileSystemEntryTarget() // FIXME: Don't use this method!
+            throw isHostedDirectoryEntryTarget() // FIXME: Make this method redundant!
                     ? new FalsePositiveEntryException(
-                        this, path, new IOException()) // TODO: Check: TransientIOException?
+                        this, path, new IOException()) // TODO: Consider TransientIOException!
                     : new FalsePositiveEnclosedEntryException(
                         this, path, new IOException()); // dito
         } else { // !isRoot(path)
@@ -526,18 +526,14 @@ implements     CommonInputSocketFactory <AE                     >,
     }
 
     /**
-     * Returns {@code true} if and only if the target file of this
-     * controller should be considered to be a file or directory in the host
-     * file system.
-     * Note that the target doesn't need to exist for this method to return
-     * {@code true}.
+     * Returns {@code true} if and only if this controller's target archive
+     * file is <em>not</em> enclosed in another archive file or actually exists
+     * as a false positive directory entry in the host file system.
      */
-    // TODO: Move to UpdatingArchiveController and declare private.
-    final boolean isHostFileSystemEntryTarget() {
-        // True iff not enclosed or the enclosing archive file is actually
-        // a plain directory.
+    // TODO: Move to ArchiveModel or UpdatingArchiveController and declare private.
+    final boolean isHostedDirectoryEntryTarget() {
         ArchiveModel enclModel = getModel().getEnclModel();
-        return null == enclModel || enclModel.getTarget().isDirectory();
+        return null == enclModel || DIRECTORY == enclModel.getTarget().getType();
     }
 
     /**

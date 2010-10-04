@@ -90,27 +90,19 @@ extends BasicArchiveController<AE> {
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private abstract class AutoMounter {
-        AutoMounter(final ArchiveFileSystem<AE> fileSystem) {
-            getModel().setFileSystem(fileSystem);
-        }
-
         abstract ArchiveFileSystem<AE> autoMount(
                 boolean autoCreate,
                 boolean createParents)
         throws IOException;
 
-        final ArchiveFileSystem<AE> getFileSystem() {
-            return getModel().getFileSystem();
+        ArchiveFileSystem<AE> getFileSystem() {
+            return null;
         }
 
         abstract void setFileSystem(ArchiveFileSystem<AE> fileSystem);
     } // class AutoMounter
 
     private class ResetFileSystem extends AutoMounter {
-        ResetFileSystem() {
-            super(null);
-        }
-
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
         throws IOException {
@@ -153,15 +145,22 @@ extends BasicArchiveController<AE> {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends AutoMounter {
+        private final ArchiveFileSystem<AE> fileSystem;
+
         MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
-            super(fileSystem);
             if (fileSystem == null)
                 throw new NullPointerException();
+            this.fileSystem = fileSystem;
         }
 
         @Override
         ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents) {
-            return getModel().getFileSystem();
+            return fileSystem;
+        }
+
+        @Override
+        ArchiveFileSystem<AE> getFileSystem() {
+            return fileSystem;
         }
 
         @Override
@@ -176,7 +175,6 @@ extends BasicArchiveController<AE> {
         private final FalsePositiveEntryException exception;
 
         private FalsePositiveFileSystem(final FalsePositiveEntryException exception) {
-            super(null);
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;

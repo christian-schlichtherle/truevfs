@@ -115,26 +115,42 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private static final class Input<CE extends CommonEntry>
-    extends ConcurrentInputShop<CE> {
-        Input(CommonInputShop<CE> input) {
+    /**
+     * This member class makes this archive controller instance strongly
+     * reachable from any created input stream.
+     * This is required by the memory management to ensure that for any
+     * prospective archive file at most one archive controller object is in
+     * use at any time.
+     *
+     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
+     */
+    private final class Input extends ConcurrentInputShop<AE> {
+        Input(CommonInputShop<AE> input) {
             super(input);
         }
 
         /** Returns the product of the archive driver this input is wrapping. */
-        CommonInputShop<CE> getDriverProduct() {
+        CommonInputShop<AE> getDriverProduct() {
             return target;
         }
     }
 
-    private static final class Output<CE extends CommonEntry>
-    extends ConcurrentOutputShop<CE> {
-        Output(CommonOutputShop<CE> output) {
+    /**
+     * This member class makes this archive controller instance strongly
+     * reachable from any created output stream.
+     * This is required by the memory management to ensure that for any
+     * prospective archive file at most one archive controller object is in
+     * use at any time.
+     *
+     * @see ArchiveControllers#getController(URI, ArchiveDriver, ArchiveController)
+     */
+    private final class Output extends ConcurrentOutputShop<AE> {
+        Output(CommonOutputShop<AE> output) {
             super(output);
         }
 
         /** Returns the product of the archive driver this output is wrapping. */
-        CommonOutputShop<CE> getDriverProduct() {
+        CommonOutputShop<AE> getDriverProduct() {
             return target;
         }
     }
@@ -143,6 +159,7 @@ extends FileSystemArchiveController<AE> {
         @Override
         public void touch() throws IOException {
             ensureOutArchive();
+            getModel().setTouched(true);
         }
     }
 
@@ -162,7 +179,7 @@ extends FileSystemArchiveController<AE> {
      * An {@link Input} object used to mount the virtual file system
      * and read the entries from the archive file.
      */
-    private Input<AE> input;
+    private Input input;
 
     /**
      * Plain {@code java.io.File} object used for temporary output.
@@ -174,7 +191,7 @@ extends FileSystemArchiveController<AE> {
      * The (possibly temporary) {@link Output} we are writing newly
      * created or modified entries to.
      */
-    private Output<AE> output;
+    private Output output;
 
     /**
      * Whether or not updating the archive entry in the enclosing archive file
@@ -238,7 +255,7 @@ extends FileSystemArchiveController<AE> {
     throws IOException {
         // We need to mount the virtual file system from the input file.
         // and so far we have not successfully opened the input file.
-        if (isHostFileSystemEntryTarget()) {
+        if (isHostedDirectoryEntryTarget()) {
             // The target file of this controller is NOT enclosed
             // in another archive file.
             // Test modification time BEFORE opening the input file!
@@ -414,7 +431,7 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private Input<AE> newInput(final File file) throws IOException {
+    private Input newInput(final File file) throws IOException {
         class InputSocket extends FilterInputSocket<FileEntry> {
             InputSocket() throws IOException {
                 super(FileSocketFactory.get().newInputSocket(new FileEntry(file)));
@@ -423,12 +440,12 @@ extends FileSystemArchiveController<AE> {
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final ReadOnlyFile rof = super.newReadOnlyFile();
-                return isHostFileSystemEntryTarget()
+                return isHostedDirectoryEntryTarget()
                         ? new CountingReadOnlyFile(rof)
                         : rof;
             }
         }
-        return new Input<AE>(getDriver().newInputShop(this, new InputSocket()));
+        return new Input(getDriver().newInputShop(this, new InputSocket()));
     }
 
     @Override
@@ -454,7 +471,7 @@ extends FileSystemArchiveController<AE> {
 
         FileEntry tmp = outFile;
         if (tmp == null) {
-            if (isHostFileSystemEntryTarget() && !getTarget().isFile()) {
+            if (isHostedDirectoryEntryTarget() && !getTarget().isFile()) {
                 tmp = getTarget();
             } else {
                 // Use a new temporary file as the output archive file.
@@ -471,7 +488,7 @@ extends FileSystemArchiveController<AE> {
         outFile = tmp; // init outFile on success only!
     }
 
-    private Output<AE> newOutput(final File file) throws IOException {
+    private Output newOutput(final File file) throws IOException {
         class OutputSocket extends FilterOutputSocket<FileEntry> {
             OutputSocket() throws IOException {
                 super(FileSocketFactory.get().newOutputSocket(new FileEntry(file)));
@@ -487,7 +504,7 @@ extends FileSystemArchiveController<AE> {
         } // class OutputSocket
         Output output = null;
         try {
-            return output = new Output<AE>(getDriver().newOutputShop(
+            return output = new Output(getDriver().newOutputShop(
                         this, new OutputSocket(),
                         null == input ? null : input.getDriverProduct()));
         } catch (TransientIOException ex) {
@@ -508,7 +525,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private boolean isFileSystemTouched() {
-        ArchiveFileSystem<AE> fileSystem = getModel().getFileSystem();
+        ArchiveFileSystem<AE> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
     }
 
@@ -633,6 +650,8 @@ extends FileSystemArchiveController<AE> {
             throw ex;
         } catch (IOException ex) {
             throw builder.fail(new ArchiveSyncException(this, ex));
+        } finally {
+            getModel().setTouched(needsReassembly);
         }
 
         builder.check();
@@ -816,7 +835,7 @@ extends FileSystemArchiveController<AE> {
      */
     private void reassemble(final ArchiveSyncExceptionHandler handler)
     throws ArchiveSyncException {
-        if (isHostFileSystemEntryTarget()) {
+        if (isHostedDirectoryEntryTarget()) {
             // The archive file managed by this object is NOT enclosed in
             // another archive file.
             if (outFile != getTarget()) {
