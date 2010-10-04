@@ -15,42 +15,42 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
-import de.schlichtherle.truezip.io.socket.input.CommonInputService;
-import java.io.File;
-import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
-import java.util.Collections;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
-import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
-import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
-import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
+import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.input.CommonInputService;
+import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.input.ConcurrentInputShop;
+import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputService;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.output.ConcurrentOutputShop;
+import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
+import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
@@ -73,7 +73,7 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  * @version $Id$
  */
 final class UpdatingArchiveController<AE extends ArchiveEntry>
-extends FileSystemArchiveController<AE> {
+extends     FileSystemArchiveController<AE> {
 
     /** Prefix for temporary files created by this class. */
     static final String TEMP_FILE_PREFIX = "tzp-ctrl";
@@ -432,10 +432,10 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private Input newInput(final File file) throws IOException {
+    private Input newInput(final FileEntry file) throws IOException {
         class InputSocket extends FilterInputSocket<FileEntry> {
             InputSocket() throws IOException {
-                super(FileSocketFactory.get().newInputSocket(new FileEntry(file)));
+                super(newInputSocket(new FileEntry(file)));
             }
 
             @Override
@@ -457,12 +457,9 @@ extends FileSystemArchiveController<AE> {
         return null == input ? null : input.newInputSocket(entry);
     }
 
-    @Override
-    public CommonOutputSocket<AE> newOutputSocket(final AE entry)
+    public CommonInputSocket<FileEntry> newInputSocket(FileEntry entry)
     throws IOException {
-        assert null != entry;
-        ensureOutArchive();
-        return output.newOutputSocket(entry);
+        return FileSocketFactory.get().newInputSocket(entry);
     }
 
     private void ensureOutArchive()
@@ -489,10 +486,10 @@ extends FileSystemArchiveController<AE> {
         outFile = tmp; // init outFile on success only!
     }
 
-    private Output newOutput(final File file) throws IOException {
+    private Output newOutput(final FileEntry file) throws IOException {
         class OutputSocket extends FilterOutputSocket<FileEntry> {
             OutputSocket() throws IOException {
-                super(FileSocketFactory.get().newOutputSocket(new FileEntry(file)));
+                super(newOutputSocket(new FileEntry(file)));
             }
 
             @Override
@@ -523,6 +520,19 @@ extends FileSystemArchiveController<AE> {
                     throw new IOException(file.getPath() + " (couldn't delete corrupted output file)");
             }
         }
+    }
+
+    @Override
+    public CommonOutputSocket<AE> newOutputSocket(final AE entry)
+    throws IOException {
+        assert null != entry;
+        ensureOutArchive();
+        return output.newOutputSocket(entry);
+    }
+
+    public CommonOutputSocket<FileEntry> newOutputSocket(FileEntry entry)
+    throws IOException {
+        return FileSocketFactory.get().newOutputSocket(entry);
     }
 
     private boolean isFileSystemTouched() {
@@ -904,13 +914,12 @@ extends FileSystemArchiveController<AE> {
         // to its enclosing archive file, preserving the
         // last modification time of the root directory as the last
         // modification time of the entry.
-        final InputStream in = new java.io.FileInputStream(outFile);
         try {
-            ArchiveControllers.copy(true, false, outFile, in, controller, path);
+            IOSocket.copy(
+                    newInputSocket(outFile),
+                    controller.newOutputSocket(path, BitField.of(PRESERVE)));
         } catch (FalsePositiveEntryException cannotHappen) {
             throw new AssertionError(cannotHappen);
-        } finally {
-            in.close();
         }
     }
 
