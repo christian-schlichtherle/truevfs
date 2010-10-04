@@ -200,7 +200,8 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser {
             filter = new FilenameFilter() {
                 final int pl = prefix.length();
 
-                public boolean accept(java.io.File d, String child) {
+                @Override
+				public boolean accept(java.io.File d, String child) {
                     if (child.length() >= pl)
                         return prefix.equalsIgnoreCase(child.substring(0, pl));
                     else

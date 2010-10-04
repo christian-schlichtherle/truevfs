@@ -66,7 +66,8 @@ public class OpenKeyPanelUITest extends TestCase {
 
     private JFrameOperator showInstanceInFrame() {
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 final JFrame frame = new JFrame();
                 frame.getContentPane().add(instance);
                 frame.pack();
@@ -89,7 +90,8 @@ public class OpenKeyPanelUITest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         EventQueue.invokeAndWait(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 //frame.setVisible(false);
                 frame.dispose();
             }

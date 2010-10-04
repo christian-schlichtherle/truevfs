@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
@@ -163,7 +164,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        Reference<ArchiveController<?>> ref = new WeakReference<ArchiveController<?>>(new File(path).getInnerArchive().getArchiveController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -183,7 +184,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference ref = new WeakReference(new File(path).getInnerArchive().getArchiveController());
+        Reference<ArchiveController<?>> ref = new WeakReference<ArchiveController<?>>(new File(path).getInnerArchive().getArchiveController());
         gc();
         assertNotNull(ref.get());
         out.close();
@@ -220,7 +221,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(archive.delete());
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     void testFalsePositive(final File file) throws IOException {
         assert file.isArchive();
 
@@ -417,7 +417,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(archive.deleteAll());
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void testIllegalDirectoryOperations(final File dir) throws IOException {
         assert dir.isDirectory();
         try {
@@ -507,7 +506,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertEquals(0, file.length());
     }
     
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileInputStream()
     throws IOException {
         final File file1 = new File(archive, "file1");
@@ -563,7 +561,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertFalse(file1.exists());
     }
 
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileOutputStream()
     throws IOException {
         File file1 = new File(archive, "file1");
@@ -588,7 +585,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         
         // fosA is still open!
         try {
-            FileOutputStream fosB = new FileOutputStream(file1);
+            new FileOutputStream(file1);
         } catch (FileBusyException busy) {
             // This is actually an implementation detail which may change in
             // a future version.

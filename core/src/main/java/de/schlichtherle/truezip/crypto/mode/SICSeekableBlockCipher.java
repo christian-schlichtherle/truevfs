@@ -64,7 +64,8 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
         return cipher;
     }
 
-    public void init(boolean forEncryption, CipherParameters params)
+    @Override
+	public void init(boolean forEncryption, CipherParameters params)
     throws IllegalArgumentException {
         if (params instanceof ParametersWithIV) {
           ParametersWithIV ivParams = (ParametersWithIV) params;
@@ -76,17 +77,20 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
         }
     }
 
-    public String getAlgorithmName() {
+    @Override
+	public String getAlgorithmName() {
         // Must add "/SIC" in order to make BufferedBlockCipher work correctly.
         return cipher.getAlgorithmName() + "/SIC";
     }
 
-    public int getBlockSize() {
+    @Override
+	public int getBlockSize() {
         assert blockSize == cipher.getBlockSize();
         return blockSize;
     }
 
-    public int processBlock(
+    @Override
+	public int processBlock(
             final byte[] in,
             final int inOff,
             final byte[] out,
@@ -113,15 +117,18 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
         }
     }
 
-    public void setBlockCounter(long block) {
+    @Override
+	public void setBlockCounter(long block) {
         blockCounter = block;
     }
 
-    public long getBlockCounter() {
+    @Override
+	public long getBlockCounter() {
         return blockCounter;
     }
 
-    public void reset() {
+    @Override
+	public void reset() {
         // Effectively the same as setBlockCounter(0).
         //System.arraycopy(IV, 0, counterIn, 0, blockSize);
         blockCounter = 0;

@@ -61,7 +61,8 @@ public class FileTreeModel implements TreeModel {
     /** A comparator which sorts directory entries to the beginning. */
     public static final Comparator<java.io.File> FILE_NAME_COMPARATOR
             = new Comparator<java.io.File>() {
-        public int compare(java.io.File f1, java.io.File f2) {
+        @Override
+		public int compare(java.io.File f1, java.io.File f2) {
             if (f1.isDirectory())
                 return f2.isDirectory()
                         ? collator.compare(f1.getName(), f2.getName())
@@ -168,28 +169,34 @@ public class FileTreeModel implements TreeModel {
      * @return A {@code File} object or {@code null} if this tree
      *         model has not been created with a {@code File} object.
      */
-    public Object getRoot() {
+    @Override
+	public Object getRoot() {
         return root;
     }
 
-    public Object getChild(Object parent, int index) {
+    @Override
+	public Object getChild(Object parent, int index) {
         final java.io.File[] children = getChildren((java.io.File) parent);
         return children != null ? children[index] : null;
     }
 
-    public int getChildCount(Object parent) {
+    @Override
+	public int getChildCount(Object parent) {
         final java.io.File[] children = getChildren((java.io.File) parent);
         return children != null ? children.length : 0;
     }
 
-    public boolean isLeaf(Object node) {
+    @Override
+	public boolean isLeaf(Object node) {
         return !((java.io.File) node).isDirectory();
     }
 
-    public void valueForPathChanged(TreePath path, Object newValue) {
+    @Override
+	public void valueForPathChanged(TreePath path, Object newValue) {
     }
 
-    public int getIndexOfChild(Object parent, Object child) {
+    @Override
+	public int getIndexOfChild(Object parent, Object child) {
         if (parent == null || child == null)
             return -1;
         final java.io.File[] children = getChildren((java.io.File) parent);
@@ -587,7 +594,8 @@ public class FileTreeModel implements TreeModel {
      *
      * @param l The listener to add.
      */
-    public void addTreeModelListener(TreeModelListener l) {
+    @Override
+	public void addTreeModelListener(TreeModelListener l) {
         listeners.add(TreeModelListener.class, l);
     }
 
@@ -596,7 +604,8 @@ public class FileTreeModel implements TreeModel {
      *
      * @param l The listener to remove.
      */
-    public void removeTreeModelListener(TreeModelListener l) {
+    @Override
+	public void removeTreeModelListener(TreeModelListener l) {
         listeners.remove(TreeModelListener.class, l);
     }
 

@@ -124,34 +124,40 @@ public class ZipRaesFileTest extends IOFileTestCase {
     }
 
     public static class CustomKeyManager extends KeyManager {
-        public CustomKeyManager() {
+        @SuppressWarnings("unchecked")
+		public CustomKeyManager() {
             mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
         }
     }
 
     public static class SimpleAesKeyProvider implements AesKeyProvider<char[]> {
-        public char[] getCreateKey() throws UnknownKeyException {
+        @Override
+		public char[] getCreateKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
             return "secret".toCharArray(); // return clone!
         }
 
-        public char[] getOpenKey() throws UnknownKeyException {
+        @Override
+		public char[] getOpenKey() throws UnknownKeyException {
             if (cancelling)
                 throw new KeyPromptingCancelledException();
             return "secret".toCharArray(); // return clone!
         }
 
-        public void invalidOpenKey() {
+        @Override
+		public void invalidOpenKey() {
             throw new AssertionError(
                     "Illegal call: Key is constant or password prompting has been cancelled!");
         }
 
-        public int getKeyStrength() {
+        @Override
+		public int getKeyStrength() {
             return KEY_STRENGTH_256;
         }
 
-        public void setKeyStrength(int keyStrength) {
+        @Override
+		public void setKeyStrength(int keyStrength) {
         }
     }
 }

@@ -31,6 +31,7 @@ import junit.framework.TestCase;
  * @version $Id$
  * @deprecated This feature is currently unused.
  */
+@Deprecated
 public class OperationContainerTest extends TestCase {
 
     public void testRunSuccesses() {
@@ -38,8 +39,8 @@ public class OperationContainerTest extends TestCase {
         final List<Success> successes = new ArrayList<Success>(
                 Collections.nCopies(n, new Success()));
         final OperationHandler handler = new OperationHandler();
-        final OperationContainer<RuntimeException> container
-                = new OperationContainer<RuntimeException>(
+        final OperationContainer<IOException, RuntimeException> container
+                = new OperationContainer<IOException, RuntimeException>(
                     successes, true, handler, IOException.class);
         container.run();
         assertTrue(successes.isEmpty());
@@ -50,8 +51,8 @@ public class OperationContainerTest extends TestCase {
         final int n = 2;
         final List<Failure> failures = Collections.nCopies(n, new Failure());
         final OperationHandler handler = new OperationHandler();
-        final OperationContainer<RuntimeException> container
-                = new OperationContainer<RuntimeException>(
+        final OperationContainer<IOException, RuntimeException> container
+                = new OperationContainer<IOException, RuntimeException>(
                     failures, true, handler, IOException.class);
         container.run();
         assertEquals(n, failures.size());

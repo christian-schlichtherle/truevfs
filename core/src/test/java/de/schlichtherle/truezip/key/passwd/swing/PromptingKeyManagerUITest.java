@@ -73,7 +73,8 @@ public class PromptingKeyManagerUITest extends TestCase {
         // TODO: This is a workaround: Without it, the very first key dialog
         // would get closed on any input by its remote control.
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 JOptionPane.showMessageDialog(null, "Hello World!");
             }
         });

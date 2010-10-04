@@ -43,7 +43,7 @@ implements CommonInputShop<ZipEntry> {
             String charset,
             boolean preambled,
             boolean postambled,
-            ZipEntryFactory factory)
+            ZipEntryFactory<ZipEntry> factory)
     throws  NullPointerException,
             UnsupportedEncodingException,
             FileNotFoundException,

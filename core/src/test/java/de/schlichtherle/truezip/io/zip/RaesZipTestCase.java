@@ -60,22 +60,27 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     private static final RaesParameters raesParameters = new Type0RaesParameters() {
-        public char[] getOpenPasswd() {
+        @Override
+		public char[] getOpenPasswd() {
             return PASSWD.toCharArray();
         }
 
-        public void invalidOpenPasswd() {
+        @Override
+		public void invalidOpenPasswd() {
         }
 
-        public char[] getCreatePasswd() {
+        @Override
+		public char[] getCreatePasswd() {
             return PASSWD.toCharArray();
         }
 
-        public int getKeyStrength() {
+        @Override
+		public int getKeyStrength() {
             return createKeyStrength();
         }
         
-        public void setKeyStrength(int keyStrength) {
+        @Override
+		public void setKeyStrength(int keyStrength) {
         }
     };
     

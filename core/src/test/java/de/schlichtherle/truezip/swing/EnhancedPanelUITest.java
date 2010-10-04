@@ -81,7 +81,8 @@ public class EnhancedPanelUITest extends TestCase {
     throws InterruptedException, InvocationTargetException {
         final JFrame frame = new JFrame();
         invokeAndWait(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 frame.getContentPane().add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -94,7 +95,8 @@ public class EnhancedPanelUITest extends TestCase {
     private static void disposeFrame(final JFrame frame)
     throws InterruptedException, InvocationTargetException {
         invokeAndWait(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 frame.setVisible(false);
                 frame.dispose();
             }
@@ -155,11 +157,13 @@ public class EnhancedPanelUITest extends TestCase {
     private static class CountingPanelListener implements PanelListener {
         public int shown, hidden;
 
-        public void ancestorWindowShown(PanelEvent evt) {
+        @Override
+		public void ancestorWindowShown(PanelEvent evt) {
             shown++;
         }
 
-        public void ancestorWindowHidden(PanelEvent evt) {
+        @Override
+		public void ancestorWindowHidden(PanelEvent evt) {
             hidden++;
         }
     }
@@ -266,7 +270,8 @@ public class EnhancedPanelUITest extends TestCase {
                 super(frame);
             }
 
-            public void run() {
+            @Override
+			public void run() {
                 frame.getContentPane().add(instance);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
@@ -278,7 +283,8 @@ public class EnhancedPanelUITest extends TestCase {
                 super(frame);
             }
 
-            @SuppressWarnings("deprecation")
+            @Override
+			@SuppressWarnings("deprecation")
             public void run() {
                 // Use multiple ways to make the frame visible.
                 // Depending on the version of the Swing implementation, this may
@@ -295,7 +301,8 @@ public class EnhancedPanelUITest extends TestCase {
                 super(frame);
             }
 
-            @SuppressWarnings("deprecation")
+            @Override
+			@SuppressWarnings("deprecation")
             public void run() {
                 // Use multiple ways to make the frame visible.
                 // Depending on the version of the Swing implementation, this may
@@ -357,7 +364,8 @@ public class EnhancedPanelUITest extends TestCase {
         while (queue.peekEvent() != null) {
             try {
                 EventQueue.invokeAndWait(new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                     }
                 });
             } catch (InvocationTargetException cannotHappen) {
@@ -377,7 +385,8 @@ public class EnhancedPanelUITest extends TestCase {
         instance.addPanelListener(l);
 
         final Runnable makeVisible = new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 JOptionPane.showMessageDialog(null, instance);
             }
         };

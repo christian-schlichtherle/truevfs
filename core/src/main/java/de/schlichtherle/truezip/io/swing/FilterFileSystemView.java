@@ -114,7 +114,8 @@ abstract class FilterFileSystemView extends FileSystemView {
         return delegate.isFileSystem(f);
     }
 
-    public File createNewFolder(File containingDir) throws IOException {
+    @Override
+	public File createNewFolder(File containingDir) throws IOException {
         return delegate.createNewFolder(containingDir);
     }
 

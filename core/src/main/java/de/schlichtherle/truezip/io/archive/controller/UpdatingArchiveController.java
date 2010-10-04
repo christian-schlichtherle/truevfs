@@ -96,7 +96,8 @@ extends FileSystemArchiveController<AE> {
             return 0;
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public Iterator<CE> iterator() {
             return (Iterator) Collections.emptyList().iterator();
         }
@@ -207,13 +208,13 @@ extends FileSystemArchiveController<AE> {
         return getModel().getTarget();
     }
 
-    private ArchiveFileSystem newArchiveFileSystem()
+    private ArchiveFileSystem<AE> newArchiveFileSystem()
     throws IOException {
         return ArchiveFileSystems.newArchiveFileSystem(
                 getDriver(), vetoableTouchListener);
     }
 
-    private ArchiveFileSystem newArchiveFileSystem(
+    private ArchiveFileSystem<AE> newArchiveFileSystem(
             CommonEntry rootTemplate,
             boolean readOnly) {
         return ArchiveFileSystems.newArchiveFileSystem(
@@ -222,7 +223,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     // FIXME: Remove this hack!
-    private static ArchiveController getEnclController(ArchiveController controller) {
+    private static ArchiveController<?> getEnclController(ArchiveController<?> controller) {
         return ArchiveControllers.getController(controller.getModel().getEnclMountPoint());
     }
 
@@ -334,7 +335,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void unwrap(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -397,7 +398,7 @@ extends FileSystemArchiveController<AE> {
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
-            final ArchiveFileSystem fileSystem = newArchiveFileSystem();
+            final ArchiveFileSystem<AE> fileSystem = newArchiveFileSystem();
             assert outFile != null;
             assert output != null;
             // Now try to create the entry in the enclosing controller.
@@ -529,10 +530,11 @@ extends FileSystemArchiveController<AE> {
         return null != fileSystem && fileSystem.isTouched();
     }
 
-    boolean autoSync(String path) throws ArchiveSyncException {
+    @Override
+	boolean autoSync(String path) throws ArchiveSyncException {
         if (null == output)
             return false;
-        final Entry entry = getFileSystem().getEntry(path);
+        final Entry<AE> entry = getFileSystem().getEntry(path);
         if (null == entry || null == output.getEntry(entry.getName()))
             return false;
         ensureWriteLockedByCurrentThread();
@@ -541,7 +543,8 @@ extends FileSystemArchiveController<AE> {
         return true;
     }
 
-    public void sync(   final ArchiveSyncExceptionBuilder builder,
+    @Override
+	public void sync(   final ArchiveSyncExceptionBuilder builder,
                         final BitField<SyncOption> options)
     throws ArchiveSyncException {
         assert input == null || inFile != null; // input archive => input file
@@ -646,10 +649,10 @@ extends FileSystemArchiveController<AE> {
                 // this ArchiveController since its creation or last update.
                 assert output == null;
             }
-        } catch (ArchiveSyncException ex) {
+        /*} catch (ArchiveSyncException ex) {
             throw ex;
         } catch (IOException ex) {
-            throw builder.fail(new ArchiveSyncException(this, ex));
+            throw builder.fail(new ArchiveSyncException(this, ex));*/
         } finally {
             getModel().setTouched(needsReassembly);
         }
@@ -685,11 +688,13 @@ extends FileSystemArchiveController<AE> {
                 this.delegate = delegate;
             }
 
-            public ArchiveSyncException fail(final IOException cannotHappen) {
+            @Override
+			public ArchiveSyncException fail(final IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
-            public void warn(final IOException cause) throws ArchiveSyncException {
+            @Override
+			public void warn(final IOException cause) throws ArchiveSyncException {
                 if (cause == null)
                     throw new NullPointerException();
                 final IOException old = last;
@@ -752,7 +757,7 @@ extends FileSystemArchiveController<AE> {
         // Check if we have written out any entries that have been
         // deleted from the archive file system meanwhile and prepare
         // to throw a warning exception.
-        final ArchiveFileSystem fileSystem = getFileSystem();
+        final ArchiveFileSystem<AE> fileSystem = getFileSystem();
         for (final AE entry : output) {
             assert entry.getType() != DIRECTORY;
             // At this point in time we could have written only file archive
@@ -888,7 +893,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private void wrap(
-            final ArchiveController controller,
+            final ArchiveController<?> controller,
             final String path)
     throws IOException {
         assert controller != null;
@@ -910,7 +915,6 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
         try {
             final ArchiveSyncExceptionBuilder handler
@@ -935,11 +939,13 @@ extends FileSystemArchiveController<AE> {
     throws ArchiveSyncException {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, ArchiveSyncException> {
-            public ArchiveSyncException fail(IOException cannotHappen) {
+            @Override
+			public ArchiveSyncException fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
-            public void warn(IOException cause) throws ArchiveSyncException {
+            @Override
+			public void warn(IOException cause) throws ArchiveSyncException {
                 if (null == cause)
                     throw new NullPointerException();
                 handler.warn(new ArchiveSyncWarningException(

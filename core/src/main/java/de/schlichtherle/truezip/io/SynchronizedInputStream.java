@@ -54,7 +54,8 @@ public class SynchronizedInputStream extends InputStream {
         this.lock = lock != null ? lock : this;
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         synchronized (lock) {
             return in.read();
         }

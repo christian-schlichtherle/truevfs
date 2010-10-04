@@ -65,7 +65,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      * Like its cousin in JSE 1.5, the returned lock does <em>not</em>
      * support upgrading to a write lock.
      */
-    public ReentrantLock readLock() {
+    @Override
+	public ReentrantLock readLock() {
         return readLock;
     }
 
@@ -74,7 +75,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
      * Like its cousin in JSE 5, the returned lock <em>does</em>
      * support downgrading to a read lock.
      */
-    public ReentrantLock writeLock() {
+    @Override
+	public ReentrantLock writeLock() {
         return writeLock;
     }
 
@@ -249,19 +251,23 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             return 0;
         }
 
-        public final boolean isHeldByCurrentThread() {
+        @Override
+		public final boolean isHeldByCurrentThread() {
             return get() > 0;
         }
 
-        public final int getHoldCount() {
+        @Override
+		public final int getHoldCount() {
             return get();
         }
 
-        public void lock() {
+        @Override
+		public void lock() {
             set(get() + 1);
         }
 
-        public void unlock() {
+        @Override
+		public void unlock() {
             int lockCount = get();
             if (lockCount <= 0)
                 throw new IllegalMonitorStateException();
@@ -276,12 +282,14 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             super.lock(); // increment thread local counter last
         }
 
-        public void lockInterruptibly() throws InterruptedException {
+        @Override
+		public void lockInterruptibly() throws InterruptedException {
             lockInterruptiblyRead();
             super.lock(); // increment thread local counter last
         }
 
-        public boolean tryLock() {
+        @Override
+		public boolean tryLock() {
             boolean locked = tryLockRead();
             if (locked)
                 super.lock();
@@ -302,12 +310,14 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             super.lock(); // increment thread local counter last
         }
 
-        public void lockInterruptibly() throws InterruptedException {
+        @Override
+		public void lockInterruptibly() throws InterruptedException {
             lockInterruptiblyWrite();
             super.lock(); // increment thread local counter last
         }
 
-        public boolean tryLock() {
+        @Override
+		public boolean tryLock() {
             boolean locked = tryLockWrite();
             if (locked)
                 super.lock();

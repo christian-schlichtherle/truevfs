@@ -372,11 +372,13 @@ public class CanonicalStringSet extends AbstractSet<String> {
             advance();
         }
 
-        public boolean hasNext() {
+        @Override
+		public boolean hasNext() {
             return canonical != null;
         }
 
-        public String next() {
+        @Override
+		public String next() {
             if (canonical == null)
                 throw new NoSuchElementException();
             final String c = canonical;
@@ -393,7 +395,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
             canonical = null; // no such element
         }
 
-        public void remove() {
+        @Override
+		public void remove() {
             throw new UnsupportedOperationException();
         }
     } // class CanonicalSuffixIterator
@@ -406,11 +409,13 @@ public class CanonicalStringSet extends AbstractSet<String> {
             split = list.split("\\" + separator); // NOI18N
         }
 
-        public boolean hasNext() {
+        @Override
+		public boolean hasNext() {
             return i < split.length;
         }
 
-        public String next() {
+        @Override
+		public String next() {
             try {
                 return split[i++];
             } catch (IndexOutOfBoundsException ex) {
@@ -418,7 +423,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
             }
         }
 
-        public void remove() {
+        @Override
+		public void remove() {
             throw new UnsupportedOperationException();
         }
     } // class StringIterator

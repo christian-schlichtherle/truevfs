@@ -70,7 +70,8 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
         this.resource = resource.getCanonicalFile().toURI();
     }
 
-    public RaesParameters getParameters(Class type) {
+    @Override
+	public RaesParameters getParameters(Class<? extends RaesParameters> type) {
         return new Type0();
     }
 
@@ -79,11 +80,12 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
      * interface as {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public char[] getCreatePasswd() throws RaesKeyException {
             // Don't cache the key manager!
             final KeyProvider<?> provider = KeyManager.getInstance()
-                    .getKeyProvider(resource, AesKeyProvider.class);
+                    .getKeyProvider(resource, (Class) AesKeyProvider.class);
             try {
                 final Object key = provider.getCreateKey();
                 if (key instanceof byte[])
@@ -95,11 +97,12 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
             }
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public char[] getOpenPasswd() throws RaesKeyException {
             // Don't cache the key manager!
             final KeyProvider<?> provider = KeyManager.getInstance()
-                    .getKeyProvider(resource, AesKeyProvider.class);
+                    .getKeyProvider(resource, (Class) AesKeyProvider.class);
             try {
                 final Object key = provider.getOpenKey();
                 if (key instanceof byte[])
@@ -111,33 +114,36 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
             }
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public void invalidOpenPasswd() {
             // Don't cache the key manager!
-            final KeyProvider provider = KeyManager.getInstance()
-                    .getKeyProvider(resource, AesKeyProvider.class);
+            final KeyProvider<?> provider = KeyManager.getInstance()
+                    .getKeyProvider(resource, (Class) AesKeyProvider.class);
             provider.invalidOpenKey();
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public int getKeyStrength() {
             // Don't cache the key manager!
             final KeyProvider<?> provider = KeyManager.getInstance()
-                    .getKeyProvider(resource, AesKeyProvider.class);
+                    .getKeyProvider(resource, (Class) AesKeyProvider.class);
             if (provider instanceof AesKeyProvider) {
-                return ((AesKeyProvider) provider).getKeyStrength();
+                return ((AesKeyProvider<?>) provider).getKeyStrength();
             } else {
                 return KEY_STRENGTH_256; // default for incompatible key providers.
             }
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public void setKeyStrength(int keyStrength) {
             // Don't cache the key manager!
             final KeyProvider<?> provider = KeyManager.getInstance()
-                    .getKeyProvider(resource, AesKeyProvider.class);
+                    .getKeyProvider(resource, (Class) AesKeyProvider.class);
             if (provider instanceof AesKeyProvider) {
-                ((AesKeyProvider) provider).setKeyStrength(keyStrength);
+                ((AesKeyProvider<?>) provider).setKeyStrength(keyStrength);
             }
         }
     }

@@ -243,9 +243,9 @@ implements CommonInputShop<TarEntry> {
     }
 
     private void close0() throws IOException {
-        final Collection values = entries.values();
-        for (final Iterator i = values.iterator(); i.hasNext(); i.remove()) {
-            final TarEntry entry = (TarEntry) i.next();
+        final Collection<TarEntry> values = entries.values();
+        for (final Iterator<TarEntry> i = values.iterator(); i.hasNext(); i.remove()) {
+            final TarEntry entry = i.next();
             final File file = entry.getFile();
             if (file == null) {
                 assert entry.isDirectory();

@@ -112,7 +112,7 @@ implements ArchiveDescriptor {
         return "model:" + getMountPoint().toString();
     }
 
-    ArchiveModel getEnclModel() {
+    ArchiveModel<?> getEnclModel() {
         return enclModel;
     }
 

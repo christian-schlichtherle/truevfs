@@ -41,29 +41,29 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
     }
 
     @Override
-    protected KeyProvider getKeyProvider(KeyManager manager, URI id) {
-        return manager.getKeyProvider(id, AesKeyProvider.class);
+    protected KeyProvider<?> getKeyProvider(KeyManager manager, URI id) {
+        return manager.getKeyProvider(id, (Class) AesKeyProvider.class);
     }
 
     @Override
-    protected void createResourceHook(KeyProvider provider) {
+    protected void createResourceHook(KeyProvider<?> provider) {
         // In a real world application, you should never blindly cast
         // a key provider.
-        this.keyStrength = ((AesKeyProvider) provider).getKeyStrength();
+        this.keyStrength = ((AesKeyProvider<?>) provider).getKeyStrength();
 
         printKeyStrength(provider);
     }
 
     @Override
-    protected void openResourceHook(KeyProvider provider) {
+    protected void openResourceHook(KeyProvider<?> provider) {
         // In a real world application, you should never blindly cast
         // a key provider.
-        ((AesKeyProvider) provider).setKeyStrength(keyStrength);
+        ((AesKeyProvider<?>) provider).setKeyStrength(keyStrength);
 
         printKeyStrength(provider);
     }
 
-    private void printKeyStrength(KeyProvider provider) {
+    private void printKeyStrength(KeyProvider<?> provider) {
         String msg = id + ": key strength is ";
         switch(keyStrength) {
             case AesKeyProvider.KEY_STRENGTH_128:

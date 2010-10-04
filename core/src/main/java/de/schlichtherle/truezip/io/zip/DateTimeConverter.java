@@ -55,11 +55,13 @@ public abstract class DateTimeConverter {
      * </ul>
      */
     public static final DateTimeConverter JAR = new DateTimeConverter() {
-        protected TimeZone newTimeZone() {
+        @Override
+		protected TimeZone newTimeZone() {
             return TimeZone.getDefault();
         }
 
-        protected boolean roundUp(long jTime) {
+        @Override
+		protected boolean roundUp(long jTime) {
             return false;
         }
     };
@@ -78,7 +80,8 @@ public abstract class DateTimeConverter {
      * </ul>
      */
     public static final DateTimeConverter ZIP = new DateTimeConverter() {
-        protected TimeZone newTimeZone() {
+        @Override
+		protected TimeZone newTimeZone() {
             TimeZone tz = TimeZone.getDefault();
             tz = new SimpleTimeZone(
                     tz.getRawOffset() + tz.getDSTSavings(),
@@ -87,7 +90,8 @@ public abstract class DateTimeConverter {
             return tz;
         }
 
-        protected boolean roundUp(long jTime) {
+        @Override
+		protected boolean roundUp(long jTime) {
             return true;
         }
     };
@@ -218,13 +222,13 @@ public abstract class DateTimeConverter {
      * @return A {@link Calendar} instance.
      */
     private Calendar getCalendar() {
-        return (Calendar) calendar.get();
+        return calendar.get();
     }
 
     /** @see #getCalendar() */
-    private final ThreadLocal calendar = new ThreadLocal() {
+    private final ThreadLocal<Calendar> calendar = new ThreadLocal<Calendar>() {
         @Override
-        protected Object initialValue() {
+        protected Calendar initialValue() {
             final Calendar cal = new GregorianCalendar(newTimeZone());
             boolean ea = false;
             assert ea = true; // NOT ea == true !

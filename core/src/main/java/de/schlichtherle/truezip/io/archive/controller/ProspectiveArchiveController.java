@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import java.util.Set;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
@@ -215,7 +214,6 @@ extends ArchiveController<AE> {
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
     public void unlink(
             final String path,
             final BitField<IOOption> options)
@@ -225,7 +223,8 @@ extends ArchiveController<AE> {
             return;
         } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
-            // FIXME: What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
+            // FIXME: Check if needed anymore!
+            // What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
                 final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
                 if (null == entry || DIRECTORY != entry.getType() // TODO: Redundant check?

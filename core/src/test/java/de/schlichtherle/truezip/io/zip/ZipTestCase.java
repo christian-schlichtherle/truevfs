@@ -27,11 +27,9 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -310,7 +308,7 @@ public abstract class ZipTestCase extends TestCase {
             zipIn.getInputStream("foo").close();
             assertNull(zipIn.getInputStream("bar"));
         } finally {
-            zipIn.close();;
+            zipIn.close();
         }
     }
 
@@ -362,19 +360,18 @@ public abstract class ZipTestCase extends TestCase {
             public void run() {
                 try {
                     // Retrieve list of entries and randomize their order.
-                    final List entries = Collections.list(zipIn.entries());
+                    final List<ZipEntry> entries = Collections.list(zipIn.entries());
                     assert entries.size() == nEntries; // this would be a programming error in the test - not the testlet!
                     for (int i = 0; i < nEntries; i++) {
                         final int j = rnd.nextInt(nEntries);
-                        final ZipEntry temp = (ZipEntry) entries.get(i);
+                        final ZipEntry temp = entries.get(i);
                         entries.set(i, entries.get(j));
                         entries.set(j, temp);
                     }
 
                     // Now read in the entries in the randomized order.
                     final byte[] buf = new byte[4096];
-                    for (final Iterator it = entries.iterator(); it.hasNext();) {
-                        final ZipEntry entry = (ZipEntry) it.next();
+                    for (final ZipEntry entry : entries) {
                         // Read full entry and check the contents.
                         final InputStream in = zipIn.getInputStream(entry.getName());
                         try {
@@ -434,7 +431,7 @@ public abstract class ZipTestCase extends TestCase {
      * The field {@code zip} is used to determine the ZIP file.
      */
     private void createTestZipFile(final int nEntries) throws IOException {
-        final HashSet set = new HashSet();
+        final HashSet<String> set = new HashSet<String>();
 
         ZipOutputStream zipOut
                 = newZipOutputStream(new FileOutputStream(zip));
@@ -453,8 +450,8 @@ public abstract class ZipTestCase extends TestCase {
         ZipFile zipIn = newZipFile(zip);
         try {
             // Check that zipIn correctly enumerates all entries.
-            for (final Enumeration e = zipIn.entries(); e.hasMoreElements(); ) {
-                final ZipEntry entry = (ZipEntry) e.nextElement();
+            for (final Enumeration<ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
+                final ZipEntry entry = e.nextElement();
                 assertEquals(data.length, entry.getSize());
                 assertTrue(set.remove(entry.getName()));
             }
@@ -464,7 +461,6 @@ public abstract class ZipTestCase extends TestCase {
         }
     }
 
-    @SuppressWarnings("empty-statement")
     public void testGoodGetCheckedInputStream() throws IOException {
         // Create test ZIP file.
         final String name = "entry";
@@ -493,7 +489,6 @@ public abstract class ZipTestCase extends TestCase {
         zipIn.close();
     }
 
-    @SuppressWarnings("empty-statement")
     public void testBadGetCheckedInputStream() throws IOException {
         if (ZIP.ZIP64_EXT)
             fail("TODO: Adapt this test so that it works when ZIP64 extensions have been forced to use!");

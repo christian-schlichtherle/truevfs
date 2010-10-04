@@ -59,7 +59,8 @@ public class Decrypt extends CommandLineUtility {
         System.exit(new Decrypt().run(args));
     }
 
-    public boolean runChecked(final String[] args)
+    @Override
+	public boolean runChecked(final String[] args)
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException();

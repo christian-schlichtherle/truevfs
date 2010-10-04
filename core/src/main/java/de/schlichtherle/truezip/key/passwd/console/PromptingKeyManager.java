@@ -63,13 +63,14 @@ public class PromptingKeyManager extends de.schlichtherle.truezip.key.PromptingK
      * </tr>
      * </table>
      */
-    public PromptingKeyManager() {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
-                PromptingKeyProvider.class,
-                PromptingKeyProviderUI.class);
+                (Class) PromptingKeyProvider.class,
+                (Class) PromptingKeyProviderUI.class);
         mapPromptingKeyProviderUIType(
-                PromptingAesKeyProvider.class,
-                PromptingAesKeyProviderUI.class);
+        		(Class) PromptingAesKeyProvider.class,
+        		(Class) PromptingAesKeyProviderUI.class);
     }
 
     //

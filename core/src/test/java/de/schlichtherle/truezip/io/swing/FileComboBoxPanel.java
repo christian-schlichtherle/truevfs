@@ -107,9 +107,11 @@ public class FileComboBoxPanel extends javax.swing.JPanel implements Runnable {
         EventQueue.invokeLater(new FileComboBoxPanel(new File(args[0])));
     }
 
-    public void run() {
+    @Override
+	public void run() {
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 final JFrame frame = new JFrame("File name auto completion fun");
                 frame.getContentPane().add(FileComboBoxPanel.this);
                 frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

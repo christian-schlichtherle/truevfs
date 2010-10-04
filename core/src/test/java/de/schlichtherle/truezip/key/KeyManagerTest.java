@@ -68,14 +68,14 @@ public class KeyManagerTest extends TestCase {
     public void testKeyProvider() {
         final URI idA = URI.create("keyProviderA");
 
-        final KeyProvider resA1 = instance.getKeyProvider(idA, KeyProvider.class);
+        final KeyProvider resA1 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
         assertNotNull(resA1);
 
-        final KeyProvider resA2 = instance.getKeyProvider(idA, KeyProvider.class);
+        final KeyProvider resA2 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
         assertSame(resA1, resA2);
 
         final KeyProvider resA3 = instance.getKeyProvider(
-                idA, SucceedingKeyProvider.class);
+                idA, (Class) SucceedingKeyProvider.class);
         assertSame(resA1, resA3);
 
         final KeyProvider resA4 = new SucceedingKeyProvider();
@@ -96,13 +96,13 @@ public class KeyManagerTest extends TestCase {
         }
         instance.setKeyProvider(idA, resA4);
 
-        final KeyProvider resA5 = instance.getKeyProvider(idA, KeyProvider.class);
+        final KeyProvider resA5 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
         assertSame(resA4, resA5);
 
         final URI idB = URI.create("keyProviderB");
 
         final KeyProvider resB1 = instance.getKeyProvider(
-                idB, SucceedingKeyProvider.class);
+                idB, (Class) SucceedingKeyProvider.class);
         assertNotNull(resB1);
         assertNotSame(resA5, resB1);
         assertTrue(resB1 instanceof SucceedingKeyProvider);
@@ -110,8 +110,7 @@ public class KeyManagerTest extends TestCase {
         final URI idC = URI.create("keyProviderC");
 
         try {
-            final KeyProvider resC1 = instance.getKeyProvider(
-                    idC, FailingKeyProvider.class);
+            instance.getKeyProvider(idC, (Class) FailingKeyProvider.class);
             fail("An IllegalArgumentException is expected from the previous call!");
         } catch (IllegalArgumentException exc) {
         }
@@ -138,7 +137,7 @@ public class KeyManagerTest extends TestCase {
         assertTrue(result);
         assertTrue(provider.reset);
 
-        assertSame(provider, instance.getKeyProvider(id, KeyProvider.class));
+        assertSame(provider, instance.getKeyProvider(id, (Class) KeyProvider.class));
     }
 
     /**
@@ -156,7 +155,7 @@ public class KeyManagerTest extends TestCase {
         assertTrue(okA);
         assertTrue(provA1.reset);
 
-        final KeyProvider provA2 = instance.getKeyProvider(idA, KeyProvider.class);
+        final KeyProvider provA2 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
         assertNotNull(provA2);
         assertNotSame(provA1, provA2);
 
@@ -166,7 +165,7 @@ public class KeyManagerTest extends TestCase {
         boolean okB = KeyManager.resetAndRemoveKeyProvider(idB);
         assertTrue(okB);
 
-        final KeyProvider provB2 = instance.getKeyProvider(idB, KeyProvider.class);
+        final KeyProvider provB2 = instance.getKeyProvider(idB, (Class) KeyProvider.class);
         assertNotNull(provB2);
         assertNotSame(provB1, provB2);
     }
@@ -213,11 +212,11 @@ public class KeyManagerTest extends TestCase {
         KeyManager.resetAndRemoveKeyProviders();
         assertTrue(provA1.reset);
 
-        final KeyProvider provA2 = instance.getKeyProvider(idA, KeyProvider.class);
+        final KeyProvider provA2 = instance.getKeyProvider(idA, (Class) KeyProvider.class);
         assertNotNull(provA2);
         assertNotSame(provA1, provA2);
 
-        final KeyProvider provB2 = instance.getKeyProvider(idB, KeyProvider.class);
+        final KeyProvider provB2 = instance.getKeyProvider(idB, (Class) KeyProvider.class);
         assertNotNull(provB2);
         assertNotSame(provB1, provB2);
     }
@@ -248,18 +247,18 @@ public class KeyManagerTest extends TestCase {
         assertEquals(false, result); // no provider mapped yet
 
         final PromptingKeyProvider provA1
-                = (PromptingKeyProvider) instance.getKeyProvider(oldID, KeyProvider.class);
+                = (PromptingKeyProvider) instance.getKeyProvider(oldID, (Class) KeyProvider.class);
         assertNotNull(provA1);
         assertSame(oldID, provA1.getResource());
 
         result = KeyManager.moveKeyProvider(oldID, newID);
         assertEquals(true, result);
 
-        final KeyProvider provA2 = instance.getKeyProvider(oldID, KeyProvider.class);
+        final KeyProvider provA2 = instance.getKeyProvider(oldID, (Class) KeyProvider.class);
         assertNotNull(provA2);
 
         final PromptingKeyProvider provB1
-                = (PromptingKeyProvider) instance.getKeyProvider(newID, KeyProvider.class);
+                = (PromptingKeyProvider) instance.getKeyProvider(newID, (Class) KeyProvider.class);
         assertNotNull(provB1);
         assertSame(provA1, provB1);
         assertSame(newID, provB1.getResource());
@@ -270,25 +269,30 @@ public class KeyManagerTest extends TestCase {
     //
 
     static class SimpleKeyProvider implements KeyProvider<char[]> {
-        public char[] getCreateKey() {
+        @Override
+		public char[] getCreateKey() {
             return "secret".toCharArray();
         }
 
-        public char[] getOpenKey() {
+        @Override
+		public char[] getOpenKey() {
             return "secret".toCharArray();
         }
 
-        public void invalidOpenKey() {
+        @Override
+		public void invalidOpenKey() {
         }
     }
 
     static class SmartKeyProvider extends AbstractKeyProvider<char[]> {
         public boolean reset;
 
-        public void invalidOpenKeyImpl() {
+        @Override
+		public void invalidOpenKeyImpl() {
         }
 
-        public void reset() {
+        @Override
+		public void reset() {
             reset = true;
         }
     }

@@ -65,15 +65,18 @@ public class OpenKeyPanel extends EnhancedPanel {
     public OpenKeyPanel() {
         initComponents();
         final DocumentListener dl = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
+            @Override
+			public void insertUpdate(DocumentEvent e) {
                 setError(null);
             }
 
-            public void removeUpdate(DocumentEvent e) {
+            @Override
+			public void removeUpdate(DocumentEvent e) {
                 setError(null);
             }
 
-            public void changedUpdate(DocumentEvent e) {
+            @Override
+			public void changedUpdate(DocumentEvent e) {
                 setError(null);
             }
         };
@@ -259,10 +262,12 @@ public class OpenKeyPanel extends EnhancedPanel {
         error = new javax.swing.JLabel();
 
         passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
@@ -285,10 +290,12 @@ public class OpenKeyPanel extends EnhancedPanel {
         passwdPanel.add(passwd, gridBagConstraints);
 
         addPanelListener(new de.schlichtherle.truezip.swing.event.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowShown(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
                 formAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
+            @Override
+			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.event.PanelEvent evt) {
             }
         });
         setLayout(new java.awt.GridBagLayout());
@@ -383,17 +390,20 @@ public class OpenKeyPanel extends EnhancedPanel {
         final Window window = evt.getAncestorWindow();
         assert window != null : "illegal state";
         window.addWindowFocusListener(new WindowFocusListener() {
-            public void windowGainedFocus(WindowEvent e) {
+            @Override
+			public void windowGainedFocus(WindowEvent e) {
                 window.removeWindowFocusListener(this);
                 EventQueue.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         if (passwd.requestFocusInWindow())
                             passwd.selectAll();
                     }
                 });
             }
 
-            public void windowLostFocus(WindowEvent e) {
+            @Override
+			public void windowLostFocus(WindowEvent e) {
             }
         });
     }//GEN-LAST:event_passwdPanelAncestorWindowShown

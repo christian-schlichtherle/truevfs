@@ -46,7 +46,8 @@ public class AesKeyStrengthPanelUITest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 instance = new AesKeyStrengthPanel();
                 frame = new JFrame();
                 frame.getContentPane().add(instance);
@@ -62,7 +63,8 @@ public class AesKeyStrengthPanelUITest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         EventQueue.invokeAndWait(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 //frame.setVisible(false);
                 frame.dispose();
             }

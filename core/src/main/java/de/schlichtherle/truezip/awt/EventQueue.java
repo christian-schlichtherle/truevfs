@@ -106,7 +106,8 @@ public class EventQueue extends java.awt.EventQueue {
                 Throwable throwable;
                 byte status = RESET;
 
-                public void run() {
+                @Override
+				public void run() {
                     assert isDispatchThread();
                     if (start()) {
                         try {

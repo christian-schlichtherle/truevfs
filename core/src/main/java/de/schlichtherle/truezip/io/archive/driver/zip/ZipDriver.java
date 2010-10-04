@@ -31,7 +31,6 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.zip.Deflater;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.DEFAULT_COMPRESSION;

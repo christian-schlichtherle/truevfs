@@ -98,17 +98,20 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
         windowOff = newWindowOff;
     }
 
-    public long length() throws IOException {
+    @Override
+	public long length() throws IOException {
         ensureOpen();
         return channel.size();
     }
 
-    public long getFilePointer() throws IOException {
+    @Override
+	public long getFilePointer() throws IOException {
         ensureOpen();
         return windowOff + window.position();
     }
 
-    public void seek(final long fp) throws IOException {
+    @Override
+	public void seek(final long fp) throws IOException {
         ensureOpen();
 
         if (fp < 0)
@@ -122,11 +125,13 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
         window.position((int) (fp % WINDOW_LEN));
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         return available() > 0 ? window.get() & 0xff : -1;
     }
 
-    public int read(final byte[] buf, final int off, int len)
+    @Override
+	public int read(final byte[] buf, final int off, int len)
     throws IOException {
         if (len == 0)
             return 0; // be fault-tolerant and compatible to RandomAccessFile
@@ -148,7 +153,8 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
         return len;
     }
 
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         // Check state.
         if (channel == null)
             return;

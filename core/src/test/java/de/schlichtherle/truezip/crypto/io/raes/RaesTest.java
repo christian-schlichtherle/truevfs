@@ -49,7 +49,8 @@ public class RaesTest extends ReadOnlyFileTestCase {
         return new Type0RaesParameters() {
             boolean secondTry;
 
-            public char[] getOpenPasswd() {
+            @Override
+			public char[] getOpenPasswd() {
                 if (secondTry) {
                     logger.finer("First returned password was wrong, providing the right one now!");
                     return PASSWD.toCharArray();
@@ -61,19 +62,23 @@ public class RaesTest extends ReadOnlyFileTestCase {
                 }
             }
 
-            public void invalidOpenPasswd() {
+            @Override
+			public void invalidOpenPasswd() {
                 logger.finer("Password wrong!");
             }
 
-            public char[] getCreatePasswd() {
+            @Override
+			public char[] getCreatePasswd() {
                 return PASSWD.toCharArray();
             }
 
-            public int getKeyStrength() {
+            @Override
+			public int getKeyStrength() {
                 return keyStrengths[rnd.nextInt(keyStrengths.length)];
             }
 
-            public void setKeyStrength(int keyStrength) {
+            @Override
+			public void setKeyStrength(int keyStrength) {
                 logger.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };

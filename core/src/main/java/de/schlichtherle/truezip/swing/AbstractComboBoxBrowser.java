@@ -285,19 +285,23 @@ public abstract class AbstractComboBoxBrowser implements Serializable {
 
     private final class Listener
             implements DocumentListener, PropertyChangeListener {
-        public void insertUpdate(DocumentEvent e) {
+        @Override
+		public void insertUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
-        public void removeUpdate(DocumentEvent e) {
+        @Override
+		public void removeUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
-        public void changedUpdate(DocumentEvent e) {
+        @Override
+		public void changedUpdate(DocumentEvent e) {
             documentUpdated();
         }
 
-        public void propertyChange(final PropertyChangeEvent e) {
+        @Override
+		public void propertyChange(final PropertyChangeEvent e) {
             final String property = e.getPropertyName();
             if ("editor".equals(property))
                 changeEditor(   (ComboBoxEditor) e.getOldValue(),

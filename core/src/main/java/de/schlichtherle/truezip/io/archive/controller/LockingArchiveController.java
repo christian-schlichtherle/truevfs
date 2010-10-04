@@ -366,7 +366,6 @@ extends ArchiveController<AE> {
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
     public void unlink(
             final String path,
             final BitField<IOOption> options)

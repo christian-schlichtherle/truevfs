@@ -83,7 +83,8 @@ public abstract class BasicInvalidKeyFeedback extends BasicFeedback {
         b.setEnabled(false);
 
         final Timer t = new Timer(delay, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 b.setEnabled(true);
             }
         });

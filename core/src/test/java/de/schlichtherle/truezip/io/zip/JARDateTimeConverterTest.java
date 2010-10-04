@@ -36,7 +36,8 @@ public class JARDateTimeConverterTest extends DateTimeConverterTestCase {
         super(testName);
     }
 
-    protected DateTimeConverter getInstance() {
+    @Override
+	protected DateTimeConverter getInstance() {
         return DateTimeConverter.JAR;
     }
 

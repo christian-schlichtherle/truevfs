@@ -40,7 +40,8 @@ public abstract class UpdatingArchiveControllerTestCase extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         final String[] temps = tempDir.list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
+            @Override
+			public boolean accept(File dir, String name) {
                 return tempMatcher.reset(name).matches();
             }
         });

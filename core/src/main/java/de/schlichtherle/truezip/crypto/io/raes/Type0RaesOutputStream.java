@@ -157,7 +157,8 @@ class Type0RaesOutputStream extends RaesOutputStream {
         this.cipher = cipher;
     }
 
-    public int getKeySizeBits() {
+    @Override
+	public int getKeySizeBits() {
         return keyStrengthBits;
     }
 

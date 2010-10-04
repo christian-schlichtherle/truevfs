@@ -292,11 +292,13 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             this.file = new File(name);
         }
 
-        public ReadOnlyFile fetch() throws IOException {
+        @Override
+		public ReadOnlyFile fetch() throws IOException {
             return new SimpleReadOnlyFile(file);
         }
 
-        public void release(ReadOnlyFile rof) throws IOException {
+        @Override
+		public void release(ReadOnlyFile rof) throws IOException {
             rof.close();
         }
     }
@@ -315,15 +317,17 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *
      * @see #iterator()
      */
-    public synchronized Enumeration<? extends ZipEntry> entries() {
+    public synchronized Enumeration<ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
-            public boolean hasMoreElements() {
+            @Override
+			public boolean hasMoreElements() {
                 return i.hasNext();
             }
 
-            public ZipEntry nextElement() {
+            @Override
+			public ZipEntry nextElement() {
                 return i.next().clone();
             }
         }
@@ -339,15 +343,18 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         class EntryIterator implements Iterator<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
-            public boolean hasNext() {
+            @Override
+			public boolean hasNext() {
                 return i.hasNext();
             }
 
-            public ZipEntry next() {
+            @Override
+			public ZipEntry next() {
                 return i.next().clone();
             }
 
-            public void remove() {
+            @Override
+			public void remove() {
                 throw new UnsupportedOperationException();
             }
         }

@@ -137,7 +137,8 @@ public class AuthenticationPanelUITest extends TestCase {
     public void testTabbedPane() {
         final String text = "Hello world!";
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 final AuthenticationPanel instance = new AuthenticationPanel();
 
                 JPanel passwdPanel = null;

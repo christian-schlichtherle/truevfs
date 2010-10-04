@@ -355,8 +355,9 @@ public class File extends java.io.File {
 
     private static final long serialVersionUID = 3617072259051821745L;
 
-    /** The filesystem roots. */
-    private static final Set roots = new TreeSet(Arrays.asList(listRoots()));
+    /** The file system roots. */
+    private static final Set<java.io.File> roots
+    		= new TreeSet<java.io.File>(Arrays.asList(listRoots()));
 
     /** The prefix of a UNC (a Windows concept). */
     private static final String uncPrefix = separator + separator;
@@ -417,7 +418,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient ArchiveController controller;
+    private transient ArchiveController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -686,8 +687,8 @@ public class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public File(
+    @Deprecated
+	public File(
             final java.io.File delegate,
             final File innerArchive,
             final ArchiveDetector detector) {
@@ -755,7 +756,8 @@ public class File extends java.io.File {
      * @deprecated This constructor is not intended for public use - do <em>not</em> use it!
      * @see FileFactory
      */
-    public File(
+    @Deprecated
+	public File(
             final File template,
             final java.io.File delegate,
             final File enclArchive) {
@@ -1808,8 +1810,7 @@ public class File extends java.io.File {
      * <b>Warning:</b> This method is <em>not</em> intended for public use!
      * It's required to support the federation of file system implementations.
      * For example, {@link javax.swing.JFileChooser javax.swing.JFileChooser}
-     * creates instances of
-     * {@link sun.awt.shell.ShellFolder sun.awt.shell.ShellFolder},
+     * creates instances of {@code sun.awt.shell.ShellFolder}
      * which is a subclass of {@link java.io.File java.io.File}, too.
      * These instances are <i>wrapped</i> as the delegate in instances of this
      * class when using
@@ -1834,7 +1835,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final ArchiveController getArchiveController() {
+    final ArchiveController<?> getArchiveController() {
         assert (null != controller) == isArchive();
         return controller;
     }
@@ -2175,7 +2176,8 @@ public class File extends java.io.File {
      * @deprecated This method has been deprecated in JSE 6.
      * @see java.io.File#toURL
      */
-    @Override
+    @Deprecated
+	@Override
     public URL toURL() throws MalformedURLException {
         return delegate.toURL();
     }
@@ -2703,7 +2705,7 @@ public class File extends java.io.File {
         // instances from this and then apply the filter to construct the
         // result list.
 
-        final List filteredList = new ArrayList();
+        final List<File> filteredList = new ArrayList<File>();
         final String[] children = delegate.list();
         if (children == null)
             return null; // no directory
@@ -2733,7 +2735,7 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null) {
-                final ArchiveController controller = enclArchive.getArchiveController();
+                final ArchiveController<?> controller = enclArchive.getArchiveController();
                 if (controller.getEntry(enclEntryName) != null)
                     return false;
                 controller.mknod(enclEntryName, FILE, null,
@@ -2871,7 +2873,8 @@ public class File extends java.io.File {
         }
 
         class DeleteOnExit implements Runnable {
-            public void run() {
+            @Override
+			public void run() {
                 if (exists() && !delete()) {
                     // Logging may not work in a shutdown hook!
                     System.err.println(getPath() + ": failed to deleteOnExit()!");

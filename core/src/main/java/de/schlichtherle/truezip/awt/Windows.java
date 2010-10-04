@@ -47,7 +47,8 @@ public class Windows {
 
     private static PropertyChangeListener focusListener
             = new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
+        @Override
+		public void propertyChange(PropertyChangeEvent evt) {
             setLastFocusedWindow((Window) evt.getNewValue());
         }
     };

@@ -44,7 +44,8 @@ extends AbstractExceptionBuilder<E, E> {
      *         already initialized by a previous call to
      *         {@link ChainableIOException#initPredecessor(ChainableIOException)}.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected final E update(E previous, E cause) {
         try {
             return (E) cause.initPredecessor(previous);
@@ -62,7 +63,8 @@ extends AbstractExceptionBuilder<E, E> {
      * {@link ChainableIOException#sortPriority() priority}
      * and returns the result.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected final E post(E assembly) {
         return null == assembly ? null : (E) assembly.sortPriority();
     }

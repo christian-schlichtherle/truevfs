@@ -47,7 +47,9 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveDriverRegistry extends HashMap implements Serializable {
+public class ArchiveDriverRegistry
+extends HashMap<String, Object>
+implements Serializable {
 
     private static final long serialVersionUID = 3445783613096128268L;
 
@@ -100,7 +102,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      */
     public ArchiveDriverRegistry(
             final ArchiveDriverRegistry delegate,
-            final Map config) {
+            final Map<String, Object> config) {
         if (delegate == null)
             throw new NullPointerException(getString("null", "delegate")); // NOI18N
         this.delegate = delegate;
@@ -111,47 +113,39 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      * Processes the given {@code config} and adds the configured archive
      * driver mappings.
      * 
-     * @param config A map of suffix lists and archive driver IDs.
+     * @param config a map of suffix lists and archive driver IDs.
      *        Each key in this map must be a non-null, non-empty suffix list,
      *        obeying the usual syntax.
      *        Each value must either be an archive driver instance, an archive
      *        driver class, or a string with the fully qualified name name of
      *        an archive driver class.
-     * @param eager Iff {@code true}, archive drivers are immediately
+     * @param eager iff {@code true}, archive drivers are immediately
      *        instantiated and the keyword {@code DEFAULT} is not allowed.
-     * @throws NullPointerException If any parameter or config element
+     * @throws NullPointerException if any parameter or config element
      *         is {@code null}.
-     * @throws IllegalArgumentException If any other parameter precondition
+     * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold or the keyword {@code DRIVER} is found.
      */
-    final void registerArchiveDrivers(final Map config, final boolean eager) {
-        try {
-            for (final Iterator i = config.entrySet().iterator(); i.hasNext(); ) {
-                final Map.Entry entry = (Map.Entry) i.next();
-                final String key = (String) entry.getKey(); // may throw ClassCastException!
-                if (KWD_DRIVER.equals(key))
+    final void registerArchiveDrivers(	final Map<String, Object> config,
+    									final boolean eager) {
+        for (final Map.Entry<String, Object> entry : config.entrySet()) {
+            final String key = entry.getKey();
+            if (KWD_DRIVER.equals(key))
+                throw new IllegalArgumentException(
+                        getString("keyword", KWD_DRIVER)); // NOI18N
+            final Object value = entry.getValue();
+            if (KWD_DEFAULT.equals(key)) {
+                if (eager)
                     throw new IllegalArgumentException(
-                            getString("keyword", KWD_DRIVER)); // NOI18N
-                final Object value = entry.getValue();
-                if (KWD_DEFAULT.equals(key)) {
-                    if (eager)
-                        throw new IllegalArgumentException(
-                                getString("keyword", KWD_DEFAULT)); // NOI18N
-                    final SuffixSet set = (SuffixSet) super.get(key);
-                    if (set != null)
-                        set.addAll((String) value);
-                    else
-                        super.put(key, new SuffixSet((String) value));
-                } else {
-                    registerArchiveDriver(key, value, eager);
-                }
+                            getString("keyword", KWD_DEFAULT)); // NOI18N
+                final SuffixSet set = (SuffixSet) super.get(key);
+                if (set != null)
+                    set.addAll((String) value);
+                else
+                    super.put(key, new SuffixSet((String) value));
+            } else {
+                registerArchiveDriver(key, value, eager);
             }
-        } catch (NullPointerException npe) {
-            throw npe;
-        } catch (IllegalArgumentException iae) {
-            throw iae;
-        } catch (RuntimeException rte) {
-            throw new IllegalArgumentException(rte);
         }
     }
 
@@ -214,11 +208,11 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      * @throws RuntimeException A subclass is thrown if loading or
      *         instantiating an archive driver class fails.
      */
-    public final synchronized ArchiveDriver getArchiveDriver(
+    public final synchronized ArchiveDriver<?> getArchiveDriver(
             final String suffix) {
         // Lookup driver locally.
         Object driver = super.get(suffix);
-        if (!(driver instanceof ArchiveDriver)) {
+        if (!(driver instanceof ArchiveDriver<?>)) {
             if (driver == null) {
                 if (super.containsKey(suffix) || delegate == null)
                     return null;
@@ -236,7 +230,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
             }
             super.put(suffix, driver); // may map null!
         }
-        return (ArchiveDriver) driver;
+        return (ArchiveDriver<?>) driver;
     }
 
     /**
@@ -251,13 +245,14 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      *         returned.
      *         The cause is wrapped in the exception.
      */
-    private static ArchiveDriver newArchiveDriver(Object driver) {
+    @SuppressWarnings("unchecked")
+	private static ArchiveDriver<?> newArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
                 driver = loadClass((String) driver, ArchiveDriverRegistry.class);
-            if (driver instanceof Class)
-                driver = ((Class) driver).newInstance();
-            return (ArchiveDriver) driver; // may throw ClassCastException
+            if (driver instanceof Class<?>)
+                driver = ((Class<? extends ArchiveDriver<?>>) driver).newInstance();
+            return (ArchiveDriver<?>) driver; // may throw ClassCastException
         } catch (Exception ex) {
             throw new IllegalArchiveDriverException(
                     getString("cannotCreate"), ex); // NOI18N
@@ -285,7 +280,7 @@ public class ArchiveDriverRegistry extends HashMap implements Serializable {
      */
     public final SuffixSet decorate(final SuffixSet set) {
         final SuffixSet local = new SuffixSet(super.keySet());
-        for (final Iterator i = local.iterator(); i.hasNext(); ) {
+        for (final Iterator<String> i = local.iterator(); i.hasNext(); ) {
             final String suffix = (String) i.next();
             assert super.containsKey(suffix);
             if (super.get(suffix) != null)

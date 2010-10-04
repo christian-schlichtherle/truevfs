@@ -64,8 +64,8 @@ import static de.schlichtherle.truezip.util.ClassLoaders.getResources;
  * @version $Id$
  */
 public final class GlobalArchiveDriverRegistry
-        extends ArchiveDriverRegistry
-        implements Serializable {
+extends ArchiveDriverRegistry
+implements Serializable {
 
     private static final long serialVersionUID = 1579600190374703884L;
     private static final String CLASS_NAME
@@ -163,7 +163,7 @@ public final class GlobalArchiveDriverRegistry
         assert driverRegistry != null;
         assert clientRegistry != null;
 
-        final Enumeration urls;
+        final Enumeration<URL> urls;
         try {
             urls = getResources(service, GlobalArchiveDriverRegistry.class);
         } catch (IOException ex) {
@@ -213,8 +213,9 @@ public final class GlobalArchiveDriverRegistry
      * @throws NullPointerException If any archive driver ID in the
      *         configuration is {@code null}.
      */
-    private static void registerArchiveDrivers(
-            final Map config,
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static void registerArchiveDrivers(
+            final Properties config,
             final ArchiveDriverRegistry driverRegistry,
             final ArchiveDriverRegistry clientRegistry) {
         assert config != null;
@@ -227,7 +228,7 @@ public final class GlobalArchiveDriverRegistry
 
         // Select registry and register drivers.
         (isDriver ? driverRegistry : clientRegistry).registerArchiveDrivers(
-                config, false);
+                (Map) config, false);
     }
 
     /**
@@ -255,8 +256,8 @@ public final class GlobalArchiveDriverRegistry
         final SuffixSet all = suffixes();
         boolean clear = false;
         boolean addAll = false;
-        for (final Iterator i = set.originalIterator(); i.hasNext(); ) {
-            final String suffix = (String) i.next();
+        for (final Iterator<String> i = set.originalIterator(); i.hasNext(); ) {
+            final String suffix = i.next();
             if (KWD_NULL.equals(suffix)) {
                 i.remove();
                 clear = true;
@@ -276,10 +277,10 @@ public final class GlobalArchiveDriverRegistry
     }
 
     private void logConfiguration() {
-        final Iterator i = entrySet().iterator();
+        final Iterator<Map.Entry<String, Object>> i = entrySet().iterator();
         if (i.hasNext()) {
             do {
-                final Map.Entry entry = (Map.Entry) i.next();
+                final Map.Entry<String, Object> entry = i.next();
                 logger.log(Level.CONFIG, "driverRegistered", // NOI18N
                         new Object[] { entry.getKey(), entry.getValue() });
             } while (i.hasNext());

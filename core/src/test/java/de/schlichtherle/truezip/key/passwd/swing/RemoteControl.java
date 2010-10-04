@@ -23,7 +23,6 @@ import java.util.Random;
 import javax.swing.JPasswordField;
 import junit.framework.Assert;
 import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
@@ -60,7 +59,8 @@ public class RemoteControl extends Assert implements Runnable {
         this.id = id;
     }
 
-    public void run() {
+    @Override
+	public void run() {
         try {
             runChecked();
         } catch (Throwable t) {
@@ -68,7 +68,6 @@ public class RemoteControl extends Assert implements Runnable {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void runChecked() {
         JDialogOperator dialog;
         JPasswordFieldOperator passwd1, passwd2;
@@ -237,7 +236,8 @@ public class RemoteControl extends Assert implements Runnable {
     }
 
     private class ByResourceIDFinder implements ComponentChooser {
-        public boolean checkComponent(Component comp) {
+        @Override
+		public boolean checkComponent(Component comp) {
             return null != JTextComponentOperator.findJTextComponent(
                         (Container) comp,
                         new JTextComponentOperator.JTextComponentByTextFinder(
@@ -245,7 +245,8 @@ public class RemoteControl extends Assert implements Runnable {
                             new Operator.DefaultStringComparator(true, true)));
         }
 
-        public String getDescription() {
+        @Override
+		public String getDescription() {
             return "Container with Component with exact text \"" + id + "\".";
         }
     }
@@ -253,15 +254,12 @@ public class RemoteControl extends Assert implements Runnable {
     private static String findErrorMessage(final ContainerOperator dialog) {
         final JLabelOperator errorLabel
                 = new JLabelOperator(dialog, new NameComponentChooser("error"));
-        if (errorLabel == null)
-            return null;
         final String error = errorLabel.getText();
         if (error == null || error.trim().length() <= 0)
             return null;
         return error;
     }
 
-    @SuppressWarnings("SleepWhileHoldingLock")
     private void pushDefaultButton(JDialogOperator dialog) {
         final JButtonOperator ok = new JButtonOperator(
                 dialog.getRootPane().getDefaultButton());

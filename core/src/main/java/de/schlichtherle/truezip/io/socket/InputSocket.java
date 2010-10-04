@@ -53,7 +53,8 @@ extends IOSocket<LT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final IS share(InputSocket<? super LT, ? extends PT, ?> with) {
+    @SuppressWarnings("unchecked")
+	public final IS share(InputSocket<? super LT, ? extends PT, ?> with) {
         chain0(with.peer);
         return (IS) this;
     }
@@ -82,7 +83,8 @@ extends IOSocket<LT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final IS connect(OutputSocket<? extends PT, ? super LT, ?> peer) {
+    @SuppressWarnings("unchecked")
+	public final IS connect(OutputSocket<? extends PT, ? super LT, ?> peer) {
         connect0(peer);
         return (IS) this;
     }

@@ -45,7 +45,8 @@ extends ExceptionHandler<C, E> {
      *
      * @return The assembled exception to throw - {@code null} is not permitted.
      */
-    E fail(C cause);
+    @Override
+	E fail(C cause);
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -58,7 +59,8 @@ extends ExceptionHandler<C, E> {
      * @throws Exception the assembled exception if the implementation wants
      *         the caller to abort its task.
      */
-    void warn(C cause) throws E;
+    @Override
+	void warn(C cause) throws E;
 
     /**
      * Either returns or checks out and throws

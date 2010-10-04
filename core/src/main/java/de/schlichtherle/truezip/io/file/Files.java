@@ -341,7 +341,7 @@ class Files {
      */
     private static void copy0(
             final boolean preserve,
-            final ArchiveController srcController,
+            final ArchiveController<?> srcController,
             final String srcPath,
             final java.io.File dst)
     throws FalsePositiveEntryException, IOException {
@@ -387,7 +387,7 @@ class Files {
                         + " (cannot preserve last modification time)");
         } catch (FalsePositiveEnclosedEntryException ex) {
             final URI enclMountPoint = ex.getMountPoint();
-            final ArchiveController enclController
+            final ArchiveController<?> enclController
                     = ArchiveControllers.getController(enclMountPoint); // FIXME: Redesign delegation strategy!
             final String enclPath = enclMountPoint.relativize(
                     enclMountPoint

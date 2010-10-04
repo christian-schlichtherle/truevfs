@@ -84,7 +84,8 @@ public class Arrays {
      * @throws NullPointerException if {@code array} is {@code null}.
      */
     public static <T> T[] copyOf(T[] array, int size) {
-        final T[] copy = (T[]) Array.newInstance(
+        @SuppressWarnings("unchecked")
+		final T[] copy = (T[]) Array.newInstance(
                 array.getClass().getComponentType(), size);
         System.arraycopy(array, 0, copy, 0, Math.min(array.length, size));
         return copy;

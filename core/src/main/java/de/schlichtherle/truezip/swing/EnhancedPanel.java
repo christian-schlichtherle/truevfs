@@ -102,7 +102,8 @@ public class EnhancedPanel extends JPanel  {
 
     private void init() {
         addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(final HierarchyEvent e) {
+            @Override
+			public void hierarchyChanged(final HierarchyEvent e) {
                 if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED)
                         != HierarchyEvent.SHOWING_CHANGED)
                     return;

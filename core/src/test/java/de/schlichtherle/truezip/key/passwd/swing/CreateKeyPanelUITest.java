@@ -65,7 +65,8 @@ public class CreateKeyPanelUITest extends TestCase {
 
     private JFrameOperator showInstanceInFrame() {
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 final JFrame frame = new JFrame();
                 frame.getContentPane().add(instance);
                 frame.pack();

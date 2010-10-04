@@ -75,27 +75,33 @@ public class FilterReadOnlyFile extends AbstractReadOnlyFile {
         this.rof = rof;
     }
 
-    public long length() throws IOException {
+    @Override
+	public long length() throws IOException {
         return rof.length();
     }
 
-    public long getFilePointer() throws IOException {
+    @Override
+	public long getFilePointer() throws IOException {
         return rof.getFilePointer();
     }
 
-    public void seek(long pos) throws IOException {
+    @Override
+	public void seek(long pos) throws IOException {
         rof.seek(pos);
     }
 
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         return rof.read();
     }
 
-    public int read(byte[] b, int off, int len) throws IOException {
+    @Override
+	public int read(byte[] b, int off, int len) throws IOException {
         return rof.read(b, off, len);
     }
 
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         rof.close();
     }
 }

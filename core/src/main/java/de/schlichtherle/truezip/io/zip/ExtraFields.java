@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.zip;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,7 +43,7 @@ final class ExtraFields implements Cloneable {
     public ExtraFields clone() {
         try {
             final ExtraFields clone = (ExtraFields) super.clone();
-            clone.extra = new TreeMap(extra);
+            clone.extra = new TreeMap<Integer, ExtraField>(extra);
             return clone;
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
@@ -124,10 +123,8 @@ final class ExtraFields implements Cloneable {
             return 0;
 
         int l = 0;
-        for (final Iterator it = extra.values().iterator(); it.hasNext(); ) {
-            final ExtraField ef = (ExtraField) it.next();
+        for (final ExtraField ef : extra.values())
             l += 4 + ef.getDataSize();
-        }
         return l;
     }
 
@@ -168,7 +165,7 @@ final class ExtraFields implements Cloneable {
      */
     void readFrom(final byte[] data, int off, final int size) {
         UShort.check(size, "Extra Field out of range", null);
-        final Map map = new TreeMap();
+        final Map<Integer, ExtraField> map = new TreeMap<Integer, ExtraField>();
         if (data != null && size > 0) {
             final int end = off + size;
             while (off < end) {
@@ -201,8 +198,7 @@ final class ExtraFields implements Cloneable {
      * @see #getExtraLength
      */
     void writeTo(final byte[] data, int off) {
-       for (final Iterator it = extra.values().iterator(); it.hasNext(); ) {
-            final ExtraField ef = (ExtraField) it.next();
+       for (final ExtraField ef : extra.values()) {
             LittleEndian.writeShort(ef.getHeaderID(), data, off);
             off += 2;
             LittleEndian.writeShort(ef.getDataSize(), data, off);

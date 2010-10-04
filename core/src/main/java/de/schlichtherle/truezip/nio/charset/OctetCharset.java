@@ -69,11 +69,13 @@ public abstract class OctetCharset extends Charset {
         this.char2byte = char2byte;
     }
 
-    public boolean contains(Charset cs) {
+    @Override
+	public boolean contains(Charset cs) {
         return this.getClass().isInstance(cs);
     }
 
-    public CharsetEncoder newEncoder() {
+    @Override
+	public CharsetEncoder newEncoder() {
         return new Encoder();
     }
 
@@ -82,7 +84,8 @@ public abstract class OctetCharset extends Charset {
             super(OctetCharset.this, 1, 1);
         }
 
-        protected CoderResult encodeLoop(
+        @Override
+		protected CoderResult encodeLoop(
                 final CharBuffer in,
                 final ByteBuffer out) {
             final char[][] c2b = char2byte;
@@ -104,7 +107,8 @@ public abstract class OctetCharset extends Charset {
         }
     }
 
-    public CharsetDecoder newDecoder() {
+    @Override
+	public CharsetDecoder newDecoder() {
         return new Decoder();
     }
 
@@ -113,7 +117,8 @@ public abstract class OctetCharset extends Charset {
             super(OctetCharset.this, 1, 1);
         }
 
-        protected CoderResult decodeLoop(
+        @Override
+		protected CoderResult decodeLoop(
                 final ByteBuffer in,
                 final CharBuffer out) {
             final char[] b2c = byte2char;

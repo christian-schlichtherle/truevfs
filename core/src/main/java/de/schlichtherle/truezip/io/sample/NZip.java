@@ -143,7 +143,8 @@ public class NZip extends CommandLineUtility {
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
-    public boolean runChecked(String[] args)
+    @Override
+	public boolean runChecked(String[] args)
     throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
@@ -386,7 +387,6 @@ public class NZip extends CommandLineUtility {
                 tmp = new File(dst, src.getName(), dstDetector);
             else
                 tmp = dst;
-            final boolean ok;
             if (mv) {
                 if ((tmp.isFile() && !tmp.delete()) || !src.renameTo(tmp))
                     throw new IOException(src + ": " + resources.getString("cpOrMv.cmt") + ": " + tmp);

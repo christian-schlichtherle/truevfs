@@ -190,11 +190,13 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         return last + delay;
     }
 
-    public int getKeySizeBits() {
+    @Override
+	public int getKeySizeBits() {
         return 128 + keyStrength * 64;
     }
 
-    public void authenticate()
+    @Override
+	public void authenticate()
     throws RaesAuthenticationException, IOException {
         final Mac mac = new HMac(new SHA256Digest());
         mac.init(macParam);

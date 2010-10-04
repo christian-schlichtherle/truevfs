@@ -65,7 +65,8 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         exception.
      * @see KeyProvider#getCreateKey
      */
-    public final K getCreateKey() throws UnknownKeyException {
+    @Override
+	public final K getCreateKey() throws UnknownKeyException {
         final K key = getCreateKeyImpl();
         if (key == null)
             throw new UnknownKeyException();
@@ -103,7 +104,8 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         exception.
      * @see KeyProvider#getOpenKey
      */
-    public final K getOpenKey() throws UnknownKeyException {
+    @Override
+	public final K getOpenKey() throws UnknownKeyException {
         try {
             final K key = getOpenKeyImpl();
             if (key == null)
@@ -137,7 +139,8 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *
      * @see KeyProvider#invalidOpenKey
      */
-    public final void invalidOpenKey() {
+    @Override
+	public final void invalidOpenKey() {
         invalidated.set(System.currentTimeMillis());
         invalidOpenKeyImpl();
     }
@@ -167,7 +170,7 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
      *         {@code null}.
      * @throws RuntimeException If cloning the key results in an exception.
      */
-    @SuppressWarnings("SuspiciousSystemArraycopy")
+    @SuppressWarnings({ "unchecked" })
     static <K> K clone(final K key) {
         // Could somebody please explain to me why the clone method is
         // declared "protected" in Object and Cloneable is just a marker
@@ -193,7 +196,6 @@ public abstract class AbstractKeyProvider<K extends Cloneable>
         }
     }
 
-    @SuppressWarnings("SleepWhileHoldingLock")
     private void enforceSuspensionPenalty() {
         final long last = invalidated.get();
         long delay;
