@@ -52,13 +52,10 @@ extends ArchiveController<AE> {
             ArchiveController<AE> controller) {
         super(model);
         this.controller = controller;
-        final ArchiveModel<?> enclModel = model.getEnclModel();
-        enclController = null == enclModel
-                ? null
-                : ArchiveControllers.getController(enclModel.getMountPoint());
-        assert (null == enclModel) == (null == enclController);
+        this.enclController = super.getEnclController();
     }
 
+    @Override
     ArchiveController<?> getEnclController() {
         return enclController;
     }

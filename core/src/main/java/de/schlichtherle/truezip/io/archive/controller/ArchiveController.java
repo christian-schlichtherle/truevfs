@@ -91,6 +91,11 @@ implements ArchiveDescriptor {
         return "controller:" + getMountPoint().toString();
     }
 
+    ArchiveController<?> getEnclController() {
+        final URI enclMountPoint = getModel().getEnclMountPoint();
+        return null == enclMountPoint ? null : ArchiveControllers.getController(enclMountPoint);
+    }
+
     final String getEnclPath(String path) {
         return getModel().getEnclPath(path);
     }
