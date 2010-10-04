@@ -167,7 +167,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     }
 
     /**
-     * This entry output stream writes directly to the output output archive.
+     * This entry output stream writes directly to the output archive.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
@@ -204,7 +204,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     /**
      * This entry output stream writes the archive entry to a temporary file.
      * When the stream is closed, the temporary file is then copied to the
-     * output output archive and finally deleted unless the output output
+     * output archive and finally deleted unless the output output
      * archive is still busy.
      */
     private class TempEntryOutputStream

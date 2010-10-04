@@ -221,6 +221,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(archive.delete());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     void testFalsePositive(final File file) throws IOException {
         assert file.isArchive();
 
@@ -417,6 +418,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(archive.deleteAll());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private void testIllegalDirectoryOperations(final File dir) throws IOException {
         assert dir.isDirectory();
         try {
@@ -506,6 +508,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertEquals(0, file.length());
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileInputStream()
     throws IOException {
         final File file1 = new File(archive, "file1");
@@ -561,6 +564,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertFalse(file1.exists());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testBusyFileOutputStream()
     throws IOException {
         File file1 = new File(archive, "file1");
@@ -713,7 +717,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         
         final File member = new File(basePath, reversePath.getName());
         final boolean created = member.mkdir();
-        final File children = (File) reversePath.getParentFile();
+        final File children = reversePath.getParentFile();
         testDirectoryTree(member, children);
         testListFiles(basePath, member.getName());
         assertTrue(member.exists());
@@ -795,7 +799,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
     public void testCopyContainingOrSameFiles() throws IOException {
         assert !archive.exists();
         
-        final File dir = (File) archive.getParentFile();
+        final File dir = archive.getParentFile();
         assertNotNull(dir);
         final File entry = new File(archive, "entry");
         
