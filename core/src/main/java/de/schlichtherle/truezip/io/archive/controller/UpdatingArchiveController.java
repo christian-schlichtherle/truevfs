@@ -915,6 +915,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
+    @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
         try {
             final ArchiveSyncExceptionBuilder handler

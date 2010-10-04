@@ -20,10 +20,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class FileOutputSocket extends CommonOutputSocket<FileEntry> {
+class FileOutputSocket extends CommonOutputSocket<FileEntry> {
     private final FileEntry entry;
 
-    public FileOutputSocket(final FileEntry entry) {
+    FileOutputSocket(final FileEntry entry) {
         this.entry = entry;
     }
 
