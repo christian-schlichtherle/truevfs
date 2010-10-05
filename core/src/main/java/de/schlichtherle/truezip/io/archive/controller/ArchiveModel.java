@@ -15,12 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
 import java.net.URI;
 
@@ -41,7 +38,8 @@ final class ArchiveModel implements ArchiveDescriptor {
     private final URI mountPoint;
     private final ArchiveModel enclModel;
     private final URI enclPath;
-    private final FileEntry target; // FIXME: remove this dependency!
+    @Deprecated
+    private final FileEntry target;
     private boolean touched;
     private final TouchListener touchListener;
 

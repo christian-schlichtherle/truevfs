@@ -39,7 +39,7 @@ public class FileEntry extends File implements CommonEntry {
      * @param path a non-{@code null} path name.
      * @throws NullPointerException if {@code path} is {@code null}.
      */
-    public FileEntry(final String path) {
+    public FileEntry(String path) {
         super(path);
     }
 
@@ -49,7 +49,7 @@ public class FileEntry extends File implements CommonEntry {
      * @param uri a non-{@code null} {@code file:} URI
      * @throws NullPointerException if {@code uri} is {@code null}.
      */
-    public FileEntry(final URI uri) {
+    public FileEntry(URI uri) {
         super(uri);
     }
 
@@ -59,8 +59,18 @@ public class FileEntry extends File implements CommonEntry {
      * @param file a non-{@code null} file.
      * @throws NullPointerException if {@code file} is {@code null}.
      */
-    public FileEntry(final File file) {
+    public FileEntry(File file) {
         super(file.getPath());
+    }
+
+    /**
+     * Constructs a new {@code FileEntry}.
+     *
+     * @param file a non-{@code null} file.
+     * @throws NullPointerException if {@code file} is {@code null}.
+     */
+    public FileEntry(File file, String path) {
+        super(file, path);
     }
 
     /** Returns the type of this file entry. */
