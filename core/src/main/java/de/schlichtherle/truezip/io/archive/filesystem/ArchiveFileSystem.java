@@ -17,12 +17,11 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.IOReference;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.util.BitField;
 
 /**
@@ -34,11 +33,11 @@ import de.schlichtherle.truezip.util.BitField;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystem<AE extends ArchiveEntry>
-extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
+public interface ArchiveFileSystem<CE extends CommonEntry>
+extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
     /** An archive file system entry which refers to an archive entry. */
-    interface Entry<AE extends ArchiveEntry>
+    interface Entry<AE extends CommonEntry>
     extends ArchiveFileSystemEntry, IOReference<AE> {
     }
 
@@ -53,7 +52,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *
      * @see #mknod
      */
-    interface EntryOperation<AE extends ArchiveEntry>
+    interface EntryOperation<AE extends CommonEntry>
     extends IOOperation, IOReference<Entry<AE>> {
 
         /** Executes this archive file system entry chain operation. */
@@ -113,7 +112,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *         into this archive file system upon a call to its
      *         {@link EntryOperation#run} method.
      */
-    EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    EntryOperation<CE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**

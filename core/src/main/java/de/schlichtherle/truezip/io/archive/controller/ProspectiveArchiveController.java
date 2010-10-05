@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -95,7 +94,7 @@ final class ProspectiveArchiveController extends ArchiveController {
         } catch (FalsePositiveEnclosedFileException ex) {
             /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return new SpecialFileEntry<ArchiveEntry>(getEnclController()
+                return new SpecialFileEntry<CommonEntry>(getEnclController()
                         .getEntry(getEnclPath(path))
                         .getTarget()); // the exception asserts that the entry exists as a file!
             // Fall through!
@@ -104,7 +103,7 @@ final class ProspectiveArchiveController extends ArchiveController {
         return getEnclController().getEntry(getEnclPath(path));
     }
 
-    private static final class SpecialFileEntry<AE extends ArchiveEntry>
+    private static final class SpecialFileEntry<AE extends CommonEntry>
     extends FilterCommonEntry<AE>
     implements Entry<AE> {
         SpecialFileEntry(AE entry) {
