@@ -164,7 +164,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<ArchiveController<?>> ref = new WeakReference<ArchiveController<?>>(new File(path).getInnerArchive().getArchiveController());
+        Reference<ArchiveController> ref = new WeakReference<ArchiveController>(new File(path).getInnerArchive().getArchiveController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -184,7 +184,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<ArchiveController<?>> ref = new WeakReference<ArchiveController<?>>(new File(path).getInnerArchive().getArchiveController());
+        Reference<ArchiveController> ref = new WeakReference<ArchiveController>(new File(path).getInnerArchive().getArchiveController());
         gc();
         assertNotNull(ref.get());
         out.close();

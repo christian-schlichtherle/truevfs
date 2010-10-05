@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -34,26 +35,23 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
+final class ArchiveModel implements ArchiveDescriptor {
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
     private final URI mountPoint;
-    private final ArchiveModel<?> enclModel;
+    private final ArchiveModel enclModel;
     private final URI enclPath;
     private final FileEntry target; // FIXME: remove this dependency!
-    private final ArchiveDriver<AE> driver;
     private boolean touched;
     private final TouchListener touchListener;
 
     ArchiveModel(   final URI mountPoint,
-                    final ArchiveDriver<AE> driver,
-                    final ArchiveModel<?> enclModel,
+                    final ArchiveModel enclModel,
                     final TouchListener touchListener) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
-        assert driver != null;
 
         this.mountPoint = mountPoint;
         if (null == enclModel) {
@@ -64,7 +62,6 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
             this.enclPath = enclModel.getMountPoint().relativize(mountPoint);
         }
         this.target = new FileEntry(mountPoint);
-        this.driver = driver;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
@@ -115,7 +112,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
      * model's target archive file or {@code null} if it's not enclosed in
      * another archive file.
      */
-    ArchiveModel<?> getEnclModel() {
+    ArchiveModel getEnclModel() {
         return enclModel;
     }
 
@@ -143,10 +140,6 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     @Deprecated
     FileEntry getTarget() {
         return target;
-    }
-
-    ArchiveDriver<AE> getDriver() {
-        return driver;
     }
 
     public boolean isTouched() {

@@ -230,6 +230,7 @@ public class NonIOFileTest extends TestCase {
         assertNull(file.getEnclEntryName());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testParentConstructor() throws Exception {
         // Test normalization and parent+child constructors.
         // This is not yet a comprehensive test.
@@ -344,14 +345,14 @@ public class NonIOFileTest extends TestCase {
     
     public void testGetParentFile() {
         File abcdefgh = new File("a/b" + suffix + "/c/d/e" + suffix + "/f" + suffix + "/g/h" + suffix + "");
-        File abcdefg  = (File) abcdefgh.getParentFile();
-        File abcdef   = (File) abcdefg .getParentFile();
-        File abcde    = (File) abcdef  .getParentFile();
-        File abcd     = (File) abcde   .getParentFile();
-        File abc      = (File) abcd    .getParentFile();
-        File ab       = (File) abc     .getParentFile();
-        File a        = (File) ab      .getParentFile();
-        File n        = (File) a       .getParentFile();
+        File abcdefg  = abcdefgh.getParentFile();
+        File abcdef   = abcdefg .getParentFile();
+        File abcde    = abcdef  .getParentFile();
+        File abcd     = abcde   .getParentFile();
+        File abc      = abcd    .getParentFile();
+        File ab       = abc     .getParentFile();
+        File a        = ab      .getParentFile();
+        File n        = a       .getParentFile();
         assertEquals(abcdefgh.getInnerArchive(), abcdefgh);
         assertEquals(abcdefgh.getEnclArchive() , abcdef);
         assertEquals(abcdefg .getInnerArchive(), abcdef);
@@ -490,7 +491,7 @@ public class NonIOFileTest extends TestCase {
         final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         final ObjectInputStream in = new ObjectInputStream(bis);
         final File inner2 = (File) in.readObject();
-        final File archive2 = (File) inner2.getParentFile();
+        final File archive2 = inner2.getParentFile();
         in.close();
 
         assertNotSame(inner, inner2);
@@ -518,11 +519,11 @@ public class NonIOFileTest extends TestCase {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final ArchiveController<?> archiveController = archive.getArchiveController();
-        final ArchiveController<?> archive2Controller = archive2.getArchiveController();
+        final ArchiveController archiveController = archive.getArchiveController();
+        final ArchiveController archive2Controller = archive2.getArchiveController();
         assertSame(archiveController, archive2Controller);
-        final ArchiveController<?> innerController = inner.getArchiveController();
-        final ArchiveController<?> inner2Controller = inner2.getArchiveController();
+        final ArchiveController innerController = inner.getArchiveController();
+        final ArchiveController inner2Controller = inner2.getArchiveController();
         assertSame(innerController, inner2Controller);
     }
 

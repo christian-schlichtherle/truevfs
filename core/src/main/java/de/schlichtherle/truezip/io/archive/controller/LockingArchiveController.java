@@ -36,14 +36,11 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class LockingArchiveController<AE extends ArchiveEntry>
-extends ArchiveController<AE> {
+final class LockingArchiveController extends ArchiveController {
 
-    private final ArchiveController<AE> controller;
+    private final ArchiveController controller;
 
-    LockingArchiveController(
-            ArchiveModel<AE> model,
-            ArchiveController<AE> controller) {
+    LockingArchiveController(ArchiveModel model, ArchiveController controller) {
         super(model);
         this.controller = controller;
     }

@@ -39,24 +39,21 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ProspectiveArchiveController<AE extends ArchiveEntry>
-extends ArchiveController<AE> {
+final class ProspectiveArchiveController extends ArchiveController {
 
-    private final ArchiveController<AE> controller;
+    private final ArchiveController controller;
 
     /** The archive controller of the enclosing archive file, if any. */
-    private final ArchiveController<?> enclController;
+    private final ArchiveController enclController;
 
-    ProspectiveArchiveController(
-            ArchiveModel<AE> model,
-            ArchiveController<AE> controller) {
+    ProspectiveArchiveController(ArchiveModel model, ArchiveController controller) {
         super(model);
         this.controller = controller;
         this.enclController = super.getEnclController();
     }
 
     @Override
-    ArchiveController<?> getEnclController() {
+    ArchiveController getEnclController() {
         return enclController;
     }
 

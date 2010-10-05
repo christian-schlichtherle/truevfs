@@ -418,7 +418,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient ArchiveController<?> controller;
+    private transient ArchiveController controller;
 
     //
     // Constructor and helper methods:
@@ -1836,7 +1836,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final ArchiveController<?> getArchiveController() {
+    final ArchiveController getArchiveController() {
         assert (null != controller) == isArchive();
         return controller;
     }
@@ -2736,7 +2736,7 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null) {
-                final ArchiveController<?> controller = enclArchive.getArchiveController();
+                final ArchiveController controller = enclArchive.getArchiveController();
                 if (controller.getEntry(enclEntryName) != null)
                     return false;
                 controller.mknod(enclEntryName, FILE, null,

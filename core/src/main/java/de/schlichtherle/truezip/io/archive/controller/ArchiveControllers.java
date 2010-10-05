@@ -51,10 +51,10 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_C
  */
 public class ArchiveControllers {
 
-    private static final Comparator<ArchiveController<?>> REVERSE_CONTROLLERS
-            = new Comparator<ArchiveController<?>>() {
+    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
+            = new Comparator<ArchiveController>() {
         @Override
-		public int compare(ArchiveController<?> l, ArchiveController<?> r) {
+		public int compare(ArchiveController l, ArchiveController r) {
             return  r.getMountPoint().compareTo(l.getMountPoint());
         }
     };
@@ -66,13 +66,13 @@ public class ArchiveControllers {
      * {@code ArchiveController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Pointer<ArchiveController<?>>> controllers
-            = new WeakHashMap<URI, Pointer<ArchiveController<?>>>();
+    private static final Map<URI, Pointer<ArchiveController>> controllers
+            = new WeakHashMap<URI, Pointer<ArchiveController>>();
 
     private ArchiveControllers() {
     }
 
-    public static ArchiveController<?> getController(URI mountPoint) {
+    public static ArchiveController getController(URI mountPoint) {
         return getController(mountPoint, null, null);
     }
 
@@ -91,20 +91,20 @@ public class ArchiveControllers {
      *     not a valid name for an archive file</li>
      * </ul>
      */
-    public static <AE extends ArchiveEntry> ArchiveController<?> getController(
+    public static <AE extends ArchiveEntry> ArchiveController getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
-            final ArchiveController<?> enclController) {
+            final ArchiveController enclController) {
         if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
         if (mountPoint.isOpaque()) throw new IllegalArgumentException();
         //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         synchronized (controllers) {
-            final Pointer<ArchiveController<?>> pointer
+            final Pointer<ArchiveController> pointer
                     = controllers.get(mountPoint);
             if (pointer != null) {
-                final ArchiveController<?> controller = pointer.get();
+                final ArchiveController controller = pointer.get();
                 // Check that the controller hasn't been garbage collected
                 // meanwhile!
                 if (controller != null) {
@@ -119,16 +119,15 @@ public class ArchiveControllers {
             if (null == driver) // pure lookup operation?
                 return null;
             final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
-            final ArchiveModel<AE> model = new ArchiveModel<AE>(
+            final ArchiveModel model = new ArchiveModel(
             		mountPoint,
-            		driver,
                     null == enclController ? null : enclController.getModel(),
                     syncScheduler);
             // TODO: Support append strategy.
             syncScheduler.controller
-                    = new ProspectiveArchiveController<AE>(     model,
-                        new LockingArchiveController<AE>(       model,
-                            new UpdatingArchiveController<AE>(  model)));
+                    = new ProspectiveArchiveController(         model,
+                        new LockingArchiveController(           model,
+                            new UpdatingArchiveController<AE>(  model, driver)));
             syncScheduler.setTouched(false);
             return syncScheduler.controller;
         }
@@ -136,7 +135,7 @@ public class ArchiveControllers {
 
     private static class SyncScheduler<AE extends ArchiveEntry>
     implements TouchListener {
-        ArchiveController<AE> controller;
+        ArchiveController controller;
 
         @Override
         public void setTouched(boolean touched) {
@@ -151,7 +150,7 @@ public class ArchiveControllers {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	static void scheduleSync(
-            final ArchiveController<?> controller,
+            final ArchiveController controller,
             final Pointer.Type type) {
         synchronized (controllers) {
             controllers.put(
@@ -211,9 +210,9 @@ public class ArchiveControllers {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its enclosing archive file.
-            for (final ArchiveController<?> controller
+            for (final ArchiveController controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
-                final ArchiveModel<?> model = controller.getModel();
+                final ArchiveModel model = controller.getModel();
                     try {
                         model.writeLock().lock();
                         try {
@@ -243,23 +242,23 @@ public class ArchiveControllers {
         }
     }
 
-    static Set<ArchiveController<?>> getControllers() {
+    static Set<ArchiveController> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<ArchiveController<?>> getControllers(
+    static Set<ArchiveController> getControllers(
             URI prefix,
-            final Comparator<ArchiveController<?>> comparator) {
+            final Comparator<ArchiveController> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<ArchiveController<?>> snapshot;
+        final Set<ArchiveController> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<ArchiveController<?>>(comparator)
-                    : new HashSet<ArchiveController<?>>((int) (controllers.size() / 0.75f));
-            for (final Pointer<ArchiveController<?>> pointer
+                    ? new TreeSet<ArchiveController>(comparator)
+                    : new HashSet<ArchiveController>((int) (controllers.size() / 0.75f));
+            for (final Pointer<ArchiveController> pointer
                     : controllers.values()) {
-                final ArchiveController<?> controller
+                final ArchiveController controller
                         = null == pointer ? null : pointer.get();
                 if (null == controller) {
                     // This may happen if there are no more strong references
