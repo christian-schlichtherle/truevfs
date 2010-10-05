@@ -59,17 +59,16 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveController<AE extends ArchiveEntry>
-implements ArchiveDescriptor {
+public abstract class ArchiveController implements ArchiveDescriptor {
 
-    private final ArchiveModel<AE> model;
+    private final ArchiveModel model;
 
-    ArchiveController(final ArchiveModel<AE> model) {
+    ArchiveController(final ArchiveModel model) {
         assert model != null;
         this.model = model;
     }
 
-    final ArchiveModel<AE> getModel() {
+    final ArchiveModel getModel() {
         return model;
     }
 
@@ -91,7 +90,7 @@ implements ArchiveDescriptor {
         return "controller:" + getMountPoint().toString();
     }
 
-    ArchiveController<?> getEnclController() {
+    ArchiveController getEnclController() {
         final URI enclMountPoint = getModel().getEnclMountPoint();
         return null == enclMountPoint ? null : ArchiveControllers.getController(enclMountPoint);
     }

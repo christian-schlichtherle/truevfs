@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.IOException;
@@ -37,8 +38,8 @@ extends BasicArchiveController<AE> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(ArchiveModel<AE> model) {
-        super(model);
+    FileSystemArchiveController(ArchiveModel model, ArchiveDriver<AE> driver) {
+        super(model, driver);
     }
 
     final void ensureWriteLockedByCurrentThread() {

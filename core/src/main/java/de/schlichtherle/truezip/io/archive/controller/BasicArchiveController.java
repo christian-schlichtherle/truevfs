@@ -97,12 +97,16 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @version $Id$
  */
 abstract class BasicArchiveController   <AE extends ArchiveEntry>
-extends        ArchiveController        <AE                     >
+extends        ArchiveController
 implements     CommonInputSocketFactory <AE                     >,
                CommonOutputSocketFactory<AE                     > {
 
-    BasicArchiveController(ArchiveModel<AE> model) {
+    private final ArchiveDriver<AE> driver;
+
+    BasicArchiveController(ArchiveModel model, ArchiveDriver<AE> driver) {
         super(model);
+        assert null != driver;
+        this.driver = driver;
     }
 
     final ArchiveFileSystem<AE> autoMount()
@@ -146,7 +150,7 @@ implements     CommonInputSocketFactory <AE                     >,
      *         - never {@code null}.
      */
     final ArchiveDriver<AE> getDriver() {
-        return getModel().getDriver();
+        return driver;
     }
 
     @Override
@@ -366,7 +370,7 @@ implements     CommonInputSocketFactory <AE                     >,
                 final AE entry = getEntry();
                 final CommonOutputSocket<AE> output = newOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
-                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes when new entry!
+                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
                         : null;
                 try {
                     final OutputStream out = output
@@ -506,7 +510,7 @@ implements     CommonInputSocketFactory <AE                     >,
      */
     @Deprecated
     final boolean isHostedDirectoryEntryTarget() {
-        ArchiveModel<?> enclModel = getModel().getEnclModel();
+        ArchiveModel enclModel = getModel().getEnclModel();
         return null == enclModel || DIRECTORY == enclModel.getTarget().getType();
     }
 

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
@@ -200,8 +201,8 @@ extends     FileSystemArchiveController<AE> {
      */
     private boolean needsReassembly;
 
-    UpdatingArchiveController(ArchiveModel<AE> model) {
-        super(model);
+    UpdatingArchiveController(ArchiveModel model, ArchiveDriver<AE> driver) {
+        super(model, driver);
     }
 
     @Deprecated
@@ -331,7 +332,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private void unwrap(
-            final ArchiveController<?> controller,
+            final ArchiveController controller,
             final String path,
             final boolean autoCreate,
             final boolean createParents)
@@ -899,7 +900,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private void wrap(
-            final ArchiveController<?> controller,
+            final ArchiveController controller,
             final String path)
     throws IOException {
         assert controller != null;
