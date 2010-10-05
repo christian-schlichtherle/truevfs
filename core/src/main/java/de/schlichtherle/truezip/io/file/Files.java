@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.file.FileEntry;
@@ -34,9 +34,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.contains;
 
@@ -218,7 +218,7 @@ class Files {
         try {
             IOSocket.copy(  newInputSocket(src),
                             newOutputSocket(dst, BitField
-                                .noneOf(IOOption.class)
+                                .noneOf(OutputOption.class)
                                 .set(PRESERVE, preserve)
                                 .set(CREATE_PARENTS, File.isLenient())));
         } catch (FileNotFoundException ex) {
@@ -259,7 +259,7 @@ class Files {
 
     static CommonOutputSocket<?> newOutputSocket(
             final java.io.File dst,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         assert dst != null;
 

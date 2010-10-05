@@ -57,5 +57,5 @@ public interface CommonOutputSocketFactory<CE extends CommonEntry> {
      * @return A new non-{@code null} output socket for writing to the local
      *         target.
      */
-    CommonOutputSocket<CE> newOutputSocket(CE entry) throws IOException; // TODO: Support IOOption!
+    CommonOutputSocket<CE> newOutputSocket(CE entry) throws IOException;
 }

@@ -62,7 +62,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     public int getTopLevelArchivesTotal() {
         int result = 0;
         for (ArchiveController<?> controller : ArchiveControllers.getControllers())
-            if (controller.getModel().getEnclMountPoint() == null)
+            if (controller.getModel().getEnclModel() == null)
                 result++;
         return result;
     }
@@ -74,7 +74,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
             final ArchiveModel<?> model = controller.getModel();
             model.readLock().lock();
             try {
-                if (controller.getModel().getEnclMountPoint() == null && model.isTouched())
+                if (model.getEnclModel() == null && model.isTouched())
                     result++;
             } finally {
                 model.readLock().unlock();
