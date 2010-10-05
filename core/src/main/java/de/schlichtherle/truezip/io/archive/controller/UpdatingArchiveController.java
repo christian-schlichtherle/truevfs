@@ -449,7 +449,7 @@ extends     FileSystemArchiveController<AE> {
     throws IOException {
         assert getEntry(entry.getName()).getTarget() == entry : "interface contract violation";
         assert input.getEntry(entry.getName()) == entry : "interface contract violation";
-        return null == input ? null : input.newInputSocket(entry);
+        return input.newInputSocket(entry);
     }
 
     public CommonInputSocket<FileEntry> newInputSocket(FileEntry entry)
