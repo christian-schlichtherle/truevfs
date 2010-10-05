@@ -187,7 +187,7 @@ extends ArchiveController<AE> {
     @Override
     public CommonOutputSocket<?> newOutputSocket(
             final String path,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         try {
             return controller.newOutputSocket(path, options);
@@ -201,7 +201,7 @@ extends ArchiveController<AE> {
             final String path,
             final Type type,
             final CommonEntry template,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         try {
             controller.mknod(path, type, template, options);
@@ -213,7 +213,7 @@ extends ArchiveController<AE> {
     @Override
     public void unlink(
             final String path,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         try {
             controller.unlink(path, options);

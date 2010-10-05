@@ -40,7 +40,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
     private final URI mountPoint;
     private final ArchiveModel<?> enclModel;
     private final URI enclPath;
-    private final FileEntry target; // TODO: make this support other virtual file systems.
+    private final FileEntry target; // FIXME: remove this dependency!
     private final ArchiveDriver<AE> driver;
     private boolean touched;
     private final TouchListener touchListener;
@@ -110,15 +110,15 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
         return "model:" + getMountPoint().toString();
     }
 
-    ArchiveModel<?> getEnclModel() {
-        return enclModel;
-    }
-
     /**
      * Returns the model for the enclosing archive file of this
      * model's target archive file or {@code null} if it's not enclosed in
      * another archive file.
      */
+    ArchiveModel<?> getEnclModel() {
+        return enclModel;
+    }
+
     URI getEnclMountPoint() {
         return null == enclModel ? null : enclModel.getMountPoint();
     }
@@ -140,6 +140,7 @@ final class ArchiveModel<AE extends ArchiveEntry> implements ArchiveDescriptor {
      * Returns the canonical or at least normalized absolute file for the
      * target archive file.
      */
+    @Deprecated
     FileEntry getTarget() {
         return target;
     }

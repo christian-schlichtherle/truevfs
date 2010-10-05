@@ -107,7 +107,7 @@ implements ArchiveDescriptor {
      * It's up to the particular operation to define which available options
      * are applicable for it and which combinations are supported.
      */
-    public enum IOOption { // FIXME: Make top level class!
+    public enum OutputOption {
         /**
          * Whether or not any missing parent directory entries within an
          * archive file shall get created automatically.
@@ -275,7 +275,7 @@ implements ArchiveDescriptor {
      * @return A non-{@code null} {@code CommonInputSocket}.
      */
     public abstract CommonOutputSocket<?> newOutputSocket(
-            String path, BitField<IOOption> options)
+            String path, BitField<OutputOption> options)
     throws IOException;
 
     /**
@@ -311,11 +311,11 @@ implements ArchiveDescriptor {
      *         </ul>
      */
     public abstract void mknod( String path, Type type, CommonEntry template,
-                                BitField<IOOption> options)
+                                BitField<OutputOption> options)
     throws IOException;
 
     /** Currently supports no options. */
-    public abstract void unlink(String path, BitField<IOOption> options)
+    public abstract void unlink(String path, BitField<OutputOption> options)
     throws IOException;
 
     /**

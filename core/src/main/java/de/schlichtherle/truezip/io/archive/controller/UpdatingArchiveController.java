@@ -49,8 +49,8 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
@@ -204,6 +204,7 @@ extends     FileSystemArchiveController<AE> {
         super(model);
     }
 
+    @Deprecated
     private FileEntry getTarget() {
         return getModel().getTarget();
     }
@@ -399,7 +400,7 @@ extends     FileSystemArchiveController<AE> {
             // Now try to create the entry in the enclosing controller.
             try {
                 controller.mknod(path, FILE, null,
-                        BitField.noneOf(IOOption.class).set(CREATE_PARENTS, createParents));
+                        BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, createParents));
             } catch (IOException ex) {
                 // The delta on the *enclosing* controller failed.
                 // Hence, we need to revert our state changes.

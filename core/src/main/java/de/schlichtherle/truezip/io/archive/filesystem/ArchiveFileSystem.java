@@ -113,7 +113,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *         into this archive file system upon a call to its
      *         {@link EntryOperation#run} method.
      */
-    EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents) // FIXME: Use IOOption and remove support for preserving -> move to CommonOutputSocketFactory instead, i.e. a driver! Check APPEND for new entry!
+    EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**

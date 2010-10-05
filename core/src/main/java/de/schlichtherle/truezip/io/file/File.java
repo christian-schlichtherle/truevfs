@@ -34,7 +34,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -65,7 +65,7 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -688,6 +688,7 @@ public class File extends java.io.File {
      * @see FileFactory
      */
     @Deprecated
+    @SuppressWarnings("LeakingThisInConstructor")
 	public File(
             final java.io.File delegate,
             final File innerArchive,
@@ -1566,14 +1567,14 @@ public class File extends java.io.File {
         final File enclArchive = this.enclArchive;
         return enclArchive != null
                 ? enclArchive.getNonArchivedParentFile()
-                : (File) getParentFile();
+                : getParentFile();
     }
 
     @Override
     public File getAbsoluteFile() {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
-            enclArchive = (File) enclArchive.getAbsoluteFile();
+            enclArchive = enclArchive.getAbsoluteFile();
         return detector.createFile(this, delegate.getAbsoluteFile(), enclArchive);
     }
 
@@ -1643,7 +1644,7 @@ public class File extends java.io.File {
     public File getCanonicalFile() throws IOException {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
-            enclArchive = (File) enclArchive.getCanonicalFile();
+            enclArchive = enclArchive.getCanonicalFile();
         // Note: entry.getCanonicalFile() may change case!
         return detector.createFile(this, delegate.getCanonicalFile(), enclArchive);
     }
@@ -2739,7 +2740,7 @@ public class File extends java.io.File {
                 if (controller.getEntry(enclEntryName) != null)
                     return false;
                 controller.mknod(enclEntryName, FILE, null,
-                        BitField.noneOf(IOOption.class)
+                        BitField.noneOf(OutputOption.class)
                             .set(CREATE_PARENTS, isLenient()));
                 return true;
             }
@@ -2758,7 +2759,7 @@ public class File extends java.io.File {
         if (innerArchive == null)
             return delegate.mkdirs();
 
-        final File parent = (File) getParentFile();
+        final File parent = getParentFile();
         if (parent != null && !parent.exists())
             parent.mkdirs();
 
@@ -2794,7 +2795,7 @@ public class File extends java.io.File {
                         getInnerEntryName(),
                         DIRECTORY,
                         null,
-                        BitField.noneOf(IOOption.class)
+                        BitField.noneOf(OutputOption.class)
                             .set(CREATE_PARENTS, isLenient()));
                 return true;
             }
@@ -2823,7 +2824,7 @@ public class File extends java.io.File {
             if (innerArchive != null) {
                 innerArchive.getArchiveController()
                         .unlink(getInnerEntryName(),
-                            BitField.noneOf(IOOption.class));
+                            BitField.noneOf(OutputOption.class));
                 return true;
             }
         } catch (FalsePositiveEntryException isNotArchive) {

@@ -38,9 +38,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.APPEND;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.IOOption.PRESERVE;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.APPEND;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
@@ -312,13 +312,9 @@ implements     CommonInputSocketFactory <AE                     >,
     } // class InputSocket
 
     @Override
-    public abstract CommonInputSocket<AE> newInputSocket(AE target)
-    throws IOException;
-
-    @Override
     public final CommonOutputSocket<?> newOutputSocket(
             final String path,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         class OutputSocket extends CommonOutputSocket<AE> {
             EntryOperation<AE> link;
@@ -370,7 +366,7 @@ implements     CommonInputSocketFactory <AE                     >,
                 final AE entry = getEntry();
                 final CommonOutputSocket<AE> output = newOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
-                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes when on entry!
+                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes when new entry!
                         : null;
                 try {
                     final OutputStream out = output
@@ -415,26 +411,12 @@ implements     CommonInputSocketFactory <AE                     >,
         }
     }
 
-    /**
-     * Tests if the file system entry with the given path name has received or
-     * is currently receiving new data via an output stream.
-     * As an implication, the entry cannot receive new data from another
-     * output stream before the next call to {@link #sync}.
-     * Note that for directories this method will always return
-     * {@code false}!
-     */
-    //abstract boolean hasNewData(String path);
-
-    @Override
-    public abstract CommonOutputSocket<AE> newOutputSocket(AE target)
-    throws IOException;
-
     @Override
     public final void mknod(
             final String path,
             final Type type,
             final CommonEntry template,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         if (FILE != type && DIRECTORY != type)
             throw new EntryNotFoundException(this, path,
@@ -475,7 +457,7 @@ implements     CommonInputSocketFactory <AE                     >,
     @Override
     public final void unlink(
             final String path,
-            final BitField<IOOption> options)
+            final BitField<OutputOption> options)
     throws IOException {
         autoSync(path);
         if (isRoot(path)) {
@@ -522,7 +504,7 @@ implements     CommonInputSocketFactory <AE                     >,
      * file is <em>not</em> enclosed in another archive file or actually exists
      * as a false positive directory entry in the host file system.
      */
-    // TODO: Move to ArchiveModel or UpdatingArchiveController and declare private.
+    @Deprecated
     final boolean isHostedDirectoryEntryTarget() {
         ArchiveModel<?> enclModel = getModel().getEnclModel();
         return null == enclModel || DIRECTORY == enclModel.getTarget().getType();
