@@ -31,6 +31,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
@@ -485,7 +486,7 @@ implements     CommonInputSocketFactory <AE                     >,
             }
             // We are actually working on the controller's target file.
             if (!fileSystem.getEntry(path).getMembers().isEmpty())
-                throw new IOException("archive file system not empty!");
+                throw new IOException("root directory not empty");
             sync(   new DefaultArchiveSyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
             // Just in case our target is an RAES encrypted ZIP file,
