@@ -155,7 +155,7 @@ public class ArchiveControllers {
         synchronized (controllers) {
             controllers.put(
                     controller.getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                    (Pointer) type.newPointer(controller));
+                    type.newPointer(controller));
         }
     }
 

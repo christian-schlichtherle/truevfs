@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.IOReferences;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocketFactory;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocketFactory;
@@ -43,6 +42,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.O
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.READ;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -240,7 +241,7 @@ implements     CommonInputSocketFactory <AE                     >,
             final BitField<Access> types,
             final long value)
     throws IOException {
-        autoSync(path);
+        autoSync(path, null);
         return autoMount().setTime(path, types, value);
     }
 
@@ -250,7 +251,7 @@ implements     CommonInputSocketFactory <AE                     >,
     throws IOException {
         class InputSocket extends CommonInputSocket<AE> {
             AE getEntry() throws IOException {
-                autoSync(path);
+                autoSync(path, READ);
                 try {
                     return IOReferences.deref(autoMount().getEntry(path));
                 } catch (FalsePositiveEntryException alreadyDetected) {
@@ -258,18 +259,17 @@ implements     CommonInputSocketFactory <AE                     >,
                 }
             }
 
-            CommonInputSocket<AE> getInputSocket() throws IOException {
+            CommonInputSocket<AE> newInputSocket() throws IOException {
+                final BasicArchiveController<AE> controller
+                        = BasicArchiveController.this;
                 final AE entry = getEntry();
-                if (null != entry && DIRECTORY == entry.getType())
-                    throw new EntryNotFoundException(
-                            BasicArchiveController.this, path,
-                            "cannot read directories");
-                final CommonInputSocket<AE> input;
-                if (null == entry || null == (input = newInputSocket(entry)))
-                    throw new EntryNotFoundException(
-                            BasicArchiveController.this, path,
+                if (null == entry)
+                    throw new EntryNotFoundException(controller, path,
                             "no such file or directory");
-                return input.share(this);
+                if (DIRECTORY == entry.getType())
+                    throw new EntryNotFoundException(controller, path,
+                            "cannot read directories");
+                return controller.newInputSocket(entry).share(this);
             }
 
             @Override
@@ -289,12 +289,12 @@ implements     CommonInputSocketFactory <AE                     >,
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return getInputSocket().newInputStream();
+                return newInputSocket().newInputStream();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getInputSocket().newReadOnlyFile();
+                return newInputSocket().newReadOnlyFile();
             }
         }
 
@@ -325,7 +325,7 @@ implements     CommonInputSocketFactory <AE                     >,
             EntryOperation<AE> link;
 
             AE getEntry() throws IOException {
-                if (autoSync(path))
+                if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
                     try {
@@ -440,22 +440,18 @@ implements     CommonInputSocketFactory <AE                     >,
 
                     case DIRECTORY:
                         autoMount(true, options.get(CREATE_PARENTS));
+                        return;
+
+                    default:
+                        throw new IOException("operation not supported");
                 }
-                return;
             }
             throw new EntryNotFoundException(this, path,
                     "directory exists already");
         } else { // !isRoot(entryName)
-            switch (type) {
-                case FILE:
-                    newOutputSocket(path, options).newOutputStream().close();
-                    break;
-
-                case DIRECTORY:
-                    autoMount(options.get(CREATE_PARENTS))
-                            .mknod(path, DIRECTORY, template, options.get(CREATE_PARENTS))
-                            .run();
-            }
+            autoMount(options.get(CREATE_PARENTS))
+                    .mknod(path, type, template, options.get(CREATE_PARENTS))
+                    .run();
         }
     }
 
@@ -464,11 +460,11 @@ implements     CommonInputSocketFactory <AE                     >,
             final String path,
             final BitField<OutputOption> options)
     throws IOException {
-        autoSync(path);
         if (isRoot(path)) {
             // Get the file system or die trying!
             final ArchiveFileSystem<AE> fileSystem;
             try {
+                autoSync(path, null);
                 fileSystem = autoMount();
             } catch (FalsePositiveEntryException ex) {
                 // The File instance is going to delete the target file
@@ -500,6 +496,7 @@ implements     CommonInputSocketFactory <AE                     >,
                     : new FalsePositiveEnclosedEntryException(
                         this, path, new IOException());
         } else { // !isRoot(path)
+            autoSync(path, null);
             autoMount().unlink(path);
         }
     }
@@ -523,11 +520,15 @@ implements     CommonInputSocketFactory <AE                     >,
      * all data structures may get reset (filesystem, entries, streams, etc.)!
      * This method may require synchronization on the write lock!
      *
+     * @param  path the path name of the entry
+     * @param  intention the intended operation on the entry. If {@code null},
+     *         a pure file system operation with no I/O is intended.
      * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
      * @throws ArchiveSyncException If any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws NotWriteLockedByCurrentThreadException
      * @return Whether or not a synchronization has been performed.
      */
-    abstract boolean autoSync(String path) throws ArchiveSyncException;
+    abstract boolean autoSync(String path, Access intention)
+    throws IOException;
 }

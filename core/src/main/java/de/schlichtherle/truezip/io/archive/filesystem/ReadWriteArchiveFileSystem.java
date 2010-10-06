@@ -36,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR_CHAR;
@@ -293,7 +294,7 @@ implements ArchiveFileSystem<AE> {
         if (touched)
             return;
         // Order is important here because of exceptions!
-        if (vetoableTouchListener != null) {
+        if (null != vetoableTouchListener) {
             try {
                 vetoableTouchListener.touch();
             } catch (IOException ex) {
@@ -597,8 +598,8 @@ implements ArchiveFileSystem<AE> {
                 parent = entry;
             }
             final AE entry = getTarget().getTarget();
-            if (entry.getTime(Access.WRITE) == UNKNOWN)
-                entry.setTime(Access.WRITE, time);
+            if (UNKNOWN == entry.getTime(WRITE))
+                entry.setTime(WRITE, time);
         }
 
         @Override

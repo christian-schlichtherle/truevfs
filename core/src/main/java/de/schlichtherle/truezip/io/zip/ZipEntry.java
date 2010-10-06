@@ -275,7 +275,7 @@ public class ZipEntry implements Cloneable {
 
     public void setTime(final long jTime) {
         // Adjust to lower granularity of DOS date/time.
-        this.jTime = jTime != UNKNOWN
+        this.jTime = UNKNOWN != jTime
                 ? getDateTimeConverter().toJavaTime(
                     getDateTimeConverter().toDosTime(jTime))
                 : UNKNOWN;

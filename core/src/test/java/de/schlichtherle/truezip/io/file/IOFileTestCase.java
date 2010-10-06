@@ -524,8 +524,8 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
             fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
         } catch (FileBusyException expected) {
         }
-        assertFalse(file2.catFrom(fisA)); // fails for same reason.
-        
+        assertTrue(file2.catFrom(fisA)); // fails for same reason.
+
         // fisA is still open!
         try {
             File.update(); // forces closing of fisA

@@ -61,6 +61,8 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.READ;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -450,7 +452,7 @@ extends     FileSystemArchiveController<AE> {
     @Override
     public CommonInputSocket<AE> newInputSocket(final AE entry)
     throws IOException {
-        assert input.getEntry(entry.getName()) == entry : "interface contract violation";
+        assert null != entry;
         return input.newInputSocket(entry);
     }
 
@@ -538,13 +540,21 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-	boolean autoSync(String path) throws ArchiveSyncException {
-        if (null == output)
+	boolean autoSync(final String path, final Access intention)
+    throws IOException {
+        final Entry<AE> entry = autoMount().getEntry(path);
+        if (null == entry)
             return false;
-        final Entry<AE> entry = getFileSystem().getEntry(path);
-        if (null == entry || null == output.getEntry(entry.getName()))
+        if (null != output && null != output.getEntry(entry.getTarget().getName()))
+            return autoSync();
+        if (null != input && null != input.getEntry(entry.getTarget().getName()))
             return false;
-        ensureWriteLockedByCurrentThread();
+        if (READ == intention)
+            return autoSync();
+        return false;
+    }
+
+    private boolean autoSync() throws ArchiveSyncException {
         sync(   new DefaultArchiveSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -557,6 +567,8 @@ extends     FileSystemArchiveController<AE> {
         assert input == null || inFile != null; // input archive => input file
         assert !isFileSystemTouched() || output != null; // file system touched => output archive
         assert output == null || outFile != null; // output archive => output file
+
+        ensureWriteLockedByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
@@ -820,12 +832,11 @@ extends     FileSystemArchiveController<AE> {
                     IOSocket.copy(  input.newInputSocket(e),
                                     output.newOutputSocket(e));
                 } else {
-                    // The file system entry is an archive file which has been
-                    // newly created and not yet been reassembled
-                    // into this (potentially new) archive file.
+                    // The file system entry is a newly created non-directory
+                    // entry which hasn't received any content yet.
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
-                    // system gets remounted from the archive file.
+                    // system gets remounted from the target archive file.
                     output.newOutputSocket(e).newOutputStream().close();
                 }
             } catch (IOException ex) {
