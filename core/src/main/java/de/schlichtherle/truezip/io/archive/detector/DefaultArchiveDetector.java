@@ -203,7 +203,8 @@ public class DefaultArchiveDetector implements ArchiveDetector, Serializable {
         if (config == null)
             return null;
 
-        final Map<String, Object> map = new LinkedHashMap<String, Object>((int) (config.length / .75) + 1); // order may be important!
+        final Map<String, Object> map
+                = new LinkedHashMap<String, Object>((int) (config.length / .75f) + 1); // order may be important!
         for (int i = 0, l = config.length; i < l; i++)
             map.put((String) config[i], config[++i]);
 

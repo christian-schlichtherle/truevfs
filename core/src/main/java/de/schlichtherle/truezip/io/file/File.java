@@ -60,6 +60,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
@@ -2384,13 +2385,13 @@ public class File extends java.io.File {
                 // TODO: Review: Can we avoid this special case?
                 // It's probably ZipDriver specific!
                 // This target is a plain file in the file system.
-                // If target.getSize() returns UNKNOWN, the getLength is yet unknown.
+                // If target.getLength() returns UNKNOWN, the getLength is yet unknown.
                 // This may happen if e.g. a ZIP target has only been partially
                 // written, i.e. not yet closed by another thread, or if this is a
                 // ghost directory.
                 // As this is not specified in the contract of this class,
                 // return 0 in this case instead.
-                final long length = entry.getSize();
+                final long length = entry.getSize(DATA);
                 return length >= 0 ? length : 0;
             }
         } catch (FalsePositiveEntryException isNotArchive) {
@@ -2492,7 +2493,7 @@ public class File extends java.io.File {
                 final Set<String> members = innerArchive
                         .getArchiveController()
                         .getEntry(getInnerEntryName())
-                        .list();
+                        .getMembers();
                 return members == null
                         ? null : members.toArray(new String[members.size()]);
             }
@@ -2524,7 +2525,7 @@ public class File extends java.io.File {
                 final Set<String> members = innerArchive
                         .getArchiveController()
                         .getEntry(getInnerEntryName())
-                        .list();
+                        .getMembers();
                 if (members == null)
                     return null;
                 if (filter == null)
@@ -2611,7 +2612,7 @@ public class File extends java.io.File {
                 final Set<String> members = innerArchive
                         .getArchiveController()
                         .getEntry(getInnerEntryName())
-                        .list();
+                        .getMembers();
                 if (members == null)
                     return null;
                 final Collection<File> filtered
@@ -2675,7 +2676,7 @@ public class File extends java.io.File {
             if (innerArchive != null) {
                 final Set<String> members = innerArchive.getArchiveController()
                         .getEntry(getInnerEntryName())
-                        .list();
+                        .getMembers();
                 if (members == null)
                     return null;
                 final Collection<File> filtered

@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.zip.DateTimeConverter;
 
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 
@@ -63,16 +65,38 @@ implements ArchiveEntry {
     }
 
     @Override
+    public long getSize(final Size type) {
+        switch (type) {
+            case DATA:
+                return getSize();
+            case STORAGE:
+                return getCompressedSize();
+            default:
+                return ArchiveEntry.UNKNOWN;
+        }
+    }
+
+    @Override
+    public boolean setSize(final Size type, final long size) {
+        if (DATA != type)
+            return false;
+        setSize(size);
+        return true;
+    }
+
+    @Override
     public long getTime(Access type) {
-        if (Access.WRITE != type)
+        if (WRITE != type)
             return ArchiveEntry.UNKNOWN;
         long time = super.getTime();
         return 0 <= time ? time : ArchiveEntry.UNKNOWN;
     }
 
     @Override
-    public void setTime(Access type, long value) {
-        if (Access.WRITE == type)
-            super.setTime(value);
+    public boolean setTime(Access type, long time) {
+        if (WRITE != type)
+            return false;
+        setTime(time);
+        return true;
     }
 }

@@ -168,12 +168,12 @@ implements Iterable<E>, Cloneable {
         final BitField<E> clone;
         if (set) {
             if (bits.contains(bit))
-                return (BitField<E>) this;
+                return this;
             clone = clone();
             clone.bits.add(bit);
         } else {
             if (!bits.contains(bit))
-                return (BitField<E>) this;
+                return this;
             clone = clone();
             clone.bits.remove(bit);
         }

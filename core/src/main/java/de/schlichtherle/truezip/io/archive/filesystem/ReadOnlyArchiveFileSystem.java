@@ -67,7 +67,7 @@ extends ReadWriteArchiveFileSystem<AE> {
     }
 
     @Override
-    public void setTime(String path, BitField<Access> types, long value)
+    public boolean setTime(String path, BitField<Access> types, long value)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

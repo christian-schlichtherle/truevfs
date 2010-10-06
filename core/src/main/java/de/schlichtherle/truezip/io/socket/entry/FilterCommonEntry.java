@@ -43,8 +43,8 @@ implements CommonEntry {
     }
 
     @Override
-    public long getSize() {
-        return entry.getSize();
+    public long getSize(Size type) {
+        return entry.getSize(type);
     }
 
     @Override

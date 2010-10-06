@@ -130,7 +130,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
     void unlink(String path)
     throws ArchiveFileSystemException;
 
-    void setTime(String path, BitField<Access> types, long value)
+    boolean setTime(String path, BitField<Access> types, long value)
     throws ArchiveFileSystemException;
 
     boolean isWritable(String path);

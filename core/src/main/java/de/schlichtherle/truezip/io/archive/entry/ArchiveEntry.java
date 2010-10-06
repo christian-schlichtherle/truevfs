@@ -55,17 +55,21 @@ public interface ArchiveEntry extends CommonEntry {
     String getName();
 
     /**
-     * Sets the (uncompressed) size of this archive entry in bytes.
+     * Sets the size of this archive entry.
      *
-     * @param  size the (uncompressed) size of this archive entry in bytes or
+     * @param  type the size type.
+     * @param  value the size of the given size type for this archive entry in
+     *         bytes or
      *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code size} is negative and not
      *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     * @return {@code true} on success, {@code false} otherwise, e.g. if the
+     *         type is unsupported.
      */
-    void setSize(long size);
+    boolean setSize(Size type, long value);
 
     /**
-     * Sets the last modification time of this archive entry.
+     * Sets the last access time of this archive entry.
      *
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive
@@ -73,6 +77,8 @@ public interface ArchiveEntry extends CommonEntry {
      *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
      *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     * @return {@code true} on success, {@code false} otherwise, e.g. if the
+     *         given type is unsupported.
      */
-    void setTime(Access type, long value);
+    boolean setTime(Access type, long value);
 }

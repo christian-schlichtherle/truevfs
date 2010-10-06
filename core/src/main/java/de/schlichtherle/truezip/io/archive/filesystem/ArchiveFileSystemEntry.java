@@ -44,5 +44,5 @@ public interface ArchiveFileSystemEntry extends CommonEntry {
      * Otherwise, an unmodifiable set of strings is returned which
      * represent the base names of the members of this directory entry.
      */
-    Set<String> list();
+    Set<String> getMembers();
 }

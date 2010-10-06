@@ -15,12 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
 import java.util.Set;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
@@ -87,7 +87,7 @@ final class ProspectiveArchiveController extends ArchiveController {
     }
 
     @Override
-    public Entry<?> getEntry(final String path)
+    public ArchiveFileSystemEntry getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
             return controller.getEntry(path);
@@ -95,8 +95,7 @@ final class ProspectiveArchiveController extends ArchiveController {
             /** @see ArchiveDriver#newInputShop! */
             if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
                 return new SpecialFileEntry<CommonEntry>(getEnclController()
-                        .getEntry(getEnclPath(path))
-                        .getTarget()); // the exception asserts that the entry exists as a file!
+                        .getEntry(getEnclPath(path))); // the exception asserts that the entry exists as a file!
             // Fall through!
         } catch (FalsePositiveEnclosedEntryException ex) {
         }
@@ -117,7 +116,7 @@ final class ProspectiveArchiveController extends ArchiveController {
         }
 
         @Override
-        public Set<String> list() {
+        public Set<String> getMembers() {
             return null;
         }
 
@@ -158,15 +157,15 @@ final class ProspectiveArchiveController extends ArchiveController {
     }
 
     @Override
-    public void setTime(
+    public boolean setTime(
             final String path,
             final BitField<Access> types,
             final long value)
     throws IOException {
         try {
-            controller.setTime(path, types, value);
+            return controller.setTime(path, types, value);
         } catch (FalsePositiveEnclosedEntryException ex) {
-            getEnclController().setTime(getEnclPath(path), types, value);
+            return getEnclController().setTime(getEnclPath(path), types, value);
         }
     }
 
@@ -219,7 +218,7 @@ final class ProspectiveArchiveController extends ArchiveController {
             // FIXME: Check if needed anymore!
             // What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
-                final ArchiveFileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
+                final CommonEntry entry = getEnclController().getEntry(getEnclPath(path));
                 if (null == entry || DIRECTORY != entry.getType() // TODO: Redundant check?
                     && ex.getCause() instanceof FileNotFoundException) {
                     throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!

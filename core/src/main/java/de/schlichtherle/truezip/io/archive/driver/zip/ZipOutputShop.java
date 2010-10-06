@@ -39,6 +39,7 @@ import java.util.zip.CheckedOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
@@ -143,21 +144,21 @@ implements CommonOutputShop<ZipEntry> {
                     return new EntryOutputStream(entry);
                 }
                 final CommonEntry peer = getPeerTarget();
-                if (peer != null) {
-                    entry.setSize(peer.getSize());
+                if (null != peer) {
+                    entry.setSize(peer.getSize(DATA));
                     if (peer instanceof ZipEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipEntry peerZipEntry = (ZipEntry) peer;
+                        final ZipEntry zipPeer = (ZipEntry) peer;
                         if (entry.getMethod() == UNKNOWN)
-                            entry.setMethod(peerZipEntry.getMethod());
-                        if (entry.getMethod() == peerZipEntry.getMethod())
-                            entry.setCompressedSize(peerZipEntry.getCompressedSize());
-                        entry.setCrc(peerZipEntry.getCrc());
+                            entry.setMethod(zipPeer.getMethod());
+                        if (entry.getMethod() == zipPeer.getMethod())
+                            entry.setCompressedSize(zipPeer.getCompressedSize());
+                        entry.setCrc(zipPeer.getCrc());
                         return new EntryOutputStream(
-                                entry, peerZipEntry.getMethod() != ZipEntry.DEFLATED);
+                                entry, zipPeer.getMethod() != ZipEntry.DEFLATED);
                     }
                 }
                 switch (entry.getMethod()) {

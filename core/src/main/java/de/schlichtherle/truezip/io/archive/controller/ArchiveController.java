@@ -16,8 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -235,7 +234,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     public abstract boolean isReadOnly()
     throws FalsePositiveEntryException;
 
-    public abstract Entry<?> getEntry(String path)
+    public abstract ArchiveFileSystemEntry getEntry(String path)
     throws FalsePositiveEntryException;
 
     public abstract boolean isReadable(String path)
@@ -247,7 +246,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
     public abstract void setReadOnly(String path)
     throws IOException;
 
-    public abstract void setTime(String path, BitField<Access> types, long value)
+    public abstract boolean setTime(String path, BitField<Access> types, long value)
     throws IOException;
 
     /**

@@ -59,7 +59,7 @@ class ReadWriteArchiveFileSystem<AE extends ArchiveEntry>
 implements ArchiveFileSystem<AE> {
 
     /** The controller that this filesystem belongs to. */
-    private final CommonEntryFactory<? extends AE> factory;
+    private final CommonEntryFactory<AE> factory;
 
     /**
      * The map of archive entries in this file system.
@@ -112,7 +112,7 @@ implements ArchiveFileSystem<AE> {
 
         this.factory = factory;
         master = new LinkedHashMap<String, BaseEntry<AE>>(
-                (int) (container.size() / 0.75f) + 1);
+                (int) (container.size() / .75f) + 1);
 
         // Load entries from input archive.
         final Normalizer normalizer = new Normalizer();
@@ -376,7 +376,7 @@ implements ArchiveFileSystem<AE> {
         assert !isRoot(path) || type == DIRECTORY;
         assert !(template instanceof Entry<?>);
 
-        return newBaseEntry((AE) factory.newEntry(path, type, template));
+        return newBaseEntry(factory.newEntry(path, type, template));
     }
 
     /**
@@ -453,7 +453,7 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        public Set<String> list() {
+        public Set<String> getMembers() {
             return null;
         }
     } // class FileEntry
@@ -470,7 +470,7 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        public Set<String> list() {
+        public Set<String> getMembers() {
             if (!(members instanceof CopyOnWriteArraySet<?>))
                 members = new CopyOnWriteArraySet<String>(members);
             return Collections.unmodifiableSet(members);
@@ -653,7 +653,7 @@ implements ArchiveFileSystem<AE> {
             throw new ArchiveFileSystemException(path,
                     "archive entry does not exist");
         assert entry != root;
-        if (entry.getType() == DIRECTORY && entry.list().size() > 0) {
+        if (entry.getType() == DIRECTORY && entry.getMembers().size() > 0) {
             master.put(path, entry); // Restore file system
             throw new ArchiveFileSystemException(path,
                     "directory is not empty");
@@ -691,7 +691,7 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public void setTime(
+    public boolean setTime(
             final String path,
             final BitField<Access> types,
             final long value)
@@ -705,7 +705,9 @@ implements ArchiveFileSystem<AE> {
                     "archive entry not found");
         // Order is important here!
         touch();
+        boolean ok = true;
         for (Access type : types)
-            entry.getTarget().setTime(type, value);
+            ok &= entry.getTarget().setTime(type, value);
+        return ok;
     }
 }

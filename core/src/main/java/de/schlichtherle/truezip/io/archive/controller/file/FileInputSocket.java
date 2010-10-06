@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket.file;
+package de.schlichtherle.truezip.io.archive.controller.file;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
@@ -22,10 +22,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class FileInputSocket extends CommonInputSocket<FileEntry> {
+/**
+ * @see FileOutputSocket
+ * @author Christian Schlichtherle
+ * @version $Id$
+ */
+public final class FileInputSocket extends CommonInputSocket<FileEntry> {
     private final FileEntry entry;
 
-    FileInputSocket(final FileEntry entry) {
+    public FileInputSocket(final FileEntry entry) {
         this.entry = entry;
     }
 

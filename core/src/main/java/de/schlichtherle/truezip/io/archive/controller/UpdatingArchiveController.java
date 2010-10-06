@@ -15,8 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.controller.file.FileOutputSocket;
+import de.schlichtherle.truezip.io.archive.controller.file.FileInputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -29,7 +30,7 @@ import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputService;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
@@ -449,14 +450,13 @@ extends     FileSystemArchiveController<AE> {
     @Override
     public CommonInputSocket<AE> newInputSocket(final AE entry)
     throws IOException {
-        assert getEntry(entry.getName()).getTarget() == entry : "interface contract violation";
         assert input.getEntry(entry.getName()) == entry : "interface contract violation";
         return input.newInputSocket(entry);
     }
 
     public CommonInputSocket<FileEntry> newInputSocket(FileEntry entry)
     throws IOException {
-        return FileSocketFactory.get().newInputSocket(entry);
+        return new FileInputSocket(entry);
     }
 
     private void ensureOutArchive()
@@ -529,7 +529,7 @@ extends     FileSystemArchiveController<AE> {
 
     public CommonOutputSocket<FileEntry> newOutputSocket(FileEntry entry)
     throws IOException {
-        return FileSocketFactory.get().newOutputSocket(entry);
+        return new FileOutputSocket(entry);
     }
 
     private boolean isFileSystemTouched() {
