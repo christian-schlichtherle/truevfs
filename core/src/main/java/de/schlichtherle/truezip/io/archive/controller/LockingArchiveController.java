@@ -346,7 +346,7 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public void mknod(
+    public boolean mknod(
             final String path,
             final Type type,
             final CommonEntry template,
@@ -355,7 +355,7 @@ final class LockingArchiveController extends ArchiveController {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.mknod(path, type, template, options);
+            return controller.mknod(path, type, template, options);
         } finally {
             writeLock().unlock();
         }

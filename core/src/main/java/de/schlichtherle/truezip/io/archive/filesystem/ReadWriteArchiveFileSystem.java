@@ -467,7 +467,7 @@ implements ArchiveFileSystem<AE> {
         /** Decorates the given archive entry. */
         DirectoryEntry(final AE entry) {
             super(entry);
-            assert entry.getType() == DIRECTORY;
+            assert DIRECTORY == entry.getType();
         }
 
         @Override
@@ -546,18 +546,18 @@ implements ArchiveFileSystem<AE> {
             final BaseEntry<AE> parentEntry = master.get(parentPath);
             final BaseEntry<AE> newEntry;
             if (parentEntry != null) {
-                if (parentEntry.getType() != DIRECTORY)
+                if (DIRECTORY != parentEntry.getType())
                     throw new ArchiveFileSystemException(entryPath,
                             "parent entry must be a directory");
                 final BaseEntry<AE> oldEntry = master.get(entryPath);
-                if (entryType == DIRECTORY) {
+                if (DIRECTORY == entryType) {
                     if (oldEntry != null) {
                         throw new ArchiveFileSystemException(entryPath,
                                 "directory entries cannot replace existing entries");
                     }
                 } else {
-                    assert entryType == FILE;
-                    if (oldEntry != null && oldEntry.getType() == DIRECTORY)
+                    assert FILE == entryType;
+                    if (oldEntry != null && DIRECTORY == oldEntry.getType())
                         throw new ArchiveFileSystemException(entryPath,
                                 "directory entries cannot get replaced");
                 }
@@ -591,9 +591,9 @@ implements ArchiveFileSystem<AE> {
                 final String path = link.path;
                 final BaseEntry<AE> entry = link.entry;
                 final String base = link.base;
-                assert parent.getType() == DIRECTORY;
+                assert DIRECTORY == parent.getType();
                 master.put(path, entry);
-                if (parent.add(base) && parent.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+                if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never touch ghosts!
                     parent.getTarget().setTime(Access.WRITE, time);
                 parent = entry;
             }

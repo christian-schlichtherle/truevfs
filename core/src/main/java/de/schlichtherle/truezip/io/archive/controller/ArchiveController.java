@@ -308,7 +308,7 @@ public abstract class ArchiveController implements ArchiveDescriptor {
      *             {@code false}.</li>
      *         </ul>
      */
-    public abstract void mknod( String path, Type type, CommonEntry template,
+    public abstract boolean mknod( String path, Type type, CommonEntry template,
                                 BitField<OutputOption> options)
     throws IOException;
 
