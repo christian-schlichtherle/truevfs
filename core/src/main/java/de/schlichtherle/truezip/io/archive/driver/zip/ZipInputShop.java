@@ -73,7 +73,7 @@ implements CommonInputShop<ZipEntry> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException(); // TODO: Support this for STORED entries.
             }
         }
         return new InputSocket();

@@ -32,8 +32,8 @@ extends CommonInputSocket<CE> {
 
     protected CommonInputSocket<? extends CE> input;
 
-    protected FilterInputSocket(final CommonInputSocket<? extends CE> target) {
-        this.input = target;
+    protected FilterInputSocket(final CommonInputSocket<? extends CE> input) {
+        this.input = input;
     }
 
     @Override

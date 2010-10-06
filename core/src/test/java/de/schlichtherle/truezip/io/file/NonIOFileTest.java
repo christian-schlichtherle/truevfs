@@ -519,11 +519,11 @@ public class NonIOFileTest extends TestCase {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final ArchiveController archiveController = archive.getArchiveController();
-        final ArchiveController archive2Controller = archive2.getArchiveController();
+        final ArchiveController archiveController = archive.getController();
+        final ArchiveController archive2Controller = archive2.getController();
         assertSame(archiveController, archive2Controller);
-        final ArchiveController innerController = inner.getArchiveController();
-        final ArchiveController inner2Controller = inner2.getArchiveController();
+        final ArchiveController innerController = inner.getController();
+        final ArchiveController inner2Controller = inner2.getController();
         assertSame(innerController, inner2Controller);
     }
 

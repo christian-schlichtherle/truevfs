@@ -213,10 +213,10 @@ class Files {
     throws IOException {
         try {
             IOSocket.copy(  newInputSocket(src),
-                            newOutputSocket(dst, BitField
-                                .noneOf(OutputOption.class)
-                                .set(PRESERVE, preserve)
-                                .set(CREATE_PARENTS, File.isLenient())));
+                            newOutputSocket(dst,
+                                BitField.noneOf(OutputOption.class)
+                                    .set(PRESERVE, preserve)
+                                    .set(CREATE_PARENTS, File.isLenient())));
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (ArchiveBusyException ex) {
@@ -237,13 +237,11 @@ class Files {
 
         try {
             if (src instanceof File) {
-                final File srcFile = (File) src;
-                final File srcArchive = srcFile.getInnerArchive();
-                if (srcArchive != null) {
-                    final String srcPath = srcFile.getInnerEntryName();
-                    assert srcPath != null;
-                    return srcArchive.getArchiveController().newInputSocket(srcPath);
-                }
+                final File file = (File) src;
+                final File archive = file.getInnerArchive();
+                if (null != archive)
+                    return archive.getController().newInputSocket(
+                            file.getInnerEntryName());
             }
         } catch (FalsePositiveEntryException isNotArchive) {
             assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
@@ -261,20 +259,18 @@ class Files {
 
         try {
             if (dst instanceof File) {
-                final File srcFile = (File) dst;
-                final File srcArchive = srcFile.getInnerArchive();
-                if (srcArchive != null) {
-                    final String srcPath = srcFile.getInnerEntryName();
-                    assert srcPath != null;
-                    return srcArchive.getArchiveController().newOutputSocket(srcPath, options);
-                }
+                final File file = (File) dst;
+                final File archive = file.getInnerArchive();
+                if (null != archive)
+                    return archive.getController().newOutputSocket(
+                            file.getInnerEntryName(), options);
             }
         } catch (FalsePositiveEntryException isNotArchive) {
             assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
                     : "must be handled in try-block!";
             // Fall through!
         }
-        return new FileOutputSocket(new FileEntry(dst));
+        return new FileOutputSocket(new FileEntry(dst), options);
     }
 
     /**

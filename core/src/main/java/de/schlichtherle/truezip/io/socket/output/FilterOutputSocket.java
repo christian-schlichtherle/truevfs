@@ -31,8 +31,8 @@ extends CommonOutputSocket<CE> {
 
     protected CommonOutputSocket<? extends CE> output;
 
-    protected FilterOutputSocket(final CommonOutputSocket<? extends CE> target) {
-        this.output = target;
+    protected FilterOutputSocket(final CommonOutputSocket<? extends CE> output) {
+        this.output = output;
     }
 
     @Override

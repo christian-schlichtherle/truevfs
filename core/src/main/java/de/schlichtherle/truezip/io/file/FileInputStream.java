@@ -74,10 +74,7 @@ import java.io.InputStream;
  * and require less space in the temp file folder.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileBusyException
- * @see File#cat
- * @see File#sync
- * @see File#update
+ * @see FileOutputStream
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -118,37 +115,21 @@ public class FileInputStream extends FilterInputStream {
     private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
         try {
-            if (src instanceof File) {
-                final File file = (File) src;
-                final File archive = file.getInnerArchive();
-                if (archive != null) {
-                    final String path = file.getInnerEntryName();
-                    assert path != null;
-                    return archive
-                            .getArchiveController()
-                            .newInputSocket(path)
-                            .newInputStream();
-                }
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
+            return Files.newInputSocket(src).newInputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
+        } catch (ArchiveBusyException ex) {
+            throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
                     = new FileNotFoundException(ioe.toString());
             fnfe.initCause(ioe);
             throw fnfe;
         }
-        return new java.io.FileInputStream(src);
     }
 
     @Override
-    public int read(byte b[]) throws IOException {
-        return in.read(b, 0, b.length);
+    public int read(byte buf[]) throws IOException {
+        return in.read(buf, 0, buf.length);
     }
 }
