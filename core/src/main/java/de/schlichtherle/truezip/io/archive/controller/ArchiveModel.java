@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import java.net.URI;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;

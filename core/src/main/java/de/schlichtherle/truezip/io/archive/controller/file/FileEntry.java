@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket.file;
+package de.schlichtherle.truezip.io.archive.controller.file;
 
-import java.net.URI;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import java.util.Collections;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import java.io.File;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 
 /**
  * Adapts a {@link File} instance to a {@link CommonEntry}.
@@ -30,7 +36,9 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry extends File implements CommonEntry {
+public final class FileEntry
+extends            File
+implements         ArchiveEntry, ArchiveFileSystemEntry {
     private static final long serialVersionUID = 5263276267534643646L;
 
     /**
@@ -82,20 +90,42 @@ public class FileEntry extends File implements CommonEntry {
                 :              null;
     }
 
-    /** Returns the file size. */
     @Override
-    public long getSize() {
-        return length();
+    public long getSize(final Size type) {
+        switch (type) {
+            case DATA:
+            case STORAGE:
+                return length();
+            default:
+                return ArchiveEntry.UNKNOWN;
+        }
+    }
+
+    @Override
+    public boolean setSize(Size type, long size) {
+        return false;
     }
 
     /** Returns the file's last modification time. */
     @Override
     public long getTime(Access type) {
-        return Access.WRITE == type ? lastModified() : UNKNOWN;
+        return WRITE == type ? lastModified() : UNKNOWN;
     }
 
-    public void setTime(Access type, long value) {
-        if (Access.WRITE == type)
-            setLastModified(value);
+    @Override
+    public boolean setTime(Access type, long time) {
+        if (WRITE != type || UNKNOWN == time)
+            return false;
+        return setLastModified(time);
+    }
+
+    @Override
+    @SuppressWarnings("ManualArrayToCollectionCopy")
+    public Set<String> getMembers() {
+        String[] list = list();
+        Set<String> set = new HashSet<String>((int) (list.length / .75f) + 1);
+        for (String member : list)
+            set.add(member);
+        return null == list ? null : Collections.unmodifiableSet(set);
     }
 }

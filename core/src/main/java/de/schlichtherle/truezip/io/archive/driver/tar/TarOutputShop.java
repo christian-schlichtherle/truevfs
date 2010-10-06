@@ -37,6 +37,7 @@ import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 
 /**
  * An implementation of {@link CommonOutputShop} to write TAR archives.
@@ -107,8 +108,8 @@ implements CommonOutputShop<TarEntry> {
                     return new EntryOutputStream(entry);
                 }
                 final CommonEntry peer = getPeerTarget();
-                if (peer != null) {
-                    entry.setSize(peer.getSize());
+                if (null != peer) {
+                    entry.setSize(peer.getSize(DATA));
                     return new EntryOutputStream(entry);
                 }
                 // The source entry does not exist or cannot support DDC

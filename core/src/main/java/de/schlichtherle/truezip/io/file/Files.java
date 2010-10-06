@@ -15,29 +15,25 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.archive.controller.file.FileInputSocket;
+import de.schlichtherle.truezip.io.archive.controller.file.FileOutputSocket;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.file.FileSocketFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -254,7 +250,7 @@ class Files {
                     : "must be handled in try-block!";
             // Fall through!
         }
-        return FileSocketFactory.get().newInputSocket(new FileEntry(src));
+        return new FileInputSocket(new FileEntry(src));
     }
 
     static CommonOutputSocket<?> newOutputSocket(
@@ -278,37 +274,7 @@ class Files {
                     : "must be handled in try-block!";
             // Fall through!
         }
-        final FileEntry target = new FileEntry(dst);
-        class OutputSocket extends CommonOutputSocket<FileEntry> {
-            @Override
-            public FileEntry getTarget() {
-                return target;
-            }
-
-            @Override
-            public OutputStream newOutputStream() throws IOException {
-                class PreservingOutputStream extends FileOutputStream {
-                    PreservingOutputStream() throws FileNotFoundException {
-                        super(target, options.get(APPEND));
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        super.close();
-                        if (!options.get(PRESERVE))
-                            return;
-                        final CommonEntry peer = getPeerTarget();
-                        if (null != peer)
-                            for (final Access access : BitField.allOf(Access.class))
-                                if (UNKNOWN != peer.getTime(access))
-                                    target.setTime(access, peer.getTime(access));
-                    }
-                } // class EntryOutputStream
-                return new PreservingOutputStream();
-            }
-
-        }
-        return new OutputSocket();
+        return new FileOutputSocket(new FileEntry(dst));
     }
 
     /**

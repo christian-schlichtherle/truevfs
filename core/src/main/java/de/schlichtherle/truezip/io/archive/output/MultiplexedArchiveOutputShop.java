@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size;
 import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -25,7 +26,7 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
 import de.schlichtherle.truezip.io.socket.output.FilterOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
@@ -144,8 +145,9 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 final CommonEntry peer = getPeerTarget();
-                if (peer != null)
-                    getTarget().setSize(peer.getSize()); // data may be compressed!
+                if (null != peer)
+                    for (Size size : BitField.allOf(Size.class))
+                            getTarget().setSize(size, peer.getSize(size)); // data may be compressed!
                 return isTargetBusy()
                         ? new TempEntryOutputStream(
                             createTempFile(
@@ -268,8 +270,9 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             } finally {
                 final AE dstEntry = output.getTarget();
                 final CommonEntry srcEntry = input.getTarget();
-                if (dstEntry.getSize() == UNKNOWN)
-                    dstEntry.setSize(srcEntry.getSize());
+                for (Size size : BitField.allOf(Size.class))
+                    if (UNKNOWN == dstEntry.getSize(size))
+                        dstEntry.setSize(size, srcEntry.getSize(size));
                 for (Access access : BitField.allOf(Access.class))
                     if (UNKNOWN == dstEntry.getTime(access))
                         dstEntry.setTime(access, srcEntry.getTime(access));

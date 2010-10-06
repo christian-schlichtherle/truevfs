@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -192,7 +193,7 @@ implements     CommonInputSocketFactory <AE                     >,
     }
 
     @Override
-    public final Entry<?> getEntry(final String path)
+    public final ArchiveFileSystemEntry getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
             return autoMount().getEntry(path);
@@ -234,13 +235,13 @@ implements     CommonInputSocketFactory <AE                     >,
     }
 
     @Override
-    public final void setTime(
+    public final boolean setTime(
             final String path,
             final BitField<Access> types,
             final long value)
     throws IOException {
         autoSync(path);
-        autoMount().setTime(path, types, value);
+        return autoMount().setTime(path, types, value);
     }
 
     @Override
@@ -481,7 +482,7 @@ implements     CommonInputSocketFactory <AE                     >,
                 throw ex;
             }
             // We are actually working on the controller's target file.
-            if (!fileSystem.getEntry(path).list().isEmpty())
+            if (!fileSystem.getEntry(path).getMembers().isEmpty())
                 throw new IOException("archive file system not empty!");
             sync(   new DefaultArchiveSyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));

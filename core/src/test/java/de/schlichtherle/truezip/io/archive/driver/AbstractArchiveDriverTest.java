@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.file.FileEntry;
+import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -58,6 +58,7 @@ public class AbstractArchiveDriverTest extends TestCase {
     protected void tearDown() throws Exception {
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructors() {
         try {
             new DummyArchiveDriver(null);
@@ -192,7 +193,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         @Override
         public ArchiveEntry newEntry(String name, Type type, CommonEntry template)
         throws CharConversionException {
-            return new DummyEntry(new File("foo/bar"));
+            return new FileEntry("foo/bar");
         }
 
         @Override
@@ -210,19 +211,6 @@ public class AbstractArchiveDriverTest extends TestCase {
         @Override
         public Icon getClosedIcon(ArchiveDescriptor archive) {
             return ICON;
-        }
-    }
-
-    private static class DummyEntry extends FileEntry implements ArchiveEntry {
-        private static final long serialVersionUID = 9650827654L;
-
-        DummyEntry(File file) {
-            super(file);
-        }
-
-        @Override
-		public void setSize(long size) {
-            throw new UnsupportedOperationException();
         }
     }
 }

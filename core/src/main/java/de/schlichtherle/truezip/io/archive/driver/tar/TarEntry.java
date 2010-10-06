@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 
@@ -73,17 +74,42 @@ implements ArchiveEntry {
     }
 
     @Override
+    public long getSize(final Size type) {
+        switch (type) {
+            case DATA:
+            case STORAGE:
+                return getSize();
+            default:
+                return ArchiveEntry.UNKNOWN;
+        }
+    }
+
+    @Override
+    public boolean setSize(final Size type, final long size) {
+        switch (type) {
+            case DATA:
+            case STORAGE:
+                setSize(size);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
     public long getTime(Access type) {
-        if (Access.WRITE != type)
+        if (WRITE != type)
             return UNKNOWN;
-        long time = super.getModTime().getTime();
+        long time = getModTime().getTime();
         return 0 <= time ? time : UNKNOWN;
     }
 
     @Override
-    public void setTime(Access type, long value) {
-        if (Access.WRITE == type)
-            super.setModTime(value);
+    public boolean setTime(Access type, long time) {
+        if (WRITE != type)
+            return false;
+        setModTime(time);
+        return true;
     }
 
     /** Returns {@link #getName()}. */

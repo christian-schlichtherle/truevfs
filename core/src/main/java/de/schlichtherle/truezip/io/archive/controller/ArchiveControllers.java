@@ -255,7 +255,7 @@ public class ArchiveControllers {
         synchronized (controllers) {
             snapshot = null != comparator
                     ? new TreeSet<ArchiveController>(comparator)
-                    : new HashSet<ArchiveController>((int) (controllers.size() / 0.75f));
+                    : new HashSet<ArchiveController>((int) (controllers.size() / .75f) + 1);
             for (final Pointer<ArchiveController> pointer
                     : controllers.values()) {
                 final ArchiveController controller

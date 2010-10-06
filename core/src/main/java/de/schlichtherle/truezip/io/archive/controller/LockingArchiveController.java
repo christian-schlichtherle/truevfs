@@ -18,10 +18,9 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
 import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
@@ -122,7 +121,7 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public Entry<?> getEntry(final String path)
+    public ArchiveFileSystemEntry getEntry(final String path)
     throws FalsePositiveEntryException {
         try {
             readLock().lock();
@@ -197,7 +196,7 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public void setTime(
+    public boolean setTime(
             final String path,
             final BitField<Access> types,
             final long value)
@@ -205,7 +204,7 @@ final class LockingArchiveController extends ArchiveController {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.setTime(path, types, value);
+            return controller.setTime(path, types, value);
         } finally {
             writeLock().unlock();
         }

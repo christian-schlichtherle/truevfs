@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
@@ -30,6 +29,9 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 
 /**
  * An archive driver which builds TAR files.
@@ -90,8 +92,8 @@ extends AbstractArchiveDriver<TarEntry> {
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
-                entry.setModTime(template.getTime(Access.WRITE));
-                entry.setSize(template.getSize());
+                entry.setModTime(template.getTime(WRITE));
+                entry.setSize(template.getSize(DATA));
             }
         } else {
             entry = newEntry(name);

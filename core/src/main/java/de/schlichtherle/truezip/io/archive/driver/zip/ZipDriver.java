@@ -19,7 +19,6 @@ package de.schlichtherle.truezip.io.archive.driver.zip;
 import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
@@ -32,6 +31,8 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import static java.util.zip.Deflater.NO_COMPRESSION;
@@ -173,8 +174,8 @@ implements ZipEntryFactory<ZipEntry> {
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
-                entry.setTime(template.getTime(Access.WRITE));
-                entry.setSize(template.getSize());
+                entry.setTime(template.getTime(WRITE));
+                entry.setSize(template.getSize(DATA));
             }
         } else {
             entry = newEntry(name);

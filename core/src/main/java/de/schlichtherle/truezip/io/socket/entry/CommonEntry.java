@@ -89,6 +89,11 @@ public interface CommonEntry {
         SPECIAL
     }
 
+    enum Size {
+        DATA,
+        STORAGE
+    }
+
     enum Access {
         WRITE,
         READ, // FIXME: This is not yet fully supported!
@@ -129,15 +134,20 @@ public interface CommonEntry {
     Type getType();
 
     /**
-     * Returns the (uncompressed) size of the archive entry in bytes,
-     * or {@link #UNKNOWN} if not specified.
+     * Returns the size of this common entry.
+     *
+     * @return The size of the given size type for this common entry in bytes,
+     * or {@link #UNKNOWN} if not specified or the type is unsupported.
      * This method is not meaningful for directory entries.
      */
-    long getSize();
+    long getSize(Size type);
 
     /**
-     * Returns the last time of the given access type for this archive entry
-     * in milliseconds since the epoch or {@value #UNKNOWN}.
+     * Returns the last access time of this common entry.
+     *
+     * @return The last time of the given access type for this common entry
+     * in milliseconds since the epoch or {@value #UNKNOWN} if not specified
+     * or the type is unsupported.
      */
     long getTime(Access type);
 }
