@@ -21,8 +21,7 @@ import java.io.IOException;
 /**
  * Thrown to indicate an exceptional condition in an {@link ArchiveFileSystem}.
  */
-public class ArchiveFileSystemException
-extends IOException {
+public class ArchiveFileSystemException extends IOException {
 
     private static final long serialVersionUID = 4652084652223428651L;
     /** The entry's path name. */
