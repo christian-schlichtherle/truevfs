@@ -460,11 +460,11 @@ implements     CommonInputSocketFactory <AE                     >,
             final String path,
             final BitField<OutputOption> options)
     throws IOException {
+        autoSync(path, null);
         if (isRoot(path)) {
             // Get the file system or die trying!
             final ArchiveFileSystem<AE> fileSystem;
             try {
-                autoSync(path, null);
                 fileSystem = autoMount();
             } catch (FalsePositiveEntryException ex) {
                 // The File instance is going to delete the target file
@@ -496,7 +496,6 @@ implements     CommonInputSocketFactory <AE                     >,
                     : new FalsePositiveEnclosedEntryException(
                         this, path, new IOException());
         } else { // !isRoot(path)
-            autoSync(path, null);
             autoMount().unlink(path);
         }
     }
@@ -530,5 +529,5 @@ implements     CommonInputSocketFactory <AE                     >,
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws IOException;
+    throws ArchiveSyncException;
 }
