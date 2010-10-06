@@ -541,9 +541,11 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws IOException {
-        final Entry<AE> entry = autoMount().getEntry(path);
-        if (null == entry)
+    throws ArchiveSyncException {
+        final ArchiveFileSystem<AE> fileSystem;
+        final Entry<AE> entry;
+        if (null == (fileSystem = getFileSystem())
+                || null == (entry = fileSystem.getEntry(path)))
             return false;
         if (null != output && null != output.getEntry(entry.getTarget().getName()))
             return autoSync();
