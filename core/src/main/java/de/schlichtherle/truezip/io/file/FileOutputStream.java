@@ -79,11 +79,7 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.O
  * and require less space in the temp file folder.
  *
  * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileBusyException
- * @see File#cat
- * @see File#sync
- * @see File#update
- * @see File#setLenient
+ * @see FileInputStream
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -151,42 +147,30 @@ public class FileOutputStream extends FilterOutputStream {
         super(new java.io.FileOutputStream(fd));
     }
 
-    private static OutputStream newOutputStream(
-            final java.io.File dst,
-            final boolean append)
+    private static OutputStream newOutputStream(    final java.io.File dst,
+                                                    final boolean append)
     throws FileNotFoundException {
         try {
-            if (dst instanceof File) {
-                final File dstFile = (File) dst;
-                final File archive = dstFile.getInnerArchive();
-                if (archive != null) {
-                    final String path = dstFile.getInnerEntryName();
-                    assert path != null;
-                    return archive
-                            .getArchiveController()
-                            .newOutputSocket(
-                                path,
-                                BitField.noneOf(OutputOption.class)
-                                    .set(APPEND, append)
-                                    .set(CREATE_PARENTS, File.isLenient()))
-                            .newOutputStream();
-                }
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
+            return Files.newOutputSocket(dst,
+                    BitField.noneOf(OutputOption.class)
+                        .set(APPEND, append)
+                        .set(CREATE_PARENTS, File.isLenient()))
+                    .newOutputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
+        } catch (ArchiveBusyException ex) {
+            throw new FileBusyException(ex);
         } catch (IOException ioe) {
             final FileNotFoundException fnfe
                     = new FileNotFoundException(ioe.toString());
             fnfe.initCause(ioe);
             throw fnfe;
         }
-        return new java.io.FileOutputStream(dst, append);
+    }
+
+    @Override
+    public void write(byte[] buf) throws IOException {
+        out.write(buf, 0, buf.length);
     }
 
     @Override

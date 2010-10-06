@@ -97,7 +97,7 @@ implements         ArchiveEntry, ArchiveFileSystemEntry {
             case STORAGE:
                 return length();
             default:
-                return ArchiveEntry.UNKNOWN;
+                return UNKNOWN;
         }
     }
 
@@ -114,9 +114,7 @@ implements         ArchiveEntry, ArchiveFileSystemEntry {
 
     @Override
     public boolean setTime(Access type, long time) {
-        if (WRITE != type || UNKNOWN == time)
-            return false;
-        return setLastModified(time);
+        return WRITE == type && UNKNOWN != time && setLastModified(time);
     }
 
     @Override

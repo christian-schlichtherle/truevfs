@@ -32,6 +32,8 @@ public final class FileInputSocket extends CommonInputSocket<FileEntry> {
 
     public FileInputSocket(final FileEntry entry) {
         this.entry = entry;
+        if (null == entry)
+            throw new NullPointerException();
     }
 
     @Override

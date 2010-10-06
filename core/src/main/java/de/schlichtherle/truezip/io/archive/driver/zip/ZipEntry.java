@@ -88,7 +88,7 @@ implements ArchiveEntry {
     public long getTime(Access type) {
         if (WRITE != type)
             return ArchiveEntry.UNKNOWN;
-        long time = super.getTime();
+        long time = getTime();
         return 0 <= time ? time : ArchiveEntry.UNKNOWN;
     }
 

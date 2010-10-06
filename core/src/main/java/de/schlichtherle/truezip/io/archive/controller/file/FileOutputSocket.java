@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller.file;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
+import java.io.File;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
 import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.UNKNOWN;
 
 /**
@@ -37,7 +38,7 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.UNKNOWN;
  */
 public final class FileOutputSocket extends CommonOutputSocket<FileEntry> {
     private final FileEntry entry;
-    private final BitField<OutputOption> options;
+    private BitField<OutputOption> options;
 
     public FileOutputSocket(final FileEntry entry) {
         this(entry, BitField.noneOf(OutputOption.class));
@@ -45,6 +46,8 @@ public final class FileOutputSocket extends CommonOutputSocket<FileEntry> {
 
     public FileOutputSocket(    final FileEntry entry,
                                 final BitField<OutputOption> options) {
+        if (null == entry || null == options)
+            throw new NullPointerException();
         this.entry = entry;
         this.options = options;
     }
@@ -63,14 +66,23 @@ public final class FileOutputSocket extends CommonOutputSocket<FileEntry> {
 
             @Override
             public void close() throws IOException {
-                super.close();
-                if (!options.get(PRESERVE))
+                if (null == options)
                     return;
-                final CommonEntry peer = getPeerTarget();
-                if (null != peer)
-                    for (final Access access : BitField.allOf(Access.class))
-                        if (UNKNOWN != peer.getTime(access))
-                            entry.setTime(access, peer.getTime(access));
+                final boolean preserve = options.get(PRESERVE);
+                options = null;
+                try {
+                    super.close();
+                } finally {
+                    if (preserve) {
+                        final CommonEntry peer = getPeerTarget();
+                        if (null != peer) {
+                            final long time = peer.getTime(WRITE);
+                            if (UNKNOWN != time)
+                                if (!entry.setLastModified(time))
+                                    throw new IOException(entry.getName() + " (could not preserve last modification time)");
+                        }
+                    }
+                }
             }
         }
         if (options.get(CREATE_PARENTS))

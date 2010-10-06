@@ -158,7 +158,7 @@ implements CommonOutputShop<ZipEntry> {
                             entry.setCompressedSize(zipPeer.getCompressedSize());
                         entry.setCrc(zipPeer.getCrc());
                         return new EntryOutputStream(
-                                entry, zipPeer.getMethod() != ZipEntry.DEFLATED);
+                                entry, zipPeer.getMethod() != DEFLATED);
                     }
                 }
                 switch (entry.getMethod()) {

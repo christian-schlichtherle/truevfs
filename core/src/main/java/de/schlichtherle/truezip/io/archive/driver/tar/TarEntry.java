@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 
@@ -80,20 +81,16 @@ implements ArchiveEntry {
             case STORAGE:
                 return getSize();
             default:
-                return ArchiveEntry.UNKNOWN;
+                return UNKNOWN;
         }
     }
 
     @Override
     public boolean setSize(final Size type, final long size) {
-        switch (type) {
-            case DATA:
-            case STORAGE:
-                setSize(size);
-                return true;
-            default:
-                return false;
-        }
+        if (DATA != type)
+            return false;
+        setSize(size);
+        return true;
     }
 
     @Override

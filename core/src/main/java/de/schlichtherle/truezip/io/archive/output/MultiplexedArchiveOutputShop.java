@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
+import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 
 /**
  * Decorates an {@code CommonOutputShop} in order to support a virtually
@@ -126,11 +127,11 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
 
     @Override
     public AE getEntry(String name) {
-        AE entry = target.getEntry(name);
-        if (entry != null)
+        final AE entry = target.getEntry(name);
+        if (null != entry)
             return entry;
         final TempEntryOutputStream out = temps.get(name);
-        return out != null ? out.getTarget() : null;
+        return null == out ? null : out.getTarget();
     }
 
     @Override
@@ -144,17 +145,13 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                final CommonEntry peer = getPeerTarget();
-                if (null != peer)
-                    for (Size size : BitField.allOf(Size.class))
-                            getTarget().setSize(size, peer.getSize(size)); // data may be compressed!
-                return isTargetBusy()
-                        ? new TempEntryOutputStream(
-                            createTempFile(
-                                TEMP_FILE_PREFIX),
-                                output.share(this),
-                                peer)
-                        : new EntryOutputStream(super.newOutputStream());
+                if (isTargetBusy()) {
+                    return new TempEntryOutputStream(
+                            new FileEntry(createTempFile(TEMP_FILE_PREFIX)),
+                            output.share(this));
+                } else {
+                    return new EntryOutputStream(super.newOutputStream());
+                }
             }
         }
         return new OutputSocket();
@@ -212,21 +209,20 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     private class TempEntryOutputStream
     extends FileOutputStream
     implements IOReference<AE> {
-        private final File temp;
+        private final FileEntry temp;
         private final CommonOutputSocket<? extends AE> output;
         private final CommonInputSocket<CommonEntry> input;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
-                final File temp,
-                final CommonOutputSocket<? extends AE> output,
-                final CommonEntry peer)
+                final FileEntry temp,
+                final CommonOutputSocket<? extends AE> output)
         throws IOException {
             super(temp);
-            class TempInputSocket extends CommonInputSocket<CommonEntry> {
-                private final CommonEntry target
-                        = null != peer ? peer : new FileEntry(temp);
+            final CommonEntry peer = output.getPeerTarget();
+            class InputSocket extends CommonInputSocket<CommonEntry> {
+                private final CommonEntry target = null == peer ? temp : peer;
 
                 @Override
                 public CommonEntry getTarget() {
@@ -245,7 +241,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             }
             this.temp = temp;
             this.output = output;
-            this.input = new TempInputSocket();
+            this.input = new InputSocket();
             temps.put(output.getTarget().getName(), this);
         }
 
@@ -268,14 +264,14 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             try {
                 super.close();
             } finally {
-                final AE dstEntry = output.getTarget();
-                final CommonEntry srcEntry = input.getTarget();
-                for (Size size : BitField.allOf(Size.class))
-                    if (UNKNOWN == dstEntry.getSize(size))
-                        dstEntry.setSize(size, srcEntry.getSize(size));
-                for (Access access : BitField.allOf(Access.class))
-                    if (UNKNOWN == dstEntry.getTime(access))
-                        dstEntry.setTime(access, srcEntry.getTime(access));
+                final CommonEntry src = input.getTarget();
+                final AE dst = output.getTarget();
+                for (final Size type : BitField.allOf(Size.class))
+                    if (UNKNOWN == dst.getSize(type))
+                        dst.setSize(type, src.getSize(type));
+                for (final Access type : BitField.allOf(Access.class))
+                    if (UNKNOWN == dst.getTime(type))
+                        dst.setTime(type, src.getTime(type));
                 storeTemps();
             }
         }
