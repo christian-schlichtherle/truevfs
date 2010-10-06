@@ -417,7 +417,7 @@ implements     CommonInputSocketFactory <AE                     >,
     }
 
     @Override
-    public final void mknod(
+    public final boolean mknod(
             final String path,
             final Type type,
             final CommonEntry template,
@@ -440,18 +440,24 @@ implements     CommonInputSocketFactory <AE                     >,
 
                     case DIRECTORY:
                         autoMount(true, options.get(CREATE_PARENTS));
-                        return;
+                        return true;
 
                     default:
-                        throw new IOException("operation not supported");
+                        throw new IOException("entry type not supported: " + type);
                 }
             }
             throw new EntryNotFoundException(this, path,
                     "directory exists already");
         } else { // !isRoot(entryName)
-            autoMount(options.get(CREATE_PARENTS))
-                    .mknod(path, type, template, options.get(CREATE_PARENTS))
-                    .run();
+            final ArchiveFileSystem<AE> fileSystem
+                    = autoMount(options.get(CREATE_PARENTS));
+            final boolean created = null == fileSystem.getEntry(path);
+            final EntryOperation<AE> operation
+                    = fileSystem.mknod( path, type, template,
+                                        options.get(CREATE_PARENTS));
+            assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
+            operation.run();
+            return created;
         }
     }
 

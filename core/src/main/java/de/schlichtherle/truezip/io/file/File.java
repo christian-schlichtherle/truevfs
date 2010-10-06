@@ -2737,13 +2737,10 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         try {
             if (enclArchive != null) {
-                final ArchiveController controller = enclArchive.getController();
-                if (controller.getEntry(enclEntryName) != null)
-                    return false;
-                controller.mknod(enclEntryName, FILE, null,
-                        BitField.noneOf(OutputOption.class)
-                            .set(CREATE_PARENTS, isLenient()));
-                return true;
+                return enclArchive.getController()
+                        .mknod(enclEntryName, FILE, null,
+                            BitField.noneOf(OutputOption.class)
+                                .set(CREATE_PARENTS, isLenient()));
             }
         } catch (FalsePositiveEntryException isNotArchive) {
             assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)

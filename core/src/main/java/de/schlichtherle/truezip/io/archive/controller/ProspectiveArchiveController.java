@@ -192,16 +192,16 @@ final class ProspectiveArchiveController extends ArchiveController {
     }
 
     @Override
-    public void mknod(
+    public boolean mknod(
             final String path,
             final Type type,
             final CommonEntry template,
             final BitField<OutputOption> options)
     throws IOException {
         try {
-            controller.mknod(path, type, template, options);
+            return controller.mknod(path, type, template, options);
         } catch (FalsePositiveEnclosedEntryException ex) {
-            getEnclController().mknod(getEnclPath(path), type, template, options);
+            return getEnclController().mknod(getEnclPath(path), type, template, options);
         }
     }
 
