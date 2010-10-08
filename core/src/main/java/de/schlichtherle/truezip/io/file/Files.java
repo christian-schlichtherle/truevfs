@@ -221,10 +221,9 @@ class Files {
             throw ex;
         } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
-        } catch (ArchiveFileSystemException afse) {
-            final FileNotFoundException fnfe = new FileNotFoundException(afse.toString());
-            fnfe.initCause(afse);
-            throw fnfe;
+        } catch (ArchiveFileSystemException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
+                    .initCause(ex);
         } catch (IOException ex) {
             dst.delete();
             throw ex;
