@@ -29,7 +29,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class IOSocket<LT> implements IOReference<LT> {
+public abstract class IOSocket<LT, PT> implements IOReference<LT> {
 
     /**
      * Returns the non-{@code null} local target for I/O operations.
@@ -44,10 +44,27 @@ public abstract class IOSocket<LT> implements IOReference<LT> {
     @Override
 	public abstract LT getTarget();
 
+    /**
+     * Returns the <i>peer target</i> for I/O operations.
+     * <p>
+     * The result of changing the state of the peer target is undefined.
+     * In particular, a subsequent I/O operation may not reflect the change
+     * or may even fail.
+     * This term may be overridden by sub-interfaces or implementations.
+     *
+     * @return The nullable peer target for I/O operations.
+     */
+    public abstract PT getPeerTarget();
+
     /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
     @Override
     public final String toString() {
-        return getTarget().toString();
+        final PT pt = getPeerTarget();
+        return getTarget() + " <-> " + (null == pt ? "(null)" : pt);
+    }
+
+    static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
     /**
