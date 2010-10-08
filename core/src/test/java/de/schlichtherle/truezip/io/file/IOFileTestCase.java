@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveControllerTestCase;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
@@ -37,6 +36,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
 /**
  * Tests the VFS implementation for a particular archive type.
@@ -45,12 +45,13 @@ import junit.framework.AssertionFailedError;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
+public abstract class IOFileTestCase extends TestCase {
 
     private static final Logger logger = Logger.getLogger(
             IOFileTestCase.class.getName());
 
-    private static final java.io.File _baseDir = tempDir;
+    private static final java.io.File _tempDir = new java.io.File(
+            System.getProperty("java.io.tmpdir"));
 
     /** The data to get compressed. */
     private static final byte[] _data = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -63,8 +64,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
 
         new Random().nextBytes(_data);
         logger.log(Level.CONFIG, "Created {0} bytes of random data.", _data.length);
-        logger.log(Level.CONFIG, "Temp dir for TrueZIP API: {0}", tempDir.getPath());
-        logger.log(Level.CONFIG, "Default temp dir for unit tests: {0}", _baseDir.getPath());
+        logger.log(Level.CONFIG, "Temporary directory: {0}", _tempDir.getPath());
         logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
         logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
         logger.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
@@ -76,7 +76,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
     
     protected byte[] data;
     
-    protected java.io.File baseDir;
+    protected java.io.File tempDir;
     
     protected String prefix;
     
@@ -107,8 +107,8 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         super.setUp();
         if (data == null)
             data = _data; // (byte[]) _data.clone();
-        if (baseDir == null)
-            baseDir = _baseDir;
+        if (tempDir == null)
+            tempDir = _tempDir;
         if (prefix == null)
             prefix = "tzp-test";
         if (suffix == null)
@@ -126,7 +126,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
     @Override
     protected void tearDown() throws Exception {
         data = null;
-        baseDir = null;
+        tempDir = null;
         prefix = null;
         suffix = null;
 
@@ -225,7 +225,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
     void testFalsePositive(final File file) throws IOException {
         assert file.isArchive();
 
-        // Note that file's parent directory may be a false positive directory!
+        // Note that file's parent directory may be a directory in the host file system!
 
         // Create file false positive.
         {
@@ -539,11 +539,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         
         // Open file2 as stream and let the garbage collection close the stream automatically.
         new FileInputStream(file1);
-        System.gc();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ignored) {
-        }
+        gc();
         
         // This update should complete without any exception if the garbage
         // collector did his job.
@@ -625,11 +621,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         // Reopen stream and let the garbage collection close the stream automatically.
         fosA = new FileOutputStream(file1);
         fosA = null;
-        System.gc();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ignored) {
-        }
+        gc();
         
         // This update should complete without any exception if the garbage
         // collector did his job.
@@ -1004,7 +996,7 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
             Object obj = new Object();
             Reference ref = new WeakReference(obj);
             obj = null;
-            System.gc(); // Assumption doesn't work without this!
+            gc(); // Assumption doesn't work without this!
             //System.runFinalization(); // doesn't work!
             assert ref.get() == null;
         }
@@ -1031,11 +1023,11 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
         // Note that ArchiveController.finalize() is called in no particular
         // order, i.e. the object graph is completely ignored! :-o
         byte[] buf1 = new byte[10 * 1024 * 1024];
-        System.gc();
+        gc();
         byte[] buf2 = new byte[10 * 1024 * 1024];
         File.sync(); // allow external modifications!
         byte[] buf3 = new byte[10 * 1024 * 1024];
-        System.gc();
+        gc();
         byte[] buf4 = new byte[10 * 1024 * 1024];
      
         assertTrue(archive.deleteAll());
@@ -1521,6 +1513,6 @@ public abstract class IOFileTestCase extends UpdatingArchiveControllerTestCase {
             String prefix,
             String suffix)
             throws IOException {
-        return File.createTempFile(prefix, suffix, baseDir).getCanonicalFile();
+        return File.createTempFile(prefix, suffix, tempDir).getCanonicalFile();
     }
 }
