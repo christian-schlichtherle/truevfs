@@ -37,9 +37,14 @@ import java.io.InputStream;
  * @version $Id$
  */
 public abstract class InputSocket<LT, PT, IS extends InputSocket<LT, PT, IS>>
-extends IOSocket<LT> {
+extends IOSocket<LT, PT> {
 
     private OutputSocket<? extends PT, ? super LT, ?> peer;
+
+    @Override
+    public PT getPeerTarget() {
+        return IOReferences.deref(peer);
+    }
 
     /**
      * Makes this input socket sharing the peering with the given input
@@ -55,11 +60,7 @@ extends IOSocket<LT> {
      */
     @SuppressWarnings("unchecked")
 	public final IS share(InputSocket<? super LT, ? extends PT, ?> with) {
-        chain0(with.peer);
-        return (IS) this;
-    }
-
-    private void chain0(final OutputSocket<? extends PT, ? super LT, ?> newPeer) {
+        final OutputSocket<? extends PT, ? super LT, ?> newPeer = with.peer;
         final OutputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
@@ -71,6 +72,7 @@ extends IOSocket<LT> {
                 throw ex;
             }
         }
+        return (IS) this;
     }
 
     /**
@@ -78,36 +80,33 @@ extends IOSocket<LT> {
      * Note that this method <em>does</em> change the peer's peer to this
      * instance.
      *
-     * @param  peer the nullable output socket to connect to.
+     * @param  newPeer the nullable output socket to connect to.
      * @return This input socket, cast to {@code IS}.
      * @see    #beforePeering
      * @see    #afterPeering
      */
     @SuppressWarnings("unchecked")
-	public final IS connect(OutputSocket<? extends PT, ? super LT, ?> peer) {
-        connect0(peer);
-        return (IS) this;
-    }
-
-    void connect0(final OutputSocket<? extends PT, ? super LT, ?> newPeer) {
+	public final IS connect(
+            final OutputSocket<? extends PT, ? super LT, ?> newPeer) {
         final OutputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
                 peer = null;
                 if (null != oldPeer)
-                    oldPeer.connect0(null);
+                    oldPeer.connect(null);
                 beforePeering();
                 peer = newPeer;
                 if (null != newPeer)
-                    newPeer.connect0(this);
+                    newPeer.connect(this);
                 afterPeering();
             } catch (RuntimeException ex) {
                 peer = oldPeer;
                 if (null != oldPeer)
-                    oldPeer.connect0(this);
+                    oldPeer.connect(this);
                 throw ex;
             }
         }
+        return (IS) this;
     }
 
     /**
@@ -122,24 +121,6 @@ extends IOSocket<LT> {
      * completed.
      */
     protected void afterPeering() {
-    }
-
-    private static boolean equal(IOSocket<?> o1, IOSocket<?> o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
-    }
-
-    /**
-     * Returns the <i>peer target</i> for I/O operations.
-     * <p>
-     * The result of changing the state of the peer target is undefined.
-     * In particular, a subsequent I/O operation may not reflect the change
-     * or may even fail.
-     * This term may be overridden by sub-interfaces or implementations.
-     *
-     * @return The nullable peer target for I/O operations.
-     */
-    public PT getPeerTarget() {
-        return IOReferences.deref(peer);
     }
 
     /**
