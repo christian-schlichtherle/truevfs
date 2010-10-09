@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
-import java.io.IOException;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 
@@ -43,18 +42,20 @@ public class ArchiveFileSystems {
      * the system's current time.
      * The file system is modifiable and marked as touched!
      *
-     * @param factory the archive entry factory to use.
-     * @param vetoableTouchListener the nullable listener for touch events.
-     *        If not {@code null}, its {@link VetoableTouchListener#touch()}
-     *        method will be called at the end of this constructor and whenever
-     *        a client class changes the state of this archive file system.
+     * @param  factory the archive entry factory to use.
+     * @param  vetoableTouchListener the nullable listener for touch events.
+     *         If not {@code null}, its {@link VetoableTouchListener#touch()}
+     *         method will be called at the end of this constructor and whenever
+     *         a client class changes the state of this archive file system.
      * @throws NullPointerException If {@code factory} is {@code null}.
+     * @throws ArchiveFileSystemException if touching the archive file system
+     *         has been vetoed by the {@code vetoableTouchListener}.
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
             CommonEntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener)
-    throws IOException {
+    throws ArchiveFileSystemException {
         return new ReadWriteArchiveFileSystem<AE>(factory, vetoableTouchListener);
     }
 

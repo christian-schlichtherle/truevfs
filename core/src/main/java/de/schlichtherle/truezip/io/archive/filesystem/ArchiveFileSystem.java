@@ -37,8 +37,8 @@ public interface ArchiveFileSystem<CE extends CommonEntry>
 extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
     /** An archive file system entry which refers to an archive entry. */
-    interface Entry<AE extends CommonEntry>
-    extends ArchiveFileSystemEntry, IOReference<AE> {
+    interface Entry<CE extends CommonEntry>
+    extends ArchiveFileSystemEntry, IOReference<CE> {
     }
 
     /**
@@ -52,8 +52,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      *
      * @see #mknod
      */
-    interface EntryOperation<AE extends CommonEntry>
-    extends IOOperation, IOReference<Entry<AE>> {
+    interface EntryOperation<CE extends CommonEntry>
+    extends IOOperation, IOReference<Entry<CE>> {
 
         /** Executes this archive file system entry chain operation. */
         @Override
