@@ -71,12 +71,16 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
         super(input);
     }
 
+    private void ensureNotShopClosed() {
+        if (shopClosed)
+            throw new IllegalStateException(
+                    new CommonInputClosedException());
+    }
+
     @Override
     public CommonInputSocket<CE> newInputSocket(final CE entry)
     throws IOException {
-        assert !shopClosed;
-        if (getEntry(entry.getName()) != entry)
-            throw new IllegalArgumentException("interface contract violation");
+
         class InputSocket extends FilterInputSocket<CE> {
             InputSocket() throws IOException {
                 super(ConcurrentInputShop.super.newInputSocket(entry));
@@ -96,6 +100,10 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 }
             }
         }
+
+        ensureNotShopClosed();
+        if (getEntry(entry.getName()) != entry)
+            throw new IllegalArgumentException("interface contract violation");
         // TODO: Check: Synchronization required?
         return new InputSocket();
     }
@@ -115,8 +123,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
      * @return The number of all open streams.
      */
     public synchronized int waitCloseOthers(final long timeout) {
-        assert !shopClosed;
-
+        ensureNotShopClosed();
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
         try {
@@ -136,7 +143,6 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
         } catch (InterruptedException ignored) {
             logger.warning("wait.interrupted");
         }
-
         return streams.size();
     }
 
@@ -160,27 +166,25 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     public synchronized <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
-        assert !shopClosed;
-        try {
-            for (final Iterator<DoCloseable> it = streams.keySet().iterator();
-            it.hasNext(); ) {
+        ensureNotShopClosed();
+        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+        it.hasNext(); ) {
+            try {
                 try {
-                    try {
-                        it.next().doClose();
-                    } finally {
-                        it.remove();
-                    }
-                } catch (IOException ioe) {
-                    handler.warn(ioe);
+                    it.next().doClose();
+                } finally {
+                    it.remove();
                 }
+            } catch (IOException ioe) {
+                handler.warn(ioe);
             }
-        } finally {
-            shopClosed = true;
         }
     }
 
     @Override
     public void close() throws IOException {
+        if (shopClosed)
+            return;
         shopClosed = true;
         super.close();
     }
@@ -195,7 +199,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     private final class EntryReadOnlyFile
     extends SynchronizedReadOnlyFile
     implements DoCloseable {
-        private /*volatile*/ boolean closed;
+        private boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryReadOnlyFile(final ReadOnlyFile rof) {
@@ -206,7 +210,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
         }
 
         private void ensureNotShopClosed() throws IOException {
-            if (shopClosed)
+            if (closed)
                 throw new CommonInputClosedException();
         }
 
@@ -297,8 +301,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!shopClosed)
-                super.doClose();
+            super.doClose();
         }
 
         /**
@@ -335,7 +338,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
     private final class EntryInputStream
     extends SynchronizedInputStream
     implements DoCloseable {
-        private /*volatile*/ boolean closed;
+        private boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryInputStream(final InputStream in) {
@@ -346,7 +349,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
         }
 
         private void ensureNotShopClosed() throws IOException {
-            if (shopClosed)
+            if (closed)
                 throw new CommonInputClosedException();
         }
 
@@ -382,7 +385,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
 
         @Override
         public void mark(int readlimit) {
-            if (!shopClosed)
+            if (!closed)
                 super.mark(readlimit);
         }
 
@@ -394,7 +397,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
 
         @Override
         public boolean markSupported() {
-            return !shopClosed && super.markSupported();
+            return !closed && super.markSupported();
         }
 
         /**
@@ -436,8 +439,7 @@ extends FilterInputShop<CE, CommonInputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!shopClosed)
-                super.doClose();
+            super.doClose();
         }
 
         /**

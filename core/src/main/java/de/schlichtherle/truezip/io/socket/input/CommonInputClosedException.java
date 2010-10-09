@@ -16,12 +16,14 @@
 
 package de.schlichtherle.truezip.io.socket.input;
 
+import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
 import java.io.IOException;
 
 /**
  * Indicates that an input stream or read only file for a common entry has been
  * forced to close.
  *
+ * @see CommonOutputClosedException
  * @author Christian Schlichtherle
  * @version $Id$
  */
