@@ -45,6 +45,8 @@ implements CommonOutputShop<CE> {
     @Override
     public CommonOutputSocket<CE> newOutputSocket(CE entry)
     throws IOException {
+        if (null == entry)
+            throw new NullPointerException();
         return target.newOutputSocket(entry);
     }
 

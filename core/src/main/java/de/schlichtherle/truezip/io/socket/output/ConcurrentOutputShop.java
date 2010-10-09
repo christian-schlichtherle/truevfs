@@ -70,11 +70,15 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
         super(output);
     }
 
+    private void ensureNotShopClosed() {
+        if (shopClosed)
+            throw new IllegalStateException(
+                    new CommonOutputClosedException());
+    }
+
     @Override
     public CommonOutputSocket<CE> newOutputSocket(final CE entry)
     throws IOException {
-        assert !shopClosed;
-        assert entry != null;
 
         class OutputSocket extends FilterOutputSocket<CE> {
             OutputSocket() throws IOException {
@@ -88,6 +92,10 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 }
             }
         }
+
+        ensureNotShopClosed();
+        if (null == entry)
+            throw new NullPointerException();
         // TODO: Check: Synchronization required?
         return new OutputSocket();
     }
@@ -107,8 +115,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
      * @return The number of all open streams.
      */
     public synchronized int waitCloseOthers(final long timeout) {
-        assert !shopClosed;
-
+        ensureNotShopClosed();
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
         try {
@@ -128,7 +135,6 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
         } catch (InterruptedException ignored) {
             logger.warning("wait.interrupted");
         }
-
         return streams.size();
     }
 
@@ -154,27 +160,25 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     public synchronized <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
-        assert !shopClosed;
-        try {
-            for (final Iterator<DoCloseable> it = streams.keySet().iterator();
-            it.hasNext(); ) {
+        ensureNotShopClosed();
+        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+        it.hasNext(); ) {
+            try {
                 try {
-                    try {
-                        it.next().doClose();
-                    } finally {
-                        it.remove();
-                    }
-                } catch (IOException ioe) {
-                    handler.warn(ioe);
+                    it.next().doClose();
+                } finally {
+                    it.remove();
                 }
+            } catch (IOException ioe) {
+                handler.warn(ioe);
             }
-        } finally {
-            shopClosed = true;
         }
     }
 
     @Override
     public void close() throws IOException {
+        if (shopClosed)
+            return;
         shopClosed = true;
         super.close();
     }
@@ -189,7 +193,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
     private final class EntryOutputStream
     extends SynchronizedOutputStream
     implements DoCloseable {
-        private /*volatile*/ boolean closed;
+        private boolean closed;
 
         @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
         private EntryOutputStream(final OutputStream out) {
@@ -200,7 +204,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
         }
 
         private void ensureNotShopClosed() throws IOException {
-            if (shopClosed)
+            if (closed)
                 throw new CommonOutputClosedException();
         }
 
@@ -267,8 +271,7 @@ extends FilterOutputShop<CE, CommonOutputShop<CE>> {
                 return;*/
             // Order is important!
             closed = true;
-            if (!shopClosed)
-                super.doClose();
+            super.doClose();
         }
 
         /**
