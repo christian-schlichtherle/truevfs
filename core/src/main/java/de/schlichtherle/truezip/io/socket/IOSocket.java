@@ -59,8 +59,14 @@ public abstract class IOSocket<LT, PT> implements IOReference<LT> {
     /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
     @Override
     public final String toString() {
+        // Note that the target actually must not be null, but this method
+        // should work even if the interface contract is broken in order to
+        // support debugging.
+        final LT lt = getTarget();
+        final String lts = null == lt ? "(null)" : lt.toString();
         final PT pt = getPeerTarget();
-        return getTarget() + " <-> " + (null == pt ? "(null)" : pt);
+        final String pts = null == pt ? "(null)" : pt.toString();
+        return lts + " <-> " + pts;
     }
 
     static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
