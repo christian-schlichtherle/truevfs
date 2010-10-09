@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.util.logging.Logger;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
@@ -31,7 +32,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
@@ -48,6 +48,7 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static java.util.logging.Level.WARNING;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -282,7 +283,9 @@ implements     CommonInputSocketFactory <AE                     >,
             public AE getTarget() {
                 try {
                     return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
-                } catch (IOException resolveToNull) {
+                } catch (IOException ex) {
+                    Logger.getLogger(BasicArchiveController.class.getName())
+                            .log(WARNING, path, ex);
                     return null; // TODO: interface contract violation!
                 }
             }
@@ -362,6 +365,8 @@ implements     CommonInputSocketFactory <AE                     >,
                 try {
                     return getEntry();
                 } catch (IOException ex) {
+                    Logger.getLogger(BasicArchiveController.class.getName())
+                            .log(WARNING, path, ex);
                     return null; // TODO: interface contract violation!
                 }
             }
