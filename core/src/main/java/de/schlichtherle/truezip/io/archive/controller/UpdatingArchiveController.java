@@ -62,11 +62,10 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.S
 import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.READ;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
+import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
@@ -266,7 +265,7 @@ extends     FileSystemArchiveController<AE> {
                 // The archive file isExisting.
                 // Thoroughly test read-only status BEFORE opening
                 // the device file!
-                final boolean isReadOnly = !isWritableOrCreatable(inFile);
+                final boolean isReadOnly = !isCreatableOrWritable(inFile);
                 try {
                     input = newInput(inFile);
                 } catch (IOException ex) {
