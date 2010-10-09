@@ -30,10 +30,8 @@ public class ContainsFileException extends FileNotFoundException {
 
     private final java.io.File ancestor, descendant;
 
-    /**
-     * Creates a new instance of {@code ContainsFileException}.
-     */
-    public ContainsFileException(
+    /** Constructs a new instance of {@code ContainsFileException}. */
+    ContainsFileException(
             final java.io.File ancestor,
             final java.io.File descendant) {
         super("Paths refer to the same file or contain each other!");
