@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class NotWriteLockedByCurrentThreadException extends RuntimeException {
+final class NotWriteLockedByCurrentThreadException extends RuntimeException {
     private static final long serialVersionUID = 91746592376291L;
 
     NotWriteLockedByCurrentThreadException() {
