@@ -55,6 +55,18 @@ public class Files extends Paths {
     private static File tempDirectory;
 
     /**
+     * Like {@link #createTempFile(String, String)}, but uses the default
+     * suffix {@code ".tmp"}.
+     *
+     * @see #getTempDirectory
+     * @see #setTempDirectory
+     */
+    public static File createTempFile(String prefix)
+    throws IOException {
+        return createTempFile(prefix, null, null);
+    }
+
+    /**
      * Like {@link File#createTempFile}, but uses the value of the
      * class property {@code tempDirectory} as the directory for temporary
      * files.
@@ -64,21 +76,17 @@ public class Files extends Paths {
      * @see #getTempDirectory
      * @see #setTempDirectory
      */
-    public static File createTempFile(final String prefix, final String suffix)
+    public static File createTempFile(String prefix, String suffix)
     throws IOException {
-        return File.createTempFile(prefix, suffix, tempDirectory);
+        return createTempFile(prefix, suffix, null);
     }
 
-    /**
-     * Like {@link #createTempFile(String, String)}, but uses the default
-     * suffix {@code ".tmp"}.
-     *
-     * @see #getTempDirectory
-     * @see #setTempDirectory
-     */
-    public static File createTempFile(final String prefix)
+    public static File createTempFile(  String prefix,
+                                        String suffix,
+                                        File directory)
     throws IOException {
-        return File.createTempFile(prefix, null, tempDirectory);
+        return File.createTempFile(prefix, suffix,
+                null == directory ? tempDirectory : directory);
     }
 
     /**
@@ -112,20 +120,15 @@ public class Files extends Paths {
     }
 
     /**
-     * Returns {@code true} if the given file exists or can be created
+     * Returns {@code true} if the given file can be created or exists
      * and at least one byte can be successfully written to it - the file is
      * restored to its previous state afterwards.
      * This is a much stronger test than {@link File#canWrite()}.
      */
-    public static boolean isWritableOrCreatable(final File file) {
+    public static boolean isCreatableOrWritable(final File file) {
         try {
-            if (!file.exists()) {
-                final boolean created = file.createNewFile();
-                boolean ok = isWritableOrCreatable(file);
-                if (created && !file.delete()) {
-                    ok = false; // be conservative!
-                }
-                return ok;
+            if (file.createNewFile()) {
+                return isCreatableOrWritable(file) && file.delete();
             } else if (file.canWrite()) {
                 // Some operating and file system combinations make File.canWrite()
                 // believe that the file is writable although it's not.
@@ -181,9 +184,8 @@ public class Files extends Paths {
                             // device is faulty.
                             ok = octet == check;
                         } finally {
-                            if (empty) {
+                            if (empty)
                                 raf.setLength(0);
-                            }
                         }
                     } finally {
                         raf.close();
@@ -199,7 +201,7 @@ public class Files extends Paths {
                     }
                 }
                 return ok;
-            } else { // if (file.exists() && !file.canWrite()) {
+            } else { // if (!file.createNewFile() && !file.canWrite()) {
                 return false;
             }
         } catch (IOException ex) {
