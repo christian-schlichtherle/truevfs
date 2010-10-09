@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.Files.isWritableOrCreatable;
+import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.Files.normalize;
 import static de.schlichtherle.truezip.io.Files.split;
 
@@ -476,7 +476,7 @@ public class FilesTest extends TestCase {
     }
 
     /**
-     * Test of isWritableOrCreatable method, of class de.schlichtherle.truezip.io.ArchiveController.
+     * Test of isCreatableOrWritable method, of class de.schlichtherle.truezip.io.ArchiveController.
      * <p>
      * Note that this test is not quite correctly designed: It tests the
      * operating system rather than the method.
@@ -484,13 +484,13 @@ public class FilesTest extends TestCase {
     public void testIsWritableOrCreatable() throws IOException {
         final java.io.File file = File.createTempFile("tzp-test", null);
 
-        boolean result = isWritableOrCreatable(file);
+        boolean result = isCreatableOrWritable(file);
         assertTrue(result);
 
         boolean total = true;
         final FileInputStream fin = new FileInputStream(file);
         try {
-            result = isWritableOrCreatable(file);
+            result = isCreatableOrWritable(file);
             total &= result;
         } finally {
             fin.close();
@@ -503,7 +503,7 @@ public class FilesTest extends TestCase {
             final String mode = modes[i];
             final RandomAccessFile raf = new RandomAccessFile(file, mode);
             try {
-                result = isWritableOrCreatable(file);
+                result = isCreatableOrWritable(file);
                 total &= result;
             } finally {
                 raf.close();
