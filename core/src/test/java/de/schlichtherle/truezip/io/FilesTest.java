@@ -476,7 +476,7 @@ public class FilesTest extends TestCase {
     }
 
     /**
-     * Test of isWritableOrCreatable method, of class de.schlichtherle.truezip.io.ArchiveController.
+     * Test of isCreatableOrWritable method, of class de.schlichtherle.truezip.io.ArchiveController.
      * <p>
      * Note that this test is not quite correctly designed: It tests the
      * operating system rather than the method.
