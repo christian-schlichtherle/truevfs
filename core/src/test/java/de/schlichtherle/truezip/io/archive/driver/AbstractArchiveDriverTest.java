@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
 import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
@@ -28,8 +27,6 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -186,21 +183,19 @@ public class AbstractArchiveDriverTest extends TestCase {
         @Override
         public CommonInputShop<ArchiveEntry> newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
         throws IOException {
-            throw new FileNotFoundException(
-                    archive.getMountPoint() + " (inaccessible archive file)");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public ArchiveEntry newEntry(String name, Type type, CommonEntry template)
         throws CharConversionException {
-            return new FileEntry("foo/bar");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public CommonOutputShop<ArchiveEntry> newOutputShop(ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<ArchiveEntry> source)
         throws IOException {
-            throw new FileNotFoundException(
-                    archive.getMountPoint() + " (inaccessible archive file)");
+            throw new UnsupportedOperationException();
         }
 
         @Override
