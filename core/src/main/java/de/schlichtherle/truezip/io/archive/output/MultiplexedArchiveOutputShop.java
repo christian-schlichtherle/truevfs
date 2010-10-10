@@ -256,10 +256,6 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
                 return;
 
             // Order is important here!
-            // Note that this must be guarded by the closed flag:
-            // close() gets called from the finalize() method in the
-            // subclass, which may cause a ConcurrentModificationException
-            // in this method.
             closed = true;
             try {
                 super.close();
