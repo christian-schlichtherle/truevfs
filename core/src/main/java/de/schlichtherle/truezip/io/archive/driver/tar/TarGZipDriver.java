@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,7 +97,7 @@ public class TarGZipDriver extends TarDriver {
 
     @Override
     protected TarInputShop newTarInputShop(
-            ArchiveDescriptor archive,
+            FileSystemModel archive,
             InputStream in)
     throws IOException {
         return new TarInputShop(new GZIPInputStream(in, BUFSIZE));
@@ -105,7 +105,7 @@ public class TarGZipDriver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final ArchiveDescriptor archive,
+            final FileSystemModel archive,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {

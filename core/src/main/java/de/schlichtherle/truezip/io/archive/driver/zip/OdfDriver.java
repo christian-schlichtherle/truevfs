@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import java.io.OutputStream;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.IOException;
 
 import static java.util.zip.Deflater.BEST_COMPRESSION;
@@ -77,10 +77,10 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    public CommonOutputShop<ZipEntry> newOutputShop(
-            ArchiveDescriptor archive,
-            CommonOutputSocket<?> output,
-            CommonInputShop<ZipEntry> source)
+    public OutputShop<ZipEntry> newOutputShop(
+            FileSystemModel archive,
+            OutputSocket<?> output,
+            InputShop<ZipEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {

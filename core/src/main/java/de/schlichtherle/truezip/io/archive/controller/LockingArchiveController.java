@@ -15,15 +15,17 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.FilterInputSocket;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.IOException;
@@ -39,9 +41,15 @@ final class LockingArchiveController extends ArchiveController {
 
     private final ArchiveController controller;
 
-    LockingArchiveController(ArchiveModel model, ArchiveController controller) {
+    LockingArchiveController(   final ArchiveModel model,
+                                final ArchiveController controller) {
         super(model);
+        assert null != controller;
         this.controller = controller;
+    }
+
+    private ArchiveController getController() {
+        return controller;
     }
 
     ReentrantLock readLock() {
@@ -58,12 +66,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public Icon getOpenIcon()
-    throws FalsePositiveEntryException {
+    public Icon getOpenIcon() {
         try {
             readLock().lock();
             try {
-                return controller.getOpenIcon();
+                return getController().getOpenIcon();
             } finally {
                 readLock().unlock();
             }
@@ -71,7 +78,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getOpenIcon();
+                return getController().getOpenIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -79,12 +86,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public Icon getClosedIcon()
-    throws FalsePositiveEntryException {
+    public Icon getClosedIcon() {
         try {
             readLock().lock();
             try {
-                return controller.getClosedIcon();
+                return getController().getClosedIcon();
             } finally {
                 readLock().unlock();
             }
@@ -92,7 +98,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getClosedIcon();
+                return getController().getClosedIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -100,12 +106,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public boolean isReadOnly()
-    throws FalsePositiveEntryException {
+    public boolean isReadOnly() {
         try {
             readLock().lock();
             try {
-                return controller.isReadOnly();
+                return getController().isReadOnly();
             } finally {
                 readLock().unlock();
             }
@@ -113,7 +118,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isReadOnly();
+                return getController().isReadOnly();
             } finally {
                 writeLock().unlock();
             }
@@ -121,12 +126,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public ArchiveFileSystemEntry getEntry(final String path)
-    throws FalsePositiveEntryException {
+    public FileSystemEntry getEntry(String path) {
         try {
             readLock().lock();
             try {
-                return controller.getEntry(path);
+                return getController().getEntry(path);
             } finally {
                 readLock().unlock();
             }
@@ -134,7 +138,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getEntry(path);
+                return getController().getEntry(path);
             } finally {
                 writeLock().unlock();
             }
@@ -142,12 +146,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public boolean isReadable(final String path)
-    throws FalsePositiveEntryException {
+    public boolean isReadable(String path) {
         try {
             readLock().lock();
             try {
-                return controller.isReadable(path);
+                return getController().isReadable(path);
             } finally {
                 readLock().unlock();
             }
@@ -155,7 +158,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isReadable(path);
+                return getController().isReadable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -163,12 +166,11 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public boolean isWritable(final String path)
-    throws FalsePositiveEntryException {
+    public boolean isWritable(String path) {
         try {
             readLock().lock();
             try {
-                return controller.isWritable(path);
+                return getController().isWritable(path);
             } finally {
                 readLock().unlock();
             }
@@ -176,7 +178,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isWritable(path);
+                return getController().isWritable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -184,39 +186,37 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public void setReadOnly(final String path)
+    public void setReadOnly(String path)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.setReadOnly(path);
+            getController().setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public boolean setTime(
-            final String path,
-            final BitField<Access> types,
-            final long value)
+    public boolean setTime( String path, BitField<Access> types, long value)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.setTime(path, types, value);
+            return getController().setTime(path, types, value);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public CommonInputSocket<?> newInputSocket(String path)
+    public InputSocket<?> newInputSocket(   String path,
+                                            BitField<InputOption> options)
     throws IOException {
         try {
             readLock().lock();
             try {
-                return new InputSocket(controller.newInputSocket(path));
+                return new Input(getController().newInputSocket(path, options));
             } finally {
                 readLock().unlock();
             }
@@ -224,18 +224,16 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return new InputSocket(controller.newInputSocket(path));
+                return new Input(getController().newInputSocket(path, options));
             } finally {
                 writeLock().unlock();
             }
         }
     }
 
-    private class InputSocket
-    extends FilterInputSocket<CommonEntry> {
+    private class Input extends FilterInputSocket<CommonEntry> {
 
-        protected InputSocket(
-                final CommonInputSocket<? extends CommonEntry> target) {
+        protected Input(InputSocket<? extends CommonEntry> target) {
             super(target);
         }
 
@@ -244,7 +242,7 @@ final class LockingArchiveController extends ArchiveController {
             try {
                 readLock().lock();
                 try {
-                    return input.share(this).getTarget();
+                    return getInputSocket().getTarget();
                 } finally {
                     readLock().unlock();
                 }
@@ -252,7 +250,7 @@ final class LockingArchiveController extends ArchiveController {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.share(this).getTarget();
+                    return getInputSocket().getTarget();
                 } finally {
                     writeLock().unlock();
                 }
@@ -264,7 +262,7 @@ final class LockingArchiveController extends ArchiveController {
             try {
                 readLock().lock();
                 try {
-                    return input.share(this).newInputStream();
+                    return getInputSocket().newInputStream();
                 } finally {
                     readLock().unlock();
                 }
@@ -272,7 +270,7 @@ final class LockingArchiveController extends ArchiveController {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.share(this).newInputStream();
+                    return getInputSocket().newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
@@ -284,7 +282,7 @@ final class LockingArchiveController extends ArchiveController {
             try {
                 readLock().lock();
                 try {
-                    return input.share(this).newReadOnlyFile();
+                    return getInputSocket().newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
@@ -292,7 +290,7 @@ final class LockingArchiveController extends ArchiveController {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return input.share(this).newReadOnlyFile();
+                    return getInputSocket().newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
                 }
@@ -301,24 +299,21 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public CommonOutputSocket<?> newOutputSocket(
-            final String path,
-            final BitField<OutputOption> options)
+    public OutputSocket<?> newOutputSocket( String path,
+                                            BitField<OutputOption> options)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return new OutputSocket(controller.newOutputSocket(path, options));
+            return new Output(getController().newOutputSocket(path, options));
         } finally {
             writeLock().unlock();
         }
     }
 
-    private class OutputSocket
-    extends FilterOutputSocket<CommonEntry> {
+    private class Output extends FilterOutputSocket<CommonEntry> {
 
-        protected OutputSocket(
-                final CommonOutputSocket<? extends CommonEntry> target) {
+        protected Output(OutputSocket<? extends CommonEntry> target) {
             super(target);
         }
 
@@ -327,7 +322,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return output.share(this).getTarget();
+                return getOutputSocket().getTarget();
             } finally {
                 writeLock().unlock();
             }
@@ -338,7 +333,7 @@ final class LockingArchiveController extends ArchiveController {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return output.share(this).newOutputStream();
+                return getOutputSocket().newOutputStream();
             } finally {
                 writeLock().unlock();
             }
@@ -346,42 +341,40 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public boolean mknod(
-            final String path,
-            final Type type,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+    public boolean mknod(   String path,
+                            Type type,
+                            CommonEntry template,
+                            BitField<OutputOption> options)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.mknod(path, type, template, options);
+            return getController().mknod(path, type, template, options);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public void unlink(
-            final String path,
-            final BitField<OutputOption> options)
+    public void unlink(String path)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.unlink(path, options);
+            getController().unlink(path);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
+    public void sync(   ArchiveSyncExceptionBuilder builder,
+                        BitField<SyncOption> options)
     throws ArchiveSyncException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.sync(builder, options);
+            getController().sync(builder, options);
         } finally {
             writeLock().unlock();
         }

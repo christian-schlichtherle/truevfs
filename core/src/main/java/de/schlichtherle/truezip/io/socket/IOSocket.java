@@ -87,8 +87,8 @@ public abstract class IOSocket<LT, PT> implements IOReference<LT> {
      *         {@code IOException} thrown by the <em>output</em> stream.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static <T> void copy(final InputSocket <? extends T, T, ?> input,
-                                final OutputSocket<? extends T, T, ?> output)
+    public static void copy(final InputSocket <?> input,
+                            final OutputSocket<?> output)
     throws IOException {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;

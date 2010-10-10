@@ -17,32 +17,37 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates input streams and read only files for reading bytes from its
- * {@link #getTarget local target}.
- * An input socket can also get {@link #connect connected} to a
- * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
- * 
- * @param   <LT> the type of the {@link #getTarget local target} for I/O
- *          operations.
- * @param   <PT> the type of the {@link #getPeerTarget peer target} for I/O
- *          operations.
- * @param   <IS> a subclass of this class to which {@code this} is cast upon
- *          return from the methods {@link #share} and {@link #connect}.
+ * Creates input streams for reading bytes from its <i>local target</i>
+ * common entry.
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe:
+ * Multithreading needs to be addressed by client classes.
+ *
+ * @param   <CE> the type of the {@link #getTarget() local target} common entry.
  * @see     OutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class InputSocket<LT, PT, IS extends InputSocket<LT, PT, IS>>
-extends IOSocket<LT, PT> {
+public abstract class InputSocket<CE extends CommonEntry>
+extends IOSocket<CE, CommonEntry> {
 
-    private OutputSocket<? extends PT, ? super LT, ?> peer;
+    private OutputSocket<?> peer;
+
+    /**
+     * Returns the non-{@code null} local common entry target.
+     *
+     * @return The non-{@code null} local common entry target.
+     */
+    @Override
+    public abstract CE getTarget();
 
     @Override
-    public PT getPeerTarget() {
+    public CommonEntry getPeerTarget() {
         return IOReferences.deref(peer);
     }
 
@@ -58,10 +63,9 @@ extends IOSocket<LT, PT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    @SuppressWarnings("unchecked")
-	public final IS share(InputSocket<? super LT, ? extends PT, ?> with) {
-        final OutputSocket<? extends PT, ? super LT, ?> newPeer = with.peer;
-        final OutputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
+	public final InputSocket<CE> share(final InputSocket<?> with) {
+        final OutputSocket<?> newPeer = with.peer;
+        final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
             try {
@@ -72,7 +76,7 @@ extends IOSocket<LT, PT> {
                 throw ex;
             }
         }
-        return (IS) this;
+        return this;
     }
 
     /**
@@ -85,10 +89,8 @@ extends IOSocket<LT, PT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    @SuppressWarnings("unchecked")
-	public final IS connect(
-            final OutputSocket<? extends PT, ? super LT, ?> newPeer) {
-        final OutputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
+	public final InputSocket<CE> connect(final OutputSocket<?> newPeer) {
+        final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
                 peer = null;
@@ -106,7 +108,7 @@ extends IOSocket<LT, PT> {
                 throw ex;
             }
         }
-        return (IS) this;
+        return this;
     }
 
     /**
@@ -131,6 +133,14 @@ extends IOSocket<LT, PT> {
      * Furthermore, the returned input stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
+     * @throws CommonInputBusyException if the local target is currently busy
+     *         on input.
+     *         This exception is guaranteed to be recoverable, meaning it
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
+     * @throws IOException on any other exceptional condition.
      * @return A new input stream.
      */
     public InputStream newInputStream() throws IOException {
@@ -146,9 +156,17 @@ extends IOSocket<LT, PT> {
      * Furthermore, the returned read only file should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @return A new read only file.
      * @throws UnsupportedOperationException to indicate that this operation
      *         is not supported.
+     * @throws CommonInputBusyException if the local target is currently busy
+     *         on input.
+     *         This exception is guaranteed to be recoverable, meaning it
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
+     * @throws IOException on any other exceptional condition.
+     * @return A new read only file.
      */
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 }

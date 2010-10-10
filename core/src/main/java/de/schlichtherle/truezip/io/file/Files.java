@@ -15,25 +15,22 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.archive.controller.file.FileInputSocket;
-import de.schlichtherle.truezip.io.archive.controller.file.FileOutputSocket;
+import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
+import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
+import de.schlichtherle.truezip.io.socket.FileEntry;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.PRESERVE;
+import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -201,7 +198,7 @@ class Files {
             final java.io.File dst)
     throws IOException {
         if (contains(src, dst))
-            throw new ContainsFileException(src, dst);
+            throw new ContainsFileException(src, dst); // TODO: Required anymore?
         copy0(preserve, src, dst);
     }
 
@@ -212,11 +209,12 @@ class Files {
             final java.io.File dst)
     throws IOException {
         try {
-            IOSocket.copy(  newInputSocket(src),
+            IOSocket.copy(  newInputSocket(src,
+                                BitField.noneOf(InputOption.class)),
                             newOutputSocket(dst,
                                 BitField.noneOf(OutputOption.class)
-                                    .set(PRESERVE, preserve)
-                                    .set(CREATE_PARENTS, File.isLenient())));
+                                    .set(CREATE_PARENTS, File.isLenient())
+                                    .set(COPY_PROPERTIES, preserve)));
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (ArchiveBusyException ex) {
@@ -230,46 +228,36 @@ class Files {
         }
     }
 
-    static CommonInputSocket<?> newInputSocket(final java.io.File src)
+    static InputSocket<?> newInputSocket(
+            final java.io.File src,
+            final BitField<InputOption> options)
     throws IOException {
         assert src != null;
 
-        try {
-            if (src instanceof File) {
-                final File file = (File) src;
-                final File archive = file.getInnerArchive();
-                if (null != archive)
-                    return archive.getController().newInputSocket(
-                            file.getInnerEntryName());
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "must be handled in try-block!";
-            // Fall through!
+        if (src instanceof File) {
+            final File file = (File) src;
+            final File archive = file.getInnerArchive();
+            if (null != archive)
+                return archive.getController()
+                        .newInputSocket(file.getInnerEntryName(), options);
         }
-        return new FileInputSocket(new FileEntry(src));
+        return new FileEntry(src).newInputSocket(options);
     }
 
-    static CommonOutputSocket<?> newOutputSocket(
+    static OutputSocket<?> newOutputSocket(
             final java.io.File dst,
             final BitField<OutputOption> options)
     throws IOException {
         assert dst != null;
 
-        try {
-            if (dst instanceof File) {
-                final File file = (File) dst;
-                final File archive = file.getInnerArchive();
-                if (null != archive)
-                    return archive.getController().newOutputSocket(
-                            file.getInnerEntryName(), options);
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "must be handled in try-block!";
-            // Fall through!
+        if (dst instanceof File) {
+            final File file = (File) dst;
+            final File archive = file.getInnerArchive();
+            if (null != archive)
+                return archive.getController()
+                        .newOutputSocket(file.getInnerEntryName(), options);
         }
-        return new FileOutputSocket(new FileEntry(dst), options);
+        return new FileEntry(dst).newOutputSocket(options);
     }
 
     /**

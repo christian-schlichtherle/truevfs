@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,7 +72,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
 
     @Override
     protected ZipOutputShop newZipOutputShop(
-            ArchiveDescriptor archive,
+            FileSystemModel archive,
             OutputStream out,
             ZipInputShop source)
     throws IOException {

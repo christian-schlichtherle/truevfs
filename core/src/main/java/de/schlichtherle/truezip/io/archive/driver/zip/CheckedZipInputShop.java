@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.zip.CRC32Exception;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
@@ -60,11 +60,11 @@ public class CheckedZipInputShop extends ZipInputShop {
 
     /** Overridden to read from a checked input stream. */
     @Override
-    public CommonInputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
+    public InputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         if (getEntry(entry.getName()) != entry)
             throw new IllegalArgumentException("interface contract violation");
-        class InputSocket extends CommonInputSocket<ZipEntry> {
+        class Input extends InputSocket<ZipEntry> {
             @Override
             public ZipEntry getTarget() {
                 return entry;
@@ -83,6 +83,6 @@ public class CheckedZipInputShop extends ZipInputShop {
                 throw new UnsupportedOperationException();
             }
         }
-        return new InputSocket();
+        return new Input();
     }
 }

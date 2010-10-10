@@ -22,10 +22,12 @@ import java.io.InputStream;
  * A decorator which synchronizes all access to an {@link InputStream}
  * via an object provided to its constructor.
  *
- * @author Christian Schlichtherle
+ * @see     SynchronizedOutputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class SynchronizedInputStream extends InputStream {
+
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
 
@@ -36,7 +38,7 @@ public class SynchronizedInputStream extends InputStream {
      * Constructs a new synchronized input stream.
      * This object will synchronize on itself.
      *
-     * @param in The input stream to wrap in this decorator.
+     * @param in the input stream to wrap in this decorator.
      */
     public SynchronizedInputStream(final InputStream in) {
         this(in, null);
@@ -45,8 +47,8 @@ public class SynchronizedInputStream extends InputStream {
     /**
      * Constructs a new synchronized input stream.
      *
-     * @param in The input stream to wrap in this decorator.
-     * @param lock The object to synchronize on.
+     * @param in the input stream to wrap in this decorator.
+     * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedInputStream(final InputStream in, final Object lock) {
@@ -62,10 +64,8 @@ public class SynchronizedInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        synchronized (lock) {
-            return read(b, 0, b.length);
-        }
+    public final int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
     }
 
     @Override
@@ -89,20 +89,11 @@ public class SynchronizedInputStream extends InputStream {
         }
     }
 
-    /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            doClose();
+            in.close();
         }
-    }
-
-    /**
-     * Closes the underlying input stream.
-     * This method is <em>not</em> synchronized!
-     */
-    protected void doClose() throws IOException {
-        in.close();
     }
 
     @Override

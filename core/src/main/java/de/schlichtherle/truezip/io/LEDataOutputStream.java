@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io;
 
 import java.io.DataOutput;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -36,8 +35,8 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class LEDataOutputStream
-        extends FilterOutputStream
-        implements DataOutput {
+extends FilterOutputStream
+implements DataOutput {
 
     /** This buffer is used for writing data. */
     private final byte[] buf = new byte[8];

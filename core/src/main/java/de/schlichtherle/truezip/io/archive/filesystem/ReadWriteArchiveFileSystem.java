@@ -17,13 +17,13 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import java.io.CharConversionException;
@@ -36,13 +36,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.ROOT;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.ROOT;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 

@@ -16,18 +16,18 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputBusyException;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,13 +39,13 @@ import java.util.zip.CheckedOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
 
 /**
- * An implementation of {@link CommonOutputShop} to write ZIP archives.
+ * An implementation of {@link OutputShop} to write ZIP archives.
  * <p>
  * This output archive can only write one entry at a time.
  * Archive drivers may wrap this class in a
@@ -58,7 +58,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;
  */
 public class ZipOutputShop
 extends RawZipOutputStream<ZipEntry>
-implements CommonOutputShop<ZipEntry> {
+implements OutputShop<ZipEntry> {
 
     private final ZipInputShop source;
     private ZipEntry tempEntry;
@@ -123,9 +123,9 @@ implements CommonOutputShop<ZipEntry> {
     }
 
     @Override
-    public CommonOutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
+    public OutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
     throws FileNotFoundException {
-        class OutputSocket extends CommonOutputSocket<ZipEntry> {
+        class Output extends OutputSocket<ZipEntry> {
             @Override
             public ZipEntry getTarget() {
                 return entry;
@@ -135,7 +135,7 @@ implements CommonOutputShop<ZipEntry> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
-                    throw new CommonOutputBusyException(entry);
+                    throw new OutputBusyException(entry);
                 if (entry.isDirectory()) {
                     entry.setMethod(STORED);
                     entry.setCrc(0);
@@ -183,7 +183,7 @@ implements CommonOutputShop<ZipEntry> {
                 return new EntryOutputStream(entry);
             }
         }
-        return new OutputSocket();
+        return new Output();
     }
 
     /**
@@ -211,11 +211,6 @@ implements CommonOutputShop<ZipEntry> {
         throws IOException {
             super(ZipOutputShop.this);
             putNextEntry(entry, deflate);
-        }
-
-        @Override
-        public void write(byte[] b) throws IOException {
-            out.write(b, 0, b.length);
         }
 
         @Override

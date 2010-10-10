@@ -16,21 +16,22 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.FilterInputSocket;
+import de.schlichtherle.truezip.io.socket.ProxyOutputSocket;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
@@ -108,8 +109,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final ArchiveDescriptor archive,
-            final CommonInputSocket<?> target)
+            final FileSystemModel archive,
+            final InputSocket<?> target)
     throws IOException {
         class InputSocket extends FilterInputSocket<CommonEntry> {
             InputSocket() {
@@ -171,10 +172,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * {@link #getRaesParameters} for authentication.
      */
     @Override
-    public CommonOutputShop<ZipEntry> newOutputShop(
-            final ArchiveDescriptor archive,
-            final CommonOutputSocket<?> target,
-            final CommonInputShop<ZipEntry> source)
+    public OutputShop<ZipEntry> newOutputShop(
+            final FileSystemModel archive,
+            final OutputSocket<?> target,
+            final InputShop<ZipEntry> source)
     throws IOException {
         class OutputSocket extends FilterOutputSocket<CommonEntry> {
             OutputSocket() {
@@ -183,7 +184,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final OutputStream out = super.newOutputStream();
+                final OutputStream out = new ProxyOutputSocket<CommonEntry>(getOutputSocket())
+                        .newOutputStream();
                 try {
                     return RaesOutputStream.getInstance(out, getRaesParameters(archive));
                 } catch (RaesKeyException failure) {
@@ -208,7 +210,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    public RaesParameters getRaesParameters(ArchiveDescriptor archive) {
+    public RaesParameters getRaesParameters(FileSystemModel archive) {
         return new KeyManagerRaesParameters(archive.getMountPoint());
     }
 }

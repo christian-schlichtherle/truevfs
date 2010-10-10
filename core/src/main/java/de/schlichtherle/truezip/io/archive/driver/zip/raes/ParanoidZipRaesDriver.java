@@ -16,15 +16,18 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.ProxyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -81,19 +84,20 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      * This implementation calls {@link #getRaesParameters}, with which it
      * initializes a new {@link RaesOutputStream}, and finally passes the
      * resulting stream to
-     * {@link #newZipOutputShop(ArchiveDescriptor, OutputStream, ZipInputShop)}.
+     * {@link #newZipOutputShop(FileSystemModel, OutputStream, ZipInputShop)}.
      * <p>
      * Note that this limits the number of concurrent output entry streams
      * to one in order to inhibit writing unencrypted temporary files for
      * buffering the written entries.
      */
     @Override
-    public CommonOutputShop<ZipEntry> newOutputShop(
-            final ArchiveDescriptor archive,
-            final CommonOutputSocket<?> output,
-            final CommonInputShop<ZipEntry> source)
+    public OutputShop<ZipEntry> newOutputShop(
+            final FileSystemModel archive,
+            final OutputSocket<?> output,
+            final InputShop<ZipEntry> source)
     throws IOException {
-        final OutputStream out = output.newOutputStream();
+        final OutputStream out = new ProxyOutputSocket<CommonEntry>(output)
+                .newOutputStream();
         try {
             final RaesOutputStream ros;
             try {

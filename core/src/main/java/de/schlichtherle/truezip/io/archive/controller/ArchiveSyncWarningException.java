@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import java.io.IOException;
 
 /**
@@ -31,19 +30,19 @@ extends ArchiveSyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive) {
+    ArchiveSyncWarningException(FileSystemModel archive) {
         super(archive, -1);
     }
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive, String message) {
+    ArchiveSyncWarningException(FileSystemModel archive, String message) {
         super(archive, message, -1);
     }
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive, IOException cause) {
+    ArchiveSyncWarningException(FileSystemModel archive, IOException cause) {
         super(archive, cause, -1);
     }
 
-    ArchiveSyncWarningException(ArchiveDescriptor archive, String message, IOException cause) {
+    ArchiveSyncWarningException(FileSystemModel archive, String message, IOException cause) {
         super(archive, message, cause, -1);
     }
 }

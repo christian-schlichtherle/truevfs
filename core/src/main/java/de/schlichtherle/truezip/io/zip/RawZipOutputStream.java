@@ -16,10 +16,10 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.Closeable;
-import java.io.FilterOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,10 +46,10 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
     }
 
     @Override
-    public CommonOutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
+    public OutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
     throws IOException {
-        class OutputSocket extends FilterOutputSocket<ZipEntry> {
-            OutputSocket() throws IOException {
+        class Output extends FilterOutputSocket<ZipEntry> {
+            Output() throws IOException {
                 super(OdfOutputShop.super.newOutputSocket(entry));
             }
 
@@ -63,7 +63,7 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
                 return super.newOutputStream();
             }
         }
-        return new OutputSocket();
+        return new Output();
     }
 
     @Override

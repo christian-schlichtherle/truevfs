@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class TarBZip2Driver extends TarDriver {
      */
     @Override
     protected TarInputShop newTarInputShop(
-            final ArchiveDescriptor archive,
+            final FileSystemModel archive,
             final InputStream in)
     throws IOException {
         // Consume and check the first two magic bytes. This is required for
@@ -133,7 +133,7 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final ArchiveDescriptor archive,
+            final FileSystemModel archive,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {

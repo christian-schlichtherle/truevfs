@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.crypto.io;
 
-import java.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
