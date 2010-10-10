@@ -26,13 +26,10 @@ import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.SPECIAL;
 
 /**
@@ -54,11 +51,17 @@ final class ProspectiveArchiveController extends ArchiveController {
         return controller;
     }
 
+    private String getPath(String path) {
+        return path;
+    }
+
     @Override
     public Icon getOpenIcon() {
         try {
             return getController().getOpenIcon();
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                return null;
             return getEnclController().getOpenIcon();
         }
     }
@@ -68,6 +71,8 @@ final class ProspectiveArchiveController extends ArchiveController {
         try {
             return getController().getClosedIcon();
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                return null;
             return getEnclController().getClosedIcon();
         }
     }
@@ -77,6 +82,8 @@ final class ProspectiveArchiveController extends ArchiveController {
         try {
             return getController().isReadOnly();
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                return true;
             return getEnclController().isReadOnly();
         }
     }
@@ -85,15 +92,12 @@ final class ProspectiveArchiveController extends ArchiveController {
     @Override
     public FileSystemEntry getEntry(String path) {
         try {
-            return getController().getEntry(path);
+            return getController().getEntry(getPath(path));
         } catch (FalsePositiveEntryException ex) {
             final FileSystemEntry entry
                     = getEnclController().getEntry(getEnclPath(path));
-            if (isRoot(path)) {
-                if (null != entry && FILE == entry.getType()
-                && ex.getCause() instanceof FileNotFoundException)
-                    return new SpecialFileEntry(entry);
-            }
+            if (ex.isTransient())
+                return null == entry ? null : new SpecialFileEntry(entry);
             return entry;
         }
     }
@@ -103,7 +107,6 @@ final class ProspectiveArchiveController extends ArchiveController {
     implements FileSystemEntry {
         SpecialFileEntry(FileSystemEntry entry) {
             super(entry);
-            assert FILE == entry.getType();
         }
 
         @Override
@@ -120,8 +123,10 @@ final class ProspectiveArchiveController extends ArchiveController {
     @Override
     public boolean isReadable(String path) {
         try {
-            return getController().isReadable(path);
+            return getController().isReadable(getPath(path));
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                return false;
             return getEnclController().isReadable(getEnclPath(path));
         }
     }
@@ -129,8 +134,10 @@ final class ProspectiveArchiveController extends ArchiveController {
     @Override
     public boolean isWritable(String path) {
         try {
-            return getController().isWritable(path);
+            return getController().isWritable(getPath(path));
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                return false;
             return getEnclController().isWritable(getEnclPath(path));
         }
     }
@@ -139,8 +146,10 @@ final class ProspectiveArchiveController extends ArchiveController {
     public void setReadOnly(String path)
     throws IOException {
         try {
-            getController().setReadOnly(path);
+            getController().setReadOnly(getPath(path));
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                throw ex.getCause();
             getEnclController().setReadOnly(getEnclPath(path));
         }
     }
@@ -149,8 +158,10 @@ final class ProspectiveArchiveController extends ArchiveController {
     public boolean setTime(String path, BitField<Access> types, long value)
     throws IOException {
         try {
-            return getController().setTime(path, types, value);
+            return getController().setTime(getPath(path), types, value);
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                throw ex.getCause();
             return getEnclController().setTime(getEnclPath(path), types, value);
         }
     }
@@ -163,8 +174,10 @@ final class ProspectiveArchiveController extends ArchiveController {
         // TODO: Return a custom socket which supports lazy false positive
         // detection when a stream is created - see LockingArchiveController.
         try {
-            return getController().newInputSocket(path, options);
+            return getController().newInputSocket(getPath(path), options);
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                throw ex.getCause();
             return getEnclController().newInputSocket(getEnclPath(path), options);
         }
     }
@@ -177,8 +190,10 @@ final class ProspectiveArchiveController extends ArchiveController {
         // TODO: Return a custom socket which supports lazy false positive
         // detection when a stream is created - see LockingArchiveController.
         try {
-            return getController().newOutputSocket(path, options);
+            return getController().newOutputSocket(getPath(path), options);
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                throw ex.getCause();
             return getEnclController().newOutputSocket(getEnclPath(path), options);
         }
     }
@@ -190,8 +205,10 @@ final class ProspectiveArchiveController extends ArchiveController {
                             BitField<OutputOption> options)
     throws IOException {
         try {
-            return getController().mknod(path, type, template, options);
+            return getController().mknod(getPath(path), type, template, options);
         } catch (FalsePositiveEntryException ex) {
+            if (ex.isTransient())
+                throw ex.getCause();
             return getEnclController().mknod(getEnclPath(path), type, template, options);
         }
     }
@@ -202,21 +219,12 @@ final class ProspectiveArchiveController extends ArchiveController {
     public void unlink(String path)
     throws IOException {
         try {
-            getController().unlink(path);
-            return;
+            getController().unlink(getPath(path));
         } catch (FalsePositiveEntryException ex) {
-            // FIXME: Check if needed anymore!
-            // What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
-            if (isRoot(path)) {
-                final FileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
-                if (null != entry && FILE == entry.getType()
-                && ex.getCause() instanceof FileNotFoundException) {
-                    throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
-                }
-            }
-            // Fall through!
+            if (ex.isTransient())
+                throw ex.getCause();
+            getEnclController().unlink(getEnclPath(path));
         }
-        getEnclController().unlink(getEnclPath(path));
     }
 
     @Override

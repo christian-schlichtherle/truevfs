@@ -124,8 +124,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                     final RaesReadOnlyFile rrof;
                     try {
                         rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(archive));
-                    } catch (RaesKeyException failure) {
-                        throw new TransientIOException(failure);
+                    } catch (RaesKeyException ex) {
+                        throw new TransientIOException(ex);
                     }
                     if (rof.length() <= getAuthenticationTrigger()) { // intentionally compares rof, not rrof!
                         // Note: If authentication fails, this is reported through some
@@ -187,13 +187,18 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                 final OutputStream out = new ProxyOutputSocket<CommonEntry>(getOutputSocket())
                         .newOutputStream();
                 try {
-                    return RaesOutputStream.getInstance(out, getRaesParameters(archive));
-                } catch (RaesKeyException failure) {
-                    out.close();
-                    throw new TransientIOException(failure);
-                } catch (IOException ex) {
-                    out.close();
-                    throw ex;
+                    try {
+                        return RaesOutputStream.getInstance(out, getRaesParameters(archive));
+                    } catch (RaesKeyException ex) {
+                        throw new TransientIOException(ex);
+                    }
+                } catch (IOException cause) {
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                        throw (IOException) ex.initCause(cause);
+                    }
+                    throw cause;
                 }
             }
         }

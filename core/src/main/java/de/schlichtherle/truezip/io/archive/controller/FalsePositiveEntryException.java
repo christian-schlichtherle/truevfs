@@ -38,6 +38,12 @@ final class FalsePositiveEntryException extends RuntimeException {
         trans = cause instanceof TransientIOException;
     }
 
+    /** Returns the nullable cause of this exception. */
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
+    }
+
     /**
      * Returns {@code true} if and only if this exception was created with a
      * {@link TransientIOException} as its cause.
