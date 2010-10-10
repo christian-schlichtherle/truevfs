@@ -53,7 +53,7 @@ abstract class ArchiveController extends FileSystemController {
     }
 
     /** Returns the file system controller for the enclosing file system. */
-    protected final FileSystemController getEnclController() {
+    protected FileSystemController getEnclController() {
         return enclController;
     }
 
@@ -61,7 +61,7 @@ abstract class ArchiveController extends FileSystemController {
      * Resolves the given relative {@code path} against the relative path of
      * this controller's archive file within its enclosing file system.
      */
-    protected final String getEnclPath(final String path) {
+    protected String getEnclPath(final String path) {
         return isRoot(path)
                 ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
                 : enclPath + path;

@@ -102,13 +102,17 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
             final RaesOutputStream ros;
             try {
                 ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
-            } catch (RaesKeyException failure) {
-                throw new TransientIOException(failure);
+            } catch (RaesKeyException ex) {
+                throw new TransientIOException(ex);
             }
             return newZipOutputShop(archive, ros, (ZipInputShop) source);
-        } catch (IOException ex) {
-            out.close();
-            throw ex;
+        } catch (IOException cause) {
+            try {
+                out.close();
+            } catch (IOException ex) {
+                throw (IOException) ex.initCause(cause);
+            }
+            throw cause;
         }
     }
 }
