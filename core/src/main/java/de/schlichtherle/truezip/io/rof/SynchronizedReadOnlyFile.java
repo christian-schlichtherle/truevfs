@@ -26,13 +26,10 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedReadOnlyFile implements ReadOnlyFile {
+public class SynchronizedReadOnlyFile extends FilterReadOnlyFile {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
-
-    /** The decorated read only file. */
-    protected ReadOnlyFile rof;
 
     /**
      * Constructs a new synchronized read only file.
@@ -52,68 +49,56 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
      *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedReadOnlyFile(final ReadOnlyFile rof, final Object lock) {
-        this.rof = rof;
+        super(rof);
         this.lock = lock != null ? lock : this;
     }
 
     @Override
     public long length() throws IOException {
         synchronized (lock) {
-            return rof.length();
+            return super.length();
         }
     }
 
     @Override
     public long getFilePointer() throws IOException {
         synchronized (lock) {
-            return rof.getFilePointer();
+            return super.getFilePointer();
         }
     }
 
     @Override
     public void seek(long pos) throws IOException {
         synchronized (lock) {
-            rof.seek(pos);
+            super.seek(pos);
         }
     }
 
     @Override
 	public int read() throws IOException {
         synchronized (lock) {
-            return rof.read();
+            return super.read();
         }
-    }
-
-    @Override
-    public final int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            return rof.read(b, off, len);
-        }
-    }
-
-    @Override
-    public void readFully(byte[] b) throws IOException {
-        synchronized (lock) {
-            rof.readFully(b);
+            return super.read(b, off, len);
         }
     }
 
     @Override
     public void readFully(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            rof.readFully(b, off, len);
+            super.readFully(b, off, len);
         }
     }
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            rof.close();
+            super.close();
         }
     }
 }

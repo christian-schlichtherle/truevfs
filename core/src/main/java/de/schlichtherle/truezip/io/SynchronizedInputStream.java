@@ -26,13 +26,10 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedInputStream extends InputStream {
+public class SynchronizedInputStream extends FilterInputStream {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
-
-    /** The decorated input stream. */
-    protected InputStream in;
 
     /**
      * Constructs a new synchronized input stream.
@@ -52,68 +49,63 @@ public class SynchronizedInputStream extends InputStream {
      *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedInputStream(final InputStream in, final Object lock) {
-        this.in = in;
+        super(in);
         this.lock = lock != null ? lock : this;
     }
 
     @Override
 	public int read() throws IOException {
         synchronized (lock) {
-            return in.read();
+            return super.read();
         }
-    }
-
-    @Override
-    public final int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            return in.read(b, off, len);
+            return super.read(b, off, len);
         }
     }
 
     @Override
     public long skip(long n) throws IOException {
         synchronized (lock) {
-            return in.skip(n);
+            return super.skip(n);
         }
     }
 
     @Override
     public int available() throws IOException {
         synchronized (lock) {
-            return in.available();
+            return super.available();
         }
     }
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            in.close();
+            super.close();
         }
     }
 
     @Override
     public void mark(int readlimit) {
         synchronized (lock) {
-            in.mark(readlimit);
+            super.mark(readlimit);
         }
     }
 
     @Override
     public void reset() throws IOException {
         synchronized (lock) {
-            in.reset();
+            super.reset();
         }
     }
 
     @Override
     public boolean markSupported() {
         synchronized (lock) {
-            return in.markSupported();
+            return super.markSupported();
         }
     }
 }

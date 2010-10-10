@@ -66,14 +66,6 @@ final class CountingReadOnlyFile extends FilterReadOnlyFile {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        int ret = rof.read(b);
-        if (ret != -1)
-            total += ret;
-        return ret;
-    }
-
-    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int ret = rof.read(b, off, len);
         if (ret != -1)
