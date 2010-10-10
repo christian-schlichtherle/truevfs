@@ -26,13 +26,10 @@ import java.io.OutputStream;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedOutputStream extends OutputStream {
+public class SynchronizedOutputStream extends FilterOutputStream {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
-
-    /** The decorated output stream. */
-    protected OutputStream out;
 
     /**
      * Constructs a new synchronized output stream.
@@ -52,44 +49,35 @@ public class SynchronizedOutputStream extends OutputStream {
      *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedOutputStream(final OutputStream out, final Object lock) {
-        this.out = out;
+        super(out);
         this.lock = null == lock ? this : lock;
     }
 
     @Override
 	public void write(int b) throws IOException {
         synchronized (lock) {
-            out.write(b);
+            super.write(b);
         }
-    }
-
-    @Override
-    public final void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
-            out.write(b, off, len);
+            super.write(b, off, len);
         }
     }
 
     @Override
     public void flush() throws IOException {
         synchronized (lock) {
-            out.flush();
+            super.flush();
         }
     }
 
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            try {
-                out.flush();
-            } finally {
-                out.close();
-            }
+            super.close();
         }
     }
 }

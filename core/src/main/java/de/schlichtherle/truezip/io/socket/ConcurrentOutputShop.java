@@ -220,9 +220,8 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
 
         @Override
         public void flush() throws IOException {
-            if (closed)
-                return;
-            super.flush();
+            if (!closed)
+                super.flush();
         }
 
         /**
@@ -264,10 +263,19 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
             /*if (closed)
                 return;*/
             closed = true;
+            IOException cause = null;
             try {
-                out.flush();
+                try {
+                    out.flush();
+                } catch (IOException ex) {
+                    throw cause = ex;
+                }
             } finally {
-                out.close();
+                try {
+                    out.close();
+                } catch (IOException ex) {
+                    throw (IOException) ex.initCause(cause);
+                }
             }
         }
 

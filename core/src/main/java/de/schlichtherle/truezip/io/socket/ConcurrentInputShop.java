@@ -243,12 +243,6 @@ extends FilterInputShop<CE, InputShop<CE>> {
         }
 
         @Override
-        public void readFully(byte[] b) throws IOException {
-            ensureNotShopClosed();
-            super.readFully(b);
-        }
-
-        @Override
         public void readFully(byte[] b, int off, int len) throws IOException {
             ensureNotShopClosed();
             super.readFully(b, off, len);

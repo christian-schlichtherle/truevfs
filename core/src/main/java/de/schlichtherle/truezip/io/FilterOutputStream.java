@@ -65,10 +65,19 @@ public class FilterOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
+        IOException cause = null;
         try {
-            out.flush();
+            try {
+                flush();
+            } catch (IOException ex) {
+                throw cause = ex;
+            }
         } finally {
-            out.close();
+            try {
+                out.close();
+            } catch (IOException ex) {
+                throw (IOException) ex.initCause(cause);
+            }
         }
     }
 }
