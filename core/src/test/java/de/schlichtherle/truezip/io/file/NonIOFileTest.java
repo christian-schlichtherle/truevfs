@@ -20,7 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayOutputStream;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.IOException;
 import java.net.URI;
@@ -519,11 +519,11 @@ public class NonIOFileTest extends TestCase {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final ArchiveController archiveController = archive.getController();
-        final ArchiveController archive2Controller = archive2.getController();
+        final FileSystemController archiveController = archive.getController();
+        final FileSystemController archive2Controller = archive2.getController();
         assertSame(archiveController, archive2Controller);
-        final ArchiveController innerController = inner.getController();
-        final ArchiveController inner2Controller = inner2.getController();
+        final FileSystemController innerController = inner.getController();
+        final FileSystemController inner2Controller = inner2.getController();
         assertSame(innerController, inner2Controller);
     }
 

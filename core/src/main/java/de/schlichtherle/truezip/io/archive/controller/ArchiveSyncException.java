@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 import java.net.URI;
@@ -33,41 +32,41 @@ public class ArchiveSyncException extends ChainableIOException {
 
     private final URI mountPoint;
 
-    ArchiveSyncException(ArchiveDescriptor archive) {
+    ArchiveSyncException(FileSystemModel archive) {
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message) {
+    ArchiveSyncException(FileSystemModel archive, String message) {
         super(message);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, IOException cause) {
+    ArchiveSyncException(FileSystemModel archive, IOException cause) {
         super(cause);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message, IOException cause) {
+    ArchiveSyncException(FileSystemModel archive, String message, IOException cause) {
         super(message, cause);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, int priority) {
+    ArchiveSyncException(FileSystemModel archive, int priority) {
         super(priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message, int priority) {
+    ArchiveSyncException(FileSystemModel archive, String message, int priority) {
         super(message, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, IOException cause, int priority) {
+    ArchiveSyncException(FileSystemModel archive, IOException cause, int priority) {
         super(cause, priority);
         this.mountPoint = archive.getMountPoint();
     }
 
-    ArchiveSyncException(ArchiveDescriptor archive, String message, IOException cause, int priority) {
+    ArchiveSyncException(FileSystemModel archive, String message, IOException cause, int priority) {
         super(message, cause, priority);
         this.mountPoint = archive.getMountPoint();
     }
@@ -81,7 +80,7 @@ public class ArchiveSyncException extends ChainableIOException {
         return (ArchiveSyncException) super.initCause(cause);
     }
 
-    /** @see ArchiveDescriptor#getMountPoint() */
+    /** @see FileSystemModel#getMountPoint() */
     public final URI getMountPoint() {
         return mountPoint;
     }

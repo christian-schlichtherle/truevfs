@@ -15,24 +15,25 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.socket.entry.FilterCommonEntry;
-import java.util.Set;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.SPECIAL;
 
 /**
  * @author Christian Schlichtherle
@@ -42,76 +43,71 @@ final class ProspectiveArchiveController extends ArchiveController {
 
     private final ArchiveController controller;
 
-    /** The archive controller of the enclosing archive file, if any. */
-    private final ArchiveController enclController;
-
-    ProspectiveArchiveController(ArchiveModel model, ArchiveController controller) {
+    ProspectiveArchiveController(   final ArchiveModel model,
+                                    final ArchiveController controller) {
         super(model);
+        assert null != controller;
         this.controller = controller;
-        this.enclController = super.getEnclController();
+    }
+
+    private ArchiveController getController() {
+        return controller;
     }
 
     @Override
-    ArchiveController getEnclController() {
-        return enclController;
-    }
-
-    @Override
-    public Icon getOpenIcon()
-    throws FalsePositiveEntryException {
+    public Icon getOpenIcon() {
         try {
-            return controller.getOpenIcon();
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().getOpenIcon();
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().getOpenIcon();
         }
     }
 
     @Override
-    public Icon getClosedIcon()
-    throws FalsePositiveEntryException {
+    public Icon getClosedIcon() {
         try {
-            return controller.getClosedIcon();
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().getClosedIcon();
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().getClosedIcon();
         }
     }
 
     @Override
-    public boolean isReadOnly()
-    throws FalsePositiveEntryException {
+    public boolean isReadOnly() {
         try {
-            return controller.isReadOnly();
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().isReadOnly();
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().isReadOnly();
         }
     }
 
+    /** @see ArchiveDriver#newInputShop! */
     @Override
-    public ArchiveFileSystemEntry getEntry(final String path)
-    throws FalsePositiveEntryException {
+    public FileSystemEntry getEntry(String path) {
         try {
-            return controller.getEntry(path);
-        } catch (FalsePositiveEnclosedFileException ex) {
-            /** @see ArchiveDriver#newInputShop! */
-            if (isRoot(path) && ex.getCause() instanceof FileNotFoundException)
-                return new SpecialFileEntry<CommonEntry>(getEnclController()
-                        .getEntry(getEnclPath(path))); // the exception asserts that the entry exists as a file!
-            // Fall through!
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().getEntry(path);
+        } catch (FalsePositiveEntryException ex) {
+            final FileSystemEntry entry
+                    = getEnclController().getEntry(getEnclPath(path));
+            if (isRoot(path)) {
+                if (null != entry && FILE == entry.getType()
+                && ex.getCause() instanceof FileNotFoundException)
+                    return new SpecialFileEntry(entry);
+            }
+            return entry;
         }
-        return getEnclController().getEntry(getEnclPath(path));
     }
 
-    private static final class SpecialFileEntry<AE extends CommonEntry>
-    extends FilterCommonEntry<AE>
-    implements Entry<AE> {
-        SpecialFileEntry(AE entry) {
+    private static final class SpecialFileEntry
+    extends FilterCommonEntry<FileSystemEntry>
+    implements FileSystemEntry {
+        SpecialFileEntry(FileSystemEntry entry) {
             super(entry);
+            assert FILE == entry.getType();
         }
 
         @Override
         public Type getType() {
-            assert FILE == super.getType();
             return SPECIAL;
         }
 
@@ -119,120 +115,114 @@ final class ProspectiveArchiveController extends ArchiveController {
         public Set<String> getMembers() {
             return null;
         }
-
-        @Override
-        public AE getTarget() {
-            return entry;
-        }
     }
 
     @Override
-    public boolean isReadable(final String path)
-    throws FalsePositiveEntryException {
+    public boolean isReadable(String path) {
         try {
-            return controller.isReadable(path);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().isReadable(path);
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().isReadable(getEnclPath(path));
         }
     }
 
     @Override
-    public boolean isWritable(final String path)
-    throws FalsePositiveEntryException {
+    public boolean isWritable(String path) {
         try {
-            return controller.isWritable(path);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().isWritable(path);
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().isWritable(getEnclPath(path));
         }
     }
 
     @Override
-    public void setReadOnly(final String path)
+    public void setReadOnly(String path)
     throws IOException {
         try {
-            controller.setReadOnly(path);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            getController().setReadOnly(path);
+        } catch (FalsePositiveEntryException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
         }
     }
 
     @Override
-    public boolean setTime(
-            final String path,
-            final BitField<Access> types,
-            final long value)
+    public boolean setTime(String path, BitField<Access> types, long value)
     throws IOException {
         try {
-            return controller.setTime(path, types, value);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().setTime(path, types, value);
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().setTime(getEnclPath(path), types, value);
         }
     }
 
     @Override
-    public CommonInputSocket<?> newInputSocket(String path)
+    public InputSocket<?> newInputSocket(
+            String path,
+            BitField<InputOption> options)
     throws IOException {
+        // TODO: Return a custom socket which supports lazy false positive
+        // detection when a stream is created - see LockingArchiveController.
         try {
-            return controller.newInputSocket(path);
-        } catch (FalsePositiveEnclosedEntryException ex) {
-            return getEnclController().newInputSocket(getEnclPath(path));
+            return getController().newInputSocket(path, options);
+        } catch (FalsePositiveEntryException ex) {
+            return getEnclController().newInputSocket(getEnclPath(path), options);
         }
     }
 
     @Override
-    public CommonOutputSocket<?> newOutputSocket(
-            final String path,
-            final BitField<OutputOption> options)
+    public OutputSocket<?> newOutputSocket(
+            String path,
+            BitField<OutputOption> options)
     throws IOException {
+        // TODO: Return a custom socket which supports lazy false positive
+        // detection when a stream is created - see LockingArchiveController.
         try {
-            return controller.newOutputSocket(path, options);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().newOutputSocket(path, options);
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().newOutputSocket(getEnclPath(path), options);
         }
     }
 
     @Override
-    public boolean mknod(
-            final String path,
-            final Type type,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+    public boolean mknod(   String path,
+                            Type type,
+                            CommonEntry template,
+                            BitField<OutputOption> options)
     throws IOException {
         try {
-            return controller.mknod(path, type, template, options);
-        } catch (FalsePositiveEnclosedEntryException ex) {
+            return getController().mknod(path, type, template, options);
+        } catch (FalsePositiveEntryException ex) {
             return getEnclController().mknod(getEnclPath(path), type, template, options);
         }
     }
 
+    /** @see ArchiveDriver#newInputShop! */
     @Override
-    public void unlink(
-            final String path,
-            final BitField<OutputOption> options)
+    @SuppressWarnings("ThrowableInitCause")
+    public void unlink(String path)
     throws IOException {
         try {
-            controller.unlink(path, options);
+            getController().unlink(path);
             return;
-        } catch (FalsePositiveEnclosedFileException ex) {
-            /** @see ArchiveDriver#newInputShop! */
+        } catch (FalsePositiveEntryException ex) {
             // FIXME: Check if needed anymore!
             // What if we remove this special case? We could probably delete a RAES encrypted ZIP file with an unknown password. Would we want this?
             if (isRoot(path)) {
-                final CommonEntry entry = getEnclController().getEntry(getEnclPath(path));
-                if (null == entry || DIRECTORY != entry.getType() // TODO: Redundant check?
-                    && ex.getCause() instanceof FileNotFoundException) {
+                final FileSystemEntry entry = getEnclController().getEntry(getEnclPath(path));
+                if (null != entry && FILE == entry.getType()
+                && ex.getCause() instanceof FileNotFoundException) {
                     throw (IOException) new IOException(ex.toString()).initCause(ex); // mask!
                 }
             }
             // Fall through!
-        } catch (FalsePositiveEnclosedEntryException ex) {
         }
-        getEnclController().unlink(getEnclPath(path), options);
+        getEnclController().unlink(getEnclPath(path));
     }
 
     @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
+    public void sync(   ArchiveSyncExceptionBuilder builder,
+                        BitField<SyncOption> options)
     throws ArchiveSyncException {
-        controller.sync(builder, options);
+        getController().sync(builder, options);
     }
 }

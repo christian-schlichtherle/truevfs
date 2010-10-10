@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import java.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -63,13 +63,6 @@ final class CountingOutputStream extends FilterOutputStream {
     public void write(final int b) throws IOException {
         out.write(b);
         total++;
-    }
-
-    @Override
-    public void write(byte[] b) throws IOException {
-        int len = b.length;
-        out.write(b, 0, len);
-        total += len;
     }
 
     @Override

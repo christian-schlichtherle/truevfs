@@ -27,6 +27,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public class SynchronizedReadOnlyFile implements ReadOnlyFile {
+
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;
 
@@ -37,7 +38,7 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
      * Constructs a new synchronized read only file.
      * This object will synchronize on itself.
      *
-     * @param rof The read only file to wrap in this decorator.
+     * @param rof the read only file to wrap in this decorator.
      */
     public SynchronizedReadOnlyFile(final ReadOnlyFile rof) {
         this(rof, null);
@@ -46,8 +47,8 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
     /**
      * Constructs a new synchronized read only file.
      *
-     * @param rof The input stream to wrap in this decorator.
-     * @param lock The object to synchronize on.
+     * @param rof the input stream to wrap in this decorator.
+     * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
     public SynchronizedReadOnlyFile(final ReadOnlyFile rof, final Object lock) {
@@ -84,10 +85,8 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        synchronized (lock) {
-            return read(b, 0, b.length);
-        }
+    public final int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
     }
 
     @Override
@@ -111,19 +110,10 @@ public class SynchronizedReadOnlyFile implements ReadOnlyFile {
         }
     }
 
-    /** Synchronizes on the {@link #lock} and calls {@link #doClose}. */
     @Override
     public void close() throws IOException {
         synchronized (lock) {
-            doClose();
+            rof.close();
         }
-    }
-
-    /**
-     * Closes the underlying input stream.
-     * This method is <em>not</em> synchronized!
-     */
-    protected void doClose() throws IOException {
-        rof.close();
     }
 }

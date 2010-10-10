@@ -15,32 +15,37 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Creates output streams for writing bytes to its
- * {@link #getTarget local target}.
- * An output socket can also get {@link #connect connected} to a
- * {@link #getPeerTarget peer target} for {@link IOSocket#copy data copying}.
+ * Creates output streams for writing bytes to its <i>local target</i>
+ * common entry.
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe:
+ * Multithreading needs to be addressed by client classes.
  *
- * @param   <LT> the type of the {@link #getTarget local target} for I/O
- *          operations.
- * @param   <PT> the type of the {@link #getPeerTarget peer target} for I/O
- *          operations.
- * @param   <OS> a subclass of this class to which {@code this} is cast upon
- *          return from the methods {@link #share} and {@link #connect}.
+ * @param   <CE> the type of the {@link #getTarget() local target} common entry.
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OutputSocket<LT, PT, OS extends OutputSocket<LT, PT, OS>>
-extends IOSocket<LT, PT> {
+public abstract class OutputSocket<CE extends CommonEntry>
+extends IOSocket<CE, CommonEntry> {
 
-    private InputSocket<? extends PT, ? super LT, ?> peer;
+    private InputSocket<?> peer;
+
+    /**
+     * Returns the non-{@code null} local common entry target.
+     *
+     * @return The non-{@code null} local common entry target.
+     */
+    @Override
+    public abstract CE getTarget();
 
     @Override
-    public PT getPeerTarget() {
+    public CommonEntry getPeerTarget() {
         return IOReferences.deref(peer);
     }
 
@@ -56,10 +61,9 @@ extends IOSocket<LT, PT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    @SuppressWarnings("unchecked")
-	public final OS share(OutputSocket<? super LT, ? extends PT, ?> with) {
-        final InputSocket<? extends PT, ? super LT, ?> newPeer = with.peer;
-        final InputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
+	public final OutputSocket<CE> share(final OutputSocket<?> with) {
+        final InputSocket<?> newPeer = with.peer;
+        final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
             try {
@@ -70,7 +74,7 @@ extends IOSocket<LT, PT> {
                 throw ex;
             }
         }
-        return (OS) this;
+        return this;
     }
 
     /**
@@ -83,10 +87,8 @@ extends IOSocket<LT, PT> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    @SuppressWarnings("unchecked")
-	public final OS connect(
-            final InputSocket<? extends PT, ? super LT, ?> newPeer) {
-        final InputSocket<? extends PT, ? super LT, ?> oldPeer = peer;
+	public final OutputSocket<CE> connect(final InputSocket<?> newPeer) {
+        final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
                 peer = null;
@@ -104,7 +106,7 @@ extends IOSocket<LT, PT> {
                 throw ex;
             }
         }
-        return (OS) this;
+        return this;
     }
 
     /**
@@ -129,6 +131,14 @@ extends IOSocket<LT, PT> {
      * Furthermore, the returned output stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
+     * @throws CommonOuputBusyException if the local target is currently busy
+     *         on output.
+     *         This exception is guaranteed to be recoverable, meaning it
+     *         should be possible to write the common entry again as soon as
+     *         the local target is not busy anymore.
+     * @throws FileNotFoundException if the local target is not accessible
+     *         for some reason.
+     * @throws IOException on any other exceptional condition.
      * @return A new output stream.
      */
     public abstract OutputStream newOutputStream() throws IOException;

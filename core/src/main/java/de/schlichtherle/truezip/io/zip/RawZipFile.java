@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import de.schlichtherle.truezip.io.FilterInputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -559,8 +559,8 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns {@code true} if and only if some input streams are fetch to
-     * read from this ZIP compatible file.
+     * Returns {@code true} if and only if some input streams are busy with
+     * reading from this ZIP  file.
      */
     public boolean busy() {
         return openStreams > 0;
@@ -936,7 +936,8 @@ implements Iterable<E>, Closeable {
      * while a CRC-32 checksum is computed over the inflated data and
      * checked in the method {@code close}.
      */
-    private static final class RawCheckedInputStream extends FilterInputStream {
+    private static final class RawCheckedInputStream
+    extends FilterInputStream {
 
         private final Checksum crc = new CRC32();
         private final byte[] singleByteBuf = new byte[1];
@@ -971,6 +972,7 @@ implements Iterable<E>, Closeable {
         }
 
         @Override
+        @SuppressWarnings("ThrowableInitCause")
         public int read(final byte[] buf, final int off, final int len)
         throws IOException {
             if (len == 0)
@@ -1198,14 +1200,16 @@ implements Iterable<E>, Closeable {
         @Override
         public void close() throws IOException {
             // Order is important here!
-            if (!closed) {
-                closed = true;
-                openStreams--;
-                super.close();
-            }
+            if (closed)
+                return;
+            closed = true;
+            openStreams--;
+            super.close();
         }
 
         @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        @Deprecated
         protected void finalize() throws Throwable {
             try {
                 close();

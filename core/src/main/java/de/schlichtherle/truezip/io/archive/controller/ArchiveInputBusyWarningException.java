@@ -16,8 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-
 /**
  * Like its super class, but indicates the existance of open input streams.
  *
@@ -29,7 +27,7 @@ extends ArchiveBusyWarningException {
 
     private static final long serialVersionUID = 965098472652287563L;
 
-    ArchiveInputBusyWarningException(ArchiveDescriptor archive, int numStreams) {
+    ArchiveInputBusyWarningException(FileSystemModel archive, int numStreams) {
         super(archive, numStreams);
     }
 }

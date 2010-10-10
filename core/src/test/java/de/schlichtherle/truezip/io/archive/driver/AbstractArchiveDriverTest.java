@@ -17,13 +17,13 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
@@ -181,7 +181,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonInputShop<ArchiveEntry> newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
+        public InputShop<ArchiveEntry> newInputShop(FileSystemModel archive, InputSocket<?> input)
         throws IOException {
             throw new UnsupportedOperationException();
         }
@@ -193,18 +193,18 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public CommonOutputShop<ArchiveEntry> newOutputShop(ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<ArchiveEntry> source)
+        public OutputShop<ArchiveEntry> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<ArchiveEntry> source)
         throws IOException {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Icon getOpenIcon(ArchiveDescriptor archive) {
+        public Icon getOpenIcon(FileSystemModel archive) {
             return ICON;
         }
 
         @Override
-        public Icon getClosedIcon(ArchiveDescriptor archive) {
+        public Icon getClosedIcon(FileSystemModel archive) {
             return ICON;
         }
     }

@@ -16,22 +16,22 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
 
 /**
  * An archive driver which builds TAR files.
@@ -119,8 +119,8 @@ extends AbstractArchiveDriver<TarEntry> {
      */
     @Override
     public TarInputShop newInputShop(
-            ArchiveDescriptor archive,
-            CommonInputSocket<?> input)
+            FileSystemModel archive,
+            InputSocket<?> input)
     throws IOException {
         final InputStream in = input.newInputStream();
         try {
@@ -131,7 +131,7 @@ extends AbstractArchiveDriver<TarEntry> {
     }
 
     protected TarInputShop newTarInputShop(
-            ArchiveDescriptor archive,
+            FileSystemModel archive,
             InputStream in)
     throws IOException {
         return new TarInputShop(in);
@@ -144,10 +144,10 @@ extends AbstractArchiveDriver<TarEntry> {
      * and wraps the result in a new {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputShop<TarEntry> newOutputShop(
-            ArchiveDescriptor archive,
-            CommonOutputSocket<?> output,
-            CommonInputShop<TarEntry> source)
+    public OutputShop<TarEntry> newOutputShop(
+            FileSystemModel archive,
+            OutputSocket<?> output,
+            InputShop<TarEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
@@ -160,7 +160,7 @@ extends AbstractArchiveDriver<TarEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            ArchiveDescriptor archive,
+            FileSystemModel archive,
             OutputStream out,
             TarInputShop source)
     throws IOException {

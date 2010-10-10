@@ -16,17 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputBusyException;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.OutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,10 +37,10 @@ import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
 
 /**
- * An implementation of {@link CommonOutputShop} to write TAR archives.
+ * An implementation of {@link OutputShop} to write TAR archives.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source (such as entries created with
@@ -62,7 +62,7 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
  */
 public class TarOutputShop
 extends TarOutputStream
-implements CommonOutputShop<TarEntry> {
+implements OutputShop<TarEntry> {
 
     /** Maps entry names to tar entries [String -> TarEntry]. */
     private final Map<String, TarEntry> entries
@@ -91,9 +91,9 @@ implements CommonOutputShop<TarEntry> {
     }
 
     @Override
-    public CommonOutputSocket<TarEntry> newOutputSocket(final TarEntry entry)
+    public OutputSocket<TarEntry> newOutputSocket(final TarEntry entry)
     throws FileNotFoundException {
-        class OutputSocket extends CommonOutputSocket<TarEntry> {
+        class Output extends OutputSocket<TarEntry> {
             @Override
             public TarEntry getTarget() {
                 return entry;
@@ -102,7 +102,7 @@ implements CommonOutputShop<TarEntry> {
             @Override
 			public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
-                    throw new CommonOutputBusyException(entry);
+                    throw new OutputBusyException(entry);
                 if (entry.isDirectory()) {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
@@ -120,7 +120,7 @@ implements CommonOutputShop<TarEntry> {
                         createTempFile(TEMP_FILE_PREFIX), entry);
             }
         }
-        return new OutputSocket();
+        return new Output();
     }
 
     /**
@@ -150,11 +150,6 @@ implements CommonOutputShop<TarEntry> {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
-            out.write(b, 0, b.length);
-        }
-
-        @Override
         public void write(byte[] b, int off, int len) throws IOException {
             out.write(b, off, len);
         }
@@ -176,14 +171,14 @@ implements CommonOutputShop<TarEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends FileOutputStream {
+    private class TempEntryOutputStream extends FilterOutputStream {
         private final File temp;
         private final TarEntry entry;
         private boolean closed;
 
         TempEntryOutputStream(final File temp, final TarEntry entry)
         throws IOException {
-            super(temp);
+            super(new FileOutputStream(temp)); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.temp = temp;
             this.entry = entry;
             entries.put(entry.getName(), entry);
