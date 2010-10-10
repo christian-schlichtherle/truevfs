@@ -1204,15 +1204,6 @@ implements Iterable<E>, Closeable {
                 super.close();
             }
         }
-
-        @Override
-        protected void finalize() throws Throwable {
-            try {
-                close();
-            } finally {
-                super.finalize();
-            }
-        }
     } // class AccountedInputStream
 
     private static class OffsetMapper {

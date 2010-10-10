@@ -932,20 +932,6 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    @Override
-    @SuppressWarnings("FinalizeDeclaration")
-    protected void finalize() throws Throwable {
-        try {
-            final ArchiveSyncExceptionBuilder handler
-                    = new DefaultArchiveSyncExceptionBuilder();
-            //shutdownStep1(handler);
-            reset2(handler);
-            reset3(true);
-        } finally {
-            super.finalize();
-        }
-    }
-
     /**
      * Closes and disconnects all entry streams of the output and input
      * archive.
