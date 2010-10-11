@@ -161,9 +161,9 @@ public class Paths {
             final String path,
             final char separatorChar) {
         int i = path.length();
-        if (i <= 0 || path.charAt(--i) != separatorChar)
+        if (0 >= i || path.charAt(--i) != separatorChar)
             return path;
-        while (i > 0 && path.charAt(--i) == separatorChar)
+        while (0 < i && path.charAt(--i) == separatorChar)
             ;
         return path.substring(0, ++i);
     }
