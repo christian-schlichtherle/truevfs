@@ -86,9 +86,7 @@ public class ZipEntry implements Cloneable {
     /** {@code null} if no comment field. */
     private String comment;
 
-    /**
-     * Constructs a new zip entry with the specified name.
-     */
+    /** Constructs a new ZIP entry with the specified name. */
     public ZipEntry(final String name) {
         setName0(name);
     }
@@ -97,16 +95,16 @@ public class ZipEntry implements Cloneable {
      * Constructs a new zip entry which has all properties copied from the
      * given template.
      */
-    public ZipEntry(final ZipEntry template) {
+    /*public ZipEntry(final ZipEntry template) {
         this(template.getName(), template);
         setInit(NAME, false); // unlock name
-    }
+    }*/
 
     /**
-     * Constructs a new zip entry with the given name which has all other
+     * Constructs a new ZIP entry with the given name which has all other
      * properties copied from the given template.
      */
-    private ZipEntry(final String name, final ZipEntry template) {
+    public ZipEntry(final String name, final ZipEntry template) {
         this.init = template.init;
         this.name = name;
         this.platform = template.platform;
@@ -155,16 +153,6 @@ public class ZipEntry implements Cloneable {
     final int getNameLength(final String charset)
     throws UnsupportedEncodingException {
         return name != null ? name.getBytes(charset).length : 0;
-    }
-
-    /**
-     * Resets the ZIP entry name.
-     * This method can be called at most once and only if this entry has
-     * been created with the {@link #ZipEntry(ZipEntry) copy constructor}
-     * or the {@link #clone} method.
-     */
-    protected void setName(final String name) {
-        setName0(name);
     }
 
     private void setName0(final String name) {
@@ -444,16 +432,14 @@ public class ZipEntry implements Cloneable {
 
         if (zip64) {
             final ExtraField field = compileZip64ExtraField();
-            if (field != null) {
-                fields = fields != null
-                        ? (ExtraFields) fields.clone()
-                        : new ExtraFields();
+            if (null != field) {
+                fields = null != fields ? fields.clone() : new ExtraFields();
                 fields.put(field);
             }
-        } else if (fields != null) {
+        } else if (null != fields) {
             ExtraField field = fields.get(ExtraField.ZIP64_HEADER_ID);
-            if (field != null) {
-                fields = (ExtraFields) fields.clone();
+            if (null != field) {
+                fields = fields.clone();
                 field = fields.remove(ExtraField.ZIP64_HEADER_ID);
                 assert ExtraField.ZIP64_HEADER_ID == field.getHeaderID();
             }

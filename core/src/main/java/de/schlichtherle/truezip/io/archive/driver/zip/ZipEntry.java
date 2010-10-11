@@ -41,17 +41,12 @@ implements ArchiveEntry {
                 == ArchiveEntry.UNKNOWN;
     }
 
-    ZipEntry(String entryName) {
-        super(entryName);
+    ZipEntry(String name) {
+        super(name);
     }
 
-    ZipEntry(ZipEntry blueprint) {
-        super(blueprint);
-    }
-
-    @Override
-    protected void setName(String name) {
-        super.setName(name);
+    ZipEntry(String name, ZipEntry template) {
+        super(name, template);
     }
 
     @Override

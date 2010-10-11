@@ -68,7 +68,7 @@ public class JarDriver extends ZipDriver {
     }
 
     @Override
-    public JarEntry newEntry(ZipEntry template) {
-        return new JarEntry(template);
+    public JarEntry newEntry(String name, ZipEntry template) {
+        return new JarEntry(name, template);
     }
 }

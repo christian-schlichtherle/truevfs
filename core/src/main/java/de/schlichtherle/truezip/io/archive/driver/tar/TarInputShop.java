@@ -23,10 +23,12 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.Streams;
+import java.io.OutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -94,7 +96,7 @@ implements InputShop<TarEntry> {
                 final String name = tinEntry.getName();
                 TarEntry entry;
                 if (tinEntry.isDirectory()) {
-                    entry = new TarEntry(tinEntry);
+                    entry = new TarEntry(name, tinEntry);
                 } else {
                     final File tmp;
                     try {
@@ -103,8 +105,7 @@ implements InputShop<TarEntry> {
                                 ? entry.getFile()
                                 : createTempFile(TEMP_FILE_PREFIX);
                         try {
-                            final java.io.FileOutputStream out
-                                    = new java.io.FileOutputStream(tmp);
+                            final OutputStream out = new FileOutputStream(tmp);
                             try {
                                 Streams.cat(tin, out); // use high performance pump (async I/O)
                             } finally {

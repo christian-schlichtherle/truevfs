@@ -216,14 +216,14 @@ extends     FileSystemArchiveController<AE> {
             assert autoCreate || output == null;
             assert getFileSystem() != null;
         } catch (RuntimeException ex) {
-            assert input == null;
-            assert output == null;
-            assert getFileSystem() == null;
+            //assert null == input;
+            //assert null == output;
+            //assert getFileSystem() == null;
 
             throw ex;
         } catch (IOException ex) {
-            assert input == null;
-            assert output == null;
+            assert null == input;
+            assert null == output;
             assert getFileSystem() == null;
 
             throw new FalsePositiveEntryException(ex);

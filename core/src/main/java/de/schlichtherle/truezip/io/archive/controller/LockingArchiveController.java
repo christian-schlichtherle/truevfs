@@ -238,7 +238,7 @@ final class LockingArchiveController extends ArchiveController {
         }
 
         @Override
-        public CommonEntry getLocalTarget() {
+        public CommonEntry getLocalTarget() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -318,7 +318,7 @@ final class LockingArchiveController extends ArchiveController {
         }
 
         @Override
-        public CommonEntry getLocalTarget() {
+        public CommonEntry getLocalTarget() throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {

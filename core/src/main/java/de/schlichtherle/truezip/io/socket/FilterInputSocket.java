@@ -41,12 +41,12 @@ extends InputSocket<CE> {
     }
 
     @Override
-    public CE getLocalTarget() {
+    public CE getLocalTarget() throws IOException {
         return getInputSocket().getLocalTarget();
     }
 
     @Override
-    public CommonEntry getRemoteTarget() {
+    public CommonEntry getRemoteTarget() throws IOException {
         return getInputSocket().getRemoteTarget();
     }
 

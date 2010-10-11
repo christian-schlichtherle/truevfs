@@ -33,7 +33,6 @@ import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
@@ -197,10 +196,11 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
      * archive is still busy.
      */
     private class TempEntryOutputStream
-    extends FilterOutputStream
-    implements Link<AE> {
+    extends FilterOutputStream {
         private final FileEntry temp;
         private final OutputSocket<? extends AE> output;
+        private final AE local;
+        private final CommonEntry remote;
         private final InputSocket<CommonEntry> input;
         private boolean closed;
 
@@ -210,9 +210,11 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 final OutputSocket<? extends AE> output)
         throws IOException {
             super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
-            final CommonEntry peer = output.getRemoteTarget();
+            this.output = output;
+            this.local = output.getLocalTarget();
+            this.remote = output.getRemoteTarget();
             class Input extends InputSocket<CommonEntry> {
-                private final CommonEntry target = null == peer ? temp : peer;
+                private final CommonEntry target = null == remote ? temp : remote;
 
                 @Override
                 public CommonEntry getLocalTarget() {
@@ -230,14 +232,12 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 }
             }
             this.temp = temp;
-            this.output = output;
             this.input = new Input();
-            temps.put(output.getLocalTarget().getName(), this);
+            temps.put(local.getName(), this);
         }
 
-        @Override
         public AE getTarget() {
-            return output.getLocalTarget();
+            return local;
         }
 
         @Override

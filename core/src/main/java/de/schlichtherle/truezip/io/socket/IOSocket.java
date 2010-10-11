@@ -30,12 +30,12 @@ import java.io.OutputStream;
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
- * @param   <PT> the type of the {@link #getRemoteTarget() remote target}
+ * @param   <RT> the type of the {@link #getRemoteTarget() remote target}
  *          for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class IOSocket<LT, PT> {
+public abstract class IOSocket<LT, RT> {
 
     /**
      * Returns the non-{@code null} <i>local target</i> for I/O operations.
@@ -47,7 +47,7 @@ public abstract class IOSocket<LT, PT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
-	public abstract LT getLocalTarget();
+	public abstract LT getLocalTarget() throws IOException;
 
     /**
      * Returns the nullable <i>remote target</i> for I/O operations.
@@ -59,7 +59,7 @@ public abstract class IOSocket<LT, PT> {
      *
      * @return The nullable remote target for I/O operations.
      */
-    public abstract PT getRemoteTarget();
+    public abstract RT getRemoteTarget() throws IOException;
 
     /**
      * Returns a string representing a connection of the local and remote
@@ -70,11 +70,21 @@ public abstract class IOSocket<LT, PT> {
         // Note that the target actually must not be null, but this method
         // should work even if the interface contract is broken in order to
         // support debugging.
-        final LT lt = getLocalTarget();
-        final String lts = null == lt ? "(null)" : lt.toString();
-        final PT pt = getRemoteTarget();
-        final String pts = null == pt ? "(null)" : pt.toString();
-        return lts + " <-> " + pts;
+        String lts;
+        try {
+            final LT lt = getLocalTarget();
+            lts = null == lt ? "(null)" : lt.toString();
+        } catch (IOException ex) {
+            lts = "(?)";
+        }
+        String rts;
+        try {
+            final RT rt = getRemoteTarget();
+            rts = null == rt ? "(null)" : rt.toString();
+        } catch (IOException ex) {
+            rts = "(?)";
+        }
+        return lts + " <-> " + rts;
     }
 
     static boolean equal(Object o1, Object o2) {

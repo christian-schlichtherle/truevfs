@@ -27,12 +27,12 @@ import de.schlichtherle.truezip.io.zip.DateTimeConverter;
  */
 public class JarEntry extends ZipEntry {
 
-    JarEntry(String entryName) {
-        super(entryName);
+    JarEntry(String name) {
+        super(name);
     }
 
-    JarEntry(ZipEntry blueprint) {
-        super(blueprint);
+    JarEntry(String name, ZipEntry template) {
+        super(name, template);
     }
 
     @Override

@@ -34,6 +34,8 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR_CHAR;
 
 /**
  * An abstract archive driver implementation to ease the task of developing
@@ -190,11 +192,9 @@ implements ArchiveDriver<AE>, Serializable {
         ensureEncodable(path);
         switch (type) {
             case DIRECTORY:
-                return path.endsWith(ArchiveEntry.SEPARATOR)
-                        ? path
-                        : path + ArchiveEntry.SEPARATOR_CHAR;
+                return path.endsWith(SEPARATOR) ? path : path + SEPARATOR_CHAR;
             default:
-                return cutTrailingSeparators(path, ArchiveEntry.SEPARATOR_CHAR);
+                return cutTrailingSeparators(path, SEPARATOR_CHAR);
         }
     }
 

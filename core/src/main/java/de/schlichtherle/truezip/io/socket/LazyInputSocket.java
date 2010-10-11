@@ -20,11 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @param   <CE> The type of the {@link #getLocalTarget() local target} common entry.
+ * @param   <CE> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Deprecated
 public abstract class LazyInputSocket<CE extends CommonEntry>
 extends InputSocket<CE> {
 
@@ -44,12 +43,8 @@ extends InputSocket<CE> {
     }
 
     @Override
-    public final CommonEntry getRemoteTarget() {
-        try {
-            return getInputSocket().getRemoteTarget();
-        } catch (IOException ex) {
-            return null;
-        }
+    public CommonEntry getRemoteTarget() throws IOException {
+        return getInputSocket().getRemoteTarget();
     }
 
     @Override
