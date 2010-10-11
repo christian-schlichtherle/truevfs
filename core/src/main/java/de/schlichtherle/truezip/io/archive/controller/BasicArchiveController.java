@@ -237,13 +237,24 @@ implements     InputSocketFactory <AE>,
             final BitField<InputOption> options)
     throws IOException {
         class Input extends InputSocket<AE> {
-            AE getEntry() throws IOException {
+            @Override
+            protected void afterPeering() {
+                try {
+                    getRemoteTarget(); // TODO: This can't get removed - explain why!
+                } catch (IOException ex) {
+                    Logger.getLogger(BasicArchiveController.class.getName())
+                            .log(WARNING, path, ex);
+                }
+            }
+
+            @Override
+            public AE getLocalTarget() throws IOException {
                 autoSync(path, READ);
                 return Links.getTarget(autoMount().getEntry(path));
             }
 
             InputSocket<AE> newInputSocket() throws IOException {
-                final AE entry = getEntry();
+                final AE entry = getLocalTarget();
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "no such file or directory");
@@ -251,22 +262,6 @@ implements     InputSocketFactory <AE>,
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "cannot read directories");
                 return BasicArchiveController.this.newInputSocket(entry).share(this);
-            }
-
-            @Override
-            protected void afterPeering() {
-                getRemoteTarget(); // TODO: This can't get removed - explain why!
-            }
-
-            @Override
-            public AE getLocalTarget() {
-                try {
-                    return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
-                } catch (IOException ex) {
-                    Logger.getLogger(BasicArchiveController.class.getName())
-                            .log(WARNING, path, ex);
-                    return null; // TODO: interface contract violation!
-                }
             }
 
             @Override
@@ -321,20 +316,19 @@ implements     InputSocketFactory <AE>,
 
             @Override
             protected void afterPeering() {
-                getRemoteTarget(); // TODO: This can't get removed - explain why!
-            }
-
-            @Override
-            public AE getLocalTarget() {
-                if (options.get(APPEND))
-                    return null;
                 try {
-                    return getEntry();
+                    getRemoteTarget(); // TODO: This can't get removed - explain why!
                 } catch (IOException ex) {
                     Logger.getLogger(BasicArchiveController.class.getName())
                             .log(WARNING, path, ex);
-                    return null; // TODO: interface contract violation!
                 }
+            }
+
+            @Override
+            public AE getLocalTarget() throws IOException {
+                if (options.get(APPEND))
+                    return null; // FIXME: broken contract
+                return getEntry();
             }
 
             @Override

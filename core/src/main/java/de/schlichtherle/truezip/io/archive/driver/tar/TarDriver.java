@@ -86,9 +86,9 @@ extends AbstractArchiveDriver<TarEntry> {
     throws CharConversionException {
         name = toZipOrTarEntryName(name, type);
         final TarEntry entry;
-        if (template != null) {
+        if (null != template) {
             if (template instanceof TarEntry) {
-                entry = newEntry((TarEntry) template);
+                entry = newEntry(name, (TarEntry) template);
                 entry.setName(name);
             } else {
                 entry = newEntry(name);
@@ -98,7 +98,6 @@ extends AbstractArchiveDriver<TarEntry> {
         } else {
             entry = newEntry(name);
         }
-
         return entry;
     }
 
@@ -106,8 +105,8 @@ extends AbstractArchiveDriver<TarEntry> {
         return new TarEntry(name);
     }
 
-    public TarEntry newEntry(TarEntry template) {
-        return new TarEntry(template);
+    public TarEntry newEntry(String name, TarEntry template) {
+        return new TarEntry(name, template);
     }
 
     /**

@@ -50,35 +50,6 @@ public class ZipEntryTest extends TestCase {
         assertNotSame(clone, entry);
     }
 
-    public void testName() {
-        assertEquals("test", entry.getName());
-        try {
-            entry.setName("foo");
-            fail("Expected IllegalStateException!");
-        } catch (IllegalStateException ex) {
-        }
-
-        entry = new ZipEntry(entry); // unlock name in copy
-        assertEquals("test", entry.getName());
-        entry.setName("foo");
-        try {
-            entry.setName("bar");
-            fail("Expected IllegalStateException!");
-        } catch (IllegalStateException ex) {
-        }
-        assertEquals("foo", entry.getName());
-
-        entry = entry.clone(); // unlock name in clone
-        assertEquals("foo", entry.getName());
-        entry.setName("bar");
-        try {
-            entry.setName("foobar");
-            fail("Expected IllegalStateException!");
-        } catch (IllegalStateException ex) {
-        }
-        assertEquals("bar", entry.getName());
-    }
-
     public void testPlatform() {
         try {
             entry.setPlatform((short) (ZipEntry.UNKNOWN - 1));

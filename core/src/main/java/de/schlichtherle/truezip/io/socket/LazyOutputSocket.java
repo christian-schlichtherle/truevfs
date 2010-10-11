@@ -19,29 +19,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @see FilterInputSocket
- * @param   <CE> The type of the {@link #getLocalTarget() local target} common entry.
+ * @param   <CE> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputSocket<CE extends CommonEntry>
+public abstract class LazyOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE> {
 
-    private final OutputSocket<? extends CE> output;
+    private final OutputSocketFactory<CE> factory;
+    private OutputSocket<CE> socket;
 
-    protected FilterOutputSocket(final OutputSocket<? extends CE> output) {
-        if (null == output)
+    protected LazyOutputSocket(final OutputSocketFactory<CE> factory) {
+        if (null == factory)
             throw new NullPointerException();
-        this.output = output;
+        this.factory = factory;
     }
 
-    protected final OutputSocket<? extends CE> getOutputSocket() {
-        return output.share(this);
-    }
-
-    @Override
-    public CE getLocalTarget() throws IOException {
-        return getOutputSocket().getLocalTarget();
+    protected final OutputSocket<CE> getOutputSocket() throws IOException {
+        return (null == socket
+                ? socket = factory.newOutputSocket(getLocalTarget())
+                : socket).share(this);
     }
 
     @Override
@@ -50,7 +47,7 @@ extends OutputSocket<CE> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public final OutputStream newOutputStream() throws IOException {
         return getOutputSocket().newOutputStream();
     }
 }

@@ -32,8 +32,8 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
  * @version $Id$
  */
 public class TarEntry
-extends    org.apache.tools.tar.TarEntry
-implements ArchiveEntry {
+extends      org.apache.tools.tar.TarEntry
+implements   ArchiveEntry {
 
     public TarEntry(final String entryName) {
         super(entryName, true);
@@ -44,29 +44,30 @@ implements ArchiveEntry {
     }
 
     public TarEntry(
-            final org.apache.tools.tar.TarEntry blueprint) {
-        super(blueprint.getName(), true);
-        super.setMode(blueprint.getMode());
-        super.setModTime(blueprint.getModTime());
-        super.setSize(blueprint.getSize());
-        super.setUserId(blueprint.getUserId());
-        super.setUserName(blueprint.getUserName());
-        super.setGroupId(blueprint.getGroupId());
-        super.setGroupName(blueprint.getGroupName());
+            final String name,
+            final org.apache.tools.tar.TarEntry template) {
+        super(name, true);
+        super.setMode(template.getMode());
+        super.setModTime(template.getModTime());
+        super.setSize(template.getSize());
+        super.setUserId(template.getUserId());
+        super.setUserName(template.getUserName());
+        super.setGroupId(template.getGroupId());
+        super.setGroupName(template.getGroupName());
     }
 
     public TarEntry(
-            final org.apache.tools.tar.TarEntry blueprint,
+            final org.apache.tools.tar.TarEntry template,
             final File file) {
         super(file);
-        super.setName(blueprint.getName());
-        super.setMode(blueprint.getMode());
-        super.setModTime(blueprint.getModTime());
-        super.setSize(blueprint.getSize());
-        super.setUserId(blueprint.getUserId());
-        super.setUserName(blueprint.getUserName());
-        super.setGroupId(blueprint.getGroupId());
-        super.setGroupName(blueprint.getGroupName());
+        super.setName(template.getName());
+        super.setMode(template.getMode());
+        super.setModTime(template.getModTime());
+        super.setSize(template.getSize());
+        super.setUserId(template.getUserId());
+        super.setUserName(template.getUserName());
+        super.setGroupId(template.getGroupId());
+        super.setGroupName(template.getGroupName());
     }
 
     @Override

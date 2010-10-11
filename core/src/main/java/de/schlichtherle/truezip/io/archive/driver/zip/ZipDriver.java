@@ -168,10 +168,9 @@ implements ZipEntryFactory<ZipEntry> {
     throws CharConversionException {
         name = toZipOrTarEntryName(name, type);
         final ZipEntry entry;
-        if (template != null) {
+        if (null != template) {
             if (template instanceof ZipEntry) {
-                entry = newEntry((ZipEntry) template);
-                entry.setName(name);
+                entry = newEntry(name, (ZipEntry) template);
             } else {
                 entry = newEntry(name);
                 entry.setTime(template.getTime(WRITE));
@@ -188,8 +187,8 @@ implements ZipEntryFactory<ZipEntry> {
         return new ZipEntry(name);
     }
 
-    public ZipEntry newEntry(ZipEntry template) {
-        return new ZipEntry(template);
+    public ZipEntry newEntry(String name, ZipEntry template) {
+        return new ZipEntry(name, template);
     }
 
     /**

@@ -49,10 +49,10 @@ extends IOSocket<CE, CommonEntry> {
      * @return The non-{@code null} local common entry target.
      */
     @Override
-    public abstract CE getLocalTarget();
+    public abstract CE getLocalTarget() throws IOException;
 
     @Override
-    public CommonEntry getRemoteTarget() {
+    public CommonEntry getRemoteTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 
