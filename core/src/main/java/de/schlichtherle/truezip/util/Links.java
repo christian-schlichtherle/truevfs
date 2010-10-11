@@ -16,8 +16,10 @@
 
 package de.schlichtherle.truezip.util;
 
+import de.schlichtherle.truezip.util.Link.Type;
+
 /**
- * Provides static utility methods for dealing with links.
+ * Provides static utility methods for links.
  * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
@@ -29,34 +31,41 @@ public class Links {
     }
 
     /**
-     * Returns a nullable link to the given target.
+     * Returns a nullable (strong) link to the given target.
      * The returned link is {@code null} if and only if {@code target}
      * is {@code null}.
      *
      * @param  <T> The type of the target.
      * @param  target the nullable target.
-     * @return A nullable link to the given target.
+     * @return A nullable (strong) link to the given target.
      */
-    public static <T> Link<T> ref(final T target) {
-        class TargetIOReference implements Link<T> {
-            @Override
-            public T getTarget() {
-                return target;
-            }
-        } // class TargetIOReference
-        return target == null ? null : new TargetIOReference();
+    public static <T> Link<T> newLink(final T target) {
+        return newLink(Type.STRONG, target);
     }
 
     /**
-     * Returns the {@link Link#getTarget() target} of the given nullable link.
+     * Returns a nullable typed link to the given target.
+     * The returned typed link is {@code null} if and only if {@code target}
+     * is {@code null}.
+     *
+     * @param  <T> The type of the target.
+     * @param  target the nullable target.
+     * @return A nullable typed link to the given target.
+     */
+    public static <T> Link<T> newLink(final Type type, final T target) {
+        return target == null ? null : type.newLink(target);
+    }
+
+    /**
+     * Returns the nullable {@link Link#getTarget() target} of the given link.
      * The returned target is {@code null} if and only if either the given
      * link is {@code null} or its target is {@code null}.
      *
      * @param  <T> The type of the target.
-     * @param  reference a nullable link to the target.
-     * @return The {@link Link#getTarget() target} of the given nullable link.
+     * @param  link a nullable link.
+     * @return The nullable {@link Link#getTarget() target} of the given link.
      */
-    public static <T> T deref(final Link<T> reference) {
-        return reference == null ? null : reference.getTarget();
+    public static <T> T getTarget(final Link<T> link) {
+        return link == null ? null : link.getTarget();
     }
 }
