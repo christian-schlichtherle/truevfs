@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
@@ -46,7 +47,6 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.REASSEMBLE_BUFFERS;
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
@@ -208,17 +208,17 @@ extends     FileSystemArchiveController<AE> {
                 // This may fail if e.g. the target file is an RAES
                 // encrypted ZIP file and the user cancels password
                 // prompting.
-                ensureOutput(createParents);
-                setFileSystem(newArchiveFileSystem());
+                try {
+                    ensureOutput(createParents);
+                    setFileSystem(newArchiveFileSystem());
+                } catch (TransientIOException ex2) {
+                    throw ex;
+                } catch (IOException ex2) {
+                    throw new TransientIOException(ex2);
+                }
             }
-
-            assert autoCreate || input != null;
-            assert autoCreate || output == null;
-            assert getFileSystem() != null;
-        } catch (RuntimeException ex) {
-            assert input == null;
-            assert output == null;
-            assert getFileSystem() == null;
+        } catch (FalsePositiveEntryException ex) {
+            assert false;
 
             throw ex;
         } catch (IOException ex) {
@@ -228,6 +228,10 @@ extends     FileSystemArchiveController<AE> {
 
             throw new FalsePositiveEntryException(ex);
         }
+
+        assert autoCreate || input != null;
+        assert autoCreate || output == null;
+        assert getFileSystem() != null;
     }
 
     private void ensureOutput(final boolean createParents) throws IOException {
