@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
 import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.util.Link;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
@@ -613,7 +613,7 @@ implements ArchiveFileSystem<AE> {
      * {@link PathLink}.
      */
     private static final class SegmentLink<AE extends ArchiveEntry>
-    implements IOReference<Entry<AE>> {
+    implements Link<Entry<AE>> {
         final String path;
         final BaseEntry<AE> entry;
         final String base;

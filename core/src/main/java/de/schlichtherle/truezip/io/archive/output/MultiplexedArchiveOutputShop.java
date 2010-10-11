@@ -33,7 +33,7 @@ import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
@@ -198,7 +198,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
      */
     private class TempEntryOutputStream
     extends FilterOutputStream
-    implements IOReference<AE> {
+    implements Link<AE> {
         private final FileEntry temp;
         private final OutputSocket<? extends AE> output;
         private final InputSocket<CommonEntry> input;

@@ -22,14 +22,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * References a target for I/O operations.
+ * Addresses a target for I/O operations.
+ * <p>
+ * A key feature of an I/O socket is that it's target can be resolved eagerly
+ * or lazily, i.e. by a constructor or a method of a sub class.
  *
  * @param   <LT> the type of the {@link #getTarget() local target} for I/O
  *          operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class IOSocket<LT, PT> implements IOReference<LT> {
+public abstract class IOSocket<LT, PT> {
 
     /**
      * Returns the non-{@code null} local target for I/O operations.
@@ -41,7 +44,6 @@ public abstract class IOSocket<LT, PT> implements IOReference<LT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
-    @Override
 	public abstract LT getTarget();
 
     /**
@@ -69,7 +71,7 @@ public abstract class IOSocket<LT, PT> implements IOReference<LT> {
         return lts + " <-> " + pts;
     }
 
-    static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
+    static boolean equal(Object o1, Object o2) {
         return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
