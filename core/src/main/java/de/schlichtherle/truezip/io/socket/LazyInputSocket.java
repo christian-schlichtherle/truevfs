@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @param   <CE> The type of the {@link #getTarget() local target} common entry.
+ * @param   <CE> The type of the {@link #getLocalTarget() local target} common entry.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -39,14 +39,14 @@ extends InputSocket<CE> {
 
     protected final InputSocket<CE> getInputSocket() throws IOException {
         return (null == socket
-                ? socket = factory.newInputSocket(getTarget())
+                ? socket = factory.newInputSocket(getLocalTarget())
                 : socket).share(this);
     }
 
     @Override
-    public final CommonEntry getPeerTarget() {
+    public final CommonEntry getRemoteTarget() {
         try {
-            return getInputSocket().getPeerTarget();
+            return getInputSocket().getRemoteTarget();
         } catch (IOException ex) {
             return null;
         }

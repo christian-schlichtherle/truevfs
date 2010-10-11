@@ -20,7 +20,7 @@ import java.io.OutputStream;
 
 /**
  * @see FilterInputSocket
- * @param   <CE> The type of the {@link #getTarget() local target} common entry.
+ * @param   <CE> The type of the {@link #getLocalTarget() local target} common entry.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -40,13 +40,13 @@ extends OutputSocket<CE> {
     }
 
     @Override
-    public CE getTarget() {
-        return getOutputSocket().getTarget();
+    public CE getLocalTarget() {
+        return getOutputSocket().getLocalTarget();
     }
 
     @Override
-    public CommonEntry getPeerTarget() {
-        return getOutputSocket().getPeerTarget();
+    public CommonEntry getRemoteTarget() {
+        return getOutputSocket().getRemoteTarget();
     }
 
     @Override

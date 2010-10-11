@@ -40,7 +40,7 @@ extends InputSocket<CE> {
     }
 
     @Override
-    public CE getTarget() {
+    public CE getLocalTarget() {
         return local;
     }
 

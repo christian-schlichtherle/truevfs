@@ -255,11 +255,11 @@ implements     InputSocketFactory <AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed - explain why!
+                getRemoteTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
-            public AE getTarget() {
+            public AE getLocalTarget() {
                 try {
                     return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
                 } catch (IOException ex) {
@@ -303,7 +303,7 @@ implements     InputSocketFactory <AE>,
                     link = null;
                 if (null == link) {
                     final CommonEntry template = options.get(COPY_PROPERTIES)
-                            ? getPeerTarget()
+                            ? getRemoteTarget()
                             : null;
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
@@ -321,11 +321,11 @@ implements     InputSocketFactory <AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed - explain why!
+                getRemoteTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
-            public AE getTarget() {
+            public AE getLocalTarget() {
                 if (options.get(APPEND))
                     return null;
                 try {

@@ -56,7 +56,7 @@ extends OutputSocket<CE> {
     }
 
     @Override
-    public CE getTarget() {
+    public CE getLocalTarget() {
         return local;
     }
 
@@ -95,7 +95,7 @@ extends OutputSocket<CE> {
                 try {
                     super.close();
                 } finally {
-                    final CommonEntry peer = getPeerTarget();
+                    final CommonEntry peer = getRemoteTarget();
                     if (temp != file
                     && !temp.renameTo(file)
                     && (!file.delete() || !temp.renameTo(file))) {
