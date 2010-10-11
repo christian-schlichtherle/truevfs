@@ -113,7 +113,7 @@ implements FileSystemEntry, Link<File> {
 
     /** Returns the type of this file entry. */
     @Override
-    public Type getType() {
+    public CommonEntry.Type getType() {
         return file.isDirectory() ? DIRECTORY
                 :   file.isFile() ? FILE
                 :   file.exists() ? SPECIAL

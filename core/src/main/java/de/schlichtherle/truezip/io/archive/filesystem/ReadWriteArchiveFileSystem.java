@@ -518,7 +518,7 @@ implements ArchiveFileSystem<AE> {
 
         PathLink(
                 final String entryPath,
-                final Type entryType,
+                final CommonEntry.Type entryType,
                 final CommonEntry template,
                 final boolean createParents)
         throws ArchiveFileSystemException {
@@ -533,7 +533,7 @@ implements ArchiveFileSystem<AE> {
         @SuppressWarnings("unchecked")
 		private SegmentLink<AE>[] newSegmentLinks(
                 final String entryPath,
-                final Type entryType,
+                final CommonEntry.Type entryType,
                 final CommonEntry template,
                 final int level)
         throws ArchiveFileSystemException, CharConversionException {

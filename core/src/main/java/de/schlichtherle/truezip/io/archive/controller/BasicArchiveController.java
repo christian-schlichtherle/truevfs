@@ -239,7 +239,7 @@ implements     InputSocketFactory <AE>,
         class Input extends InputSocket<AE> {
             AE getEntry() throws IOException {
                 autoSync(path, READ);
-                return Links.deref(autoMount().getEntry(path));
+                return Links.getTarget(autoMount().getEntry(path));
             }
 
             InputSocket<AE> newInputSocket() throws IOException {

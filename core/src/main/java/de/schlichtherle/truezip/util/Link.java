@@ -16,8 +16,14 @@
 
 package de.schlichtherle.truezip.util;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+
 /**
- * Links to a target.
+ * A link has a {@link #getTarget() target} property.
+ * This interface is useful if a class is decorating or adapting another class
+ * and access to the decorated or adapted object should be provided as part of
+ * the public API of the decorating or adapting class.
  *
  * @param   <T> The type of the target.
  * @author  Christian Schlichtherle
@@ -29,10 +35,86 @@ public interface Link<T> {
      * Returns the target of this link.
      * <p>
      * The returned object reference may be {@code null}.
-     * However, this term may be overridden by sub-interfaces or
-     * implementations.
+     * This term may be overridden by sub-interfaces or implementations.
      * 
      * @return The target of this link.
      */
     T getTarget();
+
+    /**
+     * A link type defines the terms and conditions for clearing its target
+     * and is a factory for
+     */
+    enum Type {
+
+        /** This reference type never clears the target of a link. */
+        STRONG {
+            @Override
+            public <T> Link<T> newLink(T target) {
+                return new StrongLink<T>(target);
+            }
+        },
+
+        /**
+         * This reference type clears the target of a link according to the
+         * terms and conditions of a {@link SoftReference}.
+         */
+        SOFT {
+            @Override
+            public <T> Link<T> newLink(T target) {
+                return new SoftLink<T>(target);
+            }
+        },
+
+        /**
+         * This reference type clears the target of a link according to the
+         * terms and conditions of a {@link WeakReference}.
+         */
+        WEAK {
+            @Override
+            public <T> Link<T> newLink(T target) {
+                return new WeakLink<T>(target);
+            }
+        };
+
+        /** Returns a new typed link to the given nullable target. */
+        public abstract <T> Link<T> newLink(T target);
+
+        private static class StrongLink<T> implements Link<T> {
+            private final T target;
+
+            StrongLink(final T target) {
+                this.target = target;
+            }
+
+            @Override
+            public T getTarget() {
+                return target;
+            }
+        }
+
+        private static class SoftLink<T> extends SoftReference<T>
+        implements Link<T> {
+            SoftLink(T target) {
+                super(target);
+            }
+
+            @Override
+            public T getTarget() {
+                return get();
+            }
+        }
+
+        private static class WeakLink<T> extends WeakReference<T>
+        implements Link<T> {
+            WeakLink(T target) {
+                super(target);
+            }
+
+            @Override
+            public T getTarget() {
+                return get();
+            }
+        }
+    }
 }
