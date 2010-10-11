@@ -73,9 +73,9 @@ import java.io.InputStream;
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileOutputStream
- * @author Christian Schlichtherle
+ * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
+ * @see     FileOutputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileInputStream extends FilterInputStream {
@@ -122,11 +122,9 @@ public class FileInputStream extends FilterInputStream {
             throw ex;
         } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
-        } catch (IOException ioe) {
-            final FileNotFoundException fnfe
-                    = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
+                    .initCause(ex);
         }
     }
 }
