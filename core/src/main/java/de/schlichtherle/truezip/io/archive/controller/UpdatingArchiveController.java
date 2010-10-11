@@ -199,7 +199,7 @@ extends     FileSystemArchiveController<AE> {
                         path, BitField.of(InputOption.BUFFER));
                 input = new Input(getDriver().newInputShop(getModel(), socket));
                 setFileSystem(newArchiveFileSystem(
-                        socket.getTarget(), readOnly));
+                        socket.getLocalTarget(), readOnly));
             } catch (IOException ex) {
                 if (!autoCreate)
                     throw ex;

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @param   <CE> The type of the {@link #getTarget() local target} common entry.
+ * @param   <CE> The type of the {@link #getLocalTarget() local target} common entry.
  * @author  Christian Schlichtherle
  * @version $Id$
  */

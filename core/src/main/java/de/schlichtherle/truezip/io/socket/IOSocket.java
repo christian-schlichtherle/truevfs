@@ -22,20 +22,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Addresses a target for I/O operations.
+ * Targets an object for I/O operations which are provided by sub classes.
  * <p>
- * A key feature of an I/O socket is that it's target can be resolved eagerly
- * or lazily, i.e. by a constructor or a method of a sub class.
+ * A key feature of an I/O socket is that it's targets can be resolved eagerly
+ * or lazily, i.e. the local or remote target may get resolved by a constructor
+ * or a method of a sub class.
  *
- * @param   <LT> the type of the {@link #getTarget() local target} for I/O
- *          operations.
+ * @param   <LT> the type of the {@link #getLocalTarget() local target}
+ *          for I/O operations.
+ * @param   <PT> the type of the {@link #getRemoteTarget() remote target}
+ *          for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class IOSocket<LT, PT> {
 
     /**
-     * Returns the non-{@code null} local target for I/O operations.
+     * Returns the non-{@code null} <i>local target</i> for I/O operations.
      * <p>
      * The result of changing the state of the local target is undefined.
      * In particular, a subsequent I/O operation may not reflect the change
@@ -44,29 +47,32 @@ public abstract class IOSocket<LT, PT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
-	public abstract LT getTarget();
+	public abstract LT getLocalTarget();
 
     /**
-     * Returns the <i>peer target</i> for I/O operations.
+     * Returns the nullable <i>remote target</i> for I/O operations.
      * <p>
-     * The result of changing the state of the peer target is undefined.
+     * The result of changing the state of the remote target is undefined.
      * In particular, a subsequent I/O operation may not reflect the change
      * or may even fail.
      * This term may be overridden by sub-interfaces or implementations.
      *
-     * @return The nullable peer target for I/O operations.
+     * @return The nullable remote target for I/O operations.
      */
-    public abstract PT getPeerTarget();
+    public abstract PT getRemoteTarget();
 
-    /** Returns {@link #getTarget()}{@code .}{@link Object#toString()}. */
+    /**
+     * Returns a string representing a connection of the local and remote
+     * targets.
+     */
     @Override
     public final String toString() {
         // Note that the target actually must not be null, but this method
         // should work even if the interface contract is broken in order to
         // support debugging.
-        final LT lt = getTarget();
+        final LT lt = getLocalTarget();
         final String lts = null == lt ? "(null)" : lt.toString();
-        final PT pt = getPeerTarget();
+        final PT pt = getRemoteTarget();
         final String pts = null == pt ? "(null)" : pt.toString();
         return lts + " <-> " + pts;
     }
@@ -77,8 +83,8 @@ public abstract class IOSocket<LT, PT> {
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
-     * by the input socket {@code input} to an output stream
-     * {@link OutputSocket#newOutputStream created} by the output socket
+     * by the given input socket {@code input} to an output stream
+     * {@link OutputSocket#newOutputStream created} by the given output socket
      * {@code output}.
      *
      * @param  input a non-{@code null} input socket for the input target.

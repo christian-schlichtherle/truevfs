@@ -52,7 +52,7 @@ extends FilterInputSocket<CE> {
         IOException cause = null;
         boolean ok = false;
         try {
-            CommonEntry peer = getPeerTarget();
+            CommonEntry peer = getRemoteTarget();
             if (null == peer)
                 peer = new FileEntry(temp);
             try {

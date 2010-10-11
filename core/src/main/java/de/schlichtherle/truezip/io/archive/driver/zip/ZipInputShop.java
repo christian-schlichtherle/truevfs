@@ -59,7 +59,7 @@ implements InputShop<ZipEntry> {
             throw new IllegalArgumentException("interface contract violation");
         class Input extends InputSocket<ZipEntry> {
             @Override
-            public ZipEntry getTarget() {
+            public ZipEntry getLocalTarget() {
                 return entry;
             }
 
@@ -68,7 +68,7 @@ implements InputShop<ZipEntry> {
                 return ZipInputShop.this.getInputStream(
                         entry.getName(),
                         false,
-                        !(getPeerTarget() instanceof ZipEntry));
+                        !(getRemoteTarget() instanceof ZipEntry));
             }
 
             @Override

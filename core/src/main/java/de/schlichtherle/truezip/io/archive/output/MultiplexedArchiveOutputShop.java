@@ -210,12 +210,12 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 final OutputSocket<? extends AE> output)
         throws IOException {
             super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
-            final CommonEntry peer = output.getPeerTarget();
+            final CommonEntry peer = output.getRemoteTarget();
             class Input extends InputSocket<CommonEntry> {
                 private final CommonEntry target = null == peer ? temp : peer;
 
                 @Override
-                public CommonEntry getTarget() {
+                public CommonEntry getLocalTarget() {
                     return target;
                 }
 
@@ -232,12 +232,12 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             this.temp = temp;
             this.output = output;
             this.input = new Input();
-            temps.put(output.getTarget().getName(), this);
+            temps.put(output.getLocalTarget().getName(), this);
         }
 
         @Override
         public AE getTarget() {
-            return output.getTarget();
+            return output.getLocalTarget();
         }
 
         @Override
@@ -248,8 +248,8 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             try {
                 super.close();
             } finally {
-                final CommonEntry src = input.getTarget();
-                final AE dst = output.getTarget();
+                final CommonEntry src = input.getLocalTarget();
+                final AE dst = output.getLocalTarget();
                 for (final Size type : BitField.allOf(Size.class))
                     if (UNKNOWN == dst.getSize(type))
                         dst.setSize(type, src.getSize(type));

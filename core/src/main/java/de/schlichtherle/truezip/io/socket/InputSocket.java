@@ -32,7 +32,8 @@ import java.io.InputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> the type of the {@link #getTarget() local target} common entry.
+ * @param   <CE> the type of the {@link #getLocalTarget() local target}
+ *          for I/O operations.
  * @see     OutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -48,22 +49,24 @@ extends IOSocket<CE, CommonEntry> {
      * @return The non-{@code null} local common entry target.
      */
     @Override
-    public abstract CE getTarget();
+    public abstract CE getLocalTarget();
 
     @Override
-    public CommonEntry getPeerTarget() {
-        return null == peer ? null : peer.getTarget();
+    public CommonEntry getRemoteTarget() {
+        return null == peer ? null : peer.getLocalTarget();
     }
 
     /**
-     * Makes this input socket sharing the peering with the given input
+     * Makes the given input socket share its remote target with this input
      * socket.
-     * Note that this method does <em>not</em> change the peer's peer.
+     * Note that this method does <em>not</em> change the peer input socket of
+     * the given input socket's peer output socket to this instance, i.e. this
+     * input socket is not connected to the peer output socket.
      *
-     * @param  with the non-{@code null} input socket which has a peering to
-     *         share.
+     * @param  with the non-{@code null} input socket which has a remote
+     *         target to share.
      * @throws NullPointerException if {@code with} is {@code null}.
-     * @return This input socket, cast to {@code IS}.
+     * @return This input socket.
      * @see    #beforePeering
      * @see    #afterPeering
      */
@@ -84,12 +87,12 @@ extends IOSocket<CE, CommonEntry> {
     }
 
     /**
-     * Connects this input socket to the given output socket.
-     * Note that this method <em>does</em> change the peer's peer to this
-     * instance.
+     * Connects this input socket to the given peer output socket.
+     * Note that this method changes the peer input socket of
+     * the given peer output socket to this instance.
      *
-     * @param  newPeer the nullable output socket to connect to.
-     * @return This input socket, cast to {@code IS}.
+     * @param  newPeer the nullable peer output socket to connect to.
+     * @return This input socket.
      * @see    #beforePeering
      * @see    #afterPeering
      */
@@ -117,21 +120,21 @@ extends IOSocket<CE, CommonEntry> {
 
     /**
      * Called by {@link #share} and {@link #connect} after a peering has been
-     * initiated, but before it has been completed.
+     * initiated, but before the peer output socket has been changed.
      */
     protected void beforePeering() {
     }
 
     /**
      * Called by {@link #share} and {@link #connect} after a peering has been
-     * completed.
+     * completed and the peer output socket has been successfully changed.
      */
     protected void afterPeering() {
     }
 
     /**
      * Returns a new input stream for reading bytes from the
-     * {@link #getTarget() local target}.
+     * {@link #getLocalTarget() local target}.
      * <p>
      * Implementations must enable calling this method any number of times.
      * Furthermore, the returned input stream should <em>not</em> be buffered.
@@ -152,8 +155,8 @@ extends IOSocket<CE, CommonEntry> {
     }
 
     /**
-     * <b>Optional:</b> Returns a new read only file for reading bytes from the
-     * {@link #getTarget() local target} in arbitrary order.
+     * <b>Optional:</b> Returns a new read only file for reading bytes from
+     * the {@link #getLocalTarget() local target} in arbitrary order.
      * <p>
      * If this method is supported, implementations must enable calling it
      * any number of times.
