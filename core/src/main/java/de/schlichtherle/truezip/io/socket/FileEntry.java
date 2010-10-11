@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Collections;
 import java.io.File;
@@ -36,7 +37,7 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 public final class FileEntry
-implements FileSystemEntry, IOReference<File> {
+implements FileSystemEntry, Link<File> {
     private static final long serialVersionUID = 5263276267534643646L;
 
     private final File file;
