@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
@@ -164,7 +164,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<ArchiveController> ref = new WeakReference<ArchiveController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -184,7 +184,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<ArchiveController> ref = new WeakReference<ArchiveController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();
@@ -513,7 +513,7 @@ public abstract class IOFileTestCase extends TestCase {
     throws IOException {
         final File file1 = new File(archive, "file1");
         final File file2 = new File(archive, "file2");
-        
+
         // Test open output streams.
         assertTrue(file1.createNewFile());
         File.update(); // ensure file1 is really present in the archive file
@@ -536,11 +536,11 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(file2.isFile());
         if (!file2.catFrom(fisA)) // fisA may be invalidated after update!
             assertFalse(file2.exists()); // previous op has removed file2!
-        
+
         // Open file2 as stream and let the garbage collection close the stream automatically.
         new FileInputStream(file1);
         gc();
-        
+
         // This update should complete without any exception if the garbage
         // collector did his job.
         try {
@@ -548,11 +548,11 @@ public abstract class IOFileTestCase extends TestCase {
         } catch (ArchiveBusyWarningException failure) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
-        
+
         assertTrue(newNonArchiveFile(archive).delete());
         // Closing the invalidated stream explicitly should be OK.
         fisA.close();
-        
+
         // Cleanup.
         assertFalse(file2.delete()); // already deleted externally
         assertFalse(file2.exists());
@@ -1020,7 +1020,7 @@ public abstract class IOFileTestCase extends TestCase {
         // Now set the system under stress so that the garbage collector will
         // most likely reclaim the chain of file objects and the archive
         // controllers once they have been updated.
-        // Note that ArchiveController.finalize() is called in no particular
+        // Note that FileSystemController.finalize() is called in no particular
         // order, i.e. the object graph is completely ignored! :-o
         byte[] buf1 = new byte[10 * 1024 * 1024];
         gc();

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.entry;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
 
 /**
  * Represents an entry in an archive file.

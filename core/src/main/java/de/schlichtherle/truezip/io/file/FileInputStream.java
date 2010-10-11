@@ -17,12 +17,12 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
+import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
+import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -73,9 +73,9 @@ import java.io.InputStream;
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileOutputStream
- * @author Christian Schlichtherle
+ * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
+ * @see     FileOutputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileInputStream extends FilterInputStream {
@@ -115,21 +115,16 @@ public class FileInputStream extends FilterInputStream {
     private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
         try {
-            return Files.newInputSocket(src).newInputStream();
+            return Files.newInputSocket(src,
+                    BitField.noneOf(InputOption.class))
+                    .newInputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
-        } catch (IOException ioe) {
-            final FileNotFoundException fnfe
-                    = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
+                    .initCause(ex);
         }
-    }
-
-    @Override
-    public int read(byte buf[]) throws IOException {
-        return in.read(buf, 0, buf.length);
     }
 }

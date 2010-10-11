@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
+import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.EOFException;
@@ -63,7 +63,7 @@ import static org.apache.tools.tar.TarConstants.UIDLEN;
  * @version $Id$
  */
 public class TarInputShop
-implements CommonInputShop<TarEntry> {
+implements InputShop<TarEntry> {
 
     private static final byte[] NULL_RECORD = new byte[TarBuffer.DEFAULT_RCDSIZE];
 
@@ -213,11 +213,11 @@ implements CommonInputShop<TarEntry> {
     }
 
     @Override
-    public CommonInputSocket<TarEntry> newInputSocket(final TarEntry entry)
+    public InputSocket<TarEntry> newInputSocket(final TarEntry entry)
     throws FileNotFoundException {
         if (getEntry(entry.getName()) != entry)
             throw new IllegalArgumentException("interface contract violation");
-        class InputSocket extends CommonInputSocket<TarEntry> {
+        class Input extends InputSocket<TarEntry> {
             @Override
             public TarEntry getTarget() {
                 return entry;
@@ -234,7 +234,7 @@ implements CommonInputShop<TarEntry> {
                 return new SimpleReadOnlyFile(entry.getFile());
             }
         }
-        return new InputSocket();
+        return new Input();
     }
 
     @Override

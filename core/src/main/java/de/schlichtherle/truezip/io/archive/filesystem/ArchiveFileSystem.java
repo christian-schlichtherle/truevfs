@@ -16,11 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.IOOperation;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
 import de.schlichtherle.truezip.io.socket.IOReference;
 import de.schlichtherle.truezip.util.BitField;
 
@@ -38,7 +39,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
     /** An archive file system entry which refers to an archive entry. */
     interface Entry<CE extends CommonEntry>
-    extends ArchiveFileSystemEntry, IOReference<CE> {
+    extends FileSystemEntry, IOReference<CE> {
     }
 
     /**

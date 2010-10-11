@@ -91,9 +91,8 @@ extends BasicArchiveController<AE> {
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private abstract class AutoMounter {
-        abstract ArchiveFileSystem<AE> autoMount(
-                boolean autoCreate,
-                boolean createParents)
+        abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
+                                                    boolean createParents)
         throws IOException;
 
         ArchiveFileSystem<AE> getFileSystem() {
@@ -105,12 +104,13 @@ extends BasicArchiveController<AE> {
 
     private class ResetFileSystem extends AutoMounter {
         @Override
-        ArchiveFileSystem<AE> autoMount(final boolean autoCreate, final boolean createParents)
+        ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
+                                        final boolean createParents)
         throws IOException {
             ensureWriteLockedByCurrentThread();
-            try {
+            //try {
                 mount(autoCreate, createParents);
-            } catch (FalsePositiveEntryException ex) {
+            /*} catch (FalsePositiveEntryException ex) {
                 // Catch and cache exceptions for non-transient false positives.
                 // The state is reset when unlink() is called on the false
                 // positive archive file or sync().
@@ -126,11 +126,9 @@ extends BasicArchiveController<AE> {
                 if (!ex.isTransient())
                     autoMounter = new FalsePositiveFileSystem(ex);
                 throw ex;
-            } catch (IOException ex) {
-                throw ex;
-            }
+            }*/
 
-            assert autoMounter != this;
+            assert this != autoMounter;
             // DON'T just call autoMounter.getFileSystem()!
             // This would return null if autoMounter is an instance of
             // FalsePositiveFileSystem.

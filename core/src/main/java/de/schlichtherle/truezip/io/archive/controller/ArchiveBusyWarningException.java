@@ -16,9 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.input.CommonInputClosedException;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
+import de.schlichtherle.truezip.io.socket.InputClosedException;
+import de.schlichtherle.truezip.io.socket.OutputClosedException;
 
 /**
  * Indicates that an archive file has been successfully updated, but some
@@ -26,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException;
  * <p>
  * With the exception of their {@code close()} method, any subsequent
  * I/O operation on the closed inputs or outputs will throw a
- * {@link CommonInputClosedException} or a {@link CommonOutputClosedException}.
+ * {@link InputClosedException} or a {@link OutputClosedException}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -38,7 +37,7 @@ extends ArchiveSyncWarningException {
 
     private final int numStreams;
 
-    ArchiveBusyWarningException(ArchiveDescriptor archive, int numStreams) {
+    ArchiveBusyWarningException(FileSystemModel archive, int numStreams) {
         super(archive);
         this.numStreams = numStreams;
     }

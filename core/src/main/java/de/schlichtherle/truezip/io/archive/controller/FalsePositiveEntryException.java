@@ -16,32 +16,32 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import java.io.IOException;
 
 /**
- * Indicates a false positive archive entry which actually exists as a
- * file or directory entry in the host file system or in an enclosing archive
- * file.
+ * Indicates a false positive archive entry which may exist as an entry in an
+ * enclosing file system.
  */
-public class FalsePositiveEntryException extends EntryNotFoundException {
-
+final class FalsePositiveEntryException extends RuntimeException {
     private static final long serialVersionUID = 947139561381472363L;
 
     private final boolean trans;
 
-    FalsePositiveEntryException(
-            final ArchiveDescriptor archive,
-            final String path,
-            final IOException cause) {
-        super(archive, path , cause instanceof TransientIOException
-                ? (IOException) cause.getCause() : cause);
+    FalsePositiveEntryException(final IOException cause) {
+        super(cause instanceof TransientIOException ? cause.getCause() : cause);
+        assert null != cause;
         // A transient I/O exception is just a wrapper exception to mark
         // the real transient cause, therefore we can safely throw it away.
         // We must do this in order to allow an archive controller to inspect
         // the real transient cause and act accordingly.
         trans = cause instanceof TransientIOException;
+    }
+
+    /** Returns the nullable cause of this exception. */
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
     }
 
     /**

@@ -17,10 +17,10 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 

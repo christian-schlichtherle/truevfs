@@ -17,24 +17,22 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.archive.statistics.ArchiveStatistics;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveControllers;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemStatistics;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemControllers;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
+import de.schlichtherle.truezip.io.socket.OutputOption;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -53,20 +51,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.REASSEMBLE;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.UMOUNT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.SyncOption.WAIT_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -419,7 +415,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient ArchiveController controller;
+    private transient FileSystemController controller;
 
     //
     // Constructor and helper methods:
@@ -726,7 +722,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = ArchiveControllers.getController(
+        this.controller = FileSystemControllers.getController(
                 target.toURI(),
                 detector.getArchiveDriver(target.getPath()),
                 null == enclArchive ? null : enclArchive.getController());
@@ -841,7 +837,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller initialization has been deferred until now in
-            // order to provide the ArchiveController with an otherwise fully
+            // order to provide the FileSystemController with an otherwise fully
             // initialized object.
             initController();
         }
@@ -953,7 +949,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller init has been deferred until now in
-            // order to provide the ArchiveController with a fully
+            // order to provide the FileSystemController with a fully
             // initialized object.
             initController();
         }
@@ -1125,7 +1121,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveSyncException {
-        ArchiveControllers.sync(
+        FileSystemControllers.sync(
                 null, new DefaultArchiveSyncExceptionBuilder(), options);
     }
 
@@ -1138,7 +1134,7 @@ public class File extends java.io.File {
      */
     public static void umount()
     throws ArchiveSyncException {
-        sync(BitField.of(REASSEMBLE, UMOUNT, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
@@ -1152,7 +1148,7 @@ public class File extends java.io.File {
      */
     public static void umount(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(REASSEMBLE, UMOUNT)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1172,7 +1168,7 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(REASSEMBLE, UMOUNT)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1208,7 +1204,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        ArchiveControllers.sync(
+        FileSystemControllers.sync(
                 archive.getCanOrAbsFile().toURI(),
                 new DefaultArchiveSyncExceptionBuilder(), options);
     }
@@ -1224,7 +1220,7 @@ public class File extends java.io.File {
     public static void umount(File archive)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE, UMOUNT, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
@@ -1240,7 +1236,7 @@ public class File extends java.io.File {
     public static void umount(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE, UMOUNT)
+                BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1262,7 +1258,7 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE, UMOUNT)
+                BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1278,7 +1274,7 @@ public class File extends java.io.File {
      */
     public static void update()
     throws ArchiveSyncException {
-        sync(BitField.of(REASSEMBLE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
@@ -1292,7 +1288,7 @@ public class File extends java.io.File {
      */
     public static void update(boolean closeStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(REASSEMBLE)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1312,7 +1308,7 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
-        sync(   BitField.of(REASSEMBLE)
+        sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1330,7 +1326,7 @@ public class File extends java.io.File {
     public static void update(File archive)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
@@ -1346,7 +1342,7 @@ public class File extends java.io.File {
     public static void update(File archive, boolean closeStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE)
+                BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1369,7 +1365,7 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveSyncException {
         sync(   archive,
-                BitField.of(REASSEMBLE)
+                BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1389,17 +1385,17 @@ public class File extends java.io.File {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static ArchiveStatistics getLiveArchiveStatistics() {
-        return ArchiveControllers.getStatistics();
+    public static FileSystemStatistics getLiveArchiveStatistics() {
+        return FileSystemControllers.getStatistics();
     }
 
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemControllers.strict}.
      * In other words, this returns {@code true} unless you map the
      * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.ArchiveControllers.strict}
+     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemControllers.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
@@ -1837,7 +1833,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final ArchiveController getController() {
+    final FileSystemController getController() {
         assert (null != controller) == isArchive();
         return controller;
     }
@@ -2191,15 +2187,9 @@ public class File extends java.io.File {
      */
     @Override
     public boolean exists() {
-        try {
-            if (enclArchive != null)
-                return enclArchive.getController()
-                        .getEntry(enclEntryName) != null;
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        }
+        if (enclArchive != null)
+            return enclArchive.getController()
+                    .getEntry(enclEntryName) != null;
         return delegate.exists();
     }
 
@@ -2213,21 +2203,10 @@ public class File extends java.io.File {
      */
     @Override
     public boolean isFile() {
-        try {
-            if (innerArchive != null) {
-                final ArchiveFileSystemEntry entry = innerArchive
-                        .getController().getEntry(getInnerEntryName());
-                return null != entry && entry.getType() == FILE;
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // See ArchiveDriver#newInput!
-            // FIXME: Check if needed anymore!
-            if (isArchive()
-                    && isNotArchive.getCause() instanceof FileNotFoundException)
-                return false;
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive
+                    .getController().getEntry(getInnerEntryName());
+            return null != entry && entry.getType() == FILE;
         }
         return delegate.isFile();
     }
@@ -2250,16 +2229,10 @@ public class File extends java.io.File {
      */
     @Override
     public boolean isDirectory() {
-        try {
-            if (innerArchive != null) {
-                final ArchiveFileSystemEntry entry = innerArchive
-                        .getController().getEntry(getInnerEntryName());
-                return null != entry && entry.getType() == DIRECTORY;
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive
+                    .getController().getEntry(getInnerEntryName());
+            return null != entry && entry.getType() == DIRECTORY;
         }
         return delegate.isDirectory();
     }
@@ -2271,14 +2244,8 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getOpenIcon() {
-        try {
-            if (innerArchive == this)
-                return getController().getOpenIcon();
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        }
+        if (innerArchive == this)
+            return getController().getOpenIcon();
         return null;
     }
 
@@ -2289,43 +2256,24 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getClosedIcon() {
-        try {
-            if (innerArchive == this)
-                return getController().getClosedIcon();
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        }
+        if (innerArchive == this)
+            return getController().getClosedIcon();
         return null;
     }
 
     @Override
     public boolean canRead() {
-        // More thorough test than isExisting
-        try {
-            if (innerArchive != null)
-                return innerArchive.getController()
-                        .isReadable(getInnerEntryName());
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        }
+        if (innerArchive != null)
+            return innerArchive.getController()
+                    .isReadable(getInnerEntryName());
         return delegate.canRead();
     }
 
     @Override
     public boolean canWrite() {
-        try {
-            if (innerArchive != null)
-                return innerArchive.getController()
-                        .isWritable(getInnerEntryName());
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
-        }
+        if (innerArchive != null)
+            return innerArchive.getController()
+                    .isWritable(getInnerEntryName());
         return delegate.canWrite();
     }
 
@@ -2346,10 +2294,6 @@ public class File extends java.io.File {
                         .setReadOnly(getInnerEntryName());
                 return true;
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
         } catch (IOException ex) {
             return false;
         }
@@ -2375,29 +2319,23 @@ public class File extends java.io.File {
      */
     @Override
     public long length() {
-        try {
-            if (innerArchive != null) {
-                final ArchiveFileSystemEntry entry = innerArchive
-                        .getController().getEntry(getInnerEntryName());
-                if (null == entry || DIRECTORY == entry.getType())
-                    return 0;
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive
+                    .getController().getEntry(getInnerEntryName());
+            if (null == entry || DIRECTORY == entry.getType())
+                return 0;
 
-                // TODO: Review: Can we avoid this special case?
-                // It's probably ZipDriver specific!
-                // This target is a plain file in the file system.
-                // If target.getLength() returns UNKNOWN, the getLength is yet unknown.
-                // This may happen if e.g. a ZIP target has only been partially
-                // written, i.e. not yet closed by another thread, or if this is a
-                // ghost directory.
-                // As this is not specified in the contract of this class,
-                // return 0 in this case instead.
-                final long length = entry.getSize(DATA);
-                return length >= 0 ? length : 0;
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+            // TODO: Review: Can we avoid this special case?
+            // It's probably ZipDriver specific!
+            // This target is a plain file in the file system.
+            // If target.getLength() returns UNKNOWN, the getLength is yet unknown.
+            // This may happen if e.g. a ZIP target has only been partially
+            // written, i.e. not yet closed by another thread, or if this is a
+            // ghost directory.
+            // As this is not specified in the contract of this class,
+            // return 0 in this case instead.
+            final long length = entry.getSize(DATA);
+            return length >= 0 ? length : 0;
         }
         return delegate.length();
     }
@@ -2415,25 +2353,19 @@ public class File extends java.io.File {
      */
     @Override
     public long lastModified() {
-        try {
-            if (innerArchive != null) {
-                final ArchiveFileSystemEntry entry = innerArchive
-                        .getController().getEntry(getInnerEntryName());
-                if (null == entry)
-                    return 0;
-                // Depending on the driver type, target.getTime() could return
-                // a negative value. E.g. this is the default value that the
-                // ArchiveDriver uses for newly created entries in order to
-                // indicate an unknown time.
-                // As this is not specified in the contract of this class,
-                // 0 is returned in this case instead.
-                final long time = entry.getTime(Access.WRITE);
-                return 0 <= time ? time : 0;
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive
+                    .getController().getEntry(getInnerEntryName());
+            if (null == entry)
+                return 0;
+            // Depending on the driver type, target.getTime() could return
+            // a negative value. E.g. this is the default value that the
+            // ArchiveDriver uses for newly created entries in order to
+            // indicate an unknown time.
+            // As this is not specified in the contract of this class,
+            // 0 is returned in this case instead.
+            final long time = entry.getTime(Access.WRITE);
+            return 0 <= time ? time : 0;
         }
         return delegate.lastModified();
     }
@@ -2465,10 +2397,6 @@ public class File extends java.io.File {
                         .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
                 return true;
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
         } catch (IOException ex) {
             return false;
         }
@@ -2488,19 +2416,13 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list() {
-        try {
-            if (innerArchive != null) {
-                final Set<String> members = innerArchive
-                        .getController()
-                        .getEntry(getInnerEntryName())
-                        .getMembers();
-                return members == null
-                        ? null : members.toArray(new String[members.size()]);
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive.getController()
+                    .getEntry(getInnerEntryName());
+            if (null == entry)
+                return null;
+            final Set<String> members = entry.getMembers();
+            return null == members ? null : members.toArray(new String[members.size()]);
         }
         return delegate.list();
     }
@@ -2520,27 +2442,22 @@ public class File extends java.io.File {
      */
     @Override
     public String[] list(final FilenameFilter filter) {
-        try {
-            if (innerArchive != null) {
-                final Set<String> members = innerArchive
-                        .getController()
-                        .getEntry(getInnerEntryName())
-                        .getMembers();
-                if (members == null)
-                    return null;
-                if (filter == null)
-                    return members.toArray(new String[members.size()]);
-                final Collection<String> filtered
-                        = new ArrayList<String>(members.size());
-                for (final String member : members)
-                    if (filter.accept(this, member))
-                        filtered.add(member);
-                return filtered.toArray(new String[filtered.size()]);
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive.getController()
+                    .getEntry(getInnerEntryName());
+            if (null == entry)
+                return null;
+            final Set<String> members = entry.getMembers();
+            if (null == members)
+                return null;
+            if (null == filter)
+                return members.toArray(new String[members.size()]);
+            final Collection<String> filtered
+                    = new ArrayList<String>(members.size());
+            for (final String member : members)
+                if (filter.accept(this, member))
+                    filtered.add(member);
+            return filtered.toArray(new String[filtered.size()]);
         }
         return delegate.list(filter);
     }
@@ -2607,25 +2524,20 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FilenameFilter filter,
             final FileFactory factory) {
-        try {
-            if (innerArchive != null) {
-                final Set<String> members = innerArchive
-                        .getController()
-                        .getEntry(getInnerEntryName())
-                        .getMembers();
-                if (members == null)
-                    return null;
-                final Collection<File> filtered
-                        = new ArrayList<File>(members.size());
-                for (final String member : members)
-                    if (filter == null || filter.accept(this, member))
-                        filtered.add(factory.createFile(File.this, member));
-                return filtered.toArray(new File[filtered.size()]);
-            }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive.getController()
+                    .getEntry(getInnerEntryName());
+            if (null == entry)
+                return null;
+            final Set<String> members = entry.getMembers();
+            if (null == members)
+                return null;
+            final Collection<File> filtered
+                    = new ArrayList<File>(members.size());
+            for (final String member : members)
+                if (filter == null || filter.accept(this, member))
+                    filtered.add(factory.createFile(File.this, member));
+            return filtered.toArray(new File[filtered.size()]);
         }
         return convert(delegate.listFiles(filter), factory);
     }
@@ -2672,26 +2584,22 @@ public class File extends java.io.File {
     public File[] listFiles(
             final FileFilter filter,
             final FileFactory factory) {
-        try {
-            if (innerArchive != null) {
-                final Set<String> members = innerArchive.getController()
-                        .getEntry(getInnerEntryName())
-                        .getMembers();
-                if (members == null)
-                    return null;
-                final Collection<File> filtered
-                        = new ArrayList<File>(members.size());
-                for (final String member : members) {
-                    final File file = factory.createFile(File.this, member);
-                    if (filter == null || filter.accept(file))
-                        filtered.add(file);
-                }
-                return filtered.toArray(new File[filtered.size()]);
+        if (innerArchive != null) {
+            final FileSystemEntry entry = innerArchive.getController()
+                    .getEntry(getInnerEntryName());
+            if (null == entry)
+                return null;
+            final Set<String> members = entry.getMembers();
+            if (null == members)
+                return null;
+            final Collection<File> filtered
+                    = new ArrayList<File>(members.size());
+            for (final String member : members) {
+                final File file = factory.createFile(File.this, member);
+                if (filter == null || filter.accept(file))
+                    filtered.add(file);
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
+            return filtered.toArray(new File[filtered.size()]);
         }
         return delegateListFiles(filter, factory);
     }
@@ -2742,10 +2650,6 @@ public class File extends java.io.File {
                             BitField.noneOf(OutputOption.class)
                                 .set(CREATE_PARENTS, isLenient()));
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
         } catch (IOException ex) {
             throw ex;
         }
@@ -2789,18 +2693,11 @@ public class File extends java.io.File {
     public boolean mkdir() {
         try {
             if (innerArchive != null) {
-                innerArchive.getController().mknod(
-                        getInnerEntryName(),
-                        DIRECTORY,
-                        null,
-                        BitField.noneOf(OutputOption.class)
-                            .set(CREATE_PARENTS, isLenient()));
-                return true;
+                return innerArchive.getController()
+                        .mknod(getInnerEntryName(), DIRECTORY, null,
+                            BitField.noneOf(OutputOption.class)
+                                .set(CREATE_PARENTS, isLenient()));
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // Fall through!
         } catch (IOException ex) {
             return false;
         }
@@ -2820,21 +2717,9 @@ public class File extends java.io.File {
     public boolean delete() {
         try {
             if (innerArchive != null) {
-                innerArchive.getController()
-                        .unlink(getInnerEntryName(),
-                            BitField.noneOf(OutputOption.class));
+                innerArchive.getController().unlink(getInnerEntryName());
                 return true;
             }
-        } catch (FalsePositiveEntryException isNotArchive) {
-            assert !(isNotArchive instanceof FalsePositiveEnclosedEntryException)
-                    : "Must be handled by ArchiveController!";
-            // See ArchiveDriver#newInput!
-            // FIXME: Check if needed anymore!
-            if (isArchive()
-                    && !delegate.isDirectory()
-                    && isNotArchive.getCause() instanceof FileNotFoundException)
-                return false;
-            // Fall through!
         } catch (IOException ex) {
             return false;
         }
@@ -2880,7 +2765,7 @@ public class File extends java.io.File {
                 }
             }
         }
-        ArchiveControllers.addToShutdownHook(new DeleteOnExit());
+        FileSystemControllers.addToShutdownHook(new DeleteOnExit());
     }
 
     /**

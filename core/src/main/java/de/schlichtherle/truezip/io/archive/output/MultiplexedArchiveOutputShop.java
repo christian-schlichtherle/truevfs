@@ -15,18 +15,19 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size;
-import de.schlichtherle.truezip.io.socket.output.FilterOutputSocket;
+import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Size;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.output.FilterOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.controller.file.FileEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.FilterOutputShop;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
@@ -37,7 +38,6 @@ import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,10 +47,9 @@ import java.util.Map;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
 
 /**
- * Decorates an {@code CommonOutputShop} in order to support a virtually
+ * Decorates an {@code OutputShop} in order to support a virtually
  * unlimited number of entries which may be written concurrently while
  * actually at most one entry is written concurrently to the output archive
  * output.
@@ -68,10 +67,10 @@ import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
-extends FilterOutputShop<AE, CommonOutputShop<AE>> {
+extends FilterOutputShop<AE, OutputShop<AE>> {
 
     /** Prefix for temporary files created by the multiplexer. */
-    static final String TEMP_FILE_PREFIX = "tzp-mux";
+    static final String TEMP_FILE_PREFIX = "tzp-maos";
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -89,7 +88,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
      * @param output the decorated output archive.
      * @throws NullPointerException iff {@code output} is {@code null}.
      */
-    public MultiplexedArchiveOutputShop(final CommonOutputShop<AE> output) {
+    public MultiplexedArchiveOutputShop(final OutputShop<AE> output) {
         super(output);
         if (output == null)
             throw new NullPointerException();
@@ -135,7 +134,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
     }
 
     @Override
-    public CommonOutputSocket<AE> newOutputSocket(final AE entry)
+    public OutputSocket<AE> newOutputSocket(final AE entry)
     throws IOException {
         class OutputSocket extends FilterOutputSocket<AE> {
             OutputSocket() throws IOException {
@@ -148,7 +147,7 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
                 if (isTargetBusy()) {
                     return new TempEntryOutputStream(
                             new FileEntry(createTempFile(TEMP_FILE_PREFIX)),
-                            output.share(this));
+                            getOutputSocket());
                 } else {
                     return new EntryOutputStream(super.newOutputStream());
                 }
@@ -178,25 +177,16 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
-            out.write(b, 0, b.length);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
-        }
-
-        @Override
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important here!
             closed = true;
             targetBusy = false;
-            super.close();
-            storeTemps();
+            try {
+                super.close();
+            } finally {
+                storeTemps();
+            }
         }
     } // class EntryOutputStream
 
@@ -207,21 +197,21 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
      * archive is still busy.
      */
     private class TempEntryOutputStream
-    extends FileOutputStream
+    extends FilterOutputStream
     implements IOReference<AE> {
         private final FileEntry temp;
-        private final CommonOutputSocket<? extends AE> output;
-        private final CommonInputSocket<CommonEntry> input;
+        private final OutputSocket<? extends AE> output;
+        private final InputSocket<CommonEntry> input;
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(
                 final FileEntry temp,
-                final CommonOutputSocket<? extends AE> output)
+                final OutputSocket<? extends AE> output)
         throws IOException {
-            super(temp);
+            super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             final CommonEntry peer = output.getPeerTarget();
-            class InputSocket extends CommonInputSocket<CommonEntry> {
+            class Input extends InputSocket<CommonEntry> {
                 private final CommonEntry target = null == peer ? temp : peer;
 
                 @Override
@@ -231,17 +221,17 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
 
                 @Override
                 public InputStream newInputStream() throws IOException {
-                    return new FileInputStream(temp);
+                    return new FileInputStream(temp.getTarget());
                 }
 
                 @Override
                 public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    return new SimpleReadOnlyFile(temp);
+                    return new SimpleReadOnlyFile(temp.getTarget());
                 }
             }
             this.temp = temp;
             this.output = output;
-            this.input = new InputSocket();
+            this.input = new Input();
             temps.put(output.getTarget().getName(), this);
         }
 
@@ -254,8 +244,6 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important here!
             closed = true;
             try {
                 super.close();
@@ -272,15 +260,21 @@ extends FilterOutputShop<AE, CommonOutputShop<AE>> {
             }
         }
 
+        @SuppressWarnings("ThrowableInitCause")
         boolean store() throws IOException {
             if (!closed || isTargetBusy())
                 return false;
-
+            IOException cause = null;
             try {
-                IOSocket.copy(input, output);
+                try {
+                    IOSocket.copy(input, output);
+                } catch (IOException ex) {
+                    throw cause = ex;
+                }
             } finally {
-                if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                    temp.deleteOnExit(); // be bullish never to leavy any temps!
+                final File tempFile = temp.getTarget();
+                if (!tempFile.delete())
+                    throw (IOException) new IOException(tempFile.getPath() + " (cannot delete temporary output file)").initCause(cause);
             }
             return true;
         }

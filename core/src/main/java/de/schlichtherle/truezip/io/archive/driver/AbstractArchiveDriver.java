@@ -17,9 +17,9 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -234,7 +234,7 @@ implements ArchiveDriver<AE>, Serializable {
      * @param archive Ignored.
      */
     @Override
-    public Icon getOpenIcon(ArchiveDescriptor archive) {
+    public Icon getOpenIcon(FileSystemModel archive) {
         return null;
     }
 
@@ -245,7 +245,7 @@ implements ArchiveDriver<AE>, Serializable {
      * returns {@code null}.
      */
     @Override
-    public Icon getClosedIcon(ArchiveDescriptor archive) {
+    public Icon getClosedIcon(FileSystemModel archive) {
         return null;
     }
 

@@ -16,23 +16,23 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
+import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import static java.util.zip.Deflater.NO_COMPRESSION;
@@ -201,8 +201,8 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public ZipInputShop newInputShop(
-            ArchiveDescriptor archive,
-            CommonInputSocket<?> input)
+            FileSystemModel archive,
+            InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -214,7 +214,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipInputShop newZipInputShop(
-            ArchiveDescriptor archive,
+            FileSystemModel archive,
             ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(
@@ -229,8 +229,8 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link MultiplexedArchiveOutputShop}.
      */
     @Override
-    public CommonOutputShop<ZipEntry> newOutputShop(
-            ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<ZipEntry> source)
+    public OutputShop<ZipEntry> newOutputShop(
+            FileSystemModel archive, OutputSocket<?> output, InputShop<ZipEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
@@ -243,7 +243,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            ArchiveDescriptor archive, OutputStream out, ZipInputShop source)
+            FileSystemModel archive, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source);
     }

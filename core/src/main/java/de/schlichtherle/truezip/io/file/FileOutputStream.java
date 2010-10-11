@@ -16,20 +16,18 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEnclosedEntryException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption;
-import de.schlichtherle.truezip.io.archive.controller.FalsePositiveEntryException;
+import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
+import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**
  * A drop-in replacement for {@link java.io.FileOutputStream} which
@@ -78,9 +76,9 @@ import static de.schlichtherle.truezip.io.archive.controller.ArchiveController.O
  * These methods provide ease of use, enhanced features, superior performance
  * and require less space in the temp file folder.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileInputStream
- * @author Christian Schlichtherle
+ * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
+ * @see     FileInputStream
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileOutputStream extends FilterOutputStream {
@@ -160,21 +158,9 @@ public class FileOutputStream extends FilterOutputStream {
             throw ex;
         } catch (ArchiveBusyException ex) {
             throw new FileBusyException(ex);
-        } catch (IOException ioe) {
-            final FileNotFoundException fnfe
-                    = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
+        } catch (IOException ex) {
+            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
+                    .initCause(ex);
         }
-    }
-
-    @Override
-    public void write(byte[] buf) throws IOException {
-        out.write(buf, 0, buf.length);
-    }
-
-    @Override
-    public void write(byte[] buf, int off, int len) throws IOException {
-        out.write(buf, off, len);
     }
 }

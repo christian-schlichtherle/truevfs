@@ -17,14 +17,14 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputShop;
-import de.schlichtherle.truezip.io.socket.input.CommonInputShop;
-import de.schlichtherle.truezip.io.socket.entry.CommonEntryFactory;
-import de.schlichtherle.truezip.io.archive.descriptor.ArchiveDescriptor;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.socket.OutputShop;
+import de.schlichtherle.truezip.io.socket.InputShop;
+import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.socket.input.CommonInputSocket;
-import de.schlichtherle.truezip.io.socket.output.CommonOutputSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,7 +34,7 @@ import javax.swing.Icon;
  * This "driver" interface is used as an abstract factory which reads and
  * writes archives of a particular type, e.g. ZIP, TZP, JAR, TAR, TAR.GZ,
  * TAR.BZ2 or any other.
- * ArchiveDescriptor drivers may be shared by their client applications.
+ * FileSystemModel drivers may be shared by their client applications.
  * <p>
  * The following requirements must be met by any implementation:
  * <ul>
@@ -63,7 +63,7 @@ extends CommonEntryFactory<AE> {
      * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link ArchiveController} is processing
+     *         internal {@link FileSystemController} is processing
      *         - {@code null} is not permitted.
      * @param  input the non-{@code null} common input socket for reading
      *         the contents of the described archive from its target.
@@ -81,7 +81,7 @@ extends CommonEntryFactory<AE> {
      *         <i>regular</i> file.
      * @return A non-{@code null} reference to a new common input shop.
      */
-    CommonInputShop<AE> newInputShop(ArchiveDescriptor archive, CommonInputSocket<?> input)
+    InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
     throws IOException;
 
     /**
@@ -90,11 +90,11 @@ extends CommonEntryFactory<AE> {
      * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link ArchiveController} is processing
+     *         internal {@link FileSystemController} is processing
      *         - {@code null} is not permitted.
      * @param  output the non-{@code null} common output socket for writing
      *         the contents of the described archive to its target.
-     * @param  source the nullable {@link CommonInputShop} if
+     * @param  source the nullable {@link InputShop} if
      *         {@code archive} is going to get updated.
      *         If not {@code null}, this is guaranteed to be a product
      *         of this driver's {@link #newInputShop} factor method, which may
@@ -112,7 +112,7 @@ extends CommonEntryFactory<AE> {
      * @throws IOException On any other I/O or data format related issue
      *         when writing the output archive.
      */
-    CommonOutputShop<AE> newOutputShop(ArchiveDescriptor archive, CommonOutputSocket<?> output, CommonInputShop<AE> source)
+    OutputShop<AE> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<AE> source)
     throws IOException;
 
     /**
@@ -125,7 +125,7 @@ extends CommonEntryFactory<AE> {
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
-    Icon getOpenIcon(ArchiveDescriptor archive);
+    Icon getOpenIcon(FileSystemModel archive);
 
     /**
      * Returns the icon that
@@ -139,5 +139,5 @@ extends CommonEntryFactory<AE> {
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be used.
      */
-    Icon getClosedIcon(ArchiveDescriptor archive);
+    Icon getClosedIcon(FileSystemModel archive);
 }

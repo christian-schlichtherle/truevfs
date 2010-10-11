@@ -29,12 +29,12 @@ import java.io.IOException;
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 
     @Override
-	public int read(byte[] b) throws IOException {
+	public final int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
     @Override
-	public void readFully(byte[] b) throws IOException {
+	public final void readFully(byte[] b) throws IOException {
         readFully(b, 0, b.length);
     }
 
