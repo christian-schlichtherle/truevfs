@@ -64,7 +64,7 @@ extends FilterOutputSocket<CE> {
                 try {
                     super.close();
                 } finally {
-                    CommonEntry peer = getPeerTarget();
+                    CommonEntry peer = getRemoteTarget();
                     if (null == peer)
                         peer = new FileEntry(temp);
                     IOException cause = null;

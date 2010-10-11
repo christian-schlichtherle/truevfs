@@ -95,7 +95,7 @@ implements OutputShop<TarEntry> {
     throws FileNotFoundException {
         class Output extends OutputSocket<TarEntry> {
             @Override
-            public TarEntry getTarget() {
+            public TarEntry getLocalTarget() {
                 return entry;
             }
 
@@ -107,7 +107,7 @@ implements OutputShop<TarEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final CommonEntry peer = getPeerTarget();
+                final CommonEntry peer = getRemoteTarget();
                 if (null != peer) {
                     entry.setSize(peer.getSize(DATA));
                     return new EntryOutputStream(entry);
