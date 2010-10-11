@@ -22,8 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Creates input streams for reading bytes from its <i>local target</i>
- * common entry.
+ * Creates input streams and read only files for reading bytes from its
+ * <i>local target</i>.
+ * <p>
+ * Note that the entity relationship between input sockets and output sockets
+ * is n:1, i.e. an input socket can have at most one peer output socket, but
+ * it may be the peer of many other output sockets.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
@@ -48,7 +52,7 @@ extends IOSocket<CE, CommonEntry> {
 
     @Override
     public CommonEntry getPeerTarget() {
-        return IOReferences.deref(peer);
+        return null == peer ? null : peer.getTarget();
     }
 
     /**

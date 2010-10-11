@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.util.Links;
 import de.schlichtherle.truezip.io.socket.OutputSocketFactory;
 import de.schlichtherle.truezip.io.socket.InputSocketFactory;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -239,7 +239,7 @@ implements     InputSocketFactory <AE>,
         class Input extends InputSocket<AE> {
             AE getEntry() throws IOException {
                 autoSync(path, READ);
-                return IOReferences.deref(autoMount().getEntry(path));
+                return Links.deref(autoMount().getEntry(path));
             }
 
             InputSocket<AE> newInputSocket() throws IOException {

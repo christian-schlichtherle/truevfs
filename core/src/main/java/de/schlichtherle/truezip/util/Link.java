@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.util;
 
 /**
- * References a target for I/O operations.
+ * Links to a target.
  *
- * @param   <T> The type of the target for I/O operations.
+ * @param   <T> The type of the target.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOReference<T> {
+public interface Link<T> {
 
     /**
-     * Returns the target for I/O operations.
+     * Returns the target of this link.
      * <p>
      * The returned object reference may be {@code null}.
      * However, this term may be overridden by sub-interfaces or
      * implementations.
-     * <p>
-     * The result of changing the state of the returned object is undefined.
-     * However, this term may be overridden by sub-interfaces or
-     * implementations.
      * 
-     * @return The target for I/O operations.
+     * @return The target of this link.
      */
     T getTarget();
 }
