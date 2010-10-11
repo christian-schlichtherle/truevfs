@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.IOReferences;
+import de.schlichtherle.truezip.util.Links;
 import de.schlichtherle.truezip.io.socket.OutputSocketFactory;
 import de.schlichtherle.truezip.io.socket.InputSocketFactory;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -239,7 +239,7 @@ implements     InputSocketFactory <AE>,
         class Input extends InputSocket<AE> {
             AE getEntry() throws IOException {
                 autoSync(path, READ);
-                return IOReferences.deref(autoMount().getEntry(path));
+                return Links.getTarget(autoMount().getEntry(path));
             }
 
             InputSocket<AE> newInputSocket() throws IOException {
@@ -255,11 +255,11 @@ implements     InputSocketFactory <AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed - explain why!
+                getRemoteTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
-            public AE getTarget() {
+            public AE getLocalTarget() {
                 try {
                     return getEntry(); // do NOT cache result - a sync on the same controller may happen any time after return from this method!
                 } catch (IOException ex) {
@@ -303,7 +303,7 @@ implements     InputSocketFactory <AE>,
                     link = null;
                 if (null == link) {
                     final CommonEntry template = options.get(COPY_PROPERTIES)
-                            ? getPeerTarget()
+                            ? getRemoteTarget()
                             : null;
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
@@ -321,11 +321,11 @@ implements     InputSocketFactory <AE>,
 
             @Override
             protected void afterPeering() {
-                getPeerTarget(); // TODO: This can't get removed - explain why!
+                getRemoteTarget(); // TODO: This can't get removed - explain why!
             }
 
             @Override
-            public AE getTarget() {
+            public AE getLocalTarget() {
                 if (options.get(APPEND))
                     return null;
                 try {

@@ -219,7 +219,7 @@ implements InputShop<TarEntry> {
             throw new IllegalArgumentException("interface contract violation");
         class Input extends InputSocket<TarEntry> {
             @Override
-            public TarEntry getTarget() {
+            public TarEntry getLocalTarget() {
                 return entry;
             }
 

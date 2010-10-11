@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.IOReference;
+import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.BitField;
 
 /**
@@ -37,9 +37,9 @@ import de.schlichtherle.truezip.util.BitField;
 public interface ArchiveFileSystem<CE extends CommonEntry>
 extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
-    /** An archive file system entry which refers to an archive entry. */
+    /** An archive file system entry which adapts an archive entry. */
     interface Entry<CE extends CommonEntry>
-    extends FileSystemEntry, IOReference<CE> {
+    extends FileSystemEntry, Link<CE> {
     }
 
     /**
@@ -54,7 +54,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      * @see #mknod
      */
     interface EntryOperation<CE extends CommonEntry>
-    extends IOOperation, IOReference<Entry<CE>> {
+    extends IOOperation, Link<Entry<CE>> {
 
         /** Executes this archive file system entry chain operation. */
         @Override

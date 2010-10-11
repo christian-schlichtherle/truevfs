@@ -15,12 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.util.Pointer;
+import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Links;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Collection;
@@ -37,8 +38,8 @@ import static de.schlichtherle.truezip.io.archive.controller.FileSystemControlle
 import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.REASSEMBLE_BUFFERS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.util.Pointer.Type.STRONG;
-import static de.schlichtherle.truezip.util.Pointer.Type.WEAK;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
+import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
  * Provides static utility methods for {@link FileSystemController}s.
@@ -64,8 +65,8 @@ public class FileSystemControllers {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Pointer<FileSystemController>> controllers
-            = new WeakHashMap<URI, Pointer<FileSystemController>>();
+    private static final Map<URI, Link<FileSystemController>> controllers
+            = new WeakHashMap<URI, Link<FileSystemController>>();
 
     private FileSystemControllers() {
     }
@@ -99,27 +100,21 @@ public class FileSystemControllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         synchronized (controllers) {
-            final Pointer<FileSystemController> pointer
-                    = controllers.get(mountPoint);
-            if (pointer != null) {
-                final FileSystemController controller = pointer.get();
-                // Check that the controller hasn't been garbage collected
-                // meanwhile!
-                if (controller != null) {
-                    // If required, reconfiguration of the FileSystemController
-                    // must be deferred until we have released the lock on
-                    // controllers in order to prevent dead locks.
-                    //reconfigure = driver != null && driver != controller.getDriver();
-                    return controller;
-                }
-                // Fall through!
+            final FileSystemController controller
+                    = Links.getTarget(controllers.get(mountPoint));
+            if (null != controller) {
+                // If required, reconfiguration of the FileSystemController
+                // must be deferred until we have released the lock on
+                // controllers in order to prevent dead locks.
+                //reconfigure = driver != null && driver != controller.getDriver();
+                return controller;
             }
             if (null == driver) // pure lookup operation?
                 return null;
             if (null == enclController) {
                 enclController = new OSFileSystemController(
                         mountPoint.resolve(".."));
-                scheduleSync(enclController, WEAK);
+                scheduleSync(WEAK, enclController);
             }
             final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
             final ArchiveModel model = new ArchiveModel(
@@ -142,22 +137,21 @@ public class FileSystemControllers {
         @Override
         public void setTouched(boolean touched) {
             if (null != controller)
-                scheduleSync(controller, touched ? STRONG : WEAK);
+                scheduleSync(touched ? STRONG : WEAK, controller);
         }
     }
 
     /**
      * Schedules the given archive controller for synchronization according to
-     * the given Pointer Type.
+     * the given TypedLink Type.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	static void scheduleSync(
-            final FileSystemController controller,
-            final Pointer.Type type) {
+	static void scheduleSync(   final Link.Type type,
+                                final FileSystemController controller) {
         synchronized (controllers) {
             controllers.put(
                     controller.getModel().getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                    type.newPointer(controller));
+                    type.newLink(controller));
         }
     }
 
@@ -250,18 +244,13 @@ public class FileSystemControllers {
             snapshot = null != comparator
                     ? new TreeSet<FileSystemController>(comparator)
                     : new HashSet<FileSystemController>((int) (controllers.size() / .75f) + 1);
-            for (final Pointer<FileSystemController> pointer
-                    : controllers.values()) {
-                final FileSystemController controller
-                        = null == pointer ? null : pointer.get();
-                if (null == controller) {
-                    // This may happen if there are no more strong references
-                    // to the archive controller and it has been removed from
-                    // the weak reference in the hash map's value before it's
-                    // been removed from the hash map's key - shit happens!
-                    continue;
-                }
-                if (controller.getModel().getMountPoint().toString().startsWith(prefix.toString()))
+            for (final Link<FileSystemController> link : controllers.values()) {
+                final FileSystemController controller = Links.getTarget(link);
+                if (null != controller && controller
+                        .getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .startsWith(prefix.toString()))
                     snapshot.add(controller);
             }
         }

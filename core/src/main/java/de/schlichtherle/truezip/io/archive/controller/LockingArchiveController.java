@@ -238,11 +238,11 @@ final class LockingArchiveController extends ArchiveController {
         }
 
         @Override
-        public CommonEntry getTarget() {
+        public CommonEntry getLocalTarget() {
             try {
                 readLock().lock();
                 try {
-                    return getInputSocket().getTarget();
+                    return getInputSocket().getLocalTarget();
                 } finally {
                     readLock().unlock();
                 }
@@ -250,7 +250,7 @@ final class LockingArchiveController extends ArchiveController {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return getInputSocket().getTarget();
+                    return getInputSocket().getLocalTarget();
                 } finally {
                     writeLock().unlock();
                 }
@@ -318,11 +318,11 @@ final class LockingArchiveController extends ArchiveController {
         }
 
         @Override
-        public CommonEntry getTarget() {
+        public CommonEntry getLocalTarget() {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return getOutputSocket().getTarget();
+                return getOutputSocket().getLocalTarget();
             } finally {
                 writeLock().unlock();
             }

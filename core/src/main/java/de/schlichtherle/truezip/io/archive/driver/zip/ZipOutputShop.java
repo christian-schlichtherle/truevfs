@@ -127,7 +127,7 @@ implements OutputShop<ZipEntry> {
     throws FileNotFoundException {
         class Output extends OutputSocket<ZipEntry> {
             @Override
-            public ZipEntry getTarget() {
+            public ZipEntry getLocalTarget() {
                 return entry;
             }
 
@@ -143,7 +143,7 @@ implements OutputShop<ZipEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final CommonEntry peer = getPeerTarget();
+                final CommonEntry peer = getRemoteTarget();
                 if (null != peer) {
                     entry.setSize(peer.getSize(DATA));
                     if (peer instanceof ZipEntry) {
