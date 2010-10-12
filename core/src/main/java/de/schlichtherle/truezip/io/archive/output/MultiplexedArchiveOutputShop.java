@@ -295,8 +295,8 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         if (isTargetBusy())
             return;
 
-        final ChainableIOExceptionBuilder<ChainableIOException> builder
-                = new ChainableIOExceptionBuilder<ChainableIOException>();
+        final ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException> builder
+                = new ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>(ChainableIOException.class, ChainableIOException.class);
         final Iterator<TempEntryOutputStream> i = temps.values().iterator();
         while (i.hasNext()) {
             final TempEntryOutputStream out = i.next();

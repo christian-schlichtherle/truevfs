@@ -35,14 +35,14 @@ implements ExceptionBuilder<C, E> {
      * This method is called to update the given {@code previous} result of
      * the assembly with the given {@code cause}.
      * 
-     * @param cause A(nother) non-{@code null} cause exception to add to the
-     *        assembly.
      * @param previous The previous result of the assembly or {@code null} if
      *        this is the first call since the creation of this instance or the
      *        last assembly has been checked out.
+     * @param cause A(nother) non-{@code null} cause exception to add to the
+     *        assembly.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract E update(E previous, C cause);
+    protected abstract E update(C cause, E previous);
 
     /**
      * This method is called to post-process the given result of the assembly
@@ -76,7 +76,7 @@ implements ExceptionBuilder<C, E> {
 	public final E fail(C cause) {
         if (cause == null)
             throw new NullPointerException();
-        assembly = update(assembly, cause);
+        assembly = update(cause, assembly);
         return post(checkout());
     }
 
@@ -89,7 +89,7 @@ implements ExceptionBuilder<C, E> {
 	public final void warn(C cause) {
         if (cause == null)
             throw new NullPointerException();
-        assembly = update(assembly, cause);
+        assembly = update(cause, assembly);
     }
 
     /**

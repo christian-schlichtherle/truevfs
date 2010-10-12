@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.OutputBusyException;
+import de.schlichtherle.truezip.io.OutputBusyException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -102,7 +102,7 @@ implements OutputShop<TarEntry> {
             @Override
 			public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(entry);
+                    throw new OutputBusyException(entry.getName());
                 if (entry.isDirectory()) {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);

@@ -133,9 +133,9 @@ class FilterArchiveController implements ArchiveController {
     }
 
     @Override
-    public void sync(   SyncExceptionBuilder builder,
-                        BitField<SyncOption> options)
-    throws SyncException, NotWriteLockedException {
+    public <E extends IOException>
+    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    throws E {
         getController().sync(builder, options);
     }
 }

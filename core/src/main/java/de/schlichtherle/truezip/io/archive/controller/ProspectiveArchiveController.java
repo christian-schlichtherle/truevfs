@@ -257,8 +257,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public void sync(SyncExceptionBuilder builder, BitField<SyncOption> options)
-    throws SyncException {
+    public <E extends IOException>
+    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    throws E {
         reset();
         super.getController().sync(builder, options);
     }

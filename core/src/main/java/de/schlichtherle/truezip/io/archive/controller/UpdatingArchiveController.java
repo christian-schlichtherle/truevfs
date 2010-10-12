@@ -329,7 +329,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException, NotWriteLockedException {
+    throws SyncException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -344,16 +344,17 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException, NotWriteLockedException {
+    private boolean sync() throws SyncException {
         sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
     }
 
     @Override
-	public void sync(   final SyncExceptionBuilder builder,
-                        final BitField<SyncOption> options)
-    throws SyncException, NotWriteLockedException {
+	public <E extends IOException>
+    void sync(  final SyncExceptionBuilder<E> builder,
+                final BitField<SyncOption> options)
+    throws E {
         assert !isFileSystemTouched() || output != null; // file system touched => output archive
 
         ensureWriteLockedByCurrentThread();
@@ -370,10 +371,8 @@ extends     FileSystemArchiveController<AE> {
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw builder.fail(new ArchiveOutputBusyException(
-                            getModel(), outStreams));
-                builder.warn(new ArchiveOutputBusyWarningException(
-                        getModel(), outStreams));
+                    throw builder.fail(new SyncException(this, new ArchiveOutputBusyException(outStreams)));
+                builder.warn(new SyncWarningException(this, new ArchiveOutputBusyException(outStreams)));
             }
         }
         if (input != null) {
@@ -381,10 +380,8 @@ extends     FileSystemArchiveController<AE> {
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw builder.fail(new ArchiveInputBusyException(
-                            getModel(), inStreams));
-                builder.warn(new ArchiveInputBusyWarningException(
-                        getModel(), inStreams));
+                    throw builder.fail(new SyncException(this, new ArchiveInputBusyException(inStreams)));
+                builder.warn(new SyncWarningException(this, new ArchiveInputBusyException(inStreams)));
             }
         }
 
@@ -417,46 +414,46 @@ extends     FileSystemArchiveController<AE> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void update(final SyncExceptionHandler handler)
-    throws SyncException {
+    private <E extends IOException>
+    void update(final SyncExceptionHandler<E> handler)
+    throws E {
         assert isFileSystemTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData();
 
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, SyncException> {
+        implements ExceptionHandler<IOException, E> {
 
-            final SyncExceptionHandler delegate;
+            final SyncExceptionHandler<E> delegate;
             IOException last;
 
-            FilterExceptionHandler(final SyncExceptionHandler delegate) {
+            FilterExceptionHandler(final SyncExceptionHandler<E> delegate) {
                 if (delegate == null)
                     throw new NullPointerException();
                 this.delegate = delegate;
             }
 
             @Override
-			public SyncException fail(final IOException cannotHappen) {
+			public E fail(final IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(final IOException cause) throws SyncException {
+			public void warn(final IOException cause) throws E {
                 if (cause == null)
                     throw new NullPointerException();
                 final IOException old = last;
                 last = cause;
                 if (!(cause instanceof InputException))
-                    throw handler.fail(new SyncException(getModel(), cause));
+                    throw handler.fail(new SyncException(UpdatingArchiveController.this, cause));
                 if (old == null)
-                    delegate.warn(new ArchiveSyncWarningException(getModel(), cause));
+                    delegate.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
             }
         } // class FilterExceptionHandler
-        update((ExceptionHandler<IOException, SyncException>) new FilterExceptionHandler(handler));
+        update((ExceptionHandler<IOException, E>) new FilterExceptionHandler(handler));
     }
 
-    private boolean checkNoDeletedEntriesWithNewData()
-    throws SyncException {
+    private boolean checkNoDeletedEntriesWithNewData() {
         assert isFileSystemTouched();
 
         // Check if we have written out any entries that have been
@@ -480,7 +477,7 @@ extends     FileSystemArchiveController<AE> {
         return true;
     }
 
-    private <E extends Exception>
+    private <E extends IOException>
     void update(final ExceptionHandler<IOException, E> handler)
     throws E {
         update( getFileSystem(),
@@ -489,7 +486,7 @@ extends     FileSystemArchiveController<AE> {
                 handler);
     }
 
-    private static <AE extends ArchiveEntry, E extends Exception>
+    private static <AE extends ArchiveEntry, E extends IOException>
     void update(  final ArchiveFileSystem<AE> fileSystem,
                 final InputService<AE> input,
                 final OutputService<AE> output,
@@ -537,27 +534,28 @@ extends     FileSystemArchiveController<AE> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reset1(final SyncExceptionHandler handler)
-    throws SyncException {
+    private <E extends IOException>
+    void reset1(final SyncExceptionHandler<E> handler)
+    throws E {
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, SyncException> {
+        implements ExceptionHandler<IOException, E> {
             @Override
-			public SyncException fail(IOException cannotHappen) {
+			public E fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(IOException cause) throws SyncException {
+			public void warn(IOException cause) throws E {
                 if (null == cause)
                     throw new NullPointerException();
-                handler.warn(new ArchiveSyncWarningException(getModel(), cause));
+                handler.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
             }
         } // class FilterExceptionHandler
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
         if (output != null)
-            output.closeAll((ExceptionHandler<IOException, SyncException>) decoratorHandler);
+            output.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
         if (input != null)
-            input.closeAll((ExceptionHandler<IOException, SyncException>) decoratorHandler);
+            input.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
     }
 
     /**
@@ -567,8 +565,9 @@ extends     FileSystemArchiveController<AE> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reset2(final SyncExceptionHandler handler)
-    throws SyncException {
+    private <E extends IOException>
+    void reset2(final SyncExceptionHandler<E> handler)
+    throws E {
         setFileSystem(null);
 
         // The output archive must be closed BEFORE the input archive is
@@ -583,7 +582,7 @@ extends     FileSystemArchiveController<AE> {
                 try {
                     output.close();
                 } catch (IOException ex) {
-                    handler.warn(new SyncException(getModel(), ex));
+                    throw handler.fail(new SyncException(this, ex));
                 } finally {
                     output = null;
                 }
@@ -593,7 +592,7 @@ extends     FileSystemArchiveController<AE> {
                 try {
                     input.close();
                 } catch (IOException ex) {
-                    handler.warn(new ArchiveSyncWarningException(getModel(), ex));
+                    handler.warn(new SyncWarningException(this, ex));
                 } finally {
                     input = null;
                 }

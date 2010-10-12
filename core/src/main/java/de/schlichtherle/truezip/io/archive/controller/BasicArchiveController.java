@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;

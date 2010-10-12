@@ -16,20 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-
 /**
  * Like its super class, but indicates the existance of open input streams.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveInputBusyException
-extends ArchiveBusyException {
+public class ArchiveInputBusyException extends ArchiveBusyException {
     
     private static final long serialVersionUID = 4560238423870456234L;
 
-    ArchiveInputBusyException(FileSystemModel archive, int numStreams) {
-        super(archive, numStreams);
+    ArchiveInputBusyException(int numStreams) {
+        super("number of open input streams: " + numStreams, numStreams);
     }
 }

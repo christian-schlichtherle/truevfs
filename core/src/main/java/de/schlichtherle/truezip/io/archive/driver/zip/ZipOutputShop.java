@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.OutputBusyException;
+import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
@@ -135,7 +135,7 @@ implements OutputShop<ZipEntry> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(entry);
+                    throw new OutputBusyException(entry.getName());
                 if (entry.isDirectory()) {
                     entry.setMethod(STORED);
                     entry.setCrc(0);

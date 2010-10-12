@@ -17,11 +17,12 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface SyncExceptionHandler
-extends ExceptionHandler<SyncException, SyncException> {
+public interface SyncExceptionHandler<E extends IOException>
+extends ExceptionHandler<SyncException, E> {
 }

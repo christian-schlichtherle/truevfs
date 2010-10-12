@@ -26,24 +26,11 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveSyncWarningException
-extends SyncException {
+public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    ArchiveSyncWarningException(FileSystemModel archive) {
-        super(archive, -1);
-    }
-
-    ArchiveSyncWarningException(FileSystemModel archive, String message) {
-        super(archive, message, -1);
-    }
-
-    ArchiveSyncWarningException(FileSystemModel archive, IOException cause) {
-        super(archive, cause, -1);
-    }
-
-    ArchiveSyncWarningException(FileSystemModel archive, String message, IOException cause) {
-        super(archive, message, cause, -1);
+    SyncWarningException(ArchiveController controller, Throwable cause) {
+        super(controller, cause, -1);
     }
 }

@@ -16,8 +16,10 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -156,8 +158,10 @@ public class FileOutputStream extends FilterOutputStream {
                     .newOutputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
+        } catch (SyncException ex) {
+            throw ex.getCause() instanceof ArchiveBusyException
+                    ? new OutputBusyException((ArchiveBusyException) ex.getCause())
+                    : (FileNotFoundException) new FileNotFoundException(ex.toString()).initCause(ex);
         } catch (IOException ex) {
             throw (FileNotFoundException) new FileNotFoundException(ex.toString())
                     .initCause(ex);

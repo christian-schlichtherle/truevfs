@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
- * Indicates that a file system entity could not get read or written because
- * the entity or its container is busy.
+ * Indicates that a file system entry could not get read or written because
+ * the entry or its container is busy.
+ * This exception is recoverable, meaning it should be possible to repeat the
+ * operation successfully as soon as the entry or its container is not busy
+ * anymore and unless another exceptional condition applies.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -29,12 +30,12 @@ import java.io.IOException;
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
 
-    public FileBusyException(final String msg) {
-        super(msg);
+    FileBusyException(String message) {
+        super(message);
     }
 
-    public FileBusyException(IOException cause) {
-        super(cause != null ? cause.toString() : null);
-        initCause(cause);
+    FileBusyException(Throwable cause) {
+        super(null == cause ? null : cause.toString());
+        super.initCause(cause);
     }
 }

@@ -30,8 +30,20 @@ import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ChainableIOExceptionBuilder<E extends ChainableIOException>
-extends AbstractExceptionBuilder<E, E> {
+public class ChainableIOExceptionBuilder<C extends Exception, E extends ChainableIOException>
+extends AbstractExceptionBuilder<C, E> {
+
+    private final Class<E> clazz;
+
+    public ChainableIOExceptionBuilder(Class<C> c, Class<E> e) {
+        try {
+            if (!e.isAssignableFrom(c))
+                e.newInstance(); // fail-fast!
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        this.clazz = e;
+    }
 
     /**
      * Links the given exceptions and returns the result. Equivalent to
@@ -46,13 +58,23 @@ extends AbstractExceptionBuilder<E, E> {
      */
     @SuppressWarnings("unchecked")
 	@Override
-    protected final E update(E previous, E cause) {
+    protected final E update(C cause, E previous) {
+        final E next;
         try {
-            return (E) cause.initPredecessor(previous);
-        } catch (IllegalStateException ise) {
+            next = clazz.isInstance(cause) ? ((E) cause) : clazz.newInstance();
+        } catch (InstantiationException ex) {
+            ex.initCause(cause);
+            throw new AssertionError(ex);
+        } catch (IllegalAccessException ex) {
+            ex.initCause(cause);
+            throw new AssertionError(ex);
+        }
+        try {
+            return (E) next.initPredecessor(previous);
+        } catch (IllegalStateException ex) {
             if (previous != null)
-                throw ise;
-            return cause;
+                throw (IllegalStateException) ex.initCause(next);
+            return next;
         }
     }
 
