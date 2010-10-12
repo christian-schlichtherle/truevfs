@@ -48,7 +48,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystemControllers {
+public class Controllers {
 
     private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
             = new Comparator<ArchiveController>() {
@@ -68,7 +68,7 @@ public class FileSystemControllers {
     private static final Map<URI, Link<ArchiveController>> controllers
             = new WeakHashMap<URI, Link<ArchiveController>>();
 
-    private FileSystemControllers() {
+    private Controllers() {
     }
 
     public static FileSystemController getController(URI mountPoint) {
@@ -150,9 +150,8 @@ public class FileSystemControllers {
 	static void scheduleSync(   final Link.Type type,
                                 final ArchiveController controller) {
         synchronized (controllers) {
-            controllers.put(
-                    controller.getModel().getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
-                    type.newLink(controller));
+            controllers.put(controller.getModel().getMountPoint(),
+                            type.newLink(controller));
         }
     }
 
@@ -333,7 +332,7 @@ public class FileSystemControllers {
                 try {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
-                    //FileSystemControllers.logger.setLevel(Level.OFF);
+                    //Controllers.logger.setLevel(Level.OFF);
                     synchronized (this) {
                         for (Runnable runnable : runnables)
                             runnable.run();

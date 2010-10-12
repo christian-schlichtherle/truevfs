@@ -27,7 +27,7 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemControllers;
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -722,7 +722,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = FileSystemControllers.getController(
+        this.controller = Controllers.getController(
                 target.toURI(),
                 detector.getArchiveDriver(target.getPath()),
                 null == enclArchive ? null : enclArchive.getController());
@@ -1121,7 +1121,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws SyncException {
-        FileSystemControllers.sync(
+        Controllers.sync(
                 null, new DefaultSyncExceptionBuilder(), options);
     }
 
@@ -1204,7 +1204,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FileSystemControllers.sync(
+        Controllers.sync(
                 archive.getCanOrAbsFile().toURI(),
                 new DefaultSyncExceptionBuilder(), options);
     }
@@ -1386,16 +1386,16 @@ public class File extends java.io.File {
      * This delay increases if the system is under heavy load.
      */
     public static ArchiveStatistics getLiveArchiveStatistics() {
-        return FileSystemControllers.getStatistics();
+        return Controllers.getStatistics();
     }
 
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemControllers.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.Controllers.strict}.
      * In other words, this returns {@code true} unless you map the
      * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemControllers.strict}
+     * {@code de.schlichtherle.truezip.io.archive.controllers.Controllers.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
@@ -2765,7 +2765,7 @@ public class File extends java.io.File {
                 }
             }
         }
-        FileSystemControllers.addToShutdownHook(new DeleteOnExit());
+        Controllers.addToShutdownHook(new DeleteOnExit());
     }
 
     /**

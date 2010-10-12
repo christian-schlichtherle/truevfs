@@ -37,13 +37,13 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
 
     @Override
     public int getArchivesTotal() {
-        return FileSystemControllers.getControllers().size();
+        return Controllers.getControllers().size();
     }
 
     @Override
     public int getArchivesTouched() {
         int result = 0;
-        for (final ArchiveController controller : FileSystemControllers.getControllers())
+        for (final ArchiveController controller : Controllers.getControllers())
             if (controller.isTouched())
                 result++;
         return result;
@@ -52,7 +52,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     @Override
     public int getTopLevelArchivesTotal() {
         int result = 0;
-        for (ArchiveController controller : FileSystemControllers.getControllers())
+        for (ArchiveController controller : Controllers.getControllers())
             if (controller.getModel().getEnclModel() == null)
                 result++;
         return result;
@@ -61,7 +61,7 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     @Override
     public int getTopLevelArchivesTouched() {
         int result = 0;
-        for (final ArchiveController controller : FileSystemControllers.getControllers())
+        for (final ArchiveController controller : Controllers.getControllers())
             if (controller.getModel().getEnclModel() == null && controller.isTouched())
                 result++;
         return result;
