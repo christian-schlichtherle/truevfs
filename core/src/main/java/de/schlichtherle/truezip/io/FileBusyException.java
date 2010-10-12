@@ -34,7 +34,7 @@ public class FileBusyException extends FileNotFoundException {
         super(message);
     }
 
-    FileBusyException(Throwable cause) {
+    FileBusyException(Exception cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }

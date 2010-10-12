@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import javax.swing.Icon;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -352,7 +353,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	public <E extends IOException>
-    void sync(  final SyncExceptionBuilder<E> builder,
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
     throws E {
         assert !isFileSystemTouched() || output != null; // file system touched => output archive
@@ -415,7 +416,7 @@ extends     FileSystemArchiveController<AE> {
      *         throughout the processing of the target archive file.
      */
     private <E extends IOException>
-    void update(final SyncExceptionHandler<E> handler)
+    void update(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
         assert isFileSystemTouched();
         assert output != null;
@@ -423,34 +424,29 @@ extends     FileSystemArchiveController<AE> {
 
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, E> {
-
-            final SyncExceptionHandler<E> delegate;
             IOException last;
 
-            FilterExceptionHandler(final SyncExceptionHandler<E> delegate) {
-                if (delegate == null)
-                    throw new NullPointerException();
-                this.delegate = delegate;
-            }
-
             @Override
-			public E fail(final IOException cannotHappen) {
-                throw new AssertionError(cannotHappen);
+			public E fail(final IOException cause) {
+                last = cause;
+                return handler.fail(new SyncException(UpdatingArchiveController.this, cause));
             }
 
             @Override
 			public void warn(final IOException cause) throws E {
-                if (cause == null)
-                    throw new NullPointerException();
+                assert null != cause;
                 final IOException old = last;
                 last = cause;
-                if (!(cause instanceof InputException))
+                if (null != old || !(cause instanceof InputException))
                     throw handler.fail(new SyncException(UpdatingArchiveController.this, cause));
-                if (old == null)
-                    delegate.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
+                handler.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
             }
         } // class FilterExceptionHandler
-        update((ExceptionHandler<IOException, E>) new FilterExceptionHandler(handler));
+
+        update( getFileSystem(),
+                null == input ? new DummyInputService<AE>() : input.getDriverProduct(),
+                output.getDriverProduct(),
+                (ExceptionHandler<IOException, E>) new FilterExceptionHandler());
     }
 
     private boolean checkNoDeletedEntriesWithNewData() {
@@ -477,20 +473,11 @@ extends     FileSystemArchiveController<AE> {
         return true;
     }
 
-    private <E extends IOException>
-    void update(final ExceptionHandler<IOException, E> handler)
-    throws E {
-        update( getFileSystem(),
-                null == input ? new DummyInputService<AE>() : input.getDriverProduct(),
-                output.getDriverProduct(),
-                handler);
-    }
-
     private static <AE extends ArchiveEntry, E extends IOException>
-    void update(  final ArchiveFileSystem<AE> fileSystem,
+    void update(final ArchiveFileSystem<AE> fileSystem,
                 final InputService<AE> input,
                 final OutputService<AE> output,
-                final ExceptionHandler<? super IOException, E> handler)
+                final ExceptionHandler<IOException, E> handler)
     throws E {
         final AE root = fileSystem.getEntry(ROOT).getTarget();
         assert root != null;
@@ -535,7 +522,7 @@ extends     FileSystemArchiveController<AE> {
      *         throughout the processing of the target archive file.
      */
     private <E extends IOException>
-    void reset1(final SyncExceptionHandler<E> handler)
+    void reset1(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, E> {
@@ -566,7 +553,7 @@ extends     FileSystemArchiveController<AE> {
      *         throughout the processing of the target archive file.
      */
     private <E extends IOException>
-    void reset2(final SyncExceptionHandler<E> handler)
+    void reset2(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
         setFileSystem(null);
 

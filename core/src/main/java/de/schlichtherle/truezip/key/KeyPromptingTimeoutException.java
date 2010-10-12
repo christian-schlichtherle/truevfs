@@ -32,6 +32,6 @@ public class KeyPromptingTimeoutException extends UnknownKeyException {
 
     public KeyPromptingTimeoutException(Throwable cause) {
         super("Key prompting has timed out!");
-        initCause(cause);
+        super.initCause(cause);
     }
 }

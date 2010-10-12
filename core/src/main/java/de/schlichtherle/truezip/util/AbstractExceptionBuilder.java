@@ -21,12 +21,13 @@ package de.schlichtherle.truezip.util;
  * Subclasses must implement {@link #update(Exception, Exception)} and may
  * override {@link #post(Exception)}.
  *
- * @author Christian Schlichtherle
+ * @param   <C> The type of the cause exception.
+ * @param   <E> The type of the assembled exception.
+ * @author  Christian Schlichtherle
  * @version $Id$
- * @param <C> The type of the cause exception.
- * @param <E> The type of the assembled exception.
  */
-public abstract class AbstractExceptionBuilder<C extends Exception, E extends Exception>
+public abstract class AbstractExceptionBuilder< C extends Exception,
+                                                E extends Exception>
 implements ExceptionBuilder<C, E> {
 
     private E assembly;

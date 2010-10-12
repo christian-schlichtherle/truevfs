@@ -27,6 +27,6 @@ public class ArchiveOutputBusyException extends ArchiveBusyException {
     private static final long serialVersionUID = 4652936465192837172L;
 
     ArchiveOutputBusyException(int numStreams) {
-        super("number of open output streams: " + numStreams, numStreams);
+        super("Number of open output streams: " + numStreams);
     }
 }

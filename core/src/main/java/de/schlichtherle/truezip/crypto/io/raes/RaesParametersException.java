@@ -59,6 +59,6 @@ public class RaesParametersException extends FileNotFoundException {
      */
     public RaesParametersException(Throwable cause) {
         //super(cause != null ? cause.toString() : null);
-        initCause(cause);
+        super.initCause(cause);
     }
 }

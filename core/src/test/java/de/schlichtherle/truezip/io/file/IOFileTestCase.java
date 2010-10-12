@@ -17,9 +17,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.SyncWarningException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
@@ -142,7 +140,7 @@ public abstract class IOFileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (SyncException ignored) {
+        } catch (ArchiveException ignored) {
             // Normally, you should NOT ignore all exceptions thrown by this
             // method.
             // The reason we do it here is that they are usually after effects
@@ -530,9 +528,10 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             File.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
-        } catch (SyncWarningException ex) {
+        } catch (ArchiveWarningException ex) {
             // Warning about fis1 still being used.
-            assertTrue(ex.getCause() instanceof ArchiveBusyException);
+            if (!(ex.getCause() instanceof ArchiveBusyException))
+                throw ex;
         }
         assertTrue(file2.isFile());
         if (!file2.catFrom(fisA)) // fisA may be invalidated after update!
@@ -546,7 +545,7 @@ public abstract class IOFileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (SyncWarningException ex) {
+        } catch (ArchiveWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
 
@@ -587,10 +586,11 @@ public abstract class IOFileTestCase extends TestCase {
         // fosA is still open!
         try {
             new FileOutputStream(file1);
-        } catch (FileBusyException busy) {
+        } catch (FileBusyException ex) {
             // This is actually an implementation detail which may change in
             // a future version.
-            assertTrue(busy.getCause() instanceof ArchiveBusyException);
+            if (!(ex.getCause() instanceof ArchiveBusyException))
+                throw ex;
         }
         
         // fosA is still open!
@@ -606,8 +606,9 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (SyncWarningException ex) {
-            assertTrue(ex.getCause() instanceof ArchiveBusyException);
+        } catch (ArchiveWarningException ex) {
+            if (!(ex.getCause() instanceof ArchiveBusyException))
+                throw ex;
         }
         
         try {
@@ -629,7 +630,7 @@ public abstract class IOFileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (SyncWarningException ex) {
+        } catch (ArchiveWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1398,8 +1399,9 @@ public abstract class IOFileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (SyncException ex) {
-                        assertTrue(ex.getCause() instanceof ArchiveBusyException);
+                    } catch (ArchiveException ex) {
+                        if (!(ex.getCause() instanceof ArchiveBusyException))
+                            throw ex;
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1473,8 +1475,9 @@ public abstract class IOFileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (SyncException ex) {
-                            assertTrue(ex.getCause() instanceof ArchiveBusyException);
+                        } catch (ArchiveException ex) {
+                            if (!(ex.getCause() instanceof ArchiveBusyException))
+                                throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.

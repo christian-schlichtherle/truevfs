@@ -28,7 +28,7 @@ public class OutputBusyException extends FileBusyException {
         super(message);
     }
 
-    public OutputBusyException(Throwable cause) {
+    public OutputBusyException(Exception cause) {
         super(cause);
     }
 }

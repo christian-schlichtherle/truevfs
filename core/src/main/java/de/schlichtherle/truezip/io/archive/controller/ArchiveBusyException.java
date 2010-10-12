@@ -29,18 +29,7 @@ public class ArchiveBusyException extends Exception {
 
     private static final long serialVersionUID = 1937356783082645716L;
 
-    private final int numStreams;
-
-    ArchiveBusyException(String message, int numStreams) {
+    ArchiveBusyException(String message) {
         super(message);
-        this.numStreams = numStreams;
-    }
-
-    /**
-     * Returns the number of open entry streams, whereby an open stream
-     * is a stream which's {@code close()} method hasn't been called.
-     */
-    public final int getNumStreams() {
-        return numStreams;
     }
 }

@@ -27,6 +27,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import java.io.IOException;
 import java.io.InputStream;
@@ -359,7 +360,7 @@ final class LockingArchiveController extends FilterArchiveController {
 
     @Override
     public <E extends IOException>
-    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();

@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import javax.swing.Icon;
 
@@ -134,7 +135,7 @@ class FilterArchiveController implements ArchiveController {
 
     @Override
     public <E extends IOException>
-    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E {
         getController().sync(builder, options);
     }

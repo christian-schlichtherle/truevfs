@@ -17,15 +17,15 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public final class DefaultSyncExceptionBuilder
-extends ChainableIOExceptionBuilder<SyncException, SyncException>
-implements SyncExceptionBuilder<SyncException> {
+extends ChainableIOExceptionBuilder<IOException, SyncException> {
     public DefaultSyncExceptionBuilder() {
-        super(SyncException.class, SyncException.class);
+        super(IOException.class, SyncException.class);
     }
 }

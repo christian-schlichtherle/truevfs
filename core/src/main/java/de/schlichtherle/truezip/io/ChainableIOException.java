@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import java.io.IOException;
@@ -22,30 +21,29 @@ import java.io.PrintWriter;
 import java.util.Comparator;
 
 /**
- * Represents a chain of subsequently occured {@link IOException}s which have
+ * Represents a chain of subsequently occured {@code IOException}s which have
  * <em>not</em> caused each other.
  * <p>
- * This class supports chaining exceptions for reasons other than causes
- * (which is a functionality already provided by J2SE 1.4 and later).
- * A {@code ChainableIOException} can be used to implement an algorithm
- * which must be able to continue with some work although one or more
- * {@code IOException}s have occured.
+ * This class supports chaining I/O exceptions for reasons other than
+ * causes (which is a functionality already provided by J2SE 1.4 and later).
+ * A chainable I/O exception can be used to implement an algorithm which must
+ * be able to continue with some work although one or more I/O exceptions have
+ * occured.
  * <p>
  * For example, when looping through a list of files, an algorithm might
- * encounter an {@link IOException} when processing a file element in the list.
+ * encounter an I/O exception when processing a file element in the list.
  * However, it may still be required to process the remaining files in the list
- * before actually throwing the corresponding {@link IOException}.
- * Hence, whenever this algorithm encounters an {@link IOException},
- * it would catch the {@link IOException}, create a
- * {@code ChainableIOException} for it and continue processing the
- * remainder of the list.
- * Finally, at the end of the algorithm, if any {@link IOException}s
- * have occured, the {@code ChainableIOException} chain would get sorted
- * according to priority (see {@link #getPriority()} and
- * {@link #sortPriority()}) and finally thrown.
- * This would allow a client application to filter the exceptions by priority
- * with a simple try-catch statement, ensuring that no other exception of
- * higher priority is in the catched exception chain.
+ * before actually throwing the corresponding I/O exception.
+ * Hence, whenever this algorithm encounters an I/O exception, it would catch
+ * the I/O exception, create a chainable I/O exception for it and continue
+ * processing the remainder of the list.
+ * Finally, at the end of the algorithm, if any I/O exceptions
+ * have occured, the chainable I/O exception would get sorted according to
+ * priority (see {@link #getPriority()} and {@link #sortPriority()}) and
+ * finally thrown.
+ * This would allow a client application to filter the I/O exceptions by
+ * priority with a simple try-catch statement, ensuring that no other
+ * exception of higher priority is in the catched exception chain.
  * <p>
  * This class is thread-safe.
  *
@@ -53,12 +51,13 @@ import java.util.Comparator;
  * @version $Id$
  */
 public class ChainableIOException extends IOException implements Cloneable {
+
     private static final long serialVersionUID = 2203967634187324928L;
 
     private static int maxPrintExceptions = 3;
 
     /**
-     * Compares two {@code ChainableIOException}s in descending order of their
+     * Compares two chainable I/O exceptions in descending order of their
      * priority.
      * If the priority is equal, the elements are compared in descending
      * order of their appearance.
@@ -74,7 +73,7 @@ public class ChainableIOException extends IOException implements Cloneable {
     };
 
     /**
-     * Compares two {@code ChainableIOException}s in descending order of their
+     * Compares two chainable I/O exceptions in descending order of their
      * appearance.
      */
     // Note: Not private for unit testing purposes only!
@@ -176,13 +175,27 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     /**
-     * Returns the exception chain represented by the predecessor exception,
-     * or {@code null} if no predecessing exception exists or this property
-     * hasn't been
-     * {@link #initPredecessor(ChainableIOException) initialized} yet.
+     * Initializes the <i>predecessor</i> of this chainable exception to
+     * the given object. This method can be called at most once unless the
+     * given predecessor is the same as the previously initialized predecessor.
+     *
+     * @param  predecessor An exception that happened <em>before</em> and is
+     *         <em>not</em> the cause for this exception!
+     *         Must be {@code null} to indicate that a predecessor does not
+     *         exist.
+     * @return A reference to this object.
+     * @throws IllegalStateException If the predecessor has already been set.
+     * @throws IllegalArgumentException If the given {@code predecessor} is
+     *         this instance or has not been initialized with a predecessor
+     *         itself.
      */
-    public final ChainableIOException getPredecessor() {
-        return this == predecessor ? null : predecessor;
+    public final synchronized ChainableIOException initPredecessor(
+            ChainableIOException predecessor) {
+        setPredecessor(predecessor);
+        predecessor = getPredecessor();
+        if (predecessor != null)
+            index = maxIndex = predecessor.maxIndex + 1;
+        return this;
     }
 
     private void setPredecessor(
@@ -200,41 +213,19 @@ public class ChainableIOException extends IOException implements Cloneable {
     }
 
     /**
-     * Initializes the <i>predecessor</i> of this chainable I/O exception to
-     * the given object. This method can be called at most once unless the
-     * given predecessor is the same as the previously initialized predecessor.
-     *
-     * @param predecessor An exception that happened <em>before</em> and is
-     *        <em>not</em> the cause for this exception!
-     *        Must be {@code null} to indicate that a predecessor does not
-     *        exist.
-     * @return A reference to this object.
-     * @throws IllegalStateException If the predecessor has already been set.
-     * @throws IllegalArgumentException If the given {@code predecessor} is
-     *         this instance or has not been initialized with a predecessor
-     *         itself.
+     * Returns the exception chain represented by the predecessing exception,
+     * or {@code null} if no predecessing exception exists or this property
+     * hasn't been
+     * {@link #initPredecessor(ChainableIOException) initialized} yet.
      */
-    public synchronized ChainableIOException initPredecessor(
-            ChainableIOException predecessor) {
-        setPredecessor(predecessor);
-        predecessor = getPredecessor();
-        if (predecessor != null)
-            index = maxIndex = predecessor.maxIndex + 1;
-        return this;
+    public final synchronized ChainableIOException getPredecessor() {
+        return this == predecessor ? null : predecessor;
     }
 
     /** Returns the priority of this exception. */
     public final int getPriority() {
         return priority;
     }
-
-    /**
-     * Returns the zero-based index number of this exception when it was first
-     * linked into this chain.
-     */
-    /*public final int getIndex() {
-        return index;
-    }*/
 
     /**
      * Sorts the elements of this exception chain in descending order

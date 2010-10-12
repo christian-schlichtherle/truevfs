@@ -27,9 +27,9 @@ package de.schlichtherle.truezip.util;
  * assembled exception by calling {@link #fail(Exception)} or
  * {@link #check()}.
  *
- * @param <C> The type of the cause exception.
- * @param <E> The type of the assembled exception.
- * @author Christian Schlichtherle
+ * @param   <C> The type of the cause exception.
+ * @param   <E> The type of the assembled exception.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface ExceptionBuilder<C extends Exception, E extends Exception>

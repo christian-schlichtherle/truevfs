@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2005-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
-
-import de.schlichtherle.truezip.util.ExceptionBuilder;
-import java.io.IOException;
+package de.schlichtherle.truezip.io.file;
 
 /**
- * @author Christian Schlichtherle
+ * Like its super class, but indicates an exceptional condition which does
+ * <em>not</em> incur loss of data unless some other {@code ArchiveException}
+ * occurs, too.
+ *
+ * @author  Christian Schlichtherle
  * @version $Id$
+ * @since   TrueZIP 6.0
  */
-public interface SyncExceptionBuilder<E extends IOException>
-extends SyncExceptionHandler<E>, ExceptionBuilder<SyncException, E> {
+public class ArchiveWarningException extends ArchiveException {
+
+    private static final long serialVersionUID = 1L;
+    
+    ArchiveWarningException(String message) {
+        super(message, -1);
+    }
 }

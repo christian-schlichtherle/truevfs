@@ -34,6 +34,6 @@ public class KeyPromptingDisabledException extends UnknownKeyException  {
 
     public KeyPromptingDisabledException(Throwable cause) {
         super("Key prompting has been disabled!");
-        initCause(cause);
+        super.initCause(cause);
     }
 }
