@@ -37,19 +37,10 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class LockingArchiveController extends ArchiveController {
+final class LockingArchiveController extends FilterArchiveController {
 
-    private final ArchiveController controller;
-
-    LockingArchiveController(   final ArchiveModel model,
-                                final ArchiveController controller) {
-        super(model);
-        assert null != controller;
-        this.controller = controller;
-    }
-
-    private ArchiveController getController() {
-        return controller;
+    LockingArchiveController(final ArchiveController controller) {
+        super(controller);
     }
 
     ReentrantLock readLock() {
@@ -60,8 +51,7 @@ final class LockingArchiveController extends ArchiveController {
         return getModel().writeLock();
     }
 
-    void ensureNotReadLockedByCurrentThread(
-            NotWriteLockedByCurrentThreadException ex) {
+    void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex) {
         getModel().ensureNotReadLockedByCurrentThread(ex);
     }
 
@@ -74,7 +64,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -86,7 +76,7 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public Icon getClosedIcon() {
+    public Icon getClosedIcon()  {
         try {
             readLock().lock();
             try {
@@ -94,7 +84,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -114,7 +104,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -134,7 +124,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -154,7 +144,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -174,7 +164,7 @@ final class LockingArchiveController extends ArchiveController {
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -210,21 +200,21 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public InputSocket<?> newInputSocket(   String path,
+    public InputSocket<?> getInputSocket(   String path,
                                             BitField<InputOption> options)
     throws IOException {
         try {
             readLock().lock();
             try {
-                return new Input(getController().newInputSocket(path, options));
+                return new Input(getController().getInputSocket(path, options));
             } finally {
                 readLock().unlock();
             }
-        } catch (NotWriteLockedByCurrentThreadException ex) {
+        } catch (NotWriteLockedException ex) {
             ensureNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return new Input(getController().newInputSocket(path, options));
+                return new Input(getController().getInputSocket(path, options));
             } finally {
                 writeLock().unlock();
             }
@@ -246,7 +236,7 @@ final class LockingArchiveController extends ArchiveController {
                 } finally {
                     readLock().unlock();
                 }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
+            } catch (NotWriteLockedException ex) {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
@@ -266,7 +256,7 @@ final class LockingArchiveController extends ArchiveController {
                 } finally {
                     readLock().unlock();
                 }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
+            } catch (NotWriteLockedException ex) {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
@@ -286,7 +276,7 @@ final class LockingArchiveController extends ArchiveController {
                 } finally {
                     readLock().unlock();
                 }
-            } catch (NotWriteLockedByCurrentThreadException ex) {
+            } catch (NotWriteLockedException ex) {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
@@ -299,13 +289,13 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public OutputSocket<?> newOutputSocket( String path,
+    public OutputSocket<?> getOutputSocket( String path,
                                             BitField<OutputOption> options)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return new Output(getController().newOutputSocket(path, options));
+            return new Output(getController().getOutputSocket(path, options));
         } finally {
             writeLock().unlock();
         }
@@ -368,9 +358,9 @@ final class LockingArchiveController extends ArchiveController {
     }
 
     @Override
-    public void sync(   ArchiveSyncExceptionBuilder builder,
+    public void sync(   SyncExceptionBuilder builder,
                         BitField<SyncOption> options)
-    throws ArchiveSyncException {
+    throws SyncException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {

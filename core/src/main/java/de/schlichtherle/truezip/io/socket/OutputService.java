@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 /**
- * A container and output socket factory for common entries.
+ * A container and output socket provider for common entries.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have just been partially written yet, i.e. which have not already
@@ -31,5 +31,5 @@ package de.schlichtherle.truezip.io.socket;
  * @version $Id$
  */
 public interface OutputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE>, OutputSocketFactory<CE> {
+extends CommonEntryContainer<CE>, OutputSocketProvider<CE> {
 }

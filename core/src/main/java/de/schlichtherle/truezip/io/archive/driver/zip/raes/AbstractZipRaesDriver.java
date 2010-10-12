@@ -30,7 +30,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;

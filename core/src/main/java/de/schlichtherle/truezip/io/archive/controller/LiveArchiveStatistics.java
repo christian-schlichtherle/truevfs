@@ -16,13 +16,13 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-final class LiveFileSystemStatistics implements FileSystemStatistics {
+final class LiveArchiveStatistics implements ArchiveStatistics {
 
     /** The singleton instance of this class. */
-    public static final LiveFileSystemStatistics SINGLETON
-            = new LiveFileSystemStatistics();
+    public static final LiveArchiveStatistics SINGLETON
+            = new LiveArchiveStatistics();
 
-    private LiveFileSystemStatistics() {
+    private LiveArchiveStatistics() {
     }
 
     @Override
@@ -36,32 +36,32 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     }
 
     @Override
-    public int getFileSystemsTotal() {
+    public int getArchivesTotal() {
         return FileSystemControllers.getControllers().size();
     }
 
     @Override
-    public int getFileSystemsTouched() {
+    public int getArchivesTouched() {
         int result = 0;
-        for (final FileSystemController controller : FileSystemControllers.getControllers())
+        for (final ArchiveController controller : FileSystemControllers.getControllers())
             if (controller.isTouched())
                 result++;
         return result;
     }
 
     @Override
-    public int getTopLevelFileSystemsTotal() {
+    public int getTopLevelArchivesTotal() {
         int result = 0;
-        for (FileSystemController controller : FileSystemControllers.getControllers())
+        for (ArchiveController controller : FileSystemControllers.getControllers())
             if (controller.getModel().getEnclModel() == null)
                 result++;
         return result;
     }
 
     @Override
-    public int getTopLevelFileSystemsTouched() {
+    public int getTopLevelArchivesTouched() {
         int result = 0;
-        for (final FileSystemController controller : FileSystemControllers.getControllers())
+        for (final ArchiveController controller : FileSystemControllers.getControllers())
             if (controller.getModel().getEnclModel() == null && controller.isTouched())
                 result++;
         return result;

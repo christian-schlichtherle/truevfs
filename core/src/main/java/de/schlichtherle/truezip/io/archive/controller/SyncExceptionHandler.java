@@ -16,13 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class DefaultArchiveSyncExceptionBuilder
-extends ChainableIOExceptionBuilder<ArchiveSyncException>
-implements ArchiveSyncExceptionBuilder {
+public interface SyncExceptionHandler
+extends ExceptionHandler<SyncException, SyncException> {
 }

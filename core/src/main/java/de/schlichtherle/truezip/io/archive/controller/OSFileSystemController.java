@@ -15,11 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import java.io.File;
 import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
@@ -42,8 +43,7 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 final class OSFileSystemController
-extends FileSystemController
-implements FileSystemModel {
+implements FileSystemModel, FileSystemController  {
 
     private final URI mountPoint;
     private final File target;
@@ -59,11 +59,6 @@ implements FileSystemModel {
     }
 
     @Override
-    protected FileSystemModel getModel() {
-        return this;
-    }
-
-    @Override
     public FileSystemModel getEnclModel() {
         return null;
     }
@@ -74,8 +69,8 @@ implements FileSystemModel {
     }
 
     @Override
-    public boolean isTouched() {
-        return false;
+    public FileSystemModel getModel() {
+        return this;
     }
 
     @Override
@@ -130,20 +125,20 @@ implements FileSystemModel {
     }
 
     @Override
-    public InputSocket<FileEntry> newInputSocket(
+    public InputSocket<FileEntry> getInputSocket(
             String path,
             BitField<InputOption> options)
     throws IOException {
-        return new FileEntry(target, path).newInputSocket(
+        return new FileEntry(target, path).getInputSocket(
                 options.clear(InputOption.BUFFER));
     }
 
     @Override
-    public OutputSocket<FileEntry> newOutputSocket(
+    public OutputSocket<FileEntry> getOutputSocket(
             String path,
             BitField<OutputOption> options)
     throws IOException {
-        return new FileEntry(target, path).newOutputSocket(options);
+        return new FileEntry(target, path).getOutputSocket(options);
     }
 
     @Override
@@ -168,10 +163,5 @@ implements FileSystemModel {
         final File file = new File(target, path);
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
-    }
-
-    @Override
-    public void sync(ArchiveSyncExceptionBuilder builder, BitField<SyncOption> options)
-    throws ArchiveSyncException {
     }
 }

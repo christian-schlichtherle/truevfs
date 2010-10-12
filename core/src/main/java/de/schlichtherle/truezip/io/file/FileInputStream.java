@@ -115,7 +115,7 @@ public class FileInputStream extends FilterInputStream {
     private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
         try {
-            return Files.newInputSocket(src,
+            return Files.getInputSocket(src,
                     BitField.noneOf(InputOption.class))
                     .newInputStream();
         } catch (FileNotFoundException ex) {

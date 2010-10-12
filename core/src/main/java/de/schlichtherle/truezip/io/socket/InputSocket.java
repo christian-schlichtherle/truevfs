@@ -70,7 +70,7 @@ extends IOSocket<CE, CommonEntry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final InputSocket<CE> share(final InputSocket<?> with) {
+	public final InputSocket<CE> bind(final InputSocket<?> with) {
         final OutputSocket<?> newPeer = with.peer;
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
@@ -119,14 +119,14 @@ extends IOSocket<CE, CommonEntry> {
     }
 
     /**
-     * Called by {@link #share} and {@link #connect} after a peering has been
+     * Called by {@link #bind} and {@link #connect} after a peering has been
      * initiated, but before the peer output socket has been changed.
      */
     protected void beforePeering() {
     }
 
     /**
-     * Called by {@link #share} and {@link #connect} after a peering has been
+     * Called by {@link #bind} and {@link #connect} after a peering has been
      * completed and the peer output socket has been successfully changed.
      */
     protected void afterPeering() {

@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
@@ -32,10 +32,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.REASSEMBLE_BUFFERS;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.REASSEMBLE_BUFFERS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
@@ -50,10 +50,10 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class FileSystemControllers {
 
-    private static final Comparator<FileSystemController> REVERSE_CONTROLLERS
-            = new Comparator<FileSystemController>() {
+    private static final Comparator<ArchiveController> REVERSE_CONTROLLERS
+            = new Comparator<ArchiveController>() {
         @Override
-		public int compare(FileSystemController l, FileSystemController r) {
+		public int compare(ArchiveController l, ArchiveController r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -65,8 +65,8 @@ public class FileSystemControllers {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<FileSystemController>> controllers
-            = new WeakHashMap<URI, Link<FileSystemController>>();
+    private static final Map<URI, Link<ArchiveController>> controllers
+            = new WeakHashMap<URI, Link<ArchiveController>>();
 
     private FileSystemControllers() {
     }
@@ -100,7 +100,7 @@ public class FileSystemControllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         synchronized (controllers) {
-            final FileSystemController controller
+            final ArchiveController controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller) {
                 // If required, reconfiguration of the FileSystemController
@@ -114,17 +114,18 @@ public class FileSystemControllers {
             if (null == enclController) {
                 enclController = new OSFileSystemController(
                         mountPoint.resolve(".."));
-                scheduleSync(WEAK, enclController);
             }
             final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
             final ArchiveModel model = new ArchiveModel(
                     enclController.getModel(), mountPoint, syncScheduler);
             // TODO: Support append strategy.
             syncScheduler.controller
-                    = new ProspectiveArchiveController(             model,
-                        new BufferingArchiveController(             model,
-                            new LockingArchiveController(           model,
-                                new UpdatingArchiveController<AE>(  model, driver))));
+                    = new ProspectiveArchiveController(
+                        enclController,
+                        new BufferingArchiveController(
+                            new LockingArchiveController(
+                                new UpdatingArchiveController<AE>(
+                                    enclController, model, driver))));
             syncScheduler.setTouched(false);
             return syncScheduler.controller;
         }
@@ -132,7 +133,7 @@ public class FileSystemControllers {
 
     private static class SyncScheduler<AE extends ArchiveEntry>
     implements TouchListener {
-        FileSystemController controller;
+        ArchiveController controller;
 
         @Override
         public void setTouched(boolean touched) {
@@ -147,7 +148,7 @@ public class FileSystemControllers {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	static void scheduleSync(   final Link.Type type,
-                                final FileSystemController controller) {
+                                final ArchiveController controller) {
         synchronized (controllers) {
             controllers.put(
                     controller.getModel().getMountPoint(), // ALWAYS put controller.getMountPoint() to obeye contract of WeakHashMap!
@@ -167,27 +168,27 @@ public class FileSystemControllers {
      *        This may be {@code null} or empty in order to select all accessed
      *        archive files.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultArchiveSyncExceptionBuilder} and <em>only</em>
+     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to set the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException if the configuration uses the
-     *         {@link DefaultArchiveSyncExceptionBuilder} and any error
+     *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException if {@code config} is {@code null}.
      * @throws IllegalArgumentException if the configuration property
      *         {@code closeInputStreams} is {@code false} and
      *         {@code closeOutputStreams} is {@code true}.
-     * @see FileSystemController#sync(ArchiveSyncExceptionBuilder, BitField)
+     * @see FileSystemController#sync(SyncExceptionBuilder, BitField)
      */
     public static void sync(
             final URI prefix,
-            final ArchiveSyncExceptionBuilder builder,
+            final SyncExceptionBuilder builder,
             BitField<SyncOption> options)
-    throws ArchiveSyncException {
+    throws SyncException {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
@@ -204,7 +205,7 @@ public class FileSystemControllers {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its enclosing archive file.
-            for (final FileSystemController controller
+            for (final ArchiveController controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     if (controller.isTouched())
@@ -213,7 +214,7 @@ public class FileSystemControllers {
                     // have been generated. We need to remember them for
                     // later throwing.
                     controller.sync(builder, options);
-                } catch (ArchiveSyncException exception) {
+                } catch (SyncException exception) {
                     // Updating the archive file or wrapping it back into
                     // one of it's enclosing archive files resulted in an
                     // exception for some reason.
@@ -230,22 +231,22 @@ public class FileSystemControllers {
         }
     }
 
-    static Set<FileSystemController> getControllers() {
+    static Set<ArchiveController> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<FileSystemController> getControllers(
+    static Set<ArchiveController> getControllers(
             URI prefix,
-            final Comparator<FileSystemController> comparator) {
+            final Comparator<ArchiveController> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<FileSystemController> snapshot;
+        final Set<ArchiveController> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<FileSystemController>(comparator)
-                    : new HashSet<FileSystemController>((int) (controllers.size() / .75f) + 1);
-            for (final Link<FileSystemController> link : controllers.values()) {
-                final FileSystemController controller = Links.getTarget(link);
+                    ? new TreeSet<ArchiveController>(comparator)
+                    : new HashSet<ArchiveController>((int) (controllers.size() / .75f) + 1);
+            for (final Link<ArchiveController> link : controllers.values()) {
+                final ArchiveController controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()
@@ -270,8 +271,8 @@ public class FileSystemControllers {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static FileSystemStatistics getStatistics() {
-        return LiveFileSystemStatistics.SINGLETON;
+    public static ArchiveStatistics getStatistics() {
+        return LiveArchiveStatistics.SINGLETON;
     }
 
     /**
@@ -339,11 +340,9 @@ public class FileSystemControllers {
                     }
                 } finally {
                     try {
-                        FileSystemControllers.sync(
-                                null,
-                                new DefaultArchiveSyncExceptionBuilder(),
+                        sync(   null, new DefaultSyncExceptionBuilder(),
                                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
-                    } catch (ArchiveSyncException ouch) {
+                    } catch (SyncException ouch) {
                         ouch.printStackTrace();
                     }
                 }

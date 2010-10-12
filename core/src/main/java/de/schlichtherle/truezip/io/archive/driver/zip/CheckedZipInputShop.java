@@ -60,7 +60,7 @@ public class CheckedZipInputShop extends ZipInputShop {
 
     /** Overridden to read from a checked input stream. */
     @Override
-    public InputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
+    public InputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         if (getEntry(entry.getName()) != entry)
             throw new IllegalArgumentException("interface contract violation");

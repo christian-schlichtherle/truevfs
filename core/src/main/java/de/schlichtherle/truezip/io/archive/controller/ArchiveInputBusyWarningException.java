@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+
 /**
  * Like its super class, but indicates the existance of open input streams.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.util.ExceptionHandler;
-
 /**
+ * Indicates that a controller is not write locked and the lock cannot get
+ * acquired by the current thread for some reason.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveSyncExceptionHandler
-extends ExceptionHandler<ArchiveSyncException, ArchiveSyncException> {
+final class NotWriteLockedException extends RuntimeException {
+    private static final long serialVersionUID = 91746592376291L;
+
+    NotWriteLockedException() {
+    }
+
+    NotWriteLockedException(NotWriteLockedException ex) {
+        super.initCause(ex);
+    }
 }

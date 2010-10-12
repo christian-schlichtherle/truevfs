@@ -46,11 +46,11 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
     }
 
     @Override
-    public OutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
+    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
     throws IOException {
         class Output extends FilterOutputSocket<ZipEntry> {
             Output() throws IOException {
-                super(OdfOutputShop.super.newOutputSocket(entry));
+                super(OdfOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

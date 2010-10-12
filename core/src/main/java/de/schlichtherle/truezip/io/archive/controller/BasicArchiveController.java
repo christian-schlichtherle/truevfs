@@ -22,8 +22,8 @@ import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.util.Links;
-import de.schlichtherle.truezip.io.socket.OutputSocketFactory;
-import de.schlichtherle.truezip.io.socket.InputSocketFactory;
+import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
+import de.schlichtherle.truezip.io.socket.InputSocketProvider;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -38,19 +38,16 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
-import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static java.util.logging.Level.WARNING;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -103,16 +100,25 @@ import static java.util.logging.Level.WARNING;
  * @version $Id$
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
-extends        ArchiveController
-implements     InputSocketFactory <AE>,
-               OutputSocketFactory<AE> {
+implements     ArchiveController,
+               InputSocketProvider <AE>,
+               OutputSocketProvider<AE> {
 
-    private final ArchiveDriver<AE> driver;
+    private final ArchiveModel model;
 
-    BasicArchiveController(ArchiveModel model, final ArchiveDriver<AE> driver) {
-        super(model);
-        assert null != driver;
-        this.driver = driver;
+    /**
+     * Constructs a new basic archive controller.
+     *
+     * @param model the non-{@code null} archive model.
+     */
+    BasicArchiveController(final ArchiveModel model) {
+        assert null != model;
+        this.model = model;
+    }
+
+    @Override
+    public final ArchiveModel getModel() {
+        return model;
     }
 
     final ArchiveFileSystem<AE> autoMount()
@@ -140,44 +146,12 @@ implements     InputSocketFactory <AE>,
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
-     * @throws FalsePositiveEntryException
+     * @throws FalsePositiveException
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
     abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
     throws IOException;
-
-    /**
-     * Returns the driver instance which is used for the target archive.
-     * All access to this method must be externally synchronized on this
-     * controller's read lock!
-     *
-     * @return A valid reference to an {@link ArchiveDriver} object
-     *         - never {@code null}.
-     */
-    final ArchiveDriver<AE> getDriver() {
-        return driver;
-    }
-
-    @Override
-    public final Icon getOpenIcon() {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getOpenIcon(getModel());
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public final Icon getClosedIcon() {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getClosedIcon(getModel());
-         } catch (IOException ex) {
-            return null;
-        }
-    }
 
     @Override
     public final boolean isReadOnly() {
@@ -232,49 +206,49 @@ implements     InputSocketFactory <AE>,
     }
 
     @Override
-    public final InputSocket<?> newInputSocket(
+    public final InputSocket<?> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException {
         class Input extends InputSocket<AE> {
-            @Override
-            protected void afterPeering() {
-                try {
-                    getRemoteTarget(); // TODO: This can't get removed - explain why!
-                } catch (IOException ex) {
-                    Logger.getLogger(BasicArchiveController.class.getName())
-                            .log(WARNING, path, ex);
-                }
-            }
+            boolean recursion;
 
             @Override
             public AE getLocalTarget() throws IOException {
-                autoSync(path, READ);
-                return Links.getTarget(autoMount().getEntry(path));
-            }
-
-            InputSocket<AE> newInputSocket() throws IOException {
-                final AE entry = getLocalTarget();
+                if (!autoSync(path, READ) && !recursion) {
+                    recursion = true;
+                    try {
+                        getRemoteTarget(); // force autoSync for remote target!
+                    } finally {
+                        recursion = false;
+                    }
+                }
+                final AE entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "no such file or directory");
+                return entry;
+            }
+
+            InputSocket<AE> getInputSocket() throws IOException {
+                final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "cannot read directories");
-                return BasicArchiveController.this.newInputSocket(entry).share(this);
+                return BasicArchiveController.this.getInputSocket(entry).bind(this);
             }
 
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return newInputSocket().newInputStream();
+                return getInputSocket().newInputStream();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return newInputSocket().newReadOnlyFile();
+                return getInputSocket().newReadOnlyFile();
             }
-        }
+        } // class Input
 
         autoMount(); // detect false positives!
         if (isRoot(path)) {
@@ -283,10 +257,10 @@ implements     InputSocketFactory <AE>,
         } else {
             return new Input();
         }
-    } // class InputSocket
+    }
 
     @Override
-    public final OutputSocket<?> newOutputSocket(
+    public final OutputSocket<?> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException {
@@ -310,18 +284,8 @@ implements     InputSocketFactory <AE>,
             }
 
             @Override
-            protected void beforePeering() {
-                link = null; // reset local target reference
-            }
-
-            @Override
             protected void afterPeering() {
-                try {
-                    getRemoteTarget(); // TODO: This can't get removed - explain why!
-                } catch (IOException ex) {
-                    Logger.getLogger(BasicArchiveController.class.getName())
-                            .log(WARNING, path, ex);
-                }
+                link = null; // reset local target reference
             }
 
             @Override
@@ -335,13 +299,13 @@ implements     InputSocketFactory <AE>,
             public OutputStream newOutputStream()
             throws IOException {
                 final AE entry = getEntry();
-                final OutputSocket<AE> output = newOutputSocket(entry);
+                final OutputSocket<AE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
-                        ? newInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
+                        ? getInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
                         : null;
                 try {
                     final OutputStream out = output
-                            .share(null == in ? this : null)
+                            .bind(null == in ? this : null)
                             .newOutputStream();
                     try {
                         link.run();
@@ -362,7 +326,7 @@ implements     InputSocketFactory <AE>,
                     }
                 }
             }
-        } // class OutputSocket
+        } // class Output
 
         if (isRoot(path)) {
             autoMount(); // detect false positives!
@@ -387,7 +351,7 @@ implements     InputSocketFactory <AE>,
         if (isRoot(path)) {
             try {
                 autoMount(); // detect false positives!
-            } catch (FalsePositiveEntryException ex) {
+            } catch (FalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true, options.get(CREATE_PARENTS));
@@ -416,7 +380,7 @@ implements     InputSocketFactory <AE>,
             final ArchiveFileSystem<AE> fileSystem = autoMount();
             if (!fileSystem.getEntry(path).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
-            sync(   new DefaultArchiveSyncExceptionBuilder(),
+            sync(   new DefaultSyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
             // Just in case our target is an RAES encrypted ZIP file,
             // forget it's password as well.
@@ -425,10 +389,15 @@ implements     InputSocketFactory <AE>,
             // way to model this, e.g. by calling a listener interface.
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
             // Delete the entry in the enclosing controller , too.
-            throw new FalsePositiveEntryException(new IOException()); // TODO: Consider TransientIOException!
+            throw new FalsePositiveException(new IOException()); // TODO: Consider TransientIOException!
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }
+    }
+
+    @Override
+    public final boolean isTouched() {
+        return getModel().isTouched();
     }
 
     /**
@@ -443,11 +412,11 @@ implements     InputSocketFactory <AE>,
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
      * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
-     * @throws ArchiveSyncException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws NotWriteLockedByCurrentThreadException
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws ArchiveSyncException;
+    throws SyncException;
 }

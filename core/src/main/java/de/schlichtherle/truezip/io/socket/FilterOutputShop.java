@@ -40,11 +40,11 @@ implements OutputShop<CE> {
     }
 
     @Override
-    public OutputSocket<CE> newOutputSocket(CE entry)
+    public OutputSocket<CE> getOutputSocket(CE entry)
     throws IOException {
         if (null == entry)
             throw new NullPointerException();
-        return target.newOutputSocket(entry);
+        return target.getOutputSocket(entry);
     }
 
     @Override

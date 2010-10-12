@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
 import java.io.ByteArrayInputStream;
@@ -142,7 +142,7 @@ public abstract class IOFileTestCase extends TestCase {
         // clean sheet of paper with subsequent tests.
         try {
             File.umount();
-        } catch (ArchiveSyncException ignored) {
+        } catch (SyncException ignored) {
             // Normally, you should NOT ignore all exceptions thrown by this
             // method.
             // The reason we do it here is that they are usually after effects

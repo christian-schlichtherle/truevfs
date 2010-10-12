@@ -37,7 +37,7 @@ extends InputSocket<CE> {
     }
 
     protected final InputSocket<? extends CE> getInputSocket() {
-        return input.share(this);
+        return input.bind(this);
     }
 
     @Override

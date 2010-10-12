@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+
 /**
  * Indicates that an archive file could not get updated because some input or
  * output streams for its entries are still open.
@@ -27,7 +29,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @version $Id$
  */
 public class ArchiveBusyException
-extends ArchiveSyncException {
+extends SyncException {
 
     private static final long serialVersionUID = 1937356783082645716L;
 

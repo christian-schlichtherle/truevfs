@@ -149,7 +149,7 @@ public class FileOutputStream extends FilterOutputStream {
                                                     final boolean append)
     throws FileNotFoundException {
         try {
-            return Files.newOutputSocket(dst,
+            return Files.getOutputSocket(dst,
                     BitField.noneOf(OutputOption.class)
                         .set(APPEND, append)
                         .set(CREATE_PARENTS, File.isLenient()))

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -24,8 +25,8 @@ import java.net.URI;
  * Indicates that an <i>archive entry</i>
  * does not exist or is not accessible.
  * <p>
- * May be thrown by {@link ArchiveController#newInputSocket} or
- * {@link ArchiveController#newOutputSocket}.
+ * May be thrown by {@link ArchiveController#getInputSocket} or
+ * {@link ArchiveController#getOutputSocket}.
  */
 public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 

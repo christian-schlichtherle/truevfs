@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
 import java.net.URI;
 
@@ -40,18 +40,14 @@ public interface FileSystemModel {
      * relative URIs can be resolved against it.
      * <p>
      * The mount point may be used to construct error messages or to locate
-     * and access archive metadata which is stored outside the federated file
-     * system, e.g. in-memory stored passwords for RAES encrypted ZIP files.
-     * <p>
-     * Note that the mount point <em>must not</em> and in most cases even
-     * cannot be used to locate and access the archive file in the operating
-     * system's file system directly, even if the <i>file scheme</i> is used.
+     * and access file system metadata which is stored outside the federated
+     * file system, e.g. in-memory stored passwords for RAES encrypted ZIP
+     * files.
      * <p>
      * Implementation notes: If the returned URI uses the <i>file scheme</i>,
      * its path must be canonical in order to be really unique.
      *
-     * @return A non-{@code null} URI for the mount point of the target archive
-     *         file.
+     * @return A non-{@code null} URI for the mount point of the file system.
      */
     URI getMountPoint();
 }

@@ -91,7 +91,7 @@ implements OutputShop<TarEntry> {
     }
 
     @Override
-    public OutputSocket<TarEntry> newOutputSocket(final TarEntry entry)
+    public OutputSocket<TarEntry> getOutputSocket(final TarEntry entry)
     throws FileNotFoundException {
         class Output extends OutputSocket<TarEntry> {
             @Override
@@ -136,7 +136,7 @@ implements OutputShop<TarEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #newOutputSocket(TarEntry)}.
+     * These preconditions are checked by {@link #getOutputSocket(TarEntry)}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;

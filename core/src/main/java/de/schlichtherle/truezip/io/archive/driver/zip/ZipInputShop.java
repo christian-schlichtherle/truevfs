@@ -53,7 +53,7 @@ implements InputShop<ZipEntry> {
     }
 
     @Override
-    public InputSocket<ZipEntry> newInputSocket(final ZipEntry entry)
+    public InputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         if (getEntry(entry.getName()) != entry)
             throw new IllegalArgumentException("interface contract violation");

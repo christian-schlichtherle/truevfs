@@ -20,7 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayOutputStream;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.io.IOException;
 import java.net.URI;

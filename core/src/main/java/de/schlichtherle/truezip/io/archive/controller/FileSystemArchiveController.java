@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.IOException;
@@ -38,8 +37,8 @@ extends BasicArchiveController<AE> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(ArchiveModel model, ArchiveDriver<AE> driver) {
-        super(model, driver);
+    FileSystemArchiveController(ArchiveModel model) {
+        super(model);
     }
 
     final void ensureWriteLockedByCurrentThread() {
@@ -79,7 +78,7 @@ extends BasicArchiveController<AE> {
      *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
-     * @throws FalsePositiveEntryException
+     * @throws FalsePositiveException
      * @throws IOException On any other I/O related issue with the target file
      *         or the target file of any enclosing archive file's controller.
      */
@@ -110,7 +109,7 @@ extends BasicArchiveController<AE> {
             ensureWriteLockedByCurrentThread();
             //try {
                 mount(autoCreate, createParents);
-            /*} catch (FalsePositiveEntryException ex) {
+            /*} catch (FalsePositiveException ex) {
                 // Catch and cache exceptions for non-transient false positives.
                 // The state is reset when unlink() is called on the false
                 // positive archive file or sync().
@@ -171,9 +170,9 @@ extends BasicArchiveController<AE> {
     } // class MountedFileSystem
 
     private class FalsePositiveFileSystem extends AutoMounter {
-        private final FalsePositiveEntryException exception;
+        private final FalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FalsePositiveEntryException exception) {
+        private FalsePositiveFileSystem(final FalsePositiveException exception) {
             if (exception == null)
                 throw new NullPointerException();
             this.exception = exception;
@@ -181,7 +180,7 @@ extends BasicArchiveController<AE> {
 
         @Override
         ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-        throws FalsePositiveEntryException {
+        throws FalsePositiveException {
             throw exception;
         }
 

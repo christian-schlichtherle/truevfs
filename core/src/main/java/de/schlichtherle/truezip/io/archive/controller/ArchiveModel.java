@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import java.net.URI;
@@ -89,13 +90,13 @@ final class ArchiveModel implements FileSystemModel {
     }
 
     /**
-     * @throws NotWriteLockedByCurrentThreadException if the read lock is
+     * @throws NotWriteLockedException if the read lock is
      *         held by the current thread.
      */
-    void ensureNotReadLockedByCurrentThread(
-            final NotWriteLockedByCurrentThreadException ex) {
+    void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
+    throws NotWriteLockedException  {
         if (readLock.isHeldByCurrentThread())
-            throw new NotWriteLockedByCurrentThreadException(ex);
+            throw new NotWriteLockedException(ex);
     }
 
     ReentrantLock writeLock() {
@@ -103,11 +104,12 @@ final class ArchiveModel implements FileSystemModel {
     }
 
     /**
-     * @throws NotWriteLockedByCurrentThreadException if the write lock is not
+     * @throws NotWriteLockedException if the write lock is not
      *         held by the current thread.
      */
-    void ensureWriteLockedByCurrentThread() {
+    void ensureWriteLockedByCurrentThread()
+    throws NotWriteLockedException {
         if (!writeLock.isHeldByCurrentThread())
-            throw new NotWriteLockedByCurrentThreadException();
+            throw new NotWriteLockedException();
     }
 }

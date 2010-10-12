@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
