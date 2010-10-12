@@ -272,7 +272,7 @@ implements InputShop<TarEntry> {
                 final org.apache.tools.tar.TarEntry entry,
                 final IOException cause) {
             super(entry.getName() + " (couldn't create temp file for archive entry)");
-            initCause(cause);
+            super.initCause(cause);
         }
     }
 }

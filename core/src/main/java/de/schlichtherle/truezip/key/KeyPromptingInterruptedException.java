@@ -37,6 +37,6 @@ public class KeyPromptingInterruptedException extends UnknownKeyException  {
 
     public KeyPromptingInterruptedException(Throwable cause) {
         super("Key prompting has been interrupted!");
-        initCause(cause);
+        super.initCause(cause);
     }
 }

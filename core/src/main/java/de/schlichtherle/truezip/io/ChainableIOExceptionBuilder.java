@@ -13,32 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 
 /**
- * Assembles {@link ChainableIOException}s by
- * {@link ChainableIOException#initPredecessor(ChainableIOException) linking}
+ * Assembles chainable I/O exceptions by
+ * {@link ChainableIOException#initPredecessor(ChainableIOException) chaining}
  * them.
- * When the assembly is thrown or returned at a later time, it is sorted by
+ * When the assembly is thrown or returned later, it is sorted by
  * {@link ChainableIOException#sortPriority() priority}.
  *
- * @param <E> The type of {@link ChainableIOException} to use for cause and
- *       predecessor exceptions.
- * @author Christian Schlichtherle
+ * @param   <C> The type of the cause exception.
+ * @param   <E> The type of the assembled exception.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ChainableIOExceptionBuilder<C extends Exception, E extends ChainableIOException>
+public class ChainableIOExceptionBuilder<   C extends Exception,
+                                            E extends ChainableIOException>
 extends AbstractExceptionBuilder<C, E> {
 
     private final Class<E> clazz;
 
+    /** Static constructor provided for comforting the most prominent use case. */
+    public static ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException> newInstance() {
+        return new ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>(ChainableIOException.class, ChainableIOException.class);
+    }
+
     public ChainableIOExceptionBuilder(Class<C> c, Class<E> e) {
         try {
             if (!e.isAssignableFrom(c))
-                e.newInstance(); // fail-fast!
+                e.getConstructor(String.class).newInstance("test"); // fail-fast!
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -46,10 +51,7 @@ extends AbstractExceptionBuilder<C, E> {
     }
 
     /**
-     * Links the given exceptions and returns the result. Equivalent to
-     * <pre>{@code
-     * return (E) cause.initPredecessor(previous);
-     * }</pre>
+     * Chains the given exceptions and returns the result.
      *
      * @throws IllegalStateException if
      *         {@code cause.}{@link ChainableIOException#getPredecessor()} is
@@ -61,14 +63,16 @@ extends AbstractExceptionBuilder<C, E> {
     protected final E update(C cause, E previous) {
         final E next;
         try {
-            next = clazz.isInstance(cause) ? ((E) cause) : clazz.newInstance();
-        } catch (InstantiationException ex) {
-            ex.initCause(cause);
-            throw new AssertionError(ex);
-        } catch (IllegalAccessException ex) {
+            next = clazz.isInstance(cause)
+                    ? ((E) cause)
+                    : clazz.getConstructor(String.class)
+                        .newInstance(cause.toString());
+        } catch (Exception ex) {
             ex.initCause(cause);
             throw new AssertionError(ex);
         }
+        if (next != cause)
+            next.initCause(cause);
         try {
             return (E) next.initPredecessor(previous);
         } catch (IllegalStateException ex) {

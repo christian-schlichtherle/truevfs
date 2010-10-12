@@ -48,6 +48,6 @@ public class RaesException extends IOException {
      */
     public RaesException(String msg, Throwable cause) {
         super(msg);
-        initCause(cause);
+        super.initCause(cause);
     }
 }

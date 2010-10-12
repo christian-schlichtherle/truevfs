@@ -16,10 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.ChainableIOException;
-import java.io.IOException;
-import java.net.URI;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
@@ -32,37 +29,16 @@ public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
-    private final URI mountPoint;
+    /** For exclusive use by {@link DefaultSyncExceptionBuilder}. */
+    public SyncException(String message) {
+        super(message);
+    }
 
     SyncException(ArchiveController controller, Throwable cause) {
-        super(cause);
-        this.mountPoint = controller.getModel().getMountPoint();
+        super(controller.getModel().getMountPoint().toString(), cause);
     }
 
     SyncException(ArchiveController controller, Throwable cause, int priority) {
-        super(cause, priority);
-        this.mountPoint = controller.getModel().getMountPoint();
-    }
-
-    /**
-     * Equivalent to
-     * {@code return (SyncException) super.initCause(cause);}.
-     */
-    @Override
-    public final SyncException initCause(final Throwable cause) {
-        return (SyncException) super.initCause(cause);
-    }
-
-    /** @see FileSystemModel#getMountPoint() */
-    public final URI getMountPoint() {
-        return mountPoint;
-    }
-
-    @Override
-    public final String getLocalizedMessage() {
-        final String msg = getMessage();
-        return msg != null
-                ? new StringBuilder(getMountPoint().toString()).append(" (").append(msg).append(")").toString()
-                : getMountPoint().toString();
+        super(controller.getModel().getMountPoint().toString(), cause, priority);
     }
 }

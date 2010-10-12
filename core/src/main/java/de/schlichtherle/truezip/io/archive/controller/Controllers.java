@@ -15,7 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.io.file.ArchiveWarningException;
 import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.Link;
@@ -187,7 +188,7 @@ public class Controllers {
      */
     public static <E extends IOException>
     void sync(  final URI prefix,
-                final SyncExceptionBuilder<E> builder,
+                final ExceptionBuilder<? super IOException, E> builder,
                 BitField<SyncOption> options)
     throws E {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
@@ -218,12 +219,10 @@ public class Controllers {
                 } catch (IOException ex) {
                     // Updating the archive file or wrapping it back into
                     // one of it's enclosing archive files resulted in an
-                    // exception for some reason.
-                    // We are bullheaded and store the exception share for
-                    // later throwing only and continue updating the rest.
-                    builder.warn(ex instanceof SyncException
-                            ? (SyncException) ex
-                            : new SyncException(controller, ex));
+                    // I/O exception for some reason.
+                    // We are bullheaded and store the exception for later
+                    // throwing and continue updating the rest.
+                    builder.warn(ex);
                 }
                 total++;
             }

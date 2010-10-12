@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
 import java.util.Set;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
@@ -258,7 +259,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
 
     @Override
     public <E extends IOException>
-    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E {
         reset();
         super.getController().sync(builder, options);

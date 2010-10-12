@@ -306,7 +306,7 @@ implements Serializable {
 
         private IllegalArchiveDriverException(String msg, Exception ex) {
             super(msg);
-            initCause(ex);
+            super.initCause(ex);
         }
     }
 }

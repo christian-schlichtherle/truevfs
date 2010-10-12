@@ -295,8 +295,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         if (isTargetBusy())
             return;
 
-        final ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException> builder
-                = new ChainableIOExceptionBuilder<ChainableIOException, ChainableIOException>(ChainableIOException.class, ChainableIOException.class);
+        final ChainableIOExceptionBuilder<IOException, ChainableIOException> builder
+                = new ChainableIOExceptionBuilder<IOException, ChainableIOException>(
+                    IOException.class, ChainableIOException.class);
         final Iterator<TempEntryOutputStream> i = temps.values().iterator();
         while (i.hasNext()) {
             final TempEntryOutputStream out = i.next();
@@ -304,11 +305,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             try {
                 remove = out.store();
             } catch (InputException ex) {
-                // Input exception - let's continue!
-                builder.warn(new ChainableIOException(ex));
+                builder.warn(ex); // let's continue anyway...
             } catch (IOException ex) {
-                // Something's wrong writing this MultiplexedOutputStream!
-                throw builder.fail(new ChainableIOException(ex));
+                throw builder.fail(ex); // something's wrong writing this MultiplexedOutputStream!
             } finally {
                 if (remove)
                     i.remove();
