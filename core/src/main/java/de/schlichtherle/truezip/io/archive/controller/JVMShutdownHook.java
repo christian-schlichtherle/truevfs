@@ -18,10 +18,10 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 /**
  * This singleton shutdown hook thread class runs
- * {@link FileSystemControllers.ShutdownHook#SINGLETON} when the JVM terminates.
+ * {@link Controllers.ShutdownHook#SINGLETON} when the JVM terminates.
  * You cannot instantiate this class.
  *
- * @see FileSystemControllers#addToShutdownHook(java.lang.Runnable)
+ * @see Controllers#addToShutdownHook(java.lang.Runnable)
  */
 final class JVMShutdownHook extends Thread {
 
@@ -33,17 +33,17 @@ final class JVMShutdownHook extends Thread {
     }
 
     private JVMShutdownHook() {
-        super(  FileSystemControllers.ShutdownHook.SINGLETON,
+        super(  Controllers.ShutdownHook.SINGLETON,
                 "TrueZIP ArchiveController Shutdown Hook");
         setPriority(Thread.MAX_PRIORITY);
     }
 
     /**
      * Adds the given {@code runnable} to the set of runnables to run by
-     * {@link FileSystemControllers.ShutdownHook#SINGLETON} when the JVM
+     * {@link Controllers.ShutdownHook#SINGLETON} when the JVM
      * terminates.
      */
     public synchronized void add(final Runnable runnable) {
-        FileSystemControllers.ShutdownHook.SINGLETON.add(runnable);
+        Controllers.ShutdownHook.SINGLETON.add(runnable);
     }
 }
