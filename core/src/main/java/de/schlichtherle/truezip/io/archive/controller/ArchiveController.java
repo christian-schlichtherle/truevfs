@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
@@ -43,6 +44,7 @@ interface ArchiveController extends FileSystemController {
      * throughout the processing of the target archive file.
      * @see    FileSystemControllers#sync(URI, SyncExceptionBuilder, BitField)
      */
-    void sync(SyncExceptionBuilder builder, BitField<SyncOption> options)
-    throws SyncException;
+    <E extends IOException>
+    void sync(SyncExceptionBuilder<E> builder, BitField<SyncOption> options)
+    throws E;
 }

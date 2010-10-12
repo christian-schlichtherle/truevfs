@@ -34,43 +34,14 @@ public class SyncException extends ChainableIOException {
 
     private final URI mountPoint;
 
-    public SyncException(FileSystemModel model) {
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, String message) {
-        super(message);
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, IOException cause) {
+    SyncException(ArchiveController controller, Throwable cause) {
         super(cause);
-        this.mountPoint = model.getMountPoint();
+        this.mountPoint = controller.getModel().getMountPoint();
     }
 
-    public SyncException(FileSystemModel model, String message, IOException cause) {
-        super(message, cause);
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, int priority) {
-        super(priority);
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, String message, int priority) {
-        super(message, priority);
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, IOException cause, int priority) {
+    SyncException(ArchiveController controller, Throwable cause, int priority) {
         super(cause, priority);
-        this.mountPoint = model.getMountPoint();
-    }
-
-    public SyncException(FileSystemModel model, String message, IOException cause, int priority) {
-        super(message, cause, priority);
-        this.mountPoint = model.getMountPoint();
+        this.mountPoint = controller.getModel().getMountPoint();
     }
 
     /**
@@ -78,7 +49,7 @@ public class SyncException extends ChainableIOException {
      * {@code return (SyncException) super.initCause(cause);}.
      */
     @Override
-    public SyncException initCause(final Throwable cause) {
+    public final SyncException initCause(final Throwable cause) {
         return (SyncException) super.initCause(cause);
     }
 
@@ -88,7 +59,7 @@ public class SyncException extends ChainableIOException {
     }
 
     @Override
-    public String getLocalizedMessage() {
+    public final String getLocalizedMessage() {
         final String msg = getMessage();
         return msg != null
                 ? new StringBuilder(getMountPoint().toString()).append(" (").append(msg).append(")").toString()

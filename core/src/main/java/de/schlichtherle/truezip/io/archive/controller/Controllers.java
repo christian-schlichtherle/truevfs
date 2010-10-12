@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
+import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -183,11 +185,11 @@ public class Controllers {
      *         {@code closeOutputStreams} is {@code true}.
      * @see FileSystemController#sync(SyncExceptionBuilder, BitField)
      */
-    public static void sync(
-            final URI prefix,
-            final SyncExceptionBuilder builder,
-            BitField<SyncOption> options)
-    throws SyncException {
+    public static <E extends IOException>
+    void sync(  final URI prefix,
+                final SyncExceptionBuilder<E> builder,
+                BitField<SyncOption> options)
+    throws E {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
@@ -213,13 +215,15 @@ public class Controllers {
                     // have been generated. We need to remember them for
                     // later throwing.
                     controller.sync(builder, options);
-                } catch (SyncException exception) {
+                } catch (IOException ex) {
                     // Updating the archive file or wrapping it back into
                     // one of it's enclosing archive files resulted in an
                     // exception for some reason.
                     // We are bullheaded and store the exception share for
                     // later throwing only and continue updating the rest.
-                    builder.warn(exception);
+                    builder.warn(ex instanceof SyncException
+                            ? (SyncException) ex
+                            : new SyncException(controller, ex));
                 }
                 total++;
             }
@@ -341,7 +345,7 @@ public class Controllers {
                     try {
                         sync(   null, new DefaultSyncExceptionBuilder(),
                                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
-                    } catch (SyncException ouch) {
+                    } catch (IOException ouch) {
                         ouch.printStackTrace();
                     }
                 }

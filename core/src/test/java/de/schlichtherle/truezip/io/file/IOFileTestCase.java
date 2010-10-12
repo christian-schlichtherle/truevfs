@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException;
+import de.schlichtherle.truezip.io.archive.controller.SyncWarningException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
@@ -530,8 +530,9 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             File.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (SyncWarningException ex) {
             // Warning about fis1 still being used.
+            assertTrue(ex.getCause() instanceof ArchiveBusyException);
         }
         assertTrue(file2.isFile());
         if (!file2.catFrom(fisA)) // fisA may be invalidated after update!
@@ -545,7 +546,7 @@ public abstract class IOFileTestCase extends TestCase {
         // collector did his job.
         try {
             File.umount(); // allow external modifications!
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (SyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
 
@@ -605,7 +606,8 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
-        } catch (ArchiveBusyWarningException expected) {
+        } catch (SyncWarningException ex) {
+            assertTrue(ex.getCause() instanceof ArchiveBusyException);
         }
         
         try {
@@ -627,7 +629,7 @@ public abstract class IOFileTestCase extends TestCase {
         // collector did his job.
         try {
             File.update();
-        } catch (ArchiveBusyWarningException failure) {
+        } catch (SyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
         
@@ -1396,7 +1398,8 @@ public abstract class IOFileTestCase extends TestCase {
                     }
                     try {
                         File.update(wait, false, wait, false);
-                    } catch (ArchiveBusyException mayHappen) {
+                    } catch (SyncException ex) {
+                        assertTrue(ex.getCause() instanceof ArchiveBusyException);
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
                         // Otherwise, silently ignore this exception and
@@ -1406,7 +1409,7 @@ public abstract class IOFileTestCase extends TestCase {
                         // signals that the corresponding archive hasn't
                         // been updated - a future call may still succeed.
                         if (wait)
-                            throw new AssertionError(mayHappen);
+                            throw new AssertionError(ex);
                     }
                 } catch (Throwable exception) {
                     failure = exception;
@@ -1470,7 +1473,8 @@ public abstract class IOFileTestCase extends TestCase {
                                 File.update(archive);
                             else
                                 File.update(false);
-                        } catch (ArchiveBusyException mayHappen) {
+                        } catch (SyncException ex) {
+                            assertTrue(ex.getCause() instanceof ArchiveBusyException);
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
                             // could never happen.
@@ -1481,7 +1485,7 @@ public abstract class IOFileTestCase extends TestCase {
                             // signals that the corresponding archive hasn't
                             // been updated - a future call may still succeed.
                             if (updateIndividually)
-                                throw new AssertionError(mayHappen);
+                                throw new AssertionError(ex);
                         }
                     } finally {
                         assertTrue(archive.deleteAll());

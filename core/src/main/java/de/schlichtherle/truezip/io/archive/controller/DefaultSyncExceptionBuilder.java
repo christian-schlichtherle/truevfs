@@ -23,6 +23,9 @@ import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
  * @version $Id$
  */
 public final class DefaultSyncExceptionBuilder
-extends ChainableIOExceptionBuilder<SyncException>
-implements SyncExceptionBuilder {
+extends ChainableIOExceptionBuilder<SyncException, SyncException>
+implements SyncExceptionBuilder<SyncException> {
+    public DefaultSyncExceptionBuilder() {
+        super(SyncException.class, SyncException.class);
+    }
 }

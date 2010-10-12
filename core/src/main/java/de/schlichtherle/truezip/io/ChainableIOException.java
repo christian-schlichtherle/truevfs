@@ -94,7 +94,7 @@ public class ChainableIOException extends IOException implements Cloneable {
      */
     private ChainableIOException predecessor = this;
 
-    private int priority; // effectively final
+    private final int priority;
 
     private int index; // effectively final
 
@@ -102,20 +102,24 @@ public class ChainableIOException extends IOException implements Cloneable {
     int maxIndex; // effectively final
 
     public ChainableIOException() {
+        priority = 0;
     }
 
     public ChainableIOException(String message) {
         super(message);
+        priority = 0;
     }
 
     public ChainableIOException(Throwable cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
+        priority = 0;
     }
 
     public ChainableIOException(String message, Throwable cause) {
         super(message);
         super.initCause(cause);
+        priority = 0;
     }
 
     public ChainableIOException(int priority) {

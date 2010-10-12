@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.SyncOption;
@@ -1121,8 +1120,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws SyncException {
-        Controllers.sync(
-                null, new DefaultSyncExceptionBuilder(), options);
+        Controllers.sync(null, new DefaultSyncExceptionBuilder(), options);
     }
 
     /**

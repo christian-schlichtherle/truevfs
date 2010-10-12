@@ -15,10 +15,14 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
+import de.schlichtherle.truezip.io.InputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.socket.FileEntry;
@@ -217,14 +221,17 @@ class Files {
                                     .set(COPY_PROPERTIES, preserve)));
         } catch (FileNotFoundException ex) {
             throw ex;
-        } catch (ArchiveBusyException ex) {
-            throw new FileBusyException(ex);
+        } catch (SyncException ex) {
+            if (ex.getCause() instanceof ArchiveInputBusyException)
+                throw new InputBusyException((ArchiveBusyException) ex.getCause());
+            else if (ex.getCause() instanceof ArchiveOutputBusyException)
+                throw new OutputBusyException((ArchiveBusyException) ex.getCause());
+            else
+                throw (FileNotFoundException) new FileNotFoundException(ex.toString())
+                        .initCause(ex);
         } catch (ArchiveFileSystemException ex) {
             throw (FileNotFoundException) new FileNotFoundException(ex.toString())
                     .initCause(ex);
-        } catch (IOException ex) {
-            dst.delete();
-            throw ex;
         }
     }
 

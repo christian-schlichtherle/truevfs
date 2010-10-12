@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package de.schlichtherle.truezip.io.archive.controller;
-
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+package de.schlichtherle.truezip.io;
 
 /**
- * Like its super class, but indicates the existance of open output streams.
- *
- * @author Christian Schlichtherle
+ * @see     InputBusyException
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveOutputBusyWarningException
-extends ArchiveBusyWarningException {
+public class OutputBusyException extends FileBusyException {
 
-    private static final long serialVersionUID = 962506102376252946L;
+    private static final long serialVersionUID = 962318648273654198L;
+    
+    public OutputBusyException(String message) {
+        super(message);
+    }
 
-    ArchiveOutputBusyWarningException(FileSystemModel archive, int numStreams) {
-        super(archive, numStreams);
+    public OutputBusyException(Throwable cause) {
+        super(cause);
     }
 }

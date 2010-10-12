@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
-
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 
 /**
  * Indicates that an archive file could not get updated because some input or
@@ -28,15 +25,14 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyException
-extends SyncException {
+public class ArchiveBusyException extends Exception {
 
     private static final long serialVersionUID = 1937356783082645716L;
 
     private final int numStreams;
 
-    ArchiveBusyException(FileSystemModel archive, int numStreams) {
-        super(archive);
+    ArchiveBusyException(String message, int numStreams) {
+        super(message);
         this.numStreams = numStreams;
     }
 
