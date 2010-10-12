@@ -76,12 +76,12 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     @Override
-    public InputSocket<CE> newInputSocket(final CE entry)
+    public InputSocket<CE> getInputSocket(final CE entry)
     throws IOException {
 
         class InputSocket extends FilterInputSocket<CE> {
             InputSocket() throws IOException {
-                super(ConcurrentInputShop.super.newInputSocket(entry));
+                super(ConcurrentInputShop.super.getInputSocket(entry));
             }
 
             @Override

@@ -75,12 +75,12 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     }
 
     @Override
-    public OutputSocket<CE> newOutputSocket(final CE entry)
+    public OutputSocket<CE> getOutputSocket(final CE entry)
     throws IOException {
 
         class OutputSocket extends FilterOutputSocket<CE> {
             OutputSocket() throws IOException {
-                super(ConcurrentOutputShop.super.newOutputSocket(entry));
+                super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

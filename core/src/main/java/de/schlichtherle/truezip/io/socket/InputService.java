@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 /**
- * A container and input socket factory for common entries.
+ * A container and input socket provider for common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
@@ -27,5 +27,5 @@ package de.schlichtherle.truezip.io.socket;
  * @version $Id$
  */
 public interface InputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE>, InputSocketFactory<CE> {
+extends CommonEntryContainer<CE>, InputSocketProvider<CE> {
 }

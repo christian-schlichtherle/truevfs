@@ -133,11 +133,11 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public OutputSocket<AE> newOutputSocket(final AE entry)
+    public OutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
         class OutputSocket extends FilterOutputSocket<AE> {
             OutputSocket() throws IOException {
-                super(MultiplexedArchiveOutputShop.super.newOutputSocket(entry));
+                super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

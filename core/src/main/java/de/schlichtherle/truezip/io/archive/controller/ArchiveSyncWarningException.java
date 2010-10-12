@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.io.IOException;
 
 /**
@@ -26,7 +27,7 @@ import java.io.IOException;
  * @version $Id$
  */
 public class ArchiveSyncWarningException
-extends ArchiveSyncException {
+extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 

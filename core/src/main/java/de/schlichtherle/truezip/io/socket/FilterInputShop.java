@@ -40,11 +40,11 @@ implements InputShop<CE> {
     }
 
     @Override
-    public InputSocket<CE> newInputSocket(CE entry)
+    public InputSocket<CE> getInputSocket(CE entry)
     throws IOException {
         if (getEntry(entry.getName()) != entry)
             throw new IllegalArgumentException("interface contract violation");
-        return target.newInputSocket(entry);
+        return target.getInputSocket(entry);
     }
 
     @Override

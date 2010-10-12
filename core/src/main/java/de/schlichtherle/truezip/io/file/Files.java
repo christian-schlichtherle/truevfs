@@ -209,9 +209,9 @@ class Files {
             final java.io.File dst)
     throws IOException {
         try {
-            IOSocket.copy(  newInputSocket(src,
+            IOSocket.copy(  getInputSocket(src,
                                 BitField.noneOf(InputOption.class)),
-                            newOutputSocket(dst,
+                            getOutputSocket(dst,
                                 BitField.noneOf(OutputOption.class)
                                     .set(CREATE_PARENTS, File.isLenient())
                                     .set(COPY_PROPERTIES, preserve)));
@@ -228,7 +228,7 @@ class Files {
         }
     }
 
-    static InputSocket<?> newInputSocket(
+    static InputSocket<?> getInputSocket(
             final java.io.File src,
             final BitField<InputOption> options)
     throws IOException {
@@ -239,12 +239,12 @@ class Files {
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .newInputSocket(file.getInnerEntryName(), options);
+                        .getInputSocket(file.getInnerEntryName(), options);
         }
-        return new FileEntry(src).newInputSocket(options);
+        return new FileEntry(src).getInputSocket(options);
     }
 
-    static OutputSocket<?> newOutputSocket(
+    static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
             final BitField<OutputOption> options)
     throws IOException {
@@ -255,9 +255,9 @@ class Files {
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .newOutputSocket(file.getInnerEntryName(), options);
+                        .getOutputSocket(file.getInnerEntryName(), options);
         }
-        return new FileEntry(dst).newOutputSocket(options);
+        return new FileEntry(dst).getOutputSocket(options);
     }
 
     /**

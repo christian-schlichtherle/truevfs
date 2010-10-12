@@ -36,7 +36,7 @@ extends OutputSocket<CE> {
     }
 
     protected final OutputSocket<? extends CE> getOutputSocket() {
-        return output.share(this);
+        return output.bind(this);
     }
 
     @Override

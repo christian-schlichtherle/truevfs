@@ -15,60 +15,34 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.util.BitField;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveController extends FileSystemController {
+interface ArchiveController extends FileSystemController {
 
-    private final ArchiveModel model;
-    private final FileSystemController enclController;
-    private final String enclPath;
+    @Override
+    ArchiveModel getModel();
+
+    boolean isTouched();
 
     /**
-     * Constructs a new archive controller.
+     * Writes all changes to the contents of the target archive file to the
+     * underlying file system.
+     * As a side effect,
+     * all data structures get reset (filesystem, entries, streams etc.)!
+     * This method requires synchronization on the write lock!
      *
-     * @param model the non-{@code null} archive model.
-     * @throws NullPointerExecption if {@code model} is {@code null} or if
-     *         looking up the enclosing file system controller fails.
+     * @param  options The non-{@code null} options for processing.
+     * @throws NullPointerException if {@code options} or {@code builder} is
+     * {@code null}.
+     * @throws SyncException if any exceptional condition occurs
+     * throughout the processing of the target archive file.
+     * @see    FileSystemControllers#sync(URI, SyncExceptionBuilder, BitField)
      */
-    ArchiveController(final ArchiveModel model) {
-        this.model = model;
-        this.enclController = FileSystemControllers
-                .getController(getModel().getEnclModel().getMountPoint());
-        this.enclPath = model
-                .getEnclModel()
-                .getMountPoint()
-                .relativize(model.getMountPoint())
-                .getPath();
-    }
-
-    @Override
-    protected final ArchiveModel getModel() {
-        return model;
-    }
-
-    /** Returns the file system controller for the enclosing file system. */
-    protected FileSystemController getEnclController() {
-        return enclController;
-    }
-
-    /**
-     * Resolves the given relative {@code path} against the relative path of
-     * this controller's archive file within its enclosing file system.
-     */
-    protected String getEnclPath(String path) {
-        return isRoot(path)
-                ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
-                : enclPath + path;
-    }
-
-    @Override
-    public final boolean isTouched() {
-        return getModel().isTouched();
-    }
+    void sync(SyncExceptionBuilder builder, BitField<SyncOption> options)
+    throws SyncException;
 }

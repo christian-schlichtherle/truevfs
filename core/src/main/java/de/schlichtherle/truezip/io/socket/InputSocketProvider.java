@@ -20,39 +20,37 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * A factory for common output sockets.
+ * A provider for common input sockets.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
  * @param   <CE> The type of the common entries.
- * @see     InputSocketFactory
+ * @see     OutputSocketFactory
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputSocketFactory<CE extends CommonEntry> {
+public interface InputSocketProvider<CE extends CommonEntry> {
 
     /**
-     * Returns a new non-{@code null} output socket for write access to the
-     * given local target.
+     * Returns a non-{@code null} input socket for read access to the given
+     * local target.
      * <p>
-     * When called on the returned common output socket, the method
-     * {@link OutputSocket#getTarget()} <em>must</em> return an object which
-     * {@link Object#equals(Object) compares equal} to the given local target
-     * but is not necessarily the same.
+     * When called on the returned input socket, the method
+     * {@link InputSocket#getTarget()} <em>must</em> return the same object.
      *
      * @param  entry the non-{@code null} local target.
      * @throws NullPointerException if {@code target} is {@code null}.
-     * @throws CommonOuputBusyException if the local target is currently busy
-     *         on output.
+     * @throws CommonInputBusyException if the local target is currently busy
+     *         on input.
      *         This exception is guaranteed to be recoverable, meaning it
      *         should be possible to write the common entry again as soon as
      *         the local target is not busy anymore.
-     * @throws FileNotFoundException if the local target is not accessible
-     *         for some reason.
+     * @throws FileNotFoundException if the local target does not exist or is
+     *         not accessible for some reason.
      * @throws IOException on any other exceptional condition.
-     * @return A new non-{@code null} output socket for writing to the local
+     * @return A non-{@code null} input socket for reading from the local
      *         target.
      */
-    OutputSocket<CE> newOutputSocket(CE entry) throws IOException;
+    InputSocket<CE> getInputSocket(CE entry) throws IOException;
 }

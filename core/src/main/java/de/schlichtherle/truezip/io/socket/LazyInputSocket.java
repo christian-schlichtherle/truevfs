@@ -27,10 +27,10 @@ import java.io.InputStream;
 public abstract class LazyInputSocket<CE extends CommonEntry>
 extends InputSocket<CE> {
 
-    private final InputSocketFactory<CE> factory;
+    private final InputSocketProvider<CE> factory;
     private InputSocket<CE> socket;
 
-    protected LazyInputSocket(final InputSocketFactory<CE> factory) {
+    protected LazyInputSocket(final InputSocketProvider<CE> factory) {
         if (null == factory)
             throw new NullPointerException();
         this.factory = factory;
@@ -38,8 +38,8 @@ extends InputSocket<CE> {
 
     protected final InputSocket<CE> getInputSocket() throws IOException {
         return (null == socket
-                ? socket = factory.newInputSocket(getLocalTarget())
-                : socket).share(this);
+                ? socket = factory.getInputSocket(getLocalTarget())
+                : socket).bind(this);
     }
 
     @Override

@@ -23,7 +23,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemStatistics {
+public interface ArchiveStatistics {
 
     /**
      * Returns the total number of bytes read from all <em>non-enclosed</em>
@@ -76,7 +76,7 @@ public interface FileSystemStatistics {
     /**
      * Returns the total number of archives operated by this package.
      */
-    int getFileSystemsTotal();
+    int getArchivesTotal();
     
     /**
      * Returns the number of archives which have been changed and
@@ -86,12 +86,12 @@ public interface FileSystemStatistics {
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getFileSystemsTouched();
+    int getArchivesTouched();
 
     /**
      * Returns the total number of top level archives operated by this package.
      */
-    int getTopLevelFileSystemsTotal();
+    int getTopLevelArchivesTotal();
     
     /**
      * Returns the number of top level archives which have been changed and
@@ -101,5 +101,5 @@ public interface FileSystemStatistics {
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getTopLevelFileSystemsTouched();
+    int getTopLevelArchivesTouched();
 }

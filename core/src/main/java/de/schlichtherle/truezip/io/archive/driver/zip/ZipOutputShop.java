@@ -123,7 +123,7 @@ implements OutputShop<ZipEntry> {
     }
 
     @Override
-    public OutputSocket<ZipEntry> newOutputSocket(final ZipEntry entry)
+    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
     throws FileNotFoundException {
         class Output extends OutputSocket<ZipEntry> {
             @Override
@@ -200,7 +200,7 @@ implements OutputShop<ZipEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #newOutputSocket(ZipEntry) t}.
+     * These preconditions are checked by {@link #getOutputSocket(ZipEntry) t}.
      */
     private class EntryOutputStream extends FilterOutputStream {
         EntryOutputStream(ZipEntry entry) throws IOException {

@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import javax.swing.Icon;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -42,17 +44,19 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.REASSEMBLE_BUFFERS;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -88,7 +92,7 @@ extends     FileSystemArchiveController<AE> {
         }
 
         @Override
-        public InputSocket<CE> newInputSocket(CE target)
+        public InputSocket<CE> getInputSocket(CE target)
         throws IOException {
             if (target == null)
                 throw new NullPointerException();
@@ -136,10 +140,10 @@ extends     FileSystemArchiveController<AE> {
         }
 
         @Override
-        public OutputSocket<AE> newOutputSocket(AE entry)
+        public OutputSocket<AE> getOutputSocket(AE entry)
         throws IOException {
             assert null != entry;
-            return super.newOutputSocket(entry);
+            return super.getOutputSocket(entry);
         }
     }
 
@@ -151,8 +155,9 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private final VetoableTouchListener vetoableTouchListener
-            = new TouchListener();
+    private final ArchiveDriver<AE> driver;
+    private final FileSystemController enclController;
+    private final String enclPath;
 
     /**
      * An {@link Input} object used to mount the virtual file system
@@ -166,8 +171,68 @@ extends     FileSystemArchiveController<AE> {
      */
     private Output output;
 
-    UpdatingArchiveController(ArchiveModel model, ArchiveDriver<AE> driver) {
-        super(model, driver);
+    private final VetoableTouchListener vetoableTouchListener
+            = new TouchListener();
+
+    UpdatingArchiveController(  final FileSystemController enclController,
+                                final ArchiveModel model,
+                                final ArchiveDriver<AE> driver) {
+        super(model);
+        assert null != driver;
+        this.driver = driver;
+        this.enclController = enclController;
+        this.enclPath = enclController
+                .getModel()
+                .getMountPoint()
+                .relativize(model.getMountPoint())
+                .getPath();
+    }
+
+    /**
+     * Returns the driver instance which is used for the target archive.
+     * All access to this method must be externally synchronized on this
+     * controller's read lock!
+     *
+     * @return A valid reference to an {@link ArchiveDriver} object
+     *         - never {@code null}.
+     */
+    private ArchiveDriver<AE> getDriver() {
+        return driver;
+    }
+
+    /** Returns the file system controller for the enclosing file system. */
+    private FileSystemController getEnclController() {
+        return enclController;
+    }
+
+    /**
+     * Resolves the given relative {@code path} against the relative path of
+     * this controller's archive file within its enclosing file system.
+     */
+    private String getEnclPath(String path) {
+        return isRoot(path)
+                ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
+                : enclPath + path;
+    }
+
+    @Override
+    public Icon getOpenIcon() {
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getOpenIcon(getModel());
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public Icon getClosedIcon() {
+        try {
+            autoMount(); // detect false positives!
+            return getDriver().getClosedIcon(getModel());
+         } catch (IOException ex) {
+            return null;
+        }
     }
 
     private ArchiveFileSystem<AE> newArchiveFileSystem()
@@ -185,7 +250,8 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    void mount(final boolean autoCreate, final boolean createParents) {
+    void mount(final boolean autoCreate, final boolean createParents)
+    throws IOException {
         assert input == null;
         assert output == null;
         assert getFileSystem() == null;
@@ -195,7 +261,7 @@ extends     FileSystemArchiveController<AE> {
                 final FileSystemController controller = getEnclController();
                 final String path = getEnclPath(ROOT);
                 final boolean readOnly = !controller.isWritable(path);
-                final InputSocket<?> socket = controller.newInputSocket(
+                final InputSocket<?> socket = controller.getInputSocket(
                         path, BitField.of(InputOption.BUFFER));
                 input = new Input(getDriver().newInputShop(getModel(), socket));
                 setFileSystem(newArchiveFileSystem(
@@ -216,9 +282,9 @@ extends     FileSystemArchiveController<AE> {
             assert autoCreate || output == null;
             assert getFileSystem() != null;
         } catch (RuntimeException ex) {
-            //assert null == input;
-            //assert null == output;
-            //assert getFileSystem() == null;
+            assert null == input;
+            assert null == output;
+            assert getFileSystem() == null;
 
             throw ex;
         } catch (IOException ex) {
@@ -226,7 +292,7 @@ extends     FileSystemArchiveController<AE> {
             assert null == output;
             assert getFileSystem() == null;
 
-            throw new FalsePositiveEntryException(ex);
+            throw new FalsePositiveException(ex);
         }
     }
 
@@ -236,7 +302,7 @@ extends     FileSystemArchiveController<AE> {
 
         final FileSystemController controller = getEnclController();
         final String path = getEnclPath(ROOT);
-        final OutputSocket<?> socket = controller.newOutputSocket(path,
+        final OutputSocket<?> socket = controller.getOutputSocket(path,
                 BitField.of(OutputOption.BUFFER)
                     .set(CREATE_PARENTS, createParents));
         output = new Output(getDriver().newOutputShop(getModel(), socket,
@@ -244,16 +310,16 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    public InputSocket<AE> newInputSocket(final AE entry)
+    public InputSocket<AE> getInputSocket(final AE entry)
     throws IOException {
-        return input.newInputSocket(entry);
+        return input.getInputSocket(entry);
     }
 
     @Override
-    public OutputSocket<AE> newOutputSocket(final AE entry)
+    public OutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
         ensureOutput(false);
-        return output.newOutputSocket(entry);
+        return output.getOutputSocket(entry);
     }
 
     private boolean isFileSystemTouched() {
@@ -263,7 +329,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws ArchiveSyncException {
+    throws SyncException, NotWriteLockedException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -278,16 +344,16 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws ArchiveSyncException {
-        sync(   new DefaultArchiveSyncExceptionBuilder(),
+    private boolean sync() throws SyncException, NotWriteLockedException {
+        sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
     }
 
     @Override
-	public void sync(   final ArchiveSyncExceptionBuilder builder,
+	public void sync(   final SyncExceptionBuilder builder,
                         final BitField<SyncOption> options)
-    throws ArchiveSyncException {
+    throws SyncException, NotWriteLockedException {
         assert !isFileSystemTouched() || output != null; // file system touched => output archive
 
         ensureWriteLockedByCurrentThread();
@@ -348,49 +414,49 @@ extends     FileSystemArchiveController<AE> {
      * <b>This method is intended to be called by {@code update()} only!</b>
      *
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveSyncException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void update(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException {
+    private void update(final SyncExceptionHandler handler)
+    throws SyncException {
         assert isFileSystemTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData();
 
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, ArchiveSyncException> {
+        implements ExceptionHandler<IOException, SyncException> {
 
-            final ArchiveSyncExceptionHandler delegate;
+            final SyncExceptionHandler delegate;
             IOException last;
 
-            FilterExceptionHandler(final ArchiveSyncExceptionHandler delegate) {
+            FilterExceptionHandler(final SyncExceptionHandler delegate) {
                 if (delegate == null)
                     throw new NullPointerException();
                 this.delegate = delegate;
             }
 
             @Override
-			public ArchiveSyncException fail(final IOException cannotHappen) {
+			public SyncException fail(final IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(final IOException cause) throws ArchiveSyncException {
+			public void warn(final IOException cause) throws SyncException {
                 if (cause == null)
                     throw new NullPointerException();
                 final IOException old = last;
                 last = cause;
                 if (!(cause instanceof InputException))
-                    throw handler.fail(new ArchiveSyncException(getModel(), cause));
+                    throw handler.fail(new SyncException(getModel(), cause));
                 if (old == null)
                     delegate.warn(new ArchiveSyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
-        update((ExceptionHandler<IOException, ArchiveSyncException>) new FilterExceptionHandler(handler));
+        update((ExceptionHandler<IOException, SyncException>) new FilterExceptionHandler(handler));
     }
 
     private boolean checkNoDeletedEntriesWithNewData()
-    throws ArchiveSyncException {
+    throws SyncException {
         assert isFileSystemTouched();
 
         // Check if we have written out any entries that have been
@@ -445,17 +511,17 @@ extends     FileSystemArchiveController<AE> {
                         continue; // never write the virtual root directory
                     if (UNKNOWN == ae.getTime(Access.WRITE))
                         continue; // never write ghost directories
-                    output.newOutputSocket(ae).newOutputStream().close();
+                    output.getOutputSocket(ae).newOutputStream().close();
                 } else if (input.getEntry(n) == ae) {
-                    IOSocket.copy(  input.newInputSocket(ae),
-                                    output.newOutputSocket(ae));
+                    IOSocket.copy(  input.getInputSocket(ae),
+                                    output.getOutputSocket(ae));
                 } else {
                     // The file system entry is a newly created non-directory
                     // entry which hasn't received any content yet.
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the target archive file.
-                    output.newOutputSocket(ae).newOutputStream().close();
+                    output.getOutputSocket(ae).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 handler.warn(ex);
@@ -468,20 +534,20 @@ extends     FileSystemArchiveController<AE> {
      * archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveSyncException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reset1(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException {
+    private void reset1(final SyncExceptionHandler handler)
+    throws SyncException {
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, ArchiveSyncException> {
+        implements ExceptionHandler<IOException, SyncException> {
             @Override
-			public ArchiveSyncException fail(IOException cannotHappen) {
+			public SyncException fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(IOException cause) throws ArchiveSyncException {
+			public void warn(IOException cause) throws SyncException {
                 if (null == cause)
                     throw new NullPointerException();
                 handler.warn(new ArchiveSyncWarningException(getModel(), cause));
@@ -489,20 +555,20 @@ extends     FileSystemArchiveController<AE> {
         } // class FilterExceptionHandler
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
         if (output != null)
-            output.closeAll((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
+            output.closeAll((ExceptionHandler<IOException, SyncException>) decoratorHandler);
         if (input != null)
-            input.closeAll((ExceptionHandler<IOException, ArchiveSyncException>) decoratorHandler);
+            input.closeAll((ExceptionHandler<IOException, SyncException>) decoratorHandler);
     }
 
     /**
      * Discards the file system and closes the output and input archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
-     * @throws ArchiveSyncException If any exceptional condition occurs
+     * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private void reset2(final ArchiveSyncExceptionHandler handler)
-    throws ArchiveSyncException {
+    private void reset2(final SyncExceptionHandler handler)
+    throws SyncException {
         setFileSystem(null);
 
         // The output archive must be closed BEFORE the input archive is
@@ -517,7 +583,7 @@ extends     FileSystemArchiveController<AE> {
                 try {
                     output.close();
                 } catch (IOException ex) {
-                    handler.warn(new ArchiveSyncException(getModel(), ex));
+                    handler.warn(new SyncException(getModel(), ex));
                 } finally {
                     output = null;
                 }

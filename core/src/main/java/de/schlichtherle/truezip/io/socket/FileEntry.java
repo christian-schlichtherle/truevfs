@@ -87,7 +87,7 @@ implements FileSystemEntry, Link<File> {
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }
 
-    public InputSocket<FileEntry> newInputSocket(
+    public InputSocket<FileEntry> getInputSocket(
             BitField<InputOption> options) {
         InputSocket<FileEntry> input
                 = new FileInputSocket<FileEntry>(this, file);
@@ -96,7 +96,7 @@ implements FileSystemEntry, Link<File> {
         return input;
     }
 
-    public OutputSocket<FileEntry> newOutputSocket(
+    public OutputSocket<FileEntry> getOutputSocket(
             BitField<OutputOption> options) {
         return new FileOutputSocket<FileEntry>(this, file, options);
     }

@@ -16,68 +16,70 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 import java.net.URI;
 
 /**
- * Indicates an exceptional condition when synchronizing the changes for an archive file to the underlying file system.
+ * Indicates an exceptional condition when synchronizing the changes in a
+ * virtual file system to its underlying file system.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveSyncException extends ChainableIOException {
+public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
     private final URI mountPoint;
 
-    ArchiveSyncException(FileSystemModel archive) {
-        this.mountPoint = archive.getMountPoint();
+    public SyncException(FileSystemModel model) {
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, String message) {
+    public SyncException(FileSystemModel model, String message) {
         super(message);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, IOException cause) {
+    public SyncException(FileSystemModel model, IOException cause) {
         super(cause);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, String message, IOException cause) {
+    public SyncException(FileSystemModel model, String message, IOException cause) {
         super(message, cause);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, int priority) {
+    public SyncException(FileSystemModel model, int priority) {
         super(priority);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, String message, int priority) {
+    public SyncException(FileSystemModel model, String message, int priority) {
         super(message, priority);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, IOException cause, int priority) {
+    public SyncException(FileSystemModel model, IOException cause, int priority) {
         super(cause, priority);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
-    ArchiveSyncException(FileSystemModel archive, String message, IOException cause, int priority) {
+    public SyncException(FileSystemModel model, String message, IOException cause, int priority) {
         super(message, cause, priority);
-        this.mountPoint = archive.getMountPoint();
+        this.mountPoint = model.getMountPoint();
     }
 
     /**
      * Equivalent to
-     * {@code return (ArchiveSyncException) super.initCause(cause);}.
+     * {@code return (SyncException) super.initCause(cause);}.
      */
     @Override
-    public ArchiveSyncException initCause(final Throwable cause) {
-        return (ArchiveSyncException) super.initCause(cause);
+    public SyncException initCause(final Throwable cause) {
+        return (SyncException) super.initCause(cause);
     }
 
     /** @see FileSystemModel#getMountPoint() */

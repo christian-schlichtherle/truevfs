@@ -26,10 +26,10 @@ import java.io.OutputStream;
 public abstract class LazyOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE> {
 
-    private final OutputSocketFactory<CE> factory;
+    private final OutputSocketProvider<CE> factory;
     private OutputSocket<CE> socket;
 
-    protected LazyOutputSocket(final OutputSocketFactory<CE> factory) {
+    protected LazyOutputSocket(final OutputSocketProvider<CE> factory) {
         if (null == factory)
             throw new NullPointerException();
         this.factory = factory;
@@ -37,8 +37,8 @@ extends OutputSocket<CE> {
 
     protected final OutputSocket<CE> getOutputSocket() throws IOException {
         return (null == socket
-                ? socket = factory.newOutputSocket(getLocalTarget())
-                : socket).share(this);
+                ? socket = factory.getOutputSocket(getLocalTarget())
+                : socket).bind(this);
     }
 
     @Override

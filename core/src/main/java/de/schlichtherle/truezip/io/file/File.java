@@ -19,17 +19,17 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.FileSystemEntry;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption;
+import de.schlichtherle.truezip.io.archive.controller.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemStatistics;
-import de.schlichtherle.truezip.io.archive.controller.FileSystemController;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.FileSystemControllers;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException;
-import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -51,10 +51,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.FileSystemController.SyncOption.WAIT_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
@@ -1103,14 +1103,14 @@ public class File extends java.io.File {
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultArchiveSyncExceptionBuilder} and <em>only</em>
+     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultArchiveSyncExceptionBuilder} and any error
+     *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException If {@code config} is {@code null}.
@@ -1120,9 +1120,9 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
     public static void sync(BitField<SyncOption> options)
-    throws ArchiveSyncException {
+    throws SyncException {
         FileSystemControllers.sync(
-                null, new DefaultArchiveSyncExceptionBuilder(), options);
+                null, new DefaultSyncExceptionBuilder(), options);
     }
 
     /**
@@ -1133,7 +1133,7 @@ public class File extends java.io.File {
      * @see #sync(BitField)
      */
     public static void umount()
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
@@ -1147,7 +1147,7 @@ public class File extends java.io.File {
      * @see #sync(BitField)
      */
     public static void umount(boolean closeStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
@@ -1167,7 +1167,7 @@ public class File extends java.io.File {
     public static void umount(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
@@ -1199,14 +1199,14 @@ public class File extends java.io.File {
     public static void sync(
             final File archive,
             final BitField<SyncOption> options)
-    throws ArchiveSyncException {
+    throws SyncException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
         FileSystemControllers.sync(
                 archive.getCanOrAbsFile().toURI(),
-                new DefaultArchiveSyncExceptionBuilder(), options);
+                new DefaultSyncExceptionBuilder(), options);
     }
 
     /**
@@ -1218,7 +1218,7 @@ public class File extends java.io.File {
      * @see #sync(File, BitField)
      */
     public static void umount(File archive)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
@@ -1234,7 +1234,7 @@ public class File extends java.io.File {
      * @see #sync(File, BitField)
      */
     public static void umount(File archive, boolean closeStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
@@ -1256,7 +1256,7 @@ public class File extends java.io.File {
     public static void umount(File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
@@ -1273,7 +1273,7 @@ public class File extends java.io.File {
      * @see #sync(BitField)
      */
     public static void update()
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
@@ -1287,7 +1287,7 @@ public class File extends java.io.File {
      * @see #sync(BitField)
      */
     public static void update(boolean closeStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
@@ -1307,7 +1307,7 @@ public class File extends java.io.File {
     public static void update(
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
@@ -1324,7 +1324,7 @@ public class File extends java.io.File {
      * @see #sync(File, BitField)
      */
     public static void update(File archive)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
@@ -1340,7 +1340,7 @@ public class File extends java.io.File {
      * @see #sync(File, BitField)
      */
     public static void update(File archive, boolean closeStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
@@ -1363,7 +1363,7 @@ public class File extends java.io.File {
             File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
-    throws ArchiveSyncException {
+    throws SyncException {
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
@@ -1385,7 +1385,7 @@ public class File extends java.io.File {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static FileSystemStatistics getLiveArchiveStatistics() {
+    public static ArchiveStatistics getLiveArchiveStatistics() {
         return FileSystemControllers.getStatistics();
     }
 
@@ -2798,7 +2798,7 @@ public class File extends java.io.File {
                 try {
                     sync(this);
                     sync((File) dst);
-                } catch (ArchiveSyncException ex) {
+                } catch (SyncException ex) {
                     return false;
                 }
                 return delegate.renameTo(dst);

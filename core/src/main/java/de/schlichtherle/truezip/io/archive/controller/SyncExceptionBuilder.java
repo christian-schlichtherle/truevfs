@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Schlichtherle IT Services
+ * Copyright 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.schlichtherle.truezip.io.archive.controller;
+
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class NotWriteLockedByCurrentThreadException extends RuntimeException {
-    private static final long serialVersionUID = 91746592376291L;
-
-    NotWriteLockedByCurrentThreadException() {
-    }
-
-    NotWriteLockedByCurrentThreadException(NotWriteLockedByCurrentThreadException cause) {
-        super(cause);
-    }
+public interface SyncExceptionBuilder
+extends SyncExceptionHandler, ExceptionBuilder<SyncException, SyncException> {
 }
