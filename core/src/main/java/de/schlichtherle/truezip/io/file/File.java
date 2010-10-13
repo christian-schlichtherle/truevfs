@@ -2640,15 +2640,11 @@ public class File extends java.io.File {
      */
     @Override
     public boolean createNewFile() throws IOException {
-        try {
-            if (enclArchive != null) {
-                return enclArchive.getController()
-                        .mknod(enclEntryName, FILE, null,
-                            BitField.noneOf(OutputOption.class)
-                                .set(CREATE_PARENTS, isLenient()));
-            }
-        } catch (IOException ex) {
-            throw ex;
+        if (innerArchive != null) {
+            return innerArchive.getController()
+                    .mknod(getInnerEntryName(), FILE, null,
+                        BitField.noneOf(OutputOption.class)
+                            .set(CREATE_PARENTS, isLenient()));
         }
         return delegate.createNewFile();
     }
