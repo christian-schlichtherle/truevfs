@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -378,7 +377,20 @@ implements     ArchiveController,
     throws IOException {
         autoSync(path, null);
         if (isRoot(path)) {
-            final ArchiveFileSystem<AE> fileSystem = autoMount();
+            final ArchiveFileSystem<AE> fileSystem;
+            try {
+                fileSystem = autoMount();
+            } catch (FalsePositiveException ex) {
+                try {
+                    // The enclosing archive controller will unlink our target
+                    // archive file next, so we need to reset anyway.
+                    sync(   new DefaultSyncExceptionBuilder(),
+                            BitField.of(ABORT_CHANGES));
+                } catch (IOException cannotHappen) {
+                    throw new AssertionError(cannotHappen);
+                }
+                throw ex; // continue with unlinking our target archive file.
+            }
             if (!fileSystem.getEntry(path).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
             sync(   new DefaultSyncExceptionBuilder(),
@@ -390,9 +402,23 @@ implements     ArchiveController,
             // way to model this, e.g. by calling a listener interface.
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
             // Delete the entry in the enclosing controller , too.
-            throw new FalsePositiveException(new IOException()); // TODO: Consider TransientIOException!
+            throw new NoFalsePositiveException();
         } else { // !isRoot(path)
             autoMount().unlink(path);
+        }
+    }
+
+    private static class NoFalsePositiveException
+    extends FalsePositiveException {
+        private static final long serialVersionUID = 1L;
+
+        public NoFalsePositiveException() {
+            super(new IOException());
+        }
+
+        @Override
+        public boolean isPersistent() {
+            return false;
         }
     }
 

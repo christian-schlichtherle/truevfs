@@ -46,7 +46,7 @@ class FilterArchiveController implements ArchiveController {
         this.controller = controller;
     }
 
-    ArchiveController getController() {
+    final ArchiveController getController() {
         return controller;
     }
 
