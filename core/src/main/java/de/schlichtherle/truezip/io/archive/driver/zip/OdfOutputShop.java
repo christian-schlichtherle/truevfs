@@ -67,8 +67,8 @@ public class OdfOutputShop extends MultiplexedArchiveOutputShop<ZipEntry> {
     }
 
     @Override
-    public boolean isTargetBusy() {
-        return !mimetype || super.isTargetBusy();
+    public boolean isBusy() {
+        return !mimetype || super.isBusy();
     }
 
     @Override
