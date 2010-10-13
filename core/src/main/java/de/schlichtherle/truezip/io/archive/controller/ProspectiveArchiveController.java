@@ -15,6 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.io.OutputStream;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import java.io.InputStream;
+import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
 import java.util.Set;
@@ -57,10 +62,6 @@ final class ProspectiveArchiveController extends FilterArchiveController {
                 .getMountPoint()
                 .relativize(controller.getModel().getMountPoint())
                 .getPath();
-    }
-
-    private String getPath(String path) {
-        return path;
     }
 
     /** Returns the file system controller for the enclosing file system. */
@@ -115,7 +116,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     @Override
     public FileSystemEntry getEntry(String path) {
         try {
-            return getController().getEntry(getPath(path));
+            return getController().getEntry(path);
         } catch (FalsePositiveException ex) {
             final FileSystemEntry entry = getEnclController()
                     .getEntry(getEnclPath(path));
@@ -146,7 +147,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     @Override
     public boolean isReadable(String path) {
         try {
-            return getController().isReadable(getPath(path));
+            return getController().isReadable(path);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 return false;
@@ -157,7 +158,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     @Override
     public boolean isWritable(String path) {
         try {
-            return getController().isWritable(getPath(path));
+            return getController().isWritable(path);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 return false;
@@ -169,7 +170,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     public void setReadOnly(String path)
     throws IOException {
         try {
-            getController().setReadOnly(getPath(path));
+            getController().setReadOnly(path);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();
@@ -181,7 +182,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     public boolean setTime(String path, BitField<Access> types, long value)
     throws IOException {
         try {
-            return getController().setTime(getPath(path), types, value);
+            return getController().setTime(path, types, value);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();
@@ -191,14 +192,11 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
-            String path,
-            BitField<InputOption> options)
+    public InputSocket<?> getInputSocket(   String path,
+                                            BitField<InputOption> options)
     throws IOException {
-        // TODO: Return a custom socket which supports lazy false positive
-        // detection when a stream is created - see LockingArchiveController.
         try {
-            return getController().getInputSocket(getPath(path), options);
+            return new Input(path, options);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();
@@ -207,15 +205,63 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
+    private class Input extends FilterInputSocket<CommonEntry> {
+        final String path;
+        final BitField<InputOption> options;
+
+        Input(  final String path, final BitField<InputOption> options)
+        throws IOException {
+            super(getController().getInputSocket(path, options));
+            this.path = path;
+            this.options = options;
+        }
+
+        @Override
+        public CommonEntry getLocalTarget() throws IOException {
+            try {
+                return getInputSocket().getLocalTarget();
+            } catch (FalsePositiveException ex) {
+                if (ex.isTransient())
+                    throw ex.getCause();
+                setInputSocket(getEnclController()
+                        .getInputSocket(getEnclPath(path), options));
+                return getInputSocket().getLocalTarget();
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            try {
+                return getInputSocket().newInputStream();
+            } catch (FalsePositiveException ex) {
+                if (ex.isTransient())
+                    throw ex.getCause();
+                setInputSocket(getEnclController()
+                        .getInputSocket(getEnclPath(path), options));
+                return getInputSocket().newInputStream();
+            }
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            try {
+                return getInputSocket().newReadOnlyFile();
+            } catch (FalsePositiveException ex) {
+                if (ex.isTransient())
+                    throw ex.getCause();
+                setInputSocket(getEnclController()
+                        .getInputSocket(getEnclPath(path), options));
+                return getInputSocket().newReadOnlyFile();
+            }
+        }
+    } // class Input
+
     @Override
-    public OutputSocket<?> getOutputSocket(
-            String path,
-            BitField<OutputOption> options)
+    public OutputSocket<?> getOutputSocket( String path,
+                                            BitField<OutputOption> options)
     throws IOException {
-        // TODO: Return a custom socket which supports lazy false positive
-        // detection when a stream is created - see LockingArchiveController.
         try {
-            return getController().getOutputSocket(getPath(path), options);
+            return new Output(path, options);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();
@@ -224,6 +270,44 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
+    private class Output extends FilterOutputSocket<CommonEntry> {
+        final String path;
+        final BitField<OutputOption> options;
+
+        Output(final String path, final BitField<OutputOption> options)
+        throws IOException {
+            super(getController().getOutputSocket(path, options));
+            this.path = path;
+            this.options = options;
+        }
+
+        @Override
+        public CommonEntry getLocalTarget() throws IOException {
+            try {
+                return getOutputSocket().getLocalTarget();
+            } catch (FalsePositiveException ex) {
+                if (ex.isTransient())
+                    throw ex.getCause();
+                setOutputSocket(getEnclController()
+                        .getOutputSocket(getEnclPath(path), options));
+                return getOutputSocket().getLocalTarget();
+            }
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            try {
+                return getOutputSocket().newOutputStream();
+            } catch (FalsePositiveException ex) {
+                if (ex.isTransient())
+                    throw ex.getCause();
+                setOutputSocket(getEnclController()
+                        .getOutputSocket(getEnclPath(path), options));
+                return getOutputSocket().newOutputStream();
+            }
+        }
+    } // class Output
+
     @Override
     public boolean mknod(   String path,
                             Type type,
@@ -231,7 +315,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
                             BitField<OutputOption> options)
     throws IOException {
         try {
-            return getController().mknod(getPath(path), type, template, options);
+            return getController().mknod(path, type, template, options);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();
@@ -246,7 +330,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     public void unlink(String path)
     throws IOException {
         try {
-            getController().unlink(getPath(path));
+            getController().unlink(path);
         } catch (FalsePositiveException ex) {
             if (ex.isTransient())
                 throw ex.getCause();

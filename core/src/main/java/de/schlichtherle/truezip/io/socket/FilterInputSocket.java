@@ -28,16 +28,21 @@ import java.io.InputStream;
 public class FilterInputSocket<CE extends CommonEntry>
 extends InputSocket<CE> {
 
-    private final InputSocket<? extends CE> input;
+    private InputSocket<? extends CE> input;
 
     protected FilterInputSocket(final InputSocket<? extends CE> input) {
-        if (null == input)
-            throw new NullPointerException();
-        this.input = input;
+        setInputSocket(input);
     }
+
 
     protected final InputSocket<? extends CE> getInputSocket() {
         return input.bind(this);
+    }
+
+    protected final void setInputSocket(final InputSocket<? extends CE> input) {
+        if (null == input)
+            throw new NullPointerException();
+        this.input = input;
     }
 
     @Override
