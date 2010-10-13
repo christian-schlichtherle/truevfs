@@ -27,16 +27,20 @@ import java.io.OutputStream;
 public class FilterOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE> {
 
-    private final OutputSocket<? extends CE> output;
+    private OutputSocket<? extends CE> output;
 
     protected FilterOutputSocket(final OutputSocket<? extends CE> output) {
-        if (null == output)
-            throw new NullPointerException();
-        this.output = output;
+        setOutputSocket(output);
     }
 
     protected final OutputSocket<? extends CE> getOutputSocket() {
         return output.bind(this);
+    }
+
+    protected final void setOutputSocket(final OutputSocket<? extends CE> output) {
+        if (null == output)
+            throw new NullPointerException();
+        this.output = output;
     }
 
     @Override

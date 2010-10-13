@@ -223,9 +223,8 @@ final class LockingArchiveController extends FilterArchiveController {
     }
 
     private class Input extends FilterInputSocket<CommonEntry> {
-
-        protected Input(InputSocket<? extends CommonEntry> target) {
-            super(target);
+        Input(InputSocket<?> input) {
+            super(input);
         }
 
         @Override
@@ -287,7 +286,7 @@ final class LockingArchiveController extends FilterArchiveController {
                 }
             }
         }
-    }
+    } // class Input
 
     @Override
     public OutputSocket<?> getOutputSocket( String path,
@@ -303,9 +302,8 @@ final class LockingArchiveController extends FilterArchiveController {
     }
 
     private class Output extends FilterOutputSocket<CommonEntry> {
-
-        protected Output(OutputSocket<? extends CommonEntry> target) {
-            super(target);
+        Output(OutputSocket<?> output) {
+            super(output);
         }
 
         @Override
@@ -329,7 +327,7 @@ final class LockingArchiveController extends FilterArchiveController {
                 writeLock().unlock();
             }
         }
-    }
+    } // class Output
 
     @Override
     public boolean mknod(   String path,
