@@ -218,22 +218,14 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon() {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getOpenIcon(getModel());
-        } catch (IOException ex) {
-            return null;
-        }
+        autoMount(); // detect false positives!
+        return getDriver().getOpenIcon(getModel());
     }
 
     @Override
     public Icon getClosedIcon() {
-        try {
-            autoMount(); // detect false positives!
-            return getDriver().getClosedIcon(getModel());
-         } catch (IOException ex) {
-            return null;
-        }
+        autoMount(); // detect false positives!
+        return getDriver().getClosedIcon(getModel());
     }
 
     private ArchiveFileSystem<AE> newArchiveFileSystem()
@@ -251,8 +243,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    void mount(final boolean autoCreate, final boolean createParents)
-    throws IOException {
+    void mount(final boolean autoCreate, final boolean createParents) {
         assert input == null;
         assert output == null;
         assert getFileSystem() == null;

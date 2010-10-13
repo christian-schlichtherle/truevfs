@@ -48,8 +48,7 @@ extends BasicArchiveController<AE> {
     @Override
     final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
-            final boolean createParents)
-    throws IOException {
+            final boolean createParents) {
         assert !createParents || autoCreate;
         return mountState.autoMount(autoCreate, createParents);
     }
@@ -79,11 +78,8 @@ extends BasicArchiveController<AE> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @throws FalsePositiveException
-     * @throws IOException On any other I/O related issue with the target file
-     *         or the target file of any enclosing archive file's controller.
      */
-    abstract void mount(boolean autoCreate, boolean createParents)
-    throws IOException;
+    abstract void mount(boolean autoCreate, boolean createParents);
 
     /**
      * Represents the mount state of the archive file system.
@@ -91,8 +87,7 @@ extends BasicArchiveController<AE> {
      */
     private abstract class MountState {
         abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
-                                                    boolean createParents)
-        throws IOException;
+                                                    boolean createParents);
 
         ArchiveFileSystem<AE> getFileSystem() {
             return null;
@@ -104,8 +99,7 @@ extends BasicArchiveController<AE> {
     private class ResetFileSystem extends MountState {
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
-                                        final boolean createParents)
-        throws IOException {
+                                        final boolean createParents) {
             ensureWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, createParents);
@@ -135,7 +129,7 @@ extends BasicArchiveController<AE> {
         }
 
         @Override
-        void setFileSystem(ArchiveFileSystem<AE> fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             // Passing in null may happen by sync(*).
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
@@ -152,7 +146,8 @@ extends BasicArchiveController<AE> {
         }
 
         @Override
-        ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents) {
+        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
+                                            boolean createParents) {
             return fileSystem;
         }
 
@@ -179,8 +174,8 @@ extends BasicArchiveController<AE> {
         }
 
         @Override
-        ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-        throws IOException {
+        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
+                                            boolean createParents) {
             if (!autoCreate)
                 throw exception;
 

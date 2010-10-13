@@ -121,13 +121,11 @@ implements     ArchiveController,
         return model;
     }
 
-    final ArchiveFileSystem<AE> autoMount()
-    throws IOException {
+    final ArchiveFileSystem<AE> autoMount() {
         return autoMount(false, false);
     }
 
-    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
-    throws IOException {
+    final ArchiveFileSystem<AE> autoMount(boolean autoCreate) {
         return autoMount(autoCreate, autoCreate);
     }
 
@@ -147,46 +145,27 @@ implements     ArchiveController,
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
-     * @throws IOException On any other I/O related issue with the target file
-     *         or the target file of any enclosing archive file's controller.
      */
-    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents)
-    throws IOException;
+    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents);
 
     @Override
     public final boolean isReadOnly() {
-        try {
-            return autoMount().isReadOnly();
-         } catch (IOException ex) {
-            return true;
-        }
+        return autoMount().isReadOnly();
     }
 
     @Override
     public final FileSystemEntry getEntry(final String path) {
-        try {
-            return autoMount().getEntry(path);
-        } catch (IOException ex) {
-            return null;
-        }
+        return autoMount().getEntry(path);
     }
 
     @Override
     public final boolean isReadable(final String path) {
-        try {
-            return autoMount().getEntry(path) != null;
-        } catch (IOException ex) {
-            return false;
-        }
+        return autoMount().getEntry(path) != null;
     }
 
     @Override
     public final boolean isWritable(final String path) {
-        try {
-            return autoMount().isWritable(path);
-        } catch (IOException ex) {
-            return false;
-        }
+        return autoMount().isWritable(path);
     }
 
     @Override
@@ -402,23 +381,9 @@ implements     ArchiveController,
             // way to model this, e.g. by calling a listener interface.
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
             // Delete the entry in the enclosing controller , too.
-            throw new NoFalsePositiveException();
+            throw new FalsePositiveException(new IOException());
         } else { // !isRoot(path)
             autoMount().unlink(path);
-        }
-    }
-
-    private static class NoFalsePositiveException
-    extends FalsePositiveException {
-        private static final long serialVersionUID = 1L;
-
-        public NoFalsePositiveException() {
-            super(new IOException());
-        }
-
-        @Override
-        public boolean isPersistent() {
-            return false;
         }
     }
 
