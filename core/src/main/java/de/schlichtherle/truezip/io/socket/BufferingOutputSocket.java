@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @se      BufferingInputSocket
+ * @see     BufferingInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

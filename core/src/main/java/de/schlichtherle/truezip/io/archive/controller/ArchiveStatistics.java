@@ -28,7 +28,7 @@ public interface ArchiveStatistics {
     /**
      * Returns the total number of bytes read from all <em>non-enclosed</em>
      * archive files which have been updated by a call to
-     * {@link FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts input from top level archive
      * files which require an update only, i.e. archive files which are
@@ -45,14 +45,14 @@ public interface ArchiveStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)
+     * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     long getSyncTotalByteCountRead();
     
     /**
      * Returns the total number of bytes written to all <em>non-enclosed</em>
      * archive files which have been updated by a call to
-     * {@link FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts output to top level archive
      * files which require an update only, i.e. archive files which are
@@ -69,7 +69,7 @@ public interface ArchiveStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)
+     * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     long getSyncTotalByteCountWritten();
 
@@ -81,7 +81,7 @@ public interface ArchiveStatistics {
     /**
      * Returns the number of archives which have been changed and
      * hence need to be updated when calling
-     * {@link FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
@@ -96,7 +96,7 @@ public interface ArchiveStatistics {
     /**
      * Returns the number of top level archives which have been changed and
      * hence need to be updated when calling
-     * {@link FileSystemControllers#sync(URI, ArchiveSyncExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.

@@ -184,7 +184,7 @@ public class Controllers {
      * @throws IllegalArgumentException if the configuration property
      *         {@code closeInputStreams} is {@code false} and
      *         {@code closeOutputStreams} is {@code true}.
-     * @see FileSystemController#sync(SyncExceptionBuilder, BitField)
+     * @see    ArchiveController#sync(ExceptionBuilder, BitField)
      */
     public static <E extends IOException>
     void sync(  final URI prefix,

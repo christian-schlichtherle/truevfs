@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
@@ -403,10 +403,10 @@ implements     ArchiveController,
      * @param  path the path name of the entry
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
-     * @see    #sync(ArchiveSyncExceptionBuilder, BitField)
+     * @see    ArchiveController#sync(ExceptionBuilder, BitField)
      * @throws SyncException If any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
-     * @throws NotWriteLockedByCurrentThreadException
+     * @throws NotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)

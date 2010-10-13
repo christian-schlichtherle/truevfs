@@ -25,13 +25,13 @@ import de.schlichtherle.truezip.io.socket.CommonEntry;
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value
- * {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}
+ * {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}
  * or {@code null} respectively.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface ArchiveEntry extends CommonEntry {
@@ -60,9 +60,9 @@ public interface ArchiveEntry extends CommonEntry {
      * @param  type the size type.
      * @param  value the size of the given size type for this archive entry in
      *         bytes or
-     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code size} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         type is unsupported.
      */
@@ -74,9 +74,9 @@ public interface ArchiveEntry extends CommonEntry {
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
-     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.entry.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         given type is unsupported.
      */

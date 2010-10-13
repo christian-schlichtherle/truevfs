@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.socket.CommonEntry;
 import java.util.Set;
 
 /**

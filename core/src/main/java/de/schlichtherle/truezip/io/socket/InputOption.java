@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import java.io.IOException;
+
 /**
  * Defines the potential options for data input operations.
  * Not all options may be supported or available for all operations and

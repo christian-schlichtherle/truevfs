@@ -15,15 +15,14 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.InputClosedException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
 
 /**
  * Defines the available options for archive synchronization operations, i.e.
- * {@link FileSystemControllers#sync(URI, SyncExceptionBuilder, BitField)}
- * and {@link FileSystemController#sync(SyncExceptionBuilder, BitField)}.
+ * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}
+ * and {@link ArchiveController#sync(ExceptionBuilder, BitField)}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -54,11 +53,11 @@ public enum SyncOption {
      * Suppose there are any open input streams or read only files for any
      * archive entries of an archive controller's target archive file.
      * Then if this option is set, the archive controller will proceed to
-     * update the target archive file anyway and finally throw an
-     * {@link ArchiveBusyWarningException} to indicate that any subsequent
-     * operations on these streams will fail with an
-     * {@link InputClosedException} because they have been forced to
-     * close.
+     * update the target archive file anyway and finally throw a
+     * {@link SyncWarningException} with a {@link ArchiveBusyException} as its
+     * cause to indicate that any subsequent operations on these streams will
+     * fail with an {@link InputClosedException} because they have been forced
+     * to close.
      * <p>
      * If this option is not set, the target archive file is <em>not</em>
      * updated and an {@link ArchiveBusyException} is thrown to indicate

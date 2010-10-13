@@ -16,13 +16,14 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.archive.controller.SyncException;
 import de.schlichtherle.truezip.io.archive.controller.SyncWarningException;
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
 import java.io.IOException;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class DefaultArchiveExceptionBuilder

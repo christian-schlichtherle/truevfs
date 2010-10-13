@@ -116,14 +116,14 @@
             <li>When unmounting an archive file (see <a href="#updating">below</a>), depending
 	on the parameters, TrueZIP may choose to force the closing of any open entry 
 	streams or not. If the entry streams are <em>not</em> forced to close, the archive 
-	file cannot get unmounted and an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException}
+	file cannot get unmounted and an {@link de.schlichtherle.truezip.io.file.ArchiveException}
 	is thrown. If the entry streams are forced to close however, the archive file 
-	is unmounted and an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveBusyWarningException}
+	is unmounted and an {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}
 	is thrown to indicate that subsequent I/O operations on these entry streams 
 	(other than {@code close()}) will fail with an
-    {@link de.schlichtherle.truezip.io.socket.input.CommonInputClosedException}
+    {@link de.schlichtherle.truezip.io.socket.InputClosedException}
     or
-    {@link de.schlichtherle.truezip.io.socket.output.CommonOutputClosedException}
+    {@link de.schlichtherle.truezip.io.socket.OutputClosedException}
 	Neither solution is optimal.</li>
         </ul>
         <p>In order to prevent these exceptions, TrueZIP automatically closes entry streams
@@ -194,9 +194,9 @@
             (see <a href="#third_parties">below</a>) or to monitor progress (see
             <a href="#monitoring">below</a>). It also allows some control over any exceptions
             thrown: Both {@code umount()} and {@code update()} may throw an {@link
-            de.schlichtherle.truezip.io.archive.controller.ArchiveSyncWarningException} or an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException}.
+            de.schlichtherle.truezip.io.file.ArchiveWarningException} or an {@link de.schlichtherle.truezip.io.file.ArchiveException}.
             The client application may catch these exceptions and act on them individually (see
-            <a href="#ArchiveSyncException">below</a>).</p>
+            <a href="#ArchiveException">below</a>).</p>
         <p>However, calling {@code umount()} or {@code update()} too often may
             increase the overall runtime: On each call, all remaining entries in the archive
             file are copied to the archive file again if the archive file did already exist.
@@ -269,7 +269,7 @@
             <p><em>Failure to comply to these guidelines may result in
                     unpredictable behavior and may even cause <b>loss of data</b>!</em></p>
         </blockquote>
-        <h4><a name="ArchiveSyncException">Exception Handling</a></h4>
+        <h4><a name="ArchiveException">Exception Handling</a></h4>
         <p>{@code umount()} and {@code update()} are guaranteed to process <em>
                 all</em> archive files which are in use or have been touched by the client application.
             However, processing some of these archive files may fail for a number of I/O related
@@ -281,12 +281,12 @@
             {@code IOException}s).</p>
         <p>Archive exceptions fall into two categories:</p>
         <ol>
-            <li>The class {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncWarningException} is the root
+            <li>The class {@link de.schlichtherle.truezip.io.file.ArchiveWarningException} is the root
 	of all warning exception types. These exceptions are thrown if an archive file 
 	has been completely updated, but some warning conditions apply. No data has 
 	been lost.</li>
-            <li>Its super class {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException} is the root
-	of all other exception types (unless it&#39;s an {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncWarningException}
+            <li>Its super class {@link de.schlichtherle.truezip.io.file.ArchiveException} is the root
+	of all other exception types (unless it&#39;s an {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}
 	again). These exceptions are thrown if an archive file could not get updated 
 	completely. This implies loss of some or all data in the respective archive 
 	file.</li>
@@ -296,19 +296,19 @@
             or loss of data when processing another archive file.</p>
         <p>When the archive exception chain is thrown by this method, it&#39;s first sorted
             according to (1) descending order of priority and (2) ascending order of appearance,
-            and the resulting head exception is then thrown. Since {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncWarningException}s
-            have a lower priority than {@link de.schlichtherle.truezip.io.archive.controller.ArchiveSyncException}s, they are always pushed
+            and the resulting head exception is then thrown. Since {@link de.schlichtherle.truezip.io.file.ArchiveWarningException}s
+            have a lower priority than {@link de.schlichtherle.truezip.io.file.ArchiveException}s, they are always pushed
             back to the end of the chain, so that an application can use the following simple
             idiom to detect if only some warnings or at least one severe error has occured:</p>
         <blockquote>
             <pre><code><b><font color="#000080">try</font></b> {
     File.<b>umount</b>(); <font color="#808080">// with or without parameters</font>
-} <b><font color="#000080">catch</font></b> (ArchiveSyncWarningException oops) {
-<font color="#808080">    // Only instances of the class ArchiveSyncWarningException exist in
+} <b><font color="#000080">catch</font></b> (ArchiveWarningException oops) {
+<font color="#808080">    // Only instances of the class ArchiveWarningException exist in
     // the sequential chain of exceptions. We decide to ignore this.
-</font>} <b><font color="#000080">catch</font></b> (ArchiveSyncException ouch) {
+</font>} <b><font color="#000080">catch</font></b> (ArchiveException ouch) {
 <font color="#808080">    // At least one exception occured which is not just an
-    // ArchiveSyncWarningException. This is a severe situation that
+    // ArchiveWarningException. This is a severe situation that
     // needs to be handled.
 
     // Print the sequential chain of exceptions in order of
@@ -471,7 +471,7 @@ monitor.<b>start</b>();
             <li>Otherwise, in order to achieve best performance, {@code umount()} or
 	{@code update()} should not get called unless either
                 <a href="#third_parties">third party access</a> or explicit
-                <a href="#ArchiveSyncException">exception handling</a> is required.</li>
+                <a href="#ArchiveException">exception handling</a> is required.</li>
             <li>For the same reason, these methods should never get called in a
                 <a href="#performance">loop</a> which modifies an archive file.</li>
             <li>{@code umount()} is generally preferred over {@code update()}

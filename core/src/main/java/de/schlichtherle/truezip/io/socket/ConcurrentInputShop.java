@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SynchronizedReadOnlyFile;
@@ -55,7 +56,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * value is the current thread.
      * The weak hash map allows the garbage collector to pick up an entry
      * stream if there are no more references to it.
-     * This reduces the likeliness of an {@link CommonInputBusyException}
+     * This reduces the likeliness of an {@link InputBusyException}
      * in case a sloppy client application has forgot to close a stream before
      * the common input gets closed.
      */

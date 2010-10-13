@@ -26,7 +26,7 @@ import java.io.IOException;
  * Multithreading needs to be addressed by client classes.
  *
  * @param   <CE> The type of the common entries.
- * @see     OutputSocketFactory
+ * @see     OutputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -34,10 +34,11 @@ public interface InputSocketProvider<CE extends CommonEntry> {
 
     /**
      * Returns a non-{@code null} input socket for read access to the given
-     * local target.
+     * <i>local target</i>.
      * <p>
      * When called on the returned input socket, the method
-     * {@link InputSocket#getTarget()} <em>must</em> return the same object.
+     * {@link InputSocket#getLocalTarget()} <em>must</em> return the same
+     * object.
      *
      * @param  entry the non-{@code null} local target.
      * @throws NullPointerException if {@code target} is {@code null}.
