@@ -23,7 +23,7 @@ import java.io.IOException;
  * Indicates a false positive archive entry which may exist as an entry in an
  * enclosing file system.
  */
-final class FalsePositiveException extends RuntimeException {
+class FalsePositiveException extends RuntimeException {
     private static final long serialVersionUID = 947139561381472363L;
 
     private final boolean trans;
@@ -48,7 +48,12 @@ final class FalsePositiveException extends RuntimeException {
      * Returns {@code true} if and only if this exception was created with a
      * {@link TransientIOException} as its cause.
      */
-    final boolean isTransient() {
+    boolean isTransient() {
         return trans;
+    }
+
+    // FIXME: Make a better name!
+    boolean isPersistent() {
+        return !trans;
     }
 }
