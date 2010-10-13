@@ -78,8 +78,8 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     private final Map<String, TempEntryOutputStream> temps
             = new LinkedHashMap<String, TempEntryOutputStream>();
 
-    /** @see #isTargetBusy */
-    private boolean targetBusy;
+    /** @see #isBusy */
+    private boolean busy;
 
     /**
      * Constructs a new {@code MultiplexedArchiveOutputShop}.
@@ -135,32 +135,39 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     @Override
     public OutputSocket<AE> getOutputSocket(final AE entry)
     throws IOException {
-        class OutputSocket extends FilterOutputSocket<AE> {
-            OutputSocket() throws IOException {
+        class Output extends FilterOutputSocket<AE> {
+            Output() throws IOException {
                 super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
 
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                if (isTargetBusy()) {
-                    return new TempEntryOutputStream(
-                            new FileEntry(createTempFile(TEMP_FILE_PREFIX)),
-                            getOutputSocket());
+                if (isBusy()) {
+                    final OutputSocket<? extends AE> socket = getOutputSocket();
+                    final FileEntry temp = new FileEntry(createTempFile(TEMP_FILE_PREFIX));
+                    OutputStream out = null;
+                    try {
+                        return out = new TempEntryOutputStream(socket, temp);
+                    } finally {
+                        if (null == out) // exception?
+                            if (!temp.getTarget().delete())
+                                throw new IOException(temp.getTarget().getPath() + " (cannot delete temporary output file)");
+                    }
                 } else {
                     return new EntryOutputStream(super.newOutputStream());
                 }
             }
         }
-        return new OutputSocket();
+        return new Output();
     }
 
     /**
-     * Returns whether the output output archive is busy writing an archive
+     * Returns whether the target output archive is busy writing an archive
      * entry or not.
      */
-    public boolean isTargetBusy() {
-        return targetBusy;
+    public boolean isBusy() {
+        return busy;
     }
 
     /**
@@ -172,7 +179,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         EntryOutputStream(final OutputStream out)
         throws IOException {
             super(out);
-            targetBusy = true;
+            busy = true;
         }
 
         @Override
@@ -180,7 +187,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             if (closed)
                 return;
             closed = true;
-            targetBusy = false;
+            busy = false;
             try {
                 super.close();
             } finally {
@@ -204,10 +211,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         private final InputSocket<CommonEntry> input;
         private boolean closed;
 
-        @SuppressWarnings("LeakingThisInConstructor")
-        TempEntryOutputStream(
-                final FileEntry temp,
-                final OutputSocket<? extends AE> output)
+        @SuppressWarnings({"LeakingThisInConstructor", "ThrowableInitCause"})
+        TempEntryOutputStream(  final OutputSocket<? extends AE> output,
+                                final FileEntry temp)
         throws IOException {
             super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.output = output;
@@ -233,7 +239,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             }
             this.temp = temp;
             this.input = new Input();
-            temps.put(local.getName(), this);
+            final TempEntryOutputStream old = temps.put(local.getName(), this);
+            if (null != old)
+                old.store(true);
         }
 
         public AE getTarget() {
@@ -248,28 +256,35 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             try {
                 super.close();
             } finally {
-                final CommonEntry src = input.getLocalTarget();
-                final AE dst = output.getLocalTarget();
-                for (final Size type : BitField.allOf(Size.class))
-                    if (UNKNOWN == dst.getSize(type))
-                        dst.setSize(type, src.getSize(type));
-                for (final Access type : BitField.allOf(Access.class))
-                    if (UNKNOWN == dst.getTime(type))
-                        dst.setTime(type, src.getTime(type));
-                storeTemps();
+                try {
+                    final CommonEntry src = input.getLocalTarget();
+                    final AE dst = output.getLocalTarget();
+                    for (final Size type : BitField.allOf(Size.class))
+                        if (UNKNOWN == dst.getSize(type))
+                            dst.setSize(type, src.getSize(type));
+                    for (final Access type : BitField.allOf(Access.class))
+                        if (UNKNOWN == dst.getTime(type))
+                            dst.setTime(type, src.getTime(type));
+                } finally {
+                    storeTemps();
+                }
             }
         }
 
         @SuppressWarnings("ThrowableInitCause")
-        boolean store() throws IOException {
-            if (!closed || isTargetBusy())
+        private boolean store(boolean discard) throws IOException {
+            if (discard)
+                assert closed : "broken archive controller!";
+            else if (!closed || isBusy())
                 return false;
             IOException cause = null;
             try {
-                try {
-                    IOSocket.copy(input, output);
-                } catch (IOException ex) {
-                    throw cause = ex;
+                if (!discard) {
+                    try {
+                        IOSocket.copy(input, output);
+                    } catch (IOException ex) {
+                        throw cause = ex;
+                    }
                 }
             } finally {
                 final File tempFile = temp.getTarget();
@@ -282,7 +297,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
 
     @Override
     public void close() throws IOException {
-        assert !isTargetBusy();
+        assert !isBusy();
         try {
             storeTemps();
             assert temps.isEmpty();
@@ -292,7 +307,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     private void storeTemps() throws IOException {
-        if (isTargetBusy())
+        if (isBusy())
             return;
 
         final ChainableIOExceptionBuilder<IOException, ChainableIOException> builder
@@ -303,7 +318,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             final TempEntryOutputStream out = i.next();
             boolean remove = true;
             try {
-                remove = out.store();
+                remove = out.store(false);
             } catch (InputException ex) {
                 builder.warn(ex); // let's continue anyway...
             } catch (IOException ex) {
