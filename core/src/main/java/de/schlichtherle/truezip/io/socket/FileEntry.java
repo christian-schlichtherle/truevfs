@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Collections;

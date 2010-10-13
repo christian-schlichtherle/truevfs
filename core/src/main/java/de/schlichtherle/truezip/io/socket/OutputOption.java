@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import java.io.IOException;
+
 /**
  * Defines the potential options for data output operations.
  * Not all options may be supported or available for all operations and
@@ -30,7 +33,7 @@ public enum OutputOption {
      * Whether or not any missing parent directory entries within an
      * archive file shall get created automatically.
      * If set, client applications do not need to call
-     * {@link ArchiveController#mknod} to create the parent directory
+     * {@link FileSystemController#mknod} to create the parent directory
      * entries of a file entry within an archive file before they can write
      * to it.
      */

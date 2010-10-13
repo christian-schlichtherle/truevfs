@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Collection;

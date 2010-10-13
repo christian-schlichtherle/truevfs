@@ -29,6 +29,6 @@ public class OutputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     
     OutputClosedException() {
-        super("common entry output stream has been forced to close()");
+        super("output stream has been forced to close()");
     }
 }

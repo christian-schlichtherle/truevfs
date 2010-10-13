@@ -43,7 +43,7 @@ interface ArchiveController extends FileSystemController {
      * {@code null}.
      * @throws SyncException if any exceptional condition occurs
      * throughout the processing of the target archive file.
-     * @see    FileSystemControllers#sync(URI, SyncExceptionBuilder, BitField)
+     * @see    Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,

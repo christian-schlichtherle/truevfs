@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;

@@ -30,6 +30,6 @@ public class InputClosedException extends IOException {
     private static final long serialVersionUID = 4563928734723923649L;
     
     InputClosedException() {
-        super("common entry input stream or read only file has been forced to close()");
+        super("input stream or read only file has been forced to close()");
     }
 }

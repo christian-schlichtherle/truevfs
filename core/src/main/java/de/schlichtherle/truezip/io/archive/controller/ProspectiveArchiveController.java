@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
@@ -111,7 +111,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
-    /** @see ArchiveDriver#newInputShop! */
+    /** @see ArchiveDriver#newInputShop */
     @Override
     public FileSystemEntry getEntry(String path) {
         try {
@@ -240,7 +240,7 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
-    /** @see ArchiveDriver#newInputShop! */
+    /** @see ArchiveDriver#newInputShop */
     @Override
     @SuppressWarnings("ThrowableInitCause")
     public void unlink(String path)

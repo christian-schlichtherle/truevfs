@@ -65,20 +65,16 @@ extends CommonEntryFactory<AE> {
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link FileSystemController} is processing
      *         - {@code null} is not permitted.
-     * @param  input the non-{@code null} common input socket for reading
+     * @param  input the non-{@code null} input socket for reading
      *         the contents of the described archive from its target.
      * @throws TransientIOException If calling this method for the same
-     *         archive file again could possibly succeed.
-     *         This exception is associated with another {@link IOException}
-     *         as its cause which is unwrapped and interpreted as below.
-     * @throws FileNotFoundException If the input archive is inaccessible
-     *         for any reason and the implementation would like the client
-     *         application to recognize the archive file as a <i>special</i>
-     *         file.
+     *         target archive file again could possibly succeed.
+     *         Meanwhile, the client application will recognize the archive
+     *         file as a <i>special file</i>.
      * @throws IOException On any other I/O or data format related issue
-     *         when reading the input archive and the implementation would like
-     *         the client application to recognize the archive file as a
-     *         <i>regular</i> file.
+     *         when reading the input archive and the implementation would
+     *         like the client application to recognize the archive file as a
+     *         <i>regular file</i>
      * @return A non-{@code null} reference to a new common input shop.
      */
     InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
@@ -92,7 +88,7 @@ extends CommonEntryFactory<AE> {
      * @param  archive the abstract archive representation which TrueZIP's
      *         internal {@link FileSystemController} is processing
      *         - {@code null} is not permitted.
-     * @param  output the non-{@code null} common output socket for writing
+     * @param  output the non-{@code null} output socket for writing
      *         the contents of the described archive to its target.
      * @param  source the nullable {@link InputShop} if
      *         {@code archive} is going to get updated.
@@ -102,15 +98,15 @@ extends CommonEntryFactory<AE> {
      *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
-     * @return A non-{@code null} reference to a new output archive object.
      * @throws TransientIOException If calling this method for the same
-     *         archive file again could possibly succeed.
-     *         This exception is associated with another {@code IOException}
-     *         as its cause which is unwrapped and interpreted as below.
-     * @throws FileNotFoundException If the output archive is inaccessible
-     *         for any reason.
+     *         target archive file again could possibly succeed.
+     *         Meanwhile, the client application will recognize the archive
+     *         file as a <i>special file</i>.
      * @throws IOException On any other I/O or data format related issue
-     *         when writing the output archive.
+     *         when writing the output archive and the implementation would
+     *         like the client application to recognize the archive file as a
+     *         <i>regular file</i>
+     * @return A non-{@code null} reference to a new output archive object.
      */
     OutputShop<AE> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<AE> source)
     throws IOException;

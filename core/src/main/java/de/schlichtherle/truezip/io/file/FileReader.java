@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FileBusyException;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -26,12 +27,12 @@ import java.io.InputStreamReader;
  * All file system operations in this class are
  * <a href="package-summary.html#atomicity">virtually atomic</a>.
  *
- * @see <a href="package-summary.html#streams">Using Archive Entry Streams</a>
- * @see FileBusyException
- * @see File#cat
- * @see File#umount
- * @see File#update
- * @author Christian Schlichtherle
+ * @see     <a href="package-summary.html#streams">Using Archive Entry Streams</a>
+ * @see     FileBusyException
+ * @see     File#cat
+ * @see     File#umount
+ * @see     File#update
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileReader extends InputStreamReader {

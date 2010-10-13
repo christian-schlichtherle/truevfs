@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.FileSystemEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
