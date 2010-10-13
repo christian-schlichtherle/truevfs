@@ -51,9 +51,4 @@ class FalsePositiveException extends RuntimeException {
     boolean isTransient() {
         return trans;
     }
-
-    // FIXME: Make a better name!
-    boolean isPersistent() {
-        return !trans;
-    }
 }
