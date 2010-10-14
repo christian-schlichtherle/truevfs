@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.FileEntry;
-import de.schlichtherle.truezip.io.Files;
 import de.schlichtherle.truezip.io.socket.CommonEntryPool;
 import java.io.File;
 import java.util.HashMap;
@@ -112,10 +111,10 @@ final class BufferingArchiveController extends FilterArchiveController {
                     final OutputStream out = super.newOutputStream();
                     boolean ok = false;
                     try {
-                        final CommonEntry template = options.get(COPY_PROPERTIES)
-                            ? getRemoteTarget()
-                            : null;
-                        getController().mknod(path, FILE, template, options2);
+                        getController().mknod(
+                                path, FILE,
+                                options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
+                                options2);
                         ok = true;
                     } finally {
                         if (!ok)
