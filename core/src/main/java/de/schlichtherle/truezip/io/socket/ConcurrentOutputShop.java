@@ -60,7 +60,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
      * in case a sloppy client application has forgot to close a stream before
      * the common output gets closed.
      */
-    private final Map<DoCloseable, Thread> streams
+    private final Map<DoCloseable, Thread> threads
             = new WeakHashMap<DoCloseable, Thread>();
 
     private volatile boolean shopClosed;
@@ -88,6 +88,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 synchronized (ConcurrentOutputShop.this) {
+                    ensureNotShopClosed();
                     return new EntryOutputStream(super.newOutputStream());
                 }
             }
@@ -119,7 +120,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
         try {
-            while (streams.size() > threadStreams) {
+            while (threads.size() > threadStreams) {
                 long toWait;
                 if (timeout > 0) {
                     toWait = timeout - (System.currentTimeMillis() - start);
@@ -135,7 +136,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
         } catch (InterruptedException ignored) {
             logger.warning("wait.interrupted");
         }
-        return streams.size();
+        return threads.size();
     }
 
     /**
@@ -144,7 +145,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     private int threadStreams() {
         final Thread thisThread = Thread.currentThread();
         int n = 0;
-        for (final Thread thread : streams.values())
+        for (final Thread thread : threads.values())
             if (thisThread == thread)
                 n++;
         return n;
@@ -161,7 +162,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
         ensureNotShopClosed();
-        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+        for (final Iterator<DoCloseable> it = threads.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -195,12 +196,11 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     implements DoCloseable {
         private volatile boolean closed;
 
-        @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
+        @SuppressWarnings("LeakingThisInConstructor")
         private EntryOutputStream(final OutputStream out) {
             super(out, ConcurrentOutputShop.this);
             assert out != null;
-            streams.put(this, Thread.currentThread());
-            ConcurrentOutputShop.this.notify(); // there can be only one waiting thread!
+            threads.put(this, Thread.currentThread());
         }
 
         private void ensureNotShopClosed() throws IOException {
@@ -244,7 +244,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
                 try {
                     doClose();
                 } finally {
-                    streams.remove(this);
+                    threads.remove(this);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }

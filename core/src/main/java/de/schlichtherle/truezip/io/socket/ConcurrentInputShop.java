@@ -61,7 +61,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * in case a sloppy client application has forgot to close a stream before
      * the common input gets closed.
      */
-    private final Map<DoCloseable, Thread> streams
+    private final Map<DoCloseable, Thread> threads
             = new WeakHashMap<DoCloseable, Thread>();
 
     private volatile boolean shopClosed;
@@ -89,6 +89,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
             @Override
             public InputStream newInputStream() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
+                    ensureNotShopClosed();
                     return new EntryInputStream(super.newInputStream());
                 }
             }
@@ -96,6 +97,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
+                    ensureNotShopClosed();
                     return new EntryReadOnlyFile(super.newReadOnlyFile());
                 }
             }
@@ -127,7 +129,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
         try {
-            while (streams.size() > threadStreams) {
+            while (threads.size() > threadStreams) {
                 long toWait;
                 if (timeout > 0) {
                     toWait = timeout - (System.currentTimeMillis() - start);
@@ -143,14 +145,14 @@ extends FilterInputShop<CE, InputShop<CE>> {
         } catch (InterruptedException ignored) {
             logger.warning("wait.interrupted");
         }
-        return streams.size();
+        return threads.size();
     }
 
     /** Returns the number of streams opened by the current thread. */
     private int threadStreams() {
         final Thread thisThread = Thread.currentThread();
         int n = 0;
-        for (final Thread thread : streams.values())
+        for (final Thread thread : threads.values())
             if (thisThread == thread)
                 n++;
         return n;
@@ -167,7 +169,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
         ensureNotShopClosed();
-        for (final Iterator<DoCloseable> it = streams.keySet().iterator();
+        for (final Iterator<DoCloseable> it = threads.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
@@ -201,12 +203,11 @@ extends FilterInputShop<CE, InputShop<CE>> {
     implements DoCloseable {
         private volatile boolean closed;
 
-        @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
+        @SuppressWarnings("LeakingThisInConstructor")
         private EntryReadOnlyFile(final ReadOnlyFile rof) {
             super(rof, ConcurrentInputShop.this);
             assert rof != null;
-            streams.put(this, Thread.currentThread());
-            ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
+            threads.put(this, Thread.currentThread());
         }
 
         private void ensureNotShopClosed() throws IOException {
@@ -268,7 +269,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
                 try {
                     doClose();
                 } finally {
-                    streams.remove(this);
+                    threads.remove(this);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }
@@ -286,8 +287,6 @@ extends FilterInputShop<CE, InputShop<CE>> {
         public void doClose() throws IOException {
             // Order is important!
             assert !closed;
-            /*if (closed)
-                return;*/
             closed = true;
             rof.close();
         }
@@ -329,12 +328,11 @@ extends FilterInputShop<CE, InputShop<CE>> {
     implements DoCloseable {
         private volatile boolean closed;
 
-        @SuppressWarnings({ "NotifyWhileNotSynced", "LeakingThisInConstructor" })
+        @SuppressWarnings("LeakingThisInConstructor")
         private EntryInputStream(final InputStream in) {
             super(in, ConcurrentInputShop.this);
             assert in != null;
-            streams.put(this, Thread.currentThread());
-            ConcurrentInputShop.this.notify(); // there can be only one waiting thread!
+            threads.put(this, Thread.currentThread());
         }
 
         private void ensureNotShopClosed() throws IOException {
@@ -401,7 +399,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
                 try {
                     doClose();
                 } finally {
-                    streams.remove(this);
+                    threads.remove(this);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }
@@ -419,8 +417,6 @@ extends FilterInputShop<CE, InputShop<CE>> {
         public void doClose() throws IOException {
             // Order is important!
             assert !closed;
-            /*if (closed)
-                return;*/
             closed = true;
             in.close();
         }
