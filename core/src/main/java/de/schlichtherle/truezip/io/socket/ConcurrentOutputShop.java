@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;

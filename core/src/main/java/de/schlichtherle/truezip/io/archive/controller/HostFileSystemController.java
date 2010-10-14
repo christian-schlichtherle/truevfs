@@ -23,10 +23,10 @@ import java.net.URI;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import java.io.File;
 import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.FileEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -35,7 +35,7 @@ import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 
 /**
  * Note that this class <em>must</em> be immutable because it's instances are
@@ -92,7 +92,7 @@ implements FileSystemModel, FileSystemController  {
 
     @Override
     public FileEntry getEntry(String path) {
-        final FileEntry entry = new FileEntry(target, path);
+        final FileEntry entry = FileEntry.get(target, path);
         return entry.getTarget().exists() ? entry : null;
     }
 
@@ -106,7 +106,7 @@ implements FileSystemModel, FileSystemController  {
     public boolean isWritable(String path) {
         final File file = new File(target, path);
         return isCreatableOrWritable(file);
-        //return new FileEntry(target, path).canWrite();
+        //return FileEntry.get(target, path).canWrite();
     }
 
     @Override
@@ -131,7 +131,7 @@ implements FileSystemModel, FileSystemController  {
             String path,
             BitField<InputOption> options)
     throws IOException {
-        return FileInputSocket.get( new FileEntry(target, path),
+        return FileInputSocket.get( FileEntry.get(target, path),
                                     options.clear(InputOption.BUFFER));
     }
 
@@ -140,7 +140,7 @@ implements FileSystemModel, FileSystemController  {
             String path,
             BitField<OutputOption> options)
     throws IOException {
-        return FileOutputSocket.get(new FileEntry(target, path), options);
+        return FileOutputSocket.get(FileEntry.get(target, path), options);
     }
 
     @Override

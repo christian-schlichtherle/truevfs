@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+
 /**
  * A container and input socket provider for common entries.
  * <p>

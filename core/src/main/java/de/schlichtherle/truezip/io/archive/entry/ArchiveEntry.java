@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.entry;
 
-import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 
 /**
  * Represents an entry in an archive file.
@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.CommonEntry;
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value
- * {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}
+ * {@value de.schlichtherle.truezip.io.entry.CommonEntry#UNKNOWN}
  * or {@code null} respectively.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
@@ -60,9 +60,9 @@ public interface ArchiveEntry extends CommonEntry {
      * @param  type the size type.
      * @param  value the size of the given size type for this archive entry in
      *         bytes or
-     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code size} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.entry.CommonEntry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         type is unsupported.
      */
@@ -74,9 +74,9 @@ public interface ArchiveEntry extends CommonEntry {
      * @param  type the access type.
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
-     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.entry.CommonEntry#UNKNOWN}.
      * @throws IllegalArgumentException if {@code time} is negative and not
-     *         {@value de.schlichtherle.truezip.io.socket.CommonEntry#UNKNOWN}.
+     *         {@value de.schlichtherle.truezip.io.entry.CommonEntry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         given type is unsupported.
      */

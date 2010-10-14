@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.FileEntry;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
@@ -34,7 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.socket.CommonEntry.ROOT;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 import static de.schlichtherle.truezip.io.Files.contains;

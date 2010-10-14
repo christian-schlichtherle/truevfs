@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.entry;
 
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import java.io.CharConversionException;
 
 /**

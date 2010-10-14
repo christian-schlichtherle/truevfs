@@ -27,8 +27,8 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.InputService;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -54,9 +54,9 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.READ;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**

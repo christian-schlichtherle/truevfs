@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.entry;
 
 import java.io.IOException;
 
 /**
  * A pooling strategy for common entries.
  *
- * @see     BufferingInputSocket
- * @see     BufferingOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

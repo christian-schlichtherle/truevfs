@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntryPool;
+import de.schlichtherle.truezip.io.entry.TempFilePool;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
@@ -27,8 +31,8 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.BUFFER;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 
 /**
  * @see     FileInputSocket

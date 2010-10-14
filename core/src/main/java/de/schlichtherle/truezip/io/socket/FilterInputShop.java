@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.FilterCommonEntryContainer;
 import java.io.IOException;
 
 /**
