@@ -165,9 +165,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         return busy;
     }
 
-    /**
-     * This entry output stream writes directly to the output archive.
-     */
+    /** This entry output stream writes directly to the output archive. */
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
 
