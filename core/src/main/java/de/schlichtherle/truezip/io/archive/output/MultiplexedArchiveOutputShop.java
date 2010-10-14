@@ -253,9 +253,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 return;
             closed = true;
             try {
-                super.close();
-            } finally {
                 try {
+                    super.close();
+                } finally {
                     final CommonEntry src = input.getLocalTarget();
                     final AE dst = output.getLocalTarget();
                     for (final Size type : BitField.allOf(Size.class))
@@ -264,9 +264,9 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                     for (final Access type : BitField.allOf(Access.class))
                         if (UNKNOWN == dst.getTime(type))
                             dst.setTime(type, src.getTime(type));
-                } finally {
-                    storeTemps();
                 }
+            } finally {
+                storeTemps();
             }
         }
 
