@@ -68,7 +68,7 @@ extends FilterOutputSocket<CE> {
                     CommonEntry remote = getRemoteTarget();
                     if (null == remote)
                         remote = temp;
-                        IOException cause = null;
+                    IOException cause = null;
                     try {
                         IOSocket.copy(  new TargetInputSocket<CommonEntry>(remote,
                                             FileInputSocket.get(temp)),

@@ -87,13 +87,15 @@ extends FilterInputSocket<CE> {
                 closed = true;
                 IOException cause = null;
                 try {
-                    try {
-                        super.close();
-                    } catch (IOException ex) {
-                        throw cause = ex;
-                    }
+                    super.close();
+                } catch (IOException ex) {
+                    throw cause = ex;
                 } finally {
-                    pool.release(temp);
+                    try {
+                        pool.release(temp);
+                    } catch (IOException ex) {
+                        throw (IOException) ex.initCause(cause);
+                    }
                 }
             }
         }
@@ -120,13 +122,15 @@ extends FilterInputSocket<CE> {
                 closed = true;
                 IOException cause = null;
                 try {
-                    try {
-                        super.close();
-                    } catch (IOException ex) {
-                        throw cause = ex;
-                    }
+                    super.close();
+                } catch (IOException ex) {
+                    throw cause = ex;
                 } finally {
-                    pool.release(temp);
+                    try {
+                        pool.release(temp);
+                    } catch (IOException ex) {
+                        throw (IOException) ex.initCause(cause);
+                    }
                 }
             }
         }
