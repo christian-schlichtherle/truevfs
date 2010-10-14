@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.BitField;
 import java.util.Collections;
 import java.io.File;
 import java.net.URI;
@@ -87,32 +86,19 @@ public class FileEntry implements FileSystemEntry, Link<File> {
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }
 
-    public InputSocket<FileEntry> getInputSocket(
-            BitField<InputOption> options) {
-        InputSocket<FileEntry> input = FileInputSocket.get(this);
-        if (options.get(InputOption.BUFFER))
-            input = new BufferingInputSocket<FileEntry>(input);
-        return input;
-    }
-
-    public OutputSocket<FileEntry> getOutputSocket(
-            BitField<OutputOption> options) {
-        return FileOutputSocket.get(this, options);
-    }
-
     @Override
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return name;
     }
 
     /** Returns the type of this file entry. */
     @Override
-    public CommonEntry.Type getType() {
+    public final CommonEntry.Type getType() {
         return file.isDirectory() ? DIRECTORY
                 :   file.isFile() ? FILE
                 :   file.exists() ? SPECIAL
@@ -120,7 +106,7 @@ public class FileEntry implements FileSystemEntry, Link<File> {
     }
 
     @Override
-    public long getSize(final Size type) {
+    public final long getSize(final Size type) {
         switch (type) {
             case DATA:
             case STORAGE:
@@ -132,13 +118,13 @@ public class FileEntry implements FileSystemEntry, Link<File> {
 
     /** Returns the file's last modification time. */
     @Override
-    public long getTime(Access type) {
+    public final long getTime(Access type) {
         return WRITE == type && file.exists() ? file.lastModified() : UNKNOWN;
     }
 
     @Override
     @SuppressWarnings("ManualArrayToCollectionCopy")
-    public Set<String> getMembers() {
+    public final Set<String> getMembers() {
         final String[] list = file.list();
         if (null == list)
             return null;

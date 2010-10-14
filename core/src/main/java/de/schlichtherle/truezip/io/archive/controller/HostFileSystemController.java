@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.FileInputSocket;
+import de.schlichtherle.truezip.io.socket.FileOutputSocket;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.net.URI;
@@ -129,8 +131,8 @@ implements FileSystemModel, FileSystemController  {
             String path,
             BitField<InputOption> options)
     throws IOException {
-        return new FileEntry(target, path).getInputSocket(
-                options.clear(InputOption.BUFFER));
+        return FileInputSocket.get( new FileEntry(target, path),
+                                    options.clear(InputOption.BUFFER));
     }
 
     @Override
@@ -138,7 +140,7 @@ implements FileSystemModel, FileSystemController  {
             String path,
             BitField<OutputOption> options)
     throws IOException {
-        return new FileEntry(target, path).getOutputSocket(options);
+        return FileOutputSocket.get(new FileEntry(target, path), options);
     }
 
     @Override

@@ -34,15 +34,13 @@ extends FilterInputSocket<CE> {
     private final CommonEntryPool<FileEntry> pool;
 
     public BufferingInputSocket(InputSocket<? extends CE> input) {
-        this(input, TempFilePool.get());
+        this(input, null);
     }
 
     public BufferingInputSocket(final InputSocket<? extends CE> input,
                                 final CommonEntryPool<FileEntry> pool) {
         super(input);
-        if (null == pool)
-            throw new NullPointerException();
-        this.pool = pool;
+        this.pool = null != pool ? pool : TempFilePool.get();
     }
 
     @SuppressWarnings("ThrowableInitCause")
@@ -53,7 +51,8 @@ extends FilterInputSocket<CE> {
             if (null == remote)
                 remote = temp;
             IOSocket.copy(  getInputSocket(),
-                            FileOutputSocket.get(temp, remote));
+                            new TargetOutputSocket<CommonEntry>(remote,
+                                FileOutputSocket.get(temp)));
         } catch (IOException cause) {
             try {
                 pool.release(temp);

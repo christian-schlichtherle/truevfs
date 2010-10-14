@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,29 +27,31 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class FileInputSocket<CE extends CommonEntry>
-extends InputSocket<CE> {
+public final class FileInputSocket extends InputSocket<FileEntry> {
     private final FileEntry file;
-    private final CE local;
 
-    static FileInputSocket<FileEntry> get(FileEntry file) {
-        return new FileInputSocket<FileEntry>(file, file);
+    public static InputSocket<FileEntry> get(final FileEntry file) {
+        return get(file, null);
     }
 
-    static <CE extends CommonEntry> FileInputSocket<CE> get(FileEntry file, CE local) {
-        return new FileInputSocket<CE>(file, local);
+    public static InputSocket<FileEntry> get(
+            FileEntry file,
+            BitField<InputOption> options) {
+        InputSocket<FileEntry> input = new FileInputSocket(file);
+        if (null != options && options.get(InputOption.BUFFER))
+            input = new BufferingInputSocket<FileEntry>(input);
+        return input;
     }
 
-    private FileInputSocket(final FileEntry file, final CE local) {
-        if (null == local || null == file)
+    private FileInputSocket(final FileEntry file) {
+        if (null == file)
             throw new NullPointerException();
-        this.local = local;
         this.file = file;
     }
 
     @Override
-    public CE getLocalTarget() {
-        return local;
+    public FileEntry getLocalTarget() {
+        return file;
     }
 
     @Override

@@ -35,29 +35,27 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class FileOutputSocket<CE extends CommonEntry>
-extends OutputSocket<CE> {
+public final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final FileEntry file;
     private final BitField<OutputOption> options;
-    private final CE local;
     private final CommonEntryPool<FileEntry> pool;
 
-    static FileOutputSocket<FileEntry> get(FileEntry file, BitField<OutputOption> options) {
-        return new FileOutputSocket<FileEntry>(file, options, file);
+    public static OutputSocket<FileEntry> get(FileEntry file) {
+        return new FileOutputSocket(file, null);
     }
 
-    static <CE extends CommonEntry> FileOutputSocket<CE> get(FileEntry file, CE local) {
-        return new FileOutputSocket<CE>(file, BitField.noneOf(OutputOption.class), local);
+    public static OutputSocket<FileEntry> get(
+            FileEntry file,
+            BitField<OutputOption> options) {
+        return new FileOutputSocket(file, options);
     }
 
-    FileOutputSocket(   final FileEntry file,
-                        final BitField<OutputOption> options,
-                        final CE local) {
-        if (null == local || null == file || null == options)
+    private FileOutputSocket(   final FileEntry file,
+                                final BitField<OutputOption> options) {
+        if (null == file)
             throw new NullPointerException();
-        this.local = local;
         this.file = file;
-        this.options = options;
+        this.options = null != options ? options : BitField.noneOf(OutputOption.class);
         final File fileTarget = file.getTarget();
         this.pool = new TempFilePool(   fileTarget.getName(),
                                         null,
@@ -65,8 +63,8 @@ extends OutputSocket<CE> {
     }
 
     @Override
-    public CE getLocalTarget() {
-        return local;
+    public FileEntry getLocalTarget() {
+        return file;
     }
 
     @Override
@@ -101,8 +99,8 @@ extends OutputSocket<CE> {
                     && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget))) {
                         IOException cause = null;
                         try {
-                            IOSocket.copy(  FileInputSocket.get(temp, local),
-                                            FileOutputSocket.get(file, local));
+                            IOSocket.copy(  FileInputSocket.get(temp),
+                                            FileOutputSocket.get(file));
                         } catch (IOException ex) {
                             throw cause = ex;
                         } finally {
@@ -125,8 +123,8 @@ extends OutputSocket<CE> {
 
         try {
             if (temp != file && options.get(APPEND))
-                IOSocket.copy(  FileInputSocket.get(file, local),
-                                FileOutputSocket.get(temp, local));
+                IOSocket.copy(  FileInputSocket.get(file),
+                                FileOutputSocket.get(temp));
             return new OutputStream();
         } catch (IOException cause) {
             if (temp != file) {
