@@ -39,8 +39,8 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
             FileEntry file,
             BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
-        if (null != options && options.get(InputOption.BUFFER))
-            input = new BufferingInputSocket<FileEntry>(input);
+        if (null != options && options.get(InputOption.CACHE))
+            input = new CachingInputSocket<FileEntry>(input);
         return input;
     }
 

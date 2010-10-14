@@ -30,17 +30,17 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class BufferingOutputSocket<CE extends CommonEntry>
+public class CachingOutputSocket<CE extends CommonEntry>
 extends FilterOutputSocket<CE> {
 
     private final CommonEntryPool<FileEntry> pool;
 
-    public BufferingOutputSocket(OutputSocket<? extends CE> output) {
+    public CachingOutputSocket(OutputSocket<? extends CE> output) {
         this(output, null);
     }
 
-    public BufferingOutputSocket(   final OutputSocket<? extends CE> output,
-                                    final CommonEntryPool<FileEntry> pool) {
+    public CachingOutputSocket( final OutputSocket<? extends CE> output,
+                                final CommonEntryPool<FileEntry> pool) {
         super(output);
         this.pool = null != pool ? pool : TempFilePool.get();
     }

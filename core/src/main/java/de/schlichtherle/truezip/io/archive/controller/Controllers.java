@@ -110,7 +110,7 @@ public class Controllers {
                     = new ProspectiveArchiveController(
                         enclController,
                         new LockingArchiveController(
-                            new BufferingArchiveController(
+                            new CachingArchiveController(
                                 new UpdatingArchiveController<AE>(
                                     enclController, model, driver))));
             syncScheduler.setTouched(false);

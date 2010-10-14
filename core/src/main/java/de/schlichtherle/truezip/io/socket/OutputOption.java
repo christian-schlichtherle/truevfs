@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.io.IOException;
 
 /**
@@ -26,38 +25,34 @@ import java.io.IOException;
  * supported and available.
  * If an option is not supported, it must be silently ignored.
  * If an option is not available, an {@link IOException} must be thrown.
+ *
+ * @see     InputOption
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
 public enum OutputOption {
 
     /**
-     * Whether or not any missing parent directory entries within an
-     * archive file shall get created automatically.
-     * If set, client applications do not need to call
-     * {@link FileSystemController#mknod} to create the parent directory
-     * entries of a file entry within an archive file before they can write
-     * to it.
+     * Whether or not any missing parent directory entries shall get created
+     * automatically.
      */
     CREATE_PARENTS,
 
     /**
-     * Whether or not the new data shall get written to a temporary file
-     * for buffering if the archive entry already exists.
-     * Use this option if the archive entry may be read concurrently while
-     * you are writing to it.
-     * The temporary file will get renamed or copied to the archive entry
-     * and deleted when writing the new data has been finished.
+     * Whether or not the output socket data shall get cached in a temporary
+     * file for future use.
      */
-    BUFFER,
+    CACHE,
 
     /**
      * Whether or not the new data shall get appended to the existing data
-     * of the file entry rather than replacing it entirely.
+     * of the local target rather than replacing it entirely.
      */
     APPEND,
 
     /**
-     * Whether or not a copy operation shall preserve the properties
-     * of the source entry - but not it's name, of course.
+     * Whether or not as much properties as possible shall get copied from the
+     * input target to the output target - except the entry name, of course.
      */
     COPY_PROPERTIES,
 }

@@ -254,7 +254,7 @@ extends     FileSystemArchiveController<AE> {
                 final String path = getEnclPath(ROOT);
                 final boolean readOnly = !controller.isWritable(path);
                 final InputSocket<?> socket = controller.getInputSocket(
-                        path, BitField.of(InputOption.BUFFER));
+                        path, BitField.of(InputOption.CACHE));
                 input = new Input(getDriver().newInputShop(getModel(), socket));
                 setFileSystem(newArchiveFileSystem(
                         socket.getLocalTarget(), readOnly));
@@ -295,7 +295,7 @@ extends     FileSystemArchiveController<AE> {
         final FileSystemController controller = getEnclController();
         final String path = getEnclPath(ROOT);
         final OutputSocket<?> socket = controller.getOutputSocket(path,
-                BitField.of(OutputOption.BUFFER)
+                BitField.of(OutputOption.CACHE)
                     .set(CREATE_PARENTS, createParents));
         output = new Output(getDriver().newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));
