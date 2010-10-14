@@ -97,7 +97,7 @@ public class ManySmallEntriesTest extends TestCase {
         try {
             final byte[] buf = new byte[data.length];
             for (Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
-                final ZipEntry entry = (ZipEntry) e.nextElement();
+                final ZipEntry entry = e.nextElement();
 
                 assertEquals(data.length, entry.getSize());
 

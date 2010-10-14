@@ -360,7 +360,8 @@ public abstract class ZipTestCase extends TestCase {
             public void run() {
                 try {
                     // Retrieve list of entries and randomize their order.
-                    final List<ZipEntry> entries = Collections.list(zipIn.entries());
+                    @SuppressWarnings("unchecked")
+                    final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zipIn.entries());
                     assert entries.size() == nEntries; // this would be a programming error in the test - not the testlet!
                     for (int i = 0; i < nEntries; i++) {
                         final int j = rnd.nextInt(nEntries);
@@ -450,7 +451,7 @@ public abstract class ZipTestCase extends TestCase {
         ZipFile zipIn = newZipFile(zip);
         try {
             // Check that zipIn correctly enumerates all entries.
-            for (final Enumeration<ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
+            for (final Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
                 final ZipEntry entry = e.nextElement();
                 assertEquals(data.length, entry.getSize());
                 assertTrue(set.remove(entry.getName()));

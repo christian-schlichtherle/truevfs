@@ -317,7 +317,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *
      * @see #iterator()
      */
-    public synchronized Enumeration<ZipEntry> entries() {
+    public synchronized Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
