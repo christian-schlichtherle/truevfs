@@ -20,13 +20,14 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * This pool creates a temporary file on allocation and deletes it on release
- * or finalization.
+ * This pool creates a temporary file on {@link #allocate()} and deletes it
+ * on {@link #release(FileEntry)} or when the returned file entry gets
+ * {@link Object#finalize()}d.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class TempFilePool implements CommonEntryPool<FileEntry> {
+public final class TempFilePool implements CommonEntryPool<FileEntry> {
 
     // Declared package private for unit testing purposes.
     static final String DEFAULT_PREFIX = "tzp-pool";

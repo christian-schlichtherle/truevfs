@@ -142,12 +142,19 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 if (isBusy()) {
                     final OutputSocket<? extends AE> socket = getOutputSocket();
                     final FileEntry temp = TempFilePool.get().allocate();
-                    OutputStream out = null;
+                    IOException cause = null;
                     try {
-                        return out = new TempEntryOutputStream(socket, temp);
+                        return new TempEntryOutputStream(socket, temp);
+                    } catch (IOException ex) {
+                        throw cause = ex;
                     } finally {
-                        if (null == out) // exception?
-                            TempFilePool.get().release(temp);
+                        if (null != cause) {
+                            try {
+                                TempFilePool.get().release(temp);
+                            } catch (IOException ex) {
+                                throw (IOException) ex.initCause(cause);
+                            }
+                        }
                     }
                 } else {
                     return new EntryOutputStream(super.newOutputStream());
@@ -269,11 +276,16 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
+            IOException cause = null;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
             } finally {
-                TempFilePool.get().release(temp);
+                try {
+                    TempFilePool.get().release(temp);
+                } catch (IOException ex) {
+                    throw (IOException) ex.initCause(cause);
+                }
             }
             return true;
         }
