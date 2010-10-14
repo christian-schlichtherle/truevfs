@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.io.IOException;
+
 /**
  * Indicates that an archive file could not get updated because some input or
  * output streams for its entries are still open.
@@ -25,7 +27,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveBusyException extends Exception {
+public class ArchiveBusyException extends IOException {
 
     private static final long serialVersionUID = 1937356783082645716L;
 
