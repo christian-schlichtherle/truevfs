@@ -16,10 +16,12 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -41,10 +43,6 @@ import java.util.logging.Logger;
 public class ConcurrentOutputShop<CE extends CommonEntry>
 extends FilterOutputShop<CE, OutputShop<CE>> {
 
-    private interface DoCloseable {
-        void doClose() throws IOException;
-    }
-
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
     private static final Logger logger
@@ -60,45 +58,21 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
      * in case a sloppy client application has forgot to close a stream before
      * the common output gets closed.
      */
-    private final Map<DoCloseable, Thread> threads
-            = new WeakHashMap<DoCloseable, Thread>();
+    private final Map<Closeable, Thread> threads
+            = new WeakHashMap<Closeable, Thread>();
 
-    private volatile boolean shopClosed;
+    private volatile boolean closed;
 
-    /** Constructs a new {@code ConcurrentOutputShop}. */
+    /**
+     * Constructs a concurrent output shop.
+     * 
+     * @param  output the shop to decorate.
+     * @throws NullPointerException if {@code output} is {@code null}.
+     */
     public ConcurrentOutputShop(final OutputShop<CE> output) {
         super(output);
-    }
-
-    private void ensureNotShopClosed() {
-        if (shopClosed)
-            throw new IllegalStateException(
-                    new OutputClosedException());
-    }
-
-    @Override
-    public OutputSocket<CE> getOutputSocket(final CE entry)
-    throws IOException {
-
-        class OutputSocket extends FilterOutputSocket<CE> {
-            OutputSocket() throws IOException {
-                super(ConcurrentOutputShop.super.getOutputSocket(entry));
-            }
-
-            @Override
-            public OutputStream newOutputStream() throws IOException {
-                synchronized (ConcurrentOutputShop.this) {
-                    ensureNotShopClosed();
-                    return new EntryOutputStream(super.newOutputStream());
-                }
-            }
-        }
-
-        ensureNotShopClosed();
-        if (null == entry)
+        if (null == output)
             throw new NullPointerException();
-        // TODO: Check: Synchronization required?
-        return new OutputSocket();
     }
 
     /**
@@ -116,7 +90,8 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
      * @return The number of all open streams.
      */
     public synchronized int waitCloseOthers(final long timeout) {
-        ensureNotShopClosed();
+        if (closed)
+            return 0;
         final long start = System.currentTimeMillis();
         final int threadStreams = threadStreams();
         try {
@@ -133,8 +108,8 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
                 System.runFinalization(); // trigger finalizers - is this required at all?
                 wait(toWait);
             }
-        } catch (InterruptedException ignored) {
-            logger.warning("wait.interrupted");
+        } catch (InterruptedException ex) {
+            logger.log(Level.WARNING, "wait.interrupted", ex);
         }
         return threads.size();
     }
@@ -153,7 +128,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
 
     /**
      * Closes and disconnects <em>all</em> entry output streams created by this
-     * common output shop.
+     * concurrent output shop.
      * <i>Disconnecting</i> means that any subsequent operation on the entry
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
@@ -161,51 +136,99 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     public synchronized <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
-        ensureNotShopClosed();
-        for (final Iterator<DoCloseable> it = threads.keySet().iterator();
+        if (closed)
+            return;
+        for (final Iterator<Closeable> it = threads.keySet().iterator();
         it.hasNext(); ) {
             try {
                 try {
-                    it.next().doClose();
+                    it.next().close();
                 } finally {
                     it.remove();
                 }
-            } catch (IOException ioe) {
-                handler.warn(ioe);
+            } catch (IOException ex) {
+                handler.warn(ex);
             }
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (shopClosed)
-            return;
-        shopClosed = true;
-        super.close();
+        assert threads.isEmpty();
     }
 
     /**
-     * An {@link OutputStream} to write the entry data to an
-     * {@link OutputShop}.
-     * This output stream provides support for finalization and throws an
-     * {@link IOException} on any subsequent attempt to write data after
-     * {@link #closeAll} has been called.
+     * Closes this concurrent output shop.
+     *
+     * @throws IllegalStateException If any open output streams are detected.
+     * @see    #closeAll
      */
-    private final class EntryOutputStream
-    extends SynchronizedOutputStream
-    implements DoCloseable {
-        private volatile boolean closed;
+    @Override
+    public synchronized void close() throws IOException {
+        if (!threads.isEmpty())
+            throw new IllegalStateException();
+        if (closed)
+            return;
+        closed = true;
+        super.close();
+    }
 
-        @SuppressWarnings("LeakingThisInConstructor")
-        private EntryOutputStream(final OutputStream out) {
-            super(out, ConcurrentOutputShop.this);
-            assert out != null;
-            threads.put(this, Thread.currentThread());
+    /** Needs to be externally synchronized! */
+    private void ensureNotShopClosed() throws IOException {
+        if (closed)
+            throw new OutputClosedException();
+    }
+
+    @Override
+    public OutputSocket<CE> getOutputSocket(final CE entry)
+    throws IOException {
+
+        class OutputSocket extends FilterOutputSocket<CE> {
+            OutputSocket() throws IOException {
+                super(ConcurrentOutputShop.super.getOutputSocket(entry));
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                synchronized (ConcurrentOutputShop.this) {
+                    ensureNotShopClosed();
+                    return new SynchronizedConcurrentOutputStream(
+                            new ConcurrentOutputStream(
+                                super.newOutputStream()));
+                }
+            }
         }
 
-        private void ensureNotShopClosed() throws IOException {
-            if (closed)
-                throw new OutputClosedException();
+        ensureNotShopClosed();
+        if (null == entry)
+            throw new NullPointerException();
+        // TODO: Check: Synchronization required?
+        return new OutputSocket();
+    }
+
+    private final class SynchronizedConcurrentOutputStream
+    extends SynchronizedOutputStream {
+        @SuppressWarnings("LeakingThisInConstructor")
+        SynchronizedConcurrentOutputStream(final OutputStream out) {
+            super(out, ConcurrentOutputShop.this);
+            threads.put(out, Thread.currentThread());
+        }
+
+        @Override
+        public void close() throws IOException {
+            assert ConcurrentOutputShop.this == lock;
+            synchronized (lock) {
+                if (closed)
+                    return;
+                try {
+                    super.close();
+                } finally {
+                    threads.remove(out);
+                    lock.notify(); // there can be only one waiting thread!
+                }
+            }
+        }
+    } // class SynchronizedConcurrentOutputStream
+
+    private final class ConcurrentOutputStream extends FilterOutputStream {
+        private ConcurrentOutputStream(OutputStream out) {
+            super(out);
         }
 
         @Override
@@ -226,59 +249,10 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
                 super.flush();
         }
 
-        /**
-         * Closes this common entry stream and releases any resources
-         * associated with it.
-         * This method tolerates multiple calls to it: Only the first
-         * invocation flushes and closes the underlying stream.
-         *
-         * @throws IOException If an I/O exception occurs.
-         */
         @Override
         public final void close() throws IOException {
-            assert ConcurrentOutputShop.this == lock;
-            synchronized (lock) {
-                // Order is important!
-                if (closed)
-                    return;
-                try {
-                    doClose();
-                } finally {
-                    threads.remove(this);
-                    lock.notify(); // there can be only one waiting thread!
-                }
-            }
-        }
-
-        /**
-         * Closes the underlying stream and marks this stream as being closed.
-         * It is an fail to call this method on an already closed stream.
-         * This method does <em>not</em> remove this stream from the pool.
-         * This method is not synchronized!
-         *
-         * @throws IOException If an I/O exception occurs.
-         */
-        @Override
-        public void doClose() throws IOException {
-            // Order is important!
-            assert !closed;
-            /*if (closed)
-                return;*/
-            closed = true;
-            IOException cause = null;
-            try {
-                try {
-                    out.flush();
-                } catch (IOException ex) {
-                    throw cause = ex;
-                }
-            } finally {
-                try {
-                    out.close();
-                } catch (IOException ex) {
-                    throw (IOException) ex.initCause(cause);
-                }
-            }
+            if (!closed)
+                super.close();
         }
 
         /**
@@ -291,18 +265,10 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                // Order is important!
-                if (closed)
-                    return;
-                logger.finer("finalize.open");
-                try {
-                    doClose();
-                } catch (IOException failure) {
-                    logger.log(Level.FINE, "finalize.catch", failure);
-                }
+                close();
             } finally {
                 super.finalize();
             }
         }
-    } // class EntryOutputStream
+    } // class ConcurrentOutputStream
 }

@@ -868,7 +868,6 @@ implements Iterable<E>, Closeable {
         public void close() throws IOException {
             if (closed)
                 return;
-
             closed = true;
             try {
                 super.close();
