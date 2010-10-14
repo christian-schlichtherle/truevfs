@@ -132,7 +132,7 @@ implements FileSystemModel, FileSystemController  {
             BitField<InputOption> options)
     throws IOException {
         return FileInputSocket.get( FileEntry.get(target, path),
-                                    options.clear(InputOption.BUFFER));
+                                    options.clear(InputOption.CACHE));
     }
 
     @Override

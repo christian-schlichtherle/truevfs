@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.BufferingInputSocket;
-import de.schlichtherle.truezip.io.socket.BufferingOutputSocket;
+import de.schlichtherle.truezip.io.socket.CachingInputSocket;
+import de.schlichtherle.truezip.io.socket.CachingOutputSocket;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -40,9 +40,9 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class BufferingArchiveController extends FilterArchiveController {
+final class CachingArchiveController extends FilterArchiveController {
 
-    private final static class Pool implements CommonEntryPool<FileEntry> {
+    private final static class Buffer implements CommonEntryPool<FileEntry> {
         FileEntry temp;
 
         File getFile() {
@@ -61,19 +61,19 @@ final class BufferingArchiveController extends FilterArchiveController {
         }
     }
 
-    private Map<String, Pool> pools;
+    private Map<String, Buffer> buffers;
 
-    BufferingArchiveController( final ArchiveController controller) {
+    CachingArchiveController( final ArchiveController controller) {
         super(controller);
     }
 
-    private synchronized Pool getPool(final String path) {
+    private synchronized Buffer getBuffer(final String path) {
         if (true) return null;
-        Pool pool;
-        if (null == pools)
-            (pools = new HashMap<String, Pool>()).put(path, pool = new Pool());
-        else if (null == (pool = pools.get(path)))
-            pools.put(path, pool = new Pool());
+        Buffer pool;
+        if (null == buffers)
+            (buffers = new HashMap<String, Buffer>()).put(path, pool = new Buffer());
+        else if (null == (pool = buffers.get(path)))
+            buffers.put(path, pool = new Buffer());
         return pool;
     }
 
@@ -83,11 +83,11 @@ final class BufferingArchiveController extends FilterArchiveController {
             final BitField<InputOption> options)
     throws IOException {
         final BitField<InputOption> options2 = options
-                .clear(InputOption.BUFFER);
+                .clear(InputOption.CACHE);
         InputSocket<?> input = getController()
                 .getInputSocket(path, options2);
-        if (options.get(InputOption.BUFFER)) {
-            input = new BufferingInputSocket<CommonEntry>(input, getPool(path));
+        if (options.get(InputOption.CACHE)) {
+            input = new CachingInputSocket<CommonEntry>(input, getBuffer(path));
         }
         return input;
     }
@@ -98,14 +98,14 @@ final class BufferingArchiveController extends FilterArchiveController {
             final BitField<OutputOption> options)
     throws IOException {
         final BitField<OutputOption> options2 = options
-                .clear(OutputOption.BUFFER);
+                .clear(OutputOption.CACHE);
         OutputSocket<?> output = getController()
                 .getOutputSocket(path, options2);
-        if (options.get(OutputOption.BUFFER)) {
+        if (options.get(OutputOption.CACHE)) {
 
-            class Output extends BufferingOutputSocket<CommonEntry> {
+            class Output extends CachingOutputSocket<CommonEntry> {
                 Output(OutputSocket<?> output) {
-                    super(output, getPool(path));
+                    super(output, getBuffer(path));
                 }
 
                 @Override
@@ -135,7 +135,7 @@ final class BufferingArchiveController extends FilterArchiveController {
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E {
-        pools = null;
+        buffers = null;
         super.sync(builder, options);
     }
 }

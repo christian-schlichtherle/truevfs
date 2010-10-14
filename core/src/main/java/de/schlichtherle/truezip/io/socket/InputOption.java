@@ -25,16 +25,16 @@ import java.io.IOException;
  * supported and available.
  * If an option is not supported, it must be silently ignored.
  * If an option is not available, an {@link IOException} must be thrown.
+ *
+ * @see     OutputOption
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
 public enum InputOption {
 
     /**
-     * Whether or not the data shall get written to a temporary file for
-     * buffering if the archive entry already exists.
-     * Use this option if the archvie entry may be written concurrently
-     * while you are reading from it.
-     * The temporary file will get deleted when reading the data has been
-     * finished.
+     * Whether or not the input socket data shall get cached in a temporary
+     * file for future use.
      */
-    BUFFER
+    CACHE
 }

@@ -20,8 +20,10 @@ import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.FilterInputStream;
+import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,23 +34,22 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class BufferingInputSocket<CE extends CommonEntry>
+public class CachingInputSocket<CE extends CommonEntry>
 extends FilterInputSocket<CE> {
 
     private final CommonEntryPool<FileEntry> pool;
 
-    public BufferingInputSocket(InputSocket<? extends CE> input) {
+    public CachingInputSocket(InputSocket<? extends CE> input) {
         this(input, null);
     }
 
-    public BufferingInputSocket(final InputSocket<? extends CE> input,
+    public CachingInputSocket(  final InputSocket<? extends CE> input,
                                 final CommonEntryPool<FileEntry> pool) {
         super(input);
         this.pool = null != pool ? pool : TempFilePool.get();
     }
 
-    @SuppressWarnings("ThrowableInitCause")
-    private FileEntry createTemporaryInputFile() throws IOException {
+    private FileEntry allocate() throws IOException {
         final FileEntry temp = pool.allocate();
         try {
             CommonEntry remote = getRemoteTarget();
@@ -68,9 +69,25 @@ extends FilterInputSocket<CE> {
         return temp;
     }
 
+    private void release(final FileEntry temp, final Closeable closeable)
+    throws IOException {
+        IOException cause = null;
+        try {
+            closeable.close();
+        } catch (IOException ex) {
+            throw cause = ex;
+        } finally {
+            try {
+                pool.release(temp);
+            } catch (IOException ex) {
+                throw (IOException) ex.initCause(cause);
+            }
+        }
+    }
+
     @Override
     public InputStream newInputStream() throws IOException {
-        final FileEntry temp = createTemporaryInputFile();
+        final FileEntry temp = allocate();
 
         class InputStream extends FilterInputStream {
             boolean closed;
@@ -80,23 +97,11 @@ extends FilterInputSocket<CE> {
             }
 
             @Override
-            @SuppressWarnings("ThrowableInitCause")
             public void close() throws IOException {
                 if (closed)
                     return;
                 closed = true;
-                IOException cause = null;
-                try {
-                    super.close();
-                } catch (IOException ex) {
-                    throw cause = ex;
-                } finally {
-                    try {
-                        pool.release(temp);
-                    } catch (IOException ex) {
-                        throw (IOException) ex.initCause(cause);
-                    }
-                }
+                release(temp, in);
             }
         }
 
@@ -105,33 +110,21 @@ extends FilterInputSocket<CE> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        final FileEntry temp = createTemporaryInputFile();
+        final FileEntry temp = allocate();
 
-        class ReadOnlyFile extends SimpleReadOnlyFile {
+        class ReadOnlyFile extends FilterReadOnlyFile {
             boolean closed;
 
             ReadOnlyFile() throws FileNotFoundException {
-                super(temp.getTarget());
+                super(new SimpleReadOnlyFile(temp.getTarget()));
             }
 
             @Override
-            @SuppressWarnings("ThrowableInitCause")
             public void close() throws IOException {
                 if (closed)
                     return;
                 closed = true;
-                IOException cause = null;
-                try {
-                    super.close();
-                } catch (IOException ex) {
-                    throw cause = ex;
-                } finally {
-                    try {
-                        pool.release(temp);
-                    } catch (IOException ex) {
-                        throw (IOException) ex.initCause(cause);
-                    }
-                }
+                release(temp, rof);
             }
         }
 
