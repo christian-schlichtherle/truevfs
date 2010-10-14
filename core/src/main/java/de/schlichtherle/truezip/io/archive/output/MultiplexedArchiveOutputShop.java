@@ -115,7 +115,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
 
         @Override
         public void remove() {
-            throw new UnsupportedOperationException("entry removal");
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -171,8 +171,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     private class EntryOutputStream extends FilterOutputStream {
         private boolean closed;
 
-        EntryOutputStream(final OutputStream out)
-        throws IOException {
+        EntryOutputStream(final OutputStream out) {
             super(out);
             busy = true;
         }
