@@ -74,34 +74,20 @@ public class Controllers {
     private Controllers() {
     }
 
-    public static FileSystemController getController(URI mountPoint) {
-        return getController(mountPoint, null, null);
-    }
-
     /**
-     * Factory method returning a {@link FileSystemController} object for the
+     * Looks up a suitable {@link FileSystemController} object for the
      * given mount point.
-     * <p>
-     * <b>Note:</b>
-     * <ul>
-     * <li>Neither {@code file} nor the enclosing archive file(s)
-     *     need to actually exist for this to return a valid {@code FileSystemController}.
-     *     Just the parent directories of {@code file} need to look like either
-     *     an ordinary directory or an archive file, e.g. their lowercase
-     *     representation needs to have a .zip or .jar ending.</li>
-     * <li>It is an error to call this method on a target file which is
-     *     not a valid name for an archive file</li>
-     * </ul>
      */
     public static <AE extends ArchiveEntry> FileSystemController getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
             FileSystemController enclController) {
-        if (!mountPoint.isAbsolute()) throw new IllegalArgumentException();
-        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
-        //if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
+        if (!mountPoint.isAbsolute() || mountPoint.isOpaque())
+            throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
+        if (null == driver)
+            return new HostFileSystemController(mountPoint);
         synchronized (controllers) {
             final ArchiveController controller
                     = Links.getTarget(controllers.get(mountPoint));
@@ -112,8 +98,6 @@ public class Controllers {
                 //reconfigure = driver != null && driver != controller.getDriver();
                 return controller;
             }
-            if (null == driver) // pure lookup operation?
-                return null;
             if (null == enclController) {
                 enclController = new HostFileSystemController(
                         mountPoint.resolve(".."));
@@ -125,8 +109,8 @@ public class Controllers {
             syncScheduler.controller
                     = new ProspectiveArchiveController(
                         enclController,
-                        new BufferingArchiveController(
-                            new LockingArchiveController(
+                        new LockingArchiveController(
+                            new BufferingArchiveController(
                                 new UpdatingArchiveController<AE>(
                                     enclController, model, driver))));
             syncScheduler.setTouched(false);

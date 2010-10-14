@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,15 +32,13 @@ extends FilterOutputSocket<CE> {
     private final CommonEntryPool<FileEntry> pool;
 
     public BufferingOutputSocket(OutputSocket<? extends CE> output) {
-        this(output, TempFilePool.get());
+        this(output, null);
     }
 
     public BufferingOutputSocket(   final OutputSocket<? extends CE> output,
-                                    final CommonEntryPool<FileEntry> creator) {
+                                    final CommonEntryPool<FileEntry> pool) {
         super(output);
-        if (null == creator)
-            throw new NullPointerException();
-        this.pool = creator;
+        this.pool = null != pool ? pool : TempFilePool.get();
     }
 
     @Override
@@ -69,7 +66,8 @@ extends FilterOutputSocket<CE> {
                         remote = temp;
                         IOException cause = null;
                     try {
-                        IOSocket.copy(  FileInputSocket.get(temp, remote),
+                        IOSocket.copy(  new TargetInputSocket<CommonEntry>(remote,
+                                            FileInputSocket.get(temp)),
                                         getOutputSocket());
                     } catch (IOException ex) {
                         throw cause = ex;
