@@ -115,7 +115,7 @@ public class Controllers {
             if (null == driver) // pure lookup operation?
                 return null;
             if (null == enclController) {
-                enclController = new OSFileSystemController(
+                enclController = new HostFileSystemController(
                         mountPoint.resolve(".."));
             }
             final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
