@@ -529,7 +529,7 @@ public abstract class IOFileTestCase extends TestCase {
             File.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
         } catch (ArchiveWarningException ex) {
-            // Warning about fis1 still being used.
+            // Warning about fisA still being used.
             if (!(ex.getCause() instanceof ArchiveBusyException))
                 throw ex;
         }
@@ -587,8 +587,6 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             new FileOutputStream(file1);
         } catch (FileBusyException ex) {
-            // This is actually an implementation detail which may change in
-            // a future version.
             if (!(ex.getCause() instanceof ArchiveBusyException))
                 throw ex;
         }

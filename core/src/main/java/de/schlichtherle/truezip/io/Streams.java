@@ -265,7 +265,7 @@ public class Streams {
         synchronized (Buffer.list) {
             Buffer[] buffers;
             for (Iterator<Reference<Buffer[]>> i = Buffer.list.iterator(); i.hasNext(); ) {
-                buffers = (Buffer[]) ((Reference<Buffer[]>) i.next()).get();
+                buffers = i.next().get();
                 i.remove();
                 if (buffers != null)
                     return buffers;
