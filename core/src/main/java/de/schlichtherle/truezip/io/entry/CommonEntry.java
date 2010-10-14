@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.entry;
 
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file

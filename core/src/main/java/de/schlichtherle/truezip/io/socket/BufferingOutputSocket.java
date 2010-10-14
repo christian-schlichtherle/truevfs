@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntryPool;
+import de.schlichtherle.truezip.io.entry.TempFilePool;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

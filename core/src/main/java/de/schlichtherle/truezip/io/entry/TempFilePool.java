@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.Files;
 import java.io.File;
 import java.io.IOException;
 
 /**
+ * This pool creates a temporary file on allocation and deletes it on release
+ * or finalization.
+ * 
  * @author Christian Schlichtherle
  * @version $Id$
  */

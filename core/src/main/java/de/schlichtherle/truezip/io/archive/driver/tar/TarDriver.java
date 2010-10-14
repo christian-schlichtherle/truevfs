@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
 
 /**
  * An archive driver which builds TAR files.

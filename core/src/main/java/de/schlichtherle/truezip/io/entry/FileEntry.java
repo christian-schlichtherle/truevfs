@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.util.Link;
@@ -24,10 +24,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.SPECIAL;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 
 /**
  * Adapts a {@link File} instance to a {@link FileSystemEntry}.
@@ -37,51 +37,65 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
  */
 public class FileEntry implements FileSystemEntry, Link<File> {
 
-    private static final long serialVersionUID = 5263276267534643646L;
-
-    private final File   file;
-    private final String name;
-
     /**
-     * Constructs a new {@code FileEntry}.
+     * Returns a file entry for the given parameter.
      *
      * @param path a non-{@code null} path name.
      * @throws NullPointerException if {@code path} is {@code null}.
      */
-    public FileEntry(final String path) {
-        this.file = new File(path);
-        this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
+    public static FileEntry get(String path) {
+        return new FileEntry(path);
     }
 
     /**
-     * Constructs a new {@code FileEntry}.
+     * Returns a file entry for the given parameter.
      *
      * @param uri a non-{@code null} {@code file:} URI
      * @throws NullPointerException if {@code uri} is {@code null}.
      */
-    public FileEntry(final URI uri) {
+    public static FileEntry get(final URI uri) {
+        return new FileEntry(uri);
+    }
+
+    /**
+     * Returns a file entry for the given parameter(s).
+     *
+     * @param file a non-{@code null} file.
+     * @throws NullPointerException if {@code file} is {@code null}.
+     */
+    public static FileEntry get(File file) {
+        return new FileEntry(file);
+    }
+
+    /**
+     * Returns a file entry for the given parameter(s).
+     *
+     * @param file a non-{@code null} file.
+     * @throws NullPointerException if {@code file} is {@code null}.
+     */
+    public static FileEntry get(File file, String path) {
+        return new FileEntry(file, path);
+    }
+
+    private final File   file;
+    private final String name;
+
+    FileEntry(final String path) {
+        this.file = new File(path);
+        this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
+    }
+
+    FileEntry(final URI uri) {
         this.file = new File(uri);
         this.name = cutTrailingSeparators(uri.getPath(), SEPARATOR_CHAR);
     }
 
-    /**
-     * Constructs a new {@code FileEntry}.
-     *
-     * @param file a non-{@code null} file.
-     * @throws NullPointerException if {@code file} is {@code null}.
-     */
-    public FileEntry(final File file) {
+    FileEntry(final File file) {
         this.file = file;
         this.name = file.getPath().replace(File.separatorChar, SEPARATOR_CHAR);
     }
 
-    /**
-     * Constructs a new {@code FileEntry}.
-     *
-     * @param file a non-{@code null} file.
-     * @throws NullPointerException if {@code file} is {@code null}.
-     */
-    public FileEntry(final File file, final String path) {
+    FileEntry(final File file, final String path) {
         this.file = new File(file, path);
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }

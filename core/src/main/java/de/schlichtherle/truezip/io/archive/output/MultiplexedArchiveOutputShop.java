@@ -16,25 +16,25 @@
 package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Size;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Size;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.FilterOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.FileEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.util.JointIterator;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,7 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.Files.createTempFile;
 
 /**
  * Decorates an {@code OutputShop} in order to support a virtually
@@ -67,9 +66,6 @@ import static de.schlichtherle.truezip.io.Files.createTempFile;
  */
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
 extends FilterOutputShop<AE, OutputShop<AE>> {
-
-    /** Prefix for temporary files created by the multiplexer. */
-    static final String TEMP_FILE_PREFIX = "tzp-maos";
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -145,14 +141,13 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             throws IOException {
                 if (isBusy()) {
                     final OutputSocket<? extends AE> socket = getOutputSocket();
-                    final FileEntry temp = new FileEntry(createTempFile(TEMP_FILE_PREFIX));
+                    final FileEntry temp = TempFilePool.get().allocate();
                     OutputStream out = null;
                     try {
                         return out = new TempEntryOutputStream(socket, temp);
                     } finally {
                         if (null == out) // exception?
-                            if (!temp.getTarget().delete())
-                                throw new IOException(temp.getTarget().getPath() + " (cannot delete temporary output file)");
+                            TempFilePool.get().release(temp);
                     }
                 } else {
                     return new EntryOutputStream(super.newOutputStream());
@@ -277,19 +272,11 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
-            IOException cause = null;
             try {
-                if (!discard) {
-                    try {
-                        IOSocket.copy(input, output);
-                    } catch (IOException ex) {
-                        throw cause = ex;
-                    }
-                }
+                if (!discard)
+                    IOSocket.copy(input, output);
             } finally {
-                final File tempFile = temp.getTarget();
-                if (!tempFile.delete())
-                    throw (IOException) new IOException(tempFile.getPath() + " (cannot delete temporary output file)").initCause(cause);
+                TempFilePool.get().release(temp);
             }
             return true;
         }

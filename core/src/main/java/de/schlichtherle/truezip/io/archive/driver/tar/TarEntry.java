@@ -19,10 +19,10 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.File;
 
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 
 /**
  * An entry in a TAR archive which implements the {@code ArchiveEntry}

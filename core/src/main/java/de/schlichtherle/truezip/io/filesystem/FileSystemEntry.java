@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import java.util.Set;
 
 /**

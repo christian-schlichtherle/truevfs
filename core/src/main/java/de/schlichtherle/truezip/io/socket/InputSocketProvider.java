@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 

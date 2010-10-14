@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -39,7 +39,7 @@ import java.util.zip.CheckedOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.UNKNOWN;

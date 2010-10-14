@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.FileNotFoundException;

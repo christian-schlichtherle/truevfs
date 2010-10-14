@@ -17,11 +17,11 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.CommonEntryContainer;
-import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
+import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.util.BitField;
 
 /**

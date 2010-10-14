@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.CommonEntryFactory;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -34,8 +34,8 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
 
 /**
  * An abstract archive driver implementation to ease the task of developing

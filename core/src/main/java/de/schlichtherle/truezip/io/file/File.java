@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.archive.controller.DefaultSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.archive.controller.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
@@ -55,9 +55,9 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CL
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Size.DATA;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;

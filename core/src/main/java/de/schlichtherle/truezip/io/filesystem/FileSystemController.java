@@ -17,9 +17,9 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -69,7 +69,7 @@ public interface FileSystemController {
      * Returns an input socket for reading the given entry from the file system.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws IOException for some other I/O related reason.
+     * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
     InputSocket<?> getInputSocket(String path, BitField<InputOption> options)
@@ -79,8 +79,8 @@ public interface FileSystemController {
      * Returns an output socket for writing the given entry to the file system.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws IOException for some other I/O related reason.
-     * @return A non-{@code null} {@code InputSocket}.
+     * @throws IOException for some I/O related reason.
+     * @return A non-{@code null} {@code OutputSocket}.
      */
     OutputSocket<?> getOutputSocket(String path, BitField<OutputOption> options)
     throws IOException;

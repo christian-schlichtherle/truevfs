@@ -16,8 +16,8 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.ExceptionBuilder;
-import de.schlichtherle.truezip.io.socket.FileEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntryPool;
+import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntryPool;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,15 +25,15 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.BufferingInputSocket;
 import de.schlichtherle.truezip.io.socket.BufferingOutputSocket;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.TempFilePool;
+import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 
 /**

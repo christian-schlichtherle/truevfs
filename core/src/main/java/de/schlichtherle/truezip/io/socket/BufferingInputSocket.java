@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.entry.CommonEntryPool;
+import de.schlichtherle.truezip.io.entry.TempFilePool;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;

@@ -21,16 +21,16 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
-import de.schlichtherle.truezip.io.socket.FilterCommonEntry;
+import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
 import java.util.Set;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Type;
-import de.schlichtherle.truezip.io.socket.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -40,7 +40,7 @@ import javax.swing.Icon;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.socket.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 
 /**
  * Deals with {@link FalsePositiveException}.
