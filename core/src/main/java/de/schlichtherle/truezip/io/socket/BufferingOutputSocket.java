@@ -30,30 +30,30 @@ import java.io.OutputStream;
 public class BufferingOutputSocket<CE extends CommonEntry>
 extends FilterOutputSocket<CE> {
 
-    private final FileCreator creator;
+    private final CommonEntryPool<FileEntry> pool;
 
     public BufferingOutputSocket(OutputSocket<? extends CE> output) {
-        this(output, new TempFileCreator());
+        this(output, TempFilePool.get());
     }
 
     public BufferingOutputSocket(   final OutputSocket<? extends CE> output,
-                                    final FileCreator creator) {
+                                    final CommonEntryPool<FileEntry> creator) {
         super(output);
         if (null == creator)
             throw new NullPointerException();
-        this.creator = creator;
+        this.pool = creator;
     }
 
     @Override
     @SuppressWarnings("ThrowableInitCause")
     public OutputStream newOutputStream() throws IOException {
-        final File temp = creator.createFile();
+        final FileEntry temp = pool.allocate();
 
         class OutputStream extends FilterOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(temp)); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override
@@ -64,21 +64,21 @@ extends FilterOutputSocket<CE> {
                 try {
                     super.close();
                 } finally {
-                    CommonEntry peer = getRemoteTarget();
-                    if (null == peer)
-                        peer = new FileEntry(temp);
-                    IOException cause = null;
+                    CommonEntry remote = getRemoteTarget();
+                    if (null == remote)
+                        remote = temp;
+                        IOException cause = null;
                     try {
-                        try {
-                            IOSocket.copy(
-                                    new FileInputSocket<CommonEntry>(peer, temp),
-                                    getOutputSocket());
-                        } catch (IOException ex) {
-                            throw cause = ex;
-                        }
+                        IOSocket.copy(  FileInputSocket.get(temp, remote),
+                                        getOutputSocket());
+                    } catch (IOException ex) {
+                        throw cause = ex;
                     } finally {
-                        if (!temp.delete())
-                            throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary output file)").initCause(cause);
+                        try {
+                            pool.release(temp);
+                        } catch (IOException ex) {
+                            throw (IOException) ex.initCause(cause);
+                        }
                     }
                 }
             }
@@ -86,10 +86,13 @@ extends FilterOutputSocket<CE> {
 
         try {
             return new OutputStream();
-        } catch (IOException ex) {
-            if (!temp.delete())
-                throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary output file)").initCause(ex);
-            throw ex;
+        } catch (IOException cause) {
+            try {
+                pool.release(temp);
+            } catch (IOException ex) {
+                throw (IOException) ex.initCause(cause);
+            }
+            throw cause;
         }
     }
 }

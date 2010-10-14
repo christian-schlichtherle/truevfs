@@ -185,7 +185,7 @@ implements     ArchiveController,
     }
 
     @Override
-    public final InputSocket<?> getInputSocket(
+    public final InputSocket<AE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException {
@@ -239,7 +239,7 @@ implements     ArchiveController,
     }
 
     @Override
-    public final OutputSocket<?> getOutputSocket(
+    public final OutputSocket<AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException {

@@ -55,15 +55,21 @@ public class Files extends Paths {
     private static File tempDirectory;
 
     /**
-     * Like {@link #createTempFile(String, String)}, but uses the default
-     * suffix {@code ".tmp"}.
-     *
-     * @see #getTempDirectory
-     * @see #setTempDirectory
+     * Equivalent to
+     * {@link #createTempFile(String, String, File) createTempFile(prefix, null, null)}.
      */
     public static File createTempFile(String prefix)
     throws IOException {
         return createTempFile(prefix, null, null);
+    }
+
+    /**
+     * Equivalent to
+     * {@link #createTempFile(String, String, File) createTempFile(prefix, suffix, null)}.
+     */
+    public static File createTempFile(String prefix, String suffix)
+    throws IOException {
+        return createTempFile(prefix, suffix, null);
     }
 
     /**
@@ -76,11 +82,6 @@ public class Files extends Paths {
      * @see #getTempDirectory
      * @see #setTempDirectory
      */
-    public static File createTempFile(String prefix, String suffix)
-    throws IOException {
-        return createTempFile(prefix, suffix, null);
-    }
-
     public static File createTempFile(  String prefix,
                                         String suffix,
                                         File directory)

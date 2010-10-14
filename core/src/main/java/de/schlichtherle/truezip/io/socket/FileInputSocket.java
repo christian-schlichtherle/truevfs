@@ -29,13 +29,21 @@ import java.io.InputStream;
  */
 final class FileInputSocket<CE extends CommonEntry>
 extends InputSocket<CE> {
+    private final FileEntry file;
     private final CE local;
-    private final File file;
 
-    FileInputSocket(final CE entry, final File file) {
-        if (null == entry || null == file)
+    static FileInputSocket<FileEntry> get(FileEntry file) {
+        return new FileInputSocket<FileEntry>(file, file);
+    }
+
+    static <CE extends CommonEntry> FileInputSocket<CE> get(FileEntry file, CE local) {
+        return new FileInputSocket<CE>(file, local);
+    }
+
+    private FileInputSocket(final FileEntry file, final CE local) {
+        if (null == local || null == file)
             throw new NullPointerException();
-        this.local = entry;
+        this.local = local;
         this.file = file;
     }
 
@@ -46,11 +54,11 @@ extends InputSocket<CE> {
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return new FileInputStream(file);
+        return new FileInputStream(file.getTarget());
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new SimpleReadOnlyFile(file);
+        return new SimpleReadOnlyFile(file.getTarget());
     }
 }
