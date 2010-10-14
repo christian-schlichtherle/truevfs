@@ -37,22 +37,31 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.UNKNOWN;
  */
 final class FileOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE> {
-    private final CE local;
-    private final File file;
+    private final FileEntry file;
     private final BitField<OutputOption> options;
+    private final CE local;
+    private final CommonEntryPool<FileEntry> pool;
 
-    FileOutputSocket(CE entry, File file) {
-        this(entry, file, BitField.noneOf(OutputOption.class));
+    static FileOutputSocket<FileEntry> get(FileEntry file, BitField<OutputOption> options) {
+        return new FileOutputSocket<FileEntry>(file, options, file);
     }
 
-    FileOutputSocket(   final CE entry,
-                        final File file,
-                        final BitField<OutputOption> options) {
-        if (null == entry || null == file || null == options)
+    static <CE extends CommonEntry> FileOutputSocket<CE> get(FileEntry file, CE local) {
+        return new FileOutputSocket<CE>(file, BitField.noneOf(OutputOption.class), local);
+    }
+
+    FileOutputSocket(   final FileEntry file,
+                        final BitField<OutputOption> options,
+                        final CE local) {
+        if (null == local || null == file || null == options)
             throw new NullPointerException();
-        this.local = entry;
+        this.local = local;
         this.file = file;
         this.options = options;
+        final File fileTarget = file.getTarget();
+        this.pool = new TempFilePool(   fileTarget.getName(),
+                                        null,
+                                        fileTarget.getParentFile());
     }
 
     @Override
@@ -63,28 +72,19 @@ extends OutputSocket<CE> {
     @Override
     @SuppressWarnings("ThrowableInitCause")
     public OutputStream newOutputStream() throws IOException {
-        final File dir = file.getParentFile();
+        final File fileTarget = file.getTarget();
         if (options.get(CREATE_PARENTS))
-            dir.mkdirs();
-        final File temp = options.get(BUFFER) && !file.createNewFile()
-                ? new TempFileCreator(file.getName(), null, dir).createFile()
+            fileTarget.getParentFile().mkdirs();
+        final FileEntry temp = options.get(BUFFER) && !fileTarget.createNewFile()
+                ? pool.allocate()
                 : file;
-        if (temp != file && options.get(APPEND)) {
-            try {
-                IOSocket.copy(  new FileInputSocket <CE>(local, file),
-                                new FileOutputSocket<CE>(local, temp));
-            } catch (IOException ex) {
-                if (!temp.delete())
-                    throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary output file)").initCause(ex);
-                throw ex;
-            }
-        }
+        final File tempTarget = temp.getTarget();
 
         class OutputStream extends FilterOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(temp, options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileOutputStream(tempTarget, options.get(APPEND))); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override
@@ -95,39 +95,48 @@ extends OutputSocket<CE> {
                 try {
                     super.close();
                 } finally {
-                    final CommonEntry peer = getRemoteTarget();
+                    final CommonEntry remote = getRemoteTarget();
                     if (temp != file
-                    && !temp.renameTo(file)
-                    && (!file.delete() || !temp.renameTo(file))) {
+                    && !tempTarget.renameTo(fileTarget)
+                    && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget))) {
                         IOException cause = null;
                         try {
-                            try {
-                                IOSocket.copy(  new FileInputSocket <CE>(local, temp),
-                                                new FileOutputSocket<CE>(local, file));
-                            } catch (IOException ex) {
-                                throw cause = ex;
-                            }
+                            IOSocket.copy(  FileInputSocket.get(temp, local),
+                                            FileOutputSocket.get(file, local));
+                        } catch (IOException ex) {
+                            throw cause = ex;
                         } finally {
-                            if (!temp.delete())
-                                throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary output file)").initCause(cause);
+                            try {
+                                pool.release(temp);
+                            } catch (IOException ex) {
+                                throw (IOException) ex.initCause(cause);
+                            }
                         }
                     }
-                    if (options.get(COPY_PROPERTIES) && null != peer) {
-                        final long time = peer.getTime(WRITE);
+                    if (options.get(COPY_PROPERTIES) && null != remote) {
+                        final long time = remote.getTime(WRITE);
                         if (UNKNOWN != time)
-                            if (!file.setLastModified(time))
-                                throw new IOException(file.getPath() + " (cannot preserve last modification time)");
+                            if (!fileTarget.setLastModified(time))
+                                throw new IOException(fileTarget.getPath() + " (cannot preserve last modification time)");
                     }
                 }
             }
         }
 
         try {
+            if (temp != file && options.get(APPEND))
+                IOSocket.copy(  FileInputSocket.get(file, local),
+                                FileOutputSocket.get(temp, local));
             return new OutputStream();
-        } catch (IOException ex) {
-            if (temp != file && !temp.delete())
-                throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary output file)").initCause(ex);
-            throw ex;
+        } catch (IOException cause) {
+            if (temp != file) {
+                try {
+                    pool.release(temp);
+                } catch (IOException ex) {
+                    throw (IOException) ex.initCause(cause);
+                }
+            }
+            throw cause;
         }
     }
 }

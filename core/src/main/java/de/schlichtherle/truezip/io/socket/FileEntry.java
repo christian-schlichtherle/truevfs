@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -37,11 +36,11 @@ import static de.schlichtherle.truezip.io.socket.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class FileEntry
-implements FileSystemEntry, Link<File> {
+public class FileEntry implements FileSystemEntry, Link<File> {
+
     private static final long serialVersionUID = 5263276267534643646L;
 
-    private final File file;
+    private final File   file;
     private final String name;
 
     /**
@@ -50,7 +49,7 @@ implements FileSystemEntry, Link<File> {
      * @param path a non-{@code null} path name.
      * @throws NullPointerException if {@code path} is {@code null}.
      */
-    public FileEntry(String path) {
+    public FileEntry(final String path) {
         this.file = new File(path);
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }
@@ -61,7 +60,7 @@ implements FileSystemEntry, Link<File> {
      * @param uri a non-{@code null} {@code file:} URI
      * @throws NullPointerException if {@code uri} is {@code null}.
      */
-    public FileEntry(URI uri) {
+    public FileEntry(final URI uri) {
         this.file = new File(uri);
         this.name = cutTrailingSeparators(uri.getPath(), SEPARATOR_CHAR);
     }
@@ -72,7 +71,7 @@ implements FileSystemEntry, Link<File> {
      * @param file a non-{@code null} file.
      * @throws NullPointerException if {@code file} is {@code null}.
      */
-    public FileEntry(File file) {
+    public FileEntry(final File file) {
         this.file = file;
         this.name = file.getPath().replace(File.separatorChar, SEPARATOR_CHAR);
     }
@@ -83,15 +82,14 @@ implements FileSystemEntry, Link<File> {
      * @param file a non-{@code null} file.
      * @throws NullPointerException if {@code file} is {@code null}.
      */
-    public FileEntry(File file, String path) {
+    public FileEntry(final File file, final String path) {
         this.file = new File(file, path);
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }
 
     public InputSocket<FileEntry> getInputSocket(
             BitField<InputOption> options) {
-        InputSocket<FileEntry> input
-                = new FileInputSocket<FileEntry>(this, file);
+        InputSocket<FileEntry> input = FileInputSocket.get(this);
         if (options.get(InputOption.BUFFER))
             input = new BufferingInputSocket<FileEntry>(input);
         return input;
@@ -99,7 +97,7 @@ implements FileSystemEntry, Link<File> {
 
     public OutputSocket<FileEntry> getOutputSocket(
             BitField<OutputOption> options) {
-        return new FileOutputSocket<FileEntry>(this, file, options);
+        return FileOutputSocket.get(this, options);
     }
 
     @Override

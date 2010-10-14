@@ -69,7 +69,7 @@ final class ExtraFields implements Cloneable {
     public ExtraField get(final int headerID) {
         UShort.check(headerID);
         final ExtraField ef = extra.get(headerID);
-        assert ef == null || headerID == ef.getHeaderID();
+        assert null == ef || headerID == ef.getHeaderID();
         return ef;
     }
 

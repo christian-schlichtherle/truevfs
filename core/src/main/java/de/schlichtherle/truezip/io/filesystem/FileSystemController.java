@@ -72,8 +72,7 @@ public interface FileSystemController {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<?> getInputSocket(
-            String path, BitField<InputOption> options)
+    InputSocket<?> getInputSocket(String path, BitField<InputOption> options)
     throws IOException;
 
     /**
@@ -83,8 +82,7 @@ public interface FileSystemController {
      * @throws IOException for some other I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    OutputSocket<?> getOutputSocket(
-            String path, BitField<OutputOption> options)
+    OutputSocket<?> getOutputSocket(String path, BitField<OutputOption> options)
     throws IOException;
 
     /**

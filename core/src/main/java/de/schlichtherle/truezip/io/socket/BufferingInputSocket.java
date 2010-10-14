@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,52 +31,49 @@ import java.io.InputStream;
 public class BufferingInputSocket<CE extends CommonEntry>
 extends FilterInputSocket<CE> {
 
-    private final FileCreator creator;
+    private final CommonEntryPool<FileEntry> pool;
 
     public BufferingInputSocket(InputSocket<? extends CE> input) {
-        this(input, new TempFileCreator());
+        this(input, TempFilePool.get());
     }
 
-    public BufferingInputSocket(    final InputSocket<? extends CE> input,
-                                    final FileCreator creator) {
+    public BufferingInputSocket(final InputSocket<? extends CE> input,
+                                final CommonEntryPool<FileEntry> pool) {
         super(input);
-        if (null == creator)
+        if (null == pool)
             throw new NullPointerException();
-        this.creator = creator;
+        this.pool = pool;
     }
 
     @SuppressWarnings("ThrowableInitCause")
-    private File createTemporaryInputFile() throws IOException {
-        final File temp = creator.createFile();
-        IOException cause = null;
-        boolean ok = false;
+    private FileEntry createTemporaryInputFile() throws IOException {
+        final FileEntry temp = pool.allocate();
         try {
-            CommonEntry peer = getRemoteTarget();
-            if (null == peer)
-                peer = new FileEntry(temp);
+            CommonEntry remote = getRemoteTarget();
+            if (null == remote)
+                remote = temp;
+            IOSocket.copy(  getInputSocket(),
+                            FileOutputSocket.get(temp, remote));
+        } catch (IOException cause) {
             try {
-                IOSocket.copy(  getInputSocket(),
-                                new FileOutputSocket<CommonEntry>(peer, temp));
+                pool.release(temp);
             } catch (IOException ex) {
-                throw cause = ex;
+                throw (IOException) ex.initCause(cause);
             }
-            ok = true;
-        } finally {
-            if (!ok && !temp.delete())
-                throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary input file)").initCause(cause);
+            throw cause;
         }
         return temp;
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        final File temp = createTemporaryInputFile();
+        final FileEntry temp = createTemporaryInputFile();
 
         class InputStream extends FilterInputStream {
             boolean closed;
 
             InputStream() throws FileNotFoundException {
-                super(new FileInputStream(temp)); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileInputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override
@@ -94,8 +90,7 @@ extends FilterInputSocket<CE> {
                         throw cause = ex;
                     }
                 } finally {
-                    if (!temp.delete())
-                        throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary input file)").initCause(cause);
+                    pool.release(temp);
                 }
             }
         }
@@ -105,13 +100,13 @@ extends FilterInputSocket<CE> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        final File temp = createTemporaryInputFile();
+        final FileEntry temp = createTemporaryInputFile();
 
         class ReadOnlyFile extends SimpleReadOnlyFile {
             boolean closed;
 
             ReadOnlyFile() throws FileNotFoundException {
-                super(temp);
+                super(temp.getTarget());
             }
 
             @Override
@@ -128,8 +123,7 @@ extends FilterInputSocket<CE> {
                         throw cause = ex;
                     }
                 } finally {
-                    if (!temp.delete())
-                        throw (IOException) new IOException(temp.getPath() + " (cannot delete temporary input file)").initCause(cause);
+                    pool.release(temp);
                 }
             }
         }

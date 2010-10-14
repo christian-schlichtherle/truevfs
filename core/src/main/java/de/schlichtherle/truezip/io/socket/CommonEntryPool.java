@@ -15,23 +15,31 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
+ * A pooling strategy for common entries.
+ *
  * @see     BufferingInputSocket
  * @see     BufferingOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileCreator {
+public interface CommonEntryPool<CE extends CommonEntry> {
 
     /**
-     * Creates a file in the file system, not just an object.
-     * The returned file must be reserved for exclusive access by the client
-     * application.
+     * Allocates a common entry from this pool.
      *
-     * @return A new file object which refers to a file in the file system.
+     * @return A non-{@code null} common entry.
      */
-    public File createFile() throws IOException;
+    public CE allocate() throws IOException;
+
+    /**
+     * Releases a previously allocated common entry to this pool.
+     *
+     * @param  entry a non-{@code null} common entry.
+     * @throws IllegalArgumentException if the given entry is not allocated
+     *         by this pool.
+     */
+    public void release(CE entry) throws IOException;
 }
