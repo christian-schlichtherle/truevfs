@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import java.net.URI;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
@@ -42,32 +45,52 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_C
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
+import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * A prospective archive controller is a facade which adapts an archive
- * controller and utilizes a file system controller for an enclosing archive
- * file in order to implement a chain of responsibility for resolving
- * {@link FalsePositiveException}s.
+ * A prospective archive controller is a facade which adapts a chain of
+ * archive controller decorators and utilizes a file system controller for
+ * its enclosing archive file in order to implement a chain of responsibility
+ * for resolving {@link FalsePositiveException}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ProspectiveArchiveController
+final class ProspectiveArchiveController<AE extends ArchiveEntry>
 implements FileSystemController<CommonEntry> {
 
+    private final ArchiveController<AE> controller;
     private final FileSystemController<?> enclController;
     private final String enclPath;
-    private final ArchiveController<?> controller;
 
-    ProspectiveArchiveController(   final FileSystemController<?> enclController,
-                                    final ArchiveController<?> controller) {
+    ProspectiveArchiveController(   final URI mountPoint,
+                                    final ArchiveDriver<AE> driver,
+                                    FileSystemController<?> enclController) {
+        if (null == enclController)
+            enclController = new HostFileSystemController(
+                    mountPoint.resolve(".."));
+        final SyncScheduler syncScheduler = new SyncScheduler();
+        final ArchiveModel model = new ArchiveModel(
+                enclController.getModel(), mountPoint, syncScheduler);
+        // TODO: Support append strategy.
+        this.controller = new LockingArchiveController<AE>(
+                new CachingArchiveController<AE>(
+                    new UpdatingArchiveController<AE>(
+                        enclController, model, driver)));
         this.enclController = enclController;
         this.enclPath = enclController
                 .getModel()
                 .getMountPoint()
                 .relativize(controller.getModel().getMountPoint())
                 .getPath();
-        this.controller = controller;
+    }
+
+    private class SyncScheduler implements TouchListener {
+        @Override
+        public void setTouched(boolean touched) {
+            Controllers.scheduleSync(touched ? STRONG : WEAK, ProspectiveArchiveController.this);
+        }
     }
 
     /** Returns the file system controller for the enclosing file system. */

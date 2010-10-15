@@ -41,7 +41,6 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CL
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.REASSEMBLE_BUFFERS;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
@@ -53,10 +52,10 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class Controllers {
 
-    private static final Comparator<ProspectiveArchiveController> REVERSE_CONTROLLERS
-            = new Comparator<ProspectiveArchiveController>() {
+    private static final Comparator<ProspectiveArchiveController<?>> REVERSE_CONTROLLERS
+            = new Comparator<ProspectiveArchiveController<?>>() {
         @Override
-		public int compare(ProspectiveArchiveController l, ProspectiveArchiveController r) {
+		public int compare(ProspectiveArchiveController<?> l, ProspectiveArchiveController<?> r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -68,8 +67,8 @@ public class Controllers {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<ProspectiveArchiveController>> controllers
-            = new WeakHashMap<URI, Link<ProspectiveArchiveController>>();
+    private static final Map<URI, Link<ProspectiveArchiveController<?>>> controllers
+            = new WeakHashMap<URI, Link<ProspectiveArchiveController<?>>>();
 
     private Controllers() {
     }
@@ -89,7 +88,7 @@ public class Controllers {
         if (null == driver)
             return new HostFileSystemController(mountPoint);
         synchronized (controllers) {
-            final ProspectiveArchiveController controller
+            ProspectiveArchiveController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller) {
                 // If required, reconfiguration of the FileSystemController
@@ -98,34 +97,10 @@ public class Controllers {
                 //reconfigure = driver != null && driver != controller.getDriver();
                 return controller;
             }
-            if (null == enclController) {
-                enclController = new HostFileSystemController(
-                        mountPoint.resolve(".."));
-            }
-            final SyncScheduler<AE> syncScheduler = new SyncScheduler<AE>();
-            final ArchiveModel model = new ArchiveModel(
-                    enclController.getModel(), mountPoint, syncScheduler);
-            // TODO: Support append strategy.
-            syncScheduler.controller
-                    = new ProspectiveArchiveController(
-                        enclController,
-                        new LockingArchiveController<AE>(
-                            new CachingArchiveController<AE>(
-                                new UpdatingArchiveController<AE>(
-                                    enclController, model, driver))));
-            syncScheduler.setTouched(false);
-            return syncScheduler.controller;
-        }
-    }
-
-    private static class SyncScheduler<AE extends ArchiveEntry>
-    implements TouchListener {
-        ProspectiveArchiveController controller;
-
-        @Override
-        public void setTouched(boolean touched) {
-            if (null != controller)
-                scheduleSync(touched ? STRONG : WEAK, controller);
+            controller = new ProspectiveArchiveController<AE>(
+                    mountPoint, driver, enclController);
+            scheduleSync(WEAK, controller);
+            return controller;
         }
     }
 
@@ -138,7 +113,7 @@ public class Controllers {
                                 final ProspectiveArchiveController controller) {
         synchronized (controllers) {
             controllers.put(controller.getModel().getMountPoint(),
-                            type.newLink(controller));
+                            (Link) type.newLink(controller));
         }
     }
 
@@ -191,7 +166,7 @@ public class Controllers {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its enclosing archive file.
-            for (final ProspectiveArchiveController controller
+            for (final ProspectiveArchiveController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     if (controller.isTouched())
@@ -217,22 +192,22 @@ public class Controllers {
         }
     }
 
-    static Set<ProspectiveArchiveController> getControllers() {
+    static Set<ProspectiveArchiveController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<ProspectiveArchiveController> getControllers(
+    static Set<ProspectiveArchiveController<?>> getControllers(
             URI prefix,
-            final Comparator<ProspectiveArchiveController> comparator) {
+            final Comparator<ProspectiveArchiveController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<ProspectiveArchiveController> snapshot;
+        final Set<ProspectiveArchiveController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<ProspectiveArchiveController>(comparator)
-                    : new HashSet<ProspectiveArchiveController>((int) (controllers.size() / .75f) + 1);
-            for (final Link<ProspectiveArchiveController> link : controllers.values()) {
-                final ProspectiveArchiveController controller = Links.getTarget(link);
+                    ? new TreeSet<ProspectiveArchiveController<?>>(comparator)
+                    : new HashSet<ProspectiveArchiveController<?>>((int) (controllers.size() / .75f) + 1);
+            for (final Link<ProspectiveArchiveController<?>> link : controllers.values()) {
+                final ProspectiveArchiveController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()
