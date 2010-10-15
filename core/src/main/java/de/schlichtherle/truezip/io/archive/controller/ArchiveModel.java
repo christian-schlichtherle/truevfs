@@ -50,7 +50,6 @@ final class ArchiveModel implements FileSystemModel {
         readLock = lock.readLock();
         writeLock = lock.writeLock();
         this.touchListener = touchListener;
-        notifyTouchListener();
     }
 
     @Override
