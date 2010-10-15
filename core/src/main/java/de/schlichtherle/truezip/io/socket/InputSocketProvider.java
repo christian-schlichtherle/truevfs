@@ -54,5 +54,5 @@ public interface InputSocketProvider<CE extends CommonEntry> {
      * @return A non-{@code null} input socket for reading from the local
      *         target.
      */
-    InputSocket<CE> getInputSocket(CE entry) throws IOException;
+    InputSocket<? extends CE> getInputSocket(CE entry) throws IOException;
 }

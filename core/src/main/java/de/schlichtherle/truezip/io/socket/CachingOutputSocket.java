@@ -54,7 +54,7 @@ extends FilterOutputSocket<CE> {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
-                super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override

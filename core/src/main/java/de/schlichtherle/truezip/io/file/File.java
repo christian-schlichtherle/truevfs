@@ -414,7 +414,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient FileSystemController controller;
+    private transient FileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -1830,7 +1830,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FileSystemController getController() {
+    final FileSystemController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

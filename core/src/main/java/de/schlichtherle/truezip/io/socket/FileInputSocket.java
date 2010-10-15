@@ -57,11 +57,11 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return new FileInputStream(file.getTarget());
+        return new FileInputStream(file.getFile());
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new SimpleReadOnlyFile(file.getTarget());
+        return new SimpleReadOnlyFile(file.getFile());
     }
 }

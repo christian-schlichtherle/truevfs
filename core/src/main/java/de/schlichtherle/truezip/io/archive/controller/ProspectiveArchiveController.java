@@ -15,16 +15,17 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
 import java.util.Set;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -43,29 +44,34 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 
 /**
- * Deals with {@link FalsePositiveException}.
+ * A prospective archive controller is a facade which adapts an archive
+ * controller and utilizes a file system controller for an enclosing archive
+ * file in order to implement a chain of responsibility for resolving
+ * {@link FalsePositiveException}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ProspectiveArchiveController extends FilterArchiveController {
+final class ProspectiveArchiveController
+implements FileSystemController<CommonEntry> {
 
-    private final FileSystemController enclController;
+    private final FileSystemController<?> enclController;
     private final String enclPath;
+    private final ArchiveController<?> controller;
 
-    ProspectiveArchiveController(   final FileSystemController enclController,
-                                    final ArchiveController controller) {
-        super(controller);
+    ProspectiveArchiveController(   final FileSystemController<?> enclController,
+                                    final ArchiveController<?> controller) {
         this.enclController = enclController;
         this.enclPath = enclController
                 .getModel()
                 .getMountPoint()
                 .relativize(controller.getModel().getMountPoint())
                 .getPath();
+        this.controller = controller;
     }
 
     /** Returns the file system controller for the enclosing file system. */
-    private FileSystemController getEnclController() {
+    private FileSystemController<?> getEnclController() {
         return enclController;
     }
 
@@ -77,6 +83,26 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         return isRoot(path)
                 ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
                 : enclPath + path;
+    }
+
+    private ArchiveController<?> getController() {
+        return controller;
+    }
+
+    boolean isTouched() {
+        return getController().isTouched();
+    }
+
+    <E extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
+    throws E {
+        getController().sync(builder, options);
+    }
+
+    @Override
+    public FileSystemModel getModel() {
+        return controller.getModel();
     }
 
     @Override
@@ -112,7 +138,6 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
-    /** @see ArchiveDriver#newInputShop */
     @Override
     public FileSystemEntry getEntry(String path) {
         try {
@@ -121,15 +146,20 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             final FileSystemEntry entry = getEnclController()
                     .getEntry(getEnclPath(path));
             if (ex.isTransient())
-                return null == entry ? null : new SpecialFileEntry(entry);
+                return null == entry
+                        ? null
+                        : new SpecialFileEntry<CommonEntry>(
+                            entry instanceof Entry<?>
+                                ? ((Entry<?>) entry).getTarget()
+                                : entry);
             return entry;
         }
     }
 
-    private static final class SpecialFileEntry
-    extends FilterCommonEntry<FileSystemEntry>
-    implements FileSystemEntry {
-        SpecialFileEntry(FileSystemEntry entry) {
+    private static final class SpecialFileEntry<CE extends CommonEntry>
+    extends FilterCommonEntry<CE>
+    implements Entry<CE> {
+        SpecialFileEntry(CE entry) {
             super(entry);
         }
 
@@ -141,6 +171,11 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         @Override
         public Set<String> getMembers() {
             return null;
+        }
+
+        @Override
+        public CE getTarget() {
+            return entry;
         }
     }
 
@@ -192,8 +227,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   String path,
-                                            BitField<InputOption> options)
+    public InputSocket<?> getInputSocket(
+            final String path,
+            final BitField<InputOption> options)
     throws IOException {
         try {
             return new Input(path, options);
@@ -205,6 +241,11 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
+    /**
+     * This class may be actually unused because archive controllers usually
+     * detect false positive archive files eagerly, i.e. when a socket is
+     * acquired, rather than lazily, i.e. when a socket is used.
+     */
     private class Input extends FilterInputSocket<CommonEntry> {
         final String path;
         final BitField<InputOption> options;
@@ -223,9 +264,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             } catch (FalsePositiveException ex) {
                 if (ex.isTransient())
                     throw ex.getCause();
-                setInputSocket(getEnclController()
-                        .getInputSocket(getEnclPath(path), options));
-                return getInputSocket().getLocalTarget();
+                return getEnclController()
+                        .getInputSocket(getEnclPath(path), options)
+                        .getLocalTarget();
             }
         }
 
@@ -236,9 +277,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             } catch (FalsePositiveException ex) {
                 if (ex.isTransient())
                     throw ex.getCause();
-                setInputSocket(getEnclController()
-                        .getInputSocket(getEnclPath(path), options));
-                return getInputSocket().newInputStream();
+                return getEnclController()
+                        .getInputSocket(getEnclPath(path), options)
+                        .newInputStream();
             }
         }
 
@@ -249,16 +290,17 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             } catch (FalsePositiveException ex) {
                 if (ex.isTransient())
                     throw ex.getCause();
-                setInputSocket(getEnclController()
-                        .getInputSocket(getEnclPath(path), options));
-                return getInputSocket().newReadOnlyFile();
+                return getEnclController()
+                        .getInputSocket(getEnclPath(path), options)
+                        .newReadOnlyFile();
             }
         }
     } // class Input
 
     @Override
-    public OutputSocket<?> getOutputSocket( String path,
-                                            BitField<OutputOption> options)
+    public OutputSocket<?> getOutputSocket(
+            final String path,
+            final BitField<OutputOption> options)
     throws IOException {
         try {
             return new Output(path, options);
@@ -270,6 +312,11 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
+    /**
+     * This class may be actually unused because archive controllers usually
+     * detect false positive archive files eagerly, i.e. when a socket is
+     * acquired, rather than lazily, i.e. when a socket is used.
+     */
     private class Output extends FilterOutputSocket<CommonEntry> {
         final String path;
         final BitField<OutputOption> options;
@@ -288,9 +335,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             } catch (FalsePositiveException ex) {
                 if (ex.isTransient())
                     throw ex.getCause();
-                setOutputSocket(getEnclController()
-                        .getOutputSocket(getEnclPath(path), options));
-                return getOutputSocket().getLocalTarget();
+                return getEnclController()
+                        .getOutputSocket(getEnclPath(path), options)
+                        .getLocalTarget();
             }
         }
 
@@ -301,9 +348,9 @@ final class ProspectiveArchiveController extends FilterArchiveController {
             } catch (FalsePositiveException ex) {
                 if (ex.isTransient())
                     throw ex.getCause();
-                setOutputSocket(getEnclController()
-                        .getOutputSocket(getEnclPath(path), options));
-                return getOutputSocket().newOutputStream();
+                return getEnclController()
+                        .getOutputSocket(getEnclPath(path), options)
+                        .newOutputStream();
             }
         }
     } // class Output
@@ -324,7 +371,6 @@ final class ProspectiveArchiveController extends FilterArchiveController {
         }
     }
 
-    /** @see ArchiveDriver#newInputShop */
     @Override
     @SuppressWarnings("ThrowableInitCause")
     public void unlink(String path)
@@ -336,12 +382,5 @@ final class ProspectiveArchiveController extends FilterArchiveController {
                 throw ex.getCause();
             getEnclController().unlink(getEnclPath(path));
         }
-    }
-
-    @Override
-    public <E extends IOException>
-    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E {
-        getController().sync(builder, options);
     }
 }

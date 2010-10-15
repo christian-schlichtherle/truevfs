@@ -21,24 +21,25 @@ import java.io.OutputStream;
 
 /**
  * @param   <CE> The type of the {@link #getLocalTarget() local target}.
+ * @see     LazyInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class LazyOutputSocket<CE extends CommonEntry>
 extends OutputSocket<CE> {
 
-    private final OutputSocketProvider<CE> factory;
-    private OutputSocket<CE> socket;
+    private final OutputSocketProvider<CE> provider;
+    private OutputSocket<? extends CE> socket;
 
-    protected LazyOutputSocket(final OutputSocketProvider<CE> factory) {
-        if (null == factory)
+    protected LazyOutputSocket(final OutputSocketProvider<CE> provider) {
+        if (null == provider)
             throw new NullPointerException();
-        this.factory = factory;
+        this.provider = provider;
     }
 
-    protected final OutputSocket<CE> getOutputSocket() throws IOException {
+    protected final OutputSocket<? extends CE> getOutputSocket() throws IOException {
         return (null == socket
-                ? socket = factory.getOutputSocket(getLocalTarget())
+                ? socket = provider.getOutputSocket(getLocalTarget())
                 : socket).bind(this);
     }
 

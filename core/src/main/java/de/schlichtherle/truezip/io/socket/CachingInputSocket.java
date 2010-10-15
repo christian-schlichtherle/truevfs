@@ -93,7 +93,7 @@ extends FilterInputSocket<CE> {
             boolean closed;
 
             InputStream() throws FileNotFoundException {
-                super(new FileInputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                super(new FileInputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             }
 
             @Override
@@ -116,7 +116,7 @@ extends FilterInputSocket<CE> {
             boolean closed;
 
             ReadOnlyFile() throws FileNotFoundException {
-                super(new SimpleReadOnlyFile(temp.getTarget()));
+                super(new SimpleReadOnlyFile(temp.getFile()));
             }
 
             @Override

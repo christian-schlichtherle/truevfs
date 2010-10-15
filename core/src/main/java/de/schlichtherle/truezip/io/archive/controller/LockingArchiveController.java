@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -22,7 +23,6 @@ import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
@@ -38,9 +38,10 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class LockingArchiveController extends FilterArchiveController {
+final class LockingArchiveController<CE extends CommonEntry>
+extends FilterArchiveController<CE> {
 
-    LockingArchiveController(final ArchiveController controller) {
+    LockingArchiveController(ArchiveController<? extends CE> controller) {
         super(controller);
     }
 
@@ -117,7 +118,7 @@ final class LockingArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public FileSystemEntry getEntry(String path) {
+    public Entry<? extends CE> getEntry(String path) {
         try {
             readLock().lock();
             try {
@@ -201,7 +202,7 @@ final class LockingArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   String path,
+    public InputSocket<? extends CE> getInputSocket(  String path,
                                             BitField<InputOption> options)
     throws IOException {
         try {
@@ -222,13 +223,13 @@ final class LockingArchiveController extends FilterArchiveController {
         }
     }
 
-    private class Input extends FilterInputSocket<CommonEntry> {
-        Input(InputSocket<?> input) {
+    private class Input extends FilterInputSocket<CE> {
+        Input(InputSocket<? extends CE> input) {
             super(input);
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public CE getLocalTarget() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -289,7 +290,7 @@ final class LockingArchiveController extends FilterArchiveController {
     } // class Input
 
     @Override
-    public OutputSocket<?> getOutputSocket( String path,
+    public OutputSocket<CE> getOutputSocket(String path,
                                             BitField<OutputOption> options)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
@@ -301,13 +302,13 @@ final class LockingArchiveController extends FilterArchiveController {
         }
     }
 
-    private class Output extends FilterOutputSocket<CommonEntry> {
-        Output(OutputSocket<?> output) {
+    private class Output extends FilterOutputSocket<CE> {
+        Output(OutputSocket<? extends CE> output) {
             super(output);
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public CE getLocalTarget() throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
