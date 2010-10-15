@@ -16,15 +16,19 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.util.Link;
 import java.util.Set;
 
 /**
- * A common entry which can list directory members.
+ * A file system entry is a common entry which can list directory members.
+ * Optionally, it may also provide access to another common entry which is
+ * decorated by it.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry extends CommonEntry {
+public interface FileSystemEntry<CE extends CommonEntry>
+extends CommonEntry, Link<CE> {
 
     /**
      * Returns the non-{@code null} <i>path name</i>.
@@ -45,4 +49,15 @@ public interface FileSystemEntry extends CommonEntry {
      * represent the base names of the members of this directory entry.
      */
     Set<String> getMembers();
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return The decorated common entry or {@code this} if this file system
+     *         entry does not decorate a common entry or does not want to
+     *         provide access to it.
+     *         {@code null} is an illegal return value.
+     */
+    @Override
+    CE getTarget();
 }

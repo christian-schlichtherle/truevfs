@@ -39,7 +39,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
     /** An archive file system entry which adapts an archive entry. */
     interface Entry<CE extends CommonEntry>
-    extends FileSystemEntry, Link<CE> {
+    extends FileSystemEntry<CE> {
     }
 
     /**

@@ -172,11 +172,11 @@ implements FileSystemController<CommonEntry> {
     }
 
     @Override
-    public FileSystemEntry getEntry(String path) {
+    public FileSystemEntry<?> getEntry(String path) {
         try {
             return getController().getEntry(path);
         } catch (FalsePositiveException ex) {
-            final FileSystemEntry entry = getEnclController()
+            final FileSystemEntry<?> entry = getEnclController()
                     .getEntry(getEnclPath(path));
             if (ex.isTransient())
                 return null == entry
