@@ -108,7 +108,7 @@ implements FileSystemController<CommonEntry> {
                 : enclPath + path;
     }
 
-    private ArchiveController<?> getController() {
+    private ArchiveController<AE> getController() {
         return controller;
     }
 
