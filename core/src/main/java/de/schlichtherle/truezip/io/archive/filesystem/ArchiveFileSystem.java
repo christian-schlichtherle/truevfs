@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.IOOperation;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -37,9 +38,19 @@ import de.schlichtherle.truezip.util.BitField;
 public interface ArchiveFileSystem<CE extends CommonEntry>
 extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
 
-    /** An archive file system entry which adapts an archive entry. */
-    interface Entry<CE extends CommonEntry>
-    extends FileSystemEntry<CE> {
+    /**
+     * A marker interface which distinguishes entries created by an archive
+     * file system from any other common entries, in particular those created
+     * by the {@link ArchiveDriver#newEntry factory method} of an archive
+     * driver.
+     * With the help of this marker interface, an archive file system ensures
+     * that when a new archive entry is created, the {@code template} parameter
+     * is <i>not</i> an instance of this interface, but possibly a product of
+     * the archive entry factory in the archive driver.
+     * This enables an archive driver to copy properties specific to its type
+     * of archive entries, e.g. the compressed size of ZIP entries.
+     */
+    interface Entry<CE extends CommonEntry> extends FileSystemEntry<CE> {
     }
 
     /**
