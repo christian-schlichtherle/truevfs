@@ -40,8 +40,8 @@ public interface InputSocketProvider<LT extends CommonEntry> {
      * <i>local target</i>.
      * <p>
      * When called on the returned input socket, the method
-     * {@link InputSocket#getLocalTarget()} <em>must</em> return the same
-     * object.
+     * {@link InputSocket#getLocalTarget()} must return an object which
+     * compares {@link Object#equals equal} to {@code entry}.
      *
      * @param  entry the non-{@code null} local target.
      * @throws NullPointerException if {@code target} is {@code null}.

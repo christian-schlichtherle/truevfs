@@ -49,8 +49,7 @@ public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
     protected final OutputSocket<? extends LT> getOutputSocket() throws IOException {
         if (null == socket) {
             socket = provider.getOutputSocket(target = getLocalTarget());
-            assert null != socket && target == socket.getLocalTarget()
-                    : "interface contract violation!";
+            assert socket.getLocalTarget().equals(target) : "interface contract violation!";
             provider = null; // support gc!
             target = null;
         }
