@@ -30,16 +30,16 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class CachingOutputSocket<CE extends CommonEntry>
-extends FilterOutputSocket<CE> {
+public class CachingOutputSocket<LT extends CommonEntry>
+extends FilterOutputSocket<LT> {
 
     private final CommonEntryPool<FileEntry> pool;
 
-    public CachingOutputSocket(OutputSocket<? extends CE> output) {
+    public CachingOutputSocket(OutputSocket<? extends LT> output) {
         this(output, null);
     }
 
-    public CachingOutputSocket( final OutputSocket<? extends CE> output,
+    public CachingOutputSocket( final OutputSocket<? extends LT> output,
                                 final CommonEntryPool<FileEntry> pool) {
         super(output);
         this.pool = null != pool ? pool : TempFilePool.get();
@@ -70,7 +70,7 @@ extends FilterOutputSocket<CE> {
                         remote = temp;
                     IOException cause = null;
                     try {
-                        IOSocket.copy(  new TargetInputSocket<CommonEntry>(remote,
+                        IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(remote,
                                             FileInputSocket.get(temp)),
                                         getOutputSocket());
                     } catch (IOException ex) {

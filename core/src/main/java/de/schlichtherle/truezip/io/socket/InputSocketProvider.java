@@ -26,12 +26,14 @@ import java.io.IOException;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the common entries.
+ * @param   <LT> the type of the
+ *          {@link InputSocket#getLocalTarget() local target} for I/O
+ *          operations.
  * @see     OutputSocketProvider
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputSocketProvider<CE extends CommonEntry> {
+public interface InputSocketProvider<LT extends CommonEntry> {
 
     /**
      * Returns a non-{@code null} input socket for read access to the given
@@ -54,5 +56,5 @@ public interface InputSocketProvider<CE extends CommonEntry> {
      * @return A non-{@code null} input socket for reading from the local
      *         target.
      */
-    InputSocket<? extends CE> getInputSocket(CE entry) throws IOException;
+    InputSocket<? extends LT> getInputSocket(LT entry) throws IOException;
 }

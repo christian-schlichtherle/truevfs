@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.socket.ProxyOutputSocket;
+import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
@@ -184,8 +184,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final OutputStream out = new ProxyOutputSocket<CommonEntry>(getOutputSocket())
-                        .newOutputStream();
+                final OutputStream out
+                        = new LazyOutputSocket<CommonEntry>(getOutputSocket())
+                            .newOutputStream();
                 try {
                     try {
                         return RaesOutputStream.getInstance(out, getRaesParameters(archive));

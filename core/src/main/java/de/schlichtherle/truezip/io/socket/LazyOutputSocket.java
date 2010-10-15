@@ -15,32 +15,55 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @param   <CE> The type of the {@link #getLocalTarget() local target}.
+ * @param   <LT> The type of the {@link #getLocalTarget() local target}.
  * @see     LazyInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class LazyOutputSocket<CE extends CommonEntry>
-extends OutputSocket<CE> {
+public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
 
-    private final OutputSocketProvider<CE> provider;
-    private OutputSocket<? extends CE> socket;
+    private OutputSocketProvider<LT> provider;
+    private OutputSocket<? extends LT> socket;
+    private LT target;
 
-    protected LazyOutputSocket(final OutputSocketProvider<CE> provider) {
+    public LazyOutputSocket(final OutputSocketProvider<LT> provider,
+                            final LT target) {
         if (null == provider)
             throw new NullPointerException();
         this.provider = provider;
+        this.target = target;
     }
 
-    protected final OutputSocket<? extends CE> getOutputSocket() throws IOException {
-        return (null == socket
-                ? socket = provider.getOutputSocket(getLocalTarget())
-                : socket).bind(this);
+    public LazyOutputSocket(final OutputSocket<? extends LT> output) {
+        if (null == output)
+            throw new NullPointerException();
+        this.socket = output;
+    }
+
+    protected final OutputSocket<? extends LT> getOutputSocket() throws IOException {
+        if (null == socket) {
+            socket = provider.getOutputSocket(target = getLocalTarget());
+            assert null != socket && target == socket.getLocalTarget()
+                    : "interface contract violation!";
+            provider = null; // support gc!
+            target = null;
+        }
+        return socket.bind(this);
+    }
+
+    @Override
+    public LT getLocalTarget() throws IOException {
+        if (null != socket)
+            return socket.bind(this).getLocalTarget();
+        if (null != target)
+            return target;
+        throw new IllegalStateException("cannot resolve local target!");
     }
 
     @Override
@@ -50,6 +73,37 @@ extends OutputSocket<CE> {
 
     @Override
     public final OutputStream newOutputStream() throws IOException {
-        return getOutputSocket().newOutputStream();
+        return new LazyOutputStream();
     }
+
+    private final class LazyOutputStream extends FilterOutputStream {
+        LazyOutputStream() {
+            super(null);
+        }
+
+        OutputStream getOutputStream() throws IOException {
+            return null != out ? out : (out = getOutputSocket().newOutputStream());
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            getOutputStream().write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            getOutputStream().write(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            getOutputStream().flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (null != out)
+                out.close();
+        }
+    } // class LazyOutputStream
 }

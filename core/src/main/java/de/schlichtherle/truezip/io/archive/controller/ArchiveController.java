@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -29,7 +30,8 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * @author Christian Schlichtherle
+ * @see     FileSystemController
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 interface ArchiveController<CE extends CommonEntry> {
