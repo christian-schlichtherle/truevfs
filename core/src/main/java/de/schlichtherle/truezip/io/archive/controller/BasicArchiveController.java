@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -27,7 +27,6 @@ import de.schlichtherle.truezip.io.socket.InputSocketProvider;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.EntryOperation;
 import de.schlichtherle.truezip.io.InputException;
@@ -99,10 +98,10 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<AE extends ArchiveEntry>
-implements     ArchiveController,
-               InputSocketProvider <AE>,
-               OutputSocketProvider<AE> {
+abstract class BasicArchiveController<CE extends CommonEntry>
+implements     ArchiveController<CE>,
+               InputSocketProvider <CE>,
+               OutputSocketProvider<CE> {
 
     private final ArchiveModel model;
 
@@ -121,11 +120,11 @@ implements     ArchiveController,
         return model;
     }
 
-    final ArchiveFileSystem<AE> autoMount() {
+    final ArchiveFileSystem<CE> autoMount() {
         return autoMount(false, false);
     }
 
-    final ArchiveFileSystem<AE> autoMount(boolean autoCreate) {
+    final ArchiveFileSystem<CE> autoMount(boolean autoCreate) {
         return autoMount(autoCreate, autoCreate);
     }
 
@@ -146,7 +145,7 @@ implements     ArchiveController,
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
      */
-    abstract ArchiveFileSystem<AE> autoMount(boolean autoCreate, boolean createParents);
+    abstract ArchiveFileSystem<CE> autoMount(boolean autoCreate, boolean createParents);
 
     @Override
     public final boolean isReadOnly() {
@@ -154,7 +153,7 @@ implements     ArchiveController,
     }
 
     @Override
-    public final FileSystemEntry getEntry(final String path) {
+    public final Entry<CE> getEntry(final String path) {
         return autoMount().getEntry(path);
     }
 
@@ -185,15 +184,15 @@ implements     ArchiveController,
     }
 
     @Override
-    public final InputSocket<AE> getInputSocket(
+    public final InputSocket<? extends CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException {
-        class Input extends InputSocket<AE> {
+        class Input extends InputSocket<CE> {
             boolean recursion;
 
             @Override
-            public AE getLocalTarget() throws IOException {
+            public CE getLocalTarget() throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
                     recursion = true;
                     try {
@@ -202,15 +201,15 @@ implements     ArchiveController,
                         recursion = false;
                     }
                 }
-                final AE entry = Links.getTarget(autoMount().getEntry(path));
+                final CE entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "no such file or directory");
                 return entry;
             }
 
-            InputSocket<AE> getInputSocket() throws IOException {
-                final AE entry = getLocalTarget();
+            InputSocket<? extends CE> getInputSocket() throws IOException {
+                final CE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "cannot read directories");
@@ -239,14 +238,14 @@ implements     ArchiveController,
     }
 
     @Override
-    public final OutputSocket<AE> getOutputSocket(
+    public final OutputSocket<? extends CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException {
-        class Output extends OutputSocket<AE> {
-            EntryOperation<AE> link;
+        class Output extends OutputSocket<CE> {
+            EntryOperation<CE> link;
 
-            AE getEntry() throws IOException {
+            CE getEntry() throws IOException {
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
@@ -268,7 +267,7 @@ implements     ArchiveController,
             }
 
             @Override
-            public AE getLocalTarget() throws IOException {
+            public CE getLocalTarget() throws IOException {
                 if (options.get(APPEND))
                     return null; // FIXME: broken contract
                 return getEntry();
@@ -277,8 +276,8 @@ implements     ArchiveController,
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                final AE entry = getEntry();
-                final OutputSocket<AE> output = getOutputSocket(entry);
+                final CE entry = getEntry();
+                final OutputSocket<? extends CE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
                         ? getInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
                         : null;
@@ -339,10 +338,10 @@ implements     ArchiveController,
             throw new ArchiveEntryNotFoundException(getModel(), path,
                     "directory exists already");
         } else { // !isRoot(entryName)
-            final ArchiveFileSystem<AE> fileSystem
+            final ArchiveFileSystem<CE> fileSystem
                     = autoMount(options.get(CREATE_PARENTS));
             final boolean created = null == fileSystem.getEntry(path);
-            final EntryOperation<AE> link
+            final EntryOperation<CE> link
                     = fileSystem.mknod( path, type, template,
                                         options.get(CREATE_PARENTS));
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
@@ -356,7 +355,7 @@ implements     ArchiveController,
     throws IOException {
         autoSync(path, null);
         if (isRoot(path)) {
-            final ArchiveFileSystem<AE> fileSystem;
+            final ArchiveFileSystem<CE> fileSystem;
             try {
                 fileSystem = autoMount();
             } catch (FalsePositiveException ex) {

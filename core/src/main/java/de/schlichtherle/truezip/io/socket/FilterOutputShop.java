@@ -42,7 +42,7 @@ implements OutputShop<CE> {
     }
 
     @Override
-    public OutputSocket<CE> getOutputSocket(CE entry)
+    public OutputSocket<? extends CE> getOutputSocket(CE entry)
     throws IOException {
         if (null == entry)
             throw new NullPointerException();

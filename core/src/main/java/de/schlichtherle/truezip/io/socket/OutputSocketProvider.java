@@ -54,5 +54,5 @@ public interface OutputSocketProvider<CE extends CommonEntry> {
      * @return A non-{@code null} output socket for writing to the local
      *         target.
      */
-    OutputSocket<CE> getOutputSocket(CE entry) throws IOException;
+    OutputSocket<? extends CE> getOutputSocket(CE entry) throws IOException;
 }

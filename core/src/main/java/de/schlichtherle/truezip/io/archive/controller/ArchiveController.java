@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -24,10 +26,14 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveController extends FileSystemController {
+interface ArchiveController<CE extends CommonEntry>
+extends FileSystemController<CE> {
 
     @Override
     ArchiveModel getModel();
+
+    @Override
+    Entry<? extends CE> getEntry(String path);
 
     boolean isTouched();
 

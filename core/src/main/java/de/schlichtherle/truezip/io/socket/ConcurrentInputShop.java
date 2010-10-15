@@ -91,7 +91,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      *
      * @return The number of all open streams.
      */
-    public synchronized int waitCloseOthers(final long timeout) {
+    public synchronized final int waitCloseOthers(final long timeout) {
         if (closed)
             return 0;
         final long start = System.currentTimeMillis();
@@ -133,7 +133,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * streams will throw an {@code IOException}, with the exception of
      * their {@code close()} method.
      */
-    public synchronized <E extends Exception>
+    public synchronized final <E extends Exception>
     void closeAll(final ExceptionHandler<IOException, E> handler)
     throws E {
         if (closed)
@@ -161,7 +161,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * @see    #closeAll
      */
     @Override
-    public synchronized void close() throws IOException {
+    public synchronized final void close() throws IOException {
         if (!threads.isEmpty())
             throw new IllegalStateException();
         if (closed)
@@ -177,7 +177,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     @Override
-    public InputSocket<CE> getInputSocket(final CE entry)
+    public final InputSocket<? extends CE> getInputSocket(final CE entry)
     throws IOException {
 
         class InputSocket extends FilterInputSocket<CE> {

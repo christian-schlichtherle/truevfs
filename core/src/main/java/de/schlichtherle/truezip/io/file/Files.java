@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveOutputBusyException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;

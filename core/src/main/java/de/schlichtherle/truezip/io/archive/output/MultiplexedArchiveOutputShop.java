@@ -129,7 +129,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public OutputSocket<AE> getOutputSocket(final AE entry)
+    public OutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
         class Output extends FilterOutputSocket<AE> {
             Output() throws IOException {
@@ -214,7 +214,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         TempEntryOutputStream(  final OutputSocket<? extends AE> output,
                                 final FileEntry temp)
         throws IOException {
-            super(new FileOutputStream(temp.getTarget())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.output = output;
             this.local = output.getLocalTarget();
             this.remote = output.getRemoteTarget();
@@ -228,12 +228,12 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
 
                 @Override
                 public InputStream newInputStream() throws IOException {
-                    return new FileInputStream(temp.getTarget());
+                    return new FileInputStream(temp.getFile());
                 }
 
                 @Override
                 public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    return new SimpleReadOnlyFile(temp.getTarget());
+                    return new SimpleReadOnlyFile(temp.getFile());
                 }
             }
             this.temp = temp;

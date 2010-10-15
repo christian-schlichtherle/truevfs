@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.util.Link;
 import java.util.Collections;
 import java.io.File;
 import java.net.URI;
@@ -35,7 +34,7 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry implements FileSystemEntry, Link<File> {
+public class FileEntry implements FileSystemEntry {
 
     /**
      * Returns a file entry for the given parameter.
@@ -100,6 +99,11 @@ public class FileEntry implements FileSystemEntry, Link<File> {
         this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
     }
 
+    /** Returns the decorated file. */
+    public final File getFile() {
+        return file;
+    }
+
     @Override
     public final String getName() {
         return name;
@@ -147,11 +151,5 @@ public class FileEntry implements FileSystemEntry, Link<File> {
         for (String member : list)
             set.add(member);
         return Collections.unmodifiableSet(set);
-    }
-
-    /** Returns the decorated file. */
-    @Override
-    public final File getTarget() {
-        return file;
     }
 }

@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 final class HostFileSystemController
-implements FileSystemModel, FileSystemController  {
+implements FileSystemModel, FileSystemController<FileEntry>  {
 
     private final URI mountPoint;
     private final File target;
@@ -93,7 +93,7 @@ implements FileSystemModel, FileSystemController  {
     @Override
     public FileEntry getEntry(String path) {
         final FileEntry entry = FileEntry.get(target, path);
-        return entry.getTarget().exists() ? entry : null;
+        return entry.getFile().exists() ? entry : null;
     }
 
     @Override

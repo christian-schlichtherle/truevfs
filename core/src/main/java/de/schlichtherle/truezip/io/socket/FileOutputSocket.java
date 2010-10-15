@@ -60,7 +60,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
             throw new NullPointerException();
         this.file = file;
         this.options = null != options ? options : BitField.noneOf(OutputOption.class);
-        final File fileTarget = file.getTarget();
+        final File fileTarget = file.getFile();
         this.pool = new TempFilePool(   fileTarget.getName(),
                                         null,
                                         fileTarget.getParentFile());
@@ -74,13 +74,13 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
     @Override
     @SuppressWarnings("ThrowableInitCause")
     public OutputStream newOutputStream() throws IOException {
-        final File fileTarget = file.getTarget();
+        final File fileTarget = file.getFile();
         if (options.get(CREATE_PARENTS))
             fileTarget.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !fileTarget.createNewFile()
                 ? pool.allocate()
                 : file;
-        final File tempTarget = temp.getTarget();
+        final File tempTarget = temp.getFile();
 
         class OutputStream extends FilterOutputStream {
             boolean closed;

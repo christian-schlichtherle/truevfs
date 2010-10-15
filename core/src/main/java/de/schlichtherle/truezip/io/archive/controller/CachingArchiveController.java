@@ -40,13 +40,14 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class CachingArchiveController extends FilterArchiveController {
+final class CachingArchiveController<CE extends CommonEntry>
+extends FilterArchiveController<CE> {
 
     private final static class Buffer implements CommonEntryPool<FileEntry> {
         FileEntry temp;
 
         File getFile() {
-            return temp.getTarget();
+            return temp.getFile();
         }
 
         @Override
@@ -63,7 +64,7 @@ final class CachingArchiveController extends FilterArchiveController {
 
     private Map<String, Buffer> buffers;
 
-    CachingArchiveController( final ArchiveController controller) {
+    CachingArchiveController(ArchiveController<CE> controller) {
         super(controller);
     }
 
@@ -78,33 +79,33 @@ final class CachingArchiveController extends FilterArchiveController {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<? extends CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException {
         final BitField<InputOption> options2 = options
                 .clear(InputOption.CACHE);
-        InputSocket<?> input = getController()
+        InputSocket<? extends CE> input = getController()
                 .getInputSocket(path, options2);
         if (options.get(InputOption.CACHE)) {
-            input = new CachingInputSocket<CommonEntry>(input, getBuffer(path));
+            input = new CachingInputSocket<CE>(input, getBuffer(path));
         }
         return input;
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<? extends CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException {
         final BitField<OutputOption> options2 = options
                 .clear(OutputOption.CACHE);
-        OutputSocket<?> output = getController()
+        OutputSocket<? extends CE> output = getController()
                 .getOutputSocket(path, options2);
         if (options.get(OutputOption.CACHE)) {
 
-            class Output extends CachingOutputSocket<CommonEntry> {
-                Output(OutputSocket<?> output) {
+            class Output extends CachingOutputSocket<CE> {
+                Output(OutputSocket<? extends CE> output) {
                     super(output, getBuffer(path));
                 }
 

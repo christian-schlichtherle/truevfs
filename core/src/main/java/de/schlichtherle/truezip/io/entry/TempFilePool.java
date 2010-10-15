@@ -66,7 +66,7 @@ public final class TempFilePool implements CommonEntryPool<FileEntry> {
     public void release(final FileEntry entry) throws IOException {
         if (!(entry instanceof TempFileEntry) ||
                 this != ((TempFileEntry) entry).pool(null))
-            throw new IllegalArgumentException(entry.getTarget().getPath() + " (not allocated by this temporary file pool)");
+            throw new IllegalArgumentException(entry.getFile().getPath() + " (not allocated by this temporary file pool)");
     }
 
     private static final class TempFileEntry extends FileEntry {
@@ -82,8 +82,8 @@ public final class TempFilePool implements CommonEntryPool<FileEntry> {
             final TempFilePool oldPool = pool;
             this.pool = newPool;
             if (oldPool != newPool)
-                if (!getTarget().delete())
-                    throw new IOException(getTarget().getPath() + " (cannot delete temporary file)");
+                if (!getFile().delete())
+                    throw new IOException(getFile().getPath() + " (cannot delete temporary file)");
             return oldPool;
         }
 

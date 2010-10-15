@@ -44,7 +44,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemController {
+public interface FileSystemController<CE extends CommonEntry> {
 
     FileSystemModel getModel();
 
@@ -72,7 +72,7 @@ public interface FileSystemController {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<?> getInputSocket(String path, BitField<InputOption> options)
+    InputSocket<? extends CE> getInputSocket(String path, BitField<InputOption> options)
     throws IOException;
 
     /**
@@ -82,7 +82,7 @@ public interface FileSystemController {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    OutputSocket<?> getOutputSocket(String path, BitField<OutputOption> options)
+    OutputSocket<? extends CE> getOutputSocket(String path, BitField<OutputOption> options)
     throws IOException;
 
     /**

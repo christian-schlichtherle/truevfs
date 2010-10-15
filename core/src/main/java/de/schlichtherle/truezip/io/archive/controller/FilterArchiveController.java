@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -32,21 +32,22 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class FilterArchiveController implements ArchiveController {
+class FilterArchiveController<CE extends CommonEntry>
+implements ArchiveController<CE> {
 
-    private final ArchiveController controller;
+    private final ArchiveController<? extends CE> controller;
 
     /**
      * Constructs a new filter archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
-    FilterArchiveController(final ArchiveController controller) {
+    FilterArchiveController(final ArchiveController<? extends CE> controller) {
         assert null != controller;
         this.controller = controller;
     }
 
-    final ArchiveController getController() {
+    final ArchiveController<? extends CE> getController() {
         return controller;
     }
 
@@ -71,7 +72,7 @@ class FilterArchiveController implements ArchiveController {
     }
 
     @Override
-    public FileSystemEntry getEntry(String path) {
+    public Entry<? extends CE> getEntry(String path) {
         return getController().getEntry(path);
     }
 
@@ -98,7 +99,7 @@ class FilterArchiveController implements ArchiveController {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<? extends CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException {
@@ -106,7 +107,7 @@ class FilterArchiveController implements ArchiveController {
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<? extends CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException {

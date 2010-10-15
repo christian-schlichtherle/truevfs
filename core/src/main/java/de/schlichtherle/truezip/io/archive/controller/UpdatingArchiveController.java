@@ -93,7 +93,7 @@ extends     FileSystemArchiveController<AE> {
         }
 
         @Override
-        public InputSocket<CE> getInputSocket(CE target)
+        public InputSocket<? extends CE> getInputSocket(CE target)
         throws IOException {
             if (target == null)
                 throw new NullPointerException();
@@ -139,13 +139,6 @@ extends     FileSystemArchiveController<AE> {
         OutputShop<AE> getDriverProduct() {
             return target;
         }
-
-        @Override
-        public OutputSocket<AE> getOutputSocket(AE entry)
-        throws IOException {
-            assert null != entry;
-            return super.getOutputSocket(entry);
-        }
     }
 
     private final class TouchListener implements VetoableTouchListener {
@@ -156,9 +149,9 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private final ArchiveDriver<AE> driver;
-    private final FileSystemController enclController;
+    private final FileSystemController<?> enclController;
     private final String enclPath;
+    private final ArchiveDriver<AE> driver;
 
     /**
      * An {@link Input} object used to mount the virtual file system
@@ -175,7 +168,7 @@ extends     FileSystemArchiveController<AE> {
     private final VetoableTouchListener vetoableTouchListener
             = new TouchListener();
 
-    UpdatingArchiveController(  final FileSystemController enclController,
+    UpdatingArchiveController(  final FileSystemController<?> enclController,
                                 final ArchiveModel model,
                                 final ArchiveDriver<AE> driver) {
         super(model);
@@ -202,7 +195,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     /** Returns the file system controller for the enclosing file system. */
-    private FileSystemController getEnclController() {
+    private FileSystemController<?> getEnclController() {
         return enclController;
     }
 
@@ -250,7 +243,7 @@ extends     FileSystemArchiveController<AE> {
 
         try {
             try {
-                final FileSystemController controller = getEnclController();
+                final FileSystemController<?> controller = getEnclController();
                 final String path = getEnclPath(ROOT);
                 final boolean readOnly = !controller.isWritable(path);
                 final InputSocket<?> socket = controller.getInputSocket(
@@ -292,7 +285,7 @@ extends     FileSystemArchiveController<AE> {
         if (null != output)
             return;
 
-        final FileSystemController controller = getEnclController();
+        final FileSystemController<?> controller = getEnclController();
         final String path = getEnclPath(ROOT);
         final OutputSocket<?> socket = controller.getOutputSocket(path,
                 BitField.of(OutputOption.CACHE)
@@ -302,13 +295,13 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    public InputSocket<AE> getInputSocket(final AE entry)
+    public InputSocket<? extends AE> getInputSocket(final AE entry)
     throws IOException {
         return input.getInputSocket(entry);
     }
 
     @Override
-    public OutputSocket<AE> getOutputSocket(final AE entry)
+    public OutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
         ensureOutput(false);
         return output.getOutputSocket(entry);
