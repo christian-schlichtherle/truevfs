@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -28,7 +29,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveModel implements FileSystemModel {
+final class ArchiveModel implements FileSystemModel, ReadWriteLock {
     private final FileSystemModel enclModel;
     private final URI mountPoint;
     private final ReentrantLock readLock;
@@ -84,12 +85,13 @@ final class ArchiveModel implements FileSystemModel {
             touchListener.setTouched(touched);
     }
 
-    ReentrantLock readLock() {
+    @Override
+    public ReentrantLock readLock() {
         return readLock;
     }
 
     /**
-     * @throws NotWriteLockedException if the read lock is
+     * @throws NotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
      */
     void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
@@ -98,12 +100,13 @@ final class ArchiveModel implements FileSystemModel {
             throw new NotWriteLockedException(ex);
     }
 
-    ReentrantLock writeLock() {
+    @Override
+    public ReentrantLock writeLock() {
         return writeLock;
     }
 
     /**
-     * @throws NotWriteLockedException if the write lock is not
+     * @throws NotWriteLockedException if the <i>write lock</i> is not
      *         held by the current thread.
      */
     void ensureWriteLockedByCurrentThread()

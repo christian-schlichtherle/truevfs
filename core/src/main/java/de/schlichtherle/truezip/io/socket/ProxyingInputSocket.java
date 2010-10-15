@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,33 +21,38 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @see     FilterOutputSocket
  * @param   <LT> The type of the {@link #getLocalTarget() local target}.
+ * @see     ProxyOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterInputSocket<LT extends CommonEntry>
+public class ProxyingInputSocket<LT extends CommonEntry>
 extends InputSocket<LT> {
 
-    private InputSocket<? extends LT> input;
+    private final LT target;
+    private InputSocket<?> input;
 
-    protected FilterInputSocket(final InputSocket<? extends LT> input) {
+    public ProxyingInputSocket(final LT target,
+                            final InputSocket<?> input) {
+        if (null == target)
+            throw new NullPointerException();
+        this.target = target;
         setInputSocket(input);
     }
 
-    protected final InputSocket<? extends LT> getInputSocket() {
+    protected final InputSocket<?> getInputSocket() {
         return input.bind(this);
     }
 
-    protected final void setInputSocket(final InputSocket<? extends LT> input) {
+    protected final void setInputSocket(final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
     }
 
     @Override
-    public LT getLocalTarget() throws IOException {
-        return getInputSocket().getLocalTarget();
+    public final LT getLocalTarget() {
+        return target;
     }
 
     @Override

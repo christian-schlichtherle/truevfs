@@ -30,14 +30,14 @@ import java.io.OutputStream;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> the type of the {@link #getLocalTarget() local target}
+ * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OutputSocket<CE extends CommonEntry>
-extends IOSocket<CE, CommonEntry> {
+public abstract class OutputSocket<LT extends CommonEntry>
+extends IOSocket<LT, CommonEntry> {
 
     private InputSocket<?> peer;
 
@@ -47,7 +47,7 @@ extends IOSocket<CE, CommonEntry> {
      * @return The non-{@code null} local common entry target.
      */
     @Override
-    public abstract CE getLocalTarget() throws IOException;
+    public abstract LT getLocalTarget() throws IOException;
 
     @Override
     public CommonEntry getRemoteTarget() throws IOException {
@@ -68,7 +68,7 @@ extends IOSocket<CE, CommonEntry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final OutputSocket<CE> bind(final OutputSocket<?> with) {
+	public final OutputSocket<LT> bind(final OutputSocket<?> with) {
         final InputSocket<?> newPeer = with.peer;
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
@@ -94,7 +94,7 @@ extends IOSocket<CE, CommonEntry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final OutputSocket<CE> connect(final InputSocket<?> newPeer) {
+	public final OutputSocket<LT> connect(final InputSocket<?> newPeer) {
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {

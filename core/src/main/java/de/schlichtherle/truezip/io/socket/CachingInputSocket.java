@@ -56,7 +56,7 @@ extends FilterInputSocket<CE> {
             if (null == remote)
                 remote = temp;
             IOSocket.copy(  getInputSocket(),
-                            new TargetOutputSocket<CommonEntry>(remote,
+                            new ProxyingOutputSocket<CommonEntry>(remote,
                                 FileOutputSocket.get(temp)));
         } catch (IOException cause) {
             try {

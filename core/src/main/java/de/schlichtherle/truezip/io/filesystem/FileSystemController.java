@@ -41,7 +41,7 @@ import javax.swing.Icon;
  * this must be a relative, hierarchical URI which is resolved against the
  * mount point of the file system.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface FileSystemController<CE extends CommonEntry> {

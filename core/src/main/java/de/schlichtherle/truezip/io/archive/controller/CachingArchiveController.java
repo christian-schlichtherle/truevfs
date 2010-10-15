@@ -37,6 +37,26 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 
 /**
+ * A caching archive controller implements a caching strategy for entries
+ * within its target archive file.
+ * <p>
+ * Decorating an archive controller with this class has the following effects:
+ * <ul>
+ * <li>It increases the performance of concurrent or subsequent read operations.
+ * <li>It increases the performance of subsequent write-then-read operations.
+ * <li>It decouples the target archive file from read and write operations
+ *     so that it can get {@link #sync synced} concurrently.
+ * </ul>
+ * <p>
+ * Caching is automatically activated once an
+ * {@link #getInputSocket input socket} with {@link InputOption#CACHE} or an
+ * {@link #getOutputSocket output socket} with {@link InputOption#CACHE}
+ * is acquired. Subsequent read/write operations will then use the cache
+ * regardless if these options where set when the respective socket was
+ * acquired or not.
+ * <p>
+ *
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
@@ -64,7 +84,7 @@ extends FilterArchiveController<CE> {
 
     private Map<String, Buffer> buffers;
 
-    CachingArchiveController(ArchiveController<CE> controller) {
+    CachingArchiveController(ArchiveController<? extends CE> controller) {
         super(controller);
     }
 

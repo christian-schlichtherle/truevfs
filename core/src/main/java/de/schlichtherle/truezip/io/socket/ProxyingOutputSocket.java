@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,33 +20,44 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @see     FilterInputSocket
  * @param   <LT> The type of the {@link #getLocalTarget() local target}.
+ * @see     ProxyInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputSocket<LT extends CommonEntry>
+public class ProxyingOutputSocket<LT extends CommonEntry>
 extends OutputSocket<LT> {
 
-    private OutputSocket<? extends LT> output;
+    private final LT target;
+    private OutputSocket<?> output;
 
-    protected FilterOutputSocket(final OutputSocket<? extends LT> output) {
+    /**
+     * Constructs a proxy output socket.
+     * 
+     * @param target the non-{@code null} local target.
+     * @param output the nullable proxied output socket.
+     */
+    public ProxyingOutputSocket(   final LT target,
+                                final OutputSocket<?> output) {
+        if (null == target)
+            throw new NullPointerException();
+        this.target = target;
         setOutputSocket(output);
     }
 
-    protected final OutputSocket<? extends LT> getOutputSocket() {
+    protected final OutputSocket<?> getOutputSocket() {
         return output.bind(this);
     }
 
-    protected final void setOutputSocket(final OutputSocket<? extends LT> output) {
+    protected final void setOutputSocket(final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
     }
 
     @Override
-    public LT getLocalTarget() throws IOException {
-        return getOutputSocket().getLocalTarget();
+    public final LT getLocalTarget() {
+        return target;
     }
 
     @Override

@@ -21,13 +21,12 @@ import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.ProxyOutputSocket;
+import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -96,7 +95,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
             final OutputSocket<?> output,
             final InputShop<ZipEntry> source)
     throws IOException {
-        final OutputStream out = new ProxyOutputSocket<CommonEntry>(output)
+        final OutputStream out = new LazyOutputSocket<CommonEntry>(output)
                 .newOutputStream();
         try {
             final RaesOutputStream ros;
