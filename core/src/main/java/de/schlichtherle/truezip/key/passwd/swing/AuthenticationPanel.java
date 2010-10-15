@@ -47,7 +47,7 @@ public class AuthenticationPanel extends JPanel {
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final File BASE_DIR = new File(".", ArchiveDetector.NULL);
 
-    private static SoftReference fileChooser;
+    private static SoftReference<javax.swing.JFileChooser> fileChooser;
 
     /** The password authentication method. */
     public static final int AUTH_PASSWD = 0;
@@ -146,11 +146,11 @@ public class AuthenticationPanel extends JPanel {
      * does <em>not</em> support archive browsing to prevent illegal recursion.
      */
     static javax.swing.JFileChooser getFileChooser() {
-        final SoftReference ref = fileChooser; // cache
-        javax.swing.JFileChooser fc = ref != null ? (javax.swing.JFileChooser) ref.get() : null;
+        final SoftReference<javax.swing.JFileChooser> ref = fileChooser; // cache
+        javax.swing.JFileChooser fc = ref != null ? ref.get() : null;
         if (fc == null) {
             fc = new CustomFileChooser();
-            fileChooser = new SoftReference(fc);
+            fileChooser = new SoftReference<javax.swing.JFileChooser>(fc);
         }
         return fc;
     }
