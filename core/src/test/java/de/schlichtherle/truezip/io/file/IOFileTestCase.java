@@ -162,7 +162,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -182,7 +182,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();
