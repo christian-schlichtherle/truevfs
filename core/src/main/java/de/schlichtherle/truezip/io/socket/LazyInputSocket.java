@@ -52,8 +52,7 @@ public class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
     throws IOException {
         if (null == socket) {
             socket = provider.getInputSocket(target = getLocalTarget());
-            assert null != socket && target == socket.getLocalTarget()
-                    : "interface contract violation!";
+            assert socket.getLocalTarget().equals(target) : "interface contract violation!";
             provider = null; // support gc!
             target = null;
         }

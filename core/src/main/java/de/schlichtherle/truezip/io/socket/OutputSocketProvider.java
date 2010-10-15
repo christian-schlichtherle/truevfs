@@ -40,8 +40,8 @@ public interface OutputSocketProvider<LT extends CommonEntry> {
      * <i>local target</i>.
      * <p>
      * When called on the returned output socket, the method
-     * {@link OutputSocket#getLocalTarget()} <em>must</em> return the same
-     * object.
+     * {@link OutputSocket#getLocalTarget()} must return an object which
+     * compares {@link Object#equals equal} to {@code entry}.
      *
      * @param  entry the non-{@code null} local target.
      * @throws NullPointerException if {@code target} is {@code null}.
