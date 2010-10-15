@@ -43,8 +43,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
     }
 
     /**
-     * Represents an I/O operation on a chain of one or more archive file
-     * system entries.
+     * Represents an operation on a chain of one or more archive file system
+     * entries.
      * The operation is run by its {@link #run} method and the head of the
      * chain can be obtained by its {@link #getTarget} method.
      * <p>
@@ -53,7 +53,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      *
      * @see #mknod
      */
-    interface EntryOperation<CE extends CommonEntry>
+    interface Operation<CE extends CommonEntry>
     extends IOOperation, Link<Entry<CE>> {
 
         /** Executes this archive file system entry chain operation. */
@@ -78,7 +78,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      * chain of one or more archive entries for the given {@code path} into
      * this archive file system.
      * <p>
-     * To commit the transaction, call {@link EntryOperation#run} on the
+     * To commit the transaction, call {@link Operation#run} on the
      * returned object, which will mark this archive file system as
      * {@link #isTouched() touched} and set the last modification time of the
      * created and linked archive file system entries to the system's current
@@ -111,9 +111,9 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      * @return A new I/O operation on a chain of one or more archive file
      *         system entries for the given path name which will be linked
      *         into this archive file system upon a call to its
-     *         {@link EntryOperation#run} method.
+     *         {@link Operation#run} method.
      */
-    EntryOperation<CE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    Operation<CE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**

@@ -56,7 +56,7 @@ extends ReadWriteArchiveFileSystem<AE> {
     }
 
     @Override
-    public EntryOperation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    public Operation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

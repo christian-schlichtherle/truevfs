@@ -160,7 +160,7 @@ implements ArchiveFileSystem<AE> {
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
-     * @see    CommonEntryFactory#newEntry Common Requirements For EntryOperation Names
+     * @see    CommonEntryFactory#newEntry Common Requirements For Operation Names
      * @param  name a non-{@code null} path name.
      */
     private static boolean isValidPath(final String name) {
@@ -489,7 +489,7 @@ implements ArchiveFileSystem<AE> {
     } // class DirectoryEntry
 
     @Override
-    public EntryOperation<AE> mknod(
+    public Operation<AE> mknod(
             final String path,
             final Type type,
             CommonEntry template,
@@ -511,7 +511,7 @@ implements ArchiveFileSystem<AE> {
         return new PathLink(path, type, template, createParents);
     }
 
-    private final class PathLink implements EntryOperation<AE> {
+    private final class PathLink implements Operation<AE> {
         final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<AE>[] links;
