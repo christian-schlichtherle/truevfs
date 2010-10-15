@@ -32,8 +32,8 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class FilterArchiveController<CE extends CommonEntry>
-implements ArchiveController<CE> {
+class      FilterArchiveController<CE extends CommonEntry>
+implements ArchiveController      <CE> {
 
     private final ArchiveController<? extends CE> controller;
 

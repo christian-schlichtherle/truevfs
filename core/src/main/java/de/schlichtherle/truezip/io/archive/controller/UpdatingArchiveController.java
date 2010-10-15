@@ -66,7 +66,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController<AE extends ArchiveEntry>
+final class UpdatingArchiveController  <AE extends ArchiveEntry>
 extends     FileSystemArchiveController<AE> {
 
     private static final class DummyInputService<CE extends CommonEntry>

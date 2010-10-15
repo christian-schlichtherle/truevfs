@@ -2201,7 +2201,7 @@ public class File extends java.io.File {
     @Override
     public boolean isFile() {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive
+            final FileSystemEntry<?> entry = innerArchive
                     .getController().getEntry(getInnerEntryName());
             return null != entry && entry.getType() == FILE;
         }
@@ -2227,7 +2227,7 @@ public class File extends java.io.File {
     @Override
     public boolean isDirectory() {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive
+            final FileSystemEntry<?> entry = innerArchive
                     .getController().getEntry(getInnerEntryName());
             return null != entry && entry.getType() == DIRECTORY;
         }
@@ -2317,7 +2317,7 @@ public class File extends java.io.File {
     @Override
     public long length() {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive
+            final FileSystemEntry<?> entry = innerArchive
                     .getController().getEntry(getInnerEntryName());
             if (null == entry || DIRECTORY == entry.getType())
                 return 0;
@@ -2351,7 +2351,7 @@ public class File extends java.io.File {
     @Override
     public long lastModified() {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive
+            final FileSystemEntry<?> entry = innerArchive
                     .getController().getEntry(getInnerEntryName());
             if (null == entry)
                 return 0;
@@ -2414,7 +2414,7 @@ public class File extends java.io.File {
     @Override
     public String[] list() {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive.getController()
+            final FileSystemEntry<?> entry = innerArchive.getController()
                     .getEntry(getInnerEntryName());
             if (null == entry)
                 return null;
@@ -2440,7 +2440,7 @@ public class File extends java.io.File {
     @Override
     public String[] list(final FilenameFilter filter) {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive.getController()
+            final FileSystemEntry<?> entry = innerArchive.getController()
                     .getEntry(getInnerEntryName());
             if (null == entry)
                 return null;
@@ -2522,7 +2522,7 @@ public class File extends java.io.File {
             final FilenameFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive.getController()
+            final FileSystemEntry<?> entry = innerArchive.getController()
                     .getEntry(getInnerEntryName());
             if (null == entry)
                 return null;
@@ -2582,7 +2582,7 @@ public class File extends java.io.File {
             final FileFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry entry = innerArchive.getController()
+            final FileSystemEntry<?> entry = innerArchive.getController()
                     .getEntry(getInnerEntryName());
             if (null == entry)
                 return null;

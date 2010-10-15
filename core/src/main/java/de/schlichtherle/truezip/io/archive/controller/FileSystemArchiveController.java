@@ -28,7 +28,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @version $Id$
  */
 abstract class FileSystemArchiveController<CE extends CommonEntry>
-extends BasicArchiveController<CE> {
+extends        BasicArchiveController     <CE> {
 
     /** The mount state of the archive file system. */
     private MountState mountState = new ResetFileSystem();

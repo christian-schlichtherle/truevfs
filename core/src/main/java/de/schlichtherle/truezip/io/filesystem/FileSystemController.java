@@ -54,7 +54,7 @@ public interface FileSystemController<CE extends CommonEntry> {
 
     boolean isReadOnly();
 
-    FileSystemEntry getEntry(String path);
+    FileSystemEntry<? extends CE> getEntry(String path);
 
     boolean isReadable(String path);
 

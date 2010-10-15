@@ -99,9 +99,9 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @version $Id$
  */
 abstract class BasicArchiveController<CE extends CommonEntry>
-implements     ArchiveController<CE>,
-               InputSocketProvider <CE>,
-               OutputSocketProvider<CE> {
+implements     ArchiveController     <CE>,
+               InputSocketProvider   <CE>,
+               OutputSocketProvider  <CE> {
 
     private final ArchiveModel model;
 
@@ -191,7 +191,7 @@ implements     ArchiveController<CE>,
     }
 
     @Override
-    public final InputSocket<? extends CE> getInputSocket(
+    public final InputSocket<CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
     throws IOException, FalsePositiveException, NotWriteLockedException {
@@ -248,7 +248,7 @@ implements     ArchiveController<CE>,
     }
 
     @Override
-    public final OutputSocket<? extends CE> getOutputSocket(
+    public final OutputSocket<CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
     throws IOException, FalsePositiveException, NotWriteLockedException {
