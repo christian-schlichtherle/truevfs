@@ -23,7 +23,7 @@ import java.io.IOException;
  * Indicates a false positive archive entry which may exist as an entry in an
  * enclosing file system.
  */
-class FalsePositiveException extends RuntimeException {
+class FalsePositiveException extends IOException {
     private static final long serialVersionUID = 947139561381472363L;
 
     private final boolean trans;

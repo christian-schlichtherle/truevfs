@@ -112,6 +112,11 @@ implements FileSystemController<CommonEntry> {
         return controller;
     }
 
+    @Override
+    public FileSystemModel getModel() {
+        return getController().getModel();
+    }
+
     boolean isTouched() {
         return getController().isTouched();
     }
@@ -120,12 +125,11 @@ implements FileSystemController<CommonEntry> {
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
     throws E {
-        getController().sync(builder, options);
-    }
-
-    @Override
-    public FileSystemModel getModel() {
-        return controller.getModel();
+        try {
+            getController().sync(builder, options);
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Override
@@ -136,6 +140,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return null;
             return getEnclController().getOpenIcon();
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -147,6 +153,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return null;
             return getEnclController().getClosedIcon();
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -158,6 +166,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return true;
             return getEnclController().isReadOnly();
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -176,6 +186,8 @@ implements FileSystemController<CommonEntry> {
                                 ? ((Entry<?>) entry).getTarget()
                                 : entry);
             return entry;
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -210,6 +222,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return false;
             return getEnclController().isReadable(getEnclPath(path));
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -221,6 +235,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return false;
             return getEnclController().isWritable(getEnclPath(path));
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -233,6 +249,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 throw ex.getCause();
             getEnclController().setReadOnly(getEnclPath(path));
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -246,6 +264,8 @@ implements FileSystemController<CommonEntry> {
                 throw ex.getCause();
             return getEnclController()
                     .setTime(getEnclPath(path), types, value);
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -253,7 +273,7 @@ implements FileSystemController<CommonEntry> {
     public InputSocket<?> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException {
+    throws IOException, NotWriteLockedException {
         try {
             return new Input(path, options);
         } catch (FalsePositiveException ex) {
@@ -274,14 +294,15 @@ implements FileSystemController<CommonEntry> {
         final BitField<InputOption> options;
 
         Input(  final String path, final BitField<InputOption> options)
-        throws IOException {
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             super(getController().getInputSocket(path, options));
             this.path = path;
             this.options = options;
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public CommonEntry getLocalTarget()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 return getInputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -294,7 +315,8 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newInputStream()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 return getInputSocket().newInputStream();
             } catch (FalsePositiveException ex) {
@@ -307,7 +329,8 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
+        public ReadOnlyFile newReadOnlyFile()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 return getInputSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
@@ -345,14 +368,15 @@ implements FileSystemController<CommonEntry> {
         final BitField<OutputOption> options;
 
         Output(final String path, final BitField<OutputOption> options)
-        throws IOException {
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             super(getController().getOutputSocket(path, options));
             this.path = path;
             this.options = options;
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public CommonEntry getLocalTarget()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 return getOutputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -365,7 +389,8 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newOutputStream()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 return getOutputSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
@@ -391,6 +416,8 @@ implements FileSystemController<CommonEntry> {
                 throw ex.getCause();
             return getEnclController()
                     .mknod(getEnclPath(path), type, template, options);
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 
@@ -404,6 +431,8 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 throw ex.getCause();
             getEnclController().unlink(getEnclPath(path));
+        } catch (NotWriteLockedException ex) {
+            throw new AssertionError(ex);
         }
     }
 }

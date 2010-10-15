@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @see     BufferingInputSocket
+ * @see     CachingInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

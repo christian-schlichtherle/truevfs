@@ -15,14 +15,18 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.io.IOException;
+
 /**
  * Indicates that a controller is not write locked and the lock cannot get
  * acquired by the current thread for some reason.
+ * Note that the write lock is required for any change to the state of the
+ * archive controller - not only the state of the archive file system.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class NotWriteLockedException extends RuntimeException {
+final class NotWriteLockedException extends IOException {
     private static final long serialVersionUID = 91746592376291L;
 
     NotWriteLockedException() {
