@@ -82,7 +82,7 @@ extends FilterArchiveController<CE> {
     public InputSocket<? extends CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         final BitField<InputOption> options2 = options
                 .clear(InputOption.CACHE);
         InputSocket<? extends CE> input = getController()
@@ -97,7 +97,7 @@ extends FilterArchiveController<CE> {
     public OutputSocket<? extends CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         final BitField<OutputOption> options2 = options
                 .clear(OutputOption.CACHE);
         OutputSocket<? extends CE> output = getController()
@@ -110,7 +110,8 @@ extends FilterArchiveController<CE> {
                 }
 
                 @Override
-                public OutputStream newOutputStream() throws IOException {
+                public OutputStream newOutputStream()
+                throws IOException, FalsePositiveException, NotWriteLockedException {
                     final OutputStream out = super.newOutputStream();
                     boolean ok = false;
                     try {
@@ -135,7 +136,7 @@ extends FilterArchiveController<CE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E {
+    throws E, NotWriteLockedException {
         buffers = null;
         super.sync(builder, options);
     }

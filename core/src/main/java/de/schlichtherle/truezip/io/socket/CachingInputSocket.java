@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @see     BufferingOutputSocket
+ * @see     CachingOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

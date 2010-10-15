@@ -120,11 +120,13 @@ implements     ArchiveController<CE>,
         return model;
     }
 
-    final ArchiveFileSystem<CE> autoMount() {
+    final ArchiveFileSystem<CE> autoMount()
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount(false, false);
     }
 
-    final ArchiveFileSystem<CE> autoMount(boolean autoCreate) {
+    final ArchiveFileSystem<CE> autoMount(boolean autoCreate)
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount(autoCreate, autoCreate);
     }
 
@@ -145,31 +147,36 @@ implements     ArchiveController<CE>,
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
      */
-    abstract ArchiveFileSystem<CE> autoMount(boolean autoCreate, boolean createParents);
+    abstract ArchiveFileSystem<CE> autoMount(boolean autoCreate, boolean createParents)
+    throws FalsePositiveException, NotWriteLockedException;
 
     @Override
-    public final boolean isReadOnly() {
+    public final boolean isReadOnly()
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount().isReadOnly();
     }
 
     @Override
-    public final Entry<CE> getEntry(final String path) {
+    public final Entry<CE> getEntry(final String path)
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount().getEntry(path);
     }
 
     @Override
-    public final boolean isReadable(final String path) {
+    public final boolean isReadable(final String path)
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount().getEntry(path) != null;
     }
 
     @Override
-    public final boolean isWritable(final String path) {
+    public final boolean isWritable(final String path)
+    throws FalsePositiveException, NotWriteLockedException {
         return autoMount().isWritable(path);
     }
 
     @Override
     public final void setReadOnly(final String path)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         autoMount().setReadOnly(path);
     }
 
@@ -178,7 +185,7 @@ implements     ArchiveController<CE>,
             final String path,
             final BitField<Access> types,
             final long value)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         autoSync(path, null);
         return autoMount().setTime(path, types, value);
     }
@@ -187,12 +194,13 @@ implements     ArchiveController<CE>,
     public final InputSocket<? extends CE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         class Input extends InputSocket<CE> {
             boolean recursion;
 
             @Override
-            public CE getLocalTarget() throws IOException {
+            public CE getLocalTarget()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 if (!autoSync(path, READ) && !recursion) {
                     recursion = true;
                     try {
@@ -208,7 +216,8 @@ implements     ArchiveController<CE>,
                 return entry;
             }
 
-            InputSocket<? extends CE> getInputSocket() throws IOException {
+            InputSocket<? extends CE> getInputSocket()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 final CE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(), path,
@@ -218,12 +227,13 @@ implements     ArchiveController<CE>,
 
             @Override
             public InputStream newInputStream()
-            throws IOException {
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 return getInputSocket().newInputStream();
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
+            public ReadOnlyFile newReadOnlyFile()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 return getInputSocket().newReadOnlyFile();
             }
         } // class Input
@@ -241,11 +251,12 @@ implements     ArchiveController<CE>,
     public final OutputSocket<? extends CE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         class Output extends OutputSocket<CE> {
             Operation<CE> link;
 
-            CE getEntry() throws IOException {
+            CE getEntry()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
@@ -267,7 +278,8 @@ implements     ArchiveController<CE>,
             }
 
             @Override
-            public CE getLocalTarget() throws IOException {
+            public CE getLocalTarget()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 if (options.get(APPEND))
                     return null; // FIXME: broken contract
                 return getEntry();
@@ -275,7 +287,7 @@ implements     ArchiveController<CE>,
 
             @Override
             public OutputStream newOutputStream()
-            throws IOException {
+            throws IOException, FalsePositiveException, NotWriteLockedException {
                 final CE entry = getEntry();
                 final OutputSocket<? extends CE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
@@ -322,7 +334,7 @@ implements     ArchiveController<CE>,
             final Type type,
             final CommonEntry template,
             final BitField<OutputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(), path,
                     "not yet supported: mknod " + type);
@@ -351,7 +363,7 @@ implements     ArchiveController<CE>,
 
     @Override
     public final void unlink(final String path)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         autoSync(path, null);
         if (isRoot(path)) {
             final ArchiveFileSystem<CE> fileSystem;
@@ -408,5 +420,5 @@ implements     ArchiveController<CE>,
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws SyncException;
+    throws SyncException, NotWriteLockedException;
 }

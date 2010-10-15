@@ -53,80 +53,7 @@ implements ArchiveController<CE> {
 
     @Override
     public final ArchiveModel getModel() {
-        return controller.getModel();
-    }
-
-    @Override
-    public Icon getOpenIcon() {
-        return getController().getOpenIcon();
-    }
-
-    @Override
-    public Icon getClosedIcon() {
-        return getController().getClosedIcon();
-    }
-
-    @Override
-    public boolean isReadOnly() {
-        return getController().isReadOnly();
-    }
-
-    @Override
-    public Entry<? extends CE> getEntry(String path) {
-        return getController().getEntry(path);
-    }
-
-    @Override
-    public boolean isReadable(String path) {
-        return getController().isReadable(path);
-    }
-
-    @Override
-    public boolean isWritable(String path) {
-        return getController().isWritable(path);
-    }
-
-    @Override
-    public void setReadOnly(String path)
-    throws IOException {
-        getController().setReadOnly(path);
-    }
-
-    @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
-    throws IOException {
-        return getController().setTime(path, types, value);
-    }
-
-    @Override
-    public InputSocket<? extends CE> getInputSocket(
-            final String path,
-            final BitField<InputOption> options)
-    throws IOException {
-        return getController().getInputSocket(path, options);
-    }
-
-    @Override
-    public OutputSocket<? extends CE> getOutputSocket(
-            final String path,
-            final BitField<OutputOption> options)
-    throws IOException {
-        return getController().getOutputSocket(path, options);
-    }
-
-    @Override
-    public boolean mknod(   String path,
-                            Type type,
-                            CommonEntry template,
-                            BitField<OutputOption> options)
-    throws IOException {
-        return getController().mknod(path, type, template, options);
-    }
-
-    @Override
-    public void unlink(String path)
-    throws IOException {
-        getController().unlink(path);
+        return getController().getModel();
     }
 
     @Override
@@ -137,7 +64,86 @@ implements ArchiveController<CE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E {
+    throws E, NotWriteLockedException {
         getController().sync(builder, options);
+    }
+
+    @Override
+    public Icon getOpenIcon()
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().getOpenIcon();
+    }
+
+    @Override
+    public Icon getClosedIcon()
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().getClosedIcon();
+    }
+
+    @Override
+    public boolean isReadOnly()
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().isReadOnly();
+    }
+
+    @Override
+    public Entry<? extends CE> getEntry(String path)
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().getEntry(path);
+    }
+
+    @Override
+    public boolean isReadable(String path)
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().isReadable(path);
+    }
+
+    @Override
+    public boolean isWritable(String path)
+    throws FalsePositiveException, NotWriteLockedException {
+        return getController().isWritable(path);
+    }
+
+    @Override
+    public void setReadOnly(String path)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        getController().setReadOnly(path);
+    }
+
+    @Override
+    public boolean setTime(String path, BitField<Access> types, long value)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        return getController().setTime(path, types, value);
+    }
+
+    @Override
+    public InputSocket<? extends CE> getInputSocket(
+            final String path,
+            final BitField<InputOption> options)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        return getController().getInputSocket(path, options);
+    }
+
+    @Override
+    public OutputSocket<? extends CE> getOutputSocket(
+            final String path,
+            final BitField<OutputOption> options)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        return getController().getOutputSocket(path, options);
+    }
+
+    @Override
+    public boolean mknod(   String path,
+                            Type type,
+                            CommonEntry template,
+                            BitField<OutputOption> options)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        return getController().mknod(path, type, template, options);
+    }
+
+    @Override
+    public void unlink(String path)
+    throws IOException, FalsePositiveException, NotWriteLockedException {
+        getController().unlink(path);
     }
 }

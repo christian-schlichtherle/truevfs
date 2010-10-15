@@ -40,14 +40,16 @@ extends BasicArchiveController<CE> {
         super(model);
     }
 
-    final void ensureWriteLockedByCurrentThread() {
+    final void ensureWriteLockedByCurrentThread()
+    throws NotWriteLockedException {
         getModel().ensureWriteLockedByCurrentThread();
     }
 
     @Override
     final ArchiveFileSystem<CE> autoMount(
             final boolean autoCreate,
-            final boolean createParents) {
+            final boolean createParents)
+    throws FalsePositiveException, NotWriteLockedException {
         assert !createParents || autoCreate;
         return mountState.autoMount(autoCreate, createParents);
     }
@@ -78,7 +80,8 @@ extends BasicArchiveController<CE> {
      *        system's current time.
      * @throws FalsePositiveException
      */
-    abstract void mount(boolean autoCreate, boolean createParents);
+    abstract void mount(boolean autoCreate, boolean createParents)
+    throws FalsePositiveException;
 
     /**
      * Represents the mount state of the archive file system.
@@ -86,7 +89,8 @@ extends BasicArchiveController<CE> {
      */
     private abstract class MountState {
         abstract ArchiveFileSystem<CE> autoMount(   boolean autoCreate,
-                                                    boolean createParents);
+                                                    boolean createParents)
+        throws FalsePositiveException, NotWriteLockedException;
 
         ArchiveFileSystem<CE> getFileSystem() {
             return null;
@@ -98,7 +102,8 @@ extends BasicArchiveController<CE> {
     private class ResetFileSystem extends MountState {
         @Override
         ArchiveFileSystem<CE> autoMount(final boolean autoCreate,
-                                        final boolean createParents) {
+                                        final boolean createParents)
+        throws FalsePositiveException, NotWriteLockedException {
             ensureWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, createParents);
@@ -174,7 +179,8 @@ extends BasicArchiveController<CE> {
 
         @Override
         ArchiveFileSystem<CE> autoMount(    boolean autoCreate,
-                                            boolean createParents) {
+                                            boolean createParents)
+        throws FalsePositiveException, NotWriteLockedException {
             if (!autoCreate)
                 throw exception;
 

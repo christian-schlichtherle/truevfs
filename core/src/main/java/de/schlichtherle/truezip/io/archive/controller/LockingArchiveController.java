@@ -53,12 +53,27 @@ extends FilterArchiveController<CE> {
         return getModel().writeLock();
     }
 
-    void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex) {
+    void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
+    throws NotWriteLockedException {
         getModel().ensureNotReadLockedByCurrentThread(ex);
     }
 
     @Override
-    public Icon getOpenIcon() {
+    public <E extends IOException>
+    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
+    throws E, NotWriteLockedException {
+        ensureNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            getController().sync(builder, options);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public Icon getOpenIcon()
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -78,7 +93,8 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public Icon getClosedIcon()  {
+    public Icon getClosedIcon()
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -98,7 +114,8 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public boolean isReadOnly() {
+    public boolean isReadOnly()
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -118,7 +135,8 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public Entry<? extends CE> getEntry(String path) {
+    public Entry<? extends CE> getEntry(String path)
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -138,7 +156,8 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public boolean isReadable(String path) {
+    public boolean isReadable(String path)
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -158,7 +177,8 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public boolean isWritable(String path) {
+    public boolean isWritable(String path)
+    throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -179,7 +199,7 @@ extends FilterArchiveController<CE> {
 
     @Override
     public void setReadOnly(String path)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -191,7 +211,7 @@ extends FilterArchiveController<CE> {
 
     @Override
     public boolean setTime( String path, BitField<Access> types, long value)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -204,7 +224,7 @@ extends FilterArchiveController<CE> {
     @Override
     public InputSocket<? extends CE> getInputSocket(  String path,
                                             BitField<InputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
             try {
@@ -229,7 +249,8 @@ extends FilterArchiveController<CE> {
         }
 
         @Override
-        public CE getLocalTarget() throws IOException {
+        public CE getLocalTarget()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 readLock().lock();
                 try {
@@ -249,7 +270,8 @@ extends FilterArchiveController<CE> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newInputStream()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 readLock().lock();
                 try {
@@ -269,7 +291,8 @@ extends FilterArchiveController<CE> {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
+        public ReadOnlyFile newReadOnlyFile()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             try {
                 readLock().lock();
                 try {
@@ -292,7 +315,7 @@ extends FilterArchiveController<CE> {
     @Override
     public OutputSocket<CE> getOutputSocket(String path,
                                             BitField<OutputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -308,7 +331,8 @@ extends FilterArchiveController<CE> {
         }
 
         @Override
-        public CE getLocalTarget() throws IOException {
+        public CE getLocalTarget()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -319,7 +343,8 @@ extends FilterArchiveController<CE> {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newOutputStream()
+        throws IOException, FalsePositiveException, NotWriteLockedException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -335,7 +360,7 @@ extends FilterArchiveController<CE> {
                             Type type,
                             CommonEntry template,
                             BitField<OutputOption> options)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -347,24 +372,11 @@ extends FilterArchiveController<CE> {
 
     @Override
     public void unlink(String path)
-    throws IOException {
+    throws IOException, FalsePositiveException, NotWriteLockedException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
             getController().unlink(path);
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    @Override
-    public <E extends IOException>
-    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E {
-        ensureNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            getController().sync(builder, options);
         } finally {
             writeLock().unlock();
         }

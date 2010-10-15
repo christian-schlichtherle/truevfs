@@ -210,13 +210,15 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    public Icon getOpenIcon() {
+    public Icon getOpenIcon()
+    throws FalsePositiveException, NotWriteLockedException {
         autoMount(); // detect false positives!
         return getDriver().getOpenIcon(getModel());
     }
 
     @Override
-    public Icon getClosedIcon() {
+    public Icon getClosedIcon()
+    throws FalsePositiveException, NotWriteLockedException {
         autoMount(); // detect false positives!
         return getDriver().getClosedIcon(getModel());
     }
@@ -236,7 +238,8 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    void mount(final boolean autoCreate, final boolean createParents) {
+    void mount(final boolean autoCreate, final boolean createParents)
+    throws FalsePositiveException {
         assert input == null;
         assert output == null;
         assert getFileSystem() == null;
@@ -314,7 +317,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException {
+    throws SyncException, NotWriteLockedException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -329,7 +332,7 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException {
+    private boolean sync() throws SyncException, NotWriteLockedException {
         sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -339,7 +342,7 @@ extends     FileSystemArchiveController<AE> {
 	public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E {
+    throws E, NotWriteLockedException {
         assert !isFileSystemTouched() || output != null; // file system touched => output archive
 
         ensureWriteLockedByCurrentThread();
