@@ -16,9 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import java.io.IOException;
-
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
  * which implies no or only insignificant loss of data.
@@ -30,7 +27,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    SyncWarningException(ArchiveController controller, Throwable cause) {
+    SyncWarningException(ArchiveController<?> controller, Throwable cause) {
         super(controller, cause, -1);
     }
 }

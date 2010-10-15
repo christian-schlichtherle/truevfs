@@ -34,11 +34,11 @@ public class SyncException extends ChainableIOException {
         super(message);
     }
 
-    SyncException(ArchiveController controller, Throwable cause) {
+    SyncException(ArchiveController<?> controller, Throwable cause) {
         super(controller.getModel().getMountPoint().toString(), cause);
     }
 
-    SyncException(ArchiveController controller, Throwable cause, int priority) {
+    SyncException(ArchiveController<?> controller, Throwable cause, int priority) {
         super(controller.getModel().getMountPoint().toString(), cause, priority);
     }
 }
