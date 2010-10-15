@@ -81,12 +81,18 @@ public class Controllers {
             URI mountPoint,
             final ArchiveDriver<AE> driver,
             FileSystemController<?> enclController) {
-        if (!mountPoint.isAbsolute() || mountPoint.isOpaque())
+        // TODO: Make this method support arbitrary host file systems, e.g. by
+        // using a factory from a service registry or similar.
+        if (!"file".equals(mountPoint.getScheme()) || !mountPoint.isAbsolute()
+                || mountPoint.isOpaque())
             throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == driver)
             return new HostFileSystemController(mountPoint);
+        if (null == enclController)
+            enclController = new HostFileSystemController(
+                    mountPoint.resolve(".."));
         synchronized (controllers) {
             ProspectiveArchiveController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));

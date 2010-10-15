@@ -44,8 +44,9 @@ public interface FileSystemModel {
      * file system, e.g. in-memory stored passwords for RAES encrypted ZIP
      * files.
      * <p>
-     * Implementation notes: If the returned URI uses the <i>file scheme</i>,
-     * its path must be canonical in order to be really unique.
+     * Implementation note: If the returned URI uses the <i>file scheme</i>,
+     * its path needs to be {@link java.io.File#getCanonicalPath() canonical}
+     * in order to be really unique.
      *
      * @return A non-{@code null} URI for the mount point of the file system.
      */

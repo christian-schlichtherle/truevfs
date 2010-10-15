@@ -66,17 +66,16 @@ implements FileSystemController<CommonEntry> {
 
     ProspectiveArchiveController(   final URI mountPoint,
                                     final ArchiveDriver<AE> driver,
-                                    FileSystemController<?> enclController) {
-        if (null == enclController)
-            enclController = new HostFileSystemController(
-                    mountPoint.resolve(".."));
+                                    final FileSystemController<?> enclController) {
+        assert null != mountPoint;
+        assert null != driver;
+        assert null != enclController;
         final SyncScheduler syncScheduler = new SyncScheduler();
         final ArchiveModel model = new ArchiveModel(
                 enclController.getModel(), mountPoint, syncScheduler);
-        // TODO: Support append strategy.
         this.controller = new LockingArchiveController<AE>(
                 new CachingArchiveController<AE>(
-                    new UpdatingArchiveController<AE>(
+                    new UpdatingArchiveController<AE>( // TODO: Support append strategy.
                         enclController, model, driver)));
         this.enclController = enclController;
         this.enclPath = enclController
