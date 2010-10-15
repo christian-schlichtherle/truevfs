@@ -33,7 +33,6 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -198,7 +197,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public Type getType() {
+        public CommonEntry.Type getType() {
             return SPECIAL;
         }
 
@@ -404,7 +403,7 @@ implements FileSystemController<CommonEntry> {
 
     @Override
     public boolean mknod(   String path,
-                            Type type,
+                            CommonEntry.Type type,
                             CommonEntry template,
                             BitField<OutputOption> options)
     throws IOException {
