@@ -39,7 +39,6 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 /**
  * A caching archive controller implements a caching strategy for entries
  * within its target archive file.
- * <p>
  * Decorating an archive controller with this class has the following effects:
  * <ul>
  * <li>It increases the performance of concurrent or subsequent read operations.
@@ -54,8 +53,6 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
  * is acquired. Subsequent read/write operations will then use the cache
  * regardless if these options where set when the respective socket was
  * acquired or not.
- * <p>
- *
  *
  * @author Christian Schlichtherle
  * @version $Id$
