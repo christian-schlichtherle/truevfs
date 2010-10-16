@@ -34,7 +34,7 @@ public final class TempFilePool implements CommonEntryPool<FileEntry> {
     static final String DEFAULT_SUFFIX = null;
 
     private static final TempFilePool instance
-            = new TempFilePool(DEFAULT_PREFIX, DEFAULT_PREFIX, null);
+            = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, null);
 
     private final String prefix;
     private final String suffix;
