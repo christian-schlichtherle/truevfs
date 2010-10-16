@@ -105,9 +105,8 @@ extends FilterArchiveController<CE> {
                 .clear(InputOption.CACHE);
         InputSocket<? extends CE> input = getController()
                 .getInputSocket(path, options2);
-        if (options.get(InputOption.CACHE)) {
+        if (options.get(InputOption.CACHE))
             input = new CachingInputSocket<CE>(input, getBuffer(path));
-        }
         return input;
     }
 
@@ -118,27 +117,26 @@ extends FilterArchiveController<CE> {
     throws IOException, FalsePositiveException, NotWriteLockedException {
         final BitField<OutputOption> options2 = options
                 .clear(OutputOption.CACHE);
+
+        class Output extends FilterOutputSocket<CE> {
+            Output(OutputSocket<? extends CE> output) {
+                super(new CachingOutputSocket<CE>(output, getBuffer(path)));
+            }
+
+            @Override
+            public OutputStream newOutputStream()
+            throws IOException, FalsePositiveException, NotWriteLockedException {
+                getController().mknod(path, FILE,
+                        options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
+                        options2.clear(COPY_PROPERTIES));
+                return super.newOutputStream();
+            }
+        } // class Output
+
         OutputSocket<? extends CE> output = getController()
                 .getOutputSocket(path, options2);
-        if (options.get(OutputOption.CACHE)) {
-
-            class Output extends FilterOutputSocket<CE> {
-                Output(OutputSocket<? extends CE> output) {
-                    super(new CachingOutputSocket<CE>(output, getBuffer(path)));
-                }
-
-                @Override
-                public OutputStream newOutputStream()
-                throws IOException, FalsePositiveException, NotWriteLockedException {
-                    getController().mknod(path, FILE,
-                            options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
-                            options2);
-                    return super.newOutputStream();
-                }
-            } // class Output
-
+        if (options.get(OutputOption.CACHE))
             output = new Output(output);
-        }
         return output;
     }
 
