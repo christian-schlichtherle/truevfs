@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.IOException;
 
 /**
@@ -22,17 +25,32 @@ import java.io.IOException;
  * acquired by the current thread for some reason.
  * Note that the write lock is required for any change to the state of the
  * archive controller - not only the state of the archive file system.
- * 
- * @author Christian Schlichtherle
+ * <p>
+ * While this exception could arguably be a {@link RuntimeException} too, it
+ * has been decided to subclass {@link IOException} for the following reasons:
+ * <ol>
+ * <li>This exceptional condition is defined to be recoverable and hence
+ *     indicates the use of a checked exception.
+ *     In contrast, a runtime exception is not defined to be recoverable and
+ *     accordingly most code is not designed to be reentrant once a runtime
+ *     exception has occured.
+ * <li>Exceptions of this class must pass calls to the methods of the
+ *     {@link InputSocket} and {@link OutputSocket} classes.
+ *     {@link IOException} is the only suitable exception type for this
+ *     purpose.
+ * </ol>
+ *
+ * @see     FalsePositiveException
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class NotWriteLockedException extends IOException {
-    private static final long serialVersionUID = 91746592376291L;
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+final class NotWriteLockedException extends TemporarilyNotFoundException {
 
     NotWriteLockedException() {
     }
 
     NotWriteLockedException(NotWriteLockedException ex) {
-        super.initCause(ex);
+        super(ex);
     }
 }

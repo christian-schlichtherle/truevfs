@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -35,8 +36,8 @@ import de.schlichtherle.truezip.util.BitField;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystem<CE extends CommonEntry>
-extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
+public interface ArchiveFileSystem<AE extends ArchiveEntry>
+extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
 
     /**
      * A marker interface which distinguishes entries created by an archive
@@ -50,7 +51,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      * This enables an archive driver to copy properties specific to its type
      * of archive entries, e.g. the compressed size of ZIP entries.
      */
-    interface Entry<CE extends CommonEntry> extends FileSystemEntry<CE> {
+    interface Entry<AE extends ArchiveEntry> extends FileSystemEntry<AE> {
     }
 
     /**
@@ -64,8 +65,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      *
      * @see #mknod
      */
-    interface Operation<CE extends CommonEntry>
-    extends IOOperation, Link<Entry<CE>> {
+    interface Operation<AE extends ArchiveEntry>
+    extends IOOperation, Link<Entry<AE>> {
 
         /** Executes this archive file system entry chain operation. */
         @Override
@@ -124,7 +125,7 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<CE>> {
      *         into this archive file system upon a call to its
      *         {@link Operation#run} method.
      */
-    Operation<CE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    Operation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
     throws ArchiveFileSystemException;
 
     /**

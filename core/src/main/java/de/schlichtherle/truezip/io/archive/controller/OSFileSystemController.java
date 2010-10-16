@@ -44,13 +44,13 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class HostFileSystemController
+final class OSFileSystemController
 implements FileSystemModel, FileSystemController<FileEntry>  {
 
     private final URI mountPoint;
     private final File target;
 
-    HostFileSystemController(final URI mountPoint) {
+    OSFileSystemController(final URI mountPoint) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);

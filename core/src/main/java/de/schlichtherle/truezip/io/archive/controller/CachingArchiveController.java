@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.FileEntry;
@@ -26,7 +27,6 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.CachingInputSocket;
 import de.schlichtherle.truezip.io.socket.CachingOutputSocket;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.entry.TempFilePool;
@@ -58,8 +58,8 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class CachingArchiveController<CE extends CommonEntry>
-extends FilterArchiveController<CE> {
+final class CachingArchiveController<AE extends ArchiveEntry>
+extends FilterArchiveController<AE> {
 
     private final static class Buffer implements CommonEntryPool<FileEntry> {
         FileEntry temp;
@@ -82,7 +82,7 @@ extends FilterArchiveController<CE> {
 
     private Map<String, Buffer> buffers;
 
-    CachingArchiveController(ArchiveController<? extends CE> controller) {
+    CachingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
     }
 
@@ -97,35 +97,35 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public InputSocket<? extends CE> getInputSocket(
+    public InputSocket<? extends AE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         final BitField<InputOption> options2 = options
                 .clear(InputOption.CACHE);
-        InputSocket<? extends CE> input = getController()
+        InputSocket<? extends AE> input = getController()
                 .getInputSocket(path, options2);
         if (options.get(InputOption.CACHE))
-            input = new CachingInputSocket<CE>(input, getBuffer(path));
+            input = new CachingInputSocket<AE>(input, getBuffer(path));
         return input;
     }
 
     @Override
-    public OutputSocket<? extends CE> getOutputSocket(
+    public OutputSocket<? extends AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         final BitField<OutputOption> options2 = options
                 .clear(OutputOption.CACHE);
 
-        class Output extends FilterOutputSocket<CE> {
-            Output(OutputSocket<? extends CE> output) {
-                super(new CachingOutputSocket<CE>(output, getBuffer(path)));
+        class Output extends FilterOutputSocket<AE> {
+            Output(OutputSocket<? extends AE> output) {
+                super(new CachingOutputSocket<AE>(output, getBuffer(path)));
             }
 
             @Override
             public OutputStream newOutputStream()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            throws IOException {
                 getController().mknod(path, FILE,
                         options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
                         options2.clear(COPY_PROPERTIES));
@@ -133,7 +133,7 @@ extends FilterArchiveController<CE> {
             }
         } // class Output
 
-        OutputSocket<? extends CE> output = getController()
+        OutputSocket<? extends AE> output = getController()
                 .getOutputSocket(path, options2);
         if (options.get(OutputOption.CACHE))
             output = new Output(output);

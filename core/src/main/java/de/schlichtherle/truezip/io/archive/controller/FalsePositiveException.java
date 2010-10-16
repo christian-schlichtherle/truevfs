@@ -16,39 +16,45 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
  * Indicates a false positive archive entry which may exist as an entry in an
  * enclosing file system.
+ * <p>
+ * While this exception could arguably be a {@link RuntimeException} too, it
+ * has been decided to subclass {@link IOException} for the following reasons:
+ * <ol>
+ * <li>This exceptional condition is defined to be recoverable and hence
+ *     indicates the use of a checked exception.
+ *     In contrast, a runtime exception is not defined to be recoverable and
+ *     accordingly most code is not designed to be reentrant once a runtime
+ *     exception has occured.
+ * <li>Exceptions of this class must pass calls to the methods of the
+ *     {@link InputSocket} and {@link OutputSocket} classes.
+ *     {@link IOException} is the only suitable exception type for this
+ *     purpose.
+ * </ol>
+ *
+ * @see     NotWriteLockedException
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
-class FalsePositiveException extends IOException {
+final class FalsePositiveException extends IOException {
     private static final long serialVersionUID = 947139561381472363L;
 
-    private final boolean trans;
-
     FalsePositiveException(final IOException cause) {
-        super.initCause(cause instanceof TransientIOException ? cause.getCause() : cause);
-        assert null != cause;
-        // A transient I/O exception is just a wrapper exception to mark
-        // the real transient cause, therefore we can safely throw it away.
-        // We must do this in order to allow an archive controller to inspect
-        // the real transient cause and act accordingly.
-        trans = cause instanceof TransientIOException;
+        assert !(cause instanceof TemporarilyNotFoundException);
+        super.initCause(cause);
     }
 
     /** Returns the nullable cause of this exception. */
     @Override
     public IOException getCause() {
         return (IOException) super.getCause();
-    }
-
-    /**
-     * Returns {@code true} if and only if this exception was created with a
-     * {@link TransientIOException} as its cause.
-     */
-    boolean isTransient() {
-        return trans;
     }
 }

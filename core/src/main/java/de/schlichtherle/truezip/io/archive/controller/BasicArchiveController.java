@@ -15,7 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -38,15 +39,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
+import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -98,10 +99,10 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<CE extends CommonEntry>
-implements     ArchiveController     <CE>,
-               InputSocketProvider   <CE>,
-               OutputSocketProvider  <CE> {
+abstract class BasicArchiveController<AE extends ArchiveEntry>
+implements     ArchiveController     <AE>,
+               InputSocketProvider   <AE>,
+               OutputSocketProvider  <AE> {
 
     private final ArchiveModel model;
 
@@ -120,13 +121,13 @@ implements     ArchiveController     <CE>,
         return model;
     }
 
-    final ArchiveFileSystem<CE> autoMount()
-    throws FalsePositiveException, NotWriteLockedException {
+    final ArchiveFileSystem<AE> autoMount()
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
         return autoMount(false, false);
     }
 
-    final ArchiveFileSystem<CE> autoMount(boolean autoCreate)
-    throws FalsePositiveException, NotWriteLockedException {
+    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
         return autoMount(autoCreate, autoCreate);
     }
 
@@ -147,36 +148,55 @@ implements     ArchiveController     <CE>,
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
      */
-    abstract ArchiveFileSystem<CE> autoMount(boolean autoCreate, boolean createParents)
-    throws FalsePositiveException, NotWriteLockedException;
+    abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
+                                                boolean createParents)
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException;
 
     @Override
     public final boolean isReadOnly()
-    throws FalsePositiveException, NotWriteLockedException {
-        return autoMount().isReadOnly();
-    }
-
-    @Override
-    public final Entry<CE> getEntry(final String path)
-    throws FalsePositiveException, NotWriteLockedException {
-        return autoMount().getEntry(path);
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            return autoMount().isReadOnly();
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     @Override
     public final boolean isReadable(final String path)
-    throws FalsePositiveException, NotWriteLockedException {
-        return autoMount().getEntry(path) != null;
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            return autoMount().getEntry(path) != null;
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     @Override
     public final boolean isWritable(final String path)
-    throws FalsePositiveException, NotWriteLockedException {
-        return autoMount().isWritable(path);
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            return autoMount().isWritable(path);
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     @Override
     public final void setReadOnly(final String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         autoMount().setReadOnly(path);
     }
 
@@ -185,22 +205,22 @@ implements     ArchiveController     <CE>,
             final String path,
             final BitField<Access> types,
             final long value)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         autoSync(path, null);
         return autoMount().setTime(path, types, value);
     }
 
     @Override
-    public final InputSocket<CE> getInputSocket(
+    public final InputSocket<AE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
-        class Input extends InputSocket<CE> {
+    throws IOException {
+        class Input extends InputSocket<AE> {
             boolean recursion;
 
             @Override
-            public CE getLocalTarget()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            public AE getLocalTarget()
+            throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
                     recursion = true;
                     try {
@@ -209,16 +229,16 @@ implements     ArchiveController     <CE>,
                         recursion = false;
                     }
                 }
-                final CE entry = Links.getTarget(autoMount().getEntry(path));
+                final AE entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "no such file or directory");
                 return entry;
             }
 
-            InputSocket<? extends CE> getInputSocket()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
-                final CE entry = getLocalTarget();
+            InputSocket<? extends AE> getInputSocket()
+            throws IOException {
+                final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "cannot read directories");
@@ -227,13 +247,13 @@ implements     ArchiveController     <CE>,
 
             @Override
             public InputStream newInputStream()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            throws IOException {
                 return getInputSocket().newInputStream();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            throws IOException {
                 return getInputSocket().newReadOnlyFile();
             }
         } // class Input
@@ -248,15 +268,15 @@ implements     ArchiveController     <CE>,
     }
 
     @Override
-    public final OutputSocket<CE> getOutputSocket(
+    public final OutputSocket<AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
-        class Output extends OutputSocket<CE> {
-            Operation<CE> link;
+    throws IOException {
+        class Output extends OutputSocket<AE> {
+            Operation<AE> link;
 
-            CE getEntry()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            AE getEntry()
+            throws IOException {
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
@@ -278,8 +298,8 @@ implements     ArchiveController     <CE>,
             }
 
             @Override
-            public CE getLocalTarget()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
+            public AE getLocalTarget()
+            throws IOException {
                 if (options.get(APPEND))
                     return null; // FIXME: broken contract
                 return getEntry();
@@ -287,9 +307,9 @@ implements     ArchiveController     <CE>,
 
             @Override
             public OutputStream newOutputStream()
-            throws IOException, FalsePositiveException, NotWriteLockedException {
-                final CE entry = getEntry();
-                final OutputSocket<? extends CE> output = getOutputSocket(entry);
+            throws IOException {
+                final AE entry = getEntry();
+                final OutputSocket<? extends AE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
                         ? getInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
                         : null;
@@ -334,7 +354,7 @@ implements     ArchiveController     <CE>,
             final Type type,
             final CommonEntry template,
             final BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(), path,
                     "not yet supported: mknod " + type);
@@ -350,10 +370,10 @@ implements     ArchiveController     <CE>,
             throw new ArchiveEntryNotFoundException(getModel(), path,
                     "directory exists already");
         } else { // !isRoot(entryName)
-            final ArchiveFileSystem<CE> fileSystem
+            final ArchiveFileSystem<AE> fileSystem
                     = autoMount(options.get(CREATE_PARENTS));
             final boolean created = null == fileSystem.getEntry(path);
-            final Operation<CE> link = fileSystem.mknod(
+            final Operation<AE> link = fileSystem.mknod(
                     path, type, template, options.get(CREATE_PARENTS));
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             link.run();
@@ -363,10 +383,10 @@ implements     ArchiveController     <CE>,
 
     @Override
     public final void unlink(final String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         autoSync(path, null);
         if (isRoot(path)) {
-            final ArchiveFileSystem<CE> fileSystem;
+            final ArchiveFileSystem<AE> fileSystem;
             try {
                 fileSystem = autoMount();
             } catch (FalsePositiveException ex) {

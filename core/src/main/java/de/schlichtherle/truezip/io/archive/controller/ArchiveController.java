@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
@@ -34,7 +35,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveController<CE extends CommonEntry> {
+interface ArchiveController<AE extends ArchiveEntry> {
 
     ArchiveModel getModel();
 
@@ -60,28 +61,28 @@ interface ArchiveController<CE extends CommonEntry> {
     throws E, NotWriteLockedException;
 
     Icon getOpenIcon()
-    throws FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException;
 
     Icon getClosedIcon()
-    throws FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException;
 
     boolean isReadOnly()
-    throws FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException;
 
-    Entry<? extends CE> getEntry(String path)
-    throws FalsePositiveException, NotWriteLockedException;
+    Entry<? extends AE> getEntry(String path)
+    throws NotWriteLockedException, FalsePositiveException;
 
     boolean isReadable(String path)
-    throws FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException;
 
     boolean isWritable(String path)
-    throws FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException;
 
     void setReadOnly(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 
     boolean setTime(String path, BitField<Access> types, long value)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 
     /**
      * Returns an input socket for reading the given entry from the file system.
@@ -90,8 +91,8 @@ interface ArchiveController<CE extends CommonEntry> {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<? extends CE> getInputSocket(String path, BitField<InputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    InputSocket<? extends AE> getInputSocket(String path, BitField<InputOption> options)
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 
     /**
      * Returns an output socket for writing the given entry to the file system.
@@ -100,8 +101,8 @@ interface ArchiveController<CE extends CommonEntry> {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    OutputSocket<? extends CE> getOutputSocket(String path, BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    OutputSocket<? extends AE> getOutputSocket(String path, BitField<OutputOption> options)
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -136,8 +137,8 @@ interface ArchiveController<CE extends CommonEntry> {
     boolean mknod(  String path, Type type,
                     CommonEntry template,
                     BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 
     void unlink(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException;
+    throws NotWriteLockedException, FalsePositiveException, IOException;
 }

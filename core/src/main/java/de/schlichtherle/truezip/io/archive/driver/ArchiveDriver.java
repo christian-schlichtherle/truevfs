@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -25,6 +26,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.swing.Icon;
@@ -66,14 +68,18 @@ extends CommonEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  input the non-{@code null} input socket for reading
      *         the contents of the described archive from its target.
-     * @throws TransientIOException If calling this method for the same
-     *         target archive file again could possibly succeed.
-     *         Meanwhile, the client application will recognize the archive
-     *         file as a <i>special file</i>.
-     * @throws IOException On any other I/O or data format related issue
-     *         when reading the input archive and the implementation would
-     *         like the client application to recognize the archive file as a
-     *         <i>regular file</i>
+     * @throws FileNotFoundException If the target archive file does not exist
+     *         or is not accessible.
+     * @throws TemporarilyNotFoundException If the target archive file is
+     *         temporarily not accessible, e.g. if a key for decryption is not
+     *         available.
+     *         The client application will temporarily recognize the target
+     *         archive file as a <i>special file</i>.
+     * @throws IOException If the target archive file is a
+     *         <i>false positive</i> archive file.
+     *         The client application will permanently recognize the target
+     *         archive file as a <i>regular file</i> until the archive file
+     *         system is synchronized with its enclosing file system.
      * @return A non-{@code null} reference to a new common input shop.
      */
     InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
@@ -97,14 +103,18 @@ extends CommonEntryFactory<AE> {
      *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
-     * @throws TransientIOException If calling this method for the same
-     *         target archive file again could possibly succeed.
-     *         Meanwhile, the client application will recognize the archive
-     *         file as a <i>special file</i>.
-     * @throws IOException On any other I/O or data format related issue
-     *         when writing the output archive and the implementation would
-     *         like the client application to recognize the archive file as a
-     *         <i>regular file</i>
+     * @throws FileNotFoundException If the target archive file does not exist
+     *         or is not accessible.
+     * @throws TemporarilyNotFoundException If the target archive file is
+     *         temporarily not accessible, e.g. if a key for decryption is not
+     *         available.
+     *         The client application will temporarily recognize the target
+     *         archive file as a <i>special file</i>.
+     * @throws IOException If the target archive file is a
+     *         <i>false positive</i> archive file.
+     *         The client application will permanently recognize the target
+     *         archive file as a <i>regular file</i> until the archive file
+     *         system is synchronized with its enclosing file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
     OutputShop<AE> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<AE> source)
