@@ -77,7 +77,8 @@ public class Controllers {
      * Looks up a suitable {@link FileSystemController} object for the
      * given mount point.
      */
-    public static <AE extends ArchiveEntry> FileSystemController<?> getController(
+    public static <AE extends ArchiveEntry>
+    FileSystemController<?> getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
             FileSystemController<?> enclController) {
