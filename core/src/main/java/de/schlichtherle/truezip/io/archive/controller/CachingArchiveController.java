@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntryPool;
@@ -121,24 +122,18 @@ extends FilterArchiveController<CE> {
                 .getOutputSocket(path, options2);
         if (options.get(OutputOption.CACHE)) {
 
-            class Output extends CachingOutputSocket<CE> {
+            class Output extends FilterOutputSocket<CE> {
                 Output(OutputSocket<? extends CE> output) {
-                    super(output, getBuffer(path));
+                    super(new CachingOutputSocket<CE>(output, getBuffer(path)));
                 }
 
                 @Override
                 public OutputStream newOutputStream()
                 throws IOException, FalsePositiveException, NotWriteLockedException {
-                    final OutputStream out = super.newOutputStream();
-                    try {
-                        getController().mknod(path, FILE,
-                                options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
-                                options2);
-                    } catch (IOException ex) {
-                        out.close();
-                        throw ex;
-                    }
-                    return out;
+                    getController().mknod(path, FILE,
+                            options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
+                            options2);
+                    return super.newOutputStream();
                 }
             } // class Output
 
