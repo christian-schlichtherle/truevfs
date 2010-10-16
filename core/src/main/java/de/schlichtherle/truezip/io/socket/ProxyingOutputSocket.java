@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 /**
  * @param   <LT> The type of the {@link #getLocalTarget() local target}.
- * @see     ProxyInputSocket
+ * @see     ProxyingInputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
@@ -32,22 +33,22 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class      FilterArchiveController<CE extends CommonEntry>
-implements ArchiveController      <CE> {
+class      FilterArchiveController<AE extends ArchiveEntry>
+implements ArchiveController      <AE> {
 
-    private final ArchiveController<? extends CE> controller;
+    private final ArchiveController<? extends AE> controller;
 
     /**
      * Constructs a new filter archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
-    FilterArchiveController(final ArchiveController<? extends CE> controller) {
+    FilterArchiveController(final ArchiveController<? extends AE> controller) {
         assert null != controller;
         this.controller = controller;
     }
 
-    final ArchiveController<? extends CE> getController() {
+    final ArchiveController<? extends AE> getController() {
         return controller;
     }
 
@@ -87,7 +88,7 @@ implements ArchiveController      <CE> {
     }
 
     @Override
-    public Entry<? extends CE> getEntry(String path)
+    public Entry<? extends AE> getEntry(String path)
     throws FalsePositiveException, NotWriteLockedException {
         return getController().getEntry(path);
     }
@@ -106,29 +107,29 @@ implements ArchiveController      <CE> {
 
     @Override
     public void setReadOnly(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         getController().setReadOnly(path);
     }
 
     @Override
     public boolean setTime(String path, BitField<Access> types, long value)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         return getController().setTime(path, types, value);
     }
 
     @Override
-    public InputSocket<? extends CE> getInputSocket(
+    public InputSocket<? extends AE> getInputSocket(
             final String path,
             final BitField<InputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         return getController().getInputSocket(path, options);
     }
 
     @Override
-    public OutputSocket<? extends CE> getOutputSocket(
+    public OutputSocket<? extends AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         return getController().getOutputSocket(path, options);
     }
 
@@ -137,13 +138,13 @@ implements ArchiveController      <CE> {
                             Type type,
                             CommonEntry template,
                             BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         return getController().mknod(path, type, template, options);
     }
 
     @Override
     public void unlink(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         getController().unlink(path);
     }
 }

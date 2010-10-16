@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.archive.driver.TransientIOException;
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
@@ -102,7 +102,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
             try {
                 ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
             } catch (RaesKeyException ex) {
-                throw new TransientIOException(ex);
+                throw new TemporarilyNotFoundException(ex);
             }
             return newZipOutputShop(archive, ros, (ZipInputShop) source);
         } catch (IOException cause) {

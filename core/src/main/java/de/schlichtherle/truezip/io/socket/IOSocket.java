@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Targets an object for I/O operations which are provided by sub classes.
+ * Addresses a target for I/O operations provided by sub class implementations.
  * <p>
  * A key feature of an I/O socket is that it's targets can be resolved eagerly
  * or lazily, i.e. the local or remote target may get resolved by a constructor
@@ -36,6 +36,10 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public abstract class IOSocket<LT, RT> {
+
+    /** You cannot instantiate this class outside its package. */
+    IOSocket() {
+    }
 
     /**
      * Returns the non-{@code null} <i>local target</i> for I/O operations.

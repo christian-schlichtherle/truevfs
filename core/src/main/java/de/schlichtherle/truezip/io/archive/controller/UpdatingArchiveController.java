@@ -15,6 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import java.io.CharConversionException;
+import java.util.Set;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import javax.swing.Icon;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
@@ -53,10 +58,11 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLO
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**
@@ -211,35 +217,84 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws FalsePositiveException, NotWriteLockedException {
-        autoMount(); // detect false positives!
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            autoMount(); // detect false positives!
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
         return getDriver().getOpenIcon(getModel());
     }
 
     @Override
     public Icon getClosedIcon()
-    throws FalsePositiveException, NotWriteLockedException {
-        autoMount(); // detect false positives!
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            autoMount(); // detect false positives!
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            return null;
+        }
         return getDriver().getClosedIcon(getModel());
     }
 
-    private ArchiveFileSystem<AE> newArchiveFileSystem()
-    throws IOException {
-        return ArchiveFileSystems.newArchiveFileSystem(
-                getDriver(), vetoableTouchListener);
+    @Override
+    public final Entry<AE> getEntry(final String path)
+    throws NotWriteLockedException, FalsePositiveException {
+        try {
+            return autoMount().getEntry(path);
+        } catch (NotWriteLockedException ex) {
+            throw ex;
+        } catch (FalsePositiveException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            if (!isRoot(path))
+                return null;
+            final FileSystemEntry<?> entry = getEnclController()
+                    .getEntry(getEnclPath(path));
+            if (null == entry)
+                return null;
+            try {
+                return new SpecialFileEntry<AE>(getDriver().newEntry(ROOT, SPECIAL, entry));
+            } catch (CharConversionException cannotHappen) {
+                throw new AssertionError(cannotHappen);
+            }
+        }
     }
 
-    private ArchiveFileSystem<AE> newArchiveFileSystem(
-            CommonEntry rootTemplate,
-            boolean readOnly) {
-        return ArchiveFileSystems.newArchiveFileSystem(
-                input.getDriverProduct(), getDriver(),
-                rootTemplate, vetoableTouchListener, readOnly);
+    private static final class SpecialFileEntry<AE extends ArchiveEntry>
+    extends FilterCommonEntry<AE>
+    implements Entry<AE> {
+        SpecialFileEntry(AE entry) {
+            super(entry);
+        }
+
+        @Override
+        public CommonEntry.Type getType() {
+            return SPECIAL; // drivers could ignore this type, so we must ignore them!
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return null;
+        }
+
+        @Override
+        public AE getTarget() {
+            return entry;
+        }
     }
 
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
-    throws FalsePositiveException {
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
         assert input == null;
         assert output == null;
         assert getFileSystem() == null;
@@ -248,12 +303,26 @@ extends     FileSystemArchiveController<AE> {
             try {
                 final FileSystemController<?> controller = getEnclController();
                 final String path = getEnclPath(ROOT);
+                // readOnly must be set first because the enclosing controller
+                // could be a HostFileSystemController and on stinky Windows
+                // this property turns to TRUE once a file is opened for
+                // reading!
                 final boolean readOnly = !controller.isWritable(path);
                 final InputSocket<?> socket = controller.getInputSocket(
                         path, BitField.of(InputOption.CACHE));
-                input = new Input(getDriver().newInputShop(getModel(), socket));
-                setFileSystem(newArchiveFileSystem(
-                        socket.getLocalTarget(), readOnly));
+                try {
+                    input = new Input(getDriver().newInputShop(getModel(), socket));
+                } catch (TemporarilyNotFoundException ex) {
+                    throw ex;
+                } catch (IOException ex) {
+                    throw new FalsePositiveException(ex);
+                }
+                setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+                        input.getDriverProduct(), getDriver(),
+                        socket.getLocalTarget(), vetoableTouchListener,
+                        readOnly));
+            } catch (TemporarilyNotFoundException ex) {
+                throw ex;
             } catch (IOException ex) {
                 if (!autoCreate)
                     throw ex;
@@ -263,28 +332,24 @@ extends     FileSystemArchiveController<AE> {
                 // encrypted ZIP file and the user cancels password
                 // prompting.
                 ensureOutput(createParents);
-                setFileSystem(newArchiveFileSystem());
+                setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+                        getDriver(), vetoableTouchListener));
             }
 
             assert autoCreate || input != null;
             assert autoCreate || output == null;
             assert getFileSystem() != null;
-        } catch (RuntimeException ex) {
-            assert null == input;
-            assert null == output;
-            assert getFileSystem() == null;
-
-            throw ex;
         } catch (IOException ex) {
             assert null == input;
             assert null == output;
             assert getFileSystem() == null;
 
-            throw new FalsePositiveException(ex);
+            throw ex;
         }
     }
 
-    private void ensureOutput(final boolean createParents) throws IOException {
+    private void ensureOutput(final boolean createParents)
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
         if (null != output)
             return;
 
@@ -293,8 +358,14 @@ extends     FileSystemArchiveController<AE> {
         final OutputSocket<?> socket = controller.getOutputSocket(path,
                 BitField.of(OutputOption.CACHE)
                     .set(CREATE_PARENTS, createParents));
-        output = new Output(getDriver().newOutputShop(getModel(), socket,
-                    null == input ? null : input.getDriverProduct()));
+        try {
+            output = new Output(getDriver().newOutputShop(getModel(), socket,
+                        null == input ? null : input.getDriverProduct()));
+        } catch (TemporarilyNotFoundException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw new FalsePositiveException(ex);
+        }
     }
 
     @Override

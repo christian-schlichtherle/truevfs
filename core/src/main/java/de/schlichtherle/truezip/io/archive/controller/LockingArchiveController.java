@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -38,10 +39,10 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class LockingArchiveController<CE extends CommonEntry>
-extends FilterArchiveController<CE> {
+final class LockingArchiveController<AE extends ArchiveEntry>
+extends FilterArchiveController<AE> {
 
-    LockingArchiveController(ArchiveController<? extends CE> controller) {
+    LockingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
     }
 
@@ -135,7 +136,7 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public Entry<? extends CE> getEntry(String path)
+    public Entry<? extends AE> getEntry(String path)
     throws FalsePositiveException, NotWriteLockedException {
         try {
             readLock().lock();
@@ -199,7 +200,7 @@ extends FilterArchiveController<CE> {
 
     @Override
     public void setReadOnly(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -211,7 +212,7 @@ extends FilterArchiveController<CE> {
 
     @Override
     public boolean setTime( String path, BitField<Access> types, long value)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -222,9 +223,9 @@ extends FilterArchiveController<CE> {
     }
 
     @Override
-    public InputSocket<? extends CE> getInputSocket(  String path,
+    public InputSocket<? extends AE> getInputSocket(  String path,
                                             BitField<InputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -243,14 +244,14 @@ extends FilterArchiveController<CE> {
         }
     }
 
-    private class Input extends FilterInputSocket<CE> {
-        Input(InputSocket<? extends CE> input) {
+    private class Input extends FilterInputSocket<AE> {
+        Input(InputSocket<? extends AE> input) {
             super(input);
         }
 
         @Override
-        public CE getLocalTarget()
-        throws IOException, FalsePositiveException, NotWriteLockedException {
+        public AE getLocalTarget()
+        throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -271,7 +272,7 @@ extends FilterArchiveController<CE> {
 
         @Override
         public InputStream newInputStream()
-        throws IOException, FalsePositiveException, NotWriteLockedException {
+        throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -292,7 +293,7 @@ extends FilterArchiveController<CE> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile()
-        throws IOException, FalsePositiveException, NotWriteLockedException {
+        throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -313,9 +314,9 @@ extends FilterArchiveController<CE> {
     } // class Input
 
     @Override
-    public OutputSocket<CE> getOutputSocket(String path,
+    public OutputSocket<AE> getOutputSocket(String path,
                                             BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -325,14 +326,14 @@ extends FilterArchiveController<CE> {
         }
     }
 
-    private class Output extends FilterOutputSocket<CE> {
-        Output(OutputSocket<? extends CE> output) {
+    private class Output extends FilterOutputSocket<AE> {
+        Output(OutputSocket<? extends AE> output) {
             super(output);
         }
 
         @Override
-        public CE getLocalTarget()
-        throws IOException, FalsePositiveException, NotWriteLockedException {
+        public AE getLocalTarget()
+        throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -344,7 +345,7 @@ extends FilterArchiveController<CE> {
 
         @Override
         public OutputStream newOutputStream()
-        throws IOException, FalsePositiveException, NotWriteLockedException {
+        throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -360,7 +361,7 @@ extends FilterArchiveController<CE> {
                             Type type,
                             CommonEntry template,
                             BitField<OutputOption> options)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -372,7 +373,7 @@ extends FilterArchiveController<CE> {
 
     @Override
     public void unlink(String path)
-    throws IOException, FalsePositiveException, NotWriteLockedException {
+    throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {

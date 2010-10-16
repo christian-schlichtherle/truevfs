@@ -90,9 +90,9 @@ public class Controllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == driver)
-            return new HostFileSystemController(mountPoint);
+            return new OSFileSystemController(mountPoint);
         if (null == enclController)
-            enclController = new HostFileSystemController(
+            enclController = new OSFileSystemController(
                     mountPoint.resolve(".."));
         synchronized (controllers) {
             ProspectiveArchiveController<?> controller

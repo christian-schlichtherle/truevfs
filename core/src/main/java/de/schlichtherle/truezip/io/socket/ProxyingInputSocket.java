@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 /**
  * @param   <LT> The type of the {@link #getLocalTarget() local target}.
- * @see     ProxyOutputSocket
+ * @see     ProxyingOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */

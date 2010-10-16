@@ -16,8 +16,11 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * This archive controller controls the mount state transition.
@@ -27,8 +30,8 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class FileSystemArchiveController<CE extends CommonEntry>
-extends        BasicArchiveController     <CE> {
+abstract class FileSystemArchiveController<AE extends ArchiveEntry>
+extends        BasicArchiveController     <AE> {
 
     /** The mount state of the archive file system. */
     private MountState mountState = new ResetFileSystem();
@@ -46,19 +49,19 @@ extends        BasicArchiveController     <CE> {
     }
 
     @Override
-    final ArchiveFileSystem<CE> autoMount(
+    final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
             final boolean createParents)
-    throws FalsePositiveException, NotWriteLockedException {
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
         assert !createParents || autoCreate;
         return mountState.autoMount(autoCreate, createParents);
     }
 
-    final ArchiveFileSystem<CE> getFileSystem() {
+    final ArchiveFileSystem<AE> getFileSystem() {
         return mountState.getFileSystem();
     }
 
-    final void setFileSystem(ArchiveFileSystem<CE> fileSystem) {
+    final void setFileSystem(ArchiveFileSystem<AE> fileSystem) {
         mountState.setFileSystem(fileSystem);
     }
 
@@ -78,37 +81,36 @@ extends        BasicArchiveController     <CE> {
      *        {@code true}, a new file system with only a virtual root
      *        directory is created with its last modification time set to the
      *        system's current time.
-     * @throws FalsePositiveException
      */
     abstract void mount(boolean autoCreate, boolean createParents)
-    throws FalsePositiveException;
+    throws TemporarilyNotFoundException, FalsePositiveException, IOException;
 
     /**
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private abstract class MountState {
-        abstract ArchiveFileSystem<CE> autoMount(   boolean autoCreate,
+        abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
                                                     boolean createParents)
-        throws FalsePositiveException, NotWriteLockedException;
+        throws TemporarilyNotFoundException, FalsePositiveException, IOException;
 
-        ArchiveFileSystem<CE> getFileSystem() {
+        ArchiveFileSystem<AE> getFileSystem() {
             return null;
         }
 
-        abstract void setFileSystem(ArchiveFileSystem<CE> fileSystem);
+        abstract void setFileSystem(ArchiveFileSystem<AE> fileSystem);
     } // class AutoMounter
 
     private class ResetFileSystem extends MountState {
         @Override
-        ArchiveFileSystem<CE> autoMount(final boolean autoCreate,
+        ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
                                         final boolean createParents)
-        throws FalsePositiveException, NotWriteLockedException {
+        throws TemporarilyNotFoundException, FalsePositiveException, IOException {
             ensureWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, createParents);
             } catch (FalsePositiveException ex) {
-                // Catch and cache exceptions for non-transient false positives.
+                // Catch and cache exceptions for false positive archive files.
                 // The state is reset when unlink() is called on the false
                 // positive archive file or sync().
                 //   This is an important optimization: When accessing a false
@@ -117,10 +119,7 @@ extends        BasicArchiveController     <CE> {
                 // getLength(), etc). If the exception were not cached, each call
                 // would run the file system initialization again, only to
                 // result in another instance of the same exception type again.
-                //   Note that it is important to cache the exceptions for
-                // non-transient false positives only: Otherwise, side effects
-                // of the archive driver may not be accounted for.
-                if (!ex.isTransient())
+                if (!(ex.getCause() instanceof FileNotFoundException))
                     mountState = new FalsePositiveFileSystem(ex);
                 throw ex;
             }
@@ -133,7 +132,7 @@ extends        BasicArchiveController     <CE> {
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<CE> fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             // Passing in null may happen by sync(*).
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
@@ -141,27 +140,27 @@ extends        BasicArchiveController     <CE> {
     } // class ResetFileSystem
 
     private class MountedFileSystem extends MountState {
-        private final ArchiveFileSystem<CE> fileSystem;
+        private final ArchiveFileSystem<AE> fileSystem;
 
-        MountedFileSystem(final ArchiveFileSystem<CE> fileSystem) {
+        MountedFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem == null)
                 throw new NullPointerException();
             this.fileSystem = fileSystem;
         }
 
         @Override
-        ArchiveFileSystem<CE> autoMount(    boolean autoCreate,
+        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
                                             boolean createParents) {
             return fileSystem;
         }
 
         @Override
-        ArchiveFileSystem<CE> getFileSystem() {
+        ArchiveFileSystem<AE> getFileSystem() {
             return fileSystem;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<CE> fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             if (fileSystem != null)
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
@@ -178,28 +177,14 @@ extends        BasicArchiveController     <CE> {
         }
 
         @Override
-        ArchiveFileSystem<CE> autoMount(    boolean autoCreate,
+        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
                                             boolean createParents)
-        throws FalsePositiveException, NotWriteLockedException {
-            if (!autoCreate)
-                throw exception;
-
-            ensureWriteLockedByCurrentThread();
-            try {
-                mount(autoCreate, createParents);
-            } catch (FalsePositiveException ex) {
-                throw exception = ex;
-            }
-
-            assert this != mountState;
-            // DON'T just call autoMounter.getFileSystem()!
-            // This would return null if autoMounter is an instance of
-            // FalsePositiveFileSystem.
-            return mountState.autoMount(autoCreate, createParents);
+        throws FalsePositiveException {
+            throw exception;
         }
 
         @Override
-        void setFileSystem(final ArchiveFileSystem<CE> fileSystem) {
+        void setFileSystem(final ArchiveFileSystem<AE> fileSystem) {
             mountState = null != fileSystem
                     ? new MountedFileSystem(fileSystem)
                     : new ResetFileSystem();

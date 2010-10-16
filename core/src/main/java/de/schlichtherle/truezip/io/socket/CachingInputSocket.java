@@ -34,7 +34,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class CachingInputSocket<CE extends CommonEntry>
+public final class CachingInputSocket<CE extends CommonEntry>
 extends FilterInputSocket<CE> {
 
     private final CommonEntryPool<FileEntry> pool;

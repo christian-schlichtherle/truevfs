@@ -30,7 +30,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class CachingOutputSocket<LT extends CommonEntry>
+public final class CachingOutputSocket<LT extends CommonEntry>
 extends FilterOutputSocket<LT> {
 
     private final CommonEntryPool<FileEntry> pool;
