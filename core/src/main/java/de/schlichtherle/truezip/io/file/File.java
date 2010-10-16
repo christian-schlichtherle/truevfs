@@ -2184,9 +2184,9 @@ public class File extends java.io.File {
      */
     @Override
     public boolean exists() {
-        if (enclArchive != null)
-            return enclArchive.getController()
-                    .getEntry(enclEntryName) != null;
+        if (innerArchive != null)
+            return innerArchive.getController()
+                    .getEntry(getInnerEntryName()) != null;
         return delegate.exists();
     }
 
