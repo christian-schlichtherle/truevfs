@@ -130,16 +130,13 @@ extends FilterArchiveController<CE> {
                 public OutputStream newOutputStream()
                 throws IOException, FalsePositiveException, NotWriteLockedException {
                     final OutputStream out = super.newOutputStream();
-                    boolean ok = false;
                     try {
-                        getController().mknod(
-                                path, FILE,
+                        getController().mknod(path, FILE,
                                 options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
                                 options2);
-                        ok = true;
-                    } finally {
-                        if (!ok)
-                            out.close();
+                    } catch (IOException ex) {
+                        out.close();
+                        throw ex;
                     }
                     return out;
                 }
