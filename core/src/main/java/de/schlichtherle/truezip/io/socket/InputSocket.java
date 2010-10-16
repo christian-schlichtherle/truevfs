@@ -164,8 +164,6 @@ extends IOSocket<LT, CommonEntry> {
      * Furthermore, the returned read only file should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @throws UnsupportedOperationException to indicate that this operation
-     *         is not supported.
      * @throws CommonInputBusyException if the local target is currently busy
      *         on input.
      *         This exception is guaranteed to be recoverable, meaning it
