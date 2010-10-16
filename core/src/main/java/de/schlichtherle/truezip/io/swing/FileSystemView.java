@@ -50,9 +50,8 @@ import javax.swing.UIManager;
 // For many methods in this class, we need to pass in the delegate to the
 // superclass implementation in order for the JFileChooser to work as expected.
 //
-// Dear Sun: Please COMPLETELY redesign the JFileChooser, FileSystemView,
-// FileView and ShellFolder classes. A little bit of fixing will not do the
-// job!
+// Dear Sun: Please enhance the JFileChooser, FileSystemView, FileView and
+// ShellFolder classes.
 // My primary recommendation would be to define clear responsibilities for
 // each of the redesigned classes: Most importantly, all (meta) properties of
 // a file (like its name, icon, description, etc.) should be clearly located

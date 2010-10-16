@@ -179,10 +179,7 @@ implements FileSystemController<CommonEntry> {
             if (ex.isTransient())
                 return null == entry
                         ? null
-                        : new SpecialFileEntry<CommonEntry>(
-                            entry instanceof Entry<?>
-                                ? ((Entry<?>) entry).getTarget()
-                                : entry);
+                        : new SpecialFileEntry<CommonEntry>(entry.getTarget());
             return entry;
         } catch (NotWriteLockedException ex) {
             throw new AssertionError(ex);
