@@ -73,7 +73,7 @@ implements InputShop<ZipEntry> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException(); // TODO: Support this for STORED entries.
+                throw new FileNotFoundException("this operation is not supported"); // TODO: Support this for STORED entries.
             }
         }
         return new Input();
