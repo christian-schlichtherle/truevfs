@@ -257,7 +257,7 @@ extends     FileSystemArchiveController<AE> {
                 return null;
             try {
                 return new SpecialFileEntry<AE>(
-                        getDriver().newEntry(ROOT, SPECIAL, entry));
+                        getDriver().newEntry(ROOT, SPECIAL, entry.getTarget()));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
