@@ -92,7 +92,7 @@ implements ArchiveFileSystem<AE> {
         master = new LinkedHashMap<String, BaseEntry<AE>>(64);
 
         // Setup root.
-        root = newBaseEntryUnchecked(ROOT, DIRECTORY, null);
+        root = newEntryUnchecked(ROOT, DIRECTORY, null);
         for (Access access : BitField.allOf(Access.class))
             root.getTarget().setTime(access, System.currentTimeMillis());
         master.put(ROOT, root);
@@ -119,12 +119,12 @@ implements ArchiveFileSystem<AE> {
         final Normalizer normalizer = new Normalizer();
         for (final AE entry : container) {
             final String path = normalizer.normalize(entry.getName());
-            master.put(path, newBaseEntry(entry));
+            master.put(path, newEntry(entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        root = newBaseEntryUnchecked(ROOT, DIRECTORY, rootTemplate);
+        root = newEntryUnchecked(ROOT, DIRECTORY, rootTemplate);
         master.put(ROOT, root);
 
         // Now perform a file system check to create missing parent directories
@@ -261,7 +261,7 @@ implements ArchiveFileSystem<AE> {
             final String baseName = getBaseName();
             BaseEntry<AE> parent = master.get(parentPath);
             if (parent == null) {
-                parent = newBaseEntryUnchecked(parentPath, DIRECTORY, null);
+                parent = newEntryUnchecked(parentPath, DIRECTORY, null);
                 master.put(parentPath, parent);
             }
             parent.add(baseName);
@@ -337,24 +337,33 @@ implements ArchiveFileSystem<AE> {
         if (path == null)
             throw new NullPointerException();
         return master.get(path);
+        /*final BaseEntry<AE> entry = master.get(path);
+        return null == entry
+                ? null
+                : newEntryUnchecked(path, entry.getType(), entry.getTarget());*/
     }
 
     /**
-     * Like {@link #newBaseEntry(String, CommonEntry.Type, CommonEntry)
+     * Like {@link #newEntryChecked(String, CommonEntry.Type, CommonEntry)
      * newEntry(path, type, null)}, but throws an
      * {@link AssertionError} instead of a {@link CharConversionException}.
      *
-     * @throws AssertionError if a {@link CharConversionException} occurs.
-     *         The original exception is wrapped as its cause.
+     * @throws IllegalArgumentException if a {@link CharConversionException}
+     *         occurs. The original exception is wrapped as its cause.
      */
-    private BaseEntry<AE> newBaseEntryUnchecked(
+    private BaseEntry<AE> newEntryUnchecked(
             final String path,
             final Type type,
             final CommonEntry template) {
+        assert isValidPath(path);
+        assert type != null;
+        assert !isRoot(path) || type == DIRECTORY;
+        assert !(template instanceof Entry<?>);
+
         try {
-            return newBaseEntry(path, type, template);
+            return newEntry(factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
+            throw new IllegalArgumentException(path, ex);
         }
     }
 
@@ -367,17 +376,21 @@ implements ArchiveFileSystem<AE> {
      * @param  path the non-{@code null} path name of the archive file system entry.
      *         This is always a {@link #isValidPath(String) valid path name}.
      */
-    private BaseEntry<AE> newBaseEntry(
+    private BaseEntry<AE> newEntryChecked(
             final String path,
             final Type type,
             final CommonEntry template)
-    throws CharConversionException {
+    throws ArchiveFileSystemException {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
         assert !(template instanceof Entry<?>);
 
-        return newBaseEntry(factory.newEntry(path, type, template));
+        try {
+            return newEntry(factory.newEntry(path, type, template));
+        } catch (CharConversionException ex) {
+            throw new ArchiveFileSystemException(path, ex);
+        }
     }
 
     /**
@@ -387,7 +400,7 @@ implements ArchiveFileSystem<AE> {
      * @throws NullPointerException If {@code entry} is {@code null}.
      */
     private static <AE extends ArchiveEntry>
-    BaseEntry<AE> newBaseEntry(final AE entry) {
+    BaseEntry<AE> newEntry(final AE entry) {
         return DIRECTORY == entry.getType()
                 ? new DirectoryEntry<AE>(entry)
                 : new      FileEntry<AE>(entry);
@@ -523,11 +536,7 @@ implements ArchiveFileSystem<AE> {
                 final boolean createParents)
         throws ArchiveFileSystemException {
             this.createParents = createParents;
-            try {
-                links = newSegmentLinks(entryPath, entryType, template, 1);
-            } catch (CharConversionException ex) {
-                throw new ArchiveFileSystemException(entryPath, ex);
-            }
+            links = newSegmentLinks(entryPath, entryType, template, 1);
         }
 
         @SuppressWarnings("unchecked")
@@ -536,7 +545,7 @@ implements ArchiveFileSystem<AE> {
                 final CommonEntry.Type entryType,
                 final CommonEntry template,
                 final int level)
-        throws ArchiveFileSystemException, CharConversionException {
+        throws ArchiveFileSystemException {
             final String split[] = splitter.split(entryPath);
             final String parentPath = split[0]; // could equal ROOT
             final String baseName = split[1];
@@ -563,12 +572,12 @@ implements ArchiveFileSystem<AE> {
                 }
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<AE>(parentPath, parentEntry, null);
-                newEntry = newBaseEntry(entryPath, entryType, template);
+                newEntry = newEntryChecked(entryPath, entryType, template);
                 elements[1] = new SegmentLink<AE>(entryPath, newEntry, baseName);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         parentPath, DIRECTORY, null, level + 1);
-                newEntry = newBaseEntry(entryPath, entryType, template);
+                newEntry = newEntryChecked(entryPath, entryType, template);
                 elements[elements.length - level]
                         = new SegmentLink<AE>(entryPath, newEntry, baseName);
             } else {

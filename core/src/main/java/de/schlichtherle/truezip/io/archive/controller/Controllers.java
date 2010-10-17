@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.util.ExceptionBuilder;
-import de.schlichtherle.truezip.io.file.ArchiveWarningException;
 import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.util.Link;
@@ -125,32 +124,33 @@ public class Controllers {
     }
 
     /**
-     * Writes all changes to the contents of the target archive files who's
-     * canonical path name starts with the given {@code prefix} to the
-     * underlying file system.
-     * This will reset the state of the respective archive controllers.
+     * Writes all changes to the contents of the virtual file systems who's
+     * canonical path name (mount point) starts with the given {@code prefix}
+     * to their enclosing file system.
+     * This will reset the state of the respective controllers.
      * This method is thread-safe.
      *
-     * @param prefix The prefix of the canonical path name of the archive files
-     *        which shall get synchronized to the real file system.
-     *        This may be {@code null} or empty in order to select all accessed
-     *        archive files.
-     * @throws ArchiveWarningException if the configuration uses the
+     * @param  prefix the prefix of the canonical path name of the virtual
+     *         file systems which shall get synchronized to their enclosing
+     *         file system.
+     *         This may be {@code null} or empty in order to select all
+     *         accessed virtual files systems.
+     * @throws SyncWarningException if the configuration uses the
      *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
-     *         This implies that the respective archive file has been updated
-     *         with constraints, such as a failure to set the last modification
-     *         time of the archive file to the last modification time of its
-     *         implicit root directory.
-     * @throws ArchiveWarningException if the configuration uses the
+     *         This implies that the respective virtual file system has been
+     *         synchronized with constraints, e.g. a failure to set the last
+     *         modification time of the archive file to the last modification
+     *         time of the root directory of its virtual file system.
+     * @throws SyncException if the configuration uses the
      *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
-     * @throws NullPointerException if {@code config} is {@code null}.
+     * @throws NullPointerException if {@code builder} or {@code options} is
+     *         {@code null}.
      * @throws IllegalArgumentException if the configuration property
-     *         {@code closeInputStreams} is {@code false} and
-     *         {@code closeOutputStreams} is {@code true}.
-     * @see    ArchiveController#sync(ExceptionBuilder, BitField)
+     *         {@code FORCE_CLOSE_INPUT} is {@code false} and
+     *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
      */
     public static <E extends IOException>
     void sync(  final URI prefix,
