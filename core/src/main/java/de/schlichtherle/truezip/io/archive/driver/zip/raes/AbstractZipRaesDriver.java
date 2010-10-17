@@ -32,7 +32,7 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
@@ -125,7 +125,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                     try {
                         rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(archive));
                     } catch (RaesKeyException ex) {
-                        throw new TemporarilyNotFoundException(ex);
+                        throw new TabuFileException(ex);
                     }
                     if (rof.length() <= getAuthenticationTrigger()) { // intentionally compares rof, not rrof!
                         // Note: If authentication fails, this is reported through some
@@ -191,7 +191,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                     try {
                         return RaesOutputStream.getInstance(out, getRaesParameters(archive));
                     } catch (RaesKeyException ex) {
-                        throw new TemporarilyNotFoundException(ex);
+                        throw new TabuFileException(ex);
                     }
                 } catch (IOException cause) {
                     try {

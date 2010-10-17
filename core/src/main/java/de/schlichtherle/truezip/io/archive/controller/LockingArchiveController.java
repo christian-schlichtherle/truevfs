@@ -62,7 +62,7 @@ extends FilterArchiveController<AE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E, NotWriteLockedException {
+    throws E, ArchiveControllerException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -74,7 +74,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
@@ -95,7 +95,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
@@ -116,7 +116,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadOnly()
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
@@ -137,7 +137,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Entry<? extends AE> getEntry(String path)
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
@@ -158,7 +158,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadable(String path)
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
@@ -179,7 +179,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isWritable(String path)
-    throws FalsePositiveException, NotWriteLockedException {
+    throws ArchiveControllerException {
         try {
             readLock().lock();
             try {
