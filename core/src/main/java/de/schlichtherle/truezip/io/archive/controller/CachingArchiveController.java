@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -35,7 +36,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 
 /**
  * A caching archive controller implements a caching strategy for entries
@@ -113,6 +113,7 @@ extends FilterArchiveController<AE> {
     @Override
     public OutputSocket<? extends AE> getOutputSocket(
             final String path,
+            final CommonEntry template,
             final BitField<OutputOption> options)
     throws IOException {
         final BitField<OutputOption> options2 = options
@@ -126,15 +127,13 @@ extends FilterArchiveController<AE> {
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                getController().mknod(path, FILE,
-                        options2.get(COPY_PROPERTIES) ? getRemoteTarget() : null,
-                        options2.clear(COPY_PROPERTIES));
+                getController().mknod(path, FILE, template, options2);
                 return super.newOutputStream();
             }
         } // class Output
 
         OutputSocket<? extends AE> output = getController()
-                .getOutputSocket(path, options2);
+                .getOutputSocket(path, template, options2);
         if (options.get(OutputOption.CACHE))
             output = new Output(output);
         return output;

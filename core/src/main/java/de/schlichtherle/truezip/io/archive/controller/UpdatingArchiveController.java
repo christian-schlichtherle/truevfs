@@ -352,7 +352,7 @@ extends     FileSystemArchiveController<AE> {
 
         final FileSystemController<?> controller = getEnclController();
         final String path = getEnclPath(ROOT);
-        final OutputSocket<?> socket = controller.getOutputSocket(path,
+        final OutputSocket<?> socket = controller.getOutputSocket(path, null,
                 BitField.of(OutputOption.CACHE)
                     .set(CREATE_PARENTS, createParents));
         try {

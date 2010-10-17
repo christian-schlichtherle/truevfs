@@ -127,10 +127,11 @@ implements ArchiveController      <AE> {
 
     @Override
     public OutputSocket<? extends AE> getOutputSocket(
-            final String path,
-            final BitField<OutputOption> options)
+            String path,
+            CommonEntry template,
+            BitField<OutputOption> options)
     throws IOException {
-        return getController().getOutputSocket(path, options);
+        return getController().getOutputSocket(path, template, options);
     }
 
     @Override

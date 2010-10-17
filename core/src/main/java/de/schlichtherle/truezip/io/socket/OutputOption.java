@@ -49,10 +49,4 @@ public enum OutputOption {
      * of the local target rather than replacing it entirely.
      */
     APPEND,
-
-    /**
-     * Whether or not as much properties as possible shall get copied from the
-     * input target to the output target - except the entry name, of course.
-     */
-    COPY_PROPERTIES,
 }

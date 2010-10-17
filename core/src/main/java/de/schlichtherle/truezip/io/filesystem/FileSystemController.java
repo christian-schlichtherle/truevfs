@@ -82,7 +82,9 @@ public interface FileSystemController<CE extends CommonEntry> {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    OutputSocket<? extends CE> getOutputSocket(String path, BitField<OutputOption> options)
+    OutputSocket<? extends CE> getOutputSocket( String path,
+                                                CommonEntry template,
+                                                BitField<OutputOption> options)
     throws IOException;
 
     /**

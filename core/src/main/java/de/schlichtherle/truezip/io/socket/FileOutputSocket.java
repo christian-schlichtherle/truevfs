@@ -30,7 +30,6 @@ import java.io.OutputStream;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CACHE;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 
@@ -41,24 +40,28 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
  */
 public final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final FileEntry file;
+    private final CommonEntry template;
     private final BitField<OutputOption> options;
     private final CommonEntryPool<FileEntry> pool;
 
     public static OutputSocket<FileEntry> get(FileEntry file) {
-        return new FileOutputSocket(file, null);
+        return new FileOutputSocket(file, null, null);
     }
 
     public static OutputSocket<FileEntry> get(
             FileEntry file,
+            CommonEntry template,
             BitField<OutputOption> options) {
-        return new FileOutputSocket(file, options);
+        return new FileOutputSocket(file, template, options);
     }
 
     private FileOutputSocket(   final FileEntry file,
+                                final CommonEntry template,
                                 final BitField<OutputOption> options) {
         if (null == file)
             throw new NullPointerException();
         this.file = file;
+        this.template = template;
         this.options = null != options ? options : BitField.noneOf(OutputOption.class);
         final File fileTarget = file.getFile();
         this.pool = new TempFilePool(   fileTarget.getName(),
@@ -97,7 +100,6 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     super.close();
                 } finally {
-                    final CommonEntry remote = getRemoteTarget();
                     if (temp != file
                     && !tempTarget.renameTo(fileTarget)
                     && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget))) {
@@ -115,8 +117,8 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                             }
                         }
                     }
-                    if (options.get(COPY_PROPERTIES) && null != remote) {
-                        final long time = remote.getTime(WRITE);
+                    if (null != template) {
+                        final long time = template.getTime(WRITE);
                         if (UNKNOWN != time)
                             if (!fileTarget.setLastModified(time))
                                 throw new IOException(fileTarget.getPath() + " (cannot preserve last modification time)");
