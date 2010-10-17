@@ -99,9 +99,9 @@ extends     FileSystemArchiveController<AE> {
         }
 
         @Override
-        public InputSocket<? extends CE> getInputSocket(CE target)
+        public InputSocket<? extends CE> getInputSocket(String name)
         throws IOException {
-            if (target == null)
+            if (name == null)
                 throw new NullPointerException();
             throw new FileNotFoundException();
         }
@@ -366,9 +366,9 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    public InputSocket<? extends AE> getInputSocket(final AE entry)
+    public InputSocket<? extends AE> getInputSocket(final String name)
     throws IOException {
-        return input.getInputSocket(entry);
+        return input.getInputSocket(name);
     }
 
     @Override
@@ -547,7 +547,7 @@ extends     FileSystemArchiveController<AE> {
                         continue; // never write ghost directories
                     output.getOutputSocket(ae).newOutputStream().close();
                 } else if (input.getEntry(n) == ae) {
-                    IOSocket.copy(  input.getInputSocket(ae),
+                    IOSocket.copy(  input.getInputSocket(ae.getName()),
                                     output.getOutputSocket(ae));
                 } else {
                     // The file system entry is a newly created non-directory

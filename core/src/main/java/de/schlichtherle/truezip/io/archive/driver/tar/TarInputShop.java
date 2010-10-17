@@ -214,10 +214,11 @@ implements InputShop<TarEntry> {
     }
 
     @Override
-    public InputSocket<TarEntry> getInputSocket(final TarEntry entry)
+    public InputSocket<TarEntry> getInputSocket(final String name)
     throws FileNotFoundException {
-        if (!entry.equals(getEntry(entry.getName())))
-            throw new IllegalArgumentException("interface contract violation");
+        final TarEntry entry = getEntry(name);
+        if (null == entry)
+            throw new FileNotFoundException(name + " (entry not found)");
 
         class Input extends InputSocket<TarEntry> {
             @Override
