@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.util.Link;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -337,10 +336,7 @@ implements ArchiveFileSystem<AE> {
         if (path == null)
             throw new NullPointerException();
         final BaseEntry<AE> entry = master.get(path);
-        return entry;
-        /*return null == entry
-                ? null
-                : newEntryUnchecked(path, entry.getType(), entry.getTarget());*/
+        return null == entry ? null : entry.clone(factory);
     }
 
     /**
@@ -413,11 +409,28 @@ implements ArchiveFileSystem<AE> {
      */
     private static abstract class BaseEntry<AE extends ArchiveEntry>
     extends FilterCommonEntry<AE>
-    implements Entry<AE> {
+    implements Entry<AE>, Cloneable {
         /** Constructs a new instance of {@code CommonEntry}. */
         BaseEntry(final AE entry) {
             super(entry);
             assert entry != null;
+        }
+
+        @SuppressWarnings("unchecked")
+        BaseEntry<AE> clone(final CommonEntryFactory<AE> factory) {
+            final BaseEntry<AE> clone;
+            try {
+                clone = (BaseEntry<AE>) clone();
+            } catch (CloneNotSupportedException cannotHappen) {
+                throw new AssertionError(cannotHappen);
+            }
+            final AE entry = clone.entry;
+            try {
+                clone.entry = factory.newEntry(entry.getName(), entry.getType(), entry);
+            } catch (CharConversionException cannotHappen) {
+                throw new AssertionError(cannotHappen);
+            }
+            return clone;
         }
 
         /**
@@ -484,9 +497,14 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
+        BaseEntry<AE> clone(final CommonEntryFactory<AE> factory) {
+            final DirectoryEntry<AE> clone = (DirectoryEntry<AE>) super.clone(factory);
+            clone.members = Collections.unmodifiableSet(clone.members);
+            return clone;
+        }
+
+        @Override
         public Set<String> getMembers() {
-            if (!(members instanceof CopyOnWriteArraySet<?>))
-                members = new CopyOnWriteArraySet<String>(members);
             return Collections.unmodifiableSet(members);
         }
 
