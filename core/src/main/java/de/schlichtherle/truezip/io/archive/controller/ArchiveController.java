@@ -91,7 +91,8 @@ interface ArchiveController<AE extends ArchiveEntry> {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<? extends AE> getInputSocket(String path, BitField<InputOption> options)
+    InputSocket<? extends AE> getInputSocket(   String path,
+                                                BitField<InputOption> options)
     throws IOException;
 
     /**
