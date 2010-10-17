@@ -223,8 +223,8 @@ implements     ArchiveController     <AE>,
                 }
                 final AE entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
-                    throw new ArchiveEntryNotFoundException(getModel(), path,
-                            "no such file or directory");
+                    throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                            path, "no such file or directory");
                 return entry;
             }
 
@@ -232,8 +232,8 @@ implements     ArchiveController     <AE>,
             throws IOException {
                 final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
-                    throw new ArchiveEntryNotFoundException(getModel(), path,
-                            "cannot read directories");
+                    throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                            path, "cannot read directories");
                 return BasicArchiveController.this.getInputSocket(entry.getName()).bind(this);
             }
 
@@ -252,8 +252,8 @@ implements     ArchiveController     <AE>,
 
         autoMount(); // detect false positives!
         if (isRoot(path)) {
-            throw new ArchiveEntryNotFoundException(getModel(), path,
-                    "cannot read directories");
+            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    path, "cannot read directories");
         } else {
             return new Input();
         }
@@ -330,8 +330,8 @@ implements     ArchiveController     <AE>,
 
         if (isRoot(path)) {
             autoMount(); // detect false positives!
-            throw new ArchiveEntryNotFoundException(getModel(), path,
-                    "cannot write directories");
+            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    path, "cannot write directories");
         } else {
             autoMount(options.get(CREATE_PARENTS)); // detect false positives!
             return new Output();
@@ -346,8 +346,8 @@ implements     ArchiveController     <AE>,
             final CommonEntry template)
     throws IOException {
         if (FILE != type && DIRECTORY != type)
-            throw new ArchiveEntryNotFoundException(getModel(), path,
-                    "not yet supported: mknod " + type);
+            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    path, "not yet supported: mknod " + type);
         if (isRoot(path)) {
             try {
                 autoMount(); // detect false positives!
@@ -357,8 +357,8 @@ implements     ArchiveController     <AE>,
                 autoMount(true, options.get(CREATE_PARENTS));
                 return true;
             }
-            throw new ArchiveEntryNotFoundException(getModel(), path,
-                    "directory exists already");
+            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    path, "directory exists already");
         } else { // !isRoot(entryName)
             final ArchiveFileSystem<AE> fileSystem
                     = autoMount(options.get(CREATE_PARENTS));
@@ -400,7 +400,7 @@ implements     ArchiveController     <AE>,
             // Calling it doesn't harm, but please consider a more opaque
             // way to model this, e.g. by calling a listener interface.
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
-            // Delete the entry in the enclosing controller , too.
+            // Delete the corresponding entry in the enclosing controller, too.
             throw new FalsePositiveException(new IOException());
         } else { // !isRoot(path)
             autoMount().unlink(path);
