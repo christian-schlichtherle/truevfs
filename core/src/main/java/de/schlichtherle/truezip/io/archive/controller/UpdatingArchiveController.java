@@ -531,19 +531,16 @@ extends     FileSystemArchiveController<AE> {
                 final OutputService<AE> output,
                 final ExceptionHandler<IOException, E> handler)
     throws E {
-        // TODO: Consider iterating over input instead, normalizing the input
-        // entry name and checking with master map and output.
-        // Consider the effect for absolute entry names, too.
         for (final Entry<AE> fse : fileSystem) {
             final AE ae = fse.getTarget();
             final String n = ae.getName();
             if (null != output.getEntry(n))
                 continue; // we have already written this entry
             try {
-                if (DIRECTORY == ae.getType()) {
+                if (DIRECTORY == fse.getType()) {
                     if (isRoot(fse.getName()))
                         continue; // never write the virtual root directory
-                    if (UNKNOWN == ae.getTime(Access.WRITE))
+                    if (UNKNOWN == fse.getTime(Access.WRITE))
                         continue; // never write ghost directories
                     output.getOutputSocket(ae).newOutputStream().close();
                 } else if (null != input.getEntry(n)) {
