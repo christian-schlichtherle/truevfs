@@ -143,7 +143,7 @@ extends FilterArchiveController<AE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E, NotWriteLockedException {
+    throws E, ArchiveControllerException {
         buffers = null;
         super.sync(builder, options);
     }

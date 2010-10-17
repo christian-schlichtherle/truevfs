@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -122,12 +121,12 @@ implements     ArchiveController     <AE>,
     }
 
     final ArchiveFileSystem<AE> autoMount()
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+    throws IOException {
         return autoMount(false, false);
     }
 
     final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+    throws IOException {
         return autoMount(autoCreate, autoCreate);
     }
 
@@ -150,16 +149,14 @@ implements     ArchiveController     <AE>,
      */
     abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
                                                 boolean createParents)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException;
+    throws IOException;
 
     @Override
     public final boolean isReadOnly()
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             return autoMount().isReadOnly();
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -168,12 +165,10 @@ implements     ArchiveController     <AE>,
 
     @Override
     public final boolean isReadable(final String path)
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             return autoMount().getEntry(path) != null;
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -182,12 +177,10 @@ implements     ArchiveController     <AE>,
 
     @Override
     public final boolean isWritable(final String path)
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             return autoMount().isWritable(path);
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -440,5 +433,5 @@ implements     ArchiveController     <AE>,
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws SyncException, NotWriteLockedException;
+    throws SyncException, ArchiveControllerException;
 }

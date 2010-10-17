@@ -58,31 +58,31 @@ interface ArchiveController<AE extends ArchiveEntry> {
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws E, NotWriteLockedException;
+    throws E, ArchiveControllerException;
 
     Icon getOpenIcon()
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     Icon getClosedIcon()
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     boolean isReadOnly()
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     Entry<? extends AE> getEntry(String path)
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     boolean isReadable(String path)
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     boolean isWritable(String path)
-    throws NotWriteLockedException, FalsePositiveException;
+    throws ArchiveControllerException;
 
     void setReadOnly(String path)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 
     boolean setTime(String path, BitField<Access> types, long value)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 
     /**
      * Returns an input socket for reading the given entry from the file system.
@@ -92,7 +92,7 @@ interface ArchiveController<AE extends ArchiveEntry> {
      * @return A non-{@code null} {@code InputSocket}.
      */
     InputSocket<? extends AE> getInputSocket(String path, BitField<InputOption> options)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 
     /**
      * Returns an output socket for writing the given entry to the file system.
@@ -102,7 +102,7 @@ interface ArchiveController<AE extends ArchiveEntry> {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     OutputSocket<? extends AE> getOutputSocket(String path, BitField<OutputOption> options)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -137,8 +137,8 @@ interface ArchiveController<AE extends ArchiveEntry> {
     boolean mknod(  String path, Type type,
                     CommonEntry template,
                     BitField<OutputOption> options)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 
     void unlink(String path)
-    throws NotWriteLockedException, FalsePositiveException, IOException;
+    throws IOException;
 }

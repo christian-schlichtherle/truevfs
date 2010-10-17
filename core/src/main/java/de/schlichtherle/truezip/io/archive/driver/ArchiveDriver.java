@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -68,18 +68,24 @@ extends CommonEntryFactory<AE> {
      *         - {@code null} is not permitted.
      * @param  input the non-{@code null} input socket for reading
      *         the contents of the described archive from its target.
-     * @throws FileNotFoundException If the target archive file does not exist
-     *         or is not accessible.
-     * @throws TemporarilyNotFoundException If the target archive file is
-     *         temporarily not accessible, e.g. if a key for decryption is not
+     * @throws TabuFileException if the target archive file is temporarily not
+     *         accessible, e.g. if a key for decryption is currently not
      *         available.
-     *         The client application will temporarily recognize the target
-     *         archive file as a <i>special file</i>.
-     * @throws IOException If the target archive file is a
+     *         The client application will recognize the target archive file
+     *         as a <i>tabu file</i> until a subsequent repetition of this
+     *         method call succeeds.
+     *         A tabu file will not be accessible through the API although it
+     *         exists.
+     * @throws FileNotFoundException if the target archive file does not exist
+     *         or is not accessible.
+     *         The client application will recognize the target archive file
+     *         as a <i>special file</i> until a subsequent repetition of this
+     *         method call succeeds.
+     * @throws IOException if the target archive file is a
      *         <i>false positive</i> archive file.
-     *         The client application will permanently recognize the target
-     *         archive file as a <i>regular file</i> until the archive file
-     *         system is synchronized with its enclosing file system.
+     *         The client application will recognize the target archive file
+     *         as a <i>regular file</i> until the archive file system is
+     *         synchronized with its enclosing file system.
      * @return A non-{@code null} reference to a new common input shop.
      */
     InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
@@ -103,18 +109,24 @@ extends CommonEntryFactory<AE> {
      *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
-     * @throws FileNotFoundException If the target archive file does not exist
-     *         or is not accessible.
-     * @throws TemporarilyNotFoundException If the target archive file is
-     *         temporarily not accessible, e.g. if a key for decryption is not
+     * @throws TabuFileException if the target archive file is temporarily not
+     *         accessible, e.g. if a key for decryption is currently not
      *         available.
-     *         The client application will temporarily recognize the target
-     *         archive file as a <i>special file</i>.
-     * @throws IOException If the target archive file is a
+     *         The client application will recognize the target archive file
+     *         as a <i>tabu file</i> until a subsequent repetition of this
+     *         method call succeeds.
+     *         A tabu file will not be accessible through the API although it
+     *         exists.
+     * @throws FileNotFoundException if the target archive file does not exist
+     *         or is not accessible.
+     *         The client application will recognize the target archive file
+     *         as a <i>special file</i> until a subsequent repetition of this
+     *         method call succeeds.
+     * @throws IOException if the target archive file is a
      *         <i>false positive</i> archive file.
-     *         The client application will permanently recognize the target
-     *         archive file as a <i>regular file</i> until the archive file
-     *         system is synchronized with its enclosing file system.
+     *         The client application will recognize the target archive file
+     *         as a <i>regular file</i> until the archive file system is
+     *         synchronized with its enclosing file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
     OutputShop<AE> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<AE> source)

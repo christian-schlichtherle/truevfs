@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.Streams;
 import java.io.OutputStream;
 import java.io.EOFException;
@@ -119,7 +119,7 @@ implements InputShop<TarEntry> {
                     } catch (InputException ex) {
                         throw ex;
                     } catch (IOException ex) {
-                        throw new TemporarilyNotFoundException(
+                        throw new TabuFileException(
                                 new TempFileException(tinEntry, ex));
                     }
                     entry = new TarEntry(tinEntry, tmp);

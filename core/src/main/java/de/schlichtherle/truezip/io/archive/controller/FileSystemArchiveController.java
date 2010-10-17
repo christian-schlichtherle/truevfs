@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import java.io.FileNotFoundException;
@@ -52,7 +51,7 @@ extends        BasicArchiveController     <AE> {
     final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
             final boolean createParents)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+    throws IOException {
         assert !createParents || autoCreate;
         return mountState.autoMount(autoCreate, createParents);
     }
@@ -83,7 +82,7 @@ extends        BasicArchiveController     <AE> {
      *        system's current time.
      */
     abstract void mount(boolean autoCreate, boolean createParents)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException;
+    throws IOException;
 
     /**
      * Represents the mount state of the archive file system.
@@ -92,7 +91,7 @@ extends        BasicArchiveController     <AE> {
     private abstract class MountState {
         abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
                                                     boolean createParents)
-        throws TemporarilyNotFoundException, FalsePositiveException, IOException;
+        throws IOException;
 
         ArchiveFileSystem<AE> getFileSystem() {
             return null;
@@ -105,7 +104,7 @@ extends        BasicArchiveController     <AE> {
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
                                         final boolean createParents)
-        throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+        throws IOException {
             ensureWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, createParents);

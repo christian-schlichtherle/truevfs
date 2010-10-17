@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.TemporarilyNotFoundException;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import java.io.CharConversionException;
@@ -217,12 +217,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             autoMount(); // detect false positives!
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -232,12 +230,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             autoMount(); // detect false positives!
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -247,12 +243,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public final Entry<AE> getEntry(final String path)
-    throws NotWriteLockedException, FalsePositiveException {
+    throws ArchiveControllerException {
         try {
             return autoMount().getEntry(path);
-        } catch (NotWriteLockedException ex) {
-            throw ex;
-        } catch (FalsePositiveException ex) {
+        } catch (ArchiveControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!isRoot(path))
@@ -262,7 +256,8 @@ extends     FileSystemArchiveController<AE> {
             if (null == entry)
                 return null;
             try {
-                return new SpecialFileEntry<AE>(getDriver().newEntry(ROOT, SPECIAL, entry));
+                return new SpecialFileEntry<AE>(
+                        getDriver().newEntry(ROOT, SPECIAL, entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
@@ -294,7 +289,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+    throws IOException {
         assert input == null;
         assert output == null;
         assert getFileSystem() == null;
@@ -312,7 +307,7 @@ extends     FileSystemArchiveController<AE> {
                         path, BitField.of(InputOption.CACHE));
                 try {
                     input = new Input(getDriver().newInputShop(getModel(), socket));
-                } catch (TemporarilyNotFoundException ex) {
+                } catch (FileNotFoundException ex) {
                     throw ex;
                 } catch (IOException ex) {
                     throw new FalsePositiveException(ex);
@@ -321,11 +316,13 @@ extends     FileSystemArchiveController<AE> {
                         input.getDriverProduct(), getDriver(),
                         socket.getLocalTarget(), vetoableTouchListener,
                         readOnly));
-            } catch (TemporarilyNotFoundException ex) {
+            } catch (ArchiveControllerException ex) {
                 throw ex;
-            } catch (IOException ex) {
+            } catch (TabuFileException ex) {
+                throw ex;
+            } catch (FileNotFoundException ex) {
                 if (!autoCreate)
-                    throw ex;
+                    throw new FalsePositiveException(ex);
                 // The entry does NOT exist in the enclosing archive
                 // file, but we may create it automatically.
                 // This may fail if e.g. the target file is an RAES
@@ -349,7 +346,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private void ensureOutput(final boolean createParents)
-    throws TemporarilyNotFoundException, FalsePositiveException, IOException {
+    throws IOException {
         if (null != output)
             return;
 
@@ -361,7 +358,7 @@ extends     FileSystemArchiveController<AE> {
         try {
             output = new Output(getDriver().newOutputShop(getModel(), socket,
                         null == input ? null : input.getDriverProduct()));
-        } catch (TemporarilyNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             throw ex;
         } catch (IOException ex) {
             throw new FalsePositiveException(ex);
@@ -381,14 +378,9 @@ extends     FileSystemArchiveController<AE> {
         return output.getOutputSocket(entry);
     }
 
-    private boolean isFileSystemTouched() {
-        ArchiveFileSystem<AE> fileSystem = getFileSystem();
-        return null != fileSystem && fileSystem.isTouched();
-    }
-
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException, NotWriteLockedException {
+    throws SyncException, ArchiveControllerException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -403,7 +395,7 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException, NotWriteLockedException {
+    private boolean sync() throws SyncException, ArchiveControllerException {
         sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -413,8 +405,8 @@ extends     FileSystemArchiveController<AE> {
 	public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, NotWriteLockedException {
-        assert !isFileSystemTouched() || output != null; // file system touched => output archive
+    throws E, ArchiveControllerException {
+        assert !isTouched() || output != null; // file system touched => output archive
 
         ensureWriteLockedByCurrentThread();
 
@@ -448,7 +440,7 @@ extends     FileSystemArchiveController<AE> {
         try {
             try {
                 reset1(builder);
-                if (!options.get(ABORT_CHANGES) && isFileSystemTouched())
+                if (!options.get(ABORT_CHANGES) && isTouched())
                     update(builder);
             } finally {
                 reset2(builder);
@@ -476,7 +468,7 @@ extends     FileSystemArchiveController<AE> {
     private <E extends IOException>
     void update(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
-        assert isFileSystemTouched();
+        assert isTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData();
 
@@ -508,7 +500,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private boolean checkNoDeletedEntriesWithNewData() {
-        assert isFileSystemTouched();
+        assert isTouched();
 
         // Check if we have written out any entries that have been
         // deleted from the archive file system meanwhile and prepare

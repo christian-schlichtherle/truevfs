@@ -121,7 +121,7 @@ implements FileSystemController<CommonEntry> {
     throws E {
         try {
             getController().sync(builder, options);
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -132,7 +132,7 @@ implements FileSystemController<CommonEntry> {
             return getController().getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getEnclController().getOpenIcon();
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -143,7 +143,7 @@ implements FileSystemController<CommonEntry> {
             return getController().getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getEnclController().getClosedIcon();
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -154,7 +154,7 @@ implements FileSystemController<CommonEntry> {
             return getController().isReadOnly();
         } catch (FalsePositiveException ex) {
             return getEnclController().isReadOnly();
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -165,7 +165,7 @@ implements FileSystemController<CommonEntry> {
             return getController().getEntry(path);
         } catch (FalsePositiveException ex) {
             return getEnclController().getEntry(getEnclPath(path));
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -176,7 +176,7 @@ implements FileSystemController<CommonEntry> {
             return getController().isReadable(path);
         } catch (FalsePositiveException ex) {
             return getEnclController().isReadable(getEnclPath(path));
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -187,7 +187,7 @@ implements FileSystemController<CommonEntry> {
             return getController().isWritable(path);
         } catch (FalsePositiveException ex) {
             return getEnclController().isWritable(getEnclPath(path));
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -199,7 +199,7 @@ implements FileSystemController<CommonEntry> {
             getController().setReadOnly(path);
         } catch (FalsePositiveException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -211,7 +211,7 @@ implements FileSystemController<CommonEntry> {
             return getController().setTime(path, types, value);
         } catch (FalsePositiveException ex) {
             return getEnclController().setTime(getEnclPath(path), types, value);
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -344,7 +344,7 @@ implements FileSystemController<CommonEntry> {
             return getController().mknod(path, type, template, options);
         } catch (FalsePositiveException ex) {
             return getEnclController().mknod(getEnclPath(path), type, template, options);
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -357,7 +357,7 @@ implements FileSystemController<CommonEntry> {
             getController().unlink(path);
         } catch (FalsePositiveException ex) {
             getEnclController().unlink(getEnclPath(path));
-        } catch (NotWriteLockedException ex) {
+        } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
     }

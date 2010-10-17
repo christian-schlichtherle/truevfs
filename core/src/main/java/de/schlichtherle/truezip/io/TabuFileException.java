@@ -20,26 +20,20 @@ import java.io.FileNotFoundException;
 
 /**
  * Indicates that a file is temporarily not accessible, e.g. if a key for
- * decryption is not available.
+ * decryption is currently not available.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public class TemporarilyNotFoundException extends FileNotFoundException {
+public final class TabuFileException extends FileNotFoundException {
 
     /**
-     * Constructs a temporarily-not-found-exception.
-     */
-    public TemporarilyNotFoundException() {
-    }
-
-    /**
-     * Constructs a temporarily-not-found-exception.
+     * Constructs a tabu file exception.
      *
      * @param cause The nullable temporary cause of this exception.
      */
-    public TemporarilyNotFoundException(Throwable cause) {
+    public TabuFileException(Throwable cause) {
         super.initCause(cause);
     }
 }
