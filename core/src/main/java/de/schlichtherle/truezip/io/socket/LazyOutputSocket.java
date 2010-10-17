@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
+public final class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
 
     private OutputSocketProvider<LT> provider;
     private OutputSocket<? extends LT> socket;
@@ -34,7 +34,7 @@ public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
 
     public LazyOutputSocket(final OutputSocketProvider<LT> provider,
                             final LT target) {
-        if (null == provider)
+        if (null == provider || null == target)
             throw new NullPointerException();
         this.provider = provider;
         this.target = target;
@@ -48,8 +48,7 @@ public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
 
     protected final OutputSocket<? extends LT> getOutputSocket() throws IOException {
         if (null == socket) {
-            socket = provider.getOutputSocket(target = getLocalTarget());
-            assert socket.getLocalTarget().equals(target) : "interface contract violation!";
+            socket = provider.getOutputSocket(target);
             provider = null; // support gc!
             target = null;
         }
@@ -58,11 +57,7 @@ public class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
 
     @Override
     public LT getLocalTarget() throws IOException {
-        if (null != socket)
-            return socket.bind(this).getLocalTarget();
-        if (null != target)
-            return target;
-        throw new IllegalStateException("cannot resolve local target!");
+        return getOutputSocket().getLocalTarget();
     }
 
     @Override

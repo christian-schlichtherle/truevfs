@@ -128,7 +128,7 @@ public class ZipEntry implements Cloneable {
             throw new AssertionError(cannotHappen);
         }
         entry.setExtra(getExtra());
-        entry.setInit(NAME, false); // unlock name
+        //entry.setInit(NAME, false); // unlock name
         return entry;
     }
 

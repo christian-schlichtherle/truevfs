@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
+public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
 
     private InputSocketProvider<LT> provider;
     private InputSocket<? extends LT> socket;
@@ -36,7 +36,7 @@ public class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
 
     public LazyInputSocket( final InputSocketProvider<LT> provider,
                             final LT target) {
-        if (null == provider)
+        if (null == provider || null == target)
             throw new NullPointerException();
         this.provider = provider;
         this.target = target;
@@ -51,8 +51,7 @@ public class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
     protected final InputSocket<? extends LT> getInputSocket()
     throws IOException {
         if (null == socket) {
-            socket = provider.getInputSocket(target = getLocalTarget());
-            assert socket.getLocalTarget().equals(target) : "interface contract violation!";
+            socket = provider.getInputSocket(target);
             provider = null; // support gc!
             target = null;
         }
@@ -61,11 +60,7 @@ public class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
 
     @Override
     public LT getLocalTarget() throws IOException {
-        if (null != socket)
-            return socket.bind(this).getLocalTarget();
-        if (null != target)
-            return target;
-        throw new IllegalStateException("cannot resolve local target!");
+        return getInputSocket().getLocalTarget();
     }
 
     @Override

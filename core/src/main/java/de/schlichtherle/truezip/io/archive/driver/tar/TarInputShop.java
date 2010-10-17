@@ -216,8 +216,9 @@ implements InputShop<TarEntry> {
     @Override
     public InputSocket<TarEntry> getInputSocket(final TarEntry entry)
     throws FileNotFoundException {
-        if (getEntry(entry.getName()) != entry)
+        if (!entry.equals(getEntry(entry.getName())))
             throw new IllegalArgumentException("interface contract violation");
+
         class Input extends InputSocket<TarEntry> {
             @Override
             public TarEntry getLocalTarget() {
@@ -235,6 +236,7 @@ implements InputShop<TarEntry> {
                 return new SimpleReadOnlyFile(entry.getFile());
             }
         }
+
         return new Input();
     }
 

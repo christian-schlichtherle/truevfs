@@ -44,10 +44,18 @@ public abstract class IOSocket<LT, RT> {
     /**
      * Returns the non-{@code null} <i>local target</i> for I/O operations.
      * <p>
-     * The result of changing the state of the local target is undefined.
+     * Note that this interface contract does <em>not</em> state any other
+     * terms or conditions for the returned object.
+     * In particular, clients need to consider that multiple invocations of
+     * this method could return different objects (e.g. defensive copies) which
+     * may even fail the {@link Object#equals} test.
+     * On the other hand, implementations need to consider that clients could
+     * attempt to change the state of the returned object in arbitrary manner.
+     * Consequently, the result of doing so is undefined, too.
      * In particular, a subsequent I/O operation may not reflect the change
      * or may even fail.
-     * This term may be overridden by sub-interfaces or implementations.
+     * Sub-interfaces or implementations may add additional terms and
+     * conditions in order to resolve these potential issues.
      *
      * @return The non-{@code null} local target for I/O operations.
      */
@@ -56,44 +64,11 @@ public abstract class IOSocket<LT, RT> {
     /**
      * Returns the nullable <i>remote target</i> for I/O operations.
      * <p>
-     * The result of changing the state of the remote target is undefined.
-     * In particular, a subsequent I/O operation may not reflect the change
-     * or may even fail.
-     * This term may be overridden by sub-interfaces or implementations.
+     * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
      * @return The nullable remote target for I/O operations.
      */
     public abstract RT getRemoteTarget() throws IOException;
-
-    /**
-     * Returns a string representing a connection of the local and remote
-     * targets.
-     */
-    @Override
-    public final String toString() {
-        // Note that the target actually must not be null, but this method
-        // should work even if the interface contract is broken in order to
-        // support debugging.
-        String lts;
-        try {
-            final LT lt = getLocalTarget();
-            lts = null == lt ? "(null)" : lt.toString();
-        } catch (IOException ex) {
-            lts = "(?)";
-        }
-        String rts;
-        try {
-            final RT rt = getRemoteTarget();
-            rts = null == rt ? "(null)" : rt.toString();
-        } catch (IOException ex) {
-            rts = "(?)";
-        }
-        return lts + " <-> " + rts;
-    }
-
-    static boolean equal(Object o1, Object o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
-    }
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
@@ -126,5 +101,55 @@ public abstract class IOSocket<LT, RT> {
             }
         }
         Streams.copy(in, out);
+    }
+
+    /**
+     * Returns a string representing a connection of the local and remote
+     * targets.
+     */
+    @Override
+    public final String toString() {
+        // Note that the target actually must not be null, but this method
+        // should work even if the interface contract is broken in order to
+        // support debugging.
+        String lts;
+        try {
+            final LT lt = getLocalTarget();
+            lts = null == lt ? "(null)" : lt.toString();
+        } catch (IOException ex) {
+            lts = "(?)";
+        }
+        String rts;
+        try {
+            final RT rt = getRemoteTarget();
+            rts = null == rt ? "(null)" : rt.toString();
+        } catch (IOException ex) {
+            rts = "(?)";
+        }
+        return lts + " <-> " + rts;
+    }
+
+    /** Provided for the comfort of subclasses in this package. */
+    static boolean equal(Object o1, Object o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
+    }
+
+    /**
+     * Two sockets are considered equal if and only if they are identical.
+     * This can't get overriden.
+     */
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object o) {
+        return this == o;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
     }
 }

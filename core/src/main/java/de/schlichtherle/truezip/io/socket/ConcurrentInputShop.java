@@ -207,7 +207,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
         }
 
         ensureNotShopClosed();
-        if (getEntry(entry.getName()) != entry)
+        if (!entry.equals(getEntry(entry.getName())))
             throw new IllegalArgumentException("interface contract violation");
         // TODO: Check: Synchronization required?
         return new InputSocket();
