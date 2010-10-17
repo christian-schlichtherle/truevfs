@@ -276,8 +276,8 @@ implements     ArchiveController     <AE>,
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
                     link = autoMount(options.get(CREATE_PARENTS))
-                            .mknod( path, FILE, template,
-                                    options.get(CREATE_PARENTS));
+                            .mknod( path, FILE,
+                                    options.get(CREATE_PARENTS), template);
                 }
                 return link.getTarget().getTarget();
             }
@@ -364,7 +364,7 @@ implements     ArchiveController     <AE>,
                     = autoMount(options.get(CREATE_PARENTS));
             final boolean created = null == fileSystem.getEntry(path);
             final Operation<AE> link = fileSystem.mknod(
-                    path, type, template, options.get(CREATE_PARENTS));
+                    path, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             link.run();
             return created;

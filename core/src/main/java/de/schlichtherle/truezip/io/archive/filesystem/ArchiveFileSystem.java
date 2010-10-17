@@ -98,13 +98,13 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *
      * @param  path a non-{@code null} relative path name.
      * @param  type a non-{@code null} common entry type.
+     * @param  createParents if {@code true}, any missing parent directories
+     *         will be created and linked into this archive file system with
+     *         its last modification time set to the system's current time.
      * @param  template if not {@code null}, then the archive file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this common entry as possible - with the exception of its name
      *         and type.
-     * @param  createParents if {@code true}, any missing parent directories
-     *         will be created and linked into this archive file system with
-     *         its last modification time set to the system's current time.
      * @throws NullPointerException if {@code path} or {@code type} are
      *         {@code null}.
      * @throws ArchiveReadOnlyExceptionn If this archive file system is read
@@ -125,7 +125,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *         into this archive file system upon a call to its
      *         {@link Operation#run} method.
      */
-    Operation<AE> mknod(String path, Type type, CommonEntry template, boolean createParents)
+    Operation<AE> mknod(String path, Type type,
+                        boolean createParents, CommonEntry template)
     throws ArchiveFileSystemException;
 
     /**

@@ -505,8 +505,8 @@ implements ArchiveFileSystem<AE> {
     public Operation<AE> mknod(
             final String path,
             final Type type,
-            CommonEntry template,
-            final boolean createParents)
+            final boolean createParents,
+            CommonEntry template)
     throws ArchiveFileSystemException {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
