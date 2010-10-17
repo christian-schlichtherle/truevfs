@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -36,34 +35,25 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
     private final String path;
 
     ArchiveEntryNotFoundException(
-            final FileSystemModel model,
+            final ArchiveController<?> controller,
             final String path,
             final String msg) {
         super(msg);
         assert path != null;
         assert msg != null;
-        this.mountPoint = model.getMountPoint();
+        this.mountPoint = controller.getModel().getMountPoint();
         this.path = path;
     }
 
     ArchiveEntryNotFoundException(
-            final FileSystemModel model,
+            final ArchiveController<?> controller,
             final String path,
             final IOException cause) {
         super(cause == null ? null : cause.toString());
         assert path != null;
         super.initCause(cause);
-        this.mountPoint = model.getMountPoint();
+        this.mountPoint = controller.getModel().getMountPoint();
         this.path = path;
-    }
-
-    /** @see FileSystemModel#getMountPoint() */
-    final URI getMountPoint() {
-        return mountPoint;
-    }
-
-    final String getPath() {
-        return path;
     }
 
     /**
@@ -75,8 +65,8 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
      * @return A non-{@code null} URI representing the canonical path of the
      *         target entity in the federated file system.
      */
-    final String getCanonicalPath() {
-        return mountPoint.resolve(path).toString();
+    private String getCanonicalPath() {
+        return mountPoint.resolve(path).getPath();
     }
 
     @Override
