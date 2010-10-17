@@ -41,14 +41,6 @@ extends IOSocket<LT, CommonEntry> {
 
     private InputSocket<?> peer;
 
-    /**
-     * Returns the non-{@code null} local common entry target.
-     *
-     * @return The non-{@code null} local common entry target.
-     */
-    @Override
-    public abstract LT getLocalTarget() throws IOException;
-
     @Override
     public CommonEntry getRemoteTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();

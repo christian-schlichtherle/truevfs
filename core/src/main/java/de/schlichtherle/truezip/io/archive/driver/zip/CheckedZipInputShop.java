@@ -62,8 +62,9 @@ public class CheckedZipInputShop extends ZipInputShop {
     @Override
     public InputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
     throws FileNotFoundException {
-        if (getEntry(entry.getName()) != entry)
+        if (!entry.equals(getEntry(entry.getName())))
             throw new IllegalArgumentException("interface contract violation");
+
         class Input extends InputSocket<ZipEntry> {
             @Override
             public ZipEntry getLocalTarget() {
@@ -83,6 +84,7 @@ public class CheckedZipInputShop extends ZipInputShop {
                 throw new UnsupportedOperationException();
             }
         }
+
         return new Input();
     }
 }
