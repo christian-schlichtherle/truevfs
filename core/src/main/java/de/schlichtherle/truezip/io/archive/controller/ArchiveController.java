@@ -103,8 +103,8 @@ interface ArchiveController<AE extends ArchiveEntry> {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     OutputSocket<? extends AE> getOutputSocket( String path,
-                                                CommonEntry template,
-                                                BitField<OutputOption> options)
+                                                BitField<OutputOption> options,
+                                                CommonEntry template)
     throws IOException;
 
     /**
@@ -138,8 +138,7 @@ interface ArchiveController<AE extends ArchiveEntry> {
      *         </ul>
      */
     boolean mknod(  String path, Type type,
-                    CommonEntry template,
-                    BitField<OutputOption> options)
+                    BitField<OutputOption> options, CommonEntry template)
     throws IOException;
 
     void unlink(String path)

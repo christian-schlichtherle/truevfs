@@ -315,14 +315,14 @@ extends FilterArchiveController<AE> {
 
     @Override
     public OutputSocket<AE> getOutputSocket(String path,
-                                            CommonEntry template,
-                                            BitField<OutputOption> options)
+                                            BitField<OutputOption> options,
+                                            CommonEntry template)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
             return new Output(getController().getOutputSocket(
-                    path, template, options));
+                    path, options, template));
         } finally {
             writeLock().unlock();
         }
@@ -361,13 +361,13 @@ extends FilterArchiveController<AE> {
     @Override
     public boolean mknod(   String path,
                             Type type,
-                            CommonEntry template,
-                            BitField<OutputOption> options)
+                            BitField<OutputOption> options,
+                            CommonEntry template)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return getController().mknod(path, type, template, options);
+            return getController().mknod(path, type, options, template);
         } finally {
             writeLock().unlock();
         }

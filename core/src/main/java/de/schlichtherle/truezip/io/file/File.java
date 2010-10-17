@@ -2642,9 +2642,10 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         if (innerArchive != null) {
             return innerArchive.getController()
-                    .mknod(getInnerEntryName(), FILE, null,
+                    .mknod(getInnerEntryName(), FILE,
                         BitField.noneOf(OutputOption.class)
-                            .set(CREATE_PARENTS, isLenient()));
+                            .set(CREATE_PARENTS, isLenient()),
+                        null);
         }
         return delegate.createNewFile();
     }
@@ -2687,9 +2688,9 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 return innerArchive.getController()
-                        .mknod(getInnerEntryName(), DIRECTORY, null,
+                        .mknod(getInnerEntryName(), DIRECTORY,
                             BitField.noneOf(OutputOption.class)
-                                .set(CREATE_PARENTS, isLenient()));
+                                .set(CREATE_PARENTS, isLenient()), null);
             }
         } catch (IOException ex) {
             return false;

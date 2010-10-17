@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -266,12 +265,13 @@ class Files {
             final File file = (File) dst;
             final File archive = file.getInnerArchive();
             if (null != archive)
-                return archive.getController()
-                        .getOutputSocket(file.getInnerEntryName(), template, options);
+                return archive
+                        .getController()
+                        .getOutputSocket(file.getInnerEntryName(), options, template);
         }
         return Controllers
                 .getController(dst.toURI(), null, null)
-                .getOutputSocket(ROOT, template, options);
+                .getOutputSocket(ROOT, options, template);
     }
 
     /**

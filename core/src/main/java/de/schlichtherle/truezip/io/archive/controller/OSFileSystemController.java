@@ -138,14 +138,17 @@ implements FileSystemModel, FileSystemController<FileEntry>  {
     @Override
     public OutputSocket<FileEntry> getOutputSocket(
             String path,
-            CommonEntry template,
-            BitField<OutputOption> options)
+            BitField<OutputOption> options,
+            CommonEntry template)
     throws IOException {
         return FileOutputSocket.get(FileEntry.get(target, path), template, options);
     }
 
     @Override
-    public boolean mknod(String path, Type type, CommonEntry template, BitField<OutputOption> options)
+    public boolean mknod(   String path,
+                            Type type,
+                            BitField<OutputOption> options,
+                            CommonEntry template)
     throws IOException {
         final File file = new File(target, path);
         switch (type) {

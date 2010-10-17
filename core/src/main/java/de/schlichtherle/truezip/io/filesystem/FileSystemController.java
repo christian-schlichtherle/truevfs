@@ -72,7 +72,8 @@ public interface FileSystemController<CE extends CommonEntry> {
      * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<? extends CE> getInputSocket(String path, BitField<InputOption> options)
+    InputSocket<? extends CE> getInputSocket(   String path,
+                                                BitField<InputOption> options)
     throws IOException;
 
     /**
@@ -83,8 +84,8 @@ public interface FileSystemController<CE extends CommonEntry> {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     OutputSocket<? extends CE> getOutputSocket( String path,
-                                                CommonEntry template,
-                                                BitField<OutputOption> options)
+                                                BitField<OutputOption> options,
+                                                CommonEntry template)
     throws IOException;
 
     /**
@@ -118,8 +119,7 @@ public interface FileSystemController<CE extends CommonEntry> {
      *         </ul>
      */
     boolean mknod(  String path, Type type,
-                    CommonEntry template,
-                    BitField<OutputOption> options)
+                    BitField<OutputOption> options, CommonEntry template)
     throws IOException;
 
     void unlink(String path) throws IOException;

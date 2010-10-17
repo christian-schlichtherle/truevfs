@@ -337,9 +337,10 @@ implements ArchiveFileSystem<AE> {
         if (path == null)
             throw new NullPointerException();
         final BaseEntry<AE> entry = master.get(path);
-        return null == entry
+        return entry;
+        /*return null == entry
                 ? null
-                : newEntryUnchecked(path, entry.getType(), entry.getTarget());
+                : newEntryUnchecked(path, entry.getType(), entry.getTarget());*/
     }
 
     /**
