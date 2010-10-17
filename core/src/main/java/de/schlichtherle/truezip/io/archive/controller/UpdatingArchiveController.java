@@ -541,13 +541,13 @@ extends     FileSystemArchiveController<AE> {
                 continue; // we have already written this entry
             try {
                 if (DIRECTORY == ae.getType()) {
-                    if (isRoot(ae.getName()))
+                    if (isRoot(fse.getName()))
                         continue; // never write the virtual root directory
                     if (UNKNOWN == ae.getTime(Access.WRITE))
                         continue; // never write ghost directories
                     output.getOutputSocket(ae).newOutputStream().close();
                 } else if (null != input.getEntry(n)) {
-                    IOSocket.copy(  input.getInputSocket(ae.getName()),
+                    IOSocket.copy(  input.getInputSocket(n),
                                     output.getOutputSocket(ae));
                 } else {
                     // The file system entry is a newly created non-directory
