@@ -262,8 +262,8 @@ implements     ArchiveController     <AE>,
     @Override
     public final OutputSocket<AE> getOutputSocket(
             final String path,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+            final BitField<OutputOption> options,
+            final CommonEntry template)
     throws IOException {
         class Output extends OutputSocket<AE> {
             Operation<AE> link;
@@ -342,8 +342,8 @@ implements     ArchiveController     <AE>,
     public final boolean mknod(
             final String path,
             final Type type,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+            final BitField<OutputOption> options,
+            final CommonEntry template)
     throws IOException {
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(), path,

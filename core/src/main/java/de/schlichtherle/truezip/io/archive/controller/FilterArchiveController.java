@@ -128,19 +128,19 @@ implements ArchiveController      <AE> {
     @Override
     public OutputSocket<? extends AE> getOutputSocket(
             String path,
-            CommonEntry template,
-            BitField<OutputOption> options)
+            BitField<OutputOption> options,
+            CommonEntry template)
     throws IOException {
-        return getController().getOutputSocket(path, template, options);
+        return getController().getOutputSocket(path, options, template);
     }
 
     @Override
     public boolean mknod(   String path,
                             Type type,
-                            CommonEntry template,
-                            BitField<OutputOption> options)
+                            BitField<OutputOption> options,
+                            CommonEntry template)
     throws IOException {
-        return getController().mknod(path, type, template, options);
+        return getController().mknod(path, type, options, template);
     }
 
     @Override

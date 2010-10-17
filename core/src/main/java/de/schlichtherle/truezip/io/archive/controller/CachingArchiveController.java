@@ -113,8 +113,8 @@ extends FilterArchiveController<AE> {
     @Override
     public OutputSocket<? extends AE> getOutputSocket(
             final String path,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+            final BitField<OutputOption> options,
+            final CommonEntry template)
     throws IOException {
         final BitField<OutputOption> options2 = options
                 .clear(OutputOption.CACHE);
@@ -127,13 +127,13 @@ extends FilterArchiveController<AE> {
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                getController().mknod(path, FILE, template, options2);
+                getController().mknod(path, FILE, options2, template);
                 return super.newOutputStream();
             }
         } // class Output
 
         OutputSocket<? extends AE> output = getController()
-                .getOutputSocket(path, template, options2);
+                .getOutputSocket(path, options2, template);
         if (options.get(OutputOption.CACHE))
             output = new Output(output);
         return output;

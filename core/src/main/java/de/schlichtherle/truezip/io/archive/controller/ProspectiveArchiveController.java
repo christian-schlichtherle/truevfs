@@ -284,13 +284,13 @@ implements FileSystemController<CommonEntry> {
     @Override
     public OutputSocket<?> getOutputSocket(
             String path,
-            CommonEntry template,
-            BitField<OutputOption> options)
+            BitField<OutputOption> options,
+            CommonEntry template)
     throws IOException {
         try {
             return new Output(path, template, options);
         } catch (FalsePositiveException ex) {
-            return getEnclController().getOutputSocket(getEnclPath(path), template, options);
+            return getEnclController().getOutputSocket(getEnclPath(path), options, template);
         }
     }
 
@@ -306,7 +306,7 @@ implements FileSystemController<CommonEntry> {
 
         Output(final String path, final CommonEntry template, final BitField<OutputOption> options)
         throws IOException {
-            super(getController().getOutputSocket(path, template, options));
+            super(getController().getOutputSocket(path, options, template));
             this.path = path;
             this.template = template;
             this.options = options;
@@ -319,7 +319,7 @@ implements FileSystemController<CommonEntry> {
                 return getOutputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
-                        .getOutputSocket(getEnclPath(path), template, options)
+                        .getOutputSocket(getEnclPath(path), options, template)
                         .getLocalTarget();
             }
         }
@@ -331,7 +331,7 @@ implements FileSystemController<CommonEntry> {
                 return getOutputSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
-                        .getOutputSocket(getEnclPath(path), template, options)
+                        .getOutputSocket(getEnclPath(path), options, template)
                         .newOutputStream();
             }
         }
@@ -340,13 +340,13 @@ implements FileSystemController<CommonEntry> {
     @Override
     public boolean mknod(   String path,
                             CommonEntry.Type type,
-                            CommonEntry template,
-                            BitField<OutputOption> options)
+                            BitField<OutputOption> options,
+                            CommonEntry template)
     throws IOException {
         try {
-            return getController().mknod(path, type, template, options);
+            return getController().mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getEnclController().mknod(getEnclPath(path), type, template, options);
+            return getEnclController().mknod(getEnclPath(path), type, options, template);
         } catch (ArchiveControllerException ex) {
             throw new AssertionError(ex);
         }
