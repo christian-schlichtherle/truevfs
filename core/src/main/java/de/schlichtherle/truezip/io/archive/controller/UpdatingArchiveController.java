@@ -387,9 +387,10 @@ extends     FileSystemArchiveController<AE> {
         if (null == (fileSystem = getFileSystem())
                 || null == (entry = fileSystem.getEntry(path)))
             return false;
-        if (null != output && null != output.getEntry(entry.getTarget().getName()))
+        String n = null;
+        if (null != output && null != output.getEntry(n = entry.getTarget().getName()))
             return sync();
-        if (null != input && null != input.getEntry(entry.getTarget().getName()))
+        if (null != input && null != input.getEntry(null != n ? n : (n = entry.getTarget().getName())))
             return false;
         if (READ == intention)
             return sync();
@@ -514,7 +515,7 @@ extends     FileSystemArchiveController<AE> {
             // enough:
             String path = entry.getName();
             //path = de.schlichtherle.truezip.io.Paths.normalize(path, CommonEntry.SEPARATOR_CHAR);
-            if (fileSystem.getEntry(path) == null) {
+            if (null == fileSystem.getEntry(path)) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.
                 // Create a warn exception, but do not yet throw it.
@@ -530,24 +531,22 @@ extends     FileSystemArchiveController<AE> {
                 final OutputService<AE> output,
                 final ExceptionHandler<IOException, E> handler)
     throws E {
-        final AE root = fileSystem.getEntry(ROOT).getTarget();
-        assert root != null;
         // TODO: Consider iterating over input instead, normalizing the input
         // entry name and checking with master map and output.
         // Consider the effect for absolute entry names, too.
         for (final Entry<AE> fse : fileSystem) {
             final AE ae = fse.getTarget();
             final String n = ae.getName();
-            if (output.getEntry(n) == ae)
+            if (null != output.getEntry(n))
                 continue; // we have already written this entry
             try {
                 if (DIRECTORY == ae.getType()) {
-                    if (root == ae)
+                    if (isRoot(ae.getName()))
                         continue; // never write the virtual root directory
                     if (UNKNOWN == ae.getTime(Access.WRITE))
                         continue; // never write ghost directories
                     output.getOutputSocket(ae).newOutputStream().close();
-                } else if (input.getEntry(n) == ae) {
+                } else if (null != input.getEntry(n)) {
                     IOSocket.copy(  input.getInputSocket(ae.getName()),
                                     output.getOutputSocket(ae));
                 } else {
