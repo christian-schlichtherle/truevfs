@@ -33,12 +33,19 @@ public interface CommonEntryFactory<CE extends CommonEntry> {
      * The implementation may need to fix this name in order to 
      * form a valid {@link CommonEntry#getName() entry name} for their
      * particular requirements.
+     * <p>
+     * If {@code template} is not {@code null}, then the returned common entry
+     * shall inherit as much properties from this template as possible - with
+     * the exception of its name and type.
+     * Furthermore, if {@code name} and {@code type} are equal to the name and
+     * type of this template, then the returned entry shall be a clone of the
+     * template which shares no mutable objects with the template.
      *
      * @param  name a non-{@code null} entry name.
      * @param  type a non-{@code null} entry type.
-     * @param  template if not {@code null}, then the new archive file system
-     *         entry shall inherit as much properties from this common entry
-     *         as possible - with the exception of its name and type.
+     * @param  template if not {@code null}, then the new common entry shall
+     *         inherit as much properties from this common entry as possible
+     *         - with the exception of its name and type.
      * @return A new common entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
