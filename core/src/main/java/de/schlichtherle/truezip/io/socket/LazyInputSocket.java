@@ -32,14 +32,14 @@ public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<L
 
     private InputSocketProvider<LT> provider;
     private InputSocket<? extends LT> socket;
-    private LT target;
+    private String target;
 
     public LazyInputSocket( final InputSocketProvider<LT> provider,
-                            final LT target) {
+                            final String name) {
         if (null == provider || null == target)
             throw new NullPointerException();
         this.provider = provider;
-        this.target = target;
+        this.target = name;
     }
 
     public LazyInputSocket( final InputSocket<? extends LT> input) {

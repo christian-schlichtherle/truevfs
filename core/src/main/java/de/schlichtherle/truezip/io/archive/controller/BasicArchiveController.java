@@ -235,7 +235,7 @@ implements     ArchiveController     <AE>,
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(), path,
                             "cannot read directories");
-                return BasicArchiveController.this.getInputSocket(entry).bind(this);
+                return BasicArchiveController.this.getInputSocket(entry.getName()).bind(this);
             }
 
             @Override
@@ -304,7 +304,7 @@ implements     ArchiveController     <AE>,
                 final AE entry = getEntry();
                 final OutputSocket<? extends AE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
-                        ? getInputSocket(entry).newInputStream() // FIXME: Crashes on new entry!
+                        ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
                         : null;
                 try {
                     final OutputStream out = output

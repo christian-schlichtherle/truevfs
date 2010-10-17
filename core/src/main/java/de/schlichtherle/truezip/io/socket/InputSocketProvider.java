@@ -43,8 +43,8 @@ public interface InputSocketProvider<LT extends CommonEntry> {
      * {@link InputSocket#getLocalTarget()} must return an object which
      * compares {@link Object#equals equal} to {@code entry}.
      *
-     * @param  entry the non-{@code null} local target.
-     * @throws NullPointerException if {@code target} is {@code null}.
+     * @param  name a non-{@code null} <i>common entry name</i>.
+     * @throws NullPointerException if {@code name} is {@code null}.
      * @throws CommonInputBusyException if the local target is currently busy
      *         on input.
      *         This exception is guaranteed to be recoverable, meaning it
@@ -56,5 +56,5 @@ public interface InputSocketProvider<LT extends CommonEntry> {
      * @return A non-{@code null} input socket for reading from the local
      *         target.
      */
-    InputSocket<? extends LT> getInputSocket(LT entry) throws IOException;
+    InputSocket<? extends LT> getInputSocket(String name) throws IOException;
 }

@@ -53,10 +53,11 @@ implements InputShop<ZipEntry> {
     }
 
     @Override
-    public InputSocket<ZipEntry> getInputSocket(final ZipEntry entry)
+    public InputSocket<ZipEntry> getInputSocket(final String name)
     throws FileNotFoundException {
-        if (!entry.equals(getEntry(entry.getName())))
-            throw new IllegalArgumentException("interface contract violation");
+        final ZipEntry entry = getEntry(name);
+        if (null == entry)
+            throw new FileNotFoundException(name + " (entry not found)");
 
         class Input extends InputSocket<ZipEntry> {
             @Override
@@ -74,7 +75,7 @@ implements InputShop<ZipEntry> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new FileNotFoundException("this operation is not supported"); // TODO: Support this for STORED entries.
+                throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this for STORED entries.
             }
         }
 

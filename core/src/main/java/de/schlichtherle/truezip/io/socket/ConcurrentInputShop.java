@@ -177,12 +177,12 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     @Override
-    public final InputSocket<? extends CE> getInputSocket(final CE entry)
+    public final InputSocket<? extends CE> getInputSocket(final String name)
     throws IOException {
 
         class InputSocket extends FilterInputSocket<CE> {
             InputSocket() throws IOException {
-                super(ConcurrentInputShop.super.getInputSocket(entry));
+                super(ConcurrentInputShop.super.getInputSocket(name));
             }
 
             @Override
@@ -207,8 +207,6 @@ extends FilterInputShop<CE, InputShop<CE>> {
         }
 
         ensureNotShopClosed();
-        if (!entry.equals(getEntry(entry.getName())))
-            throw new IllegalArgumentException("interface contract violation");
         // TODO: Check: Synchronization required?
         return new InputSocket();
     }
