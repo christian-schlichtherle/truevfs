@@ -46,7 +46,6 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -263,6 +262,7 @@ implements     ArchiveController     <AE>,
     @Override
     public final OutputSocket<AE> getOutputSocket(
             final String path,
+            final CommonEntry template,
             final BitField<OutputOption> options)
     throws IOException {
         class Output extends OutputSocket<AE> {
@@ -273,9 +273,6 @@ implements     ArchiveController     <AE>,
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
-                    final CommonEntry template = options.get(COPY_PROPERTIES)
-                            ? getRemoteTarget()
-                            : null;
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
                     link = autoMount(options.get(CREATE_PARENTS))

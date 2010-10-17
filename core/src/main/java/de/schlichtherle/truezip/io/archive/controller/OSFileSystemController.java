@@ -138,9 +138,10 @@ implements FileSystemModel, FileSystemController<FileEntry>  {
     @Override
     public OutputSocket<FileEntry> getOutputSocket(
             String path,
+            CommonEntry template,
             BitField<OutputOption> options)
     throws IOException {
-        return FileOutputSocket.get(FileEntry.get(target, path), options);
+        return FileOutputSocket.get(FileEntry.get(target, path), template, options);
     }
 
     @Override

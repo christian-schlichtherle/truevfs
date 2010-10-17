@@ -315,12 +315,14 @@ extends FilterArchiveController<AE> {
 
     @Override
     public OutputSocket<AE> getOutputSocket(String path,
+                                            CommonEntry template,
                                             BitField<OutputOption> options)
     throws IOException {
         ensureNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return new Output(getController().getOutputSocket(path, options));
+            return new Output(getController().getOutputSocket(
+                    path, template, options));
         } finally {
             writeLock().unlock();
         }

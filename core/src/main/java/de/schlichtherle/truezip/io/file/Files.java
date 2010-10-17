@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
@@ -35,7 +37,6 @@ import java.util.Arrays;
 
 import static de.schlichtherle.truezip.io.entry.CommonEntry.ROOT;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.socket.OutputOption.COPY_PROPERTIES;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**
@@ -214,12 +215,12 @@ class Files {
             final java.io.File dst)
     throws IOException {
         try {
-            IOSocket.copy(  getInputSocket(src,
-                                BitField.noneOf(InputOption.class)),
-                            getOutputSocket(dst,
-                                BitField.noneOf(OutputOption.class)
-                                    .set(CREATE_PARENTS, File.isLenient())
-                                    .set(COPY_PROPERTIES, preserve)));
+            final InputSocket<?> input = getInputSocket(src,
+                    BitField.noneOf(InputOption.class));
+            final CommonEntry template = preserve ? input.getLocalTarget() : null;
+            final OutputSocket<?> output = getOutputSocket(dst, template,
+                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()));
+            IOSocket.copy(input, output);
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (SyncException ex) {
@@ -256,6 +257,7 @@ class Files {
 
     static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
+            final CommonEntry template,
             final BitField<OutputOption> options)
     throws IOException {
         assert dst != null;
@@ -265,11 +267,11 @@ class Files {
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .getOutputSocket(file.getInnerEntryName(), options);
+                        .getOutputSocket(file.getInnerEntryName(), template, options);
         }
         return Controllers
                 .getController(dst.toURI(), null, null)
-                .getOutputSocket(ROOT, options);
+                .getOutputSocket(ROOT, template, options);
     }
 
     /**

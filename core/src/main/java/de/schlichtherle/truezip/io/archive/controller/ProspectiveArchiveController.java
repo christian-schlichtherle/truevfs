@@ -283,13 +283,14 @@ implements FileSystemController<CommonEntry> {
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            final String path,
-            final BitField<OutputOption> options)
+            String path,
+            CommonEntry template,
+            BitField<OutputOption> options)
     throws IOException {
         try {
-            return new Output(path, options);
+            return new Output(path, template, options);
         } catch (FalsePositiveException ex) {
-            return getEnclController().getOutputSocket(getEnclPath(path), options);
+            return getEnclController().getOutputSocket(getEnclPath(path), template, options);
         }
     }
 
@@ -300,12 +301,14 @@ implements FileSystemController<CommonEntry> {
      */
     private class Output extends FilterOutputSocket<CommonEntry> {
         final String path;
+        final CommonEntry template;
         final BitField<OutputOption> options;
 
-        Output(final String path, final BitField<OutputOption> options)
+        Output(final String path, final CommonEntry template, final BitField<OutputOption> options)
         throws IOException {
-            super(getController().getOutputSocket(path, options));
+            super(getController().getOutputSocket(path, template, options));
             this.path = path;
+            this.template = template;
             this.options = options;
         }
 
@@ -316,7 +319,7 @@ implements FileSystemController<CommonEntry> {
                 return getOutputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
-                        .getOutputSocket(getEnclPath(path), options)
+                        .getOutputSocket(getEnclPath(path), template, options)
                         .getLocalTarget();
             }
         }
@@ -328,7 +331,7 @@ implements FileSystemController<CommonEntry> {
                 return getOutputSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
-                        .getOutputSocket(getEnclPath(path), options)
+                        .getOutputSocket(getEnclPath(path), template, options)
                         .newOutputStream();
             }
         }
