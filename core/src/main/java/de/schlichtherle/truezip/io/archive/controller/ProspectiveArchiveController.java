@@ -237,7 +237,7 @@ implements FileSystemController<CommonEntry> {
         final String path;
         final BitField<InputOption> options;
 
-        Input(  final String path, final BitField<InputOption> options)
+        Input(final String path, final BitField<InputOption> options)
         throws IOException {
             super(getController().getInputSocket(path, options));
             this.path = path;
@@ -252,6 +252,7 @@ implements FileSystemController<CommonEntry> {
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
+                        .bind(this)
                         .getLocalTarget();
             }
         }
@@ -264,6 +265,7 @@ implements FileSystemController<CommonEntry> {
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
+                        .bind(this)
                         .newInputStream();
             }
         }
@@ -276,6 +278,7 @@ implements FileSystemController<CommonEntry> {
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
+                        .bind(this)
                         .newReadOnlyFile();
             }
         }
@@ -301,15 +304,17 @@ implements FileSystemController<CommonEntry> {
      */
     private class Output extends FilterOutputSocket<CommonEntry> {
         final String path;
-        final CommonEntry template;
         final BitField<OutputOption> options;
+        final CommonEntry template;
 
-        Output(final String path, final CommonEntry template, final BitField<OutputOption> options)
+        Output( final String path,
+                final CommonEntry template,
+                final BitField<OutputOption> options)
         throws IOException {
             super(getController().getOutputSocket(path, options, template));
             this.path = path;
-            this.template = template;
             this.options = options;
+            this.template = template;
         }
 
         @Override
@@ -320,6 +325,7 @@ implements FileSystemController<CommonEntry> {
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getOutputSocket(getEnclPath(path), options, template)
+                        .bind(this)
                         .getLocalTarget();
             }
         }
@@ -332,6 +338,7 @@ implements FileSystemController<CommonEntry> {
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getOutputSocket(getEnclPath(path), options, template)
+                        .bind(this)
                         .newOutputStream();
             }
         }

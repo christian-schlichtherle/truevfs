@@ -39,6 +39,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// FIXME: Make this work as described in the interface contract!
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     private final InputSocket <? extends LT> input;

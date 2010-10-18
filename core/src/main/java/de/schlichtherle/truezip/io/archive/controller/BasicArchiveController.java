@@ -210,14 +210,11 @@ implements     ArchiveController     <AE>,
         class Input extends InputSocket<AE> {
             boolean recursion;
 
-            Input() throws IOException {
-                autoMount(); // detect false positives!
-            }
-
             @Override
             public AE getLocalTarget()
             throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
+                    autoMount(); // detect false positives!
                     recursion = true;
                     try {
                         getPeerTarget(); // force autoSync for peer target!
@@ -254,13 +251,7 @@ implements     ArchiveController     <AE>,
             }
         } // class Input
 
-        if (isRoot(path)) {
-            autoMount(); // detect false positives!
-            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
-                    path, "cannot read directories");
-        } else {
-            return new Input();
-        }
+        return new Input();
     }
 
     @Override
@@ -272,10 +263,6 @@ implements     ArchiveController     <AE>,
         class Output extends OutputSocket<AE> {
             Operation<AE> link;
 
-            Output() throws IOException {
-                autoMount(options.get(CREATE_PARENTS)); // detect false positives!
-            }
-
             AE getEntry()
             throws IOException {
                 if (autoSync(path, WRITE))
@@ -283,7 +270,7 @@ implements     ArchiveController     <AE>,
                 if (null == link) {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
-                    link = autoMount(options.get(CREATE_PARENTS))
+                    link = autoMount(!isRoot(path) && options.get(CREATE_PARENTS))
                             .mknod( path, FILE,
                                     options.get(CREATE_PARENTS), template);
                 }
@@ -336,13 +323,7 @@ implements     ArchiveController     <AE>,
             }
         } // class Output
 
-        if (isRoot(path)) {
-            autoMount(); // detect false positives!
-            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
-                    path, "cannot write directories");
-        } else {
-            return new Output();
-        }
+        return new Output();
     }
 
     @Override

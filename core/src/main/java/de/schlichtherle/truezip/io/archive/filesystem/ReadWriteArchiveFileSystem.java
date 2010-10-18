@@ -153,14 +153,14 @@ implements ArchiveFileSystem<AE> {
     }
 
     /**
-     * Checks whether the given path path is a <i>valid path path</i>.
-     * A valid path path is in
+     * Checks whether the given path name is a <i>valid path name</i>.
+     * A valid path name is in
      * {@link Paths#normalize(String, char) normal form},
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
      * @see    CommonEntryFactory#newEntry Common Requirements For Operation Names
-     * @param  path a non-{@code null} path path.
+     * @param  name a non-{@code null} path name.
      */
     private static boolean isValidPath(final String name) {
         if (isRoot(name))
@@ -173,7 +173,7 @@ implements ArchiveFileSystem<AE> {
         assert length > 0 || isRoot(name);
         switch (name.charAt(0)) {
         case SEPARATOR_CHAR:
-            return false; // not a relative path path
+            return false; // not a relative path name
 
         case '.':
             if (length >= 2) {
@@ -211,7 +211,7 @@ implements ArchiveFileSystem<AE> {
         return true;
     }
 
-    /** Splits a path path into a parent path path and a base path. */
+    /** Splits a path name into a parent path name and a base path. */
     private static class Splitter
     extends de.schlichtherle.truezip.io.Paths.Splitter {
         Splitter() {
@@ -219,11 +219,11 @@ implements ArchiveFileSystem<AE> {
         }
 
         /**
-         * Splits the given path path into a parent path path and a base path.
-         * Iff the given path path does not path a parent directory, then
+         * Splits the given path name into a parent path name and a base path.
+         * Iff the given path name does not path a parent directory, then
          * {@link ArchiveEntry#ROOT} is set at index zero of the returned array.
          *
-         * @param  path The path path which's parent path path and base path
+         * @param  path The path name which's parent path name and base path
          *         are to be returned.
          * @throws NullPointerException If {@code path} is {@code null}.
          */
@@ -369,8 +369,8 @@ implements ArchiveFileSystem<AE> {
      * not yet linked into this virtual archive file system.
      *
      * @see    #mknod
-     * @param  path the non-{@code null} path path of the archive file system entry.
-     *         This is always a {@link #isValidPath(String) valid path path}.
+     * @param  path the non-{@code null} path name of the archive file system entry.
+     *         This is always a {@link #isValidPath(String) valid path name}.
      */
     private BaseEntry<AE> newEntryChecked(
             final String path,
@@ -688,11 +688,11 @@ implements ArchiveFileSystem<AE> {
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param path The non-{@code null} normalized path path of the file
+         * @param path The non-{@code null} normalized path name of the file
          *        system entry.
          * @param entry The non-{@code null} file system entry for the path
          *        path.
-         * @param base The nullable base (segment) path of the path path.
+         * @param base The nullable base (segment) path of the path name.
          */
         SegmentLink(
                 final String path,
