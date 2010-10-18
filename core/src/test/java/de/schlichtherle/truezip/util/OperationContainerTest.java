@@ -16,7 +16,6 @@
 
 package de.schlichtherle.truezip.util;
 
-import de.schlichtherle.truezip.io.IOOperation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,13 +58,13 @@ public class OperationContainerTest extends TestCase {
         assertEquals(n, handler.warnCount);
     }
 
-    private static class Success implements IOOperation {
+    private static class Success implements Operation<IOException> {
         @Override
         public void run() throws IOException {
         }
     }
 
-    private static class Failure implements IOOperation {
+    private static class Failure implements Operation<IOException> {
         @Override
         public void run() throws IOException {
             throw new FileNotFoundException();

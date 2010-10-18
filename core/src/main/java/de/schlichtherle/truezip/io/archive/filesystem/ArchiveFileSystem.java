@@ -17,7 +17,6 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.IOOperation;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -66,7 +65,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      * @see #mknod
      */
     interface Operation<AE extends ArchiveEntry>
-    extends IOOperation, Link<Entry<AE>> {
+    extends de.schlichtherle.truezip.util.Operation<ArchiveFileSystemException>,
+            Link<Entry<AE>> {
 
         /** Executes this archive file system entry chain operation. */
         @Override
