@@ -31,16 +31,17 @@ import java.io.InputStream;
 public final class FileInputSocket extends InputSocket<FileEntry> {
     private final FileEntry file;
 
-    public static InputSocket<FileEntry> get(final FileEntry file) {
+    public static InputSocket<FileEntry> get(FileEntry file)
+    throws IOException {
         return get(file, null);
     }
 
-    public static InputSocket<FileEntry> get(
-            FileEntry file,
-            BitField<InputOption> options) {
+    public static InputSocket<FileEntry> get(   FileEntry file,
+                                                BitField<InputOption> options)
+    throws IOException {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (null != options && options.get(InputOption.CACHE))
-            input = new CachingInputSocket<FileEntry>(input);
+            input = Caches.newInstance(input).getInputSocket();
         return input;
     }
 

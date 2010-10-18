@@ -107,7 +107,7 @@ implements OutputShop<TarEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final CommonEntry peer = getRemoteTarget();
+                final CommonEntry peer = getPeerTarget();
                 if (null != peer) {
                     entry.setSize(peer.getSize(DATA));
                     return new EntryOutputStream(entry);

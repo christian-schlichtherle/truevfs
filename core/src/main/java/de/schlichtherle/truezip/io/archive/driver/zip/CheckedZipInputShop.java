@@ -77,7 +77,7 @@ public class CheckedZipInputShop extends ZipInputShop {
                 return CheckedZipInputShop.this.getInputStream(
                         entry.getName(),
                         true,
-                        !(getRemoteTarget() instanceof ZipEntry));
+                        !(getPeerTarget() instanceof ZipEntry));
             }
 
             @Override

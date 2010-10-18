@@ -42,12 +42,12 @@ extends IOSocket<LT, CommonEntry> {
     private InputSocket<?> peer;
 
     @Override
-    public CommonEntry getRemoteTarget() throws IOException {
+    public CommonEntry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 
     /**
-     * Makes the given output socket share its remote target with this output
+     * Makes the given output socket share its peer target with this output
      * socket.
      * Note that this method does <em>not</em> change the peer output socket of
      * the given output socket's peer input socket to this instance, i.e. this

@@ -466,9 +466,9 @@ public abstract class IOFileTestCase extends TestCase {
     public void testLenientFileOutputStream()
     throws IOException {
         File file = new File(archive, "dir/inner" + suffix + "/dir/test.txt");
-        
+
         testFileOutputStream(file);
-        
+
         assertFalse(archive.delete()); // directory not empty!
         File.umount(); // allow external modifications!
         assertTrue(new java.io.File(archive.getPath()).delete()); // use plain file to delete instead!
@@ -477,7 +477,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertFalse(archive.isFile());
         assertEquals(0, archive.length());
     }
-    
+
     void testFileOutputStream(File file)
     throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
