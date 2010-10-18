@@ -22,8 +22,8 @@ import java.io.IOException;
  * Implements a caching strategy for input sockets.
  * Using this interface has the following effects:
  * <ul>
- * <li>Upon the first read operation, the data will be read and from the
- *     local target and stored in the cache.
+ * <li>Upon the first read operation, the data will be read from the local
+ *     target and stored in the cache.
  *     Subsequent or concurrent read operations will be served from the cache
  *     without re-reading the data from the local target again until the cache
  *     gets cleared.

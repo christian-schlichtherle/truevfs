@@ -22,27 +22,24 @@ import java.util.logging.Logger;
 
 /**
  * Similar to {@code java.util.concurrent.locks.ReentrantReadWriteLock}
- * with the following differences:
- * <ul>
- * <li>This class performs better than its overengineered colleague in JSE 5.
- * <li>This class provides locks which provide a different set of methods
- *     (with the same functionality in the common subset) in order to suit
- *     the particular needs of TrueZIP (see {@link ReentrantLock}).
- * </ul>
+ * but provides read/write locks with a slightly different interface in order
+ * to suit the particular needs of TrueZIP (see {@link ReentrantLock}).
+ * Methods common to both APIs have identical contracts in order not to
+ * confuse users.
  * <p>
- * <b>Note:</b> In accordance with JSE 5, upgrading a read lock to a write
- * lock is not possible. Any attempt to do so will lock the current thread.
- * This is a constraint which can't be fixed properly: If this constraint
- * would not exist, two reader threads could try to upgrade from a read lock
- * to a write lock concurrently, effectively dead locking them.
+ * <b>Note:</b> In accordance with JSE 5, any attempt to upgrade a read lock
+ * to a write will lock the current thread.
+ * This is by design: If this limitation would not exist, two reader threads
+ * could try to upgrade from a read lock to a write lock concurrently,
+ * effectively dead locking each other.
  * By locking this thread immediately on any attempt to do so, this is
  * considered to be a programming error which can be easily fixed without
  * affecting any other thread.
  * <p>
- * To the contrary, it is possible to downgrade from a write lock to a
- * read lock. Please consult the JSE 5 Javadoc of the class
- * {@code java.util.concurrent.locks.ReentrantReadWriteLock}
- * for more information.
+ * Conversely, it's possible to downgrade from a write lock to a read lock.
+ * Please consult the JSE 5 Javadoc of the class
+ * {@code java.util.concurrent.locks.ReentrantReadWriteLock} for more
+ * information.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -54,11 +51,11 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
     private static final Logger logger
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
+    private int  readCount; // shared
+    private int writeCount; // exclusive
+
     private final ReadLock readLock = new ReadLock();
     private final WriteLock writeLock = new WriteLock();
-
-    private int writeLockCount; // exclusive
-    private int  readLockCount; // shared
 
     /**
      * Returns the lock for reading.
@@ -135,7 +132,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
         final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Wait until no other writer has acquired a lock.
-            while (writeLockCount > writeHoldCount) {
+            while (writeCount > writeHoldCount) {
                 assert writeHoldCount == 0 : "write lock isn't held exclusively!";
                 try {
                     wait();
@@ -144,8 +141,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
                     logger.log(Level.FINE, "continuing");
                 }
             }
-            assert writeLockCount == writeHoldCount : "write lock/hold mismatch!";
-            readLockCount++;
+            assert writeCount == writeHoldCount : "write lock/hold mismatch!";
+            readCount++;
         }
     }
 
@@ -154,12 +151,12 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
         final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Wait until no other writer has acquired a lock.
-            while (writeLockCount > writeHoldCount) {
+            while (writeCount > writeHoldCount) {
                 assert writeHoldCount == 0 : "write lock isn't held exclusively!";
                 wait();
             }
-            assert writeLockCount == writeHoldCount : "write lock/hold mismatch!";
-            readLockCount++;
+            assert writeCount == writeHoldCount : "write lock/hold mismatch!";
+            readCount++;
         }
     }
 
@@ -167,18 +164,18 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
         final int writeHoldCount = writeLock.getHoldCount();
         synchronized (this) {
             // Check if another writer has acquired a lock.
-            if (writeLockCount > writeHoldCount) {
+            if (writeCount > writeHoldCount) {
                 assert writeHoldCount == 0 : "write lock isn't held exclusively!";
                 return false;
             }
-            assert writeLockCount == writeHoldCount : "write lock/hold mismatch!";
-            readLockCount++;
+            assert writeCount == writeHoldCount : "write lock/hold mismatch!";
+            readCount++;
         }
         return true;
     }
 
     private synchronized void unlockRead() {
-        readLockCount--;
+        readCount--;
         notifyAll();
     }
 
@@ -188,8 +185,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             if (writeHoldCount <= 0) { // If I'm not the writer...
                 final int readHoldCount = readLock.getHoldCount();
                 // ... wait until no other writer and no readers have acquired a lock.
-                while (readLockCount > 0 /*- readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
-                        || writeLockCount > writeHoldCount) {
+                while (readCount > 0 /*- readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
+                        || writeCount > writeHoldCount) {
                     try {
                         wait();
                     } catch (InterruptedException ex) {
@@ -197,9 +194,9 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
                         logger.log(Level.FINE, "continuing");
                     }
                 }
-                assert readLockCount == readHoldCount : "read lock/hold mismatch!";
+                assert readCount == readHoldCount : "read lock/hold mismatch!";
             }
-            writeLockCount++;
+            writeCount++;
         }
     }
 
@@ -210,13 +207,13 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             if (writeHoldCount <= 0) { // If I'm not the writer...
                 final int readHoldCount = readLock.getHoldCount();
                 // ... wait until no other writer and no readers have acquired a lock.
-                while (readLockCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
-                        || writeLockCount > writeHoldCount) {
+                while (readCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
+                        || writeCount > writeHoldCount) {
                     wait();
                 }
-                assert readLockCount == readHoldCount : "read lock/hold mismatch!";
+                assert readCount == readHoldCount : "read lock/hold mismatch!";
             }
-            writeLockCount++;
+            writeCount++;
         }
     }
 
@@ -226,19 +223,19 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
             if (writeHoldCount <= 0) { // If I'm not the writer...
                 final int readHoldCount = readLock.getHoldCount();
                 // ... check if another reader or writer has acquired a lock.
-                if (readLockCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
-                        || writeLockCount > writeHoldCount) {
+                if (readCount > 0 /* readHoldCount*/ // mimic JSE 5: dead lock on lock upgrade!
+                        || writeCount > writeHoldCount) {
                     return false;
                 }
-                assert readLockCount == readHoldCount : "read lock/hold mismatch!";
+                assert readCount == readHoldCount : "read lock/hold mismatch!";
             }
-            writeLockCount++;
+            writeCount++;
         }
         return true;
     }
 
     private synchronized void unlockWrite() {
-        writeLockCount--;
+        writeCount--;
         notifyAll();
     }
 

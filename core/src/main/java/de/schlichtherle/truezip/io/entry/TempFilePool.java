@@ -33,7 +33,7 @@ public final class TempFilePool implements CommonEntryPool<FileEntry> {
     static final String DEFAULT_PREFIX = "tzp-pool";
     static final String DEFAULT_SUFFIX = null;
 
-    private static final TempFilePool instance
+    private static final TempFilePool INSTANCE
             = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, null);
 
     private final String prefix;
@@ -42,7 +42,7 @@ public final class TempFilePool implements CommonEntryPool<FileEntry> {
 
     /** Returns the default instance of this temp file pool. */
     public static TempFilePool get() {
-        return instance;
+        return INSTANCE;
     }
 
     /** Constructs a new temp file pool. */

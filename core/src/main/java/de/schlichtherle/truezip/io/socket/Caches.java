@@ -40,18 +40,18 @@ public class Caches {
 
     public static <LT extends CommonEntry>
     InputCache<LT> newInstance(InputSocket <? extends LT> input) {
-        return new DefaultCache<LT>(input, null, null);
+        return new DefaultCache<LT>(input, null);
     }
 
     public static <LT extends CommonEntry>
     OutputCache<LT> newInstance(OutputSocket <? extends LT> output) {
-        return new DefaultCache<LT>(null, output, null);
+        return new DefaultCache<LT>(null, output);
     }
 
     public static <LT extends CommonEntry>
     Cache<LT> newInstance(InputSocket<? extends LT> input, OutputSocket<? extends LT> output) {
         /*if (null == input || null == output)
             throw new NullPointerException();*/
-        return new DefaultCache<LT>(input, output, null);
+        return new DefaultCache<LT>(input, output);
     }
 }
