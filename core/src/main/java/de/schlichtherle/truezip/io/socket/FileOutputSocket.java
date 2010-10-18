@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntryPool;
+import de.schlichtherle.truezip.util.Pool;
 import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.FilterOutputStream;
@@ -42,7 +42,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final FileEntry file;
     private final CommonEntry template;
     private final BitField<OutputOption> options;
-    private final CommonEntryPool<FileEntry> pool;
+    private final Pool<FileEntry, IOException> pool;
 
     public static OutputSocket<FileEntry> get(FileEntry file) {
         return new FileOutputSocket(file, null, null);

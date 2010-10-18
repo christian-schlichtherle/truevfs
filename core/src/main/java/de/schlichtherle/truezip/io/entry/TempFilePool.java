@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.Files;
+import de.schlichtherle.truezip.util.Pool;
 import java.io.File;
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TempFilePool implements CommonEntryPool<FileEntry> {
+public final class TempFilePool implements Pool<FileEntry, IOException> {
 
     // Declared package private for unit testing purposes.
     static final String DEFAULT_PREFIX = "tzp-pool";

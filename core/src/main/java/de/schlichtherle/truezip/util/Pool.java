@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.entry;
-
-import java.io.IOException;
+package de.schlichtherle.truezip.util;
 
 /**
- * A pooling strategy for common entries.
+ * A pooling strategy.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonEntryPool<CE extends CommonEntry> {
+public interface Pool<R, E extends Exception> {
 
     /**
-     * Allocates a common entry from this pool.
+     * Allocates a resource from this pool.
      *
-     * @return A non-{@code null} common entry.
+     * @return A non-{@code null} resource.
+     * @throws Exception if allocating the resource failed for any reason.
      */
-    public CE allocate() throws IOException;
+    public R allocate() throws E;
 
     /**
-     * Releases a previously allocated common entry to this pool.
+     * Releases a previously allocated resource to this pool.
      *
-     * @param  entry a non-{@code null} common entry.
-     * @throws IllegalArgumentException if the given entry is not allocated
+     * @param  resource a non-{@code null} resource.
+     * @throws IllegalArgumentException if the given resource is not allocated
      *         by this pool.
+     * @throws Exception if releasing the resource failed for any other reason.
      */
-    public void release(CE entry) throws IOException;
+    public void release(R resource) throws E;
 }
