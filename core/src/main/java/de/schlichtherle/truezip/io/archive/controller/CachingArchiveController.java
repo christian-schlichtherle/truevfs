@@ -41,18 +41,24 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
  * within its target archive file.
  * Decorating an archive controller with this class has the following effects:
  * <ul>
- * <li>It increases the performance of concurrent or subsequent read operations.
- * <li>It increases the performance of subsequent write-then-read operations.
- * <li>It decouples the target archive file from read and write operations
- *     so that it can get {@link #sync synced} concurrently.
+ * <li>Upon the first read operation, the data will be read from the archive
+ *     entry and stored in the cache.
+ *     Subsequent or concurrent read operations will be served from the cache
+ *     without re-reading the data from the archive entry again until the
+ *     target archive file gets {@link #sync synced}.
+ * <li>Any data written to the cache will get written to the target archive
+ *     file if and only if the target archive file gets {@link #sync synced}.
+ * <li>After a write operation, the data will be stored in the cache for
+ *     subsequent read operations until the target archive file gets
+ *     {@link #sync synced}.
  * </ul>
  * <p>
- * Caching is automatically activated once an
+ * Caching an archive entry is automatically activated once an
  * {@link #getInputSocket input socket} with {@link InputOption#CACHE} or an
  * {@link #getOutputSocket output socket} with {@link InputOption#CACHE}
- * is acquired. Subsequent read/write operations will then use the cache
- * regardless if these options where set when the respective socket was
- * acquired or not.
+ * is acquired. Subsequent read/write operations for the archive entry will
+ * then use the cache regardless if these options were set when the respective
+ * socket was acquired or not.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -61,22 +67,21 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
 final class CachingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
-    private Map<String, PathCache> caches;
+    private Map<String, EntryCache> caches;
 
     CachingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
     }
 
-    private Cache<AE> getCache(
-            final String path,
-            final boolean create,
-            final BitField<InputOption > inputOptions,
-            final BitField<OutputOption> outputOptions)
+    private Cache<AE> getCache( final boolean create,
+                                final String path,
+                                final BitField<InputOption > inputOptions,
+                                final BitField<OutputOption> outputOptions)
     throws IOException {
         if (create) {
             if (null == caches)
-                caches = new HashMap<String, PathCache>();
-            return new PathCache(path, inputOptions, outputOptions);
+                caches = new HashMap<String, EntryCache>();
+            return new EntryCache(path, inputOptions, outputOptions);
         } else {
             if (null == caches)
                 return null;
@@ -89,21 +94,13 @@ extends FilterArchiveController<AE> {
             final String path,
             final BitField<InputOption> options)
     throws IOException {
-        if (!options.get(InputOption.CACHE)) {
-            final Cache<AE> cache = getCache(path, false, options, null);
-            if (null != cache) {
-                assert false;
-                try {
-                    cache.flush();
-                } finally {
-                    final Cache<AE> cache2 = caches.remove(path);
-                    assert cache2 == cache;
-                    cache.clear();
-                }
-            }
+        Cache<AE> cache = null;
+        if (!options.get(InputOption.CACHE)
+                && null == (cache = getCache(false, path, options, null))) {
             return getController().getInputSocket(path, options);
         }
-        return getCache(path, true, options, null).getInputSocket();
+        return (null != cache ? cache : getCache(true, path, options, null))
+                .getInputSocket();
     }
 
     @Override
@@ -112,10 +109,11 @@ extends FilterArchiveController<AE> {
             final BitField<OutputOption> options,
             final CommonEntry template)
     throws IOException {
-        if (!options.get(OutputOption.CACHE) || options.get(OutputOption.APPEND) || null != template) {
-            final Cache<AE> cache = getCache(path, false, null, options);
+        Cache<AE> cache = null;
+        if (!options.get(OutputOption.CACHE)
+                && null == (cache = getCache(false, path, null, options))
+                || options.get(OutputOption.APPEND) || null != template) {
             if (null != cache) {
-                assert false;
                 try {
                     cache.flush();
                 } finally {
@@ -139,7 +137,9 @@ extends FilterArchiveController<AE> {
             }
         } // class Output
 
-        return new Output(getCache(path, true, null, options).getOutputSocket());
+        return new Output(
+                (null != cache ? cache : getCache(true, path, null, options))
+                .getOutputSocket());
     }
 
     @Override
@@ -148,7 +148,7 @@ extends FilterArchiveController<AE> {
     throws E, ArchiveControllerException {
         if (null != caches) {
             final boolean abort = options.get(SyncOption.ABORT_CHANGES);
-            for (final PathCache cache : caches.values()) {
+            for (final EntryCache cache : caches.values()) {
                 try {
                     try {
                         if (!abort)
@@ -165,13 +165,13 @@ extends FilterArchiveController<AE> {
         super.sync(builder, options);
     }
 
-    private final class PathCache implements Cache<AE> {
+    private final class EntryCache implements Cache<AE> {
         final String path;
         final BitField<InputOption > inputOptions;
         final BitField<OutputOption> outputOptions;
         final Cache<AE> cache;
 
-        PathCache(  final String path,
+        EntryCache(  final String path,
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions)
         throws IOException {
@@ -199,10 +199,6 @@ extends FilterArchiveController<AE> {
 
         public void clear() throws IOException {
             cache.clear();
-            /*synchronized (CachingArchiveController.this) {
-                caches.remove(path);
-                cache.clear();
-            }*/
         }
 
         class Input extends FilterInputSocket<AE> {
@@ -214,7 +210,7 @@ extends FilterArchiveController<AE> {
             public InputStream newInputStream() throws IOException {
                 synchronized (CachingArchiveController.this) {
                     final InputStream in = super.newInputStream();
-                    //caches.put(path, PathCache.this);
+                    caches.put(path, EntryCache.this);
                     return in;
                 }
             }
@@ -223,7 +219,7 @@ extends FilterArchiveController<AE> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 synchronized (CachingArchiveController.this) {
                     final ReadOnlyFile rof = super.newReadOnlyFile();
-                    //caches.put(path, PathCache.this);
+                    caches.put(path, EntryCache.this);
                     return rof;
                 }
             }
@@ -238,7 +234,7 @@ extends FilterArchiveController<AE> {
             public OutputStream newOutputStream() throws IOException {
                 synchronized (CachingArchiveController.this) {
                     final OutputStream out = super.newOutputStream();
-                    //caches.put(path, PathCache.this);
+                    caches.put(path, EntryCache.this);
                     return out;
                 }
             }
