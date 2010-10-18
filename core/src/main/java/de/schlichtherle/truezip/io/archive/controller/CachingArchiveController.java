@@ -57,6 +57,7 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+// FIXME: Make this work as advertised!
 final class CachingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
@@ -181,9 +182,7 @@ extends FilterArchiveController<AE> {
             this.outputOptions = null != outputOptions
                     ? outputOptions.clear(OutputOption.CACHE)
                     : BitField.noneOf(OutputOption.class);
-            this.cache = Caches.newInstance(
-                    null == inputOptions ? null : new Input(),
-                    null == outputOptions ? null : new Output());
+            this.cache = Caches.newInstance(new Input(), new Output()); // FIXME: this doesn't work with eager socket implementations!
         }
 
         public InputSocket<AE> getInputSocket() throws IOException {

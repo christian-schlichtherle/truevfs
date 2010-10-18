@@ -33,7 +33,6 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  *     subsequent read operations until the cache gets cleared.
  * </ul>
  *
- * @param   <LT> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
