@@ -118,7 +118,7 @@ implements ArchiveFileSystem<AE> {
         final Normalizer normalizer = new Normalizer();
         for (final AE entry : container) {
             final String path = normalizer.normalize(entry.getName());
-            master.put(path, newEntry(entry));
+            master.put(path, newEntry(path, entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -153,14 +153,14 @@ implements ArchiveFileSystem<AE> {
     }
 
     /**
-     * Checks whether the given path name is a <i>valid path name</i>.
-     * A valid path name is in
+     * Checks whether the given path path is a <i>valid path path</i>.
+     * A valid path path is in
      * {@link Paths#normalize(String, char) normal form},
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
      * @see    CommonEntryFactory#newEntry Common Requirements For Operation Names
-     * @param  name a non-{@code null} path name.
+     * @param  path a non-{@code null} path path.
      */
     private static boolean isValidPath(final String name) {
         if (isRoot(name))
@@ -173,7 +173,7 @@ implements ArchiveFileSystem<AE> {
         assert length > 0 || isRoot(name);
         switch (name.charAt(0)) {
         case SEPARATOR_CHAR:
-            return false; // not a relative path name
+            return false; // not a relative path path
 
         case '.':
             if (length >= 2) {
@@ -211,7 +211,7 @@ implements ArchiveFileSystem<AE> {
         return true;
     }
 
-    /** Splits a path name into a parent path name and a base name. */
+    /** Splits a path path into a parent path path and a base path. */
     private static class Splitter
     extends de.schlichtherle.truezip.io.Paths.Splitter {
         Splitter() {
@@ -219,11 +219,11 @@ implements ArchiveFileSystem<AE> {
         }
 
         /**
-         * Splits the given path name into a parent path name and a base name.
-         * Iff the given path name does not name a parent directory, then
+         * Splits the given path path into a parent path path and a base path.
+         * Iff the given path path does not path a parent directory, then
          * {@link ArchiveEntry#ROOT} is set at index zero of the returned array.
          *
-         * @param  path The path name which's parent path name and base name
+         * @param  path The path path which's parent path path and base path
          *         are to be returned.
          * @throws NullPointerException If {@code path} is {@code null}.
          */
@@ -357,7 +357,7 @@ implements ArchiveFileSystem<AE> {
         assert !(template instanceof Entry<?>);
 
         try {
-            return newEntry(factory.newEntry(path, type, template));
+            return newEntry(path, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new IllegalArgumentException(path, ex);
         }
@@ -369,8 +369,8 @@ implements ArchiveFileSystem<AE> {
      * not yet linked into this virtual archive file system.
      *
      * @see    #mknod
-     * @param  path the non-{@code null} path name of the archive file system entry.
-     *         This is always a {@link #isValidPath(String) valid path name}.
+     * @param  path the non-{@code null} path path of the archive file system entry.
+     *         This is always a {@link #isValidPath(String) valid path path}.
      */
     private BaseEntry<AE> newEntryChecked(
             final String path,
@@ -383,7 +383,7 @@ implements ArchiveFileSystem<AE> {
         assert !(template instanceof Entry<?>);
 
         try {
-            return newEntry(factory.newEntry(path, type, template));
+            return newEntry(path, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new ArchiveFileSystemException(path, ex);
         }
@@ -396,10 +396,14 @@ implements ArchiveFileSystem<AE> {
      * @throws NullPointerException If {@code entry} is {@code null}.
      */
     private static <AE extends ArchiveEntry>
-    BaseEntry<AE> newEntry(final AE entry) {
+    BaseEntry<AE> newEntry(final String path, final AE entry) {
         return DIRECTORY == entry.getType()
-                ? new DirectoryEntry<AE>(entry)
-                : new      FileEntry<AE>(entry);
+                ? path.equals(entry.getName())
+                    ? new      DirectoryEntry<AE>(      entry)
+                    : new NamedDirectoryEntry<AE>(path, entry)
+                : path.equals(entry.getName())
+                    ? new           FileEntry<AE>(      entry)
+                    : new      NamedFileEntry<AE>(path, entry);
     }
 
     /**
@@ -434,10 +438,10 @@ implements ArchiveFileSystem<AE> {
         }
 
         /**
-         * Adds the given base name to the set of members of this directory
+         * Adds the given base path to the set of members of this directory
          * if and only if this file system entry is a directory.
          *
-         * @param  member The non-{@code null} base name of the member to add.
+         * @param  member The non-{@code null} base path of the member to add.
          * @return Whether the member has been added or an equal member was
          *         already present in the directory.
          * @throws UnsupportedOperationException if this file system entry is
@@ -448,11 +452,11 @@ implements ArchiveFileSystem<AE> {
         }
 
         /**
-         * Removes the given base name from the set of members of this
+         * Removes the given base path from the set of members of this
          * directory
          * if and only if this file system entry is a directory.
          *
-         * @param  member The non-{@code null} base name of the member to
+         * @param  member The non-{@code null} base path of the member to
          *         remove.
          * @return Whether the member has been removed or no equal member was
          *         present in the directory.
@@ -471,7 +475,7 @@ implements ArchiveFileSystem<AE> {
     } // class CommonEntry
 
     /** A file entry. */
-    private static final class FileEntry<AE extends ArchiveEntry>
+    private static class FileEntry<AE extends ArchiveEntry>
     extends BaseEntry<AE> {
         /** Decorates the given archive entry. */
         FileEntry(final AE entry) {
@@ -485,8 +489,26 @@ implements ArchiveFileSystem<AE> {
         }
     } // class FileEntry
 
+    /** A named file entry. */
+    private static class NamedFileEntry<AE extends ArchiveEntry>
+    extends FileEntry<AE> {
+        final String path;
+
+        /** Decorates the given archive entry. */
+        NamedFileEntry(final String path, final AE entry) {
+            super(entry);
+            assert entry.getType() != DIRECTORY;
+            this.path = path;
+        }
+
+        @Override
+        public String getName() {
+            return path;
+        }
+    } // class NamedFileEntry
+
     /** A directory entry. */
-    private static final class DirectoryEntry<AE extends ArchiveEntry>
+    private static class DirectoryEntry<AE extends ArchiveEntry>
     extends BaseEntry<AE> {
         Set<String> members = new LinkedHashSet<String>();
 
@@ -505,7 +527,7 @@ implements ArchiveFileSystem<AE> {
 
         @Override
         public Set<String> getMembers() {
-            return Collections.unmodifiableSet(members);
+            return members;
         }
 
         @Override
@@ -518,6 +540,24 @@ implements ArchiveFileSystem<AE> {
             return members.remove(member);
         }
     } // class DirectoryEntry
+
+    /** A named file entry. */
+    private static class NamedDirectoryEntry<AE extends ArchiveEntry>
+    extends DirectoryEntry<AE> {
+        final String path;
+
+        /** Decorates the given archive entry. */
+        NamedDirectoryEntry(final String path, final AE entry) {
+            super(entry);
+            assert DIRECTORY == entry.getType();
+            this.path = path;
+        }
+
+        @Override
+        public String getName() {
+            return path;
+        }
+    } // class NamedDirectoryEntry
 
     @Override
     public Operation<AE> mknod(
@@ -648,11 +688,11 @@ implements ArchiveFileSystem<AE> {
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param path The non-{@code null} normalized path name of the file
+         * @param path The non-{@code null} normalized path path of the file
          *        system entry.
          * @param entry The non-{@code null} file system entry for the path
-         *        name.
-         * @param base The nullable base (segment) name of the path name.
+         *        path.
+         * @param base The nullable base (segment) path of the path path.
          */
         SegmentLink(
                 final String path,
