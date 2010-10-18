@@ -26,43 +26,11 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket<LT> {
-
-    private OutputSocketProvider<LT> provider;
-    private OutputSocket<? extends LT> socket;
-    private LT target;
-
-    public LazyOutputSocket(final OutputSocketProvider<LT> provider,
-                            final LT target) {
-        if (null == provider || null == target)
-            throw new NullPointerException();
-        this.provider = provider;
-        this.target = target;
-    }
+public final class LazyOutputSocket<LT extends CommonEntry>
+extends FilterOutputSocket<LT> {
 
     public LazyOutputSocket(final OutputSocket<? extends LT> output) {
-        if (null == output)
-            throw new NullPointerException();
-        this.socket = output;
-    }
-
-    protected final OutputSocket<? extends LT> getOutputSocket() throws IOException {
-        if (null == socket) {
-            socket = provider.getOutputSocket(target);
-            provider = null; // support gc!
-            target = null;
-        }
-        return socket.bind(this);
-    }
-
-    @Override
-    public LT getLocalTarget() throws IOException {
-        return getOutputSocket().getLocalTarget();
-    }
-
-    @Override
-    public CommonEntry getPeerTarget() throws IOException {
-        return getOutputSocket().getPeerTarget();
+        super(output);
     }
 
     @Override
@@ -70,7 +38,7 @@ public final class LazyOutputSocket<LT extends CommonEntry> extends OutputSocket
         return new LazyOutputStream();
     }
 
-    private final class LazyOutputStream extends FilterOutputStream {
+    private class LazyOutputStream extends FilterOutputStream {
         LazyOutputStream() {
             super(null);
         }

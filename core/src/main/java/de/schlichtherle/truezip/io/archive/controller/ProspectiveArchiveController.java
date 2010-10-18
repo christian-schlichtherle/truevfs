@@ -219,13 +219,8 @@ implements FileSystemController<CommonEntry> {
     @Override
     public InputSocket<?> getInputSocket(
             final String path,
-            final BitField<InputOption> options)
-    throws IOException {
-        try {
-            return new Input(path, options);
-        } catch (FalsePositiveException ex) {
-            return getEnclController().getInputSocket(getEnclPath(path), options);
-        }
+            final BitField<InputOption> options) {
+        return new Input(path, options);
     }
 
     /**
@@ -237,8 +232,7 @@ implements FileSystemController<CommonEntry> {
         final String path;
         final BitField<InputOption> options;
 
-        Input(final String path, final BitField<InputOption> options)
-        throws IOException {
+        Input(final String path, final BitField<InputOption> options) {
             super(getController().getInputSocket(path, options));
             this.path = path;
             this.options = options;
@@ -288,13 +282,8 @@ implements FileSystemController<CommonEntry> {
     public OutputSocket<?> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template)
-    throws IOException {
-        try {
-            return new Output(path, template, options);
-        } catch (FalsePositiveException ex) {
-            return getEnclController().getOutputSocket(getEnclPath(path), options, template);
-        }
+            CommonEntry template) {
+        return new Output(path, options, template);
     }
 
     /**
@@ -308,9 +297,8 @@ implements FileSystemController<CommonEntry> {
         final CommonEntry template;
 
         Output( final String path,
-                final CommonEntry template,
-                final BitField<OutputOption> options)
-        throws IOException {
+                final BitField<OutputOption> options,
+                final CommonEntry template) {
             super(getController().getOutputSocket(path, options, template));
             this.path = path;
             this.options = options;

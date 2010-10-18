@@ -91,8 +91,10 @@ implements OutputShop<TarEntry> {
     }
 
     @Override
-    public OutputSocket<TarEntry> getOutputSocket(final TarEntry entry)
-    throws FileNotFoundException {
+    public OutputSocket<TarEntry> getOutputSocket(final TarEntry entry) {
+        if (null == entry)
+            throw new NullPointerException();
+
         class Output extends OutputSocket<TarEntry> {
             @Override
             public TarEntry getLocalTarget() {
@@ -119,7 +121,8 @@ implements OutputShop<TarEntry> {
                 return new TempEntryOutputStream(
                         createTempFile(TEMP_FILE_PREFIX), entry);
             }
-        }
+        } // class Output
+
         return new Output();
     }
 

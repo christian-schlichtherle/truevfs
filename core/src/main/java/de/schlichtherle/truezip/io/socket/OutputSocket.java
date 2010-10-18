@@ -130,11 +130,6 @@ extends IOSocket<LT, CommonEntry> {
      * Furthermore, the returned output stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @throws CommonOuputBusyException if the local target is currently busy
-     *         on output.
-     *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to write the common entry again as soon as
-     *         the local target is not busy anymore.
      * @throws FileNotFoundException if the local target is not accessible
      *         for some reason.
      * @throws IOException on any other exceptional condition.

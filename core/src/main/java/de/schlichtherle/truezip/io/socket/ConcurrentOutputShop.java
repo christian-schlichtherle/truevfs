@@ -176,11 +176,12 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     }
 
     @Override
-    public final OutputSocket<? extends CE> getOutputSocket(final CE entry)
-    throws IOException {
+    public final OutputSocket<? extends CE> getOutputSocket(final CE entry) {
+        if (null == entry)
+            throw new NullPointerException();
 
         class OutputSocket extends FilterOutputSocket<CE> {
-            OutputSocket() throws IOException {
+            OutputSocket() {
                 super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
 
@@ -193,12 +194,8 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
                                 super.newOutputStream()));
                 }
             }
-        }
+        } // class Output
 
-        ensureNotShopClosed();
-        if (null == entry)
-            throw new NullPointerException();
-        // TODO: Check: Synchronization required?
         return new OutputSocket();
     }
 

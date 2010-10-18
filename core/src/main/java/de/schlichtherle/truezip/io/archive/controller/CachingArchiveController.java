@@ -76,8 +76,7 @@ extends FilterArchiveController<AE> {
     private Cache<AE> getCache( final boolean create,
                                 final String path,
                                 final BitField<InputOption > inputOptions,
-                                final BitField<OutputOption> outputOptions)
-    throws IOException {
+                                final BitField<OutputOption> outputOptions) {
         if (create) {
             if (null == caches)
                 caches = new HashMap<String, EntryCache>();
@@ -92,8 +91,7 @@ extends FilterArchiveController<AE> {
     @Override
     public synchronized InputSocket<? extends AE> getInputSocket(
             final String path,
-            final BitField<InputOption> options)
-    throws IOException {
+            final BitField<InputOption> options) {
         Cache<AE> cache = null;
         if (!options.get(InputOption.CACHE)
                 && null == (cache = getCache(false, path, options, null))) {
@@ -107,27 +105,42 @@ extends FilterArchiveController<AE> {
     public synchronized OutputSocket<? extends AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options,
-            final CommonEntry template)
-    throws IOException {
+            final CommonEntry template) {
         Cache<AE> cache = null;
         if (!options.get(OutputOption.CACHE)
                 && null == (cache = getCache(false, path, null, options))
                 || options.get(OutputOption.APPEND) || null != template) {
-            if (null != cache) {
-                try {
-                    cache.flush();
-                } finally {
-                    final Cache<AE> cache2 = caches.remove(path);
-                    assert cache2 == cache;
-                    cache.clear();
+
+            class DirectOutput extends FilterOutputSocket<AE> {
+                final Cache<AE> cache;
+
+                DirectOutput(final Cache<AE> cache) {
+                    super(getController().getOutputSocket(path, options, template));
+                    this.cache = cache;
                 }
-            }
-            return getController().getOutputSocket(path, options, template);
+
+                @Override
+                public OutputStream newOutputStream() throws IOException {
+                    if (null != cache) {
+                        try {
+                            cache.flush();
+                        } finally {
+                            final Cache<AE> cache2 = caches.remove(path);
+                            assert cache2 == cache;
+                            cache.clear();
+                        }
+                    }
+                    return super.newOutputStream();
+                }
+            } // class DirectOutput
+
+            return new DirectOutput(cache);
         }
 
-        class Output extends FilterOutputSocket<AE> {
-            Output(OutputSocket<? extends AE> output) {
-                super(output);
+        class CachedOutput extends FilterOutputSocket<AE> {
+            CachedOutput(final Cache<AE> cache) {
+                super((null != cache ? cache : getCache(true, path, null, options))
+                .getOutputSocket());
             }
 
             @Override
@@ -135,11 +148,9 @@ extends FilterArchiveController<AE> {
                 getController().mknod(path, FILE, options, null);
                 return super.newOutputStream();
             }
-        } // class Output
+        } // class CachedOutput
 
-        return new Output(
-                (null != cache ? cache : getCache(true, path, null, options))
-                .getOutputSocket());
+        return new CachedOutput(cache);
     }
 
     @Override
@@ -173,8 +184,7 @@ extends FilterArchiveController<AE> {
 
         EntryCache(  final String path,
                     final BitField<InputOption > inputOptions,
-                    final BitField<OutputOption> outputOptions)
-        throws IOException {
+                    final BitField<OutputOption> outputOptions) {
             this.path = path;
             this.inputOptions = null != inputOptions
                     ? inputOptions.clear(InputOption.CACHE)
@@ -185,24 +195,28 @@ extends FilterArchiveController<AE> {
             this.cache = Caches.newInstance(new Input(), new Output()); // FIXME: this doesn't work with eager socket implementations!
         }
 
-        public InputSocket<AE> getInputSocket() throws IOException {
+        @Override
+        public InputSocket<AE> getInputSocket() {
             return cache.getInputSocket();
         }
 
-        public OutputSocket<AE> getOutputSocket() throws IOException {
+        @Override
+        public OutputSocket<AE> getOutputSocket() {
             return cache.getOutputSocket();
         }
 
+        @Override
         public void flush() throws IOException {
             cache.flush();
         }
 
+        @Override
         public void clear() throws IOException {
             cache.clear();
         }
 
         class Input extends FilterInputSocket<AE> {
-            Input() throws IOException {
+            Input() {
                 super(getController().getInputSocket(path, inputOptions));
             }
 
@@ -226,7 +240,7 @@ extends FilterArchiveController<AE> {
         } // class Input
 
         class Output extends FilterOutputSocket<AE> {
-            Output() throws IOException {
+            Output() {
                 super(getController().getOutputSocket(path, outputOptions, null));
             }
 

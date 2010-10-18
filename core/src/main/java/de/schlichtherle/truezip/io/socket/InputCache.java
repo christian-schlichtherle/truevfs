@@ -38,7 +38,7 @@ import java.io.IOException;
 public interface InputCache<LT extends CommonEntry> {
 
     /** Returns an input socket for cached read operations. */
-    InputSocket<LT> getInputSocket() throws IOException;
+    InputSocket<LT> getInputSocket();
 
     /**
      * Clears the cache and triggers re-reading the data from the underlying

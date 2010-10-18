@@ -35,7 +35,7 @@ import java.io.IOException;
 public interface OutputCache<LT extends CommonEntry> {
 
     /** Returns an output socket for cached write operations. */
-    OutputSocket<LT> getOutputSocket() throws IOException;
+    OutputSocket<LT> getOutputSocket();
 
     /**
      * Writes the data in the cache to the underlying storage.

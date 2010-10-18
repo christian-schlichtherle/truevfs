@@ -129,10 +129,12 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public OutputSocket<? extends AE> getOutputSocket(final AE entry)
-    throws IOException {
+    public OutputSocket<? extends AE> getOutputSocket(final AE entry) {
+        if (null == entry)
+            throw new NullPointerException();
+
         class Output extends FilterOutputSocket<AE> {
-            Output() throws IOException {
+            Output() {
                 super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
 
@@ -160,7 +162,8 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                     return new EntryOutputStream(super.newOutputStream());
                 }
             }
-        }
+        } // class Output
+
         return new Output();
     }
 

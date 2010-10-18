@@ -223,25 +223,9 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public InputSocket<? extends AE> getInputSocket(  String path,
-                                            BitField<InputOption> options)
-    throws IOException {
-        try {
-            readLock().lock();
-            try {
-                return new Input(getController().getInputSocket(path, options));
-            } finally {
-                readLock().unlock();
-            }
-        } catch (NotWriteLockedException ex) {
-            ensureNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
-            try {
-                return new Input(getController().getInputSocket(path, options));
-            } finally {
-                writeLock().unlock();
-            }
-        }
+    public InputSocket<AE> getInputSocket(  String path,
+                                            BitField<InputOption> options) {
+        return new Input(getController().getInputSocket(path, options));
     }
 
     private class Input extends FilterInputSocket<AE> {
@@ -316,16 +300,8 @@ extends FilterArchiveController<AE> {
     @Override
     public OutputSocket<AE> getOutputSocket(String path,
                                             BitField<OutputOption> options,
-                                            CommonEntry template)
-    throws IOException {
-        ensureNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            return new Output(getController().getOutputSocket(
-                    path, options, template));
-        } finally {
-            writeLock().unlock();
-        }
+                                            CommonEntry template) {
+        return new Output(getController().getOutputSocket(path, options, template));
     }
 
     private class Output extends FilterOutputSocket<AE> {

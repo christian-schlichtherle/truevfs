@@ -123,8 +123,10 @@ implements OutputShop<ZipEntry> {
     }
 
     @Override
-    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry)
-    throws FileNotFoundException {
+    public OutputSocket<ZipEntry> getOutputSocket(final ZipEntry entry) {
+        if (null == entry)
+            throw new NullPointerException();
+
         class Output extends OutputSocket<ZipEntry> {
             @Override
             public ZipEntry getLocalTarget() {
@@ -182,7 +184,8 @@ implements OutputShop<ZipEntry> {
                 }
                 return new EntryOutputStream(entry);
             }
-        }
+        } // class Output
+
         return new Output();
     }
 

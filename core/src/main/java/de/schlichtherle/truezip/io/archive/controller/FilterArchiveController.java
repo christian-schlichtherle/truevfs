@@ -120,8 +120,7 @@ implements ArchiveController      <AE> {
     @Override
     public InputSocket<? extends AE> getInputSocket(
             final String path,
-            final BitField<InputOption> options)
-    throws IOException {
+            final BitField<InputOption> options) {
         return getController().getInputSocket(path, options);
     }
 
@@ -129,8 +128,7 @@ implements ArchiveController      <AE> {
     public OutputSocket<? extends AE> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template)
-    throws IOException {
+            CommonEntry template) {
         return getController().getOutputSocket(path, options, template);
     }
 
