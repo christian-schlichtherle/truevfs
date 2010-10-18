@@ -56,12 +56,12 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     }
 
     @Override
-    public InputSocket<LT> getInputSocket() throws IOException {
+    public InputSocket<LT> getInputSocket() {
         return input;
     }
 
     @Override
-    public OutputSocket<LT> getOutputSocket() throws IOException {
+    public OutputSocket<LT> getOutputSocket() {
         return output;
     }
 

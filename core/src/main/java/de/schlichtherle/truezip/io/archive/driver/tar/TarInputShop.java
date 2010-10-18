@@ -214,29 +214,31 @@ implements InputShop<TarEntry> {
     }
 
     @Override
-    public InputSocket<TarEntry> getInputSocket(final String name)
-    throws FileNotFoundException {
-        final TarEntry entry = getEntry(name);
-        if (null == entry)
-            throw new FileNotFoundException(name + " (entry not found)");
+    public InputSocket<TarEntry> getInputSocket(final String name) {
+        if (null == name)
+            throw new NullPointerException();
 
         class Input extends InputSocket<TarEntry> {
+            final TarEntry entry = getEntry(name);
+
             @Override
-            public TarEntry getLocalTarget() {
+            public TarEntry getLocalTarget() throws IOException {
+                if (null == entry)
+                    throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
             }
 
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return new FileInputStream(entry.getFile());
+                return new FileInputStream(getLocalTarget().getFile());
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new SimpleReadOnlyFile(entry.getFile());
+                return new SimpleReadOnlyFile(getLocalTarget().getFile());
             }
-        }
+        } // class Input
 
         return new Input();
     }

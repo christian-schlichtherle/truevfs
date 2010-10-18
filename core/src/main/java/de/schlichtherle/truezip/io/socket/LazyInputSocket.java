@@ -28,44 +28,11 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<LT> {
-
-    private InputSocketProvider<LT> provider;
-    private InputSocket<? extends LT> socket;
-    private String target;
-
-    public LazyInputSocket( final InputSocketProvider<LT> provider,
-                            final String name) {
-        if (null == provider || null == target)
-            throw new NullPointerException();
-        this.provider = provider;
-        this.target = name;
-    }
+public final class LazyInputSocket<LT extends CommonEntry>
+extends FilterInputSocket<LT> {
 
     public LazyInputSocket( final InputSocket<? extends LT> input) {
-        if (null == input)
-            throw new NullPointerException();
-        this.socket = input;
-    }
-
-    protected final InputSocket<? extends LT> getInputSocket()
-    throws IOException {
-        if (null == socket) {
-            socket = provider.getInputSocket(target);
-            provider = null; // support gc!
-            target = null;
-        }
-        return socket.bind(this);
-    }
-
-    @Override
-    public LT getLocalTarget() throws IOException {
-        return getInputSocket().getLocalTarget();
-    }
-
-    @Override
-    public final CommonEntry getPeerTarget() throws IOException {
-        return getInputSocket().getPeerTarget();
+        super(input);
     }
 
     @Override
@@ -73,7 +40,12 @@ public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<L
         return new LazyInputStream();
     }
 
-    private final class LazyInputStream extends FilterInputStream {
+    @Override
+    public final ReadOnlyFile newReadOnlyFile() throws IOException {
+        return new LazyReadOnlyFile();
+    }
+
+    private class LazyInputStream extends FilterInputStream {
         LazyInputStream() {
             super(null);
         }
@@ -137,12 +109,7 @@ public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<L
         }
     } // class LazyInputStream
 
-    @Override
-    public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new LazyReadOnlyFile();
-    }
-
-    private final class LazyReadOnlyFile extends FilterReadOnlyFile {
+    private class LazyReadOnlyFile extends FilterReadOnlyFile {
         LazyReadOnlyFile() {
             super(null);
         }

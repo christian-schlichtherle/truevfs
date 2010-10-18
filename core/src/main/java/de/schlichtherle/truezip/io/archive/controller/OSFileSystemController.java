@@ -129,8 +129,7 @@ implements FileSystemModel, FileSystemController<FileEntry>  {
     @Override
     public InputSocket<FileEntry> getInputSocket(
             String path,
-            BitField<InputOption> options)
-    throws IOException {
+            BitField<InputOption> options) {
         return FileInputSocket.get( FileEntry.get(target, path),
                                     options.clear(InputOption.CACHE));
     }
@@ -139,8 +138,7 @@ implements FileSystemModel, FileSystemController<FileEntry>  {
     public OutputSocket<FileEntry> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template)
-    throws IOException {
+            CommonEntry template) {
         return FileOutputSocket.get(FileEntry.get(target, path), template, options);
     }
 

@@ -19,10 +19,10 @@ import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 
 /**
- * A container and output socket provider for common entries.
+ * A container and output socket factory for common entries.
  * <p>
  * All methods of this interface must reflect all entries, including those
- * which have just been partially written yet, i.e. which have not already
+ * which have only been partially written yet, i.e. which have not already
  * received a call to their {@code close()} method.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
@@ -34,5 +34,16 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @version $Id$
  */
 public interface OutputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE>, OutputSocketProvider<CE> {
+extends CommonEntryContainer<CE> {
+
+    /**
+     * Returns a non-{@code null} output socket for write access to the given
+     * common entry.
+     *
+     * @param  entry the non-{@code null} local target.
+     * @throws NullPointerException if {@code target} is {@code null}.
+     * @return A non-{@code null} output socket for writing to the local
+     *         target.
+     */
+    OutputSocket<? extends CE> getOutputSocket(CE entry);
 }

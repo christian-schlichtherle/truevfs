@@ -37,8 +37,7 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     public static InputSocket<FileEntry> get(   FileEntry file,
-                                                BitField<InputOption> options)
-    throws IOException {
+                                                BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (null != options && options.get(InputOption.CACHE))
             input = Caches.newInstance(input).getInputSocket();

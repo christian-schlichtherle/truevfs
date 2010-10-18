@@ -53,22 +53,24 @@ implements InputShop<ZipEntry> {
     }
 
     @Override
-    public InputSocket<ZipEntry> getInputSocket(final String name)
-    throws FileNotFoundException {
-        final ZipEntry entry = getEntry(name);
-        if (null == entry)
-            throw new FileNotFoundException(name + " (entry not found)");
+    public InputSocket<ZipEntry> getInputSocket(final String name) {
+        if (null == name)
+            throw new NullPointerException();
 
         class Input extends InputSocket<ZipEntry> {
+            final ZipEntry entry = getEntry(name);
+
             @Override
-            public ZipEntry getLocalTarget() {
+            public ZipEntry getLocalTarget() throws IOException {
+                if (null == entry)
+                    throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
                 return ZipInputShop.this.getInputStream(
-                        entry.getName(),
+                        getLocalTarget().getName(),
                         false,
                         !(getPeerTarget() instanceof ZipEntry));
             }
@@ -77,7 +79,7 @@ implements InputShop<ZipEntry> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this for STORED entries.
             }
-        }
+        } // class Input
 
         return new Input();
     }

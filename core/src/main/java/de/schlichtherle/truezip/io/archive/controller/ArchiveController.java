@@ -85,27 +85,25 @@ interface ArchiveController<AE extends ArchiveEntry> {
     throws IOException;
 
     /**
-     * Returns an input socket for reading the given entry from the file system.
+     * Returns an input socket for reading the given entry from the file
+     * system.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code InputSocket}.
      */
     InputSocket<? extends AE> getInputSocket(   String path,
-                                                BitField<InputOption> options)
-    throws IOException;
+                                                BitField<InputOption> options);
 
     /**
-     * Returns an output socket for writing the given entry to the file system.
+     * Returns an output socket for writing the given entry to the file
+     * system.
      *
      * @param  path a non-{@code null} relative path name.
-     * @throws IOException for some I/O related reason.
      * @return A non-{@code null} {@code OutputSocket}.
      */
     OutputSocket<? extends AE> getOutputSocket( String path,
                                                 BitField<OutputOption> options,
-                                                CommonEntry template)
-    throws IOException;
+                                                CommonEntry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries

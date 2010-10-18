@@ -22,8 +22,6 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.util.Links;
-import de.schlichtherle.truezip.io.socket.OutputSocketProvider;
-import de.schlichtherle.truezip.io.socket.InputSocketProvider;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -98,9 +96,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @version $Id$
  */
 abstract class BasicArchiveController<AE extends ArchiveEntry>
-implements     ArchiveController     <AE>,
-               InputSocketProvider   <AE>,
-               OutputSocketProvider  <AE> {
+implements     ArchiveController     <AE> {
 
     private final ArchiveModel model;
 
@@ -205,8 +201,7 @@ implements     ArchiveController     <AE>,
     @Override
     public final InputSocket<AE> getInputSocket(
             final String path,
-            final BitField<InputOption> options)
-    throws IOException {
+            final BitField<InputOption> options) {
         class Input extends InputSocket<AE> {
             boolean recursion;
 
@@ -254,12 +249,13 @@ implements     ArchiveController     <AE>,
         return new Input();
     }
 
+    abstract InputSocket<? extends AE> getInputSocket(String name) throws IOException;
+
     @Override
     public final OutputSocket<AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options,
-            final CommonEntry template)
-    throws IOException {
+            final CommonEntry template) {
         class Output extends OutputSocket<AE> {
             Operation<AE> link;
 
@@ -325,6 +321,8 @@ implements     ArchiveController     <AE>,
 
         return new Output();
     }
+
+    abstract OutputSocket<? extends AE> getOutputSocket(AE entry) throws IOException;
 
     @Override
     public final boolean mknod(

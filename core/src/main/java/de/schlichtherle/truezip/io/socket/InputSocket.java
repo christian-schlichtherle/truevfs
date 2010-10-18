@@ -133,13 +133,8 @@ extends IOSocket<LT, CommonEntry> {
      * Furthermore, the returned input stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @throws CommonInputBusyException if the local target is currently busy
-     *         on input.
-     *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to write the common entry again as soon as
-     *         the local target is not busy anymore.
-     * @throws FileNotFoundException if the local target is not accessible
-     *         for some reason.
+     * @throws FileNotFoundException if the local target does not exist or is
+     *         not accessible for some reason.
      * @throws IOException on any other exceptional condition.
      * @return A new input stream.
      */
@@ -156,13 +151,8 @@ extends IOSocket<LT, CommonEntry> {
      * Furthermore, the returned read only file should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
-     * @throws CommonInputBusyException if the local target is currently busy
-     *         on input.
-     *         This exception is guaranteed to be recoverable, meaning it
-     *         should be possible to write the common entry again as soon as
-     *         the local target is not busy anymore.
-     * @throws FileNotFoundException if the local target is not accessible
-     *         for some reason.
+     * @throws FileNotFoundException if the local target does not exist or is
+     *         not accessible for some reason.
      * @throws IOException on any other exceptional condition.
      * @return A new read only file.
      */

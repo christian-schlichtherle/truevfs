@@ -99,11 +99,10 @@ extends     FileSystemArchiveController<AE> {
         }
 
         @Override
-        public InputSocket<? extends CE> getInputSocket(String name)
-        throws IOException {
-            if (name == null)
+        public InputSocket<? extends CE> getInputSocket(String name) {
+            if (null == name)
                 throw new NullPointerException();
-            throw new FileNotFoundException();
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -367,13 +366,13 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    public InputSocket<? extends AE> getInputSocket(final String name)
+    InputSocket<? extends AE> getInputSocket(final String name)
     throws IOException {
         return input.getInputSocket(name);
     }
 
     @Override
-    public OutputSocket<? extends AE> getOutputSocket(final AE entry)
+    OutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
         ensureOutput(false);
         return output.getOutputSocket(entry);

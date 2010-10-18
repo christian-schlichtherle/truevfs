@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 
 /**
- * A container and input socket provider for common entries.
+ * A container and input socket factory for common entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
@@ -30,5 +30,16 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @version $Id$
  */
 public interface InputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE>, InputSocketProvider<CE> {
+extends CommonEntryContainer<CE> {
+
+    /**
+     * Returns a non-{@code null} input socket for read access to the given
+     * common entry.
+     *
+     * @param  name a non-{@code null} <i>common entry name</i>.
+     * @throws NullPointerException if {@code name} is {@code null}.
+     * @return A non-{@code null} input socket for reading from the local
+     *         target.
+     */
+    InputSocket<? extends CE> getInputSocket(String name);
 }

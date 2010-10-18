@@ -177,11 +177,12 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     @Override
-    public final InputSocket<? extends CE> getInputSocket(final String name)
-    throws IOException {
+    public final InputSocket<? extends CE> getInputSocket(final String name) {
+        if (null == name)
+            throw new NullPointerException();
 
-        class InputSocket extends FilterInputSocket<CE> {
-            InputSocket() throws IOException {
+        class Input extends FilterInputSocket<CE> {
+            Input() {
                 super(ConcurrentInputShop.super.getInputSocket(name));
             }
 
@@ -204,11 +205,9 @@ extends FilterInputShop<CE, InputShop<CE>> {
                                 super.newReadOnlyFile()));
                 }
             }
-        }
+        } // class Input
 
-        ensureNotShopClosed();
-        // TODO: Check: Synchronization required?
-        return new InputSocket();
+        return new Input();
     }
 
     private final class SynchronizedConcurrentInputStream

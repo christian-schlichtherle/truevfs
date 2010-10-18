@@ -60,15 +60,17 @@ public class CheckedZipInputShop extends ZipInputShop {
 
     /** Overridden to read from a checked input stream. */
     @Override
-    public InputSocket<ZipEntry> getInputSocket(final String name)
-    throws FileNotFoundException {
-        final ZipEntry entry = getEntry(name);
-        if (null == entry)
-            throw new FileNotFoundException(name + " (entry not found)");
+    public InputSocket<ZipEntry> getInputSocket(final String name) {
+        if (null == name)
+            throw new NullPointerException();
 
         class Input extends InputSocket<ZipEntry> {
+            final ZipEntry entry = getEntry(name);
+
             @Override
-            public ZipEntry getLocalTarget() {
+            public ZipEntry getLocalTarget() throws IOException {
+                if (null == entry)
+                    throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
             }
 
@@ -84,7 +86,7 @@ public class CheckedZipInputShop extends ZipInputShop {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 throw new FileNotFoundException(name + " (unsupported operation)"); // TODO: Support this for STORED entries.
             }
-        }
+        } // class Input
 
         return new Input();
     }

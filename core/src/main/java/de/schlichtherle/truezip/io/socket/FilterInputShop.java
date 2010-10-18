@@ -42,8 +42,10 @@ implements InputShop<CE> {
     }
 
     @Override
-    public InputSocket<? extends CE> getInputSocket(String name)
-    throws IOException {
+    public InputSocket<? extends CE> getInputSocket(String name) {
+        if (null == name)
+            throw new NullPointerException();
+
         return target.getInputSocket(name);
     }
 
