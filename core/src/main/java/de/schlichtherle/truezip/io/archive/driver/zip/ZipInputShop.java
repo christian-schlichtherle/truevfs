@@ -70,7 +70,7 @@ implements InputShop<ZipEntry> {
                 return ZipInputShop.this.getInputStream(
                         entry.getName(),
                         false,
-                        !(getRemoteTarget() instanceof ZipEntry));
+                        !(getPeerTarget() instanceof ZipEntry));
             }
 
             @Override

@@ -64,8 +64,8 @@ public final class LazyInputSocket<LT extends CommonEntry> extends InputSocket<L
     }
 
     @Override
-    public final CommonEntry getRemoteTarget() throws IOException {
-        return getInputSocket().getRemoteTarget();
+    public final CommonEntry getPeerTarget() throws IOException {
+        return getInputSocket().getPeerTarget();
     }
 
     @Override

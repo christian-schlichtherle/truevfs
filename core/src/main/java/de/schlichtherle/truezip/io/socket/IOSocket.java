@@ -25,12 +25,12 @@ import java.io.OutputStream;
  * Addresses a target for I/O operations provided by sub class implementations.
  * <p>
  * A key feature of an I/O socket is that it's targets can be resolved eagerly
- * or lazily, i.e. the local or remote target may get resolved by a constructor
+ * or lazily, i.e. the local or peer target may get resolved by a constructor
  * or a method of a sub class.
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
- * @param   <RT> the type of the {@link #getRemoteTarget() remote target}
+ * @param   <RT> the type of the {@link #getPeerTarget() peer target}
  *          for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -62,13 +62,13 @@ public abstract class IOSocket<LT, RT> {
 	public abstract LT getLocalTarget() throws IOException;
 
     /**
-     * Returns the nullable <i>remote target</i> for I/O operations.
+     * Returns the nullable <i>peer target</i> for I/O operations.
      * <p>
      * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
-     * @return The nullable remote target for I/O operations.
+     * @return The nullable peer target for I/O operations.
      */
-    public abstract RT getRemoteTarget() throws IOException;
+    public abstract RT getPeerTarget() throws IOException;
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
@@ -121,7 +121,7 @@ public abstract class IOSocket<LT, RT> {
         }
         String rts;
         try {
-            final RT rt = getRemoteTarget();
+            final RT rt = getPeerTarget();
             rts = null == rt ? "(null)" : rt.toString();
         } catch (IOException ex) {
             rts = "(?)";

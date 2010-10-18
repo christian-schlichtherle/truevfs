@@ -217,7 +217,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.output = output;
             this.local = output.getLocalTarget();
-            this.remote = output.getRemoteTarget();
+            this.remote = output.getPeerTarget();
             class Input extends InputSocket<CommonEntry> {
                 private final CommonEntry target = null == remote ? temp : remote;
 

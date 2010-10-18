@@ -56,8 +56,8 @@ extends InputSocket<LT> {
     }
 
     @Override
-    public CommonEntry getRemoteTarget() throws IOException {
-        return getInputSocket().getRemoteTarget();
+    public CommonEntry getPeerTarget() throws IOException {
+        return getInputSocket().getPeerTarget();
     }
 
     @Override

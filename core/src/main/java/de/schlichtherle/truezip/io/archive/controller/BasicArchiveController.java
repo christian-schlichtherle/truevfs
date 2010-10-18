@@ -210,13 +210,17 @@ implements     ArchiveController     <AE>,
         class Input extends InputSocket<AE> {
             boolean recursion;
 
+            Input() throws IOException {
+                autoMount(); // detect false positives!
+            }
+
             @Override
             public AE getLocalTarget()
             throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
                     recursion = true;
                     try {
-                        getRemoteTarget(); // force autoSync for remote target!
+                        getPeerTarget(); // force autoSync for peer target!
                     } finally {
                         recursion = false;
                     }
@@ -250,8 +254,8 @@ implements     ArchiveController     <AE>,
             }
         } // class Input
 
-        autoMount(); // detect false positives!
         if (isRoot(path)) {
+            autoMount(); // detect false positives!
             throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
                     path, "cannot read directories");
         } else {
@@ -267,6 +271,10 @@ implements     ArchiveController     <AE>,
     throws IOException {
         class Output extends OutputSocket<AE> {
             Operation<AE> link;
+
+            Output() throws IOException {
+                autoMount(options.get(CREATE_PARENTS)); // detect false positives!
+            }
 
             AE getEntry()
             throws IOException {
@@ -333,7 +341,6 @@ implements     ArchiveController     <AE>,
             throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
                     path, "cannot write directories");
         } else {
-            autoMount(options.get(CREATE_PARENTS)); // detect false positives!
             return new Output();
         }
     }

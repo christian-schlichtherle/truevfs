@@ -143,7 +143,7 @@ implements OutputShop<ZipEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final CommonEntry peer = getRemoteTarget();
+                final CommonEntry peer = getPeerTarget();
                 if (null != peer) {
                     entry.setSize(peer.getSize(DATA));
                     if (peer instanceof ZipEntry) {
