@@ -234,8 +234,7 @@ extends FilterArchiveController<AE> {
         }
 
         @Override
-        public AE getLocalTarget()
-        throws IOException {
+        public AE getLocalTarget() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -255,8 +254,7 @@ extends FilterArchiveController<AE> {
         }
 
         @Override
-        public InputStream newInputStream()
-        throws IOException {
+        public InputStream newInputStream() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -276,8 +274,7 @@ extends FilterArchiveController<AE> {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile()
-        throws IOException {
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -310,8 +307,7 @@ extends FilterArchiveController<AE> {
         }
 
         @Override
-        public AE getLocalTarget()
-        throws IOException {
+        public AE getLocalTarget() throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -322,8 +318,7 @@ extends FilterArchiveController<AE> {
         }
 
         @Override
-        public OutputStream newOutputStream()
-        throws IOException {
+        public OutputStream newOutputStream() throws IOException {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {

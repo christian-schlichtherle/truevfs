@@ -223,11 +223,6 @@ implements FileSystemController<CommonEntry> {
         return new Input(path, options);
     }
 
-    /**
-     * This class may be actually unused because archive controllers usually
-     * detect false positive archive files eagerly, i.e. when a socket is
-     * acquired, rather than lazily, i.e. when a socket is used.
-     */
     private class Input extends FilterInputSocket<CommonEntry> {
         final String path;
         final BitField<InputOption> options;
@@ -239,8 +234,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public CommonEntry getLocalTarget()
-        throws IOException {
+        public CommonEntry getLocalTarget() throws IOException {
             try {
                 return getInputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -252,8 +246,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public InputStream newInputStream()
-        throws IOException {
+        public InputStream newInputStream() throws IOException {
             try {
                 return getInputSocket().newInputStream();
             } catch (FalsePositiveException ex) {
@@ -265,8 +258,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile()
-        throws IOException {
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 return getInputSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
@@ -286,11 +278,6 @@ implements FileSystemController<CommonEntry> {
         return new Output(path, options, template);
     }
 
-    /**
-     * This class may be actually unused because archive controllers usually
-     * detect false positive archive files eagerly, i.e. when a socket is
-     * acquired, rather than lazily, i.e. when a socket is used.
-     */
     private class Output extends FilterOutputSocket<CommonEntry> {
         final String path;
         final BitField<OutputOption> options;
@@ -306,8 +293,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public CommonEntry getLocalTarget()
-        throws IOException {
+        public CommonEntry getLocalTarget() throws IOException {
             try {
                 return getOutputSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -319,8 +305,7 @@ implements FileSystemController<CommonEntry> {
         }
 
         @Override
-        public OutputStream newOutputStream()
-        throws IOException {
+        public OutputStream newOutputStream() throws IOException {
             try {
                 return getOutputSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
