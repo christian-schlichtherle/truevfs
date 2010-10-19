@@ -358,8 +358,7 @@ implements     ArchiveController     <AE> {
     }
 
     @Override
-    public final void unlink(final String path)
-    throws IOException {
+    public void unlink(final String path) throws IOException {
         autoSync(path, null);
         if (isRoot(path)) {
             final ArchiveFileSystem<AE> fileSystem;
@@ -386,8 +385,6 @@ implements     ArchiveController     <AE> {
             // Calling it doesn't harm, but please consider a more opaque
             // way to model this, e.g. by calling a listener interface.
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
-            // Delete the corresponding entry in the enclosing controller, too.
-            throw new FalsePositiveException(new IOException());
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }

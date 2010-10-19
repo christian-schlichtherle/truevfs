@@ -91,13 +91,9 @@ public enum SyncOption {
     ABORT_CHANGES,
 
     /**
-     * Suppose an archive controller has closed input or output buffers for
-     * archive entries.
-     * Then if this option is set, these closed buffers get written to the
+     * Suppose an archive controller has cached output data for archive entries.
+     * Then if this option is set, the cached data gets written to the
      * target archive file when it gets synchronized.
-     * Not that open buffers will never get reassembled.
-     *
-     * @deprecated TODO: Implement this!
      */
-    REASSEMBLE_BUFFERS,
+    FLUSH_CACHE,
 }

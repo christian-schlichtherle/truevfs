@@ -295,15 +295,15 @@ extends     FileSystemArchiveController<AE> {
 
         try {
             try {
-                final FileSystemController<?> controller = getEnclController();
-                final String path = getEnclPath(ROOT);
+                final FileSystemController<?> enclController = getEnclController();
+                final String enclPath = getEnclPath(ROOT);
                 // readOnly must be set first because the enclosing controller
                 // could be a HostFileSystemController and on stinky Windows
                 // this property turns to TRUE once a file is opened for
                 // reading!
-                final boolean readOnly = !controller.isWritable(path);
-                final InputSocket<?> socket = controller.getInputSocket(
-                        path, BitField.of(InputOption.CACHE));
+                final boolean readOnly = !enclController.isWritable(enclPath);
+                final InputSocket<?> socket = enclController.getInputSocket(
+                        enclPath, BitField.of(InputOption.CACHE));
                 try {
                     input = new Input(getDriver().newInputShop(getModel(), socket));
                 } catch (FileNotFoundException ex) {
@@ -349,9 +349,9 @@ extends     FileSystemArchiveController<AE> {
         if (null != output)
             return;
 
-        final FileSystemController<?> controller = getEnclController();
-        final String path = getEnclPath(ROOT);
-        final OutputSocket<?> socket = controller.getOutputSocket(path,
+        final FileSystemController<?> enclController = getEnclController();
+        final String enclPath = getEnclPath(ROOT);
+        final OutputSocket<?> socket = enclController.getOutputSocket(enclPath,
                 BitField.of(OutputOption.CACHE)
                     .set(CREATE_PARENTS, createParents),
                 null);
@@ -631,5 +631,12 @@ extends     FileSystemArchiveController<AE> {
                 }
             }
         }
+    }
+
+    @Override
+    public void unlink(final String path) throws IOException {
+        super.unlink(path);
+        if (isRoot(path))
+            getEnclController().unlink(getEnclPath(path));
     }
 }
