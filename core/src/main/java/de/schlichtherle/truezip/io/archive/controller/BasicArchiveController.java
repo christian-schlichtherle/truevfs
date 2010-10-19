@@ -223,7 +223,7 @@ implements     ArchiveController     <AE> {
                 return entry;
             }
 
-            InputSocket<? extends AE> getInputSocket() throws IOException {
+            final InputSocket<? extends AE> getInputSocket() throws IOException {
                 final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
