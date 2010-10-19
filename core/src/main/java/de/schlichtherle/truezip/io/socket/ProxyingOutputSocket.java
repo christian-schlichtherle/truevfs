@@ -45,7 +45,15 @@ extends OutputSocket<LT> {
         setOutputSocket(output);
     }
 
-    protected final OutputSocket<?> getOutputSocket() {
+    /**
+     * Binds the proxied socket to this socket and returns it.
+     * If you override this method, you must make sure to bind the returned
+     * socket to this socket!
+     *
+     * @throws IOException at the discretion of an overriding method.
+     * @return The bound proxied socket.
+     */
+    protected OutputSocket<?> getOutputSocket() throws IOException {
         return output.bind(this);
     }
 

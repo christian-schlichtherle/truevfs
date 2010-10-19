@@ -35,7 +35,15 @@ extends InputSocket<LT> {
         setInputSocket(input);
     }
 
-    protected final InputSocket<? extends LT> getInputSocket() {
+    /**
+     * Binds the filtered socket to this socket and returns it.
+     * If you override this method, you must make sure to bind the returned
+     * socket to this socket!
+     *
+     * @throws IOException at the discretion of an overriding method.
+     * @return The bound filtered socket.
+     */
+    protected InputSocket<? extends LT> getInputSocket() throws IOException {
         return input.bind(this);
     }
 

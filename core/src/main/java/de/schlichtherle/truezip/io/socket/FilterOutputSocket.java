@@ -34,7 +34,15 @@ extends OutputSocket<LT> {
         setOutputSocket(output);
     }
 
-    protected final OutputSocket<? extends LT> getOutputSocket() {
+    /**
+     * Binds the filtered socket to this socket and returns it.
+     * If you override this method, you must make sure to bind the returned
+     * socket to this socket!
+     *
+     * @throws IOException at the discretion of an overriding method.
+     * @return The bound filtered socket.
+     */
+    protected OutputSocket<? extends LT> getOutputSocket() throws IOException {
         return output.bind(this);
     }
 
