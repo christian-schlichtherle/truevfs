@@ -206,8 +206,7 @@ implements     ArchiveController     <AE> {
             boolean recursion;
 
             @Override
-            public AE getLocalTarget()
-            throws IOException {
+            public AE getLocalTarget() throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
                     autoMount(); // detect false positives!
                     recursion = true;
@@ -224,8 +223,7 @@ implements     ArchiveController     <AE> {
                 return entry;
             }
 
-            InputSocket<? extends AE> getInputSocket()
-            throws IOException {
+            InputSocket<? extends AE> getInputSocket() throws IOException {
                 final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
@@ -234,14 +232,12 @@ implements     ArchiveController     <AE> {
             }
 
             @Override
-            public InputStream newInputStream()
-            throws IOException {
+            public InputStream newInputStream() throws IOException {
                 return getInputSocket().newInputStream();
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile()
-            throws IOException {
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
                 return getInputSocket().newReadOnlyFile();
             }
         } // class Input
@@ -259,8 +255,7 @@ implements     ArchiveController     <AE> {
         class Output extends OutputSocket<AE> {
             Operation<AE> link;
 
-            AE getEntry()
-            throws IOException {
+            AE getEntry() throws IOException {
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
@@ -279,16 +274,14 @@ implements     ArchiveController     <AE> {
             }
 
             @Override
-            public AE getLocalTarget()
-            throws IOException {
+            public AE getLocalTarget() throws IOException {
                 if (options.get(APPEND))
                     return null; // FIXME: broken contract
                 return getEntry();
             }
 
             @Override
-            public OutputStream newOutputStream()
-            throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 final AE entry = getEntry();
                 final OutputSocket<? extends AE> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
