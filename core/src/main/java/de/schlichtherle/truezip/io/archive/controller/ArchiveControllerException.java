@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -38,8 +37,8 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-abstract class ArchiveControllerException extends FileNotFoundException {
+abstract class ArchiveControllerException extends IOException {
+    private static final long serialVersionUID = 2947623946725372554L;
 
     ArchiveControllerException() {
         super.initCause(null);

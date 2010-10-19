@@ -289,63 +289,48 @@ extends     FileSystemArchiveController<AE> {
     @Override
     void mount(final boolean autoCreate, final boolean createParents)
     throws IOException {
-        assert input == null;
-        assert output == null;
-        assert getFileSystem() == null;
-
         try {
-            try {
-                final FileSystemController<?> enclController = getEnclController();
-                final String enclPath = getEnclPath(ROOT);
-                // readOnly must be set first because the enclosing controller
-                // could be a HostFileSystemController and on stinky Windows
-                // this property turns to TRUE once a file is opened for
-                // reading!
-                final boolean readOnly = !enclController.isWritable(enclPath);
-                final InputSocket<?> socket = enclController.getInputSocket(
-                        enclPath, BitField.of(InputOption.CACHE));
-                try {
-                    input = new Input(getDriver().newInputShop(getModel(), socket));
-                } catch (FileNotFoundException ex) {
-                    throw ex;
-                } catch (IOException ex) {
-                    throw new FalsePositiveException(ex);
-                }
-                setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
-                        input.getDriverProduct(), getDriver(),
-                        socket.getLocalTarget(), vetoableTouchListener,
-                        readOnly));
-            } catch (ArchiveControllerException ex) {
-                throw ex;
-            } catch (TabuFileException ex) {
-                throw ex;
-            } catch (FileNotFoundException ex) {
-                if (!autoCreate)
-                    throw new FalsePositiveException(ex);
-                // The entry does NOT exist in the enclosing archive
-                // file, but we may create it automatically.
-                // This may fail if e.g. the target file is an RAES
-                // encrypted ZIP file and the user cancels password
-                // prompting.
-                ensureOutput(createParents);
-                setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
-                        getDriver(), vetoableTouchListener));
-            }
-
-            assert autoCreate || input != null;
-            assert autoCreate || output == null;
-            assert getFileSystem() != null;
-        } catch (IOException ex) {
-            assert null == input;
-            assert null == output;
-            assert getFileSystem() == null;
-
+            final FileSystemController<?> enclController = getEnclController();
+            final String enclPath = getEnclPath(ROOT);
+            // readOnly must be set first because the enclosing controller
+            // could be a HostFileSystemController and on stinky Windows
+            // this property turns to TRUE once a file is opened for
+            // reading!
+            final boolean readOnly = !enclController.isWritable(enclPath);
+            final InputSocket<?> socket = enclController.getInputSocket(
+                    enclPath, BitField.of(InputOption.CACHE));
+            input = new Input(getDriver().newInputShop(getModel(), socket));
+            setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+                    input.getDriverProduct(), getDriver(),
+                    socket.getLocalTarget(), vetoableTouchListener,
+                    readOnly));
+        } catch (ArchiveControllerException ex) {
             throw ex;
+        } catch (TabuFileException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            if (!autoCreate)
+                throw new FalsePositiveException(ex);
+            // The entry does NOT exist in the enclosing archive
+            // file, but we may create it automatically.
+            // This may fail if e.g. the target file is an RAES
+            // encrypted ZIP file and the user cancels password
+            // prompting.
+            try {
+                ensureOutput(createParents);
+            } catch (ArchiveControllerException ex2) {
+                throw ex2;
+            } catch (TabuFileException ex2) {
+                throw ex2;
+            } catch (IOException ex2) {
+                throw new FalsePositiveException(ex2);
+            }
+            setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+                    getDriver(), vetoableTouchListener));
         }
     }
 
-    private void ensureOutput(final boolean createParents)
-    throws IOException {
+    private void ensureOutput(final boolean createParents) throws IOException {
         if (null != output)
             return;
 
@@ -355,14 +340,8 @@ extends     FileSystemArchiveController<AE> {
                 BitField.of(OutputOption.CACHE)
                     .set(CREATE_PARENTS, createParents),
                 null);
-        try {
-            output = new Output(getDriver().newOutputShop(getModel(), socket,
-                        null == input ? null : input.getDriverProduct()));
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw new FalsePositiveException(ex);
-        }
+        output = new Output(getDriver().newOutputShop(getModel(), socket,
+                    null == input ? null : input.getDriverProduct()));
     }
 
     @Override
