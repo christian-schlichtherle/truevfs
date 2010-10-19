@@ -86,7 +86,7 @@ extends IOSocket<LT, CommonEntry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final OutputSocket<LT> connect(final InputSocket<?> newPeer) {
+	final OutputSocket<LT> connect(final InputSocket<?> newPeer) {
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {

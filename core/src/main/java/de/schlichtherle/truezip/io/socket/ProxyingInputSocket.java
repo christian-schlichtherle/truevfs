@@ -32,8 +32,8 @@ extends InputSocket<LT> {
     private final LT target;
     private InputSocket<?> input;
 
-    public ProxyingInputSocket(final LT target,
-                            final InputSocket<?> input) {
+    public ProxyingInputSocket( final LT target,
+                                final InputSocket<?> input) {
         if (null == target)
             throw new NullPointerException();
         this.target = target;
