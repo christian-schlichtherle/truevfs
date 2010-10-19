@@ -37,7 +37,7 @@ extends OutputSocket<LT> {
      * @param target the non-{@code null} local target.
      * @param output the nullable proxied output socket.
      */
-    public ProxyingOutputSocket(   final LT target,
+    public ProxyingOutputSocket(final LT target,
                                 final OutputSocket<?> output) {
         if (null == target)
             throw new NullPointerException();
