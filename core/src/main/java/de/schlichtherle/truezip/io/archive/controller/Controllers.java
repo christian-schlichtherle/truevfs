@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.REASSEMBLE_BUFFERS;
+import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CACHE;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -160,7 +160,7 @@ public class Controllers {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-        options = options.set(REASSEMBLE_BUFFERS);
+        options = options.set(FLUSH_CACHE);
 
         int total = 0, touched = 0;
         // Reset statistics if it hasn't happened yet.
