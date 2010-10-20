@@ -172,9 +172,9 @@ extends     FileSystemArchiveController<AE> {
     private final VetoableTouchListener vetoableTouchListener
             = new TouchListener();
 
-    UpdatingArchiveController(  final FileSystemController<?> enclController,
-                                final ArchiveModel model,
-                                final ArchiveDriver<AE> driver) {
+    UpdatingArchiveController(  final ArchiveModel model,
+                                final ArchiveDriver<AE> driver,
+                                final FileSystemController<?> enclController) {
         super(model);
         assert null != driver;
         this.driver = driver;

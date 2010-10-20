@@ -73,12 +73,12 @@ extends AbstractFileSystemController<CommonEntry> {
                 new LockingArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                            enclController, model, driver))));
+                            model, driver, enclController))));
         this.enclController = enclController;
         this.enclPath = enclController
                 .getModel()
                 .getMountPoint()
-                .relativize(controller.getModel().getMountPoint())
+                .relativize(mountPoint)
                 .getPath();
     }
 
