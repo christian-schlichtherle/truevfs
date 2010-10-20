@@ -203,7 +203,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public InputStream newInputStream() throws IOException {
             if (null != getPeerTarget()) {
-                buffer = null;
+                //clear();
                 return super.newInputStream(); // can't cache data for connected sockets!
             }
 
@@ -231,7 +231,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
-                buffer = null;
+                //clear();
                 return super.newReadOnlyFile(); // can't cache data for connected sockets!
             }
 
@@ -266,7 +266,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @SuppressWarnings("ThrowableInitCause")
         public OutputStream newOutputStream() throws IOException {
             if (null != getPeerTarget()) {
-                buffer = null;
+                clear();
                 return super.newOutputStream(); // can't cache data for connected sockets!
             }
 
