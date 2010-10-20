@@ -182,7 +182,7 @@ extends AbstractKeyProvider<K> {
      * protected resource.
      */
     private K promptCreateKey() throws UnknownKeyException {
-        PromptingKeyManager.ensurePrompting();
+        PromptingKeyManager.assertPrompting();
 
         final K oldKey = getKey();
         getUI().promptCreateKey(this);
@@ -220,7 +220,7 @@ extends AbstractKeyProvider<K> {
      * resource in order to access its contents.
      */
     private K promptOpenKey(final boolean invalid) throws UnknownKeyException {
-        PromptingKeyManager.ensurePrompting();
+        PromptingKeyManager.assertPrompting();
 
         final K oldKey = getKey();
         final boolean changeKey = invalid

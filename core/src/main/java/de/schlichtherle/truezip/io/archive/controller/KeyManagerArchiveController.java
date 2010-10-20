@@ -46,7 +46,7 @@ extends     FilterArchiveController    <AE> {
 
     @Override
     public void unlink(String path) throws IOException {
-        super.unlink(path);
+        getController().unlink(path);
         if (isRoot(path))
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
     }

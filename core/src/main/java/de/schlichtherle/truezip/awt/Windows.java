@@ -104,7 +104,6 @@ public class Windows {
                 = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         if (fm == lfm)
             return;
-
         if (lfm != null)
             lfm.removePropertyChangeListener(
                     PROPERTY_FOCUSED_WINDOW, focusListener);

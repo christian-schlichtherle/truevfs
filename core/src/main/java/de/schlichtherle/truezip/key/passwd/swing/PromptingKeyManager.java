@@ -87,10 +87,10 @@ public class PromptingKeyManager
      * as its cause.
      */
     @Override
-    protected void ensurePromptingImpl()
+    protected void assertPromptingImpl()
     throws KeyPromptingDisabledException {
         if (GraphicsEnvironment.isHeadless())
             throw new KeyPromptingDisabledException(new HeadlessException());
-        super.ensurePromptingImpl();
+        super.assertPromptingImpl();
     }
 }

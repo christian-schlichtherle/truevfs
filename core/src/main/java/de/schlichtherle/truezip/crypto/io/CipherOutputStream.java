@@ -73,12 +73,12 @@ public class CipherOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Ensures that this cipher output stream is in open state, which requires
+     * Asserts that this cipher output stream is in open state, which requires
      * that {@link #cipher} is not {@code null}.
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void ensureOpen() throws IOException {
+    private void assertOpen() throws IOException {
         if (cipher == null)
             throw new IOException("cipher output stream is not in open state");
     }
@@ -94,7 +94,7 @@ public class CipherOutputStream extends FilterOutputStream {
     @Override
     public void write(final int b)
     throws IOException {
-        ensureOpen();
+        assertOpen();
 
         int outLen = cipher.getUpdateOutputSize(1);
         if (outLen > outBuf.length)
@@ -118,7 +118,7 @@ public class CipherOutputStream extends FilterOutputStream {
     @Override
     public void write(final byte[] buf, final int off, final int len)
     throws IOException {
-        ensureOpen();
+        assertOpen();
 
         int outLen = cipher.getUpdateOutputSize(len);
         if (outLen > outBuf.length)
@@ -141,7 +141,7 @@ public class CipherOutputStream extends FilterOutputStream {
      *         text is invalid, i.e. required padding information is missing.
      */
     public void finish() throws IOException {
-        ensureOpen();
+        assertOpen();
 
         int outLen = cipher.getOutputSize(0);
         if (outLen > outBuf.length)

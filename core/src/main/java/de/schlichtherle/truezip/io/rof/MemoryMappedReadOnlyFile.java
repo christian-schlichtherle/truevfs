@@ -78,7 +78,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      *         If zero, the end of the file has been reached.
      */
     private int available() throws IOException {
-        ensureOpen();
+        assertOpen();
         if (window.remaining() <= 0)
             window(windowOff + WINDOW_LEN);
         return window.remaining();
@@ -100,19 +100,19 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
 
     @Override
 	public long length() throws IOException {
-        ensureOpen();
+        assertOpen();
         return channel.size();
     }
 
     @Override
 	public long getFilePointer() throws IOException {
-        ensureOpen();
+        assertOpen();
         return windowOff + window.position();
     }
 
     @Override
 	public void seek(final long fp) throws IOException {
-        ensureOpen();
+        assertOpen();
 
         if (fp < 0)
             throw new IOException("file pointer must not be negative");
@@ -183,7 +183,7 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void ensureOpen() throws IOException {
+    private void assertOpen() throws IOException {
         if (channel == null)
             throw new IOException("file is closed");
     }

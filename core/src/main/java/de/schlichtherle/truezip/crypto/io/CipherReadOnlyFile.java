@@ -137,12 +137,12 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Ensures that this cipher output stream is in open state, which requires
+     * Asserts that this cipher output stream is in open state, which requires
      * that {@link #cipher} is not {@code null}.
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void ensureOpen() throws IOException {
+    private void assertOpen() throws IOException {
         if (cipher == null)
             throw new IOException("cipher read only file is not in open state");
     }
@@ -231,19 +231,19 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
 
     @Override
     public long length() throws IOException {
-        ensureOpen();
+        assertOpen();
         return length;
     }
 
     @Override
     public long getFilePointer() throws IOException {
-        ensureOpen();
+        assertOpen();
         return fp;
     }
 
     @Override
     public void seek(final long fp) throws IOException {
-        ensureOpen();
+        assertOpen();
 
         if (fp < 0)
             throw new IOException("file pointer must not be negative");
@@ -257,7 +257,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
     @Override
     public int read() throws IOException {
         // Check state.
-        ensureOpen();
+        assertOpen();
         if (fp >= length)
             return -1;
 
@@ -273,7 +273,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
         // Check state.
-        ensureOpen();
+        assertOpen();
         if (fp >= length)
             return -1;
 
@@ -349,9 +349,8 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Ensures that the block with the decrypted data for partial reading is
-     * positioned so that it contains the current virtual file pointer
-     * in the encrypted file.
+     * Positions the block with the decrypted data for partial reading so that
+     * it contains the current virtual file pointer in the encrypted file.
      *
      * @throws IOException On any I/O related issue.
      *         The block is not moved in this case.
@@ -377,7 +376,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Ensures that the window is positioned so that the block containing
+     * Positions the window so that the block containing
      * the current virtual file pointer in the encrypted file is entirely
      * contained in it.
      *

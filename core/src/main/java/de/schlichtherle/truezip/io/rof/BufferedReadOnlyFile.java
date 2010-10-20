@@ -179,14 +179,14 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     @Override
     public long getFilePointer()
     throws IOException {
-        ensureOpen();
+        assertOpen();
         return fp;
     }
 
     @Override
     public void seek(final long fp)
     throws IOException {
-        ensureOpen();
+        assertOpen();
 
         if (fp < 0)
             throw new IOException("file pointer must not be negative");
@@ -202,7 +202,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     public int read()
     throws IOException {
         // Check state.
-        ensureOpen();
+        assertOpen();
         if (fp >= length())
             return -1;
 
@@ -218,7 +218,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
         // Check state.
-        ensureOpen();
+        assertOpen();
         final long length = length();
         if (fp >= length)
             return -1;
@@ -291,11 +291,11 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     }
 
     /**
-     * Ensures that this file is open.
+     * Asserts that this file is open.
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void ensureOpen() throws IOException {
+    private void assertOpen() throws IOException {
         if (closed)
             throw new IOException("file is closed");
     }
@@ -305,9 +305,8 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     //
 
     /**
-     * Ensures that the window is positioned so that the block containing
-     * the current virtual file pointer in the encrypted file is entirely
-     * contained in it.
+     * Positions the window so that the block containing the current virtual
+     * file pointer in the encrypted file is entirely contained in it.
      *
      * @throws IOException On any I/O related issue.
      *         The window is invalidated in this case.

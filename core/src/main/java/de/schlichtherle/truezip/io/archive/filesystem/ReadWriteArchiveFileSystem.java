@@ -686,8 +686,6 @@ implements ArchiveFileSystem<AE> {
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param path The non-{@code null} normalized path name of the file
-         *        system entry.
          * @param entry The non-{@code null} file system entry for the path
          *        path.
          * @param base The nullable base (segment) path of the path name.

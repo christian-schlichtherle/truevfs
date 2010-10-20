@@ -166,11 +166,11 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
         if (closed)
             return;
         closed = true;
-        super.close();
+        target.close();
     }
 
     /** Needs to be externally synchronized! */
-    private void ensureNotShopClosed() throws IOException {
+    private void assertNotShopClosed() throws IOException {
         if (closed)
             throw new OutputClosedException();
     }
@@ -188,10 +188,10 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 synchronized (ConcurrentOutputShop.this) {
-                    ensureNotShopClosed();
+                    assertNotShopClosed();
                     return new SynchronizedConcurrentOutputStream(
                             new ConcurrentOutputStream(
-                                super.newOutputStream()));
+                                getBoundSocket().newOutputStream()));
                 }
             }
         } // class Output
@@ -214,7 +214,11 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
                 if (closed)
                     return;
                 try {
-                    super.close();
+                    try {
+                        flush();
+                    } finally {
+                        out.close();
+                    }
                 } finally {
                     threads.remove(out);
                     lock.notify(); // there can be only one waiting thread!
@@ -230,26 +234,31 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
 
         @Override
         public void write(int b) throws IOException {
-            ensureNotShopClosed();
-            super.write(b);
+            assertNotShopClosed();
+            out.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            ensureNotShopClosed();
-            super.write(b, off, len);
+            assertNotShopClosed();
+            out.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
             if (!closed)
-                super.flush();
+                out.flush();
         }
 
         @Override
         public final void close() throws IOException {
-            if (!closed)
-                super.close();
+            if (!closed) {
+                try {
+                    out.flush();
+                } finally {
+                    out.close();
+                }
+            }
         }
 
         /**

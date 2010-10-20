@@ -56,12 +56,10 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CA
  *     {@link #sync synced}.
  * </ul>
  * <p>
- * Caching an archive entry is automatically activated once an
- * {@link #getInputSocket input socket} with {@link InputOption#CACHE} or an
- * {@link #getOutputSocket output socket} with {@link InputOption#CACHE}
- * is acquired. Subsequent read/write operations for the archive entry will
- * then use the cache regardless if these options were set when the respective
- * socket was acquired or not.
+ * Caching an archive entry is automatically used for an
+ * {@link #getInputSocket input socket} with the option
+ * {@link InputOption#CACHE} or an {@link #getOutputSocket output socket} with
+ * the option {@link InputOption#CACHE} set.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -76,31 +74,34 @@ extends FilterArchiveController<AE> {
         super(controller);
     }
 
-    final void ensureWriteLockedByCurrentThread()
+    final void assertWriteLockedByCurrentThread()
     throws NotWriteLockedException {
-        getModel().ensureWriteLockedByCurrentThread();
+        getModel().assertWriteLockedByCurrentThread();
     }
 
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E, ArchiveControllerException {
+        assertWriteLockedByCurrentThread();
         final boolean flush = options.get(FLUSH_CACHE);
         assert options.get(ABORT_CHANGES) != flush;
         for (final EntryCache cache : caches.values()) {
             try {
-                try {
-                    if (flush)
-                        cache.flush();
-                } finally {
-                    cache.clear();
-                }
+                if (flush)
+                    cache.flush();
             } catch (IOException ex) {
                 throw builder.fail(new SyncException(getModel(), ex));
+            } finally  {
+                try {
+                    cache.clear();
+                } catch (IOException ex) {
+                    builder.warn(new SyncWarningException(getModel(), ex));
+                }
             }
         }
         caches.clear();
-        super.sync(builder, options);
+        getController().sync(builder, options);
     }
 
     @Override
@@ -122,12 +123,9 @@ extends FilterArchiveController<AE> {
 
         @Override
         public InputSocket<? extends AE> getBoundSocket() throws IOException {
-            Cache<AE> cache = null;
-            if (!options.get(InputOption.CACHE)
-                    && null == (cache = caches.get(path))) {
+            final Cache<AE> cache = caches.get(path);
+            if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket();
-            }
-            ensureWriteLockedByCurrentThread();
             return (null != cache ? cache : new EntryCache(path, options, null))
                     .getInputSocket()
                     .bind(this);
@@ -158,10 +156,10 @@ extends FilterArchiveController<AE> {
 
         @Override
         public OutputSocket<? extends AE> getBoundSocket() throws IOException {
-            Cache<AE> cache = null;
+            final Cache<AE> cache = caches.get(path);
             if (!options.get(OutputOption.CACHE)
-                    && null == (cache = caches.get(path))
-                    || options.get(OutputOption.APPEND) || null != template) {
+                    || options.get(OutputOption.APPEND)
+                    || null != template) {
                 if (null != cache) {
                     try {
                         cache.flush();
@@ -173,8 +171,8 @@ extends FilterArchiveController<AE> {
                 }
                 return super.getBoundSocket();
             }
-
-            getController().mknod(path, FILE, options, null);
+            // Create marker entry and mind CREATE_PARENTS!
+            getController().mknod(path, FILE, options, template);
             return (null != cache ? cache : new EntryCache(path, null, options))
                     .getOutputSocket()
                     .bind(this);
@@ -183,7 +181,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public void unlink(final String path) throws IOException {
-        super.unlink(path);
+        getController().unlink(path);
         final Cache<AE> cache = caches.remove(path);
         if (null != cache)
             cache.clear();
@@ -197,8 +195,17 @@ extends FilterArchiveController<AE> {
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions) {
             this.path = path;
-            this.cache = Caches.newInstance(    new Input(inputOptions),
-                                                new Output(outputOptions));
+            this.cache = Caches.newInstance(
+                    new RegisteringInputSocket(
+                        getController().getInputSocket(path,
+                            null != inputOptions
+                                ? inputOptions.clear(InputOption.CACHE)
+                                : BitField.noneOf(InputOption.class))),
+                    getController().getOutputSocket(path,
+                        null != outputOptions
+                            ? outputOptions.clear(OutputOption.CACHE)
+                            : BitField.noneOf(OutputOption.class),
+                        null));
         }
 
         @Override
@@ -208,7 +215,7 @@ extends FilterArchiveController<AE> {
 
         @Override
         public OutputSocket<AE> getOutputSocket() {
-            return cache.getOutputSocket();
+            return new RegisteringOutputSocket(cache.getOutputSocket());
         }
 
         @Override
@@ -221,41 +228,34 @@ extends FilterArchiveController<AE> {
             cache.clear();
         }
 
-        class Input extends FilterInputSocket<AE> {
-            Input(final BitField<InputOption> inputOptions) {
-                super(getController().getInputSocket(path,
-                        null != inputOptions
-                            ? inputOptions.clear(InputOption.CACHE)
-                            : BitField.noneOf(InputOption.class)));
+        class RegisteringInputSocket extends FilterInputSocket<AE> {
+            RegisteringInputSocket(final InputSocket <? extends AE> input) {
+                super(input);
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
-                final InputStream in = super.newInputStream();
+                final InputStream in = getBoundSocket().newInputStream();
                 caches.put(path, EntryCache.this);
                 return in;
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof = super.newReadOnlyFile();
+                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
                 caches.put(path, EntryCache.this);
                 return rof;
             }
         } // class Input
 
-        class Output extends FilterOutputSocket<AE> {
-            Output(BitField<OutputOption> outputOptions) {
-                super(getController().getOutputSocket(path,
-                        null != outputOptions
-                            ? outputOptions.clear(OutputOption.CACHE)
-                            : BitField.noneOf(OutputOption.class),
-                        null));
+        class RegisteringOutputSocket extends FilterOutputSocket<AE> {
+            RegisteringOutputSocket(OutputSocket <? extends AE> output) {
+                super(output);
             }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final OutputStream out = super.newOutputStream();
+                final OutputStream out = getBoundSocket().newOutputStream();
                 caches.put(path, EntryCache.this);
                 return out;
             }
