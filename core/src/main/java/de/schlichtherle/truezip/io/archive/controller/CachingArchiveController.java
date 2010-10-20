@@ -182,8 +182,8 @@ extends FilterArchiveController<AE> {
     } // class Output
 
     @Override
-    public void unlink(String path) throws IOException {
-        getController().unlink(path);
+    public void unlink(final String path) throws IOException {
+        super.unlink(path);
         final Cache<AE> cache = caches.remove(path);
         if (null != cache)
             cache.clear();

@@ -70,20 +70,17 @@ extends    AbstractArchiveController<AE> {
     }
 
     @Override
-    public Icon getOpenIcon()
-    throws ArchiveControllerException {
+    public Icon getOpenIcon() throws ArchiveControllerException {
         return getController().getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon()
-    throws ArchiveControllerException {
+    public Icon getClosedIcon() throws ArchiveControllerException {
         return getController().getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly()
-    throws ArchiveControllerException {
+    public boolean isReadOnly() throws ArchiveControllerException {
         return getController().isReadOnly();
     }
 
@@ -94,20 +91,17 @@ extends    AbstractArchiveController<AE> {
     }
 
     @Override
-    public boolean isReadable(String path)
-    throws ArchiveControllerException {
+    public boolean isReadable(String path) throws ArchiveControllerException {
         return getController().isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path)
-    throws ArchiveControllerException {
+    public boolean isWritable(String path) throws ArchiveControllerException {
         return getController().isWritable(path);
     }
 
     @Override
-    public void setReadOnly(String path)
-    throws IOException {
+    public void setReadOnly(String path) throws IOException {
         getController().setReadOnly(path);
     }
 
@@ -142,8 +136,7 @@ extends    AbstractArchiveController<AE> {
     }
 
     @Override
-    public void unlink(String path)
-    throws IOException {
+    public void unlink(String path) throws IOException {
         getController().unlink(path);
     }
 }

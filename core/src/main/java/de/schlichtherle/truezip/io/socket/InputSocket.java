@@ -56,15 +56,15 @@ extends IOSocket<LT, CommonEntry> {
      * the given input socket's peer output socket to this instance, i.e. this
      * input socket is not connected to the peer output socket.
      *
-     * @param  with the non-{@code null} input socket which has a remote
+     * @param  to the non-{@code null} input socket which has a remote
      *         target to share.
      * @throws NullPointerException if {@code with} is {@code null}.
      * @return This input socket.
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final InputSocket<LT> bind(final InputSocket<?> with) {
-        final OutputSocket<?> newPeer = with.peer;
+	public final InputSocket<LT> bind(final InputSocket<?> to) {
+        final OutputSocket<?> newPeer = to.peer;
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();

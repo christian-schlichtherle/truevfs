@@ -69,10 +69,11 @@ extends AbstractFileSystemController<CommonEntry> {
         final SyncScheduler syncScheduler = new SyncScheduler();
         final ArchiveModel model = new ArchiveModel(
                 enclController.getModel(), mountPoint, syncScheduler);
-        this.controller = new LockingArchiveController<AE>(
-                new CachingArchiveController<AE>(
-                    new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                        enclController, model, driver)));
+        this.controller = new KeyManagerArchiveController<AE>(
+                new LockingArchiveController<AE>(
+                    new CachingArchiveController<AE>(
+                        new UpdatingArchiveController<AE>( // TODO: Support append strategy.
+                            enclController, model, driver))));
         this.enclController = enclController;
         this.enclPath = enclController
                 .getModel()

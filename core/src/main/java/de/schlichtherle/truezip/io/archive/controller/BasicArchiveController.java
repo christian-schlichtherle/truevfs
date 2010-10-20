@@ -30,7 +30,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Operatio
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -372,12 +371,6 @@ extends        AbstractArchiveController<AE> {
                 throw new IOException("root directory not empty");
             sync(   new DefaultSyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
-            // Just in case our target is an RAES encrypted ZIP file,
-            // forget it's password as well.
-            // TODO: Review: This is an archive driver dependency!
-            // Calling it doesn't harm, but please consider a more opaque
-            // way to model this, e.g. by calling a listener interface.
-            PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }
