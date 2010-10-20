@@ -629,15 +629,15 @@ implements ArchiveFileSystem<AE> {
                                 "directory entries cannot get replaced");
                 }
                 elements = new SegmentLink[level + 1];
-                elements[0] = new SegmentLink<AE>(parentPath, parentEntry, null);
+                elements[0] = new SegmentLink<AE>(parentEntry, null);
                 newEntry = newEntryChecked(entryPath, entryType, template);
-                elements[1] = new SegmentLink<AE>(entryPath, newEntry, baseName);
+                elements[1] = new SegmentLink<AE>(newEntry, baseName);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         parentPath, DIRECTORY, null, level + 1);
                 newEntry = newEntryChecked(entryPath, entryType, template);
                 elements[elements.length - level]
-                        = new SegmentLink<AE>(entryPath, newEntry, baseName);
+                        = new SegmentLink<AE>(newEntry, baseName);
             } else {
                 throw new ArchiveFileSystemException(entryPath,
                         "missing parent directory entry");
@@ -655,11 +655,10 @@ implements ArchiveFileSystem<AE> {
             BaseEntry<AE> parent = links[0].entry;
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<AE> link = links[i];
-                final String path = link.path;
                 final BaseEntry<AE> entry = link.entry;
                 final String base = link.base;
                 assert DIRECTORY == parent.getType();
-                master.put(path, entry);
+                master.put(entry.getName(), entry);
                 if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never touch ghosts!
                     parent.getTarget().setTime(Access.WRITE, time);
                 parent = entry;
@@ -681,7 +680,6 @@ implements ArchiveFileSystem<AE> {
      */
     private static final class SegmentLink<AE extends ArchiveEntry>
     implements Link<Entry<AE>> {
-        final String path;
         final BaseEntry<AE> entry;
         final String base;
 
@@ -695,12 +693,9 @@ implements ArchiveFileSystem<AE> {
          * @param base The nullable base (segment) path of the path name.
          */
         SegmentLink(
-                final String path,
                 final BaseEntry<AE> entry,
                 final String base) {
-            assert path != null;
             assert entry != null;
-            this.path = path;
             this.entry = entry;
             this.base = base; // may be null!
         }
