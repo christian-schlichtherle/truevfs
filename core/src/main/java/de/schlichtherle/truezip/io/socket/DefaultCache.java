@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,27 +43,26 @@ import java.io.OutputStream;
 // FIXME: Make this work as described in the interface contract!
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
-    private int  readCount; // shared
-    private int writeCount; // exclusive
-
-    private final Input input;
-    private final Output output;
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
+    private final InputProxy inputProxy;
+    private final OutputProxy outputProxy;
+    private Buffer buffer;
+    private final Lock lock = new Lock();
 
     DefaultCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output) {
-        this.input = new Input(input);
-        this.output = new Output(output);
+        this.inputProxy = new InputProxy(input);
+        this.outputProxy = new OutputProxy(output);
     }
 
     @Override
     public InputSocket<LT> getInputSocket() {
-        return input;
+        return inputProxy;
     }
 
     @Override
     public OutputSocket<LT> getOutputSocket() {
-        return output;
+        return outputProxy;
     }
 
     @Override
@@ -71,24 +71,149 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     @Override
     public void clear() throws IOException {
+        synchronized (lock) {
+            Buffer buffer = this.buffer;
+            if (null != buffer) {
+                // Order is important here!
+                this.buffer = null;
+                buffer.inputPool.release(null);
+            }
+        }
     }
 
-    private final class Input extends FilterInputSocket<LT> {
-        //FileEntry temp;
+    private Buffer getBuffer() {
+        synchronized (lock) {
+            if (null == buffer)
+                buffer = new Buffer();
+            return buffer;
+        }
+    }
 
-        Input(final InputSocket <? extends LT> input) {
+    private void release(   final Closeable closeable,
+                            final Pool<Buffer, IOException> pool)
+    throws IOException {
+        synchronized (lock) {
+            try {
+                closeable.close();
+            } finally {
+                pool.release(null);
+            }
+        }
+    }
+
+    private static class Lock {
+    }
+
+    private final class Buffer {
+        final InputPool inputPool = new InputPool();
+        final OutputPool outputPool = new OutputPool();
+        FileEntry temp;
+
+        File getFile() {
+            return temp.getFile();
+        }
+
+        @Override
+        public String toString() {
+            return null == temp ? "(null)" : temp.toString();
+        }
+
+        class InputPool implements Pool<Buffer, IOException> {
+            int uses;
+
+            @Override
+            public Buffer allocate() throws IOException {
+                synchronized (lock) {
+                    if (null == temp) {
+                        final InputSocket<? extends LT> input
+                                = inputProxy.getBoundSocket();
+                        CommonEntry peer = input.getPeerTarget();
+                        final FileEntry temp = pool.allocate();
+                        if (null == peer)
+                            peer = temp;
+                        try {
+                            IOSocket.copy(  input,
+                                            new ProxyingOutputSocket<CommonEntry>(peer,
+                                                FileOutputSocket.get(temp)));
+                        } catch (IOException ex) {
+                            pool.release(temp);
+                            throw ex;
+                        }
+                        Buffer.this.temp = temp;
+                    }
+                    uses++;
+                }
+                return Buffer.this;
+            }
+
+            @Override
+            public void release(final Buffer resource) throws IOException {
+                assert null == resource;
+                synchronized (lock) {
+                    uses--;
+                    if (Buffer.this != buffer && 0 >= uses) {
+                        final FileEntry temp = Buffer.this.temp;
+                        Buffer.this.temp = null;
+                        if (null != temp)
+                            pool.release(temp);
+                    }
+                }
+            }
+        } // class InputBuffer
+
+        class OutputPool implements Pool<Buffer, IOException> {
+            @Override
+            public Buffer allocate() throws IOException {
+                assert null == temp;
+                synchronized (lock) {
+                    temp = pool.allocate();
+                }
+                return Buffer.this;
+            }
+
+            @Override
+            public void release(final Buffer resource) throws IOException {
+                assert null == resource;
+                synchronized (lock) {
+                    try {
+                        final OutputSocket<? extends LT> output
+                                = outputProxy.getBoundSocket();
+                        CommonEntry peer = output.getPeerTarget();
+                        if (null == peer)
+                            peer = temp;
+                        buffer = new Buffer();
+                        IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
+                                            FileInputSocket.get(temp)),
+                                        output);
+                    } catch (IOException ex) {
+                        pool.release(temp);
+                        throw ex;
+                    }
+                    buffer.temp = temp;
+                }
+            }
+        } // class OutputBuffer
+    } // class Buffer
+
+    private class InputProxy extends FilterInputSocket<LT> {
+        InputProxy(final InputSocket <? extends LT> input) {
             super(input);
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            final FileEntry temp = allocate();
+            if (null != getPeerTarget()) {
+                buffer = null;
+                return super.newInputStream(); // can't cache data for connected sockets!
+            }
+
+            final Buffer buffer = getBuffer().inputPool.allocate();
 
             class InputStream extends FilterInputStream {
                 boolean closed;
 
                 InputStream() throws FileNotFoundException {
-                    super(new FileInputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                    super(new FileInputStream(buffer.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
                 }
 
                 @Override
@@ -96,7 +221,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     if (closed)
                         return;
                     closed = true;
-                    release(in, temp);
+                    release(in, buffer.inputPool);
                 }
             } // class InputStream
 
@@ -105,13 +230,18 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final FileEntry temp = allocate();
+            if (null != getPeerTarget()) {
+                buffer = null;
+                return super.newReadOnlyFile(); // can't cache data for connected sockets!
+            }
+
+            final Buffer buffer = getBuffer().inputPool.allocate();
 
             class ReadOnlyFile extends FilterReadOnlyFile {
                 boolean closed;
 
                 ReadOnlyFile() throws FileNotFoundException {
-                    super(new SimpleReadOnlyFile(temp.getFile()));
+                    super(new SimpleReadOnlyFile(buffer.getFile()));
                 }
 
                 @Override
@@ -119,75 +249,34 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     if (closed)
                         return;
                     closed = true;
-                    release(rof, temp);
+                    release(rof, buffer.inputPool);
                 }
             } // class ReadOnlyFile
 
             return new ReadOnlyFile();
         }
-
-        FileEntry allocate() throws IOException {
-            synchronized (DefaultCache.this) {
-                FileEntry temp = null;//this.temp;
-                if (null == temp) {
-                    temp = pool.allocate();
-                    try {
-                        CommonEntry peer = getPeerTarget();
-                        if (null == peer)
-                            peer = temp;
-                        IOSocket.copy(  getInputSocket(),
-                                        new ProxyingOutputSocket<CommonEntry>(peer,
-                                            FileOutputSocket.get(temp)));
-                    } catch (IOException cause) {
-                        try {
-                            pool.release(temp);
-                        } catch (IOException ex) {
-                            throw (IOException) ex.initCause(cause);
-                        }
-                        throw cause;
-                    }
-                    //this.temp = temp;
-                }
-                //readCount++;
-                return temp;
-            }
-        }
-
-        void release(final Closeable closeable, final FileEntry temp)
-        throws IOException {
-            synchronized (DefaultCache.this) {
-                //readCount--;
-                IOException cause = null;
-                try {
-                    closeable.close();
-                } catch (IOException ex) {
-                    throw cause = ex;
-                } finally {
-                    try {
-                        pool.release(temp);
-                    } catch (IOException ex) {
-                        throw (IOException) ex.initCause(cause);
-                    }
-                }
-            }
-        }
     } // class Input
 
-    private final class Output extends FilterOutputSocket<LT> {
-        Output(final OutputSocket<? extends LT> output) {
+    private class OutputProxy extends FilterOutputSocket<LT> {
+        OutputProxy(final OutputSocket<? extends LT> output) {
             super(output);
         }
 
         @Override
         @SuppressWarnings("ThrowableInitCause")
         public OutputStream newOutputStream() throws IOException {
-            final FileEntry temp = allocate();
+            if (null != getPeerTarget()) {
+                buffer = null;
+                return super.newOutputStream(); // can't cache data for connected sockets!
+            }
+
+            final Buffer buffer = new Buffer().outputPool.allocate();
 
             class OutputStream extends FilterOutputStream {
                 boolean closed;
 
                 OutputStream() throws FileNotFoundException {
-                    super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+                    super(new FileOutputStream(buffer.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
                 }
 
                 @Override
@@ -195,54 +284,16 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     if (closed)
                         return;
                     closed = true;
-                    release(out, temp);
+                    release(out, buffer.outputPool);
                 }
             } // class OutputStream
 
             try {
                 return new OutputStream();
-            } catch (IOException cause) {
-                try {
-                    pool.release(temp);
-                } catch (IOException ex) {
-                    throw (IOException) ex.initCause(cause);
-                }
-                throw cause;
-            }
-        }
-
-        FileEntry allocate() throws IOException {
-            synchronized (DefaultCache.this) {
-                return pool.allocate();
-            }
-        }
-
-        void release(final Closeable closeable, final FileEntry temp)
-        throws IOException {
-            synchronized (DefaultCache.this) {
-                IOException cause = null;
-                try {
-                    closeable.close();
-                } catch (IOException ex) {
-                    throw cause = ex;
-                } finally {
-                    try {
-                        CommonEntry peer = getPeerTarget();
-                        if (null == peer)
-                            peer = temp;
-                        IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
-                                            FileInputSocket.get(temp)),
-                                        getOutputSocket());
-                    } catch (IOException ex) {
-                        throw cause = (IOException) ex.initCause(cause);
-                    } finally {
-                        try {
-                            pool.release(temp);
-                        } catch (IOException ex) {
-                            throw (IOException) ex.initCause(cause);
-                        }
-                    }
-                }
+            } catch (IOException ex) {
+                assert false : ex;
+                buffer.inputPool.release(null); // Dirty Hacky was here!
+                throw ex;
             }
         }
     } // class Output
