@@ -42,12 +42,11 @@ import java.io.OutputStream;
  */
 // FIXME: Current write policy is write-through. Implement write-back for better performance.
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
-
+    private final Lock lock = new Lock();
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     private final OutputProxy outputProxy;
     private volatile Buffer buffer;
-    private final Lock lock = new Lock();
 
     DefaultCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output) {
@@ -72,7 +71,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     @Override
     public void clear() throws IOException {
         synchronized (lock) {
-            Buffer buffer = this.buffer;
+            final Buffer buffer = this.buffer;
             if (null != buffer) {
                 // Order is important here!
                 this.buffer = null;
@@ -104,18 +103,13 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     private static class Lock {
     }
 
-    private final class Buffer {
+    private class Buffer {
         final InputPool inputPool = new InputPool();
         final OutputPool outputPool = new OutputPool();
         FileEntry temp;
 
         File getFile() {
             return temp.getFile();
-        }
-
-        @Override
-        public String toString() {
-            return null == temp ? "(null)" : temp.toString();
         }
 
         class InputPool implements Pool<Buffer, IOException> {
@@ -282,7 +276,6 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             try {
                 return buffer.new OutputStream();
             } catch (IOException ex) {
-                assert false : ex;
                 buffer.inputPool.release(null); // Dirty Hacky was here!
                 throw ex;
             }
