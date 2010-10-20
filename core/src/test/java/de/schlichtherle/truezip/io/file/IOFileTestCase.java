@@ -498,6 +498,10 @@ public abstract class IOFileTestCase extends TestCase {
         assertEquals(message.length, file.length());
         
         assertFalse(file.createNewFile());
+        assertTrue(file.exists());
+        assertFalse(file.isDirectory());
+        assertTrue(file.isFile());
+        assertEquals(message.length, file.length());
         
         assertTrue(file.delete());
         assertFalse(file.exists());
