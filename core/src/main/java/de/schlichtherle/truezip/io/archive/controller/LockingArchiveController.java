@@ -56,7 +56,7 @@ extends FilterArchiveController<AE> {
 
     void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
     throws NotWriteLockedException {
-        getModel().ensureNotReadLockedByCurrentThread(ex);
+        getModel().assertNotReadLockedByCurrentThread(ex);
     }
 
     @Override

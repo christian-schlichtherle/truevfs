@@ -42,9 +42,9 @@ extends        BasicArchiveController     <AE> {
         super(model);
     }
 
-    final void ensureWriteLockedByCurrentThread()
+    final void assertWriteLockedByCurrentThread()
     throws NotWriteLockedException {
-        getModel().ensureWriteLockedByCurrentThread();
+        getModel().assertWriteLockedByCurrentThread();
     }
 
     @Override
@@ -105,7 +105,7 @@ extends        BasicArchiveController     <AE> {
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
                                         final boolean createParents)
         throws IOException {
-            ensureWriteLockedByCurrentThread();
+            assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, createParents);
             } catch (FalsePositiveException ex) {

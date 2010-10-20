@@ -166,16 +166,16 @@ public class PromptingKeyManager extends KeyManager {
         PromptingKeyManager.prompting = prompting;
     }
 
-    static void ensurePrompting()
+    static void assertPrompting()
     throws KeyPromptingDisabledException {
         KeyManager manager = getInstance();
         if (manager instanceof PromptingKeyManager)
-                ((PromptingKeyManager) manager).ensurePromptingImpl();
+                ((PromptingKeyManager) manager).assertPromptingImpl();
     }
 
     /**
      * Called by some methods in the {@link PromptingKeyProvider} class in
-     * order to ensure that prompting mode is enabled.
+     * order to assert that prompting mode is enabled.
      * This method may be overridden by subclasses in order to throw a more
      * detailed exception.
      * <p>
@@ -185,7 +185,7 @@ public class PromptingKeyManager extends KeyManager {
             throw new KeyPromptingDisabledException();
      * </pre>
      */
-    protected void ensurePromptingImpl()
+    protected void assertPromptingImpl()
     throws KeyPromptingDisabledException {
         if (!isPromptingImpl())
             throw new KeyPromptingDisabledException();

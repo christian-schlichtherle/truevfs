@@ -63,7 +63,7 @@ implements ArchiveDriver<AE>, Serializable {
     /**
      * This field should be considered to be {@code final}!
      *
-     * @see #ensureEncodable
+     * @see #assertEncodable
      */
     private transient ThreadLocalEncoder encoder; // never transmit this over the wire!
 
@@ -100,6 +100,7 @@ implements ArchiveDriver<AE>, Serializable {
         assert invariants();
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     private static UnsupportedEncodingException testJSE11Support(
             final String charset) {
         try {
@@ -166,7 +167,7 @@ implements ArchiveDriver<AE>, Serializable {
         if (charset == null)
             throw new AssertionError("character set not initialized");
         try {
-            ensureEncodable("");
+            assertEncodable("");
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -178,7 +179,7 @@ implements ArchiveDriver<AE>, Serializable {
      * files by ensuring that the returned entry name ends with the separator
      * character {@code '/'} if and only if {@code type} is {@code DIRECTORY}.
      * <p>
-     * First, {@link #ensureEncodable(String) ensureEncodable(path)} is called.
+     * First, {@link #assertEncodable(String) assertEncodable(path)} is called.
      *
      * @see    CommonEntryFactory#newEntry Common Requirements For Path Names
      * @param  path a non-{@code null} <i>path name</i>.
@@ -189,7 +190,7 @@ implements ArchiveDriver<AE>, Serializable {
             final String path,
             final Type type)
     throws CharConversionException {
-        ensureEncodable(path);
+        assertEncodable(path);
         switch (type) {
             case DIRECTORY:
                 return path.endsWith(SEPARATOR) ? path : path + SEPARATOR_CHAR;
@@ -210,7 +211,7 @@ implements ArchiveDriver<AE>, Serializable {
      * @throws CharConversionException If the path name contains characters
      *         which cannot get encoded.
      */
-    protected final void ensureEncodable(String path)
+    protected final void assertEncodable(String path)
     throws CharConversionException {
         if (!encoder.canEncode(path))
             throw new CharConversionException(path +
@@ -281,7 +282,7 @@ implements ArchiveDriver<AE>, Serializable {
      * <i>$JAVA_HOME/lib/charsets.jar</i>, where <i>$JAVA_HOME</i> is the
      * path name of the installed JRE.
      * <p>
-     * To ensure that &quot;IBM437&quot; is always available regardless of
+     * To assert that &quot;IBM437&quot; is always available regardless of
      * the JRE installation, TrueZIP provides its own provider for this charset.
      * This provider is configured in
      * <i>truezip.jar/META-INF/services/java.nio.charset.spi.CharsetProvider</i>.
@@ -296,7 +297,7 @@ implements ArchiveDriver<AE>, Serializable {
      * <li>Fix the JRE by copying <i>$JAVA_HOME/lib/charsets.jar</i> from some
      *     other distribution.
      * </ol>
-     * This should ensure that $JAVA_HOME/lib/charsets.jar is present in the
+     * This should assert that $JAVA_HOME/lib/charsets.jar is present in the
      * JRE, which contains the provider for the &quot;IBM437&quot; character
      * set.
      * Although this should not be necessary due to TrueZIP's own provider,

@@ -605,7 +605,7 @@ implements Iterable<E>, Closeable {
      * Returns the file length of this ZIP compatible file in bytes.
      */
     public long length() throws IOException {
-        ensureOpen();
+        assertOpen();
         return archive.length();
     }
 
@@ -636,7 +636,7 @@ implements Iterable<E>, Closeable {
      * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPreambleInputStream() throws IOException {
-        ensureOpen();
+        assertOpen();
         return new IntervalInputStream(0, preamble);
     }
 
@@ -666,7 +666,7 @@ implements Iterable<E>, Closeable {
      * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPostambleInputStream() throws IOException {
-        ensureOpen();
+        assertOpen();
         return new IntervalInputStream(archive.length() - postamble, postamble);
     }
 
@@ -761,7 +761,7 @@ implements Iterable<E>, Closeable {
             final boolean check,
             final boolean inflate)
     throws IOException {
-        ensureOpen();
+        assertOpen();
         if (name == null)
             throw new NullPointerException();
 
@@ -848,10 +848,8 @@ implements Iterable<E>, Closeable {
         return (int) size;
     }
 
-    /**
-     * Ensures that this archive is still fetch.
-     */
-    private void ensureOpen() throws ZipException {
+    /** Asserts that this archive is still open. */
+    private void assertOpen() throws ZipException {
         if (archive == null)
             throw new ZipException("ZIP file has been closed!");
     }
@@ -1102,7 +1100,7 @@ implements Iterable<E>, Closeable {
         @Override
 		public int read()
         throws IOException {
-            ensureOpen();
+            assertOpen();
 
             if (remaining <= 0) {
                 if (addDummyByte) {
@@ -1132,7 +1130,7 @@ implements Iterable<E>, Closeable {
                 return 0;
             }
 
-            ensureOpen();
+            assertOpen();
 
             if (remaining <= 0) {
                 if (addDummyByte) {
@@ -1178,7 +1176,7 @@ implements Iterable<E>, Closeable {
         @Override
         public int available()
         throws IOException {
-            ensureOpen();
+            assertOpen();
 
             long available = remaining;
             if (addDummyByte)

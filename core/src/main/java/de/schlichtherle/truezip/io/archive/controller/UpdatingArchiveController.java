@@ -148,7 +148,7 @@ extends     FileSystemArchiveController<AE> {
     private final class TouchListener implements VetoableTouchListener {
         @Override
         public void touch() throws IOException {
-            ensureOutput(false);
+            makeOutput(false);
             getModel().setTouched(true);
         }
     }
@@ -316,7 +316,7 @@ extends     FileSystemArchiveController<AE> {
             // encrypted ZIP file and the user cancels password
             // prompting.
             try {
-                ensureOutput(createParents);
+                makeOutput(createParents);
             } catch (ArchiveControllerException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
@@ -329,10 +329,9 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private void ensureOutput(final boolean createParents) throws IOException {
+    private void makeOutput(final boolean createParents) throws IOException {
         if (null != output)
             return;
-
         final FileSystemController<?> enclController = getEnclController();
         final String enclPath = getEnclPath(ROOT);
         final OutputSocket<?> socket = enclController.getOutputSocket(enclPath,
@@ -352,7 +351,7 @@ extends     FileSystemArchiveController<AE> {
     @Override
     OutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
-        ensureOutput(false);
+        makeOutput(false);
         return output.getOutputSocket(entry);
     }
 
@@ -387,18 +386,38 @@ extends     FileSystemArchiveController<AE> {
     throws E, ArchiveControllerException {
         assert !isTouched() || output != null; // file system touched => output archive
 
-        ensureWriteLockedByCurrentThread();
-
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
+        assertWriteLockedByCurrentThread();
+        awaitSync(builder, options);
+        commenceSync(builder);
+        try {
+            if (!options.get(ABORT_CHANGES) && isTouched())
+                performSync(builder);
+        } finally {
+            try {
+                commitSync(builder);
+            } finally {
+                assert null == getFileSystem();
+                assert null == input;
+                assert null == output;
+                getModel().setTouched(false);
+            }
+        }
+        builder.check();
+    }
 
+    private <E extends IOException>
+    void awaitSync(
+            final ExceptionBuilder<? super SyncException, E> builder,
+            final BitField<SyncOption> options)
+    throws E {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
         // don't even need to check open input streams if there are
         // some open output streams.
         if (output != null) {
-            final int outStreams = output.waitCloseOthers(
-                    options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
+            final int outStreams = output.waitCloseOthers(options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
                 if (!options.get(FORCE_CLOSE_OUTPUT))
                     throw builder.fail(new SyncException(getModel(), new ArchiveOutputBusyException(outStreams)));
@@ -406,32 +425,46 @@ extends     FileSystemArchiveController<AE> {
             }
         }
         if (input != null) {
-            final int inStreams = input.waitCloseOthers(
-                    options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
+            final int inStreams = input.waitCloseOthers(options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
                 if (!options.get(FORCE_CLOSE_INPUT))
                     throw builder.fail(new SyncException(getModel(), new ArchiveInputBusyException(inStreams)));
                 builder.warn(new SyncWarningException(getModel(), new ArchiveInputBusyException(inStreams)));
             }
         }
+    }
 
-        // Now update the target archive file.
-        try {
-            try {
-                reset1(builder);
-                if (!options.get(ABORT_CHANGES) && isTouched())
-                    update(builder);
-            } finally {
-                reset2(builder);
+    /**
+     * Closes and disconnects all entry streams of the output and input
+     * archive.
+     *
+     * @param handler An exception handler - {@code null} is not permitted.
+     * @throws SyncException If any exceptional condition occurs
+     *         throughout the processing of the target archive file.
+     */
+    private <E extends IOException>
+    void commenceSync(final ExceptionHandler<? super SyncException, E> handler)
+    throws E {
+        class FilterExceptionHandler
+        implements ExceptionHandler<IOException, E> {
+            @Override
+			public E fail(IOException cannotHappen) {
+                throw new AssertionError(cannotHappen);
             }
-        } finally {
-            assert getFileSystem() == null;
-            assert null == input;
-            assert null == output;
-            getModel().setTouched(false);
-        }
 
-        builder.check();
+            @Override
+			public void warn(IOException cause) throws E {
+                if (null == cause)
+                    throw new NullPointerException();
+                handler.warn(new SyncWarningException(getModel(), cause));
+            }
+        } // class FilterExceptionHandler
+
+        final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
+        if (output != null)
+            output.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
+        if (input != null)
+            input.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
     }
 
     /**
@@ -445,7 +478,7 @@ extends     FileSystemArchiveController<AE> {
      *         throughout the processing of the target archive file.
      */
     private <E extends IOException>
-    void update(final ExceptionHandler<? super SyncException, E> handler)
+    void performSync(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
         assert isTouched();
         assert output != null;
@@ -472,7 +505,7 @@ extends     FileSystemArchiveController<AE> {
             }
         } // class FilterExceptionHandler
 
-        update( getFileSystem(),
+        copy(   getFileSystem(),
                 null == input ? new DummyInputService<AE>() : input.getDriverProduct(),
                 output.getDriverProduct(),
                 (ExceptionHandler<IOException, E>) new FilterExceptionHandler());
@@ -503,7 +536,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private static <AE extends ArchiveEntry, E extends IOException>
-    void update(final ArchiveFileSystem<AE> fileSystem,
+    void copy(  final ArchiveFileSystem<AE> fileSystem,
                 final InputService<AE> input,
                 final OutputService<AE> output,
                 final ExceptionHandler<IOException, E> handler)
@@ -538,38 +571,6 @@ extends     FileSystemArchiveController<AE> {
     }
 
     /**
-     * Closes and disconnects all entry streams of the output and input
-     * archive.
-     * 
-     * @param handler An exception handler - {@code null} is not permitted.
-     * @throws SyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
-     */
-    private <E extends IOException>
-    void reset1(final ExceptionHandler<? super SyncException, E> handler)
-    throws E {
-        class FilterExceptionHandler
-        implements ExceptionHandler<IOException, E> {
-            @Override
-			public E fail(IOException cannotHappen) {
-                throw new AssertionError(cannotHappen);
-            }
-
-            @Override
-			public void warn(IOException cause) throws E {
-                if (null == cause)
-                    throw new NullPointerException();
-                handler.warn(new SyncWarningException(getModel(), cause));
-            }
-        } // class FilterExceptionHandler
-        final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
-        if (output != null)
-            output.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
-        if (input != null)
-            input.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
-    }
-
-    /**
      * Discards the file system and closes the output and input archive.
      * 
      * @param handler An exception handler - {@code null} is not permitted.
@@ -577,7 +578,7 @@ extends     FileSystemArchiveController<AE> {
      *         throughout the processing of the target archive file.
      */
     private <E extends IOException>
-    void reset2(final ExceptionHandler<? super SyncException, E> handler)
+    void commitSync(final ExceptionHandler<? super SyncException, E> handler)
     throws E {
         setFileSystem(null);
 

@@ -84,10 +84,10 @@ public class AbstractArchiveDriverTest extends TestCase {
         assertSame("US-ASCII", driver.getCharset()); // string literals are interned
     }
 
-    public void testEnsureEncodable() throws CharConversionException {
-        driver.ensureEncodable("foo/bar");
+    public void testAssertEncodable() throws CharConversionException {
+        driver.assertEncodable("foo/bar");
         try {
-            driver.ensureEncodable("\u1234");
+            driver.assertEncodable("\u1234");
             fail("Unencodable string!");
         } catch (CharConversionException expected) {
         }
@@ -112,7 +112,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         assertEquals(driver.getCharset(), driver2.getCharset());
         assertSame(driver.getOpenIcon(null), driver2.getOpenIcon(null)); // static property!
         assertSame(driver.getClosedIcon(null), driver2.getClosedIcon(null)); // static property!
-        driver2.ensureEncodable("foo/bar");
+        driver2.assertEncodable("foo/bar");
     }
 
     public void testMultithreading() throws Throwable {
@@ -136,7 +136,7 @@ public class AbstractArchiveDriverTest extends TestCase {
                         go.wait(2000);
                     }
                     for (int i = 0; i < 100000; i++)
-                        driver.ensureEncodable("foo/bar");
+                        driver.assertEncodable("foo/bar");
                 } catch (Throwable t) {
                     throwable = t;
                 }

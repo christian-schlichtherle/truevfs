@@ -171,7 +171,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     /** Needs to be externally synchronized! */
-    private void ensureNotShopClosed() throws IOException {
+    private void assertNotShopClosed() throws IOException {
         if (closed)
             throw new InputClosedException();
     }
@@ -189,20 +189,20 @@ extends FilterInputShop<CE, InputShop<CE>> {
             @Override
             public InputStream newInputStream() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
-                    ensureNotShopClosed();
+                    assertNotShopClosed();
                     return new SynchronizedConcurrentInputStream(
                             new ConcurrentInputStream(
-                                super.newInputStream()));
+                                getBoundSocket().newInputStream()));
                 }
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 synchronized (ConcurrentInputShop.this) {
-                    ensureNotShopClosed();
+                    assertNotShopClosed();
                     return new SynchronizedConcurrentReadOnlyFile(
                             new ConcurrentReadOnlyFile(
-                                super.newReadOnlyFile()));
+                                getBoundSocket().newReadOnlyFile()));
                 }
             }
         } // class Input
@@ -225,7 +225,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
                 if (closed)
                     return;
                 try {
-                    super.close();
+                    in.close();
                 } finally {
                     threads.remove(in);
                     lock.notify(); // there can be only one waiting thread!
@@ -249,7 +249,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
                 if (closed)
                     return;
                 try {
-                    super.close();
+                    rof.close();
                 } finally {
                     threads.remove(rof);
                     lock.notify(); // there can be only one waiting thread!
@@ -265,49 +265,49 @@ extends FilterInputShop<CE, InputShop<CE>> {
 
         @Override
         public int read() throws IOException {
-            ensureNotShopClosed();
-            return super.read();
+            assertNotShopClosed();
+            return in.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            ensureNotShopClosed();
-            return super.read(b, off, len);
+            assertNotShopClosed();
+            return in.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            ensureNotShopClosed();
-            return super.skip(n);
+            assertNotShopClosed();
+            return in.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            ensureNotShopClosed();
-            return super.available();
+            assertNotShopClosed();
+            return in.available();
         }
 
         @Override
         public void mark(int readlimit) {
             if (!closed)
-                super.mark(readlimit);
+                in.mark(readlimit);
         }
 
         @Override
         public void reset() throws IOException {
-            ensureNotShopClosed();
-            super.reset();
+            assertNotShopClosed();
+            in.reset();
         }
 
         @Override
         public boolean markSupported() {
-            return !closed && super.markSupported();
+            return !closed && in.markSupported();
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                super.close();
+                in.close();
         }
 
         /**
@@ -333,44 +333,44 @@ extends FilterInputShop<CE, InputShop<CE>> {
 
         @Override
         public long length() throws IOException {
-            ensureNotShopClosed();
-            return super.length();
+            assertNotShopClosed();
+            return rof.length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
-            ensureNotShopClosed();
-            return super.getFilePointer();
+            assertNotShopClosed();
+            return rof.getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            ensureNotShopClosed();
-            super.seek(pos);
+            assertNotShopClosed();
+            rof.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
-            ensureNotShopClosed();
-            return super.read();
+            assertNotShopClosed();
+            return rof.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            ensureNotShopClosed();
-            return super.read(b, off, len);
+            assertNotShopClosed();
+            return rof.read(b, off, len);
         }
 
         @Override
         public void readFully(byte[] b, int off, int len) throws IOException {
-            ensureNotShopClosed();
-            super.readFully(b, off, len);
+            assertNotShopClosed();
+            rof.readFully(b, off, len);
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                super.close();
+                rof.close();
         }
 
         /**

@@ -87,10 +87,10 @@ public class PromptingKeyManager extends de.schlichtherle.truezip.key.PromptingK
      * {@link KeyPromptingDisabledException}.
      */
     @Override
-    protected void ensurePromptingImpl()
+    protected void assertPromptingImpl()
     throws KeyPromptingDisabledException {
         if (System.console() == null)
             throw new KeyPromptingDisabledException();
-        super.ensurePromptingImpl();
+        super.assertPromptingImpl();
     }
 }

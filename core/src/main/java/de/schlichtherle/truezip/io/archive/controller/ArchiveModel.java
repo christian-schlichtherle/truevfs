@@ -94,7 +94,7 @@ final class ArchiveModel implements FileSystemModel, ReadWriteLock {
      * @throws NotWriteLockedException if the <i>read lock</i> is
      *         held by the current thread.
      */
-    void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
+    void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)
     throws NotWriteLockedException  {
         if (readLock.isHeldByCurrentThread())
             throw new NotWriteLockedException(this, ex);
@@ -109,7 +109,7 @@ final class ArchiveModel implements FileSystemModel, ReadWriteLock {
      * @throws NotWriteLockedException if the <i>write lock</i> is not
      *         held by the current thread.
      */
-    void ensureWriteLockedByCurrentThread()
+    void assertWriteLockedByCurrentThread()
     throws NotWriteLockedException {
         if (!writeLock.isHeldByCurrentThread())
             throw new NotWriteLockedException(this);
