@@ -43,8 +43,8 @@ public interface OutputCache<LT extends CommonEntry> {
     void flush() throws IOException;
 
     /**
-     * Clears the cache, effectively throwing away any data which has not been
-     * {@link #flush() flushed} to the underlying storage.
+     * Clears the cache, effectively discarding any data which has not been
+     * {@link #flush() flushed} to the underlying storage before.
      */
     void clear() throws IOException;
 }
