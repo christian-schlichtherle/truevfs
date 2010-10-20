@@ -66,6 +66,10 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     @Override
     public void flush() throws IOException {
+        /*synchronized (lock) {
+            if (null != buffer)
+                buffer.outputPool.release(buffer);
+        }*/
     }
 
     @Override
@@ -75,7 +79,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             if (null != buffer) {
                 // Order is important here!
                 this.buffer = null;
-                buffer.inputPool.release(null);
+                buffer.inputPool.release(buffer);
             }
         }
     }
@@ -85,18 +89,6 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             if (null == buffer)
                 buffer = new Buffer();
             return buffer;
-        }
-    }
-
-    private void release(   final Closeable closeable,
-                            final Pool<Buffer, IOException> pool)
-    throws IOException {
-        synchronized (lock) {
-            try {
-                closeable.close();
-            } finally {
-                pool.release(null);
-            }
         }
     }
 
@@ -110,6 +102,18 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
         File getFile() {
             return temp.getFile();
+        }
+
+        void close( final Closeable closeable,
+                    final Pool<Buffer, IOException> pool)
+        throws IOException {
+            synchronized (lock) {
+                try {
+                    closeable.close();
+                } finally {
+                    pool.release(this);
+                }
+            }
         }
 
         class InputPool implements Pool<Buffer, IOException> {
@@ -142,7 +146,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
             @Override
             public void release(final Buffer resource) throws IOException {
-                assert null == resource;
+                assert Buffer.this == resource;
                 synchronized (lock) {
                     uses--;
                     if (Buffer.this != buffer && 0 >= uses) {
@@ -156,6 +160,8 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         } // class InputPool
 
         class OutputPool implements Pool<Buffer, IOException> {
+            //boolean dirty;
+
             @Override
             public Buffer allocate() throws IOException {
                 assert null == temp;
@@ -167,22 +173,26 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
             @Override
             public void release(final Buffer resource) throws IOException {
-                assert null == resource;
+                assert Buffer.this == resource;
                 synchronized (lock) {
-                    try {
-                        final OutputSocket<? extends LT> output
-                                = outputProxy.getBoundSocket();
-                        CommonEntry peer = output.getPeerTarget();
-                        if (null == peer)
-                            peer = temp;
-                        IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
-                                            FileInputSocket.get(temp)),
-                                        output);
-                    } catch (IOException ex) {
-                        pool.release(temp);
-                        throw ex;
-                    }
-                    buffer = Buffer.this;
+                    //if (dirty) {
+                        try {
+                            final OutputSocket<? extends LT> output
+                                    = outputProxy.getBoundSocket();
+                            CommonEntry peer = output.getPeerTarget();
+                            if (null == peer)
+                                peer = temp;
+                            IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
+                                                FileInputSocket.get(temp)),
+                                            output);
+                        } catch (IOException ex) {
+                            pool.release(temp);
+                            throw ex;
+                        }
+                        buffer = Buffer.this;
+                    /*} else {
+                        dirty = true;
+                    }*/
                 }
             }
         } // class OutputPool
@@ -199,7 +209,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 if (closed)
                     return;
                 closed = true;
-                release(rof, inputPool);
+                Buffer.this.close(rof, inputPool);
             }
         } // class ReadOnlyFile
 
@@ -215,7 +225,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 if (closed)
                     return;
                 closed = true;
-                release(in, inputPool);
+                Buffer.this.close(in, inputPool);
             }
         } // class InputStream
 
@@ -231,7 +241,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 if (closed)
                     return;
                 closed = true;
-                release(out, outputPool);
+                Buffer.this.close(out, outputPool);
             }
         } // class OutputStream
     } // class Buffer
@@ -276,7 +286,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             try {
                 return buffer.new OutputStream();
             } catch (IOException ex) {
-                buffer.inputPool.release(null); // Dirty Hacky was here!
+                buffer.inputPool.release(buffer); // Dirty Hacky was here!
                 throw ex;
             }
         }
