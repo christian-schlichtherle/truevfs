@@ -45,7 +45,6 @@ import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -310,7 +309,7 @@ extends     FileSystemArchiveController<AE> {
             throw ex;
         } catch (IOException ex) {
             if (!autoCreate)
-                throw new FalsePositiveException(ex);
+                throw new FalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the enclosing archive
             // file, but we may create it automatically.
             // This may fail if e.g. the target file is an RAES
@@ -323,7 +322,7 @@ extends     FileSystemArchiveController<AE> {
             } catch (TabuFileException ex2) {
                 throw ex2;
             } catch (IOException ex2) {
-                throw new FalsePositiveException(ex2);
+                throw new FalsePositiveException(getModel(), ex2);
             }
             setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
                     getDriver(), vetoableTouchListener));
@@ -402,8 +401,8 @@ extends     FileSystemArchiveController<AE> {
                     options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw builder.fail(new SyncException(this, new ArchiveOutputBusyException(outStreams)));
-                builder.warn(new SyncWarningException(this, new ArchiveOutputBusyException(outStreams)));
+                    throw builder.fail(new SyncException(getModel(), new ArchiveOutputBusyException(outStreams)));
+                builder.warn(new SyncWarningException(getModel(), new ArchiveOutputBusyException(outStreams)));
             }
         }
         if (input != null) {
@@ -411,8 +410,8 @@ extends     FileSystemArchiveController<AE> {
                     options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw builder.fail(new SyncException(this, new ArchiveInputBusyException(inStreams)));
-                builder.warn(new SyncWarningException(this, new ArchiveInputBusyException(inStreams)));
+                    throw builder.fail(new SyncException(getModel(), new ArchiveInputBusyException(inStreams)));
+                builder.warn(new SyncWarningException(getModel(), new ArchiveInputBusyException(inStreams)));
             }
         }
 
@@ -459,7 +458,7 @@ extends     FileSystemArchiveController<AE> {
             @Override
 			public E fail(final IOException cause) {
                 last = cause;
-                return handler.fail(new SyncException(UpdatingArchiveController.this, cause));
+                return handler.fail(new SyncException(getModel(), cause));
             }
 
             @Override
@@ -468,8 +467,8 @@ extends     FileSystemArchiveController<AE> {
                 final IOException old = last;
                 last = cause;
                 if (null != old || !(cause instanceof InputException))
-                    throw handler.fail(new SyncException(UpdatingArchiveController.this, cause));
-                handler.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
+                    throw handler.fail(new SyncException(getModel(), cause));
+                handler.warn(new SyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
 
@@ -560,7 +559,7 @@ extends     FileSystemArchiveController<AE> {
 			public void warn(IOException cause) throws E {
                 if (null == cause)
                     throw new NullPointerException();
-                handler.warn(new SyncWarningException(UpdatingArchiveController.this, cause));
+                handler.warn(new SyncWarningException(getModel(), cause));
             }
         } // class FilterExceptionHandler
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
@@ -594,7 +593,7 @@ extends     FileSystemArchiveController<AE> {
                 try {
                     output.close();
                 } catch (IOException ex) {
-                    throw handler.fail(new SyncException(this, ex));
+                    throw handler.fail(new SyncException(getModel(), ex));
                 } finally {
                     output = null;
                 }
@@ -604,7 +603,7 @@ extends     FileSystemArchiveController<AE> {
                 try {
                     input.close();
                 } catch (IOException ex) {
-                    handler.warn(new SyncWarningException(this, ex));
+                    handler.warn(new SyncWarningException(getModel(), ex));
                 } finally {
                     input = null;
                 }

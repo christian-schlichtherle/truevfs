@@ -15,37 +15,33 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**
- * While this exception could arguably be a {@link RuntimeException} too, it
- * has been decided to subclass {@link IOException} for the following reasons:
- * <ol>
- * <li>This exceptional condition is defined to be recoverable and hence
- *     indicates the use of a checked exception.
- *     In contrast, a runtime exception is not defined to be recoverable and
- *     accordingly most code is not designed to be reentrant once a runtime
- *     exception has occured.
- * <li>Exceptions of this class must pass calls to the methods of the
- *     {@link InputSocket} and {@link OutputSocket} classes.
- *     {@link IOException} is the only suitable exception type for this
- *     purpose.
- * </ol>
+ * Indicates an exceptional condition in an archive controller.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveControllerException extends IOException {
+abstract class ArchiveControllerException extends ChainableIOException {
     private static final long serialVersionUID = 2947623946725372554L;
 
-    ArchiveControllerException() {
-        super.initCause(null);
+    /** For exclusive use by {@link DefaultSyncExceptionBuilder}. */
+    public ArchiveControllerException(String message) {
+        super(message);
     }
 
-    ArchiveControllerException(IOException cause) {
-        super.initCause(cause);
+    ArchiveControllerException(ArchiveModel model) {
+        super();
+    }
+
+    ArchiveControllerException(ArchiveModel model, Throwable cause) {
+        super(model.getMountPoint().getPath(), cause);
+    }
+
+    ArchiveControllerException(ArchiveModel model, Throwable cause, int priority) {
+        super(model.getMountPoint().getPath(), cause, priority);
     }
 
     /** Returns the nullable cause of this exception. */

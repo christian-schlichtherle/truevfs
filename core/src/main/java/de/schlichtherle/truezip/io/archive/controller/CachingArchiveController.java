@@ -168,7 +168,7 @@ extends FilterArchiveController<AE> {
                         cache.clear();
                     }
                 } catch (IOException ex) {
-                    throw builder.fail(new SyncException(this, ex));
+                    throw builder.fail(new SyncException(getModel(), ex));
                 }
             }
             caches.clear();

@@ -97,7 +97,7 @@ final class ArchiveModel implements FileSystemModel, ReadWriteLock {
     void ensureNotReadLockedByCurrentThread(NotWriteLockedException ex)
     throws NotWriteLockedException  {
         if (readLock.isHeldByCurrentThread())
-            throw new NotWriteLockedException(ex);
+            throw new NotWriteLockedException(this, ex);
     }
 
     @Override
@@ -112,6 +112,6 @@ final class ArchiveModel implements FileSystemModel, ReadWriteLock {
     void ensureWriteLockedByCurrentThread()
     throws NotWriteLockedException {
         if (!writeLock.isHeldByCurrentThread())
-            throw new NotWriteLockedException();
+            throw new NotWriteLockedException(this);
     }
 }
