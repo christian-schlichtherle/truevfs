@@ -51,7 +51,7 @@ extends FilterInputSocket<LT> {
         }
 
         InputStream getInputStream() throws IOException {
-            return null != in ? in : (in = getInputSocket().newInputStream());
+            return null != in ? in : (in = getBoundSocket().newInputStream());
         }
 
         @Override
@@ -115,7 +115,7 @@ extends FilterInputSocket<LT> {
         }
 
         ReadOnlyFile getReadOnlyFile() throws IOException {
-            return null != rof ? rof : (rof = getInputSocket().newReadOnlyFile());
+            return null != rof ? rof : (rof = getBoundSocket().newReadOnlyFile());
         }
 
         @Override

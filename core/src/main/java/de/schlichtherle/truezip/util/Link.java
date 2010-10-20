@@ -91,6 +91,12 @@ public interface Link<T> {
             public T getTarget() {
                 return target;
             }
+
+            @Override
+            public String toString() {
+                final T target = getTarget();
+                return "strongLink:" + (null == target ? "(null)" : target);
+            }
         }
 
         private static class SoftLink<T> extends SoftReference<T>
@@ -103,6 +109,12 @@ public interface Link<T> {
             public T getTarget() {
                 return get();
             }
+
+            @Override
+            public String toString() {
+                final T target = getTarget();
+                return "softLink:" + (null == target ? "(null)" : target);
+            }
         }
 
         private static class WeakLink<T> extends WeakReference<T>
@@ -114,6 +126,12 @@ public interface Link<T> {
             @Override
             public T getTarget() {
                 return get();
+            }
+
+            @Override
+            public String toString() {
+                final T target = getTarget();
+                return "weakLink:" + (null == target ? "(null)" : target);
             }
         }
     }

@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.net.URI;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -27,6 +26,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -45,7 +45,8 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 final class OSFileSystemController
-implements FileSystemModel, FileSystemController<FileEntry>  {
+extends AbstractFileSystemController<FileEntry>
+implements FileSystemModel {
 
     private final URI mountPoint;
     private final File target;

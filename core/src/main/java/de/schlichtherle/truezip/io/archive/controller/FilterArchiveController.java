@@ -33,8 +33,8 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class      FilterArchiveController<AE extends ArchiveEntry>
-implements ArchiveController      <AE> {
+class      FilterArchiveController  <AE extends ArchiveEntry>
+extends    AbstractArchiveController<AE> {
 
     private final ArchiveController<? extends AE> controller;
 

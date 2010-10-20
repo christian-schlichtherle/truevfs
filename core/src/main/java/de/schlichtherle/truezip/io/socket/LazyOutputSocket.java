@@ -44,7 +44,7 @@ extends FilterOutputSocket<LT> {
         }
 
         OutputStream getOutputStream() throws IOException {
-            return null != out ? out : (out = getOutputSocket().newOutputStream());
+            return null != out ? out : (out = getBoundSocket().newOutputStream());
         }
 
         @Override

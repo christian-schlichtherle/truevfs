@@ -43,7 +43,7 @@ extends InputSocket<LT> {
      * @throws IOException at the discretion of an overriding method.
      * @return The bound filtered socket.
      */
-    protected InputSocket<? extends LT> getInputSocket() throws IOException {
+    protected InputSocket<? extends LT> getBoundSocket() throws IOException {
         return input.bind(this);
     }
 
@@ -55,21 +55,21 @@ extends InputSocket<LT> {
 
     @Override
     public LT getLocalTarget() throws IOException {
-        return getInputSocket().getLocalTarget();
+        return getBoundSocket().getLocalTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() throws IOException {
-        return getInputSocket().getPeerTarget();
+        return getBoundSocket().getPeerTarget();
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return getInputSocket().newInputStream();
+        return getBoundSocket().newInputStream();
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getInputSocket().newReadOnlyFile();
+        return getBoundSocket().newReadOnlyFile();
     }
 }

@@ -53,7 +53,7 @@ extends OutputSocket<LT> {
      * @throws IOException at the discretion of an overriding method.
      * @return The bound proxied socket.
      */
-    protected OutputSocket<?> getOutputSocket() throws IOException {
+    protected OutputSocket<?> getBoundSocket() throws IOException {
         return output.bind(this);
     }
 
@@ -70,11 +70,11 @@ extends OutputSocket<LT> {
 
     @Override
     public CommonEntry getPeerTarget() throws IOException {
-        return getOutputSocket().getPeerTarget();
+        return getBoundSocket().getPeerTarget();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return getOutputSocket().newOutputStream();
+        return getBoundSocket().newOutputStream();
     }
 }

@@ -49,7 +49,8 @@ public class Caches {
     }
 
     public static <LT extends CommonEntry>
-    Cache<LT> newInstance(InputSocket<? extends LT> input, OutputSocket<? extends LT> output) {
+    Cache<LT> newInstance(InputSocket<? extends LT> input,
+                          OutputSocket<? extends LT> output) {
         /*if (null == input || null == output)
             throw new NullPointerException();*/
         return new DefaultCache<LT>(input, output);

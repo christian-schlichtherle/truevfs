@@ -238,7 +238,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return getInputSocket().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } finally {
                     readLock().unlock();
                 }
@@ -246,7 +246,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return getInputSocket().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } finally {
                     writeLock().unlock();
                 }
@@ -258,7 +258,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return getInputSocket().newInputStream();
+                    return getBoundSocket().newInputStream();
                 } finally {
                     readLock().unlock();
                 }
@@ -266,7 +266,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return getInputSocket().newInputStream();
+                    return getBoundSocket().newInputStream();
                 } finally {
                     writeLock().unlock();
                 }
@@ -278,7 +278,7 @@ extends FilterArchiveController<AE> {
             try {
                 readLock().lock();
                 try {
-                    return getInputSocket().newReadOnlyFile();
+                    return getBoundSocket().newReadOnlyFile();
                 } finally {
                     readLock().unlock();
                 }
@@ -286,7 +286,7 @@ extends FilterArchiveController<AE> {
                 ensureNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {
-                    return getInputSocket().newReadOnlyFile();
+                    return getBoundSocket().newReadOnlyFile();
                 } finally {
                     writeLock().unlock();
                 }
@@ -311,7 +311,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return getOutputSocket().getLocalTarget();
+                return getBoundSocket().getLocalTarget();
             } finally {
                 writeLock().unlock();
             }
@@ -322,7 +322,7 @@ extends FilterArchiveController<AE> {
             ensureNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return getOutputSocket().newOutputStream();
+                return getBoundSocket().newOutputStream();
             } finally {
                 writeLock().unlock();
             }

@@ -130,8 +130,9 @@ public abstract class IOSocket<LT, RT> {
     }
 
     /** Provided for the comfort of subclasses in this package. */
-    static boolean equal(Object o1, Object o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
+    static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
+        assert (o1 == o2) == (o1 == o2 || null != o1 && o1.equals(o2));
+        return o1 == o2;
     }
 
     /**

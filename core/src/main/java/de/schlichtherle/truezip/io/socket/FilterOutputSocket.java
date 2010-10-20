@@ -42,7 +42,7 @@ extends OutputSocket<LT> {
      * @throws IOException at the discretion of an overriding method.
      * @return The bound filtered socket.
      */
-    protected OutputSocket<? extends LT> getOutputSocket() throws IOException {
+    protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
         return output.bind(this);
     }
 
@@ -54,16 +54,16 @@ extends OutputSocket<LT> {
 
     @Override
     public LT getLocalTarget() throws IOException {
-        return getOutputSocket().getLocalTarget();
+        return getBoundSocket().getLocalTarget();
     }
 
     @Override
     public CommonEntry getPeerTarget() throws IOException {
-        return getOutputSocket().getPeerTarget();
+        return getBoundSocket().getPeerTarget();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return getOutputSocket().newOutputStream();
+        return getBoundSocket().newOutputStream();
     }
 }

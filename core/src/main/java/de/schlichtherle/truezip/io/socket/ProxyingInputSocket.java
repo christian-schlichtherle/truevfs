@@ -48,7 +48,7 @@ extends InputSocket<LT> {
      * @throws IOException at the discretion of an overriding method.
      * @return The bound proxied socket.
      */
-    protected InputSocket<?> getInputSocket() throws IOException {
+    protected InputSocket<?> getBoundSocket() throws IOException {
         return input.bind(this);
     }
 
@@ -65,16 +65,16 @@ extends InputSocket<LT> {
 
     @Override
     public CommonEntry getPeerTarget() throws IOException {
-        return getInputSocket().getPeerTarget();
+        return getBoundSocket().getPeerTarget();
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return getInputSocket().newInputStream();
+        return getBoundSocket().newInputStream();
     }
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getInputSocket().newReadOnlyFile();
+        return getBoundSocket().newReadOnlyFile();
     }
 }

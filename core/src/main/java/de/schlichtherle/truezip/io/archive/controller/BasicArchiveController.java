@@ -95,8 +95,8 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<AE extends ArchiveEntry>
-implements     ArchiveController     <AE> {
+abstract class BasicArchiveController   <AE extends ArchiveEntry>
+extends        AbstractArchiveController<AE> {
 
     private final ArchiveModel model;
 
@@ -223,7 +223,7 @@ implements     ArchiveController     <AE> {
                 return entry;
             }
 
-            final InputSocket<? extends AE> getInputSocket() throws IOException {
+            final InputSocket<? extends AE> getBoundSocket() throws IOException {
                 final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
@@ -233,12 +233,12 @@ implements     ArchiveController     <AE> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                return getInputSocket().newInputStream();
+                return getBoundSocket().newInputStream();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getInputSocket().newReadOnlyFile();
+                return getBoundSocket().newReadOnlyFile();
             }
         } // class Input
 

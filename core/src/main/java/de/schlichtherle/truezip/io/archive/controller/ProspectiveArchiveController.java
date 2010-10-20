@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -53,7 +54,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @version $Id$
  */
 final class ProspectiveArchiveController<AE extends ArchiveEntry>
-implements FileSystemController<CommonEntry> {
+extends AbstractFileSystemController<CommonEntry> {
 
     private final ArchiveController<AE> controller;
     private final FileSystemController<?> enclController;
@@ -236,7 +237,7 @@ implements FileSystemController<CommonEntry> {
         @Override
         public CommonEntry getLocalTarget() throws IOException {
             try {
-                return getInputSocket().getLocalTarget();
+                return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
@@ -248,7 +249,7 @@ implements FileSystemController<CommonEntry> {
         @Override
         public InputStream newInputStream() throws IOException {
             try {
-                return getInputSocket().newInputStream();
+                return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
@@ -260,7 +261,7 @@ implements FileSystemController<CommonEntry> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
-                return getInputSocket().newReadOnlyFile();
+                return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getInputSocket(getEnclPath(path), options)
@@ -295,7 +296,7 @@ implements FileSystemController<CommonEntry> {
         @Override
         public CommonEntry getLocalTarget() throws IOException {
             try {
-                return getOutputSocket().getLocalTarget();
+                return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getOutputSocket(getEnclPath(path), options, template)
@@ -307,7 +308,7 @@ implements FileSystemController<CommonEntry> {
         @Override
         public OutputStream newOutputStream() throws IOException {
             try {
-                return getOutputSocket().newOutputStream();
+                return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getEnclController()
                         .getOutputSocket(getEnclPath(path), options, template)

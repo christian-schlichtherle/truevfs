@@ -142,7 +142,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final OutputSocket<? extends AE> socket = getOutputSocket();
+                    final OutputSocket<? extends AE> socket = getBoundSocket();
                     final FileEntry temp = TempFilePool.get().allocate();
                     IOException cause = null;
                     try {
