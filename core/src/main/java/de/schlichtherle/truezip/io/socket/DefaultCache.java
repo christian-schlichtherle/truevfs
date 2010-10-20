@@ -44,7 +44,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     private final OutputProxy outputProxy;
-    private volatile Buffer buffer;
+    private Buffer buffer;
 
     DefaultCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output) {
@@ -93,7 +93,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     private static class Lock {
     }
 
-    private class Buffer {
+    private final class Buffer {
         final InputChannel inputChannel = new InputChannel();
         final OutputChannel outputChannel = new OutputChannel();
         FileEntry temp;
@@ -102,7 +102,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             return temp.getFile();
         }
 
-        class InputChannel implements Pool<Buffer, IOException> {
+        final class InputChannel implements Pool<Buffer, IOException> {
             int used;
 
             @Override
@@ -146,18 +146,16 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             }
 
             void close(final Closeable closeable) throws IOException {
-                synchronized (lock) {
-                    try {
-                        closeable.close();
-                    } finally {
-                        release(Buffer.this);
-                    }
+                try {
+                    closeable.close();
+                } finally {
+                    release(Buffer.this);
                 }
             }
         } // class InputChannel
 
-        class OutputChannel implements Pool<Buffer, IOException> {
-            boolean dirty;
+        final class OutputChannel implements Pool<Buffer, IOException> {
+            volatile boolean dirty;
 
             @Override
             public Buffer allocate() throws IOException {
@@ -172,43 +170,40 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             @Override
             public void release(final Buffer resource) throws IOException {
                 assert Buffer.this == resource;
+                if (!dirty)
+                    return;
                 synchronized (lock) {
                     if (resource != buffer) {
-                        if (dirty)
-                            buffer = resource;
+                        buffer = resource;
                     } else {
-                        if (dirty) {
-                            dirty = false;
-                            try {
-                                final OutputSocket<? extends LT> output
-                                        = outputProxy.getBoundSocket();
-                                CommonEntry peer = output.getPeerTarget();
-                                if (null == peer)
-                                    peer = temp;
-                                IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
-                                                    FileInputSocket.get(temp)),
-                                                output);
-                            } catch (IOException ex) {
-                                pool.release(temp);
-                                throw ex;
-                            }
+                        dirty = false;
+                        try {
+                            final OutputSocket<? extends LT> output
+                                    = outputProxy.getBoundSocket();
+                            CommonEntry peer = output.getPeerTarget();
+                            if (null == peer)
+                                peer = temp;
+                            IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
+                                                FileInputSocket.get(temp)),
+                                            output);
+                        } catch (IOException ex) {
+                            pool.release(temp);
+                            throw ex;
                         }
                     }
                 }
             }
 
             void close(final Closeable closeable) throws IOException {
-                synchronized (lock) {
-                    try {
-                        closeable.close();
-                    } finally {
-                        release(Buffer.this);
-                    }
+                try {
+                    closeable.close();
+                } finally {
+                    release(Buffer.this);
                 }
             }
         } // class OutputChannel
 
-        class ReadOnlyFile extends FilterReadOnlyFile {
+        final class ReadOnlyFile extends FilterReadOnlyFile {
             boolean closed;
 
             ReadOnlyFile() throws IOException {
@@ -224,7 +219,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             }
         } // class ReadOnlyFile
 
-        class InputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class InputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
             InputStream() throws IOException {
@@ -240,7 +235,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             }
         } // class InputStream
 
-        class OutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class OutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
             OutputStream() throws IOException {
@@ -257,7 +252,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         } // class OutputStream
     } // class Buffer
 
-    private class InputProxy extends FilterInputSocket<LT> {
+    private final class InputProxy extends FilterInputSocket<LT> {
         InputProxy(final InputSocket <? extends LT> input) {
             super(input);
         }
@@ -265,8 +260,16 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public InputStream newInputStream() throws IOException {
             if (null != getPeerTarget()) {
+                // The data for connected sockets cannot not be cached because
+                // sockets may transfer different encoded data depending on
+                // the identity of their peer target!
+                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
+                // target, it transfers deflated data in order to omit
+                // redundant inflating of the data from the source archive file
+                // and deflating it again to the target archive file.
+                // So we must flush and bypass the cache.
                 flush();
-                return getBoundSocket().newInputStream(); // can't cache data for connected sockets!
+                return getBoundSocket().newInputStream();
             }
             return getBuffer().new InputStream();
         }
@@ -274,14 +277,15 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
+                // Dito.
                 flush();
-                return getBoundSocket().newReadOnlyFile(); // can't cache data for connected sockets!
+                return getBoundSocket().newReadOnlyFile();
             }
             return getBuffer().new ReadOnlyFile();
         }
     } // class InputProxy
 
-    private class OutputProxy extends FilterOutputSocket<LT> {
+    private final class OutputProxy extends FilterOutputSocket<LT> {
         OutputProxy(final OutputSocket<? extends LT> output) {
             super(output);
         }
@@ -290,8 +294,9 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @SuppressWarnings("ThrowableInitCause")
         public OutputStream newOutputStream() throws IOException {
             if (null != getPeerTarget()) {
+                // Dito, but this time we must clear the cache.
                 clear();
-                return getBoundSocket().newOutputStream(); // can't cache data for connected sockets!
+                return getBoundSocket().newOutputStream();
             }
             final Buffer buffer = new Buffer();
             try {
