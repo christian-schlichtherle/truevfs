@@ -199,8 +199,6 @@ implements FileSystemController<CommonEntry> {
             getController().setReadOnly(path);
         } catch (FalsePositiveException ex) {
             getEnclController().setReadOnly(getEnclPath(path));
-        } catch (ArchiveControllerException ex) {
-            throw new AssertionError(ex);
         }
     }
 
@@ -211,8 +209,6 @@ implements FileSystemController<CommonEntry> {
             return getController().setTime(path, types, value);
         } catch (FalsePositiveException ex) {
             return getEnclController().setTime(getEnclPath(path), types, value);
-        } catch (ArchiveControllerException ex) {
-            throw new AssertionError(ex);
         }
     }
 
@@ -327,8 +323,6 @@ implements FileSystemController<CommonEntry> {
             return getController().mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
             return getEnclController().mknod(getEnclPath(path), type, options, template);
-        } catch (ArchiveControllerException ex) {
-            throw new AssertionError(ex);
         }
     }
 
@@ -340,8 +334,6 @@ implements FileSystemController<CommonEntry> {
             getController().unlink(path);
         } catch (FalsePositiveException ex) {
             getEnclController().unlink(getEnclPath(path));
-        } catch (ArchiveControllerException ex) {
-            throw new AssertionError(ex);
         }
     }
 }

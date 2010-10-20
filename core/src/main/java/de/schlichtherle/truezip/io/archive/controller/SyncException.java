@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.ChainableIOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SyncException extends ChainableIOException {
+public class SyncException extends ArchiveControllerException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
@@ -34,11 +34,11 @@ public class SyncException extends ChainableIOException {
         super(message);
     }
 
-    SyncException(ArchiveController<?> controller, Throwable cause) {
-        super(controller.getModel().getMountPoint().getPath(), cause);
+    SyncException(ArchiveModel model, Throwable cause) {
+        super(model, cause);
     }
 
-    SyncException(ArchiveController<?> controller, Throwable cause, int priority) {
-        super(controller.getModel().getMountPoint().getPath(), cause, priority);
+    SyncException(ArchiveModel model, Throwable cause, int priority) {
+        super(model, cause, priority);
     }
 }
