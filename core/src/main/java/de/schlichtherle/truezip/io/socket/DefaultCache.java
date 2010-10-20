@@ -159,7 +159,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     }
                 }
             }
-        } // class InputBuffer
+        } // class InputPool
 
         class OutputPool implements Pool<Buffer, IOException> {
             @Override
@@ -181,7 +181,6 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                         CommonEntry peer = output.getPeerTarget();
                         if (null == peer)
                             peer = temp;
-                        buffer = new Buffer();
                         IOSocket.copy(  new ProxyingInputSocket<CommonEntry>(peer,
                                             FileInputSocket.get(temp)),
                                         output);
@@ -189,10 +188,58 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                         pool.release(temp);
                         throw ex;
                     }
-                    buffer.temp = temp;
+                    buffer = Buffer.this;
                 }
             }
-        } // class OutputBuffer
+        } // class OutputPool
+
+        class InputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            boolean closed;
+
+            InputStream() throws IOException {
+                super(new FileInputStream(inputPool.allocate().getFile()));
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                release(in, inputPool);
+            }
+        } // class InputStream
+
+        class ReadOnlyFile extends FilterReadOnlyFile {
+            boolean closed;
+
+            ReadOnlyFile() throws IOException {
+                super(new SimpleReadOnlyFile(inputPool.allocate().getFile()));
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                release(rof, inputPool);
+            }
+        } // class ReadOnlyFile
+
+        class OutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            boolean closed;
+
+            OutputStream() throws IOException {
+                super(new FileOutputStream(outputPool.allocate().getFile()));
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                release(out, outputPool);
+            }
+        } // class OutputStream
     } // class Buffer
 
     private class InputProxy extends FilterInputSocket<LT> {
@@ -206,26 +253,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 //clear();
                 return super.newInputStream(); // can't cache data for connected sockets!
             }
-
-            final Buffer buffer = getBuffer().inputPool.allocate();
-
-            class InputStream extends FilterInputStream {
-                boolean closed;
-
-                InputStream() throws FileNotFoundException {
-                    super(new FileInputStream(buffer.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
-                }
-
-                @Override
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    closed = true;
-                    release(in, buffer.inputPool);
-                }
-            } // class InputStream
-
-            return new InputStream();
+            return getBuffer().new InputStream();
         }
 
         @Override
@@ -234,26 +262,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 //clear();
                 return super.newReadOnlyFile(); // can't cache data for connected sockets!
             }
-
-            final Buffer buffer = getBuffer().inputPool.allocate();
-
-            class ReadOnlyFile extends FilterReadOnlyFile {
-                boolean closed;
-
-                ReadOnlyFile() throws FileNotFoundException {
-                    super(new SimpleReadOnlyFile(buffer.getFile()));
-                }
-
-                @Override
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    closed = true;
-                    release(rof, buffer.inputPool);
-                }
-            } // class ReadOnlyFile
-
-            return new ReadOnlyFile();
+            return getBuffer().new ReadOnlyFile();
         }
     } // class Input
 
@@ -269,27 +278,9 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 clear();
                 return super.newOutputStream(); // can't cache data for connected sockets!
             }
-
-            final Buffer buffer = new Buffer().outputPool.allocate();
-
-            class OutputStream extends FilterOutputStream {
-                boolean closed;
-
-                OutputStream() throws FileNotFoundException {
-                    super(new FileOutputStream(buffer.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
-                }
-
-                @Override
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    closed = true;
-                    release(out, buffer.outputPool);
-                }
-            } // class OutputStream
-
+            final Buffer buffer = new Buffer();
             try {
-                return new OutputStream();
+                return buffer.new OutputStream();
             } catch (IOException ex) {
                 assert false : ex;
                 buffer.inputPool.release(null); // Dirty Hacky was here!
