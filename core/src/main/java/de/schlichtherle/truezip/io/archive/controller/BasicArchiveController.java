@@ -344,7 +344,8 @@ extends        AbstractArchiveController<AE> {
             final Operation<AE> link = fileSystem.mknod(
                     path, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
-            link.run();
+            if (created)
+                link.run();
             return created;
         }
     }
