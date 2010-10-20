@@ -187,22 +187,6 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             }
         } // class OutputPool
 
-        class InputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
-            boolean closed;
-
-            InputStream() throws IOException {
-                super(new FileInputStream(inputPool.allocate().getFile()));
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                closed = true;
-                release(in, inputPool);
-            }
-        } // class InputStream
-
         class ReadOnlyFile extends FilterReadOnlyFile {
             boolean closed;
 
@@ -218,6 +202,22 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 release(rof, inputPool);
             }
         } // class ReadOnlyFile
+
+        class InputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            boolean closed;
+
+            InputStream() throws IOException {
+                super(new FileInputStream(inputPool.allocate().getFile()));
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                release(in, inputPool);
+            }
+        } // class InputStream
 
         class OutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
