@@ -40,13 +40,13 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-// FIXME: Make this work as described in the interface contract!
+// FIXME: Current write policy is write-through. Implement write-back for better performance.
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     private final OutputProxy outputProxy;
-    private Buffer buffer;
+    private volatile Buffer buffer;
     private final Lock lock = new Lock();
 
     DefaultCache(   final InputSocket <? extends LT> input,

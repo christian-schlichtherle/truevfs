@@ -28,8 +28,8 @@ import java.io.IOException;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 final class FalsePositiveException extends ArchiveControllerException {
 
-    FalsePositiveException(final IOException cause) {
-        super(cause);
+    FalsePositiveException(ArchiveModel model, IOException cause) {
+        super(model, cause);
         assert !(cause instanceof ArchiveControllerException);
     }
 }

@@ -218,7 +218,7 @@ extends        AbstractArchiveController<AE> {
                 }
                 final AE entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
-                    throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    throw new ArchiveEntryNotFoundException(getModel(),
                             path, "no such file or directory");
                 return entry;
             }
@@ -226,7 +226,7 @@ extends        AbstractArchiveController<AE> {
             final InputSocket<? extends AE> getBoundSocket() throws IOException {
                 final AE entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
-                    throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+                    throw new ArchiveEntryNotFoundException(getModel(),
                             path, "cannot read directories");
                 return BasicArchiveController.this.getInputSocket(entry.getName()).bind(this);
             }
@@ -325,7 +325,7 @@ extends        AbstractArchiveController<AE> {
             final CommonEntry template)
     throws IOException {
         if (FILE != type && DIRECTORY != type)
-            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+            throw new ArchiveEntryNotFoundException(getModel(),
                     path, "not yet supported: mknod " + type);
         if (isRoot(path)) {
             try {
@@ -336,7 +336,7 @@ extends        AbstractArchiveController<AE> {
                 autoMount(true, options.get(CREATE_PARENTS));
                 return true;
             }
-            throw new ArchiveEntryNotFoundException(BasicArchiveController.this,
+            throw new ArchiveEntryNotFoundException(getModel(),
                     path, "directory exists already");
         } else { // !isRoot(entryName)
             final ArchiveFileSystem<AE> fileSystem

@@ -27,7 +27,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    SyncWarningException(ArchiveController<?> controller, Throwable cause) {
-        super(controller, cause, -1);
+    SyncWarningException(ArchiveModel model, Throwable cause) {
+        super(model, cause, -1);
     }
 }
