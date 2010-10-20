@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import java.util.Collections;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
@@ -68,7 +67,7 @@ final class CachingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
     private final Map<String, EntryCache> caches
-            = Collections.synchronizedMap(new HashMap<String, EntryCache>());
+            = new HashMap<String, EntryCache>();
 
     CachingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
@@ -83,7 +82,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E, ArchiveControllerException {
-        assertWriteLockedByCurrentThread();
+        assert getModel().writeLock().isHeldByCurrentThread();
         final boolean flush = options.get(FLUSH_CACHE);
         assert options.get(ABORT_CHANGES) != flush;
         for (final EntryCache cache : caches.values()) {
@@ -161,6 +160,7 @@ extends FilterArchiveController<AE> {
                     || options.get(OutputOption.APPEND)
                     || null != template) {
                 if (null != cache) {
+                    assertWriteLockedByCurrentThread();
                     try {
                         cache.flush();
                     } finally {
@@ -181,6 +181,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public void unlink(final String path) throws IOException {
+        assert getModel().writeLock().isHeldByCurrentThread();
         getController().unlink(path);
         final Cache<AE> cache = caches.remove(path);
         if (null != cache)
@@ -236,17 +237,21 @@ extends FilterArchiveController<AE> {
             @Override
             public InputStream newInputStream() throws IOException {
                 final InputStream in = getBoundSocket().newInputStream();
-                caches.put(path, EntryCache.this);
+                synchronized (caches) {
+                    caches.put(path, EntryCache.this);
+                }
                 return in;
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                caches.put(path, EntryCache.this);
+                synchronized (caches) {
+                    caches.put(path, EntryCache.this);
+                }
                 return rof;
             }
-        } // class Input
+        } // class RegisteringInputSocket
 
         class RegisteringOutputSocket extends FilterOutputSocket<AE> {
             RegisteringOutputSocket(OutputSocket <? extends AE> output) {
@@ -255,10 +260,11 @@ extends FilterArchiveController<AE> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
+                assert getModel().writeLock().isHeldByCurrentThread();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 caches.put(path, EntryCache.this);
                 return out;
             }
-        } // class Output
+        } // class RegisteringOutputSocket
     }
 }
