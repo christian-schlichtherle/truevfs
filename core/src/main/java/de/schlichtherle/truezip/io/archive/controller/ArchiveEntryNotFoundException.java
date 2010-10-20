@@ -35,24 +35,24 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
     private final String path;
 
     ArchiveEntryNotFoundException(
-            final ArchiveController<?> controller,
+            final ArchiveModel model,
             final String path,
             final String msg) {
         super(msg);
         assert path != null;
         assert msg != null;
-        this.mountPoint = controller.getModel().getMountPoint();
+        this.mountPoint = model.getMountPoint();
         this.path = path;
     }
 
     ArchiveEntryNotFoundException(
-            final ArchiveController<?> controller,
+            final ArchiveModel model,
             final String path,
             final IOException cause) {
         super(cause == null ? null : cause.toString());
         assert path != null;
         super.initCause(cause);
-        this.mountPoint = controller.getModel().getMountPoint();
+        this.mountPoint = model.getMountPoint();
         this.path = path;
     }
 

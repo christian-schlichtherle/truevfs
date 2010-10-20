@@ -57,8 +57,8 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CA
  * </ul>
  * <p>
  * Caching an archive entry is automatically activated once an
- * {@link #getBoundSocket input socket} with {@link InputOption#CACHE} or an
- * {@link #getBoundSocket output socket} with {@link InputOption#CACHE}
+ * {@link #getInputSocket input socket} with {@link InputOption#CACHE} or an
+ * {@link #getOutputSocket output socket} with {@link InputOption#CACHE}
  * is acquired. Subsequent read/write operations for the archive entry will
  * then use the cache regardless if these options were set when the respective
  * socket was acquired or not.
@@ -66,7 +66,6 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CA
  * @author Christian Schlichtherle
  * @version $Id$
  */
-// FIXME: Make this work as advertised!
 final class CachingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
@@ -97,7 +96,7 @@ extends FilterArchiveController<AE> {
                     cache.clear();
                 }
             } catch (IOException ex) {
-                throw builder.fail(new SyncException(this, ex));
+                throw builder.fail(new SyncException(getModel(), ex));
             }
         }
         caches.clear();

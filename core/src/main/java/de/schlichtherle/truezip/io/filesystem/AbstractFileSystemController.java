@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
 public abstract class AbstractFileSystemController<CE extends CommonEntry>
 implements            FileSystemController        <CE> {
 
-    /** Returns {@code "controller:" + }{@link #getModel()}{@code .}{@link ArchiveModel#getMountPoint()}{@code .}{@link Object#toString()}. */
+    /** Returns {@code "controller:" + }{@link #getModel()}{@code .}{@link FileSystemModel#getMountPoint()}{@code .}{@link Object#toString()}. */
     @Override
     public final String toString() {
         return "fileSystemController:" + getModel().getMountPoint().toString();
