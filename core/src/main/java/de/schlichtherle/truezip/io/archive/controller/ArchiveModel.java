@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.util.concurrent.lock.ReadWriteLock;
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -29,7 +29,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveModel implements FileSystemModel {
+public final class ArchiveModel implements SyncableFileSystemModel {
     private final FileSystemModel enclModel;
     private final URI mountPoint;
     private final ReentrantLock readLock;
@@ -63,13 +63,8 @@ public final class ArchiveModel implements FileSystemModel {
         return mountPoint;
     }
 
-    /** Returns {@code "model:" + }{@link #getMountPoint()}{@code .}{@link Object#toString()}. */
     @Override
-    public String toString() {
-        return "model:" + getMountPoint().toString();
-    }
-
-    boolean isTouched() {
+    public boolean isTouched() {
         return touched;
     }
 
@@ -78,6 +73,11 @@ public final class ArchiveModel implements FileSystemModel {
         touched = newTouched;
         if (newTouched != oldTouched)
             notifyTouchListener();
+    }
+
+    @Override
+    public String toString() {
+        return "model:" + getMountPoint().toString() + "?touched=" + touched;
     }
 
     private void notifyTouchListener() {

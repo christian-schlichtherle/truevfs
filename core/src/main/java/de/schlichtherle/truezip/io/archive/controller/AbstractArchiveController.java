@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 abstract class AbstractArchiveController<AE extends ArchiveEntry>
 implements     ArchiveController        <AE> {
 
-    /** Returns {@code "controller:" + }{@link #getModel()}{@code .}{@link ArchiveModel#getMountPoint()}{@code .}{@link Object#toString()}. */
     @Override
     public final String toString() {
         return "archiveController:" + getModel().getMountPoint().toString();

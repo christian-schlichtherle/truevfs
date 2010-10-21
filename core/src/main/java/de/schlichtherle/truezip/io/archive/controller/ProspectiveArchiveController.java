@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
@@ -34,6 +35,7 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -56,7 +58,8 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @version $Id$
  */
 final class ProspectiveArchiveController<AE extends ArchiveEntry>
-extends AbstractFileSystemController<CommonEntry> {
+extends     AbstractFileSystemController<CommonEntry>
+implements  SyncableFileSystemController<CommonEntry> {
 
     private final ArchiveController<AE> controller;
     private final FileSystemController<?> enclController;
@@ -107,14 +110,15 @@ extends AbstractFileSystemController<CommonEntry> {
     }
 
     @Override
-    public FileSystemModel getModel() {
+    public SyncableFileSystemModel getModel() {
         return getController().getModel();
     }
 
-    boolean isTouched() {
+    /*boolean isTouched() {
         return getController().isTouched();
-    }
+    }*/
 
+    @Override
     public <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)

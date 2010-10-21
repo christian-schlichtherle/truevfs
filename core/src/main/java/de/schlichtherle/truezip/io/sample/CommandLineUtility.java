@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.sample;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
+import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.file.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -153,7 +153,7 @@ abstract class CommandLineUtility {
     protected static class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final ArchiveStatistics liveStats = File.getLiveArchiveStatistics();
+        private final FileSystemStatistics liveStats = File.getLiveArchiveStatistics();
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
