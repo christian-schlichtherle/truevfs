@@ -389,7 +389,7 @@ extends     FileSystemArchiveController<AE> {
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
     throws E, ArchiveControllerException {
-        assert !isTouched() || output != null; // file system touched => output archive
+        assert !isTouched() || null != output; // file system touched => output archive
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
@@ -617,6 +617,11 @@ extends     FileSystemArchiveController<AE> {
                 }
             }
         }
+    }
+
+    private boolean isTouched() {
+        final ArchiveFileSystem<AE> fileSystem = getFileSystem();
+        return null != fileSystem && fileSystem.isTouched();
     }
 
     @Override

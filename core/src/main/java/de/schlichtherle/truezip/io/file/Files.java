@@ -217,8 +217,8 @@ class Files {
             final InputSocket<?> input = getInputSocket(src,
                     BitField.noneOf(InputOption.class));
             final CommonEntry template = preserve ? input.getLocalTarget() : null;
-            final OutputSocket<?> output = getOutputSocket(dst, template,
-                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()));
+            final OutputSocket<?> output = getOutputSocket(dst,
+                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()), template);
             IOSocket.copy(input, output);
         } catch (FileNotFoundException ex) {
             throw ex;
@@ -256,8 +256,8 @@ class Files {
 
     static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
-            final CommonEntry template,
-            final BitField<OutputOption> options)
+            final BitField<OutputOption> options,
+            final CommonEntry template)
     throws IOException {
         assert dst != null;
 
@@ -267,7 +267,8 @@ class Files {
             if (null != archive)
                 return archive
                         .getController()
-                        .getOutputSocket(file.getInnerEntryName(), options, template);
+                        .getOutputSocket(   file.getInnerEntryName(),
+                                            options, template);
         }
         return Controllers
                 .getController(dst.toURI(), null, null)
