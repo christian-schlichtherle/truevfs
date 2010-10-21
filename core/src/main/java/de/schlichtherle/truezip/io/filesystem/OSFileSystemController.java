@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.socket.FileInputSocket;
-import de.schlichtherle.truezip.io.socket.FileOutputSocket;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import java.net.URI;
-import de.schlichtherle.truezip.io.socket.InputOption;
-import java.io.File;
-import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
+import de.schlichtherle.truezip.io.socket.FileInputSocket;
+import de.schlichtherle.truezip.io.socket.FileOutputSocket;
+import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 
@@ -44,14 +42,14 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class OSFileSystemController
-extends AbstractFileSystemController<FileEntry>
-implements FileSystemModel {
+public final class OSFileSystemController
+extends            AbstractFileSystemController<FileEntry>
+implements         FileSystemModel {
 
     private final URI mountPoint;
     private final File target;
 
-    OSFileSystemController(final URI mountPoint) {
+    public OSFileSystemController(final URI mountPoint) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);

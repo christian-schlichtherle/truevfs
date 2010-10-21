@@ -66,9 +66,9 @@ extends CommonEntryFactory<AE> {
      * <p>
      * This method is primarily provided to serve two purposes:
      * <ol>
-     * <li>An archive driver could decorate the standard chain of archive
+     * <li>An archive driver could decorate the default chain of archive
      *     controllers in order to implement additional aspects such as
-     *     logging or managing authentication keys.
+     *     managing authentication keys for encrypted archive files or logging.
      * <li>An archive driver could use the provided enclosing file system
      *     controller to request a common entry for the archive model's
      *     mountpoint and use its properties in order to resolve the best

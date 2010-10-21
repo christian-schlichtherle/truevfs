@@ -73,11 +73,6 @@ extends FilterArchiveController<AE> {
         super(controller);
     }
 
-    final void assertWriteLockedByCurrentThread()
-    throws NotWriteLockedException {
-        getModel().assertWriteLockedByCurrentThread();
-    }
-
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
