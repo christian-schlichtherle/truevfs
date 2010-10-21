@@ -55,9 +55,10 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
     /**
      * {@inheritDoc}
      * <p>
-     * Sorts the given exception chain by
-     * {@link ChainableIOException#sortPriority() priority}
-     * and returns the result.
+     * The implementation in the class {@link DefaultArchiveExceptionBuilder}
+     * sorts the given exception chain by
+     * {@link ChainableIOException#sortPriority() priority} and returns the
+     * result.
      */
     @SuppressWarnings("unchecked")
 	@Override
