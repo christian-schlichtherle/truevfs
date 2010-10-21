@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.Caches;
 import java.util.HashMap;
 import de.schlichtherle.truezip.io.socket.Cache;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -33,6 +32,7 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.WriteBackCache;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -197,7 +197,7 @@ extends FilterArchiveController<AE> {
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions) {
             this.path = path;
-            this.cache = Caches.newInstance(
+            this.cache = WriteBackCache.newInstance(
                     new RegisteringInputSocket(
                         getController().getInputSocket(path,
                             null != inputOptions

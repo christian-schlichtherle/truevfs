@@ -40,7 +40,7 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (null != options && options.get(InputOption.CACHE))
-            input = Caches.newInstance(input).getInputSocket();
+            input = WriteBackCache.newInstance(input).getInputSocket();
         return input;
     }
 
