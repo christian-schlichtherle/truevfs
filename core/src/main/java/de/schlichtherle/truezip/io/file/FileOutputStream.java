@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
 import de.schlichtherle.truezip.io.socket.OutputOption;

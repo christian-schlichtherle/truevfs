@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.InputStream;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
@@ -35,8 +38,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 
 /**
  * A caching archive controller implements a caching strategy for entries
@@ -75,7 +78,8 @@ extends FilterArchiveController<AE> {
 
     @Override
     public <E extends IOException>
-    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
     throws E, ArchiveControllerException {
         assert getModel().writeLock().isHeldByCurrentThread();
         final boolean flush = options.get(FLUSH_CACHE);

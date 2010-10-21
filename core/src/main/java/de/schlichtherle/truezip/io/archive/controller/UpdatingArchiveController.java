@@ -15,6 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -49,11 +53,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.WAIT_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
@@ -387,6 +392,8 @@ extends     FileSystemArchiveController<AE> {
         assert !isTouched() || output != null; // file system touched => output archive
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
+            throw new IllegalArgumentException();
+        if (options.get(ABORT_CHANGES) && options.get(FLUSH_CACHE))
             throw new IllegalArgumentException();
         assertWriteLockedByCurrentThread();
         awaitSync(builder, options);

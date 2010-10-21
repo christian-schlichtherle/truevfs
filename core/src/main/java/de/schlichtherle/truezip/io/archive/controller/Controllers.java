@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.OSFileSystemController;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
@@ -35,10 +37,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -163,7 +165,6 @@ public class Controllers {
             throw new IllegalArgumentException();
         options = options.set(FLUSH_CACHE);
 
-        int total = 0, touched = 0;
         // Reset statistics if it hasn't happened yet.
         CountingReadOnlyFile.init();
         CountingOutputStream.init();
@@ -177,8 +178,6 @@ public class Controllers {
             for (final ProspectiveArchiveController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
-                    if (controller.isTouched())
-                        touched++;
                     // Upon return, some new ArchiveWarningException's may
                     // have been generated. We need to remember them for
                     // later throwing.
@@ -191,7 +190,6 @@ public class Controllers {
                     // throwing and continue updating the rest.
                     builder.warn(ex);
                 }
-                total++;
             }
             builder.check();
         } finally {

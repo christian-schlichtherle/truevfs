@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import java.io.IOException;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
@@ -25,7 +27,7 @@ import de.schlichtherle.truezip.io.ChainableIOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SyncException extends ArchiveControllerException {
+public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
@@ -34,11 +36,11 @@ public class SyncException extends ArchiveControllerException {
         super(message);
     }
 
-    SyncException(ArchiveModel model, Throwable cause) {
-        super(model, cause);
+    public SyncException(ArchiveModel model, IOException cause) {
+        super(model.getMountPoint().getPath(), cause);
     }
 
-    SyncException(ArchiveModel model, Throwable cause, int priority) {
-        super(model, cause, priority);
+    public SyncException(ArchiveModel model, IOException cause, int priority) {
+        super(model.getMountPoint().getPath(), cause, priority);
     }
 }
