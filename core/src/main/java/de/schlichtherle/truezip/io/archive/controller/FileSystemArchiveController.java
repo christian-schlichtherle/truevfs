@@ -42,11 +42,6 @@ extends        BasicArchiveController     <AE> {
         super(model);
     }
 
-    final void assertWriteLockedByCurrentThread()
-    throws NotWriteLockedException {
-        getModel().assertWriteLockedByCurrentThread();
-    }
-
     @Override
     final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,

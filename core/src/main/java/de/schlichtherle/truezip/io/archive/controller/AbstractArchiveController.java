@@ -29,4 +29,26 @@ implements     ArchiveController        <AE> {
     public final String toString() {
         return "archiveController:" + getModel().getMountPoint().toString();
     }
+
+    /**
+     * @throws NotWriteLockedException if the <i>write lock</i> is not
+     *         held by the current thread.
+     */
+    final void assertWriteLockedByCurrentThread()
+    throws NotWriteLockedException {
+        final ArchiveModel model = getModel();
+        if (!model.writeLock().isHeldByCurrentThread())
+            throw new NotWriteLockedException(model);
+    }
+
+    /**
+     * @throws NotWriteLockedException if the <i>read lock</i> is
+     *         held by the current thread.
+     */
+    final void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)
+    throws NotWriteLockedException {
+        final ArchiveModel model = getModel();
+        if (model.readLock().isHeldByCurrentThread())
+            throw new NotWriteLockedException(model, ex);
+    }
 }

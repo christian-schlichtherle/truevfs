@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.OSFileSystemController;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
