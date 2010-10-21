@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveStatistics;
+import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -1382,8 +1382,8 @@ public class File extends java.io.File {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static ArchiveStatistics getLiveArchiveStatistics() {
-        return Controllers.getStatistics();
+    public static FileSystemStatistics getLiveArchiveStatistics() {
+        return Controllers.getLiveStatistics();
     }
 
     /**

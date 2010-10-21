@@ -16,13 +16,17 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-final class LiveArchiveStatistics implements ArchiveStatistics {
+import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemModel;
+
+final class LiveFileSystemStatistics implements FileSystemStatistics {
 
     /** The singleton instance of this class. */
-    public static final LiveArchiveStatistics SINGLETON
-            = new LiveArchiveStatistics();
+    public static final LiveFileSystemStatistics SINGLETON
+            = new LiveFileSystemStatistics();
 
-    private LiveArchiveStatistics() {
+    private LiveFileSystemStatistics() {
     }
 
     @Override
@@ -36,34 +40,36 @@ final class LiveArchiveStatistics implements ArchiveStatistics {
     }
 
     @Override
-    public int getArchivesTotal() {
+    public int getFileSystemsTotal() {
         return Controllers.getControllers().size();
     }
 
     @Override
-    public int getArchivesTouched() {
+    public int getFileSystemsTouched() {
         int result = 0;
-        for (ProspectiveArchiveController<?> controller : Controllers.getControllers())
-            if (controller.isTouched())
+        for (SyncableFileSystemController<?> controller : Controllers.getControllers())
+            if (controller.getModel().isTouched())
                 result++;
         return result;
     }
 
     @Override
-    public int getTopLevelArchivesTotal() {
+    public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (ProspectiveArchiveController<?> controller : Controllers.getControllers())
+        for (SyncableFileSystemController<?> controller : Controllers.getControllers())
             if (controller.getModel().getEnclModel() == null)
                 result++;
         return result;
     }
 
     @Override
-    public int getTopLevelArchivesTouched() {
+    public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (ProspectiveArchiveController<?> controller : Controllers.getControllers())
-            if (controller.getModel().getEnclModel() == null && controller.isTouched())
+        for (SyncableFileSystemController<?> controller : Controllers.getControllers()) {
+            final SyncableFileSystemModel model = controller.getModel();
+            if (model.getEnclModel() == null && model.isTouched())
                 result++;
+        }
         return result;
     }
 }

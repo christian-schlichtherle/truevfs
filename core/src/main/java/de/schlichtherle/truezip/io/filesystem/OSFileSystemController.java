@@ -168,11 +168,4 @@ implements         FileSystemModel {
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
     }
-
-    @Override
-    public <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
-                BitField<SyncOption> options)
-    throws E {
-    }
 }

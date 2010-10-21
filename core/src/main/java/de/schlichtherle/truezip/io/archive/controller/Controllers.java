@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
+import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.OSFileSystemController;
@@ -54,10 +56,10 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class Controllers {
 
-    private static final Comparator<ProspectiveArchiveController<?>> REVERSE_CONTROLLERS
-            = new Comparator<ProspectiveArchiveController<?>>() {
+    private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
+            = new Comparator<FileSystemController<?>>() {
         @Override
-		public int compare(ProspectiveArchiveController<?> l, ProspectiveArchiveController<?> r) {
+		public int compare(FileSystemController<?> l, FileSystemController<?> r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -69,8 +71,8 @@ public class Controllers {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<ProspectiveArchiveController<?>>> controllers
-            = new WeakHashMap<URI, Link<ProspectiveArchiveController<?>>>();
+    private static final Map<URI, Link<SyncableFileSystemController<?>>> controllers
+            = new WeakHashMap<URI, Link<SyncableFileSystemController<?>>>();
 
     private Controllers() {
     }
@@ -97,7 +99,7 @@ public class Controllers {
             enclController = new OSFileSystemController(
                     mountPoint.resolve(".."));
         synchronized (controllers) {
-            ProspectiveArchiveController<?> controller
+            SyncableFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller) {
                 // If required, reconfiguration of the FileSystemController
@@ -119,7 +121,7 @@ public class Controllers {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	static void scheduleSync(   final Link.Type type,
-                                final ProspectiveArchiveController controller) {
+                                final SyncableFileSystemController<?> controller) {
         synchronized (controllers) {
             controllers.put(controller.getModel().getMountPoint(),
                             (Link) type.newLink(controller));
@@ -175,7 +177,7 @@ public class Controllers {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its enclosing archive file.
-            for (final ProspectiveArchiveController<?> controller
+            for (final SyncableFileSystemController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     // Upon return, some new ArchiveWarningException's may
@@ -198,22 +200,22 @@ public class Controllers {
         }
     }
 
-    static Set<ProspectiveArchiveController<?>> getControllers() {
+    static Set<SyncableFileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<ProspectiveArchiveController<?>> getControllers(
+    static Set<SyncableFileSystemController<?>> getControllers(
             URI prefix,
-            final Comparator<ProspectiveArchiveController<?>> comparator) {
+            final Comparator<FileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<ProspectiveArchiveController<?>> snapshot;
+        final Set<SyncableFileSystemController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<ProspectiveArchiveController<?>>(comparator)
-                    : new HashSet<ProspectiveArchiveController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<ProspectiveArchiveController<?>> link : controllers.values()) {
-                final ProspectiveArchiveController<?> controller = Links.getTarget(link);
+                    ? new TreeSet<SyncableFileSystemController<?>>(comparator)
+                    : new HashSet<SyncableFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
+            for (final Link<SyncableFileSystemController<?>> link : controllers.values()) {
+                final SyncableFileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()
@@ -238,8 +240,8 @@ public class Controllers {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static ArchiveStatistics getStatistics() {
-        return LiveArchiveStatistics.SINGLETON;
+    public static FileSystemStatistics getLiveStatistics() {
+        return LiveFileSystemStatistics.SINGLETON;
     }
 
     /**

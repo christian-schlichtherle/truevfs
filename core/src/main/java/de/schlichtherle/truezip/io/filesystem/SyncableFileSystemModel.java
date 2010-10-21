@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Schlichtherle IT Services
+ * Copyright (C) 2006-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,22 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-
 /**
+ * Defines the common properties of any file system which holds writable
+ * contents and need to get synchronized to its underlying file system once
+ * they have been modified.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractFileSystemController<CE extends CommonEntry>
-implements            FileSystemController        <CE> {
+public interface SyncableFileSystemModel extends FileSystemModel {
 
-    @Override
-    public final String toString() {
-        return "fileSystemController:" + getModel().getMountPoint().toString();
-    }
+    /**
+     * Returns {@code true} if and only if this file system is
+     * {@link #syncable} and its contents have been modified so that it needs
+     * synchronization to its underlying file system.
+     *
+     * @see SyncableFileSystemController#sync
+     */
+    boolean isTouched();
 }

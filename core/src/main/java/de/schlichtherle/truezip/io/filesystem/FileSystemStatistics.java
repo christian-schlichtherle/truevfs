@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
 /**
  * Provides statistics about the total set of archive files accessed.
@@ -23,17 +23,17 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveStatistics {
+public interface FileSystemStatistics {
 
     /**
      * Returns the total number of bytes read from all <em>non-enclosed</em>
-     * archive files which have been updated by a call to
+     * file systems which have been updated by a call to
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
-     * Please note that this method counts input from top level archive
-     * files which require an update only, i.e. archive files which are
-     * actually updated and are not enclosed in other archive
-     * files and hence are present in the real file system.
+     * Please note that this method counts only input from top level file
+     * systems which have been touched, i.e. archive files which are actually
+     * updated and are not enclosed in other file systems and hence are present
+     * in their host file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.
@@ -51,13 +51,13 @@ public interface ArchiveStatistics {
     
     /**
      * Returns the total number of bytes written to all <em>non-enclosed</em>
-     * archive files which have been updated by a call to
+     * file systems which have been updated by a call to
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
-     * Please note that this method counts output to top level archive
-     * files which require an update only, i.e. archive files which are
-     * actually updated and are not enclosed in other archive
-     * files and hence are present in the real file system.
+     * Please note that this method counts only output to top level file
+     * systems which have been touched, i.e. archive files which are actually
+     * updated and are not enclosed in other file systems and hence are present
+     * in their host file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.
@@ -74,32 +74,32 @@ public interface ArchiveStatistics {
     long getSyncTotalByteCountWritten();
 
     /**
-     * Returns the total number of archives operated by this package.
+     * Returns the total number of file systems processed.
      */
-    int getArchivesTotal();
+    int getFileSystemsTotal();
     
     /**
-     * Returns the number of archives which have been changed and
-     * hence need to be updated when calling
+     * Returns the number of file systems which have been touched and
+     * need synchronization by calling
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getArchivesTouched();
+    int getFileSystemsTouched();
 
     /**
-     * Returns the total number of top level archives operated by this package.
+     * Returns the total number of top level file systems processed.
      */
-    int getTopLevelArchivesTotal();
+    int getTopLevelFileSystemsTotal();
     
     /**
-     * Returns the number of top level archives which have been changed and
-     * hence need to be updated when calling
+     * Returns the number of top level file systems which have been touched and
+     * need synchronization by calling
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getTopLevelArchivesTouched();
+    int getTopLevelFileSystemsTouched();
 }
