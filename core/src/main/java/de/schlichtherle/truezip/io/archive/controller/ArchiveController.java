@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -40,25 +42,6 @@ public interface ArchiveController<AE extends ArchiveEntry> {
     ArchiveModel getModel();
 
     boolean isTouched();
-
-    /**
-     * Writes all changes to the contents of the target archive file to the
-     * underlying file system.
-     * As a side effect,
-     * all data structures get reset (filesystem, entries, streams etc.)!
-     * This method requires synchronization on the write lock!
-     *
-     * @param  options The non-{@code null} options for processing.
-     * @throws NullPointerException if {@code options} or {@code builder} is
-     * {@code null}.
-     * @throws SyncException if any exceptional condition occurs
-     * throughout the processing of the target archive file.
-     * @see    Controllers#sync(URI, ExceptionBuilder, BitField)
-     */
-    <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
-                BitField<SyncOption> options)
-    throws E, ArchiveControllerException;
 
     Icon getOpenIcon() throws ArchiveControllerException;
 
@@ -133,4 +116,9 @@ public interface ArchiveController<AE extends ArchiveEntry> {
     throws IOException;
 
     void unlink(String path) throws IOException;
+
+    <E extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
+    throws E, ArchiveControllerException;
 }

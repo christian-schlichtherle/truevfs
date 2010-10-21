@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveInputBusyException;
 import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;

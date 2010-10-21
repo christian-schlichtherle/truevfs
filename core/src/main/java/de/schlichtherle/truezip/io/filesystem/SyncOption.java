@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.socket.InputClosedException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
@@ -87,6 +87,9 @@ public enum SyncOption {
      * If this option is set, all pending changes are aborted.
      * This option will leave a corrupted target archive file and is only
      * meaningful if the target archive file gets deleted immediately.
+     * <p>
+     * Note that this option is mutually exclusive with {@link #FLUSH_CACHE}.
+     * If both are set, an {@code IllegalArgumentException} is thrown.
      */
     ABORT_CHANGES,
 
@@ -94,6 +97,9 @@ public enum SyncOption {
      * Suppose an archive controller has cached output data for archive entries.
      * Then if this option is set, the cached data gets written to the
      * target archive file when it gets synchronized.
+     * <p>
+     * Note that this option is mutually exclusive with {@link #ABORT_CHANGES}.
+     * If both are set, an {@code IllegalArgumentException} is thrown.
      */
     FLUSH_CACHE,
 }

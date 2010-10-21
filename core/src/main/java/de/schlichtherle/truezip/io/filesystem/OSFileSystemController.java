@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -166,5 +167,12 @@ implements         FileSystemModel {
         final File file = new File(target, path);
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
+    throws E {
     }
 }

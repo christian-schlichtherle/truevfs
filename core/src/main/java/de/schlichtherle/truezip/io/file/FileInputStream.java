@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
-import de.schlichtherle.truezip.io.archive.controller.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;

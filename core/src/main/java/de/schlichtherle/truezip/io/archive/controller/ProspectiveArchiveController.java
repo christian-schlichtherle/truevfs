@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.net.URI;
@@ -113,7 +115,7 @@ extends AbstractFileSystemController<CommonEntry> {
         return getController().isTouched();
     }
 
-    <E extends IOException>
+    public <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
     throws E {

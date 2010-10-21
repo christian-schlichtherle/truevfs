@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**
@@ -24,29 +23,30 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveControllerException extends ChainableIOException {
+abstract class ArchiveControllerException extends IOException {
     private static final long serialVersionUID = 2947623946725372554L;
 
-    /** For exclusive use by {@link DefaultSyncExceptionBuilder}. */
-    public ArchiveControllerException(String message) {
-        super(message);
+    private final ArchiveModel model;
+
+    ArchiveControllerException( final ArchiveModel model) {
+        super.initCause(null);
+        this.model = model;
     }
 
-    ArchiveControllerException(ArchiveModel model) {
-        super();
-    }
-
-    ArchiveControllerException(ArchiveModel model, Throwable cause) {
-        super(model.getMountPoint().getPath(), cause);
-    }
-
-    ArchiveControllerException(ArchiveModel model, Throwable cause, int priority) {
-        super(model.getMountPoint().getPath(), cause, priority);
+    ArchiveControllerException( final ArchiveModel model,
+                                final IOException cause) {
+        super.initCause(cause);
+        this.model = model;
     }
 
     /** Returns the nullable cause of this exception. */
     @Override
     public IOException getCause() {
         return (IOException) super.getCause();
+    }
+
+    @Override
+    public final String getMessage() {
+        return model.getMountPoint().getPath();
     }
 }

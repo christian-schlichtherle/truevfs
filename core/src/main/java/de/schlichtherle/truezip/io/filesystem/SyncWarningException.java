@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
+
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import java.io.IOException;
 
 /**
  * Indicates an exceptional condition detected by an {@link ArchiveController}
@@ -27,7 +30,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    SyncWarningException(ArchiveModel model, Throwable cause) {
+    public SyncWarningException(ArchiveModel model, IOException cause) {
         super(model, cause, -1);
     }
 }

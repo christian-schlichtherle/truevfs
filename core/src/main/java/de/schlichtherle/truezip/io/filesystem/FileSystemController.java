@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import javax.swing.Icon;
 
@@ -121,4 +122,20 @@ public interface FileSystemController<CE extends CommonEntry> {
     throws IOException;
 
     void unlink(String path) throws IOException;
+
+    /**
+     * Writes all changes to the contents of the file system to its underlying
+     * file system.
+     *
+     * @param  options the non-{@code null} synchronization options.
+     * @throws NullPointerException if {@code builder} or {@code options} is
+     *         {@code null}.
+     * @throws SyncException if any exceptional condition occurs
+     *         throughout the synchronization of the file system.
+     * @see    Controllers#sync(URI, ExceptionBuilder, BitField)
+     */
+    <E extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
+    throws E;
 }
