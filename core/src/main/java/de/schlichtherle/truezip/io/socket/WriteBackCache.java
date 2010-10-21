@@ -39,14 +39,14 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
+final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
     private final Lock lock = new Lock();
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     private final OutputProxy outputProxy;
     private Buffer buffer;
 
-    DefaultCache(   final InputSocket <? extends LT> input,
+    WriteBackCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output) {
         this.inputProxy = new InputProxy(input);
         this.outputProxy = new OutputProxy(output);

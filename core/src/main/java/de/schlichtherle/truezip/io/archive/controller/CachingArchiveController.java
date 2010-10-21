@@ -186,6 +186,8 @@ extends FilterArchiveController<AE> {
     private final class EntryCache implements Cache<AE> {
         final String path;
         final Cache<AE> cache;
+        final InputSocket <AE> input;
+        final OutputSocket<AE> output;
 
         EntryCache( final String path,
                     final BitField<InputOption > inputOptions,
@@ -202,16 +204,18 @@ extends FilterArchiveController<AE> {
                             ? outputOptions.clear(OutputOption.CACHE)
                             : BitField.noneOf(OutputOption.class),
                         null));
+            this.input = cache.getInputSocket();
+            this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }
 
         @Override
         public InputSocket<AE> getInputSocket() {
-            return cache.getInputSocket();
+            return input;
         }
 
         @Override
         public OutputSocket<AE> getOutputSocket() {
-            return new RegisteringOutputSocket(cache.getOutputSocket());
+            return output;
         }
 
         @Override
