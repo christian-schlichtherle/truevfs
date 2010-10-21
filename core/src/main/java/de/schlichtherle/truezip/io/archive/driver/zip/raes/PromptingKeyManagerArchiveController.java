@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 
 /**
  * This archive controller resets the key provider in the prompting key manager
- * if the target archive file gets deleted.
- * Note that this aspect is specific to RAES encrypted ZIP file only.
- * TODO: Consider refactoring this to a notifying archive controller which
- * calls a listener interface instead. Some object would have to register
- * itself as a listener which resets the key provider then.
+ * if the target RAES encrypted ZIP archive file gets deleted.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class KeyManagerArchiveController<AE extends ArchiveEntry>
-extends     FilterArchiveController    <AE> {
+final class PromptingKeyManagerArchiveController
+extends     FilterArchiveController    <ZipEntry> {
 
     /**
-     * Constructs a new key manager archive controller.
+     * Constructs a new prompting key manager archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
-    KeyManagerArchiveController(ArchiveController<? extends AE> controller) {
+    PromptingKeyManagerArchiveController(
+            ArchiveController<? extends ZipEntry> controller) {
         super(controller);
     }
 

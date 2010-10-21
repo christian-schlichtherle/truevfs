@@ -35,7 +35,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-interface ArchiveController<AE extends ArchiveEntry> {
+public interface ArchiveController<AE extends ArchiveEntry> {
 
     ArchiveModel getModel();
 
@@ -60,26 +60,19 @@ interface ArchiveController<AE extends ArchiveEntry> {
                 BitField<SyncOption> options)
     throws E, ArchiveControllerException;
 
-    Icon getOpenIcon()
-    throws ArchiveControllerException;
+    Icon getOpenIcon() throws ArchiveControllerException;
 
-    Icon getClosedIcon()
-    throws ArchiveControllerException;
+    Icon getClosedIcon() throws ArchiveControllerException;
 
-    boolean isReadOnly()
-    throws ArchiveControllerException;
+    boolean isReadOnly() throws ArchiveControllerException;
 
-    Entry<? extends AE> getEntry(String path)
-    throws ArchiveControllerException;
+    Entry<? extends AE> getEntry(String path) throws ArchiveControllerException;
 
-    boolean isReadable(String path)
-    throws ArchiveControllerException;
+    boolean isReadable(String path) throws ArchiveControllerException;
 
-    boolean isWritable(String path)
-    throws ArchiveControllerException;
+    boolean isWritable(String path) throws ArchiveControllerException;
 
-    void setReadOnly(String path)
-    throws IOException;
+    void setReadOnly(String path) throws IOException;
 
     boolean setTime(String path, BitField<Access> types, long value)
     throws IOException;
@@ -139,6 +132,5 @@ interface ArchiveController<AE extends ArchiveEntry> {
                     BitField<OutputOption> options, CommonEntry template)
     throws IOException;
 
-    void unlink(String path)
-    throws IOException;
+    void unlink(String path) throws IOException;
 }

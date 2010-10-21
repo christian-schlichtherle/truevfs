@@ -63,13 +63,13 @@ import static de.schlichtherle.truezip.io.archive.controller.SyncOption.FLUSH_CA
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class CachingArchiveController<AE extends ArchiveEntry>
+public final class CachingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
     private final Map<String, EntryCache> caches
             = new HashMap<String, EntryCache>();
 
-    CachingArchiveController(ArchiveController<? extends AE> controller) {
+    public CachingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
     }
 

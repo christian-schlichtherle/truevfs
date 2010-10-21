@@ -29,7 +29,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ArchiveModel implements FileSystemModel, ReadWriteLock {
+public final class ArchiveModel implements FileSystemModel, ReadWriteLock {
     private final FileSystemModel enclModel;
     private final URI mountPoint;
     private final ReentrantLock readLock;
