@@ -33,8 +33,8 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class      FilterArchiveController  <AE extends ArchiveEntry>
-extends    AbstractArchiveController<AE> {
+public abstract class FilterArchiveController  <AE extends ArchiveEntry>
+extends               AbstractArchiveController<AE> {
 
     private final ArchiveController<? extends AE> controller;
 
@@ -43,12 +43,12 @@ extends    AbstractArchiveController<AE> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    FilterArchiveController(final ArchiveController<? extends AE> controller) {
+    protected FilterArchiveController(final ArchiveController<? extends AE> controller) {
         assert null != controller;
         this.controller = controller;
     }
 
-    final ArchiveController<? extends AE> getController() {
+    protected final ArchiveController<? extends AE> getController() {
         return controller;
     }
 

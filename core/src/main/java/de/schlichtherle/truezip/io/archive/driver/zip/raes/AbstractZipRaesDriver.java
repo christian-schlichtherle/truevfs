@@ -16,6 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -88,6 +91,14 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final long authenticationTrigger) {
         super(preambled, postambled, level);
         this.authenticationTrigger = authenticationTrigger;
+    }
+
+    @Override
+    public ArchiveController<ZipEntry> newController(
+            ArchiveModel model,
+            FileSystemController<?> enclController) {
+        return new PromptingKeyManagerArchiveController(
+                super.newController(model, enclController));
     }
 
     /**

@@ -71,7 +71,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class UpdatingArchiveController  <AE extends ArchiveEntry>
+public final class UpdatingArchiveController  <AE extends ArchiveEntry>
 extends     FileSystemArchiveController<AE> {
 
     private static final class DummyInputService<CE extends CommonEntry>
@@ -172,7 +172,7 @@ extends     FileSystemArchiveController<AE> {
     private final VetoableTouchListener vetoableTouchListener
             = new TouchListener();
 
-    UpdatingArchiveController(  final ArchiveModel model,
+    public UpdatingArchiveController(  final ArchiveModel model,
                                 final ArchiveDriver<AE> driver,
                                 final FileSystemController<?> enclController) {
         super(model);

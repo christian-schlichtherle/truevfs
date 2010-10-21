@@ -39,10 +39,10 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class LockingArchiveController<AE extends ArchiveEntry>
+public final class LockingArchiveController<AE extends ArchiveEntry>
 extends FilterArchiveController<AE> {
 
-    LockingArchiveController(ArchiveController<? extends AE> controller) {
+    public LockingArchiveController(ArchiveController<? extends AE> controller) {
         super(controller);
     }
 

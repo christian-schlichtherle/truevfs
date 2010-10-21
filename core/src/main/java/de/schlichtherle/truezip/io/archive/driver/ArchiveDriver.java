@@ -17,6 +17,8 @@
 package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.TabuFileException;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -57,6 +59,34 @@ import javax.swing.Icon;
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
 extends CommonEntryFactory<AE> {
+
+    /**
+     * Creates a new archive controller for the given archive model and
+     * enclosing file system controller.
+     * <p>
+     * This method is primarily provided to serve two purposes:
+     * <ol>
+     * <li>An archive driver could decorate the standard chain of archive
+     *     controllers in order to implement additional aspects such as
+     *     logging or managing authentication keys.
+     * <li>An archive driver could use the provided enclosing file system
+     *     controller to request a common entry for the archive model's
+     *     mountpoint and use its properties in order to resolve the best
+     *     update strategy.
+     *     E.g. an archive driver for ZIP files could return an archive
+     *     controller which uses an append-strategy rather than the default
+     *     full-update-strategy if the target archive file exceeds a
+     *     predefined size threshold such as 128 MB for example.
+     * </ol>
+     *
+     * @param  model the non-{@code null} archive model.
+     * @param  enclController the non-{@code null} enclosing file system
+     *         controller.
+     * @return A new archive controller for the given archive model and
+     *         enclosing file system controller.
+     */
+    ArchiveController<AE> newController(ArchiveModel model,
+                                        FileSystemController<?> enclController);
 
     /**
      * Creates a new common input shop for reading the archive entries of the
@@ -129,7 +159,9 @@ extends CommonEntryFactory<AE> {
      *         synchronized with its enclosing file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
-    OutputShop<AE> newOutputShop(FileSystemModel archive, OutputSocket<?> output, InputShop<AE> source)
+    OutputShop<AE> newOutputShop(   FileSystemModel archive,
+                                    OutputSocket<?> output,
+                                    InputShop<AE> source)
     throws IOException;
 
     /**
@@ -140,7 +172,7 @@ extends CommonEntryFactory<AE> {
      * @param  archive the archive file to display - never {@code null}.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
-     *         If {@code null} is returned, a default icon should be used.
+     *         If {@code null} is returned, a default icon should be displayed.
      */
     Icon getOpenIcon(FileSystemModel archive);
 
@@ -154,7 +186,7 @@ extends CommonEntryFactory<AE> {
      * @param  archive the archive file to display - never {@code null}.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
-     *         If {@code null} is returned, a default icon should be used.
+     *         If {@code null} is returned, a default icon should be displayed.
      */
     Icon getClosedIcon(FileSystemModel archive);
 }

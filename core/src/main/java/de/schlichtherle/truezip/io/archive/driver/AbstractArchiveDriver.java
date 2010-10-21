@@ -16,6 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.LockingArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -50,7 +56,6 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
  */
 public abstract class AbstractArchiveDriver<AE extends ArchiveEntry>
 implements ArchiveDriver<AE>, Serializable {
-
     private static final long serialVersionUID = 6546816446546846516L;
 
     private static final String CLASS_NAME
@@ -127,24 +132,6 @@ implements ArchiveDriver<AE>, Serializable {
     }
 
     /**
-     * Postfixes the instance after its default deserialization.
-     *
-     * @throws InvalidObjectException If the instance invariants are not met.
-     */
-    private void readObject(final ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        assert encoder == null;
-        encoder = new ThreadLocalEncoder();
-
-        try {
-            invariants();
-        } catch (AssertionError ex) {
-            throw (InvalidObjectException) new InvalidObjectException(ex.toString()).initCause(ex);
-        }
-    }
-
-    /**
      * Checks the invariants of this class and throws an AssertionError if
      * any is violated even if assertion checking is disabled.
      * <p>
@@ -172,6 +159,24 @@ implements ArchiveDriver<AE>, Serializable {
             throw new AssertionError(ex);
         }
         return true;
+    }
+
+    /**
+     * Postfixes the instance after its default deserialization.
+     *
+     * @throws InvalidObjectException If the instance invariants are not met.
+     */
+    private void readObject(final ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        assert encoder == null;
+        encoder = new ThreadLocalEncoder();
+
+        try {
+            invariants();
+        } catch (AssertionError ex) {
+            throw (InvalidObjectException) new InvalidObjectException(ex.toString()).initCause(ex);
+        }
     }
 
     /**
@@ -224,6 +229,16 @@ implements ArchiveDriver<AE>, Serializable {
      */
     public final String getCharset() {
         return charset;
+    }
+
+    @Override
+    public ArchiveController<AE> newController(
+            ArchiveModel model,
+            FileSystemController<?> enclController) {
+        return new LockingArchiveController<AE>(
+                    new CachingArchiveController<AE>(
+                        new UpdatingArchiveController<AE>( // TODO: Support append strategy.
+                            model, this, enclController)));
     }
 
     /**
