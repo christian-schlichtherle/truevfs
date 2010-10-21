@@ -34,22 +34,59 @@ import java.io.OutputStream;
 
 /**
  * Implements a write-back caching strategy for input and output sockets.
+ * Using this class has the following effects:
+ * <ul>
+ * <li>Upon the first read operation, the data will be read and from the
+ *     local target and stored in the cache.
+ *     Subsequent or concurrent read operations will be served from the cache
+ *     without re-reading the data from the local target again until the cache
+ *     gets cleared.
+ * <li>Any data written to the cache will get written to the local target if
+ *     and only if the cache gets flushed.
+ * <li>After a write operation, the data will be stored in the cache for
+ *     subsequent read operations until the cache gets cleared.
+ * </ul>
+ * <p>
+ * Note that the cache is only effective when the input and output sockets
+ * are <em>not</em> connected to a peer socket!
  * 
  * @param   <LT> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
+public final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
     private final Lock lock = new Lock();
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     private final OutputProxy outputProxy;
     private Buffer buffer;
 
-    WriteBackCache(   final InputSocket <? extends LT> input,
-                    final OutputSocket<? extends LT> output) {
-        this.inputProxy = new InputProxy(input);
-        this.outputProxy = new OutputProxy(output);
+    public static <LT extends CommonEntry>
+    InputCache<LT> newInstance(InputSocket <? extends LT> input) {
+        if (null == input)
+            throw new NullPointerException();
+        return new WriteBackCache<LT>(input, null);
+    }
+
+    public static <LT extends CommonEntry>
+    OutputCache<LT> newInstance(OutputSocket <? extends LT> output) {
+        if (null == output)
+            throw new NullPointerException();
+        return new WriteBackCache<LT>(null, output);
+    }
+
+    public static <LT extends CommonEntry>
+    Cache<LT> newInstance(InputSocket<? extends LT> input,
+                          OutputSocket<? extends LT> output) {
+        if (null == input || null == output)
+            throw new NullPointerException();
+        return new WriteBackCache<LT>(input, output);
+    }
+
+    private WriteBackCache( final InputSocket <? extends LT> input,
+                            final OutputSocket<? extends LT> output) {
+        this.inputProxy = input == null ? null : new InputProxy(input);
+        this.outputProxy = output == null ? null : new OutputProxy(output);
     }
 
     @Override
@@ -88,9 +125,6 @@ final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
                 buffer = new Buffer();
             return buffer;
         }
-    }
-
-    private static class Lock {
     }
 
     private final class Buffer {
@@ -307,4 +341,7 @@ final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
             }
         }
     } // class OutputProxy
+
+    private static class Lock {
+    }
 }
