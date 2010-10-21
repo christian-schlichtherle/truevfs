@@ -60,11 +60,6 @@ extends               AbstractArchiveController<AE> {
     }
 
     @Override
-    public final boolean isTouched() {
-        return getModel().isTouched();
-    }
-
-    @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
     throws E, ArchiveControllerException {

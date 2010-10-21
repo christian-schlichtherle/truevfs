@@ -520,15 +520,15 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(file1.createNewFile());
         File.update(); // ensure file1 is really present in the archive file
         assertTrue(file2.createNewFile());
-        FileInputStream fisA = new FileInputStream(file1);
+        FileInputStream fis1 = new FileInputStream(file1);
         try {
             new FileInputStream(file2);
             fail("Accessing file2 was expected to fail because an auto update needs to be done but the archive file is busy on input for fis1!");
         } catch (FileBusyException expected) {
         }
-        assertTrue(file2.catFrom(fisA)); // fails for same reason.
+        assertTrue(file2.catFrom(fis1)); // fails for same reason.
 
-        // fisA is still open!
+        // fis1 is still open!
         try {
             File.update(); // forces closing of fisA
             fail("ArchiveFileBusyWarningException expected!");
@@ -538,7 +538,7 @@ public abstract class IOFileTestCase extends TestCase {
                 throw ex;
         }
         assertTrue(file2.isFile());
-        if (!file2.catFrom(fisA)) // fisA may be invalidated after update!
+        if (!file2.catFrom(fis1)) // fisA may be invalidated after update!
             assertFalse(file2.exists()); // previous op has removed file2!
 
         // Open file2 as stream and let the garbage collection close the stream automatically.
@@ -555,7 +555,7 @@ public abstract class IOFileTestCase extends TestCase {
 
         assertTrue(newNonArchiveFile(archive).delete());
         // Closing the invalidated stream explicitly should be OK.
-        fisA.close();
+        fis1.close();
 
         // Cleanup.
         assertFalse(file2.delete()); // already deleted externally
@@ -574,20 +574,20 @@ public abstract class IOFileTestCase extends TestCase {
         // This is used later to check whether the update operation knows
         // how to deal with updating an archive for which there is still
         // an open output stream.
-        FileOutputStream fosA = new FileOutputStream(file1);
-        File.cat(new ByteArrayInputStream(data), fosA);
-        fosA.close();
+        FileOutputStream fos1 = new FileOutputStream(file1);
+        File.cat(new ByteArrayInputStream(data), fos1);
+        fos1.close();
         
-        fosA = new FileOutputStream(file2);
-        File.cat(new ByteArrayInputStream(data), fosA);
-        fosA.close();
+        fos1 = new FileOutputStream(file2);
+        File.cat(new ByteArrayInputStream(data), fos1);
+        fos1.close();
         
         File.update(); // ensure two entries in the archive
         
-        fosA = new FileOutputStream(file1);
-        File.cat(new ByteArrayInputStream(data), fosA);
+        fos1 = new FileOutputStream(file1);
+        File.cat(new ByteArrayInputStream(data), fos1);
         
-        // fosA is still open!
+        // fos1 is still open!
         try {
             new FileOutputStream(file1);
         } catch (FileBusyException ex) {
@@ -595,15 +595,15 @@ public abstract class IOFileTestCase extends TestCase {
                 throw ex;
         }
         
-        // fosA is still open!
+        // fos1 is still open!
         try {
             new FileOutputStream(file2);
         } catch (FileBusyException busy) {
             logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
-        
-        // fosA is still open!
-        File.cat(new ByteArrayInputStream(data), fosA); // write again
+
+        // fos1 is still open!
+        File.cat(new ByteArrayInputStream(data), fos1); // write again
         
         try {
             File.update(); // forces closing of all streams
@@ -614,18 +614,18 @@ public abstract class IOFileTestCase extends TestCase {
         }
         
         try {
-            File.cat(new ByteArrayInputStream(data), fosA); // write again
+            File.cat(new ByteArrayInputStream(data), fos1); // write again
             fail("Output stream should have been forcibly closed!");
         } catch (IOException expected) {
         }
         
         // The stream has been forcibly closed by File.update().
         // Another close is OK, though!
-        fosA.close();
+        fos1.close();
         
         // Reopen stream and let the garbage collection close the stream automatically.
-        fosA = new FileOutputStream(file1);
-        fosA = null;
+        fos1 = new FileOutputStream(file1);
+        fos1 = null;
         gc();
         
         // This update should complete without any exception if the garbage

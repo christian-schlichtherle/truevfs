@@ -58,7 +58,8 @@ extends FilterArchiveController<AE> {
 
     @Override
     public <E extends IOException>
-    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
     throws E, ArchiveControllerException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();

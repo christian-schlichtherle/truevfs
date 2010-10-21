@@ -83,7 +83,8 @@ extends FilterArchiveController<AE> {
     throws E, ArchiveControllerException {
         assert getModel().writeLock().isHeldByCurrentThread();
         final boolean flush = options.get(FLUSH_CACHE);
-        assert options.get(ABORT_CHANGES) != flush;
+        if (flush && options.get(ABORT_CHANGES))
+            throw new IllegalArgumentException();
         for (final EntryCache cache : caches.values()) {
             try {
                 if (flush)
@@ -123,7 +124,7 @@ extends FilterArchiveController<AE> {
         public InputSocket<? extends AE> getBoundSocket() throws IOException {
             final Cache<AE> cache = caches.get(path);
             if (null == cache && !options.get(InputOption.CACHE))
-                return super.getBoundSocket();
+                return super.getBoundSocket(); // bypass the cache
             return (null != cache ? cache : new EntryCache(path, options, null))
                     .getInputSocket()
                     .bind(this);
@@ -168,10 +169,8 @@ extends FilterArchiveController<AE> {
                         cache.clear();
                     }
                 }
-                return super.getBoundSocket();
+                return super.getBoundSocket(); // bypass the cache
             }
-            // Create marker entry and mind CREATE_PARENTS!
-            getController().mknod(path, FILE, options, template);
             return (null != cache ? cache : new EntryCache(path, null, options))
                     .getOutputSocket()
                     .bind(this);
@@ -189,6 +188,8 @@ extends FilterArchiveController<AE> {
 
     private final class EntryCache implements Cache<AE> {
         final String path;
+        final BitField<InputOption> inputOptions;
+        final BitField<OutputOption> outputOptions;
         final Cache<AE> cache;
         final InputSocket <AE> input;
         final OutputSocket<AE> output;
@@ -197,17 +198,16 @@ extends FilterArchiveController<AE> {
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions) {
             this.path = path;
+            this.inputOptions = null != inputOptions
+                    ? inputOptions.clear(InputOption.CACHE)
+                    : BitField.noneOf(InputOption.class);
+            this.outputOptions = null != outputOptions
+                            ? outputOptions.clear(OutputOption.CACHE)
+                            : BitField.noneOf(OutputOption.class);
             this.cache = WriteBackCache.newInstance(
                     new RegisteringInputSocket(
-                        getController().getInputSocket(path,
-                            null != inputOptions
-                                ? inputOptions.clear(InputOption.CACHE)
-                                : BitField.noneOf(InputOption.class))),
-                    getController().getOutputSocket(path,
-                        null != outputOptions
-                            ? outputOptions.clear(OutputOption.CACHE)
-                            : BitField.noneOf(OutputOption.class),
-                        null));
+                        getController().getInputSocket(path, inputOptions)),
+                    getController().getOutputSocket(path, outputOptions, null));
             this.input = cache.getInputSocket();
             this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }
@@ -265,6 +265,9 @@ extends FilterArchiveController<AE> {
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().writeLock().isHeldByCurrentThread();
                 final OutputStream out = getBoundSocket().newOutputStream();
+                // Create marker entry and mind CREATE_PARENTS!
+                getController().mknod(path, FILE, outputOptions, null);
+                getModel().setTouched(true);
                 caches.put(path, EntryCache.this);
                 return out;
             }

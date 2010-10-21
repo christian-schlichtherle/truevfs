@@ -41,8 +41,6 @@ public interface ArchiveController<AE extends ArchiveEntry> {
 
     ArchiveModel getModel();
 
-    boolean isTouched();
-
     Icon getOpenIcon() throws ArchiveControllerException;
 
     Icon getClosedIcon() throws ArchiveControllerException;

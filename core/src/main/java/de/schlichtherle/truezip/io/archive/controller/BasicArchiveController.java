@@ -379,11 +379,6 @@ extends        AbstractArchiveController<AE> {
         }
     }
 
-    @Override
-    public final boolean isTouched() {
-        return getModel().isTouched();
-    }
-
     /**
      * Synchronizes the archive file only if the archive file has new data for
      * the file system entry with the given path name.
