@@ -20,7 +20,7 @@ package de.schlichtherle.truezip.io.entry;
  * system.
  * <p>
  * In general, if a property has an unknown value, its getter method must
- * return the value {@value #UNKNOWN} or {@code null} respectively.
+ * return the value {@link #UNKNOWN} or {@code null} respectively.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
@@ -31,8 +31,36 @@ package de.schlichtherle.truezip.io.entry;
 public interface CommonEntry {
 
     /**
-     * The entry name of the root directory, which is {@value}.
-     * Note that this name is empty and hence does not contain a
+     * The {@code NULL} common entry is a dummy entry which may be useful in
+     * places where a non-{@code null} common entry is expected but none is
+     * available.
+     * <p>
+     * The {@code NULL} common entry has {@code "/dev/null"} as its name,
+     * {@link Type#SPECIAL} as its type, {@code 0} as its sizes and
+     * {@link #UNKNOWN} as its times.
+     */
+    CommonEntry NULL = new CommonEntry() {
+        public String getName() {
+            return "/dev/null";
+        }
+
+        public Type getType() {
+            return Type.SPECIAL;
+        }
+
+        public long getSize(Size type) {
+            return 0;
+        }
+
+        public long getTime(Access type) {
+            return UNKNOWN;
+        }
+    };
+
+    /**
+     * The entry name of the root directory,
+     * which is {@value}.
+     * Note that this name is empty and hence does <em>not</em> contain a
      * separator character.
      *
      * @see #SEPARATOR_CHAR
@@ -63,24 +91,26 @@ public interface CommonEntry {
 
     /** Defines the type of archive entry. */
     enum Type {
-
         /**
          * Regular file.
          * A file usually has some content associated to it which can be read
          * and written using a stream.
          */
         FILE,
+
         /**
          * Regular directory.
          * A directory can have other archive entries as children.
          */
         DIRECTORY,
+
         /**
          * Symbolic (named) link.
          * A symbolic link refers to another file system node which could even
          * be located outside the current archive file.
          */
         SYMLINK,
+
         /**
          * Special file.
          * A special file is a byte or block oriented interface to an arbitrary

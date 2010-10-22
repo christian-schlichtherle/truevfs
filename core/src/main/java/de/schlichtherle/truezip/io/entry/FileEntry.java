@@ -81,7 +81,9 @@ public class FileEntry implements FileSystemEntry<FileEntry> {
 
     FileEntry(final String path) {
         this.file = new File(path);
-        this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
+        this.name = cutTrailingSeparators(
+                path.replace(File.separatorChar, SEPARATOR_CHAR),
+                SEPARATOR_CHAR);
     }
 
     FileEntry(final URI uri) {
@@ -96,7 +98,9 @@ public class FileEntry implements FileSystemEntry<FileEntry> {
 
     FileEntry(final File file, final String path) {
         this.file = new File(file, path);
-        this.name = cutTrailingSeparators(path, SEPARATOR_CHAR);
+        this.name = cutTrailingSeparators(
+                path.replace(File.separatorChar, SEPARATOR_CHAR),
+                SEPARATOR_CHAR);
     }
 
     /** Returns the decorated file. */
