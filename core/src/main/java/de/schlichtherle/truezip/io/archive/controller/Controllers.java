@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.OSFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.NativeFileSystemController;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
@@ -94,9 +94,9 @@ public class Controllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == driver)
-            return new OSFileSystemController(mountPoint);
+            return new NativeFileSystemController(mountPoint);
         if (null == enclController)
-            enclController = new OSFileSystemController(
+            enclController = new NativeFileSystemController(
                     mountPoint.resolve(".."));
         synchronized (controllers) {
             SyncableFileSystemController<?> controller

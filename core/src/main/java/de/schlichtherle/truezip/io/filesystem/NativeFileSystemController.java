@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -43,14 +42,14 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class OSFileSystemController
+public final class NativeFileSystemController
 extends            AbstractFileSystemController<FileEntry>
 implements         FileSystemModel {
 
     private final URI mountPoint;
     private final File target;
 
-    public OSFileSystemController(final URI mountPoint) {
+    public NativeFileSystemController(final URI mountPoint) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
