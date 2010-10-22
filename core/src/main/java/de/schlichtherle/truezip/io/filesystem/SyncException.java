@@ -17,12 +17,14 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import java.io.IOException;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
- * virtual file system to its underlying file system.
+ * virtual file system with its enclosing file system.
+ * Unless this is an instance of the sub class {@link SyncWarningException},
+ * an exception of this class implies that some or all of the data in the
+ * file system has been lost!
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -36,11 +38,11 @@ public class SyncException extends ChainableIOException {
         super(message);
     }
 
-    public SyncException(ArchiveModel model, IOException cause) {
+    public SyncException(SyncableFileSystemModel model, IOException cause) {
         super(model.getMountPoint().getPath(), cause);
     }
 
-    public SyncException(ArchiveModel model, IOException cause, int priority) {
+    public SyncException(SyncableFileSystemModel model, IOException cause, int priority) {
         super(model.getMountPoint().getPath(), cause, priority);
     }
 }

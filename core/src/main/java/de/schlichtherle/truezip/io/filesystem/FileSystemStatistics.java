@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
+
 /**
  * Provides statistics about the total set of archive files accessed.
  * Client applications should never implement this interface because (a)

@@ -26,9 +26,9 @@ package de.schlichtherle.truezip.io.filesystem;
 public interface SyncableFileSystemModel extends FileSystemModel {
 
     /**
-     * Returns {@code true} if and only if this file system is
-     * {@link #syncable} and its contents have been modified so that it needs
-     * synchronization to its underlying file system.
+     * Returns {@code true} if and only if the contents of this file system
+     * have been modified so that it needs synchronization with its enclosing
+     * file system.
      *
      * @see SyncableFileSystemController#sync
      */
