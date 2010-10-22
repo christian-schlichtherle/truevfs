@@ -31,8 +31,7 @@ import java.io.InputStream;
 public final class FileInputSocket extends InputSocket<FileEntry> {
     private final FileEntry file;
 
-    public static InputSocket<FileEntry> get(FileEntry file)
-    throws IOException {
+    public static InputSocket<FileEntry> get(FileEntry file) {
         return get(file, null);
     }
 
