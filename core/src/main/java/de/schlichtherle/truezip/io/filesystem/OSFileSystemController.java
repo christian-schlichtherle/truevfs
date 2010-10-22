@@ -139,7 +139,7 @@ implements         FileSystemModel {
             String path,
             BitField<OutputOption> options,
             CommonEntry template) {
-        return FileOutputSocket.get(FileEntry.get(target, path), template, options);
+        return FileOutputSocket.get(FileEntry.get(target, path), options, template);
     }
 
     @Override

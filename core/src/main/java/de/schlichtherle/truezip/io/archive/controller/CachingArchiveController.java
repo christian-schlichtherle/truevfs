@@ -171,6 +171,9 @@ extends FilterArchiveController<AE> {
                 }
                 return super.getBoundSocket(); // bypass the cache
             }
+            // Create marker entry and mind CREATE_PARENTS!
+            getController().mknod(path, FILE, options, null);
+            getModel().setTouched(true);
             return (null != cache ? cache : new EntryCache(path, null, options))
                     .getOutputSocket()
                     .bind(this);
@@ -266,8 +269,8 @@ extends FilterArchiveController<AE> {
                 assert getModel().writeLock().isHeldByCurrentThread();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 // Create marker entry and mind CREATE_PARENTS!
-                getController().mknod(path, FILE, outputOptions, null);
-                getModel().setTouched(true);
+                //getController().mknod(path, FILE, outputOptions, null);
+                //getModel().setTouched(true);
                 caches.put(path, EntryCache.this);
                 return out;
             }

@@ -38,4 +38,31 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  */
 public interface Cache<LT extends CommonEntry>
 extends InputCache<LT>, OutputCache<LT> {
+
+    enum Strategy {
+        WRITE_THROUGH,
+        WRITE_BACK;
+
+        public <LT extends CommonEntry>
+        InputCache<LT> newInstance(InputSocket <? extends LT> input) {
+            if (null == input)
+                throw new NullPointerException();
+            throw new UnsupportedOperationException();
+        }
+
+        public <LT extends CommonEntry>
+        OutputCache<LT> newInstance(OutputSocket <? extends LT> output) {
+            if (null == output)
+                throw new NullPointerException();
+            throw new UnsupportedOperationException();
+        }
+
+        public <LT extends CommonEntry>
+        Cache<LT> newInstance(InputSocket<? extends LT> input,
+                              OutputSocket<? extends LT> output) {
+            if (null == input || null == output)
+                throw new NullPointerException();
+            throw new UnsupportedOperationException();
+        }
+    }
 }
