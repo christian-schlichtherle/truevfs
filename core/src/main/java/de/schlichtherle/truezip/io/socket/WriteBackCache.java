@@ -247,7 +247,9 @@ public final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
             boolean closed;
 
             BufferReadOnlyFile() throws IOException {
-                super(FileInputSocket.get(inputChannel.allocate().temp).newReadOnlyFile());
+                super(FileInputSocket
+                        .get(inputChannel.allocate().temp)
+                        .newReadOnlyFile());
             }
 
             @Override
@@ -263,7 +265,9 @@ public final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
             boolean closed;
 
             BufferInputStream() throws IOException {
-                super(FileInputSocket.get(inputChannel.allocate().temp).newInputStream());
+                super(FileInputSocket
+                        .get(inputChannel.allocate().temp)
+                        .newInputStream());
             }
 
             @Override
@@ -279,7 +283,9 @@ public final class WriteBackCache<LT extends CommonEntry> implements Cache<LT> {
             boolean closed;
 
             BufferOutputStream() throws IOException {
-                super(FileOutputSocket.get(outputChannel.allocate().temp).newOutputStream());
+                super(FileOutputSocket
+                        .get(outputChannel.allocate().temp)
+                        .newOutputStream());
             }
 
             @Override
