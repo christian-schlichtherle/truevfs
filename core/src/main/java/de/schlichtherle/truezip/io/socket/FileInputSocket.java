@@ -32,13 +32,13 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
     private final FileEntry file;
 
     public static InputSocket<FileEntry> get(FileEntry file) {
-        return get(file, null);
+        return get(file, BitField.noneOf(InputOption.class));
     }
 
     public static InputSocket<FileEntry> get(   FileEntry file,
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
-        if (null != options && options.get(InputOption.CACHE))
+        if (options.get(InputOption.CACHE))
             input = WriteBackCache.newInstance(input).getInputSocket();
         return input;
     }

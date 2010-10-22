@@ -45,24 +45,24 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final Pool<FileEntry, IOException> pool;
 
     public static OutputSocket<FileEntry> get(FileEntry file) {
-        return new FileOutputSocket(file, null, null);
+        return new FileOutputSocket(file, BitField.noneOf(OutputOption.class), null);
     }
 
     public static OutputSocket<FileEntry> get(
             FileEntry file,
-            CommonEntry template,
-            BitField<OutputOption> options) {
-        return new FileOutputSocket(file, template, options);
+            BitField<OutputOption> options,
+            CommonEntry template) {
+        return new FileOutputSocket(file, options, template);
     }
 
     private FileOutputSocket(   final FileEntry file,
-                                final CommonEntry template,
-                                final BitField<OutputOption> options) {
-        if (null == file)
+                                final BitField<OutputOption> options,
+                                final CommonEntry template) {
+        if (null == file || null == options)
             throw new NullPointerException();
         this.file = file;
         this.template = template;
-        this.options = null != options ? options : BitField.noneOf(OutputOption.class);
+        this.options = options;
         final File fileTarget = file.getFile();
         this.pool = new TempFilePool(   fileTarget.getName(),
                                         null,
