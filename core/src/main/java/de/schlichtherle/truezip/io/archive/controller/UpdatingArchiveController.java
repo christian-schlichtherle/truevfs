@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -426,17 +428,19 @@ extends     FileSystemArchiveController<AE> {
         if (output != null) {
             final int outStreams = output.waitCloseOthers(options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
+                final String message = "Number of open output streams: " + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw builder.fail(new SyncException(getModel(), new ArchiveOutputBusyException(outStreams)));
-                builder.warn(new SyncWarningException(getModel(), new ArchiveOutputBusyException(outStreams)));
+                    throw builder.fail(new SyncException(getModel(), new OutputBusyException(message)));
+                builder.warn(new SyncWarningException(getModel(), new OutputBusyException(message)));
             }
         }
         if (input != null) {
             final int inStreams = input.waitCloseOthers(options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
+                final String message = "Number of open input streams: " + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw builder.fail(new SyncException(getModel(), new ArchiveInputBusyException(inStreams)));
-                builder.warn(new SyncWarningException(getModel(), new ArchiveInputBusyException(inStreams)));
+                    throw builder.fail(new SyncException(getModel(), new InputBusyException(message)));
+                builder.warn(new SyncWarningException(getModel(), new InputBusyException(message)));
             }
         }
     }

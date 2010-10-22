@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.InputBusyException;
+import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.socket.InputClosedException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
@@ -22,7 +25,7 @@ import java.io.IOException;
 /**
  * Defines the available options for archive synchronization operations, i.e.
  * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}
- * and {@link ArchiveController#sync(ExceptionBuilder, BitField)}.
+ * and {@link SyncableFileSystemController#sync(ExceptionBuilder, BitField)}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -54,13 +57,13 @@ public enum SyncOption {
      * archive entries of an archive controller's target archive file.
      * Then if this option is set, the archive controller will proceed to
      * update the target archive file anyway and finally throw a
-     * {@link SyncWarningException} with a {@link ArchiveBusyException} as its
+     * {@link SyncWarningException} with a {@link InputBusyException} as its
      * cause to indicate that any subsequent operations on these streams will
      * fail with an {@link InputClosedException} because they have been forced
      * to close.
      * <p>
      * If this option is not set, the target archive file is <em>not</em>
-     * updated and an {@link ArchiveBusyException} is thrown to indicate
+     * updated and an {@link InputBusyException} is thrown to indicate
      * that the application must close all entry input streams and read
      * only files first.
      */
@@ -75,7 +78,7 @@ public enum SyncOption {
     /**
      * Similar to {@link #FORCE_CLOSE_INPUT},
      * but applies to archive entry output streams and may throw a
-     * {@link OutputClosedException} instead.
+     * {@link OutputClosedException} / {@link OutputBusyException} instead.
      * <p>
      * If this option is set, then
      * {@link #FORCE_CLOSE_INPUT} must be set, too.

@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveBusyException;
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
@@ -534,7 +534,7 @@ public abstract class IOFileTestCase extends TestCase {
             fail("ArchiveFileBusyWarningException expected!");
         } catch (ArchiveWarningException ex) {
             // Warning about fisA still being used.
-            if (!(ex.getCause() instanceof ArchiveBusyException))
+            if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
         assertTrue(file2.isFile());
@@ -590,9 +590,7 @@ public abstract class IOFileTestCase extends TestCase {
         // fos1 is still open!
         try {
             new FileOutputStream(file1);
-        } catch (FileBusyException ex) {
-            if (!(ex.getCause() instanceof ArchiveBusyException))
-                throw ex;
+        } catch (FileBusyException expected) {
         }
         
         // fos1 is still open!
@@ -609,14 +607,14 @@ public abstract class IOFileTestCase extends TestCase {
             File.update(); // forces closing of all streams
             fail("Output stream should have been forced to close!");
         } catch (ArchiveWarningException ex) {
-            if (!(ex.getCause() instanceof ArchiveBusyException))
+            if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
         
         try {
             File.cat(new ByteArrayInputStream(data), fos1); // write again
             fail("Output stream should have been forcibly closed!");
-        } catch (IOException expected) {
+        } catch (OutputClosedException expected) {
         }
         
         // The stream has been forcibly closed by File.update().
@@ -1402,7 +1400,7 @@ public abstract class IOFileTestCase extends TestCase {
                     try {
                         File.update(wait, false, wait, false);
                     } catch (ArchiveException ex) {
-                        if (!(ex.getCause() instanceof ArchiveBusyException))
+                        if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
                         // Some other thread is busy updating an archive.
                         // If we are waiting, then this could never happen.
@@ -1478,7 +1476,7 @@ public abstract class IOFileTestCase extends TestCase {
                             else
                                 File.update(false);
                         } catch (ArchiveException ex) {
-                            if (!(ex.getCause() instanceof ArchiveBusyException))
+                            if (!(ex.getCause() instanceof FileBusyException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this

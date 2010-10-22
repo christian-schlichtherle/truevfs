@@ -16,12 +16,13 @@
 
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import java.io.IOException;
 
 /**
- * Indicates an exceptional condition detected by an {@link ArchiveController}
- * which implies no or only insignificant loss of data.
+ * Indicates an exceptional condition when synchronizing the changes in a
+ * virtual file system with its enclosing file system.
+ * An exception of this class implies that no or only insignificant parts of
+ * the data in the file system have been lost!
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -30,7 +31,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public SyncWarningException(ArchiveModel model, IOException cause) {
+    public SyncWarningException(SyncableFileSystemModel model, IOException cause) {
         super(model, cause, -1);
     }
 }
