@@ -58,7 +58,7 @@ extends InputCache<LT>, OutputCache<LT> {
 
             @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
                 throw new AssertionError();
             }
@@ -67,18 +67,18 @@ extends InputCache<LT>, OutputCache<LT> {
         WRITE_THROUGH {
             @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
-                return cache.new WriteThroughOutputBufferPool();
+                return cache.new WriteThroughOutputStrategy();
             }
         },
 
         WRITE_BACK {
             @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
-                return cache.new WriteBackOutputBufferPool();
+                return cache.new WriteBackOutputStrategy();
             }
         };
 
@@ -105,7 +105,7 @@ extends InputCache<LT>, OutputCache<LT> {
         }
 
         abstract <LT extends CommonEntry>
-        Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+        Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                 DefaultCache<LT> cache);
     }
 }
