@@ -51,29 +51,33 @@ import java.io.OutputStream;
  */
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
-    private final InputProxy inputProxy;
-    final Pool<Buffer, IOException> inputBufferPool;
-    private final OutputProxy outputProxy;
-    Pool<Buffer, IOException> outputBufferPool;
-    private volatile Buffer buffer;
+    private final InputSocketProxy inputProxy;
+    private final OutputSocketProxy outputProxy;
+    private final Strategy factory;
+    private Pool<Buffer, IOException> inputStrategy;
+    private Pool<Buffer, IOException> outputStrategy;
+    private Buffer buffer;
 
     DefaultCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output,
-                    final Strategy strategy) {
-        if (null == input) {
-            this.inputProxy = null;
-            this.inputBufferPool = null;
-        } else {
-            this.inputProxy = new InputProxy(input);
-            this.inputBufferPool = new InputBufferPool();
-        }
-        if (null == output) {
-            this.outputProxy = null;
-            this.outputBufferPool = null;
-        } else {
-            this.outputProxy = new OutputProxy(output);
-            this.outputBufferPool = strategy.newOutputBufferPool(this);
-        }
+                    final Strategy factory) {
+        if (null == factory)
+            throw new NullPointerException();
+        this.inputProxy  = null == input  ? null : new InputSocketProxy (input );
+        this.outputProxy = null == output ? null : new OutputSocketProxy(output);
+        this.factory = factory;
+    }
+
+    private Pool<Buffer, IOException> getInputStrategy() {
+        return null != inputStrategy
+                ? inputStrategy
+                : (inputStrategy = new InputStrategy());
+    }
+
+    private Pool<Buffer, IOException> getOutputStrategy() {
+        return null != outputStrategy
+                ? outputStrategy
+                : (outputStrategy = factory.newOutputStrategy(this));
     }
 
     @Override
@@ -91,7 +95,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         if (null != buffer) {
             synchronized (DefaultCache.this) {
                 if (null != buffer)
-                    outputBufferPool.release(buffer);
+                    getOutputStrategy().release(buffer);
             }
         }
     }
@@ -104,18 +108,17 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 if (null != buffer) {
                     // Order is important here!
                     this.buffer = null;
-                    inputBufferPool.release(buffer);
+                    getInputStrategy().release(buffer);
                 }
             }
         }
     }
 
-    final class InputBufferPool implements Pool<Buffer, IOException> {
+    final class InputStrategy implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (DefaultCache.this) {
                 if (null == buffer) {
-                    final Buffer resource = new Buffer();
                     final InputSocket<? extends LT> input
                             = inputProxy.getBoundSocket();
                     assert null == input.getPeerTarget();
@@ -138,8 +141,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    resource.temp = output.getTemp();
-                    buffer = resource;
+                    buffer = new Buffer(output.getTemp());
                 }
                 buffer.used++;
                 return buffer;
@@ -147,32 +149,30 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         }
 
         @Override
-        public void release(final Buffer resource) throws IOException {
+        public void release(final Buffer buf) throws IOException {
             synchronized (DefaultCache.this) {
-                resource.used--;
-                if (resource != buffer && 0 == resource.used)
-                    pool.release(resource.temp);
+                buf.used--;
+                if (buf != buffer && 0 == buf.used)
+                    pool.release(buf.file);
             }
         }
-    } // class InputBufferPool
+    } // class InputStrategy
 
-    abstract class OutputBufferPool implements Pool<Buffer, IOException> {
+    abstract class OutputStrategy implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            final Buffer buffer = new Buffer();
-            buffer.temp = pool.allocate();
-            return buffer;
+            return new Buffer(pool.allocate());
         }
 
         @Override
-        public void release(final Buffer resource) throws IOException {
+        public void release(final Buffer buf) throws IOException {
             try {
                 final OutputSocket<? extends LT> output
                         = outputProxy.getBoundSocket();
                 assert null == output.getPeerTarget();
                 class ProxyInput extends FilterInputSocket<CommonEntry> {
                     ProxyInput() {
-                        super(FileInputSocket.get(resource.temp));
+                        super(FileInputSocket.get(buf.file));
                     }
 
                     @Override
@@ -182,59 +182,63 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 }
                 IOSocket.copy(new ProxyInput(), output);
             } catch (IOException ex) {
-                pool.release(resource.temp);
+                pool.release(buf.file);
                 throw ex;
             }
         }
-    } // class OutputBufferPool
+    } // class OutputStrategy
 
-    final class WriteBackOutputBufferPool extends OutputBufferPool {
+    final class WriteBackOutputStrategy extends OutputStrategy {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (DefaultCache.this) {
-                final Buffer buffer = super.allocate();
-                buffer.dirty = true;
-                return buffer;
+                final Buffer buf = super.allocate();
+                buf.dirty = true;
+                return buf;
             }
         }
 
         @Override
-        public void release(final Buffer resource) throws IOException {
-            if (!resource.dirty)
+        public void release(final Buffer buf) throws IOException {
+            if (!buf.dirty)
                 return;
             synchronized (DefaultCache.this) {
-                if (resource != buffer) {
-                    buffer = resource;
+                if (buf != buffer) {
+                    buffer = buf;
                 } else {
-                    resource.dirty = false;
-                    super.release(resource);
+                    buf.dirty = false;
+                    super.release(buf);
                 }
             }
         }
-    } // class WriteBackOutputBufferPool
+    } // class WriteBackOutputStrategy
 
-    final class WriteThroughOutputBufferPool extends OutputBufferPool {
+    final class WriteThroughOutputStrategy extends OutputStrategy {
         @Override
-        public void release(final Buffer resource) throws IOException {
+        public void release(final Buffer buf) throws IOException {
             synchronized (DefaultCache.this) {
-                if (resource != buffer) {
-                    buffer = resource;
-                    super.release(resource);
+                if (buf != buffer) {
+                    buffer = buf;
+                    super.release(buf);
                 }
             }
         }
-    } // class WriteThroughOutputBufferPool
+    } // class WriteThroughOutputStrategy
 
     final class Buffer {
-        FileEntry temp;
+        final FileEntry file;
         int used;
         boolean dirty;
+
+        Buffer(final FileEntry file) {
+            this.file = file;
+        }
 
         final class BufferReadOnlyFile extends FilterReadOnlyFile {
             boolean closed;
 
             BufferReadOnlyFile() throws IOException {
-                super(FileInputSocket.get(temp).newReadOnlyFile());
+                super(FileInputSocket.get(file).newReadOnlyFile());
             }
 
             @Override
@@ -245,7 +249,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 try {
                     rof.close();
                 } finally {
-                    inputBufferPool.release(Buffer.this);
+                    getInputStrategy().release(Buffer.this);
                 }
             }
         } // class ReadOnlyFile
@@ -254,7 +258,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             boolean closed;
 
             BufferInputStream() throws IOException {
-                super(FileInputSocket.get(temp).newInputStream());
+                super(FileInputSocket.get(file).newInputStream());
             }
 
             @Override
@@ -265,7 +269,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 try {
                     in.close();
                 } finally {
-                    inputBufferPool.release(Buffer.this);
+                    getInputStrategy().release(Buffer.this);
                 }
             }
         } // class InputStream
@@ -274,7 +278,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
             boolean closed;
 
             BufferOutputStream() throws IOException {
-                super(FileOutputSocket.get(temp).newOutputStream());
+                super(FileOutputSocket.get(file).newOutputStream());
             }
 
             @Override
@@ -285,14 +289,14 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 try {
                     out.close();
                 } finally {
-                    outputBufferPool.release(Buffer.this);
+                    getOutputStrategy().release(Buffer.this);
                 }
             }
         } // class OutputStream
     } // class Buffer
 
-    private final class InputProxy extends FilterInputSocket<LT> {
-        InputProxy(final InputSocket <? extends LT> input) {
+    private final class InputSocketProxy extends FilterInputSocket<LT> {
+        InputSocketProxy(final InputSocket <? extends LT> input) {
             super(input);
         }
 
@@ -303,7 +307,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 flush();
                 return getBoundSocket().newReadOnlyFile();
             }
-            return inputBufferPool.allocate().new BufferReadOnlyFile();
+            return getInputStrategy().allocate().new BufferReadOnlyFile();
         }
 
         @Override
@@ -320,12 +324,12 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 flush();
                 return getBoundSocket().newInputStream();
             }
-            return inputBufferPool.allocate().new BufferInputStream();
+            return getInputStrategy().allocate().new BufferInputStream();
         }
     } // class InputProxy
 
-    private final class OutputProxy extends FilterOutputSocket<LT> {
-        OutputProxy(final OutputSocket<? extends LT> output) {
+    private final class OutputSocketProxy extends FilterOutputSocket<LT> {
+        OutputSocketProxy(final OutputSocket<? extends LT> output) {
             super(output);
         }
 
@@ -337,10 +341,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                 clear();
                 return getBoundSocket().newOutputStream();
             }
-            return outputBufferPool.allocate().new BufferOutputStream();
+            return getOutputStrategy().allocate().new BufferOutputStream();
         }
     } // class OutputProxy
-
-    private static class Lock {
-    }
 }
