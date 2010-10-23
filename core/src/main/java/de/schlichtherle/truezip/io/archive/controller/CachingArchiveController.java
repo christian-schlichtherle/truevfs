@@ -32,7 +32,6 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.WriteBackCache;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -207,7 +206,7 @@ extends FilterArchiveController<AE> {
             this.outputOptions = null != outputOptions
                             ? outputOptions.clear(OutputOption.CACHE)
                             : BitField.noneOf(OutputOption.class);
-            this.cache = WriteBackCache.newInstance(
+            this.cache = Cache.Strategy.WRITE_BACK.newCache(
                     new RegisteringInputSocket(
                         getController().getInputSocket(path, inputOptions)),
                     getController().getOutputSocket(path, outputOptions, null));

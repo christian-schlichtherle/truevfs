@@ -172,7 +172,7 @@ implements Serializable {
         }
 
         while (urls.hasMoreElements()) {
-            final URL url = (URL) urls.nextElement();
+            final URL url = urls.nextElement();
             registerArchiveDrivers(url, driverRegistry, clientRegistry);
         }
     }

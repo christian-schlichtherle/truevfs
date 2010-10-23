@@ -277,7 +277,7 @@ extends        AbstractArchiveController<AE> {
             @Override
             public AE getLocalTarget() throws IOException {
                 if (options.get(APPEND))
-                    return null; // FIXME: broken contract
+                    return null; // FIXME: broken interface contract!
                 return getEntry();
             }
 
