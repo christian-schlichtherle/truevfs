@@ -63,13 +63,10 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
  * implement the {@link java.io.Serializable} interface too, so that
  * {@link File} instances which use it can be serialized.
  *
- * @see ArchiveDriver
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDetector
-        extends de.schlichtherle.truezip.io.archive.detector.ArchiveDetector,
-                FileFactory {
+public interface ArchiveDetector extends FileFactory {
 
     /**
      * Never recognizes archive files in a path.
@@ -77,7 +74,6 @@ public interface ArchiveDetector
      * {@code DefaultArchiveDetector} instances or if archive files
      * shall be treated like ordinary files rather than (virtual) directories.
      */
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector NULL = new DefaultArchiveDetector(""); // or null
 
     /**
@@ -93,7 +89,6 @@ public interface ArchiveDetector
      *
      * @see GlobalArchiveDriverRegistry
      */
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector DEFAULT = new DefaultArchiveDetector(
             GlobalArchiveDriverRegistry.INSTANCE.defaultSuffixes);
 
@@ -106,7 +101,35 @@ public interface ArchiveDetector
      *
      * @see GlobalArchiveDriverRegistry
      */
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     DefaultArchiveDetector ALL = new DefaultArchiveDetector(
             GlobalArchiveDriverRegistry.INSTANCE.allSuffixes);
+
+    /**
+     * Detects whether the given {@code path} identifies a prospective
+     * archive file or not by applying heuristics to it and returns an
+     * appropriate {@code ArchiveDriver} to use or {@code null}
+     * if the path does not denote a prospective archive file or an
+     * appropriate {@code ArchiveDriver} is not available for some
+     * reason.
+     * <p>
+     * Please note that implementations <em>must not</em> check the actual
+     * contents of the file identified by {@code path}!
+     * This is because this method may be used to detect archive files
+     * by their names before they are actually created or to detect archive
+     * files which are enclosed in other archive files, in which case there
+     * is no way to check the file contents in the real file system.
+     *
+     * @param path The path name of the file in the virtual file system.
+     *        This does not need to be absolute and it does not need to be
+     *        actually accessible in the real file system!
+     * @return An {@code ArchiveDriver} instance for this archive file
+     *         or {@code null} if the path does not denote an archive
+     *         file (i.e. the path does not have a known suffix)
+     *         or an appropriate {@code ArchiveDriver} is not available
+     *         for some reason.
+     * @throws NullPointerException If {@code path} is {@code null}.
+     * @throws RuntimeException A subclass is thrown if loading or
+     *         instantiating an archive driver class fails.
+     */
+    ArchiveDriver<?> getArchiveDriver(String path);
 }

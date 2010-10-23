@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
 import java.io.FileNotFoundException;
@@ -41,12 +40,12 @@ public interface FileFactory {
      * Constructs a new {@link File} instance from the given
      * {@code blueprint}.
      *
-     * @param blueprint The file to use as a blueprint. If this is an instance
+     * @param template The file to use as a blueprint. If this is an instance
      *        of the {@link File} class, its fields are simply copied.
      *
      * @return A newly created instance of the class {@link File}.
      */
-    File createFile(java.io.File blueprint);
+    File newFile(java.io.File template);
 
     /**
      * This is used by {@link File#getParentFile()} for fast file construction
@@ -59,7 +58,7 @@ public interface FileFactory {
      * {@link IllegalArgumentException}, {@link AssertionError} or
      * may even silently fail!
      */
-    File createFile(java.io.File delegate, File innerArchive);
+    File newFile(java.io.File delegate, File innerArchive);
 
     /**
      * Used for fast file construction without rescanning the pathname for
@@ -72,7 +71,7 @@ public interface FileFactory {
      * {@link IllegalArgumentException}, {@link AssertionError} or
      * may even silently fail!
      */
-    File createFile(File blueprint, java.io.File delegate, File enclArchive);
+    File newFile(File template, java.io.File delegate, File enclArchive);
 
     /**
      * Constructs a new {@link File} instance which uses this
@@ -81,7 +80,7 @@ public interface FileFactory {
      * @param path The pathname of the file.
      * @return A newly created instance of the class {@link File}.
      */
-    File createFile(String path);
+    File newFile(String path);
 
     /**
      * Constructs a new {@link File} instance which uses this
@@ -92,7 +91,7 @@ public interface FileFactory {
      *
      * @return A newly created instance of the class {@link File}.
      */
-    File createFile(String parent, String child);
+    File newFile(String parent, String child);
 
     /**
      * Constructs a new {@link File} instance which uses this
@@ -103,7 +102,7 @@ public interface FileFactory {
      *
      * @return A newly created instance of the class {@link File}.
      */
-    File createFile(java.io.File parent, String child);
+    File newFile(java.io.File parent, String child);
 
     /**
      * Constructs a new {@link File} instance from the given
@@ -127,7 +126,7 @@ public interface FileFactory {
      * @throws IllegalArgumentException if the preconditions on the
      *         parameter {@code uri} do not hold.
      */
-    File createFile(URI uri);
+    File newFile(URI uri);
 
     /**
      * Creates a new {@link FileInputStream} to read the content of the
@@ -139,7 +138,7 @@ public interface FileFactory {
      *
      * @throws FileNotFoundException On any I/O related issue when opening the file.
      */
-    FileInputStream createFileInputStream(java.io.File file)
+    FileInputStream newFileInputStream(java.io.File file)
     throws FileNotFoundException;
 
     /**
@@ -154,6 +153,6 @@ public interface FileFactory {
      *
      * @throws FileNotFoundException On any I/O related issue when opening the file.
      */
-    FileOutputStream createFileOutputStream(java.io.File file, boolean append)
+    FileOutputStream newFileOutputStream(java.io.File file, boolean append)
     throws FileNotFoundException;
 }

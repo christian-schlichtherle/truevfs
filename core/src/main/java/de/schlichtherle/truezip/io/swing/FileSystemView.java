@@ -121,7 +121,7 @@ public class FileSystemView extends FilterFileSystemView {
             return null;
         return file instanceof File
                 ? (File) file
-                : getArchiveDetector().createFile(file);
+                : getArchiveDetector().newFile(file);
     }
 
     /** Unwraps the delegate of a possibly archive enabled file. */
@@ -215,7 +215,7 @@ public class FileSystemView extends FilterFileSystemView {
     throws IOException {
         final File wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry()) {
-            File folder = getArchiveDetector().createFile(
+            File folder = getArchiveDetector().newFile(
                     wParent,
                     UIManager.getString(File.separatorChar == '\\'
                             ? "FileChooser.win32.newFolder"
@@ -224,7 +224,7 @@ public class FileSystemView extends FilterFileSystemView {
             for (int i = 2; !folder.mkdirs(); i++) {
                 if (i > 100)
                     throw new IOException(wParent + ": Could not create new directory entry!");
-                folder = getArchiveDetector().createFile(
+                folder = getArchiveDetector().newFile(
                         wParent,
                         MessageFormat.format(
                             UIManager.getString(File.separatorChar == '\\'
