@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.socket.DefaultCache.Buffer.WriteBackOutputBuffer;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
@@ -57,26 +56,29 @@ extends InputCache<LT>, OutputCache<LT> {
                 throw new UnsupportedOperationException("read only cache!");
             }
 
+            @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
-                    DefaultCache<LT>.Buffer buffer) {
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+                    DefaultCache<LT> cache) {
                 throw new AssertionError();
             }
         },
 
         WRITE_THROUGH {
+            @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
-                    DefaultCache<LT>.Buffer buffer) {
-                return buffer.new WriteThroughOutputBuffer();
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+                    DefaultCache<LT> cache) {
+                return cache.new WriteThroughOutputBufferPool();
             }
         },
 
         WRITE_BACK {
+            @Override
             <LT extends CommonEntry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
-                    DefaultCache<LT>.Buffer buffer) {
-                return buffer.new WriteBackOutputBuffer();
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+                    DefaultCache<LT> cache) {
+                return cache.new WriteBackOutputBufferPool();
             }
         };
 
@@ -103,7 +105,7 @@ extends InputCache<LT>, OutputCache<LT> {
         }
 
         abstract <LT extends CommonEntry>
-        Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
-                DefaultCache<LT>.Buffer buffer);
+        Pool<DefaultCache<LT>.Buffer, IOException> newOutputBufferPool(
+                DefaultCache<LT> cache);
     }
 }
