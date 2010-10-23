@@ -47,9 +47,7 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveDriverRegistry
-extends HashMap<String, Object>
-implements Serializable {
+public class ArchiveDriverRegistry implements Serializable {
 
     private static final long serialVersionUID = 3445783613096128268L;
 
@@ -63,6 +61,7 @@ implements Serializable {
     static final String KWD_DRIVER = "DRIVER";      // NOI18N
     static final String KWD_DEFAULT = "DEFAULT";    // NOI18N
 
+    final Map<String, Object> drivers = new HashMap<String, Object>();
     /**
      * The delegate used to lookup archive drivers when no driver is
      * configured locally.
@@ -138,11 +137,11 @@ implements Serializable {
                 if (eager)
                     throw new IllegalArgumentException(
                             getString("keyword", KWD_DEFAULT)); // NOI18N
-                final SuffixSet set = (SuffixSet) super.get(key);
+                final SuffixSet set = (SuffixSet) drivers.get(key);
                 if (set != null)
                     set.addAll((String) value);
                 else
-                    super.put(key, new SuffixSet((String) value));
+                    drivers.put(key, new SuffixSet((String) value));
             } else {
                 registerArchiveDriver(key, value, eager);
             }
@@ -177,7 +176,7 @@ implements Serializable {
         } else {
             driver = eager ? (Object) newArchiveDriver(driver) : (String) driver; // force cast
             for (String suffix : set)
-                super.put(suffix, driver);
+                drivers.put(suffix, driver);
         }
     }
 
@@ -211,10 +210,10 @@ implements Serializable {
     public final synchronized ArchiveDriver<?> getArchiveDriver(
             final String suffix) {
         // Lookup driver locally.
-        Object driver = super.get(suffix);
+        Object driver = drivers.get(suffix);
         if (!(driver instanceof ArchiveDriver<?>)) {
             if (driver == null) {
-                if (super.containsKey(suffix) || delegate == null)
+                if (drivers.containsKey(suffix) || delegate == null)
                     return null;
 
                 // Lookup the driver in the delegate and cache it in the
@@ -228,7 +227,7 @@ implements Serializable {
                 logger.log(Level.FINE, "installed", // NOI18N
                         new Object[] { suffix, driver });
             }
-            super.put(suffix, driver); // may map null!
+            drivers.put(suffix, driver); // may drivers null!
         }
         return (ArchiveDriver<?>) driver;
     }
@@ -278,11 +277,11 @@ implements Serializable {
      *         local registry.
      */
     public final SuffixSet decorate(final SuffixSet set) {
-        final SuffixSet local = new SuffixSet(super.keySet());
+        final SuffixSet local = new SuffixSet(drivers.keySet());
         for (final Iterator<String> i = local.iterator(); i.hasNext(); ) {
             final String suffix = i.next();
-            assert super.containsKey(suffix);
-            if (super.get(suffix) != null)
+            assert drivers.containsKey(suffix);
+            if (drivers.get(suffix) != null)
                 set.addAll(suffix);
             else
                 set.removeAll(suffix);

@@ -142,7 +142,7 @@ implements Serializable {
         final String[] services = getServices();
         for (int i = services.length; --i >= 0; )
             registerArchiveDrivers(services[i], this, clientRegistry);
-        putAll(clientRegistry);
+        drivers.putAll(clientRegistry.drivers);
     }
 
     /**
@@ -248,7 +248,7 @@ implements Serializable {
         if (defaultSuffixesProperty != null) {
             set = new SuffixSet(defaultSuffixesProperty);
         } else {
-            set = (SuffixSet) remove(KWD_DEFAULT);
+            set = (SuffixSet) drivers.remove(KWD_DEFAULT);
             if (set == null)
                 return new SuffixSet();
         }
@@ -277,7 +277,7 @@ implements Serializable {
     }
 
     private void logConfiguration() {
-        final Iterator<Map.Entry<String, Object>> i = entrySet().iterator();
+        final Iterator<Map.Entry<String, Object>> i = drivers.entrySet().iterator();
         if (i.hasNext()) {
             do {
                 final Map.Entry<String, Object> entry = i.next();
