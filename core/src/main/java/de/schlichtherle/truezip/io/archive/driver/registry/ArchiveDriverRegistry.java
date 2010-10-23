@@ -241,11 +241,10 @@ implements Serializable {
      *        implementation, an archive driver instance or {@code null}.
      * @return An archive driver instance or {@code null} iff
      *         {@code driver} is {@code null}.
-     * @throws IllegalArchiveDriverException If an archive driver cannot get
-     *         returned.
-     *         The cause is wrapped in the exception.
+     * @throws IllegalArgumentException If an archive driver cannot get
+     *         returned. Its cause provides more detail.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ThrowableInitCause"})
 	private static ArchiveDriver<?> newArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
@@ -254,8 +253,8 @@ implements Serializable {
                 driver = ((Class<? extends ArchiveDriver<?>>) driver).newInstance();
             return (ArchiveDriver<?>) driver; // may throw ClassCastException
         } catch (Exception ex) {
-            throw new IllegalArchiveDriverException(
-                    getString("cannotCreate"), ex); // NOI18N
+            throw (IllegalArgumentException) new IllegalArgumentException(getString("cannotCreate"))
+                    .initCause(ex); // NOI18N
         }
     }
 
@@ -281,7 +280,7 @@ implements Serializable {
     public final SuffixSet decorate(final SuffixSet set) {
         final SuffixSet local = new SuffixSet(super.keySet());
         for (final Iterator<String> i = local.iterator(); i.hasNext(); ) {
-            final String suffix = (String) i.next();
+            final String suffix = i.next();
             assert super.containsKey(suffix);
             if (super.get(suffix) != null)
                 set.addAll(suffix);
@@ -298,15 +297,5 @@ implements Serializable {
     private static String getString(String key, String arg) {
         return MessageFormat.format(resources.getString(key),
                                     (Object[]) new String[] { arg });
-    }
-
-    static class IllegalArchiveDriverException
-            extends IllegalArgumentException {
-        private static final long serialVersionUID = 923470364629386423L;
-
-        private IllegalArchiveDriverException(String msg, Exception ex) {
-            super(msg);
-            super.initCause(ex);
-        }
     }
 }

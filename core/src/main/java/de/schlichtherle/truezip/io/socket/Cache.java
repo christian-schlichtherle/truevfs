@@ -16,6 +16,9 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.socket.DefaultCache.Buffer.WriteBackOutputBuffer;
+import de.schlichtherle.truezip.util.Pool;
+import java.io.IOException;
 
 /**
  * Implements a caching strategy for input and output sockets.
@@ -40,29 +43,67 @@ public interface Cache<LT extends CommonEntry>
 extends InputCache<LT>, OutputCache<LT> {
 
     enum Strategy {
-        WRITE_THROUGH,
-        WRITE_BACK;
+        READ_ONLY {
+            @Override
+            public <LT extends CommonEntry>
+            OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
+                throw new UnsupportedOperationException("read only cache!");
+            }
+
+            @Override
+            public <LT extends CommonEntry>
+            Cache<LT> newCache( InputSocket<? extends LT> input,
+                                OutputSocket<? extends LT> output) {
+                throw new UnsupportedOperationException("read only cache!");
+            }
+
+            <LT extends CommonEntry>
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
+                    DefaultCache<LT>.Buffer buffer) {
+                throw new AssertionError();
+            }
+        },
+
+        WRITE_THROUGH {
+            <LT extends CommonEntry>
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
+                    DefaultCache<LT>.Buffer buffer) {
+                return buffer.new WriteThroughOutputBuffer();
+            }
+        },
+
+        WRITE_BACK {
+            <LT extends CommonEntry>
+            Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
+                    DefaultCache<LT>.Buffer buffer) {
+                return buffer.new WriteBackOutputBuffer();
+            }
+        };
 
         public <LT extends CommonEntry>
-        InputCache<LT> newInstance(InputSocket <? extends LT> input) {
+        InputCache<LT> newCache(InputSocket <? extends LT> input) {
             if (null == input)
                 throw new NullPointerException();
-            throw new UnsupportedOperationException();
+            return new DefaultCache<LT>(input, null, this);
         }
 
         public <LT extends CommonEntry>
-        OutputCache<LT> newInstance(OutputSocket <? extends LT> output) {
+        OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
             if (null == output)
                 throw new NullPointerException();
-            throw new UnsupportedOperationException();
+            return new DefaultCache<LT>(null, output, this);
         }
 
         public <LT extends CommonEntry>
-        Cache<LT> newInstance(InputSocket<? extends LT> input,
-                              OutputSocket<? extends LT> output) {
+        Cache<LT> newCache( InputSocket<? extends LT> input,
+                            OutputSocket<? extends LT> output) {
             if (null == input || null == output)
                 throw new NullPointerException();
-            throw new UnsupportedOperationException();
+            return new DefaultCache<LT>(input, output, this);
         }
+
+        abstract <LT extends CommonEntry>
+        Pool<DefaultCache<LT>.Buffer, IOException> newOutputBuffer(
+                DefaultCache<LT>.Buffer buffer);
     }
 }
