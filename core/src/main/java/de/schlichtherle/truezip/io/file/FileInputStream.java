@@ -91,7 +91,7 @@ public class FileInputStream extends FilterInputStream {
      */
     public FileInputStream(String name)
     throws FileNotFoundException {
-        super(newInputStream(File.getDefaultArchiveDetector().createFile(name)));
+        super(newInputStream(File.getDefaultArchiveDetector().newFile(name)));
     }
 
     /**

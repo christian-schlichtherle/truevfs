@@ -95,7 +95,7 @@ public class FileOutputStream extends FilterOutputStream {
     public FileOutputStream(String name)
     throws FileNotFoundException {
         super(newOutputStream(
-                File.getDefaultArchiveDetector().createFile(name), false));
+                File.getDefaultArchiveDetector().newFile(name), false));
     }
 
     /**
@@ -110,7 +110,7 @@ public class FileOutputStream extends FilterOutputStream {
     public FileOutputStream(String name, boolean append)
     throws FileNotFoundException {
         super(newOutputStream(
-                File.getDefaultArchiveDetector().createFile(name), append));
+                File.getDefaultArchiveDetector().newFile(name), append));
     }
 
     /**

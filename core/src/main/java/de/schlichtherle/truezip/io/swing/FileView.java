@@ -120,7 +120,7 @@ final class FileView extends FilterFileView {
     }
 
     private static File newNonArchiveFile(File file) {
-        return ArchiveDetector.NULL.createFile(
+        return ArchiveDetector.NULL.newFile(
                 file .getParentFile(), file.getName());
     }
 
@@ -132,7 +132,7 @@ final class FileView extends FilterFileView {
         java.io.File parent = file.getParentFile();
         assert parent != null : "An archive entry must always name a parent!";
         return parent.isDirectory()
-                && !ArchiveDetector.NULL.createFile(parent.getPath())
+                && !ArchiveDetector.NULL.newFile(parent.getPath())
                     .isDirectory();
     }
 

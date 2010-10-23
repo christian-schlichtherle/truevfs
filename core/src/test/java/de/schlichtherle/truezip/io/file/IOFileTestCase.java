@@ -151,7 +151,7 @@ public abstract class IOFileTestCase extends TestCase {
     }
 
     private static File newNonArchiveFile(File file) {
-        return ArchiveDetector.NULL.createFile(
+        return ArchiveDetector.NULL.newFile(
                 file.getParentFile(), file.getName());
     }
 

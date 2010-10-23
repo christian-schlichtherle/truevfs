@@ -66,13 +66,13 @@ public class RaesFiles {
             final ArchiveDetector detector)
     throws IOException {
         final File plainFile = getNonArchiveFile(plainFilePath, detector);
-        final InputStream in = detector.createFileInputStream(plainFile);
+        final InputStream in = detector.newFileInputStream(plainFile);
         final RaesOutputStream out;
         try {
             final File raesFile = getNonArchiveFile(raesFilePath, detector);
             final RaesParameters params = new KeyManagerRaesParameters(raesFile);
             out = RaesOutputStream.getInstance(
-                    detector.createFileOutputStream(raesFile, false),
+                    detector.newFileOutputStream(raesFile, false),
                     params);
         } catch (IOException failure) {
             in.close();
@@ -125,7 +125,7 @@ public class RaesFiles {
                 rrof.authenticate();
             in = new ReadOnlyFileInputStream(rrof);
             final File plainFile = getNonArchiveFile(plainFilePath, detector);
-            out = detector.createFileOutputStream(plainFile, false);
+            out = detector.newFileOutputStream(plainFile, false);
         } catch (IOException failure) {
             rrof.close();
             throw failure;
@@ -142,7 +142,7 @@ public class RaesFiles {
     private static File getNonArchiveFile(
             final String path,
             final ArchiveDetector detector) {
-        final File file = detector.createFile(path);
-        return ArchiveDetector.NULL.createFile(file.getParentFile(), file.getName());
+        final File file = detector.newFile(path);
+        return ArchiveDetector.NULL.newFile(file.getParentFile(), file.getName());
     }
 }

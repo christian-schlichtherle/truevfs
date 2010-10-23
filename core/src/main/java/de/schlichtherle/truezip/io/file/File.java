@@ -913,7 +913,7 @@ public class File extends java.io.File {
             final boolean isArchive = detector.getArchiveDriver(path) != null;
             if (enclEntryNameBuf.length() > 0) {
                 if (isArchive) {
-                    enclArchive = detector.createFile(path); // use the same detector for the parent directory
+                    enclArchive = detector.newFile(path); // use the same detector for the parent directory
                     if (innerArchive != this)
                         innerArchive = enclArchive;
                     return;
@@ -983,7 +983,7 @@ public class File extends java.io.File {
             final boolean isArchive = base.charAt(baseEnd) == '!';
             if (enclEntryName != null) {
                 if (isArchive) {
-                    enclArchive = detector.createFile(newURI(scheme, path)); // use the same detector for the parent directory
+                    enclArchive = detector.newFile(newURI(scheme, path)); // use the same detector for the parent directory
                     if (innerArchive != this) {
                         innerArchive = enclArchive;
                     }
@@ -1550,7 +1550,7 @@ public class File extends java.io.File {
         // archive files with a different detector, which could
         // trigger an update and reconfiguration of the respective
         // archive controller!
-        return detector.createFile(parent, enclArchive);
+        return detector.newFile(parent, enclArchive);
     }
 
     /**
@@ -1569,7 +1569,7 @@ public class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = enclArchive.getAbsoluteFile();
-        return detector.createFile(this, delegate.getAbsoluteFile(), enclArchive);
+        return detector.newFile(this, delegate.getAbsoluteFile(), enclArchive);
     }
 
     /**
@@ -1588,7 +1588,7 @@ public class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = enclArchive.getNormalizedAbsoluteFile();
-        return detector.createFile(
+        return detector.newFile(
                 this, normalize(delegate.getAbsoluteFile()), enclArchive);
     }
 
@@ -1621,7 +1621,7 @@ public class File extends java.io.File {
             return this;
         assert !(normalizedFile instanceof File);
         assert enclArchive == null || normalize(enclArchive) == enclArchive;
-        return detector.createFile(this, normalizedFile, enclArchive);
+        return detector.newFile(this, normalizedFile, enclArchive);
     }
 
     /**
@@ -1640,7 +1640,7 @@ public class File extends java.io.File {
         if (enclArchive != null)
             enclArchive = enclArchive.getCanonicalFile();
         // Note: entry.getCanonicalFile() may change case!
-        return detector.createFile(this, delegate.getCanonicalFile(), enclArchive);
+        return detector.newFile(this, delegate.getCanonicalFile(), enclArchive);
     }
 
     /**
@@ -1655,7 +1655,7 @@ public class File extends java.io.File {
         File enclArchive = this.enclArchive;
         if (enclArchive != null)
             enclArchive = enclArchive.getCanOrAbsFile();
-        return detector.createFile(this, getRealFile(delegate), enclArchive);
+        return detector.newFile(this, getRealFile(delegate), enclArchive);
     }
 
     /**
@@ -1816,7 +1816,7 @@ public class File extends java.io.File {
      * In case you want to convert an instance of this class which recognized
      * the base name of its path as an archive file to a file instance which
      * doesn't recognize this archive file, use the following code instead:
-     * {@code ArchiveDetector.NULL.createFile((File) file.getParentFile(), file.getName())}
+     * {@code ArchiveDetector.NULL.newFile((File) file.getParentFile(), file.getName())}
      *
      * @return An instance of the {@link java.io.File java.io.File} class or
      *         one of its subclasses, but never an instance of this class or
@@ -2533,7 +2533,7 @@ public class File extends java.io.File {
                     = new ArrayList<File>(members.size());
             for (final String member : members)
                 if (filter == null || filter.accept(this, member))
-                    filtered.add(factory.createFile(File.this, member));
+                    filtered.add(factory.newFile(File.this, member));
             return filtered.toArray(new File[filtered.size()]);
         }
         return convert(delegate.listFiles(filter), factory);
@@ -2546,7 +2546,7 @@ public class File extends java.io.File {
             return null; // no directory
         File[] results = new File[files.length];
         for (int i = files.length; 0 <= --i; )
-            results[i] = factory.createFile(files[i]);
+            results[i] = factory.newFile(files[i]);
         return results;
     }
 
@@ -2592,7 +2592,7 @@ public class File extends java.io.File {
             final Collection<File> filtered
                     = new ArrayList<File>(members.size());
             for (final String member : members) {
-                final File file = factory.createFile(File.this, member);
+                final File file = factory.newFile(File.this, member);
                 if (filter == null || filter.accept(file))
                     filtered.add(file);
             }
@@ -2619,7 +2619,7 @@ public class File extends java.io.File {
 
         for (int i = 0, l = children.length; i < l; i++) {
             final String child = children[i];
-            final File file = factory.createFile(this, child);
+            final File file = factory.newFile(this, child);
             if (filter == null || filter.accept(file))
                 filteredList.add(file);
         }
@@ -2854,7 +2854,7 @@ public class File extends java.io.File {
      */
     public boolean copyFrom(final InputStream in) {
         try {
-            final OutputStream out = detector.createFileOutputStream(this, false);
+            final OutputStream out = detector.newFileOutputStream(this, false);
             try {
                 cp(in, out); // always closes in and out
                 return true;
@@ -3175,7 +3175,7 @@ public class File extends java.io.File {
      */
     public boolean copyTo(final OutputStream out) {
         try {
-            final InputStream in = detector.createFileInputStream(this);
+            final InputStream in = detector.newFileInputStream(this);
             cp(in, out); // always closes in and out
             return true;
         } catch (IOException failed) {
@@ -4250,7 +4250,7 @@ public class File extends java.io.File {
      */
     public boolean catFrom(final InputStream in) {
         try {
-            final OutputStream out = detector.createFileOutputStream(this, false);
+            final OutputStream out = detector.newFileOutputStream(this, false);
             try {
                 try {
                     Streams.cat(in, out);
@@ -4316,7 +4316,7 @@ public class File extends java.io.File {
      */
     public boolean catTo(final OutputStream out) {
         try {
-            final InputStream in = detector.createFileInputStream(this);
+            final InputStream in = detector.newFileInputStream(this);
             try {
                 Streams.cat(in, out);
             } finally {
