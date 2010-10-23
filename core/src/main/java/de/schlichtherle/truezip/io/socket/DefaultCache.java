@@ -50,12 +50,11 @@ import java.io.OutputStream;
  * @version $Id$
  */
 final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
-    private final Lock lock = new Lock();
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputProxy inputProxy;
     final Pool<Buffer, IOException> inputBufferPool;
     private final OutputProxy outputProxy;
-    final Pool<Buffer, IOException> outputBufferPool;
+    Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
 
     DefaultCache(   final InputSocket <? extends LT> input,
@@ -89,20 +88,24 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     @Override
     public void flush() throws IOException {
-        synchronized (lock) {
-            if (null != buffer)
-                outputBufferPool.release(buffer);
+        if (null != buffer) {
+            synchronized (DefaultCache.this) {
+                if (null != buffer)
+                    outputBufferPool.release(buffer);
+            }
         }
     }
 
     @Override
     public void clear() throws IOException {
-        synchronized (lock) {
-            final Buffer buffer = this.buffer;
-            if (null != buffer) {
-                // Order is important here!
-                this.buffer = null;
-                inputBufferPool.release(buffer);
+        if (null != buffer) {
+            synchronized (DefaultCache.this) {
+                final Buffer buffer = this.buffer;
+                if (null != buffer) {
+                    // Order is important here!
+                    this.buffer = null;
+                    inputBufferPool.release(buffer);
+                }
             }
         }
     }
@@ -110,9 +113,9 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (lock) {
+            synchronized (DefaultCache.this) {
                 if (null == buffer) {
-                    buffer = new Buffer();
+                    final Buffer resource = new Buffer();
                     final InputSocket<? extends LT> input
                             = inputProxy.getBoundSocket();
                     assert null == input.getPeerTarget();
@@ -135,7 +138,8 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    buffer.temp = output.getTemp();
+                    resource.temp = output.getTemp();
+                    buffer = resource;
                 }
                 buffer.used++;
                 return buffer;
@@ -144,15 +148,10 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
         @Override
         public void release(final Buffer resource) throws IOException {
-            synchronized (lock) {
+            synchronized (DefaultCache.this) {
                 resource.used--;
-                if (resource != buffer && 0 >= resource.used) {
-                    final FileEntry temp = resource.temp;
-                    if (null != temp) {
-                        resource.temp = null;
-                        pool.release(temp);
-                    }
-                }
+                if (resource != buffer && 0 == resource.used)
+                    pool.release(resource.temp);
             }
         }
     } // class InputBufferPool
@@ -192,7 +191,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (lock) {
+            synchronized (DefaultCache.this) {
                 final Buffer buffer = super.allocate();
                 buffer.dirty = true;
                 return buffer;
@@ -203,7 +202,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         public void release(final Buffer resource) throws IOException {
             if (!resource.dirty)
                 return;
-            synchronized (lock) {
+            synchronized (DefaultCache.this) {
                 if (resource != buffer) {
                     buffer = resource;
                 } else {
@@ -217,7 +216,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer resource) throws IOException {
-            synchronized (lock) {
+            synchronized (DefaultCache.this) {
                 if (resource != buffer) {
                     buffer = resource;
                     super.release(resource);
