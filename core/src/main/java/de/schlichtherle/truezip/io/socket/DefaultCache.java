@@ -228,7 +228,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     final class Buffer {
         final FileEntry file;
         int used;
-        boolean dirty;
+        volatile boolean dirty;
 
         Buffer(final FileEntry file) {
             this.file = file;
