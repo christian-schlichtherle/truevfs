@@ -308,7 +308,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Returns the Compressed Size of this entry.
+     * Returns the compressed size of this entry.
      *
      * @see #setCompressedSize
      */
@@ -317,7 +317,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Sets the Compressed Size of this entry.
+     * Sets the compressed size of this entry.
      *
      * @param csize The Compressed Size.
      * @throws IllegalArgumentException If {@code csize} is not in the
@@ -348,7 +348,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Returns the (Uncompressed) Size of this entry.
+     * Returns the uncompressed size of this entry.
      *
      * @see #setCompressedSize
      */
@@ -357,7 +357,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Sets the (Uncompressed) Size of this entry.
+     * Sets the uncompressed size of this entry.
      *
      * @param size The (Uncompressed) Size.
      * @throws IllegalArgumentException If {@code size} is not in the
