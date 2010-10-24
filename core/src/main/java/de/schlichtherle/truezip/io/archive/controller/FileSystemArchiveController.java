@@ -18,8 +18,12 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 
 /**
  * This archive controller controls the mount state transition.
@@ -45,10 +49,9 @@ extends        BasicArchiveController     <AE> {
     @Override
     final ArchiveFileSystem<AE> autoMount(
             final boolean autoCreate,
-            final boolean createParents)
+            final BitField<OutputOption> options)
     throws IOException {
-        assert !createParents || autoCreate;
-        return mountState.autoMount(autoCreate, createParents);
+        return mountState.autoMount(autoCreate, options.clear(APPEND));
     }
 
     final ArchiveFileSystem<AE> getFileSystem() {
@@ -76,7 +79,7 @@ extends        BasicArchiveController     <AE> {
      *        directory is created with its last modification time set to the
      *        system's current time.
      */
-    abstract void mount(boolean autoCreate, boolean createParents)
+    abstract void mount(boolean autoCreate, BitField<OutputOption> options)
     throws IOException;
 
     /**
@@ -85,7 +88,7 @@ extends        BasicArchiveController     <AE> {
      */
     private abstract class MountState {
         abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
-                                                    boolean createParents)
+                                                    BitField<OutputOption> options)
         throws IOException;
 
         ArchiveFileSystem<AE> getFileSystem() {
@@ -98,11 +101,11 @@ extends        BasicArchiveController     <AE> {
     private class ResetFileSystem extends MountState {
         @Override
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
-                                        final boolean createParents)
+                                        final BitField<OutputOption> options)
         throws IOException {
             assertWriteLockedByCurrentThread();
             try {
-                mount(autoCreate, createParents);
+                mount(autoCreate, options);
             } catch (FalsePositiveException ex) {
                 // Catch and cache exceptions for false positive archive files.
                 // The state is reset when unlink() is called on the false
@@ -122,7 +125,7 @@ extends        BasicArchiveController     <AE> {
             // DON'T just call autoMounter.getFileSystem()!
             // This would return null if autoMounter is an instance of
             // FalsePositiveFileSystem.
-            return mountState.autoMount(autoCreate, createParents);
+            return mountState.autoMount(autoCreate, options);
         }
 
         @Override
@@ -143,8 +146,8 @@ extends        BasicArchiveController     <AE> {
         }
 
         @Override
-        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
-                                            boolean createParents) {
+        ArchiveFileSystem<AE> autoMount(boolean autoCreate,
+                                        BitField<OutputOption> options) {
             return fileSystem;
         }
 
@@ -171,8 +174,8 @@ extends        BasicArchiveController     <AE> {
         }
 
         @Override
-        ArchiveFileSystem<AE> autoMount(    boolean autoCreate,
-                                            boolean createParents)
+        ArchiveFileSystem<AE> autoMount(boolean autoCreate,
+                                        final BitField<OutputOption> options)
         throws FalsePositiveException {
             throw exception;
         }

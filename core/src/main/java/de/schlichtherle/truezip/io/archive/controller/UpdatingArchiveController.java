@@ -68,7 +68,6 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -154,7 +153,7 @@ extends     FileSystemArchiveController<AE> {
     private final class TouchListener implements VetoableTouchListener {
         @Override
         public void touch() throws IOException {
-            makeOutput(false);
+            makeOutput(BitField.noneOf(OutputOption.class));
             getModel().setTouched(true);
         }
     }
@@ -292,7 +291,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     @Override
-    void mount(final boolean autoCreate, final boolean createParents)
+    void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
             final FileSystemController<?> enclController = getEnclController();
@@ -322,7 +321,7 @@ extends     FileSystemArchiveController<AE> {
             // encrypted ZIP file and the user cancels password
             // prompting.
             try {
-                makeOutput(createParents);
+                makeOutput(options);
             } catch (ArchiveControllerException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
@@ -335,15 +334,14 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private void makeOutput(final boolean createParents) throws IOException {
+    private void makeOutput(final BitField<OutputOption> options)
+    throws IOException {
         if (null != output)
             return;
         final FileSystemController<?> enclController = getEnclController();
         final String enclPath = getEnclPath(ROOT);
-        final OutputSocket<?> socket = enclController.getOutputSocket(enclPath,
-                BitField.of(OutputOption.CACHE)
-                    .set(CREATE_PARENTS, createParents),
-                null);
+        final OutputSocket<?> socket = enclController.getOutputSocket(
+                enclPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));
     }
@@ -357,7 +355,7 @@ extends     FileSystemArchiveController<AE> {
     @Override
     OutputSocket<? extends AE> getOutputSocket(final AE entry)
     throws IOException {
-        makeOutput(false);
+        makeOutput(BitField.noneOf(OutputOption.class));
         return output.getOutputSocket(entry);
     }
 
