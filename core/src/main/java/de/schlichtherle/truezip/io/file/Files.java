@@ -215,7 +215,8 @@ class Files {
                     BitField.noneOf(InputOption.class));
             final CommonEntry template = preserve ? input.getLocalTarget() : null;
             final OutputSocket<?> output = getOutputSocket(dst,
-                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()), template);
+                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()),
+                    template);
             IOSocket.copy(input, output);
         } catch (FileNotFoundException ex) {
             throw ex;

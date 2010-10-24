@@ -15,11 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Size;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
-import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
@@ -34,11 +33,10 @@ import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.TempFilePool;
+import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -142,11 +140,10 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final OutputSocket<? extends AE> socket = getBoundSocket();
                     final FileEntry temp = TempFilePool.get().allocate();
                     IOException cause = null;
                     try {
-                        return new TempEntryOutputStream(socket, temp);
+                        return new TempEntryOutputStream(getBoundSocket(), temp);
                     } catch (IOException ex) {
                         throw cause = ex;
                     } finally {
@@ -209,8 +206,8 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         private final FileEntry temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
-        private final CommonEntry remote;
-        private final InputSocket<CommonEntry> input;
+        private final CommonEntry peer;
+        private final InputSocket<?> input;
         private boolean closed;
 
         @SuppressWarnings({"LeakingThisInConstructor", "ThrowableInitCause"})
@@ -220,27 +217,21 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             this.output = output;
             this.local = output.getLocalTarget();
-            this.remote = output.getPeerTarget();
-            class Input extends InputSocket<CommonEntry> {
-                private final CommonEntry target = null == remote ? temp : remote;
+            this.peer = output.getPeerTarget();
+            class ProxyInput extends FilterInputSocket<CommonEntry> {
+                private final CommonEntry target = null != peer ? peer : temp;
+
+                ProxyInput() {
+                    super(FileInputSocket.get(temp));
+                }
 
                 @Override
                 public CommonEntry getLocalTarget() {
                     return target;
                 }
-
-                @Override
-                public InputStream newInputStream() throws IOException {
-                    return new FileInputStream(temp.getFile());
-                }
-
-                @Override
-                public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    return new SimpleReadOnlyFile(temp.getFile());
-                }
             }
             this.temp = temp;
-            this.input = new Input();
+            this.input = new ProxyInput();
             final TempEntryOutputStream old = temps.put(local.getName(), this);
             if (null != old)
                 old.store(true);
