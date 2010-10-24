@@ -35,9 +35,9 @@ public interface CommonEntry {
      * places where a non-{@code null} common entry is expected but none is
      * available.
      * <p>
-     * The {@code NULL} common entry has {@code "/dev/null"} as its name,
-     * {@link Type#SPECIAL} as its type, {@code 0} as its sizes and
-     * {@link #UNKNOWN} as its times.
+     * The {@code NULL} common entry has {@code "/dev/random"} as its name,
+     * {@link Type#SPECIAL} as its type and {@link #UNKNOWN} for any other
+     * property.
      */
     CommonEntry NULL = new CommonEntry() {
         public String getName() {
@@ -49,7 +49,7 @@ public interface CommonEntry {
         }
 
         public long getSize(Size type) {
-            return 0;
+            return UNKNOWN;
         }
 
         public long getTime(Access type) {

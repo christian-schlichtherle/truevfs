@@ -56,7 +56,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
@@ -394,8 +393,6 @@ extends     FileSystemArchiveController<AE> {
         assert !isTouched() || null != output; // file system touched => output archive
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
-            throw new IllegalArgumentException();
-        if (options.get(ABORT_CHANGES) && options.get(FLUSH_CACHE))
             throw new IllegalArgumentException();
         assertWriteLockedByCurrentThread();
         awaitSync(builder, options);

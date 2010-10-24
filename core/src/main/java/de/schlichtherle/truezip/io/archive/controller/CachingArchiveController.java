@@ -99,7 +99,7 @@ extends FilterArchiveController<AE> {
             }
         }
         caches.clear();
-        getController().sync(builder, options);
+        getController().sync(builder, options.clear(FLUSH_CACHE));
     }
 
     @Override
@@ -124,7 +124,9 @@ extends FilterArchiveController<AE> {
             final Cache<AE> cache = caches.get(path);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
-            return (null != cache ? cache : new EntryCache(path, options, null))
+            return (null != cache ? cache : new EntryCache(path,
+                        options,
+                        BitField.noneOf(OutputOption.class)))
                     .getInputSocket()
                     .bind(this);
         }
@@ -155,7 +157,7 @@ extends FilterArchiveController<AE> {
         @Override
         public OutputSocket<? extends AE> getBoundSocket() throws IOException {
             final Cache<AE> cache = caches.get(path);
-            if (!options.get(OutputOption.CACHE)
+            if (null == cache && !options.get(OutputOption.CACHE)
                     || options.get(OutputOption.APPEND)
                     || null != template) {
                 if (null != cache) {
@@ -173,7 +175,9 @@ extends FilterArchiveController<AE> {
             // Create marker entry and mind CREATE_PARENTS!
             getController().mknod(path, FILE, options, null);
             getModel().setTouched(true);
-            return (null != cache ? cache : new EntryCache(path, null, options))
+            return (null != cache ? cache : new EntryCache(path,
+                        BitField.noneOf(InputOption.class),
+                        options))
                     .getOutputSocket()
                     .bind(this);
         }
@@ -200,16 +204,12 @@ extends FilterArchiveController<AE> {
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions) {
             this.path = path;
-            this.inputOptions = null != inputOptions
-                    ? inputOptions.clear(InputOption.CACHE)
-                    : BitField.noneOf(InputOption.class);
-            this.outputOptions = null != outputOptions
-                            ? outputOptions.clear(OutputOption.CACHE)
-                            : BitField.noneOf(OutputOption.class);
+            this.inputOptions = inputOptions.clear(InputOption.CACHE);
+            this.outputOptions = outputOptions.clear(OutputOption.CACHE);
             this.cache = Cache.Strategy.WRITE_BACK.newCache(
                     new RegisteringInputSocket(
-                        getController().getInputSocket(path, inputOptions)),
-                    getController().getOutputSocket(path, outputOptions, null));
+                        getController().getInputSocket(path, this.inputOptions)),
+                    getController().getOutputSocket(path, this.outputOptions, null));
             this.input = cache.getInputSocket();
             this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }

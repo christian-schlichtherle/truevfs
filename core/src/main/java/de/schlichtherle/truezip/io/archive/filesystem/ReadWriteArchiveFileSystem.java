@@ -623,7 +623,6 @@ implements ArchiveFileSystem<AE> {
                                 "directory entries cannot replace existing entries");
                     }
                 } else {
-                    assert FILE == entryType;
                     if (oldEntry != null && DIRECTORY == oldEntry.getType())
                         throw new ArchiveFileSystemException(entryPath,
                                 "directory entries cannot get replaced");
