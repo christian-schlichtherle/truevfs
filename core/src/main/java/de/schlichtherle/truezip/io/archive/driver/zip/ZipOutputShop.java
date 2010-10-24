@@ -146,8 +146,9 @@ implements OutputShop<ZipEntry> {
                     return new EntryOutputStream(entry);
                 }
                 final CommonEntry peer = getPeerTarget();
-                if (null != peer) {
-                    entry.setSize(peer.getSize(DATA));
+                long size;
+                if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
+                    entry.setSize(size);
                     if (peer instanceof ZipEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
                         // A preset method in the entry takes priority.

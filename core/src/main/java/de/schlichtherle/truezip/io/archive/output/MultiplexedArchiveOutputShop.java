@@ -159,7 +159,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                         }
                     }
                 } else {
-                    return new EntryOutputStream(super.newOutputStream());
+                    return new EntryOutputStream(getBoundSocket().newOutputStream());
                 }
             }
         } // class Output

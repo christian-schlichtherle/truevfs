@@ -313,7 +313,7 @@ implements Iterable<E>, Closeable, Flushable {
                             + entry.getCommentLength(charset);
             if (size > UShort.MAX_VALUE)
                 throw new ZipException(entry.getName()
-                + ": sum of name, extra fields and comment too long: " + size);
+                + " (sum of name, extra fields and comment too long: " + size + ")");
         }
 
         int method = entry.getMethod();
@@ -333,7 +333,7 @@ implements Iterable<E>, Closeable, Flushable {
 
             default:
                 throw new ZipException(entry.getName()
-                + ": unsupported compression method: " + method);
+                + " (unsupported compression method: " + method + ")");
         }
 
         if (entry.getPlatform() == ZipEntry.UNKNOWN)
@@ -355,11 +355,11 @@ implements Iterable<E>, Closeable, Flushable {
     private static void checkLocalFileHeaderData(final ZipEntry entry)
     throws ZipException {
         if (entry.getCrc()              == ZipEntry.UNKNOWN)
-            throw new ZipException("Unknown CRC Checksum!");
+            throw new ZipException(entry.getName() + " (unknown CRC checksum)");
         if (entry.getCompressedSize32() == ZipEntry.UNKNOWN)
-            throw new ZipException("Unknown Compressed Size!");
+            throw new ZipException(entry.getName() + " (unknown compressed size)");
         if (entry.getSize32()           == ZipEntry.UNKNOWN)
-            throw new ZipException("Unknown Uncompressed Size!");
+            throw new ZipException(entry.getName() + " (unknown uncompressed size)");
     }
 
     /** @throws IOException On any I/O related issue. */
@@ -501,19 +501,21 @@ implements Iterable<E>, Closeable, Flushable {
                 final long expectedCrc = crc.getValue();
                 if (expectedCrc != entry.getCrc()) {
                     throw new ZipException(entry.getName()
-                    + ": bad CRC-32: 0x"
+                    + " (bad CRC-32: 0x"
                     + Long.toHexString(entry.getCrc())
                     + " expected: 0x"
-                    + Long.toHexString(expectedCrc));
+                    + Long.toHexString(expectedCrc)
+                    + ")");
                 }
                 final long written = ((LEDataOutputStream) out).size();
                 final long entrySize = written - dataStart;
                 if (entry.getSize() != entrySize) {
                     throw new ZipException(entry.getName()
-                    + ": bad Uncompressed Size: "
+                    + " (bad uncompressed Size: "
                     + entry.getSize()
                     + " expected: "
-                    + entrySize);
+                    + entrySize
+                    + ")");
                 }
                 break;
 
@@ -538,8 +540,9 @@ implements Iterable<E>, Closeable, Flushable {
 
             default:
                 throw new ZipException(entry.getName()
-                + ": unsupported Compression Method: "
-                + entry.getMethod());
+                + " (unsupported Compression Method: "
+                + entry.getMethod()
+                + ")");
         }
 
         writeDataDescriptor();

@@ -270,7 +270,7 @@ implements Iterable<E>, Closeable {
                 off += 2;
                 if (method != STORED && method != DEFLATED)
                     throw new ZipException(entry.getName()
-                    + ": unsupported compression method: " + method);
+                    + " (unsupported compression method: " + method + ")");
                 entry.setMethod(method);
 
                 entry.setDosTime(LittleEndian.readUInt(cfh, off));
@@ -780,7 +780,7 @@ implements Iterable<E>, Closeable {
         final long lfhSig = LittleEndian.readUInt(lfh, 0);
         if (lfhSig != ZIP.LFH_SIG)
             throw new ZipException(name
-            + ": Expected Local File Header Signature!");
+            + " (expected Local File Header Signature)");
         offset += ZIP.LFH_MIN_LEN
                 + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
@@ -956,7 +956,7 @@ implements Iterable<E>, Closeable {
         private void ensureOpen()
         throws IOException {
             if (closed)
-                throw new IOException("input stream has been closed");
+                throw new IOException("Input stream has been closed!");
         }
 
         @Override
@@ -1047,7 +1047,7 @@ implements Iterable<E>, Closeable {
         @Override
         public void reset()
         throws IOException {
-            throw new IOException("mark()/reset() not supported");
+            throw new IOException("mark()/reset() is not supported!");
         }
 
         @Override
