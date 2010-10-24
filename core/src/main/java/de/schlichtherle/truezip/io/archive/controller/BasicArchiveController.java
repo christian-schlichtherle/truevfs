@@ -118,12 +118,7 @@ extends        AbstractArchiveController<AE> {
 
     final ArchiveFileSystem<AE> autoMount()
     throws IOException {
-        return autoMount(false, false);
-    }
-
-    final ArchiveFileSystem<AE> autoMount(boolean autoCreate)
-    throws IOException {
-        return autoMount(autoCreate, autoCreate);
+        return autoMount(false, BitField.noneOf(OutputOption.class));
     }
 
     /**
@@ -144,7 +139,7 @@ extends        AbstractArchiveController<AE> {
      * @throws FalsePositiveException
      */
     abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
-                                                boolean createParents)
+                                                BitField<OutputOption> options)
     throws IOException;
 
     @Override
@@ -262,7 +257,8 @@ extends        AbstractArchiveController<AE> {
                 if (null == link) {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
-                    link = autoMount(!isRoot(path) && options.get(CREATE_PARENTS))
+                    link = autoMount(!isRoot(path) && options.get(CREATE_PARENTS),
+                                     options)
                             .mknod( path, FILE,
                                     options.get(CREATE_PARENTS), template);
                 }
@@ -334,14 +330,14 @@ extends        AbstractArchiveController<AE> {
             } catch (FalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
-                autoMount(true, options.get(CREATE_PARENTS));
+                autoMount(true, options);
                 return true;
             }
             throw new ArchiveEntryNotFoundException(getModel(),
                     path, "directory exists already");
         } else { // !isRoot(entryName)
             final ArchiveFileSystem<AE> fileSystem
-                    = autoMount(options.get(CREATE_PARENTS));
+                    = autoMount(options.get(CREATE_PARENTS), options);
             final boolean created = null == fileSystem.getEntry(path);
             final Operation<AE> link = fileSystem.mknod(
                     path, type, options.get(CREATE_PARENTS), template);
