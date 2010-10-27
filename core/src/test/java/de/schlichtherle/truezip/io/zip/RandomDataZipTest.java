@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * 
  * @author Christian Schlichtherle
  */
-public class RandomDataZipTest extends ZipTestCase {
+public class RandomDataZipTest extends PlainZipTestCase {
 
     private static final Logger logger
             = Logger.getLogger(RandomDataZipTest.class.getName());

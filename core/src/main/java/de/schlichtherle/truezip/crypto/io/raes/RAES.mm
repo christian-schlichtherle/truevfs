@@ -1,21 +1,22 @@
-<map version="0.8.0">
+<map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
-<node COLOR="#000000" CREATED="1143630507250" ID="Freemind_Link_567208098" MODIFIED="1144072822107" TEXT="RAES">
+<node COLOR="#000000" CREATED="1143630507250" ID="Freemind_Link_567208098" MODIFIED="1288123585241" TEXT="RAES">
 <font NAME="SansSerif" SIZE="20"/>
 <icon BUILTIN="password"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties"/>
-<node COLOR="#0033ff" CREATED="1143672334015" ID="Freemind_Link_1921380347" MODIFIED="1144072839701" POSITION="left" TEXT="Specification">
-<edge WIDTH="thin"/>
+<node COLOR="#0033ff" CREATED="1143672334015" ID="Freemind_Link_1921380347" MODIFIED="1288123568786" POSITION="left" TEXT="Specification">
+<edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
 <icon BUILTIN="attach"/>
-<node COLOR="#00b439" CREATED="1143667000421" ID="Freemind_Link_1496196467" MODIFIED="1143681056531" TEXT="Random Access Encryption Specification">
+<node COLOR="#00b439" CREATED="1143667000421" ID="Freemind_Link_1496196467" MODIFIED="1288123568786" TEXT="Random Access Encryption Specification">
+<edge STYLE="bezier" WIDTH="thin"/>
 <font BOLD="true" ITALIC="true" NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1143670141062" FOLDED="true" ID="Freemind_Link_690241170" MODIFIED="1143724050703" TEXT="Definition">
+<node COLOR="#990000" CREATED="1143670141062" ID="Freemind_Link_690241170" MODIFIED="1288134164839" TEXT="Definition">
 <edge COLOR="#009999" WIDTH="4"/>
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
-<node COLOR="#111111" CREATED="1143709290593" ID="Freemind_Link_1329218691" MODIFIED="1143720166359" TEXT="Extensible">
+<node COLOR="#111111" CREATED="1143709290593" ID="Freemind_Link_1329218691" MODIFIED="1288134852562" TEXT="Extensible">
 <edge COLOR="#009999" WIDTH="4"/>
 <font NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1143720062031" ID="Freemind_Link_428215567" MODIFIED="1143720169453" TEXT="Uses">
@@ -33,7 +34,7 @@
 <edge COLOR="#009999" WIDTH="4"/>
 <font ITALIC="true" NAME="SansSerif" SIZE="12"/>
 </node>
-<node COLOR="#111111" CREATED="1143669871625" ID="Freemind_Link_1941084832" MODIFIED="1143720202937" TEXT="which encrypts arbitrary data">
+<node COLOR="#111111" CREATED="1143669871625" ID="Freemind_Link_1941084832" MODIFIED="1288134842668" TEXT="which encrypts arbitrary data">
 <edge COLOR="#009999" WIDTH="4"/>
 <font ITALIC="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1143709866875" ID="Freemind_Link_740616174" MODIFIED="1143720176687" TEXT="Data is called">
@@ -54,7 +55,7 @@
 <icon BUILTIN="bookmark"/>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1143683011812" FOLDED="true" ID="Freemind_Link_609169704" MODIFIED="1143709919015" TEXT="Features">
+<node COLOR="#990000" CREATED="1143683011812" ID="Freemind_Link_609169704" MODIFIED="1288134164860" TEXT="Features">
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1143706748328" ID="Freemind_Link_123578849" MODIFIED="1143706751750" TEXT="I/O">
@@ -84,7 +85,7 @@
 <node COLOR="#111111" CREATED="1143675116093" ID="Freemind_Link_1912412120" MODIFIED="1143675127375" TEXT="Advantages">
 <node COLOR="#111111" CREATED="1143675128578" ID="Freemind_Link_117595815" MODIFIED="1143680965468" TEXT="Allows fast processing"/>
 </node>
-<node COLOR="#0000ff" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1144079246107" TEXT="Disadvantages">
+<node COLOR="#111111" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1288123568789" TEXT="Disadvantages">
 <hook NAME="accessories/plugins/BlinkingNodeHook.properties"/>
 <node COLOR="#111111" CREATED="1143675155000" ID="Freemind_Link_1516326278" MODIFIED="1143683706109" TEXT="No message authentication">
 <icon BUILTIN="clanbomber"/>
@@ -126,7 +127,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1143724553453" FOLDED="true" ID="Freemind_Link_1178409143" MODIFIED="1143724578406" TEXT="Constraints">
+<node COLOR="#990000" CREATED="1143724553453" ID="Freemind_Link_1178409143" MODIFIED="1288134164863" TEXT="Constraints">
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1143683251562" ID="Freemind_Link_1581849658" MODIFIED="1143683262546" TEXT="Stream writing only">
@@ -135,7 +136,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1143683072437" FOLDED="true" ID="Freemind_Link_912347610" MODIFIED="1143722819500" STYLE="fork" TEXT="Cryptographic Parameters">
+<node COLOR="#990000" CREATED="1143683072437" ID="Freemind_Link_912347610" MODIFIED="1288134164888" STYLE="fork" TEXT="Cryptographic Parameters">
 <edge WIDTH="thin"/>
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
@@ -225,7 +226,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1143642661765" FOLDED="true" ID="Freemind_Link_1980459774" MODIFIED="1144072584201" TEXT="File format">
+<node COLOR="#990000" CREATED="1143642661765" ID="Freemind_Link_1980459774" MODIFIED="1288134164910" TEXT="File format">
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1143723764984" ID="Freemind_Link_154427550" MODIFIED="1143725387984" TEXT="Lead-In">
@@ -238,6 +239,7 @@
 <node COLOR="#111111" CREATED="1143664430562" ID="Freemind_Link_1214620978" MODIFIED="1143690884515" TEXT="[4 bytes]">
 <node COLOR="#111111" CREATED="1143645600296" ID="Freemind_Link_1885678563" MODIFIED="1144071975638" TEXT="&quot;RAES&quot;">
 <font NAME="SansSerif" SIZE="12"/>
+<node COLOR="#111111" CREATED="1288136726858" ID="ID_73185912" MODIFIED="1288136730951" TEXT="US-ASCII"/>
 </node>
 </node>
 </node>
@@ -267,9 +269,9 @@
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <icon BUILTIN="full-1"/>
 <node COLOR="#111111" CREATED="1143664294265" ID="Freemind_Link_157892811" MODIFIED="1143724946000" TEXT="[1 byte]">
-<node COLOR="#111111" CREATED="1143664265578" ID="Freemind_Link_1196327289" MODIFIED="1143664274031" TEXT="0 = 128 Bit"/>
-<node COLOR="#111111" CREATED="1143664275156" ID="Freemind_Link_144726012" MODIFIED="1143664279328" TEXT="1 = 192 Bit"/>
-<node COLOR="#111111" CREATED="1143664280718" ID="Freemind_Link_901307446" MODIFIED="1143664285140" TEXT="2 = 256 Bit"/>
+<node COLOR="#111111" CREATED="1143664265578" ID="Freemind_Link_1196327289" MODIFIED="1288136815999" TEXT="0: 128 Bit"/>
+<node COLOR="#111111" CREATED="1143664275156" ID="Freemind_Link_144726012" MODIFIED="1288136821349" TEXT="1: 192 Bit"/>
+<node COLOR="#111111" CREATED="1143664280718" ID="Freemind_Link_901307446" MODIFIED="1288140759569" TEXT="2: 256 Bit"/>
 </node>
 <node COLOR="#111111" CREATED="1143664303562" ID="Freemind_Link_1705733947" MODIFIED="1143664308984" TEXT="Used for">
 <node COLOR="#111111" CREATED="1143712974578" ID="Freemind_Link_1332766639" MODIFIED="1143712977171" TEXT="Salt"/>
@@ -330,10 +332,12 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143675614875" ID="Freemind_Link_1280393464" MODIFIED="1143707006781" POSITION="left" TEXT="Applications">
+<node COLOR="#0033ff" CREATED="1143675614875" ID="Freemind_Link_1280393464" MODIFIED="1288123568796" POSITION="left" TEXT="Applications">
+<edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
-<node COLOR="#00b439" CREATED="1143680578703" FOLDED="true" ID="Freemind_Link_433240875" MODIFIED="1143706990765" TEXT="ZIP.RAES">
+<node COLOR="#00b439" CREATED="1143680578703" ID="Freemind_Link_433240875" MODIFIED="1288134164921" TEXT="ZIP.RAES">
+<edge STYLE="bezier" WIDTH="thin"/>
 <font BOLD="true" ITALIC="true" NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1143706365578" ID="Freemind_Link_1012892795" MODIFIED="1143706990765" TEXT="Regular ZIP file">
 <font NAME="SansSerif" SIZE="14"/>
@@ -380,10 +384,12 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143642394203" ID="Freemind_Link_1715794342" MODIFIED="1144070819951" POSITION="right" TEXT="Implementation">
+<node COLOR="#0033ff" CREATED="1143642394203" ID="Freemind_Link_1715794342" MODIFIED="1288123568797" POSITION="right" TEXT="Implementation">
+<edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
-<node COLOR="#00b439" CREATED="1143631244656" FOLDED="true" ID="Freemind_Link_1323970228" MODIFIED="1143708921031" TEXT="Operations" VSHIFT="-41">
+<node COLOR="#00b439" CREATED="1143631244656" ID="Freemind_Link_1323970228" MODIFIED="1288134164928" TEXT="Operations" VSHIFT="-41">
+<edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1143631285625" ID="Freemind_Link_285943267" MODIFIED="1143665164656" TEXT="Random read">
 <font NAME="SansSerif" SIZE="14"/>
@@ -410,7 +416,8 @@
 </node>
 </node>
 </node>
-<node COLOR="#00b439" CREATED="1143709493781" FOLDED="true" ID="Freemind_Link_1191781586" MODIFIED="1143709496093" TEXT="Parameters">
+<node COLOR="#00b439" CREATED="1143709493781" ID="Freemind_Link_1191781586" MODIFIED="1288134164933" TEXT="Parameters">
+<edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1143709558125" ID="Freemind_Link_195436846" MODIFIED="1143709559578" TEXT="Interface">
 <font NAME="SansSerif" SIZE="14"/>
@@ -442,12 +449,13 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143642522921" ID="Freemind_Link_685986456" MODIFIED="1143719148328" POSITION="right" TEXT="Reference">
+<node COLOR="#0033ff" CREATED="1143642522921" ID="Freemind_Link_685986456" MODIFIED="1288123568806" POSITION="right" TEXT="Reference">
+<edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
 <icon BUILTIN="bell"/>
-<node COLOR="#00b439" CREATED="1143666597593" FOLDED="true" ID="Freemind_Link_734244204" MODIFIED="1143719178937" TEXT="Alphabetic&#xa;Glossary">
-<edge WIDTH="thin"/>
+<node COLOR="#00b439" CREATED="1143666597593" ID="Freemind_Link_734244204" MODIFIED="1288134164968" TEXT="Alphabetic&#xa;Glossary">
+<edge STYLE="bezier" WIDTH="thin"/>
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1143667021843" ID="Freemind_Link_1055176107" MODIFIED="1143719157625" TEXT="AES">
@@ -595,7 +603,8 @@
 </node>
 </node>
 </node>
-<node COLOR="#00b439" CREATED="1143631557765" FOLDED="true" ID="Freemind_Link_494081966" MODIFIED="1143719187281" TEXT="Standards" VSHIFT="11">
+<node COLOR="#00b439" CREATED="1143631557765" ID="Freemind_Link_494081966" MODIFIED="1288134164977" TEXT="Standards" VSHIFT="11">
+<edge STYLE="bezier" WIDTH="thin"/>
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1143631562781" ID="Freemind_Link_1042126855" MODIFIED="1143719148328" TEXT="PKCS">

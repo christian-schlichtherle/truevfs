@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
@@ -23,7 +25,6 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -58,7 +59,9 @@ implements Iterable<E>, Closeable, Flushable {
     public static final String DEFAULT_CHARSET = ZIP.DEFAULT_CHARSET;
 
     /** The charset to use for entry names and comments. */
-    private final String charset;
+    private final Charset charset;
+
+    private final RawZipFile<E> appendee;
 
     /** CRC instance to avoid parsing DEFLATED data twice. */
     private final CRC32 crc = new CRC32();
@@ -109,32 +112,45 @@ implements Iterable<E>, Closeable, Flushable {
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
-    protected RawZipOutputStream(final OutputStream out)
-    throws NullPointerException {
-        super(toLEDataOutputStream(out));
-        if (out == null)
-            throw new NullPointerException();
-        this.charset = DEFAULT_CHARSET;
+    protected RawZipOutputStream(final OutputStream out) {
+        this(out, DEFAULT_CHARSET);
     }
 
     /**
      * Creates a new ZIP output stream decorating the given output stream.
      *
-     * @throws NullPointerException If {@code out} or {@code charset} is
+     * @throws NullPointerException If {@code out} or {@code charset} are
      *         {@code null}.
-     * @throws UnsupportedEncodingException If {@code charset} is not supported
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
      *         by this JVM.
      */
     protected RawZipOutputStream(
             final OutputStream out,
-            final String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException {
+            final String charset) {
         super(toLEDataOutputStream(out));
         if (out == null || charset == null)
             throw new NullPointerException();
-        "".getBytes(charset); // may throw UnsupportedEncodingException!
-        this.charset = charset;
+        this.appendee = null;
+        this.charset = Charset.forName(charset);
+    }
+
+    protected RawZipOutputStream(
+            final OutputStream out,
+            final String charset,
+            final RawZipFile<E> appendee)
+    throws ZipException {
+        super(new CustomLEDataOutputStream(out, appendee));
+        if (null == out || null == charset)
+            throw new NullPointerException();
+        this.appendee = appendee;
+        if (null != appendee) {
+            appendee.assertOpen();
+            for (E entry : appendee)
+                entries.put(entry.getName(), entry);
+            this.charset = Charset.forName(appendee.getCharset());
+        } else {
+            this.charset = Charset.forName(charset);
+        }
     }
 
     private static LEDataOutputStream toLEDataOutputStream(OutputStream out) {
@@ -143,9 +159,18 @@ implements Iterable<E>, Closeable, Flushable {
                 : new LEDataOutputStream(out);
     }
 
+    private static class CustomLEDataOutputStream extends LEDataOutputStream {
+        public CustomLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+            super(out);
+            super.written = null == appendee
+                    ? 0
+                    : appendee.getOffsetMapper().location(appendee.length());
+        }
+    }
+
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
-        return charset;
+        return charset.name();
     }
 
     /**
@@ -386,7 +411,7 @@ implements Iterable<E>, Closeable, Flushable {
 
         // Compose General Purpose Bit Flag.
         // See appendix D of PKWARE's ZIP File Format Specification.
-        final boolean utf8 = ZIP.UTF8.equalsIgnoreCase(charset);
+        final boolean utf8 = ZIP.UTF8.equalsIgnoreCase(charset.name());
         final int general = (dd   ? (1 <<  3) : 0)
                           | (utf8 ? (1 << 11) : 0);
 
@@ -827,16 +852,9 @@ implements Iterable<E>, Closeable, Flushable {
      */
     private static class ZipDeflater extends Deflater {
         private int level = Deflater.DEFAULT_COMPRESSION;
-        private long read = 0, written = 0;
 
         public ZipDeflater() {
             super(Deflater.DEFAULT_COMPRESSION, true);
-        }
-
-        @Override
-        public void setInput(byte[] b, int off, int len) {
-            super.setInput(b, off, len);
-            read += len;
         }
 
         public int getLevel() {
@@ -844,38 +862,9 @@ implements Iterable<E>, Closeable, Flushable {
         }
 
         @Override
-        public void setLevel(int level) {
+        public void setLevel(final int level) {
             super.setLevel(level);
             this.level = level;
-        }
-
-        @Override
-        public int deflate(byte[] b, int off, int len) {
-            int dlen = super.deflate(b, off, len);
-            written += dlen;
-            return dlen;
-        }
-
-        /**
-         * Returns the total number of uncompressed bytes input so far.
-         */
-        @Override
-        public long getBytesRead() {
-            return read;
-        }
-
-        /**
-         * Returns the total number of compressed bytes output so far.
-         */
-        @Override
-        public long getBytesWritten() {
-            return written;
-        }
-
-        @Override
-        public void reset() {
-            super.reset();
-            read = written = 0;
         }
     }
 }

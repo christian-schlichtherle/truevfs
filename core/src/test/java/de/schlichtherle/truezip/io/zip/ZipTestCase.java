@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -55,7 +55,7 @@ public abstract class ZipTestCase extends TestCase {
     protected byte[] data;
 
     /** The temporary file to use as a ZIP file. */
-    private File zip;
+    protected File zip;
     
     public ZipTestCase(String testName) {
         super(testName);
@@ -92,9 +92,16 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipOutputStream newZipOutputStream(
-            OutputStream out, String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipOutputStream(out, encoding);
+            OutputStream out, String charset)
+    throws IOException {
+        return new ZipOutputStream(out, charset);
+    }
+
+    protected ZipOutputStream newZipOutputStream(
+            OutputStream out,
+            ZipFile appendee)
+    throws IOException {
+        return new ZipOutputStream(out, ZIP.DEFAULT_CHARSET, appendee);
     }
 
     protected ZipFile newZipFile(String name)
@@ -103,9 +110,9 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            String name, String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipFile(name, encoding);
+            String name, String charset)
+    throws IOException {
+        return new ZipFile(name, charset);
     }
 
     protected ZipFile newZipFile(File file)
@@ -114,9 +121,9 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            File file, String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipFile(file, encoding);
+            File file, String charset)
+    throws IOException {
+        return new ZipFile(file, charset);
     }
 
     protected ZipFile newZipFile(ReadOnlyFile file)
@@ -125,9 +132,9 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     protected ZipFile newZipFile(
-            ReadOnlyFile file, String encoding)
-    throws IOException, UnsupportedEncodingException {
-        return new ZipFile(file, encoding);
+            ReadOnlyFile file, String charset)
+    throws IOException {
+        return new ZipFile(file, charset);
     }
 
     public void testConstructors() throws Exception {
@@ -140,14 +147,20 @@ public abstract class ZipTestCase extends TestCase {
         final ReadOnlyFile rof = new SimpleReadOnlyFile(zip);
 
         try {
-            newZipOutputStream(null, null);
+            newZipOutputStream(null, (String) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            newZipOutputStream(new ByteArrayOutputStream(), null);
+            newZipOutputStream(new ByteArrayOutputStream(), (String) null);
             fail("Use of null argument must throw a NullPointerException!");
+        } catch (NullPointerException npe) {
+        }
+
+        try {
+            newZipOutputStream(null, (ZipFile) null);
+            fail("Use of null arguments should throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
@@ -160,7 +173,7 @@ public abstract class ZipTestCase extends TestCase {
         try {
             newZipOutputStream(new ByteArrayOutputStream(), "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        } catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedCharsetException uce) {
         }
 
         try {
@@ -238,7 +251,7 @@ public abstract class ZipTestCase extends TestCase {
         /*try {
             newZipFile(zip, "unknown");
             fail("Use of unknown encoding should throw an UnsupportedEncodingException!");
-        } catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedCharsetException uce) {
         }*/
 
         try {

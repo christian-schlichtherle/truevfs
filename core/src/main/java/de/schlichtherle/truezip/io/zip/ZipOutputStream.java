@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.ZipException;
 
 /**
  * Drop-in replacement for
@@ -59,26 +60,28 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
-    public ZipOutputStream(
-            final OutputStream out)
-    throws NullPointerException {
+    public ZipOutputStream(final OutputStream out) {
         super(out);
     }
 
     /**
      * Creates a new ZIP output stream decorating the given output stream.
      *
-     * @throws NullPointerException If {@code out} or {@code charset} is
+     * @throws NullPointerException If {@code out} or {@code charset} are
      *         {@code null}.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
      */
+    public ZipOutputStream(final OutputStream out, final String charset) {
+        super(out, charset);
+    }
+
     public ZipOutputStream(
             final OutputStream out,
-            final String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException {
-        super(out, charset);
+            final String charset,
+            final RawZipFile<ZipEntry> appendee)
+    throws ZipException {
+        super(out, charset, appendee);
     }
 
     @Override
