@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
