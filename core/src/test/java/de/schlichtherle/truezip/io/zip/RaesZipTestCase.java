@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
@@ -25,7 +24,6 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,6 +65,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
         @Override
 		public void invalidOpenPasswd() {
+            throw new AssertionError();
         }
 
         @Override
@@ -84,7 +83,6 @@ public abstract class RaesZipTestCase extends ZipTestCase {
         }
     };
     
-    /** Creates a new instance of RandomMessageZipTest */
     public RaesZipTestCase(String testName) {
         super(testName);
     }
@@ -104,16 +102,28 @@ public abstract class RaesZipTestCase extends ZipTestCase {
 
     @Override
     protected ZipOutputStream newZipOutputStream(
-            final OutputStream out, final String encoding)
-    throws IOException, UnsupportedEncodingException {
+            final OutputStream out, final String charset)
+    throws IOException {
         final RaesOutputStream ros = RaesOutputStream.getInstance(
                 out, raesParameters);
         try {
-            return new ZipOutputStream(ros, encoding);
+            return new ZipOutputStream(ros, charset);
         } catch (RuntimeException exc) {
             ros.close();
             throw exc;
-        } catch (UnsupportedEncodingException exc) {
+        }
+    }
+
+    @Override
+    protected ZipOutputStream newZipOutputStream(
+            final OutputStream out,
+            final ZipFile appendee)
+    throws IOException {
+        final RaesOutputStream ros = RaesOutputStream.getInstance(
+                out, raesParameters);
+        try {
+            return new ZipOutputStream(ros, ZIP.UTF8, appendee);
+        } catch (RuntimeException exc) {
             ros.close();
             throw exc;
         }
@@ -141,7 +151,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(
             final String name, final String charset)
-    throws IOException, UnsupportedEncodingException {
+    throws IOException {
         if (charset == null)
             throw new NullPointerException();
         new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
@@ -182,7 +192,7 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(
             final File file, final String charset)
-    throws IOException, UnsupportedEncodingException {
+    throws IOException {
         if (charset == null)
             throw new NullPointerException();
         new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!

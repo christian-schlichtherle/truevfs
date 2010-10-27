@@ -19,6 +19,7 @@ package de.schlichtherle.truezip.io.zip;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
+import de.schlichtherle.truezip.util.Pool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,10 +61,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(name, DEFAULT_CHARSET, true, false)}
      */
     public ZipFile(String name)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(name, DEFAULT_CHARSET, true, false);
     }
 
@@ -72,11 +70,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(name, charset, true, false)}
      */
     public ZipFile(String name, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(name, charset, true, false);
     }
 
@@ -84,10 +78,10 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * Opens the ZIP file identified by the given path name for reading its
      * entries.
      *
-     * @param name The path name of the file.
-     * @param charset The charset to use for decoding entry names and ZIP file
+     * @param name the path name of the file.
+     * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
-     * @param preambled If this is {@code true}, then the ZIP file may have a
+     * @param preambled if this is {@code true}, then the ZIP file may have a
      *        preamble.
      *        Otherwise, the ZIP file must start with either a Local File
      *        Header (LFH) signature or an End Of Central Directory (EOCD)
@@ -97,7 +91,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
      *        the preamble.
-     * @param postambled If this is {@code true}, then the ZIP file may have a
+     * @param postambled if this is {@code true}, then the ZIP file may have a
      *        postamble of arbitrary length.
      *        Otherwise, the ZIP file must not have a postamble which exceeds
      *        64KB size, including the End Of Central Directory record
@@ -106,26 +100,22 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException If {@code name} or {@code charset} is
-     *         {@code null}.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not compatible with the ZIP File
-     *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @throws NullPointerException if any reference parameter is {@code null}.
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
+     * @throws FileNotFoundException if {@code name} cannot get opened for
+     *         reading.
+     * @throws ZipException if {@code name} is not compatible with the ZIP
+     *         File Format Specification.
+     * @throws IOException on any other I/O related issue.
      */
     public ZipFile(
             final String name,
             final String charset,
             final boolean preambled,
             final boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        super(  new SimpleReadOnlyFileSource(name),
+    throws IOException {
+        super(  new SimpleReadOnlyFilePool(name),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = name;
@@ -136,10 +126,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(file, DEFAULT_CHARSET, true, false)}
      */
     public ZipFile(File file)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(file, DEFAULT_CHARSET, true, false);
     }
 
@@ -148,21 +135,17 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(file, charset, true, false)}
      */
     public ZipFile(File file, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(file, charset, true, false);
     }
 
     /**
      * Opens the given {@link File} for reading its entries.
      *
-     * @param file The file.
-     * @param charset The charset to use for decoding entry names and ZIP file
+     * @param file the file.
+     * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
-     * @param preambled If this is {@code true}, then the ZIP file may have a
+     * @param preambled if this is {@code true}, then the ZIP file may have a
      *        preamble.
      *        Otherwise, the ZIP file must start with either a Local File
      *        Header (LFH) signature or an End Of Central Directory (EOCD)
@@ -172,7 +155,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
      *        the preamble.
-     * @param postambled If this is {@code true}, then the ZIP file may have a
+     * @param postambled if this is {@code true}, then the ZIP file may have a
      *        postamble of arbitrary length.
      *        Otherwise, the ZIP file must not have a postamble which exceeds
      *        64KB size, including the End Of Central Directory record
@@ -181,26 +164,22 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException If {@code file} or {@code charset} is
-     *         {@code null}.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not compatible with the ZIP File
-     *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @throws NullPointerException if any reference parameter is {@code null}.
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
+     * @throws FileNotFoundException if {@code file} cannot get opened for
+     *         reading.
+     * @throws ZipException if {@code file} is not compatible with the ZIP
+     *         File Format Specification.
+     * @throws IOException on any other I/O related issue.
      */
     public ZipFile(
             final File file,
             final String charset,
             final boolean preambled,
             final boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        super(  new SimpleReadOnlyFileSource(file),
+    throws IOException {
+        super(  new SimpleReadOnlyFilePool(file),
                 charset, DefaultZipEntryFactory.SINGLETON,
                 preambled, postambled);
         this.name = file.toString();
@@ -211,10 +190,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(rof, DEFAULT_CHARSET, true, false)}
      */
     public ZipFile(ReadOnlyFile rof)
-    throws  NullPointerException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(rof, DEFAULT_CHARSET, true, false);
     }
 
@@ -223,21 +199,17 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * ZipFile(rof, charset, true, false)}
      */
     public ZipFile(ReadOnlyFile rof, String charset)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         this(rof, charset, true, false);
     }
 
     /**
      * Opens the given {@link ReadOnlyFile} for reading its entries.
      *
-     * @param rof The random access read only file.
-     * @param charset The charset to use for decoding entry names and ZIP file
+     * @param rof the random access read only file.
+     * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
-     * @param preambled If this is {@code true}, then the ZIP file may have a
+     * @param preambled if this is {@code true}, then the ZIP file may have a
      *        preamble.
      *        Otherwise, the ZIP file must start with either a Local File
      *        Header (LFH) signature or an End Of Central Directory (EOCD)
@@ -247,7 +219,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
      *        the preamble.
-     * @param postambled If this is {@code true}, then the ZIP file may have a
+     * @param postambled if this is {@code true}, then the ZIP file may have a
      *        postamble of arbitrary length.
      *        Otherwise, the ZIP file must not have a postamble which exceeds
      *        64KB size, including the End Of Central Directory record
@@ -256,44 +228,40 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @throws NullPointerException If {@code rof} or {@code charset} is
-     *         {@code null}.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not compatible with the ZIP File
-     *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @throws NullPointerException if any reference parameter is {@code null}.
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
+     * @throws FileNotFoundException if {@code rof} cannot get opened for
+     *         reading.
+     * @throws ZipException if {@code rof} is not compatible with the ZIP
+     *         File Format Specification.
+     * @throws IOException on any other I/O related issue.
      */
     public ZipFile(
             ReadOnlyFile rof,
             String charset,
             boolean preambled,
             boolean postambled)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         super(  rof, charset, preambled, postambled,
                 DefaultZipEntryFactory.SINGLETON);
         this.name = rof.toString();
     }
 
-    private static class SimpleReadOnlyFileSource
-    implements ReadOnlyFileSource {
+    private static class SimpleReadOnlyFilePool
+    implements Pool<ReadOnlyFile, IOException> {
         final File file;
 
-        public SimpleReadOnlyFileSource(File file) {
+        public SimpleReadOnlyFilePool(File file) {
             this.file = file;
         }
 
-        public SimpleReadOnlyFileSource(String name) {
+        public SimpleReadOnlyFilePool(String name) {
             this.file = new File(name);
         }
 
         @Override
-		public ReadOnlyFile fetch() throws IOException {
+		public ReadOnlyFile allocate() throws IOException {
             return new SimpleReadOnlyFile(file);
         }
 

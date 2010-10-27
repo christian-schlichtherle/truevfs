@@ -17,6 +17,7 @@
 package de.schlichtherle.truezip.io.zip;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * Drop-in replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
@@ -150,9 +151,8 @@ public class ZipEntry implements Cloneable {
         return name;
     }
 
-    final int getNameLength(final String charset)
-    throws UnsupportedEncodingException {
-        return name != null ? name.getBytes(charset).length : 0;
+    final int getNameLength(final Charset charset) {
+        return null == name ? 0 : charset.encode(name).limit();
     }
 
     private void setName0(final String name) {
@@ -572,9 +572,8 @@ public class ZipEntry implements Cloneable {
         return comment;
     }
 
-    final int getCommentLength(String charset)
-    throws UnsupportedEncodingException {
-        return comment != null ? comment.getBytes(charset).length : 0;
+    final int getCommentLength(final Charset charset) {
+        return null == comment ? 0 : charset.encode(comment).limit();
     }
 
     public void setComment(final String comment) {

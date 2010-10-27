@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.zip;
 
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.ByteBuffer;
+import de.schlichtherle.truezip.util.Pool;
+import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.FilterInputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
@@ -24,7 +28,6 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
@@ -80,20 +83,17 @@ implements Iterable<E>, Closeable {
      */
     public static final String DEFAULT_CHARSET = ZIP.DEFAULT_CHARSET;
 
+    /** Maps entry names to zip entries. */
+    private final Map<String, E> entries = new LinkedHashMap<String, E>();
+
     /** The charset to use for entry names and comments. */
-    private String charset;
+    private Charset charset;
 
     /** The comment of this ZIP compatible file. */
     private String comment;
 
-    /** Maps entry names to zip entries. */
-    private final Map<String, E> entries = new LinkedHashMap<String, E>();
-
-    /** The actual data source. */
-    private ReadOnlyFile archive;
-
-    /** The number of fetch streams reading from this ZIP compatible file. */
-    private int openStreams;
+    /** The total number of bytes in this ZIP file. */
+    private long length = -1;
 
     /** The number of bytes in the preamble of this ZIP compatible file. */
     private long preamble;
@@ -106,15 +106,21 @@ implements Iterable<E>, Closeable {
 
     private final ZipEntryFactory<E> factory;
 
+    /** The nullable data source. */
+    private ReadOnlyFile archive;
+
+    /** The number of fetch streams reading from this ZIP file. */
+    private int openStreams;
+
     /**
      * Reads the given {@code archive} in order to provide random access
      * to its ZIP entries.
      *
-     * @param archive The {@link ReadOnlyFile} instance to be read in order to
+     * @param archive the {@link ReadOnlyFile} instance to be read in order to
      *        provide random access to its ZIP entries.
-     * @param charset The charset to use for decoding entry names and ZIP file
+     * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
-     * @param preambled If this is {@code true}, then the ZIP file may have a
+     * @param preambled if this is {@code true}, then the ZIP file may have a
      *        preamble.
      *        Otherwise, the ZIP file must start with either a Local File
      *        Header (LFH) signature or an End Of Central Directory (EOCD)
@@ -124,7 +130,7 @@ implements Iterable<E>, Closeable {
      *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
      *        the preamble.
-     * @param postambled If this is {@code true}, then the ZIP file may have a
+     * @param postambled if this is {@code true}, then the ZIP file may have a
      *        postamble of arbitrary length.
      *        Otherwise, the ZIP file must not have a postamble which exceeds
      *        64KB size, including the End Of Central Directory record
@@ -133,14 +139,15 @@ implements Iterable<E>, Closeable {
      *        not compatible to the ZIP File Format Specification.
      *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
-     * @param factory A factory for {@link ZipEntry}s.
-     * @throws NullPointerException If any reference parameter is {@code null}.
-     * @throws UnsupportedEncodingException If charset is not supported by
-     *         this JVM.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws ZipException If the file is not compatible with the ZIP File
-     *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @param factory a factory for {@link ZipEntry}s.
+     * @throws NullPointerException if any reference parameter is {@code null}.
+     * @throws UnsupportedCharsetException If {@code charset} is not supported
+     *         by this JVM.
+     * @throws FileNotFoundException if {@code archive} cannot get opened for
+     *         reading.
+     * @throws ZipException if {@code archive} is not compatible with the ZIP
+     *         File Format Specification.
+     * @throws IOException on any other I/O related issue.
      */
     protected RawZipFile(
             final ReadOnlyFile archive,
@@ -148,17 +155,13 @@ implements Iterable<E>, Closeable {
             boolean preambled,
             boolean postambled,
             final ZipEntryFactory<E> factory)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
-        this(   new SingletonReadOnlyFileSource(archive),
+    throws IOException {
+        this(   new SingletonReadOnlyFilePool(archive),
                 charset, factory, preambled, postambled);
     }
 
     RawZipFile(
-            final ReadOnlyFileSource source,
+            final Pool<ReadOnlyFile, IOException> source,
             final String charset,
             final ZipEntryFactory<E> zipEntryFactory,
             boolean preambled,
@@ -166,24 +169,22 @@ implements Iterable<E>, Closeable {
     throws IOException {
         if (charset == null || zipEntryFactory == null)
             throw new NullPointerException();
-        //new String(new byte[0], charset); // may throw UnsupportedEncodingException!
-
-        final ReadOnlyFile rof = source.fetch();
+        final ReadOnlyFile rof = source.allocate();
         try {
             this.archive = rof;
-            this.charset = charset;
+            this.charset = Charset.forName(charset);
             this.factory = zipEntryFactory;
 
-            final BufferedReadOnlyFile bzip;
+            final BufferedReadOnlyFile brof;
             if (rof instanceof BufferedReadOnlyFile)
-                bzip = (BufferedReadOnlyFile) rof;
+                brof = (BufferedReadOnlyFile) rof;
             else
-                bzip = new BufferedReadOnlyFile(rof);
-            mountCentralDirectory(bzip, preambled, postambled);
+                brof = new BufferedReadOnlyFile(rof);
+            mountCentralDirectory(brof, preambled, postambled);
             // Do NOT close brof - would close rof as well!
-        } catch (IOException ioe) {
+        } catch (IOException ex) {
             source.release(rof);
-            throw ioe;
+            throw ex;
         }
 
         assert rof != null;
@@ -191,21 +192,16 @@ implements Iterable<E>, Closeable {
         assert mapper != null;
     }
 
-    interface ReadOnlyFileSource {
-        ReadOnlyFile fetch() throws IOException;
-        void release(ReadOnlyFile rof) throws IOException;
-    }
-
-    private static class SingletonReadOnlyFileSource
-    implements ReadOnlyFileSource {
+    private static class SingletonReadOnlyFilePool
+    implements Pool<ReadOnlyFile, IOException> {
         final ReadOnlyFile rof;
 
-        public SingletonReadOnlyFileSource(ReadOnlyFile rof) {
+        public SingletonReadOnlyFilePool(ReadOnlyFile rof) {
             this.rof = rof;
         }
 
         @Override
-		public ReadOnlyFile fetch() {
+		public ReadOnlyFile allocate() {
             return rof;
         }
 
@@ -230,7 +226,7 @@ implements Iterable<E>, Closeable {
             final ReadOnlyFile rof,
             final boolean preambled,
             final boolean postambled)
-    throws ZipException, IOException {
+    throws IOException {
         int numEntries = findCentralDirectory(rof, preambled, postambled);
         assert mapper != null;
 
@@ -251,8 +247,9 @@ implements Iterable<E>, Closeable {
 
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
-            final String charset = utf8 ? ZIP.UTF8 : this.charset;
-            final E entry = factory.newEntry(new String(name, charset));
+            if (utf8)
+                charset = Charset.forName(ZIP.UTF8);
+            final E entry = factory.newEntry(decode(name));
             try {
                 int off = 0;
 
@@ -315,7 +312,7 @@ implements Iterable<E>, Closeable {
                 if (commentLen > 0) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    entry.setComment(new String(comment, charset));
+                    entry.setComment(decode(comment));
                 }
 
                 // Re-read virtual offset after ZIP64 Extended Information
@@ -358,6 +355,10 @@ implements Iterable<E>, Closeable {
             preamble = 0;
     }
 
+    private String decode(byte[] bytes) {
+        return charset.decode(ByteBuffer.wrap(bytes)).toString();
+    }
+
     /**
      * Positions the file pointer at the first Central File Header.
      * Performs some means to check that this is really a ZIP compatible
@@ -386,7 +387,7 @@ implements Iterable<E>, Closeable {
                       || signature == ZIP.EOCD_SIG;
         }
         if (preambled) {
-            final long length = rof.length();
+            length = rof.length();
             final long max = length - ZIP.EOCD_MIN_LEN;
             final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
@@ -437,7 +438,7 @@ implements Iterable<E>, Closeable {
                 if (commentLen > 0) {
                     final byte[] comment = new byte[commentLen];
                     rof.readFully(comment);
-                    setComment(new String(comment, charset));
+                    setComment(decode(comment));
                 }
                 postamble = length - rof.getFilePointer();
 
@@ -568,7 +569,7 @@ implements Iterable<E>, Closeable {
 
     /** Returns the charset to use for entry names and the file comment. */
     public String getCharset() {
-        return charset;
+        return charset.name();
     }
 
     /**
@@ -604,9 +605,8 @@ implements Iterable<E>, Closeable {
     /**
      * Returns the file length of this ZIP compatible file in bytes.
      */
-    public long length() throws IOException {
-        assertOpen();
-        return archive.length();
+    public long length() {
+        return length;
     }
 
     /**
@@ -667,7 +667,11 @@ implements Iterable<E>, Closeable {
      */
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
-        return new IntervalInputStream(archive.length() - postamble, postamble);
+        return new IntervalInputStream(length - postamble, postamble);
+    }
+
+    OffsetMapper getOffsetMapper() {
+        return mapper;
     }
 
     /**
@@ -849,8 +853,8 @@ implements Iterable<E>, Closeable {
     }
 
     /** Asserts that this archive is still open. */
-    private void assertOpen() throws ZipException {
-        if (archive == null)
+    final void assertOpen() throws ZipException {
+        if (null == archive)
             throw new ZipException("ZIP file has been closed!");
     }
 
@@ -1205,7 +1209,7 @@ implements Iterable<E>, Closeable {
         }
     } // class AccountedInputStream
 
-    private static class OffsetMapper {
+    static class OffsetMapper {
         long location(long offset) {
             return offset;
         }
