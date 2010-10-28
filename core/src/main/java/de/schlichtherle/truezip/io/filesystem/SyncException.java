@@ -24,7 +24,7 @@ import java.io.IOException;
  * virtual file system with its parent file system.
  * Unless this is an instance of the sub class {@link SyncWarningException},
  * an exception of this class implies that some or all of the data in the
- * file system has been lost!
+ * file system has been lost.
  *
  * @author Christian Schlichtherle
  * @version $Id$

@@ -22,12 +22,16 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 
 /**
+ * Provides the methods to describe a composite file system and synchronize its
+ * (virtual) file system with its parent file system.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface CompositeFileSystemController<CE extends CommonEntry>
-extends                   FileSystemController<CE                    > {
+extends          FileSystemController         <CE                    > {
 
+    /** Returns the non-{@code null} composite file system model. */
     @Override
     CompositeFileSystemModel getModel();
 
@@ -35,13 +39,17 @@ extends                   FileSystemController<CE                    > {
      * Writes all changes to the contents of this composite file system to its
      * parent file system.
      *
+     * @param  <E> the type of the assembled {@code IOException} to throw.
+     * @param  builder the non-{@code null} exception builder to use for the
+     *         assembly of an {@code IOException} from the given
+     *         {@code SyncException}s.
      * @param  options the non-{@code null} synchronization options.
      * @throws NullPointerException if {@code builder} or {@code options} is
      *         {@code null}.
-     * @throws SyncException if any exceptional condition occurs
-     *         throughout the synchronization of this composite file system.
+     * @throws IOException if any exceptional condition occurs throughout the
+     *         synchronization of this composite file system.
      * @see    CompositeFileSystemModel#isTouched
-     * @see    Controllers#sync(URI, ExceptionBuilder, BitField)
+     * @see    Controllers#sync
      */
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,

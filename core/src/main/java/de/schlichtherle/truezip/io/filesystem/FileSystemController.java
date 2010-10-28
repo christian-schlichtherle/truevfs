@@ -31,21 +31,23 @@ import javax.swing.Icon;
  * addressed by the {@link FileSystemModel#getMountPoint() mount point} of
  * its associated {@link #getModel() file system model}.
  * <p>
- * Each instance of this class maintains a file system and provides input and
- * output sockets for its entries.
+ * Each instance of this class maintains a (virtual) file system and provides
+ * input and output sockets for its entries.
  * <p>
- * Note that in general all of its methods are reentrant on exceptions - so
+ * Note that the methods of this interface are reentrant on exceptions - so
  * client applications may repeatedly call them.
  * <p>
- * Where the methods of this class accept a path name string as a parameter,
- * this must be a relative, hierarchical URI which is resolved against the
- * mount point of the file system.
+ * Where the methods of this interface accept a path name string as a
+ * parameter, this must be a relative, hierarchical URI which is resolved
+ * against the {@link FileSystemModel#getMountPoint() mount point} of the
+ * (virtual) file system.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface FileSystemController<CE extends CommonEntry> {
 
+    /** Returns the non-{@code null} file system model. */
     FileSystemModel getModel();
 
     Icon getOpenIcon();
