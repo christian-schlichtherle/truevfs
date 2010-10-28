@@ -62,38 +62,38 @@ extends               AbstractArchiveController<AE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E, ArchiveControllerException {
+    throws E, ArchiveException {
         getController().sync(builder, options);
     }
 
     @Override
-    public Icon getOpenIcon() throws ArchiveControllerException {
+    public Icon getOpenIcon() throws ArchiveException {
         return getController().getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon() throws ArchiveControllerException {
+    public Icon getClosedIcon() throws ArchiveException {
         return getController().getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly() throws ArchiveControllerException {
+    public boolean isReadOnly() throws ArchiveException {
         return getController().isReadOnly();
     }
 
     @Override
     public Entry<? extends AE> getEntry(String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         return getController().getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws ArchiveControllerException {
+    public boolean isReadable(String path) throws ArchiveException {
         return getController().isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws ArchiveControllerException {
+    public boolean isWritable(String path) throws ArchiveException {
         return getController().isWritable(path);
     }
 

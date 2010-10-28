@@ -16,21 +16,26 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 /**
- * Defines the common properties of any file system which holds writable
- * contents and need to get synchronized to its underlying file system once
- * they have been modified.
+ * Defines the common properties of any composite file system.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface SyncableFileSystemModel extends FileSystemModel {
+public interface CompositeFileSystemModel extends FileSystemModel {
 
     /**
-     * Returns {@code true} if and only if the contents of this file system
-     * have been modified so that it needs synchronization with its enclosing
-     * file system.
+     * Returns the model for the parent file system of this composite file
+     * system or {@code null} if this composite file system is not a member of
+     * another file system.
+     */
+    FileSystemModel getParentModel();
+
+    /**
+     * Returns {@code true} if and only if the contents of this composite file
+     * system have been modified so that it needs synchronization with its
+     * parent file system.
      *
-     * @see SyncableFileSystemController#sync
+     * @see CompositeFileSystemController#sync
      */
     boolean isTouched();
 }

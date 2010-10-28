@@ -60,7 +60,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, ArchiveControllerException {
+    throws E, ArchiveException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -72,7 +72,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {
@@ -93,7 +93,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {
@@ -114,7 +114,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadOnly()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {
@@ -135,7 +135,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Entry<? extends AE> getEntry(String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {
@@ -156,7 +156,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadable(String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {
@@ -177,7 +177,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isWritable(String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             readLock().lock();
             try {

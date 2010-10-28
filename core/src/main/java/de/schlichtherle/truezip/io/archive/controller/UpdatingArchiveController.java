@@ -158,12 +158,12 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private final FileSystemController<?> enclController;
-    private final String enclPath;
+    private final FileSystemController<?> parentController;
+    private final String parentPath;
     private final ArchiveDriver<AE> driver;
 
     /**
-     * An {@link Input} object used to mount the virtual file system
+     * An {@link Input} object used to mount the (virtual) archive file system
      * and read the entries from the archive file.
      */
     private Input input;
@@ -179,12 +179,12 @@ extends     FileSystemArchiveController<AE> {
 
     public UpdatingArchiveController(  final ArchiveModel model,
                                 final ArchiveDriver<AE> driver,
-                                final FileSystemController<?> enclController) {
+                                final FileSystemController<?> parentController) {
         super(model);
         assert null != driver;
         this.driver = driver;
-        this.enclController = enclController;
-        this.enclPath = enclController
+        this.parentController = parentController;
+        this.parentPath = parentController
                 .getModel()
                 .getMountPoint()
                 .relativize(model.getMountPoint())
@@ -203,27 +203,27 @@ extends     FileSystemArchiveController<AE> {
         return driver;
     }
 
-    /** Returns the file system controller for the enclosing file system. */
-    private FileSystemController<?> getEnclController() {
-        return enclController;
+    /** Returns the file system controller for the parent file system. */
+    private FileSystemController<?> getParentController() {
+        return parentController;
     }
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this controller's archive file within its enclosing file system.
+     * this controller's target archive file within its parent file system.
      */
-    private String getEnclPath(String path) {
+    private String getParentPath(String path) {
         return isRoot(path)
-                ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
-                : enclPath + path;
+                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
+                : parentPath + path;
     }
 
     @Override
     public Icon getOpenIcon()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             autoMount(); // detect false positives!
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -233,10 +233,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             autoMount(); // detect false positives!
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -246,16 +246,16 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public final Entry<AE> getEntry(final String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             return autoMount().getEntry(path);
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!isRoot(path))
                 return null;
-            final FileSystemEntry<?> entry = getEnclController()
-                    .getEntry(getEnclPath(path));
+            final FileSystemEntry<?> entry = getParentController()
+                    .getEntry(getParentPath(path));
             if (null == entry)
                 return null;
             try {
@@ -294,35 +294,35 @@ extends     FileSystemArchiveController<AE> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final FileSystemController<?> enclController = getEnclController();
-            final String enclPath = getEnclPath(ROOT);
-            // readOnly must be set first because the enclosing controller
+            final FileSystemController<?> parentController = getParentController();
+            final String parentPath = getParentPath(ROOT);
+            // readOnly must be set first because the parent archive controller
             // could be a HostFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
             // reading!
-            final boolean readOnly = !enclController.isWritable(enclPath);
-            final InputSocket<?> socket = enclController.getInputSocket(
-                    enclPath, BitField.of(InputOption.CACHE));
+            final boolean readOnly = !parentController.isWritable(parentPath);
+            final InputSocket<?> socket = parentController.getInputSocket(
+                    parentPath, BitField.of(InputOption.CACHE));
             input = new Input(getDriver().newInputShop(getModel(), socket));
             setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
                     input.getDriverProduct(), getDriver(),
                     socket.getLocalTarget(), vetoableTouchListener,
                     readOnly));
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (TabuFileException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!autoCreate)
                 throw new FalsePositiveException(getModel(), ex);
-            // The entry does NOT exist in the enclosing archive
+            // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             // This may fail if e.g. the target file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
             try {
                 makeOutput(options);
-            } catch (ArchiveControllerException ex2) {
+            } catch (ArchiveException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
                 throw ex2;
@@ -338,10 +338,10 @@ extends     FileSystemArchiveController<AE> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemController<?> enclController = getEnclController();
-        final String enclPath = getEnclPath(ROOT);
-        final OutputSocket<?> socket = enclController.getOutputSocket(
-                enclPath, options.set(OutputOption.CACHE), null);
+        final FileSystemController<?> parentController = getParentController();
+        final String parentPath = getParentPath(ROOT);
+        final OutputSocket<?> socket = parentController.getOutputSocket(
+                parentPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));
     }
@@ -361,7 +361,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException, ArchiveControllerException {
+    throws SyncException, ArchiveException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -377,7 +377,7 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException, ArchiveControllerException {
+    private boolean sync() throws SyncException, ArchiveException {
         sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -387,7 +387,7 @@ extends     FileSystemArchiveController<AE> {
 	public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, ArchiveControllerException {
+    throws E, ArchiveException {
         assert !isTouched() || null != output; // file system touched => output archive
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
@@ -474,14 +474,12 @@ extends     FileSystemArchiveController<AE> {
     }
 
     /**
-     * Updates all entries in the virtual file system to the (temporary) output
-     * archive file.
-     * <p>
-     * <b>This method is intended to be called by {@code update()} only!</b>
+     * Synchronizes all entries in the (virtual) archive file system with the
+     * (temporary) output archive file.
      *
-     * @param handler An exception handler - {@code null} is not permitted.
-     * @throws SyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
+     * @param  handler An exception handler - {@code null} is not permitted.
+     * @throws IOException If any exceptional condition occurs throughout the
+     *         processing of the target archive file.
      */
     private <E extends IOException>
     void performSync(final ExceptionHandler<? super SyncException, E> handler)
@@ -555,7 +553,7 @@ extends     FileSystemArchiveController<AE> {
             try {
                 if (DIRECTORY == fse.getType()) {
                     if (isRoot(fse.getName()))
-                        continue; // never write the virtual root directory
+                        continue; // never write the (virtual) root directory
                     if (UNKNOWN == fse.getTime(Access.WRITE))
                         continue; // never write ghost directories
                     output.getOutputSocket(ae).newOutputStream().close();
@@ -627,6 +625,6 @@ extends     FileSystemArchiveController<AE> {
     public void unlink(String path) throws IOException {
         super.unlink(path);
         if (isRoot(path))
-            getEnclController().unlink(getEnclPath(path));
+            getParentController().unlink(getParentPath(path));
     }
 }

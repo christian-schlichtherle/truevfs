@@ -25,22 +25,22 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface SyncableFileSystemController<CE extends CommonEntry>
-extends FileSystemController<CE> {
+public interface CompositeFileSystemController<CE extends CommonEntry>
+extends                   FileSystemController<CE                    > {
 
     @Override
-    SyncableFileSystemModel getModel();
+    CompositeFileSystemModel getModel();
 
     /**
-     * Writes all changes to the contents of the file system to its underlying
-     * file system.
+     * Writes all changes to the contents of this composite file system to its
+     * parent file system.
      *
      * @param  options the non-{@code null} synchronization options.
      * @throws NullPointerException if {@code builder} or {@code options} is
      *         {@code null}.
      * @throws SyncException if any exceptional condition occurs
-     *         throughout the synchronization of the file system.
-     * @see    SyncableFileSystemModel#isTouched
+     *         throughout the synchronization of this composite file system.
+     * @see    CompositeFileSystemModel#isTouched
      * @see    Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     <E extends IOException>

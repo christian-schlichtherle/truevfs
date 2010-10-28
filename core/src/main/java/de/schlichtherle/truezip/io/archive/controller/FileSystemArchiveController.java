@@ -63,7 +63,7 @@ extends        BasicArchiveController     <AE> {
     }
 
     /**
-     * Mounts the virtual file system from the target file.
+     * Mounts the (virtual) archive file system from the target file.
      * This method is called while the write lock to mount the file system
      * for this controller is acquired.
      * <p>
@@ -75,7 +75,7 @@ extends        BasicArchiveController     <AE> {
      * It may, however, have side effects on the state of the sub class.
      *
      * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
+     *        {@code true}, a new file system with only a (virtual) root
      *        directory is created with its last modification time set to the
      *        system's current time.
      */

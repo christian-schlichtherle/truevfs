@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
@@ -34,7 +34,7 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -48,34 +48,34 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * A prospective archive controller is a facade which adapts a chain of
- * archive controller decorators and utilizes a file system controller for
- * its enclosing archive file in order to implement a chain of responsibility
- * for resolving {@link FalsePositiveException}s.
+ * A prospective archive controller is a composite file system facade which
+ * adapts a chain of archive controller decorators and utilizes a (composite)
+ * file system controller for its parent archive file in order to implement a
+ * chain of responsibility for resolving {@link FalsePositiveException}s.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 final class ProspectiveArchiveController<AE extends ArchiveEntry>
-extends     AbstractFileSystemController<CommonEntry>
-implements  SyncableFileSystemController<CommonEntry> {
+extends     AbstractFileSystemController<CommonEntry            >
+implements  CompositeFileSystemController<CommonEntry           > {
 
     private final ArchiveController<AE> controller;
-    private final FileSystemController<?> enclController;
-    private final String enclPath;
+    private final FileSystemController<?> parentController;
+    private final String parentPath;
 
     ProspectiveArchiveController(   final URI mountPoint,
                                     final ArchiveDriver<AE> driver,
-                                    final FileSystemController<?> enclController) {
+                                    final FileSystemController<?> parentController) {
         assert null != mountPoint;
         assert null != driver;
-        assert null != enclController;
+        assert null != parentController;
         final SyncScheduler syncScheduler = new SyncScheduler();
         final ArchiveModel model = new ArchiveModel(
-                enclController.getModel(), mountPoint, syncScheduler);
-        this.controller = driver.newController(model, enclController);
-        this.enclController = enclController;
-        this.enclPath = enclController
+                parentController.getModel(), mountPoint, syncScheduler);
+        this.controller = driver.newController(model, parentController);
+        this.parentController = parentController;
+        this.parentPath = parentController
                 .getModel()
                 .getMountPoint()
                 .relativize(mountPoint)
@@ -89,19 +89,19 @@ implements  SyncableFileSystemController<CommonEntry> {
         }
     }
 
-    /** Returns the file system controller for the enclosing file system. */
-    private FileSystemController<?> getEnclController() {
-        return enclController;
+    /** Returns the file system controller for the parent file system. */
+    private FileSystemController<?> getParentController() {
+        return parentController;
     }
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this controller's archive file within its enclosing file system.
+     * this controller's target archive file within its parent file system.
      */
-    private String getEnclPath(String path) {
+    private String getParentPath(String path) {
         return isRoot(path)
-                ? cutTrailingSeparators(enclPath, SEPARATOR_CHAR)
-                : enclPath + path;
+                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
+                : parentPath + path;
     }
 
     private ArchiveController<AE> getController() {
@@ -109,7 +109,7 @@ implements  SyncableFileSystemController<CommonEntry> {
     }
 
     @Override
-    public SyncableFileSystemModel getModel() {
+    public CompositeFileSystemModel getModel() {
         return getController().getModel();
     }
 
@@ -124,7 +124,7 @@ implements  SyncableFileSystemController<CommonEntry> {
     throws E {
         try {
             getController().sync(builder, options);
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -134,8 +134,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().getOpenIcon();
         } catch (FalsePositiveException ex) {
-            return getEnclController().getOpenIcon();
-        } catch (ArchiveControllerException ex) {
+            return getParentController().getOpenIcon();
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -145,8 +145,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().getClosedIcon();
         } catch (FalsePositiveException ex) {
-            return getEnclController().getClosedIcon();
-        } catch (ArchiveControllerException ex) {
+            return getParentController().getClosedIcon();
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -156,8 +156,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().isReadOnly();
         } catch (FalsePositiveException ex) {
-            return getEnclController().isReadOnly();
-        } catch (ArchiveControllerException ex) {
+            return getParentController().isReadOnly();
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -167,8 +167,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().getEntry(path);
         } catch (FalsePositiveException ex) {
-            return getEnclController().getEntry(getEnclPath(path));
-        } catch (ArchiveControllerException ex) {
+            return getParentController().getEntry(getParentPath(path));
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -178,8 +178,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().isReadable(path);
         } catch (FalsePositiveException ex) {
-            return getEnclController().isReadable(getEnclPath(path));
-        } catch (ArchiveControllerException ex) {
+            return getParentController().isReadable(getParentPath(path));
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -189,8 +189,8 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().isWritable(path);
         } catch (FalsePositiveException ex) {
-            return getEnclController().isWritable(getEnclPath(path));
-        } catch (ArchiveControllerException ex) {
+            return getParentController().isWritable(getParentPath(path));
+        } catch (ArchiveException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -201,7 +201,7 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             getController().setReadOnly(path);
         } catch (FalsePositiveException ex) {
-            getEnclController().setReadOnly(getEnclPath(path));
+            getParentController().setReadOnly(getParentPath(path));
         }
     }
 
@@ -211,7 +211,7 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().setTime(path, types, value);
         } catch (FalsePositiveException ex) {
-            return getEnclController().setTime(getEnclPath(path), types, value);
+            return getParentController().setTime(getParentPath(path), types, value);
         }
     }
 
@@ -237,8 +237,8 @@ implements  SyncableFileSystemController<CommonEntry> {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
-                return getEnclController()
-                        .getInputSocket(getEnclPath(path), options)
+                return getParentController()
+                        .getInputSocket(getParentPath(path), options)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -249,8 +249,8 @@ implements  SyncableFileSystemController<CommonEntry> {
             try {
                 return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
-                return getEnclController()
-                        .getInputSocket(getEnclPath(path), options)
+                return getParentController()
+                        .getInputSocket(getParentPath(path), options)
                         .bind(this)
                         .newInputStream();
             }
@@ -261,8 +261,8 @@ implements  SyncableFileSystemController<CommonEntry> {
             try {
                 return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
-                return getEnclController()
-                        .getInputSocket(getEnclPath(path), options)
+                return getParentController()
+                        .getInputSocket(getParentPath(path), options)
                         .bind(this)
                         .newReadOnlyFile();
             }
@@ -296,8 +296,8 @@ implements  SyncableFileSystemController<CommonEntry> {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
-                return getEnclController()
-                        .getOutputSocket(getEnclPath(path), options, template)
+                return getParentController()
+                        .getOutputSocket(getParentPath(path), options, template)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -308,8 +308,8 @@ implements  SyncableFileSystemController<CommonEntry> {
             try {
                 return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
-                return getEnclController()
-                        .getOutputSocket(getEnclPath(path), options, template)
+                return getParentController()
+                        .getOutputSocket(getParentPath(path), options, template)
                         .bind(this)
                         .newOutputStream();
             }
@@ -325,7 +325,7 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             return getController().mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getEnclController().mknod(getEnclPath(path), type, options, template);
+            return getParentController().mknod(getParentPath(path), type, options, template);
         }
     }
 
@@ -336,7 +336,7 @@ implements  SyncableFileSystemController<CommonEntry> {
         try {
             getController().unlink(path);
         } catch (FalsePositiveException ex) {
-            getEnclController().unlink(getEnclPath(path));
+            getParentController().unlink(getParentPath(path));
         }
     }
 }

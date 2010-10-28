@@ -30,7 +30,7 @@ import javax.swing.Timer;
  * when prompting for a key
  * and the last input was invalid.
  * <p>
- * Note that the root pane is normally the root pane of an enclosing
+ * Note that the root pane is normally the root pane of a parent
  * JOptionPane which has the OK button set as its default button.
  * This is to inhibit the use of a GUI robot for exhaustive password searching.
  * <p>

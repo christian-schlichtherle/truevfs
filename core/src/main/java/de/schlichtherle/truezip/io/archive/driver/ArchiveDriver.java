@@ -62,31 +62,31 @@ extends CommonEntryFactory<AE> {
 
     /**
      * Creates a new archive controller for the given archive model and
-     * enclosing file system controller.
+     * parent file system controller.
      * <p>
      * This method is primarily provided to serve two purposes:
      * <ol>
      * <li>An archive driver could decorate the default chain of archive
      *     controllers in order to implement additional aspects such as
      *     managing authentication keys for encrypted archive files or logging.
-     * <li>An archive driver could use the provided enclosing file system
+     * <li>An archive driver could use the provided parent file system
      *     controller to request a common entry for the archive model's
-     *     mountpoint and use its properties in order to resolve the best
+     *     mountpoint and use its properties in order to resolve an appropriate
      *     update strategy.
      *     E.g. an archive driver for ZIP files could return an archive
-     *     controller which uses an append-strategy rather than the default
+     *     controller which uses an append-strategy rather than the usual
      *     full-update-strategy if the target archive file exceeds a
      *     predefined size threshold such as 128 MB for example.
      * </ol>
      *
      * @param  model the non-{@code null} archive model.
-     * @param  enclController the non-{@code null} enclosing file system
+     * @param  parentController the non-{@code null} parent file system
      *         controller.
      * @return A new archive controller for the given archive model and
-     *         enclosing file system controller.
+     *         parent file system controller.
      */
     ArchiveController<AE> newController(ArchiveModel model,
-                                        FileSystemController<?> enclController);
+                                        FileSystemController<?> parentController);
 
     /**
      * Creates a new common input shop for reading the archive entries of the
@@ -115,7 +115,7 @@ extends CommonEntryFactory<AE> {
      *         <i>false positive</i> archive file.
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
-     *         synchronized with its enclosing file system.
+     *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new common input shop.
      */
     InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
@@ -156,7 +156,7 @@ extends CommonEntryFactory<AE> {
      *         <i>false positive</i> archive file.
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
-     *         synchronized with its enclosing file system.
+     *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
     OutputShop<AE> newOutputShop(   FileSystemModel archive,

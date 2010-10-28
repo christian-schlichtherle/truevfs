@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -29,15 +29,15 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveModel implements SyncableFileSystemModel {
-    private final FileSystemModel enclModel;
+public final class ArchiveModel implements CompositeFileSystemModel {
+    private final FileSystemModel parentModel;
     private final URI mountPoint;
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
     private final TouchListener touchListener;
     private boolean touched;
 
-    ArchiveModel(   final FileSystemModel enclModel,
+    ArchiveModel(   final FileSystemModel parentModel,
                     final URI mountPoint,
                     final TouchListener touchListener) {
         assert "file".equals(mountPoint.getScheme());
@@ -45,7 +45,7 @@ public final class ArchiveModel implements SyncableFileSystemModel {
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
 
-        this.enclModel = enclModel;
+        this.parentModel = parentModel;
         this.mountPoint = mountPoint;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
@@ -54,8 +54,8 @@ public final class ArchiveModel implements SyncableFileSystemModel {
     }
 
     @Override
-    public FileSystemModel getEnclModel() {
-        return enclModel;
+    public FileSystemModel getParentModel() {
+        return parentModel;
     }
 
     @Override

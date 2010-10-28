@@ -64,14 +64,14 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * client application and deals with the rather complex details of its
  * states and transitions.
  * <p>
- * Each instance of this class maintains a virtual file system, provides input
- * and output streams for the entries of the archive file and methods
- * to update the contents of the virtual file system to the target file
- * in the real file system.
+ * Each instance of this class maintains a (virtual) archive file system,
+ * provides input and output streams for the entries of the archive file and
+ * methods to synchronize the contents of the archive file system to the target
+ * archive file in the parent file system.
  * In cooperation with the calling methods, it also knows how to deal with
  * nested archive files (such as {@code "outer.zip/inner.tar.gz"}
  * and <i>false positives</i>, i.e. plain files or directories or file or
- * directory entries in an enclosing archive file which have been incorrectly
+ * directory entries in a parent archive file which have been incorrectly
  * recognized to be <i>prospective archive files</i>.
  * <p>
  * To ensure that for each archive file there is at most one
@@ -122,8 +122,9 @@ extends        AbstractArchiveController<AE> {
     }
 
     /**
-     * Returns the virtual archive file system mounted from the target file.
-     * This method is reentrant with respect to any exceptions it may throw.
+     * Returns the (virtual) archive file system mounted from the target
+     * archive file. This method is reentrant with respect to any exceptions
+     * it may throw.
      * <p>
      * <b>Warning:</b> Either the read or the write lock of this controller
      * must be acquired while this method is called!
@@ -132,7 +133,7 @@ extends        AbstractArchiveController<AE> {
      * checked again upon return to protect against concurrent modifications!
      *
      * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
+     *        {@code true}, a new file system with only a (virtual) root
      *        directory is created with its last modification time set to the
      *        system's current time.
      * @return A valid archive file system - {@code null} is never returned.
@@ -144,10 +145,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isReadOnly()
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             return autoMount().isReadOnly();
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -156,10 +157,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isReadable(final String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             return autoMount().getEntry(path) != null;
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -168,10 +169,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isWritable(final String path)
-    throws ArchiveControllerException {
+    throws ArchiveException {
         try {
             return autoMount().isWritable(path);
-        } catch (ArchiveControllerException ex) {
+        } catch (ArchiveException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -357,7 +358,7 @@ extends        AbstractArchiveController<AE> {
                 fileSystem = autoMount();
             } catch (FalsePositiveException ex) {
                 try {
-                    // The enclosing archive controller will unlink our target
+                    // The parent archive controller will unlink our target
                     // archive file next, so we need to reset anyway.
                     sync(   new DefaultSyncExceptionBuilder(),
                             BitField.of(ABORT_CHANGES));
@@ -393,5 +394,5 @@ extends        AbstractArchiveController<AE> {
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws SyncException, ArchiveControllerException;
+    throws SyncException, ArchiveException;
 }

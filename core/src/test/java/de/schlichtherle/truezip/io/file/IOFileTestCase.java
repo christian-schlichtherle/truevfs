@@ -1130,14 +1130,14 @@ public abstract class IOFileTestCase extends TestCase {
     public void testRenameArchiveToTemp(final File archive)
     throws IOException {
         assert archive.isArchive(); // regular archive or false positive
-        assert !archive.isEntry(); // not enclosed in another archive
-        
+        assert !archive.isEntry(); // not contained in another archive file
+
         // Create a temporary path.
         File tmp = new File(createTempFile(prefix, null));
         assertTrue(tmp.delete());
         assertFalse(tmp.exists());
         assertFalse(getPlainFile(tmp).exists());
-        
+
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
         // either create a directory (iff archive is a regular archive) or a
@@ -1145,13 +1145,13 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(archive.renameTo(tmp));
         assertFalse(archive.exists());
         assertFalse(getPlainFile(archive).exists());
-        
+
         // Now delete resulting temporary file.
         assertTrue(tmp.deleteAll());
         assertFalse(tmp.exists());
         assertFalse(getPlainFile(tmp).exists());
     }
-    
+
     public void testRenameRecursively()
     throws IOException {
         final File temp = new File(createTempFile(prefix, suffix));

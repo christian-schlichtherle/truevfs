@@ -19,17 +19,17 @@ import java.io.IOException;
 
 /**
  * Indicates a false positive archive entry which should be accessed as an
- * entry in its enclosing file system.
+ * entry in its parent file system.
  *
  * @see     NotWriteLockedException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class FalsePositiveException extends ArchiveControllerException {
+public final class FalsePositiveException extends ArchiveException {
 
     FalsePositiveException(ArchiveModel model, IOException cause) {
         super(model, cause);
-        assert !(cause instanceof ArchiveControllerException);
+        assert !(cause instanceof ArchiveException);
     }
 }
