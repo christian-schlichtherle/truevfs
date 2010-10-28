@@ -1382,7 +1382,7 @@ public class File extends java.io.File {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static FileSystemStatistics getLiveArchiveStatistics() {
+    public static FileSystemStatistics getLiveFileSystemStatistics() {
         return Controllers.getLiveStatistics();
     }
 
