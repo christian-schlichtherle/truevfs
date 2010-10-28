@@ -22,7 +22,7 @@ import java.io.IOException;
  * Indicates an exceptional condition when synchronizing the changes in a
  * virtual file system with its parent file system.
  * An exception of this class implies that no or only insignificant parts of
- * the data in the file system have been lost!
+ * the data in the file system have been lost.
  * 
  * @author Christian Schlichtherle
  * @version $Id$

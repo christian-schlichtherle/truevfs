@@ -24,7 +24,7 @@ package de.schlichtherle.truezip.io.filesystem;
 public interface CompositeFileSystemModel extends FileSystemModel {
 
     /**
-     * Returns the model for the parent file system of this composite file
+     * Returns the model of the parent file system of this composite file
      * system or {@code null} if this composite file system is not a member of
      * another file system.
      */
@@ -32,10 +32,9 @@ public interface CompositeFileSystemModel extends FileSystemModel {
 
     /**
      * Returns {@code true} if and only if the contents of this composite file
-     * system have been modified so that it needs synchronization with its
+     * system have been modified so that it needs
+     * {@link CompositeFileSystemController#sync synchronization} with its
      * parent file system.
-     *
-     * @see CompositeFileSystemController#sync
      */
     boolean isTouched();
 }
