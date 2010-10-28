@@ -84,9 +84,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
             throw new NullPointerException("out");
 
         // Order is important here to support multiple interface implementations!
-        if (parameters == null) {
-            throw new RaesParametersException();
-        } else if (parameters instanceof Type0RaesParameters) {
+        if (parameters instanceof Type0RaesParameters) {
             return new Type0RaesOutputStream(out,
                     (Type0RaesParameters) parameters);
         } else if (parameters instanceof RaesParametersAgent) {
