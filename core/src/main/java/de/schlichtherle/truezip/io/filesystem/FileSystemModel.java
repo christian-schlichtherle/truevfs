@@ -26,13 +26,6 @@ import java.net.URI;
 public interface FileSystemModel {
 
     /**
-     * Returns the model for the enclosing file system of this file system or
-     * {@code null} if this file system is not enclosed in another file
-     * system.
-     */
-    FileSystemModel getEnclModel();
-
-    /**
      * Returns an absolute, hierarchical and normalized Unique Resource
      * Identifier (URI) of the file system's <i>mount point</i> in the
      * federated file system.

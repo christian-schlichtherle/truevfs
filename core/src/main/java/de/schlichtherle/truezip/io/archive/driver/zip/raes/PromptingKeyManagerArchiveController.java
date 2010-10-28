@@ -31,7 +31,7 @@ import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.
  * @version $Id$
  */
 final class PromptingKeyManagerArchiveController
-extends     FilterArchiveController    <ZipEntry> {
+extends     FilterArchiveController<ZipEntry> {
 
     /**
      * Constructs a new prompting key manager archive controller.

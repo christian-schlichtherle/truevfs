@@ -20,7 +20,7 @@ import java.io.IOException;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
- * virtual file system with its enclosing file system.
+ * virtual file system with its parent file system.
  * An exception of this class implies that no or only insignificant parts of
  * the data in the file system have been lost!
  * 
@@ -31,7 +31,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public SyncWarningException(SyncableFileSystemModel model, IOException cause) {
+    public SyncWarningException(CompositeFileSystemModel model, IOException cause) {
         super(model, cause, -1);
     }
 }

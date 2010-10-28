@@ -26,7 +26,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @version $Id$
  */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class NotWriteLockedException extends ArchiveControllerException {
+public final class NotWriteLockedException extends ArchiveException {
 
     NotWriteLockedException(ArchiveModel model) {
         super(model);

@@ -234,11 +234,11 @@ implements ArchiveDriver<AE>, Serializable {
     @Override
     public ArchiveController<AE> newController(
             ArchiveModel model,
-            FileSystemController<?> enclController) {
+            FileSystemController<?> parentController) {
         return new LockingArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                            model, this, enclController)));
+                            model, this, parentController)));
     }
 
     /**

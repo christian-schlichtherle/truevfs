@@ -24,8 +24,7 @@ import java.io.IOException;
 
 /**
  * Defines the available options for archive synchronization operations, i.e.
- * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}
- * and {@link SyncableFileSystemController#sync(ExceptionBuilder, BitField)}.
+ * {@link Controllers#sync} and {@link CompositeFileSystemController#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$

@@ -79,7 +79,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, ArchiveControllerException {
+    throws E, ArchiveException {
         assert getModel().writeLock().isHeldByCurrentThread();
         final boolean flush = options.get(FLUSH_CACHE);
         if (flush && options.get(ABORT_CHANGES))

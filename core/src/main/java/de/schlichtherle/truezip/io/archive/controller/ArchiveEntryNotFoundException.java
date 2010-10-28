@@ -57,13 +57,13 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
     }
 
     /**
-     * Returns the <em>canonical path</em> of the target entity which caused
-     * this exception to be created when processing it.
+     * Returns the <em>canonical path</em> of the file system entry which
+     * caused this exception to be created when processing it.
      * A canonical path is absolute, hierarchical and unique within the
-     * federated file system.
+     * federated name space.
      *
      * @return A non-{@code null} URI representing the canonical path of the
-     *         target entity in the federated file system.
+     *         target entry in the federated file system.
      */
     private String getCanonicalPath() {
         return mountPoint.resolve(path).getPath();

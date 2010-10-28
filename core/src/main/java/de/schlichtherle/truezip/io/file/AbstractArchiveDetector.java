@@ -45,8 +45,8 @@ public abstract class AbstractArchiveDetector implements ArchiveDetector {
     public File newFile(
             File template,
             java.io.File delegate,
-            File enclArchive) {
-        return new File(template, delegate, enclArchive);
+            File parentArchive) {
+        return new File(template, delegate, parentArchive);
     }
 
     @Override

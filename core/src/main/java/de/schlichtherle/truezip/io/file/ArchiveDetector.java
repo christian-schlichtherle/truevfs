@@ -114,14 +114,15 @@ public interface ArchiveDetector extends FileFactory {
      * <p>
      * Please note that implementations <em>must not</em> check the actual
      * contents of the file identified by {@code path}!
-     * This is because this method may be used to detect archive files
-     * by their names before they are actually created or to detect archive
-     * files which are enclosed in other archive files, in which case there
-     * is no way to check the file contents in the real file system.
+     * This is because this method may be used to detect prospective archive
+     * files by their path names before they are actually created or to detect
+     * prospective archive files which are contained in other archive files,
+     * in which case there is no way to check the file contents in the parent
+     * file systems.
      *
-     * @param path The path name of the file in the virtual file system.
+     * @param path The path name of the file in the federated file system.
      *        This does not need to be absolute and it does not need to be
-     *        actually accessible in the real file system!
+     *        actually accessible in the parent file system!
      * @return An {@code ArchiveDriver} instance for this archive file
      *         or {@code null} if the path does not denote an archive
      *         file (i.e. the path does not have a known suffix)

@@ -73,7 +73,7 @@ implements ArchiveFileSystem<AE> {
      */
     private Map<String, BaseEntry<AE>> master;
 
-    /** The file system entry for the virtual root of this file system. */
+    /** The file system entry for the (virtual) root of this file system. */
     private final BaseEntry<AE> root;
 
     /** Whether or not this file system has been modified (touched). */
@@ -281,13 +281,13 @@ implements ArchiveFileSystem<AE> {
 
     /**
      * Ensures that the controller's data structures required to output
-     * entries are properly initialized and marks this virtual archive
+     * entries are properly initialized and marks this (virtual) archive
      * file system as touched.
      *
-     * @throws ArchiveReadOnlyExceptionn If this virtual archive file system
+     * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
      *         is read only.
-     * @throws ArchiveFileSystemException If setting up the required data structures in the
-     *         controller fails for some reason.
+     * @throws ArchiveFileSystemException If the listener vetoed the touch
+     *         operation for any reason.
      */
     private void touch() throws ArchiveFileSystemException {
         if (touched)
@@ -364,9 +364,9 @@ implements ArchiveFileSystem<AE> {
     }
 
     /**
-     * Returns a new file system entry for this virtual archive file system.
+     * Returns a new file system entry for this (virtual) archive file system.
      * This is only a factory method, i.e. the returned file system entry is
-     * not yet linked into this virtual archive file system.
+     * not yet linked into this (virtual) archive file system.
      *
      * @see    #mknod
      * @param  path the non-{@code null} path name of the archive file system entry.
@@ -568,7 +568,7 @@ implements ArchiveFileSystem<AE> {
     throws ArchiveFileSystemException {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
-                    "cannot replace virtual root directory entry");
+                    "cannot replace (virtual) root directory entry");
         if (!isValidPath(path))
             throw new ArchiveFileSystemException(path,
                     "is not a valid path name");
@@ -707,7 +707,7 @@ implements ArchiveFileSystem<AE> {
     public void unlink(final String path) throws ArchiveFileSystemException {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
-                    "virtual root directory cannot get unlinked");
+                    "(virtual) root directory cannot get unlinked");
         final BaseEntry<AE> entry = master.remove(path);
         if (entry == null)
             throw new ArchiveFileSystemException(path,

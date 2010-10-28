@@ -374,8 +374,8 @@ public class File extends java.io.File {
      * If this instance is constructed from another {@code java.io.File}
      * instance, then this field is initialized with that instance.
      * <p>
-     * This enables "stacking" of virtual file system implementations and is
-     * essential to enable the broken implementation in
+     * This enables federation of file system implementations and is essential
+     * to enable the broken implementation in
      * {@code javax.swing.JFileChooser} to browse archive files.
      */
     private final java.io.File delegate;
@@ -1421,9 +1421,9 @@ public class File extends java.io.File {
      * before it could actually create the innermost &quot;c&quot; entry as a file
      * or directory.
      * <p>
-     * More formally, before you can access a node in the virtual file
+     * More formally, before you can access an entry in the federated file
      * system, all its parent directories must exist, including archive
-     * files. This emulates the behaviour of real file systems.
+     * files. This emulates the behaviour of native file systems.
      * <p>
      * If this class property is map to {@code true} however, then
      * any missing parent directories (including archive files) up to the
@@ -1684,7 +1684,7 @@ public class File extends java.io.File {
      * as an archive file in the file system (and the correct password has
      * been entered in case it's a RAES encrypted ZIP file), it should
      * subsequently call {@link #isDirectory}, too.
-     * This will automount the virtual file system from the archive file and
+     * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
      * @see <a href="#false_positives">Identifying Archive Paths and False Positives</a>
@@ -1709,7 +1709,7 @@ public class File extends java.io.File {
      * file (and the correct password has been entered in case it's a RAES
      * encrypted ZIP file), you should call
      * {@link #getParentFile getParentFile()}.{@link #isDirectory isDirectory()}, too.
-     * This will automount the virtual file system from the archive file and
+     * This will automount the (virtual) file system from the archive file and
      * return {@code true} if and only if it's a valid archive file.
      *
      * @see #isArchive

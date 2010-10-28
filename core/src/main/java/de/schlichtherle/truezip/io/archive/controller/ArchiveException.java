@@ -23,17 +23,17 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-abstract class ArchiveControllerException extends IOException {
+public abstract class ArchiveException extends IOException {
     private static final long serialVersionUID = 2947623946725372554L;
 
     private final ArchiveModel model;
 
-    ArchiveControllerException( final ArchiveModel model) {
+    ArchiveException( final ArchiveModel model) {
         super.initCause(null);
         this.model = model;
     }
 
-    ArchiveControllerException( final ArchiveModel model,
+    ArchiveException( final ArchiveModel model,
                                 final IOException cause) {
         super.initCause(cause);
         this.model = model;

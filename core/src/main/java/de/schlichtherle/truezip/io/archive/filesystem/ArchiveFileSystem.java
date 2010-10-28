@@ -136,8 +136,8 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      * If the file system entry is a directory, it must be empty for successful
      * deletion.
      *
-     * @throws ArchiveReadOnlyExceptionn If this virtual archive file system is
-     *         read-only.
+     * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
+     *         is read-only.
      * @throws ArchiveFileSystemException If the operation fails for some other
      *         reason.
      */

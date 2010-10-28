@@ -16,10 +16,10 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.SyncableFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.NativeFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.host.HostFileSystemController;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
@@ -71,8 +71,8 @@ public class Controllers {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<SyncableFileSystemController<?>>> controllers
-            = new WeakHashMap<URI, Link<SyncableFileSystemController<?>>>();
+    private static final Map<URI, Link<CompositeFileSystemController<?>>> controllers
+            = new WeakHashMap<URI, Link<CompositeFileSystemController<?>>>();
 
     private Controllers() {
     }
@@ -85,7 +85,7 @@ public class Controllers {
     FileSystemController<?> getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
-            FileSystemController<?> enclController) {
+            FileSystemController<?> parentController) {
         // TODO: Make this method support arbitrary host file systems, e.g. by
         // using a factory from a service registry or similar.
         if (!"file".equals(mountPoint.getScheme()) || !mountPoint.isAbsolute()
@@ -94,12 +94,12 @@ public class Controllers {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == driver)
-            return new NativeFileSystemController(mountPoint);
-        if (null == enclController)
-            enclController = new NativeFileSystemController(
+            return new HostFileSystemController(mountPoint);
+        if (null == parentController)
+            parentController = new HostFileSystemController(
                     mountPoint.resolve(".."));
         synchronized (controllers) {
-            SyncableFileSystemController<?> controller
+            CompositeFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller) {
                 // If required, reconfiguration of the FileSystemController
@@ -109,7 +109,7 @@ public class Controllers {
                 return controller;
             }
             controller = new ProspectiveArchiveController<AE>(
-                    mountPoint, driver, enclController);
+                    mountPoint, driver, parentController);
             scheduleSync(WEAK, controller);
             return controller;
         }
@@ -121,7 +121,7 @@ public class Controllers {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	static void scheduleSync(   final Link.Type type,
-                                final SyncableFileSystemController<?> controller) {
+                                final CompositeFileSystemController<?> controller) {
         synchronized (controllers) {
             controllers.put(controller.getModel().getMountPoint(),
                             (Link) type.newLink(controller));
@@ -129,24 +129,24 @@ public class Controllers {
     }
 
     /**
-     * Writes all changes to the contents of the virtual file systems who's
-     * canonical path name (mount point) starts with the given {@code prefix}
-     * to their enclosing file system.
-     * This will reset the state of the respective controllers.
+     * Writes all changes to the contents of the file systems who's canonical
+     * path name (mount point) starts with the given {@code prefix} to their
+     * parent file system.
+     * This will reset the state of the respective file system controllers.
      * This method is thread-safe.
      *
-     * @param  prefix the prefix of the canonical path name of the virtual
-     *         file systems which shall get synchronized to their enclosing
-     *         file system.
+     * @param  prefix the prefix of the canonical path name of the file systems
+     *         which shall get synchronized with their parent file system.
      *         This may be {@code null} or empty in order to select all
-     *         accessed virtual files systems.
+     *         accessed files systems.
      * @throws SyncWarningException if the configuration uses the
      *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
-     *         This implies that the respective virtual file system has been
+     *         This implies that the respective file system has been
      *         synchronized with constraints, e.g. a failure to set the last
-     *         modification time of the archive file to the last modification
-     *         time of the root directory of its virtual file system.
+     *         modification time of the parent file system entry to the last
+     *         modification time of the (virtual) root directory of its file
+     *         system.
      * @throws SyncException if the configuration uses the
      *         {@link DefaultSyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
@@ -176,8 +176,8 @@ public class Controllers {
             // separator character) and then walk the array in reverse order to
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
-            // before its enclosing archive file.
-            for (final SyncableFileSystemController<?> controller
+            // before its parent archive file.
+            for (final CompositeFileSystemController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     // Upon return, some new ArchiveWarningException's may
@@ -186,7 +186,7 @@ public class Controllers {
                     controller.sync(builder, options);
                 } catch (IOException ex) {
                     // Updating the archive file or wrapping it back into
-                    // one of it's enclosing archive files resulted in an
+                    // one of it's parent archive files resulted in an
                     // I/O exception for some reason.
                     // We are bullheaded and store the exception for later
                     // throwing and continue updating the rest.
@@ -200,22 +200,22 @@ public class Controllers {
         }
     }
 
-    static Set<SyncableFileSystemController<?>> getControllers() {
+    static Set<CompositeFileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<SyncableFileSystemController<?>> getControllers(
+    static Set<CompositeFileSystemController<?>> getControllers(
             URI prefix,
             final Comparator<FileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
-        final Set<SyncableFileSystemController<?>> snapshot;
+        final Set<CompositeFileSystemController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<SyncableFileSystemController<?>>(comparator)
-                    : new HashSet<SyncableFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<SyncableFileSystemController<?>> link : controllers.values()) {
-                final SyncableFileSystemController<?> controller = Links.getTarget(link);
+                    ? new TreeSet<CompositeFileSystemController<?>>(comparator)
+                    : new HashSet<CompositeFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
+            for (final Link<CompositeFileSystemController<?>> link : controllers.values()) {
+                final CompositeFileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()

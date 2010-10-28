@@ -28,14 +28,14 @@ import de.schlichtherle.truezip.io.archive.controller.Controllers;
 public interface FileSystemStatistics {
 
     /**
-     * Returns the total number of bytes read from all <em>non-enclosed</em>
-     * file systems which have been updated by a call to
+     * Returns the total number of bytes read from all <em>top level file
+     * systems</em> which have been updated by a call to
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only input from top level file
      * systems which have been touched, i.e. archive files which are actually
-     * updated and are not enclosed in other file systems and hence are present
-     * in their host file system.
+     * updated and are not contained in other file systems and hence are
+     * present in the host file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.
@@ -52,14 +52,14 @@ public interface FileSystemStatistics {
     long getSyncTotalByteCountRead();
     
     /**
-     * Returns the total number of bytes written to all <em>non-enclosed</em>
-     * file systems which have been updated by a call to
+     * Returns the total number of bytes written to all <em>top level file
+     * systems</em> which have been updated by a call to
      * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only output to top level file
      * systems which have been touched, i.e. archive files which are actually
-     * updated and are not enclosed in other file systems and hence are present
-     * in their host file system.
+     * updated and are not contained in other file systems and hence are
+     * present in the host file system.
      * <p>
      * This method is intended to be used for progress monitors and is a rough
      * indicator about what is going on inside the TrueZIP API.

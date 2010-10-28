@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.filesystem.host;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -42,14 +44,14 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class NativeFileSystemController
+public final class HostFileSystemController
 extends            AbstractFileSystemController<FileEntry>
 implements         FileSystemModel {
 
     private final URI mountPoint;
     private final File target;
 
-    public NativeFileSystemController(final URI mountPoint) {
+    public HostFileSystemController(final URI mountPoint) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
@@ -57,11 +59,6 @@ implements         FileSystemModel {
 
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);
-    }
-
-    @Override
-    public FileSystemModel getEnclModel() {
-        return null;
     }
 
     @Override

@@ -96,9 +96,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     @Override
     public ArchiveController<ZipEntry> newController(
             ArchiveModel model,
-            FileSystemController<?> enclController) {
+            FileSystemController<?> parentController) {
         return new PromptingKeyManagerArchiveController(
-                super.newController(model, enclController));
+                super.newController(model, parentController));
     }
 
     /**

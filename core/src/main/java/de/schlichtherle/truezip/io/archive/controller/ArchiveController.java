@@ -41,17 +41,17 @@ public interface ArchiveController<AE extends ArchiveEntry> {
 
     ArchiveModel getModel();
 
-    Icon getOpenIcon() throws ArchiveControllerException;
+    Icon getOpenIcon() throws ArchiveException;
 
-    Icon getClosedIcon() throws ArchiveControllerException;
+    Icon getClosedIcon() throws ArchiveException;
 
-    boolean isReadOnly() throws ArchiveControllerException;
+    boolean isReadOnly() throws ArchiveException;
 
-    Entry<? extends AE> getEntry(String path) throws ArchiveControllerException;
+    Entry<? extends AE> getEntry(String path) throws ArchiveException;
 
-    boolean isReadable(String path) throws ArchiveControllerException;
+    boolean isReadable(String path) throws ArchiveException;
 
-    boolean isWritable(String path) throws ArchiveControllerException;
+    boolean isWritable(String path) throws ArchiveException;
 
     void setReadOnly(String path) throws IOException;
 
@@ -118,5 +118,5 @@ public interface ArchiveController<AE extends ArchiveEntry> {
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws E, ArchiveControllerException;
+    throws E, ArchiveException;
 }
