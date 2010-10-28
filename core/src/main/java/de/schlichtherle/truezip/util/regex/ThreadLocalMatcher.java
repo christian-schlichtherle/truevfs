@@ -32,14 +32,25 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
     private final Pattern pattern;
 
     /**
-     * Creates a new thread local matcher by compiling the given regex.
+     * Equivalent to {@code new}
+     * {@link #ThreadLocalMatcher(String, int) ThreadLocal(regex, 0)}.
+     */
+    public ThreadLocalMatcher(String regex)
+    throws PatternSyntaxException {
+        this(regex, 0);
+    }
+
+    /**
+     * Creates a new thread local matcher by compiling the given regex with the
+     * given flags.
      *
      * @param regex The expression to be compiled.
+     * @param flags The flags to use for compilation.
      * @throws PatternSyntaxException If the expression's syntax is invalid.
      */
-    public ThreadLocalMatcher(final String regex)
+    public ThreadLocalMatcher(final String regex, final int flags)
     throws PatternSyntaxException {
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(regex, flags);
     }
 
     /**
@@ -55,7 +66,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
     }
 
     @Override
-    protected Matcher initialValue() {
+    protected final Matcher initialValue() {
         return pattern.matcher(""); // NOI18N
     }
 
@@ -63,7 +74,7 @@ public class ThreadLocalMatcher extends ThreadLocal<Matcher> {
      * Resets the thread local matcher with the given character sequence and
      * returns it.
      */
-    public Matcher reset(CharSequence input) {
+    public final Matcher reset(CharSequence input) {
         return get().reset(input);
     }
 }
