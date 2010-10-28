@@ -153,7 +153,7 @@ abstract class CommandLineUtility {
     protected static class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final FileSystemStatistics liveStats = File.getLiveArchiveStatistics();
+        private final FileSystemStatistics liveStats = File.getLiveFileSystemStatistics();
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
