@@ -168,24 +168,16 @@ limitations under the License.
                     <doctitle>TrueZIP Core API&lt;br/&gt;Version ${project.version}</doctitle>
                     <groups>
                         <group>
-                            <title>High Level API For Accessing Archive Files</title>
-                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample</packages>
+                            <title>Presentation / Access Tier</title>
+                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample:de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
                         </group>
                         <group>
-                            <title>GUI For Accessing Archive Files</title>
-                            <packages>de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
+                            <title>Application / Engine Tier</title>
+                            <packages>de.schlichtherle.truezip.io.archive*:de.schlichtherle.truezip.io.filesystem*</packages>
                         </group>
                         <group>
-                            <title>Low Level API For Accessing ZIP Files</title>
-                            <packages>de.schlichtherle.truezip.io.zip</packages>
-                        </group>
-                        <group>
-                            <title>Low Level API For Accessing RAES Files</title>
-                            <packages>de.schlichtherle.truezip.crypto.io.raes:de.schlichtherle.truezip.key*</packages>
-                        </group>
-                        <group>
-                            <title>SPI And Implementations For Pluggable Archive Drivers</title>
-                            <packages>de.schlichtherle.truezip.io.archive*</packages>
+                            <title>Data Tier</title>
+                            <packages>de.schlichtherle.truezip.io.zip:de.schlichtherle.truezip.crypto.io.raes</packages>
                         </group>
                     </groups>
                     <header>&lt;b&gt;TrueZIP Core ${project.version}&lt;/b&gt;</header>
