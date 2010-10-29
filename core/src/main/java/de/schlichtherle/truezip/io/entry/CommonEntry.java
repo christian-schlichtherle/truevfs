@@ -68,20 +68,20 @@ public interface CommonEntry {
     String ROOT = "";
 
     /**
-     * The separator character for base names in an entry name,
-     * which is {@value}.
-     *
-     * @see #SEPARATOR
-     */
-    char SEPARATOR_CHAR = '/';
-
-    /**
      * The separator string for base names in an entry name,
      * which is {@value}.
      *
      * @see #SEPARATOR_CHAR
      */
     String SEPARATOR = "/";
+
+    /**
+     * The separator character for base names in an entry name,
+     * which is {@value}.
+     *
+     * @see #SEPARATOR
+     */
+    char SEPARATOR_CHAR = '/';
 
     /**
      * The unknown value for numeric properties,
