@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipException;
 import junit.framework.TestCase;
 
 /**
@@ -100,7 +101,7 @@ public abstract class ZipTestCase extends TestCase {
     protected ZipOutputStream newZipOutputStream(
             OutputStream out,
             ZipFile appendee)
-    throws IOException {
+    throws ZipException {
         return new ZipOutputStream(out, appendee);
     }
 

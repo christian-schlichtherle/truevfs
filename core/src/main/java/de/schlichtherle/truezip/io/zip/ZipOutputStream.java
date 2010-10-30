@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.zip;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -88,8 +88,11 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * {@code appendee} may already be closed.
      *
      * @throws NullPointerException If any parameter is {@code null}.
+     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
+     *         after its central directory and before its end.
      */
-    public ZipOutputStream(OutputStream out, ZipFile appendee) {
+    public ZipOutputStream(OutputStream out, ZipFile appendee)
+    throws ZipException {
         super(out, appendee);
     }
 
