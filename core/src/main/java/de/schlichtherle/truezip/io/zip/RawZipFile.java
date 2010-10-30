@@ -150,11 +150,11 @@ implements Iterable<E>, Closeable {
      * @throws IOException on any other I/O related issue.
      */
     protected RawZipFile(
-            final ReadOnlyFile archive,
-            final String charset,
+            ReadOnlyFile archive,
+            String charset,
             boolean preambled,
             boolean postambled,
-            final ZipEntryFactory<E> factory)
+            ZipEntryFactory<E> factory)
     throws IOException {
         this(   new SingletonReadOnlyFilePool(archive),
                 charset, factory, preambled, postambled);
@@ -164,8 +164,8 @@ implements Iterable<E>, Closeable {
             final Pool<ReadOnlyFile, IOException> source,
             final String charset,
             final ZipEntryFactory<E> zipEntryFactory,
-            boolean preambled,
-            boolean postambled)
+            final boolean preambled,
+            final boolean postambled)
     throws IOException {
         if (charset == null || zipEntryFactory == null)
             throw new NullPointerException();
@@ -644,7 +644,7 @@ implements Iterable<E>, Closeable {
      * Returns the length of the postamble of this ZIP compatible file in bytes.
      *
      * @return A positive value or zero to indicate that this ZIP compatible
-     *         file does not have an postamble.
+     *         file does not have a postamble.
      */
     public long getPostambleLength() {
         return postamble;

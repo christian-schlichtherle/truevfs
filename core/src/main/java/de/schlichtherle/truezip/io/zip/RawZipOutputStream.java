@@ -21,8 +21,6 @@ import java.nio.charset.Charset;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -49,7 +47,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  */
 public abstract class RawZipOutputStream<E extends ZipEntry>
 extends FilterOutputStream
-implements Iterable<E>, Closeable, Flushable {
+implements Iterable<E> {
 
     /**
      * The default character set used for entry names and comments in ZIP
@@ -131,13 +129,18 @@ implements Iterable<E>, Closeable, Flushable {
      * {@code appendee} may already be closed.
      *
      * @throws NullPointerException If any parameter is {@code null}.
+     * @throws ZipException if {@code appendee} has a postamble, i.e. some data
+     *         after its central directory and before its end.
      */
     protected RawZipOutputStream(
             final OutputStream out,
-            final RawZipFile<E> appendee) {
+            final RawZipFile<E> appendee)
+    throws ZipException {
         super(new CustomLEDataOutputStream(out, appendee));
         if (null == out)
             throw new NullPointerException();
+        if (appendee.getPostambleLength() > 0)
+            throw new ZipException("Appending to a ZIP file with a postamble is not supported!");
         for (E entry : appendee)
             entries.put(entry.getName(), entry);
         this.charset = Charset.forName(appendee.getCharset());
