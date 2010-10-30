@@ -61,8 +61,6 @@ implements Iterable<E>, Closeable, Flushable {
     /** The charset to use for entry names and comments. */
     private final Charset charset;
 
-    private final RawZipFile<E> appendee;
-
     /** CRC instance to avoid parsing DEFLATED data twice. */
     private final CRC32 crc = new CRC32();
 
@@ -107,20 +105,10 @@ implements Iterable<E>, Closeable, Flushable {
     private boolean deflate;
 
     /**
-     * Creates a new ZIP output stream decorating the given output stream,
-     * using the {@value #DEFAULT_CHARSET} charset.
+     * Constructs a ZIP output stream which decorates the given output stream
+     * using the given charset.
      *
-     * @throws NullPointerException If {@code out} is {@code null}.
-     */
-    protected RawZipOutputStream(final OutputStream out) {
-        this(out, DEFAULT_CHARSET);
-    }
-
-    /**
-     * Creates a new ZIP output stream decorating the given output stream.
-     *
-     * @throws NullPointerException If {@code out} or {@code charset} are
-     *         {@code null}.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not supported
      *         by this JVM.
      */
@@ -128,29 +116,31 @@ implements Iterable<E>, Closeable, Flushable {
             final OutputStream out,
             final String charset) {
         super(toLEDataOutputStream(out));
-        if (out == null || charset == null)
+        if (null == out || null == charset)
             throw new NullPointerException();
-        this.appendee = null;
         this.charset = Charset.forName(charset);
     }
 
+    /**
+     * Constructs a ZIP output stream which decorates the given output stream
+     * and apppends to the given raw ZIP file.
+     * <p>
+     * In order to append entries to an existing ZIP file, {@code out} must be
+     * set up so that it appends to the same ZIP file from which
+     * {@code appendee} is reading.
+     * {@code appendee} may already be closed.
+     *
+     * @throws NullPointerException If any parameter is {@code null}.
+     */
     protected RawZipOutputStream(
             final OutputStream out,
-            final String charset,
-            final RawZipFile<E> appendee)
-    throws ZipException {
+            final RawZipFile<E> appendee) {
         super(new CustomLEDataOutputStream(out, appendee));
-        if (null == out || null == charset)
+        if (null == out)
             throw new NullPointerException();
-        this.appendee = appendee;
-        if (null != appendee) {
-            appendee.assertOpen();
-            for (E entry : appendee)
-                entries.put(entry.getName(), entry);
-            this.charset = Charset.forName(appendee.getCharset());
-        } else {
-            this.charset = Charset.forName(charset);
-        }
+        for (E entry : appendee)
+            entries.put(entry.getName(), entry);
+        this.charset = Charset.forName(appendee.getCharset());
     }
 
     private static LEDataOutputStream toLEDataOutputStream(OutputStream out) {

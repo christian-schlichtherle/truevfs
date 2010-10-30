@@ -115,21 +115,6 @@ public abstract class RaesZipTestCase extends ZipTestCase {
     }
 
     @Override
-    protected ZipOutputStream newZipOutputStream(
-            final OutputStream out,
-            final ZipFile appendee)
-    throws IOException {
-        final RaesOutputStream ros = RaesOutputStream.getInstance(
-                out, raesParameters);
-        try {
-            return new ZipOutputStream(ros, ZIP.UTF8, appendee);
-        } catch (RuntimeException exc) {
-            ros.close();
-            throw exc;
-        }
-    }
-
-    @Override
     protected ZipFile newZipFile(final String name)
     throws IOException {
         final RaesReadOnlyFile rof

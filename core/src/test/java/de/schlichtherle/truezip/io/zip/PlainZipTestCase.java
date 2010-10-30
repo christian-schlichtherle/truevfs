@@ -77,22 +77,22 @@ public class PlainZipTestCase extends ZipTestCase {
             final int len,
             final byte[] data)
     throws IOException {
-        final ZipFile zipIn = zip.exists() ? newZipFile(zip) : null;
+        final ZipOutputStream zipOut;
+        if (zip.exists()) {
+            final ZipFile zipIn = newZipFile(zip);
+            zipIn.close();
+            zipOut = newZipOutputStream(new FileOutputStream(zip, true), zipIn);
+        } else {
+            zipOut = newZipOutputStream(new FileOutputStream(zip));
+        }
         try {
-            final ZipOutputStream zipOut = newZipOutputStream(
-                    new FileOutputStream(zip, true), zipIn);
-            try {
-                for (int i = 0; i < len; i++) {
-                    final String name = off + i + ".txt";
-                    zipOut.putNextEntry(new ZipEntry(name));
-                    zipOut.write(data);
-                }
-            } finally {
-                zipOut.close();
+            for (int i = 0; i < len; i++) {
+                final String name = off + i + ".txt";
+                zipOut.putNextEntry(new ZipEntry(name));
+                zipOut.write(data);
             }
         } finally {
-            if (zipIn != null)
-                zipIn.close();
+            zipOut.close();
         }
     }
 }

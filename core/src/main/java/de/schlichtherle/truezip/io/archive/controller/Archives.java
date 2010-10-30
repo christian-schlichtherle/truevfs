@@ -54,7 +54,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Controllers {
+public class Archives {
 
     private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
@@ -74,12 +74,11 @@ public class Controllers {
     private static final Map<URI, Link<CompositeFileSystemController<?>>> controllers
             = new WeakHashMap<URI, Link<CompositeFileSystemController<?>>>();
 
-    private Controllers() {
+    private Archives() {
     }
 
     /**
-     * Looks up a suitable {@link FileSystemController} object for the
-     * given mount point.
+     * Looks up a {@link FileSystemController} for the given mount point.
      */
     public static <AE extends ArchiveEntry>
     FileSystemController<?> getController(
@@ -302,7 +301,7 @@ public class Controllers {
                 try {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
-                    //Controllers.logger.setLevel(Level.OFF);
+                    //Archives.logger.setLevel(Level.OFF);
                     synchronized (this) {
                         for (Runnable runnable : runnables)
                             runnable.run();

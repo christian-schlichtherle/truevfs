@@ -85,7 +85,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
     private class SyncScheduler implements TouchListener {
         @Override
         public void setTouched(boolean touched) {
-            Controllers.scheduleSync(touched ? STRONG : WEAK, ProspectiveArchiveController.this);
+            Archives.scheduleSync(touched ? STRONG : WEAK, ProspectiveArchiveController.this);
         }
     }
 
