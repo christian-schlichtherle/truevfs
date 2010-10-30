@@ -117,7 +117,7 @@ extends     FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      *
-     * @see Controllers#getController(URI, ArchiveDriver, FileSystemController)
+     * @see Archives#getController(URI, ArchiveDriver, FileSystemController)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(InputShop<AE> input) {
@@ -137,7 +137,7 @@ extends     FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      *
-     * @see Controllers#getController(URI, ArchiveDriver, FileSystemController)
+     * @see Archives#getController(URI, ArchiveDriver, FileSystemController)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(OutputShop<AE> output) {

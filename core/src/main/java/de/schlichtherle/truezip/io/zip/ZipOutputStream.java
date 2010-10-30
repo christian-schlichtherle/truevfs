@@ -55,33 +55,42 @@ import java.util.zip.ZipException;
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     
     /**
-     * Creates a new ZIP output stream decorating the given output stream,
-     * using the {@value de.schlichtherle.truezip.io.zip.RawZipOutputStream#DEFAULT_CHARSET} charset.
+     * Constructs a ZIP output stream which decorates the given output stream
+     * using the
+     * {@value de.schlichtherle.truezip.io.zip.RawZipOutputStream#DEFAULT_CHARSET}
+     * charset.
      *
      * @throws NullPointerException If {@code out} is {@code null}.
      */
-    public ZipOutputStream(final OutputStream out) {
-        super(out);
+    public ZipOutputStream(OutputStream out) {
+        super(out, DEFAULT_CHARSET);
     }
 
     /**
-     * Creates a new ZIP output stream decorating the given output stream.
+     * Constructs a ZIP output stream which decorates the given output stream
+     * using the given charset.
      *
-     * @throws NullPointerException If {@code out} or {@code charset} are
-     *         {@code null}.
+     * @throws NullPointerException If any parameter is {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not supported
      *         by this JVM.
      */
-    public ZipOutputStream(final OutputStream out, final String charset) {
+    public ZipOutputStream(OutputStream out, String charset) {
         super(out, charset);
     }
 
-    public ZipOutputStream(
-            final OutputStream out,
-            final String charset,
-            final RawZipFile<ZipEntry> appendee)
-    throws ZipException {
-        super(out, charset, appendee);
+    /**
+     * Constructs a ZIP output stream which decorates the given output stream
+     * and apppends to the given raw ZIP file.
+     * <p>
+     * In order to append entries to an existing ZIP file, {@code out} must be
+     * set up so that it appends to the same ZIP file from which
+     * {@code appendee} is reading.
+     * {@code appendee} may already be closed.
+     *
+     * @throws NullPointerException If any parameter is {@code null}.
+     */
+    public ZipOutputStream(OutputStream out, ZipFile appendee) {
+        super(out, appendee);
     }
 
     @Override

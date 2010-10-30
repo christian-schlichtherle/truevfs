@@ -101,7 +101,7 @@ public abstract class ZipTestCase extends TestCase {
             OutputStream out,
             ZipFile appendee)
     throws IOException {
-        return new ZipOutputStream(out, ZIP.DEFAULT_CHARSET, appendee);
+        return new ZipOutputStream(out, appendee);
     }
 
     protected ZipFile newZipFile(String name)
@@ -153,14 +153,20 @@ public abstract class ZipTestCase extends TestCase {
         }
 
         try {
+            newZipOutputStream(null, (ZipFile) null);
+            fail("Use of null arguments should throw a NullPointerException!");
+        } catch (NullPointerException npe) {
+        }
+
+        try {
             newZipOutputStream(new ByteArrayOutputStream(), (String) null);
             fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 
         try {
-            newZipOutputStream(null, (ZipFile) null);
-            fail("Use of null arguments should throw a NullPointerException!");
+            newZipOutputStream(new ByteArrayOutputStream(), (ZipFile) null);
+            fail("Use of null argument must throw a NullPointerException!");
         } catch (NullPointerException npe) {
         }
 

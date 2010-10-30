@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.controller.Controllers;
+import de.schlichtherle.truezip.io.archive.controller.Archives;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -49,7 +49,7 @@ extends          FileSystemController         <CE                    > {
      * @throws IOException if any exceptional condition occurs throughout the
      *         synchronization of this composite file system.
      * @see    CompositeFileSystemModel#isTouched
-     * @see    Controllers#sync
+     * @see    Archives#sync
      */
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
