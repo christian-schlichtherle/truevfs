@@ -23,7 +23,7 @@
     <artifactId>truezip-core</artifactId>
     <packaging>jar</packaging>
     <version>7.0-SNAPSHOT</version>
-    <name>TrueZIP Core ${project.version}</name>
+    <name>TrueZIP Core</name>
     <description>TrueZIP is a Java based Virtual File System (VFS) to enable
 transparent, multi-threaded read/write access to archive files
 (ZIP, TAR etc.) as if they were directories.
@@ -165,7 +165,7 @@ limitations under the License.
                 <version>2.7</version>
                 <configuration>
                     <author>true</author>
-                    <doctitle>TrueZIP Core API&lt;br/&gt;Version ${project.version}</doctitle>
+                    <doctitle>${project.name} API&lt;br/&gt;Version ${project.version}</doctitle>
                     <groups>
                         <group>
                             <title>Presentation / Access Tier</title>
@@ -180,7 +180,7 @@ limitations under the License.
                             <packages>de.schlichtherle.truezip.io.zip:de.schlichtherle.truezip.crypto.io.raes</packages>
                         </group>
                     </groups>
-                    <header>&lt;b&gt;TrueZIP Core ${project.version}&lt;/b&gt;</header>
+                    <header>&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;</header>
                     <links>
                         <link>http://www.bouncycastle.org/docs/docs1.5/</link>
                     </links>
@@ -189,7 +189,7 @@ limitations under the License.
                     <show>private</show>
                     <splitindex>true</splitindex>
                     <version>true</version>
-                    <windowtitle>TrueZIP Core ${project.version}</windowtitle>
+                    <windowtitle>${project.name} ${project.version}</windowtitle>
                 </configuration>
             </plugin>
             <plugin>
