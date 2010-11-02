@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -208,6 +210,8 @@ public class Archives {
             final Comparator<FileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
+        else
+            prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
         final Set<CompositeFileSystemController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
@@ -219,7 +223,7 @@ public class Archives {
                         .getModel()
                         .getMountPoint()
                         .getPath()
-                        .startsWith(prefix.toString()))
+                        .startsWith(prefix.getPath()))
                     snapshot.add(controller);
             }
         }
@@ -295,7 +299,7 @@ public class Archives {
          * directly called except for unit testing.
          */
         @Override
-        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
+        @SuppressWarnings("NestedSynchronizedStatement")
         public void run() {
             synchronized (PromptingKeyManager.class) {
                 try {
@@ -308,9 +312,11 @@ public class Archives {
                     }
                 } finally {
                     try {
-                        sync(   null, new DefaultSyncExceptionBuilder(),
+                        sync(   null,
+                                new DefaultSyncExceptionBuilder(),
                                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
                     } catch (IOException ouch) {
+                        // Logging doesn't work in a shutdown hook!
                         ouch.printStackTrace();
                     }
                 }

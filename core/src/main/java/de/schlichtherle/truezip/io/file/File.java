@@ -1202,8 +1202,9 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        Archives.sync(   archive.getCanOrAbsFile().toURI(),
-                            new DefaultArchiveExceptionBuilder(), options);
+        Archives.sync(  archive.getCanOrAbsFile().toURI(),
+                        new DefaultArchiveExceptionBuilder(),
+                        options);
     }
 
     /**
