@@ -253,9 +253,41 @@ public class Archives {
      * This is typically used to delete archive files or entries.
      */
     public static void addToShutdownHook(final Runnable runnable) {
-        //ShutdownHook.SINGLETON.add(runnable);
-        JVMShutdownHook.SINGLETON.add(runnable);
+        //ShutdownRunnables.SINGLETON.add(runnable);
+        ShutdownHook.SINGLETON.add(runnable);
     }
+
+    static {
+        Runtime.getRuntime().addShutdownHook(ShutdownHook.SINGLETON);
+    }
+
+    /**
+     * This singleton shutdown hook thread class runs
+     * {@link Archives.ShutdownRunnables#SINGLETON} when the JVM terminates.
+     * You cannot instantiate this class.
+     *
+     * @see Archives#addToShutdownHook(java.lang.Runnable)
+     */
+    private static final class ShutdownHook extends Thread {
+
+        /** The singleton instance of this class. */
+        static final ShutdownHook SINGLETON = new ShutdownHook();
+
+        ShutdownHook() {
+            super(  Archives.ShutdownRunnables.SINGLETON,
+                    "TrueZIP ArchiveController Shutdown Hook");
+            setPriority(Thread.MAX_PRIORITY);
+        }
+
+        /**
+         * Adds the given {@code runnable} to the set of runnables to run by
+         * {@link Archives.ShutdownRunnables#SINGLETON} when the JVM
+         * terminates.
+         */
+        void add(final Runnable runnable) {
+            Archives.ShutdownRunnables.SINGLETON.add(runnable);
+        }
+    } // class JVMShutdownHook
 
     /**
      * This singleton shutdown hook runnable class runs a set of user-provided
@@ -263,14 +295,14 @@ public class Archives {
      * method is invoked.
      * This is typically used to delete archive files or entries.
      */
-    static final class ShutdownHook implements Runnable {
+    private static final class ShutdownRunnables implements Runnable {
 
         /** The singleton instance of this class. */
-        public static final ShutdownHook SINGLETON = new ShutdownHook();
+        static final ShutdownRunnables SINGLETON = new ShutdownRunnables();
 
-        private final Collection<Runnable> runnables = new HashSet<Runnable>();
+        final Collection<Runnable> runnables = new HashSet<Runnable>();
 
-        private ShutdownHook() {
+        ShutdownRunnables() {
             // Force loading the key manager now in order to prevent class
             // loading when running the shutdown hook.
             // This may help if this shutdown hook is run as a JVM shutdown
@@ -283,7 +315,7 @@ public class Archives {
          * Adds the given {@code runnable} to the set of runnables to run by
          * this shutdown hook.
          */
-        public synchronized void add(final Runnable runnable) {
+        synchronized void add(final Runnable runnable) {
             if (runnable != null)
                 runnables.add(runnable);
         }
@@ -300,16 +332,15 @@ public class Archives {
          */
         @Override
         @SuppressWarnings("NestedSynchronizedStatement")
-        public void run() {
+        public synchronized void run() {
             synchronized (PromptingKeyManager.class) {
                 try {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
+                    // Logging doesn't work in a shutdown hook!
                     //Archives.logger.setLevel(Level.OFF);
-                    synchronized (this) {
-                        for (Runnable runnable : runnables)
-                            runnable.run();
-                    }
+                    for (Runnable runnable : runnables)
+                        runnable.run();
                 } finally {
                     try {
                         sync(   null,
@@ -322,5 +353,5 @@ public class Archives {
                 }
             }
         }
-    } // class ShutdownHook
+    } // class ShutdownRunnables
 }
