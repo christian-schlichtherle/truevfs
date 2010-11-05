@@ -196,7 +196,6 @@ limitations under the License.
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <skipTests>true</skipTests>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
@@ -204,17 +203,6 @@ limitations under the License.
                         <exclude>**/PromptingKeyManagerUITest.java</exclude> <!-- FIXME: Make this test work -->
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skipTests>false</skipTests>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-gpg-plugin</artifactId>
