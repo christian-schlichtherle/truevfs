@@ -43,9 +43,9 @@ limited by heap and file system size.
         </license>
     </licenses>
     <scm>
-        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7-release</connection>
-        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7-release</developerConnection>
-        <url>http://kenai.com/projects/truezip/sources/v7-release/show</url>
+        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7</developerConnection>
+        <url>http://kenai.com/projects/truezip/sources/v7/show</url>
     </scm>
     <developers>
         <developer>
