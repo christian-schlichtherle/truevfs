@@ -123,6 +123,14 @@ limited by heap and file system size.
         </testResources>
         <plugins>
             <plugin>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <goals>source:jar javadoc:jar install</goals>
+                    <goalsDirectory>core</goalsDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
