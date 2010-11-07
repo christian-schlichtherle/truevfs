@@ -110,7 +110,7 @@ public interface FileFactory {
      * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
      * amendment:
      * If the URI matches the pattern
-     * <code>(jar:)*file:(<i>path</i>!/)*<i>entry</i></code>, then the
+     * {@code (jar:)*file:(<i>path</i>!/)*<i>entry</i>}, then the
      * constructed file object treats the URI like a (possibly ZIPped) file.
      * <p>
      * The newly created {@link File} instance uses this

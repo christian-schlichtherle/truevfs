@@ -169,7 +169,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -178,7 +178,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -187,7 +187,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
@@ -217,7 +217,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *  <td><code><i>?</i></code></td>
+ *  <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -226,7 +226,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -235,7 +235,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -244,7 +244,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code true}</td>
- *   <td><code><i>?</i></code></td>
+ *   <td>{@code <i>?</i>}</td>
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
@@ -587,7 +587,7 @@ public class File extends java.io.File {
      * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
      * amendment:
      * If the URI matches the pattern
-     * <code>(jar:)*file:(<i>path</i>!/)*<i>entry</i></code>, then the
+     * {@code (jar:)*file:(<i>path</i>!/)*<i>entry</i>}, then the
      * constructed file object treats the URI like a (possibly ZIPped) file.
      * <p>
      * For example, in a Java application which is running from a JAR in the

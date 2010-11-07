@@ -99,7 +99,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      *        the required RAES parameters.
      *        This is applied recursively.
      *
-     * @throws NullPointerException If any of the parameters is <tt>null</tt>.
+     * @throws NullPointerException If any of the parameters is {@code null}.
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws RaesParametersException If no suitable RAES parameters have been
      *         provided or something is wrong with the parameters.
@@ -123,7 +123,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
     }
 
     /**
-     * Creates a new instance of <tt>RaesReadOnlyFile</tt>.
+     * Creates a new instance of {@code RaesReadOnlyFile}.
      *
      * @param rof The read only file to read.
      * @param parameters The {@link RaesParameters} required to access the

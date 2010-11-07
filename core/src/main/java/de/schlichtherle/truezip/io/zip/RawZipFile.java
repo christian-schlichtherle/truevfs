@@ -364,7 +364,7 @@ implements Iterable<E>, Closeable {
      * Performs some means to check that this is really a ZIP compatible
      * file.
      * <p>
-     * As a side effect, both {@code mapper} and </code>postamble</code>
+     * As a side effect, both {@code mapper} and }postamble}
      * will be set.
      *
      * @throws ZipException If the file is not ZIP compatible.
