@@ -33,20 +33,15 @@ limited by heap and file system size.
     </description>
     <url>http://kenai.com/projects/truezip</url>
     <inceptionYear>2005</inceptionYear>
-    <organization>
-        <name>Schlichtherle IT Services</name>
-    </organization>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-    <scm>
-        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7</connection>
-        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7</developerConnection>
-        <url>http://kenai.com/projects/truezip/sources/v7/show</url>
-    </scm>
+    <organization>
+        <name>Schlichtherle IT Services</name>
+    </organization>
     <developers>
         <developer>
             <name>Christian Schlichtherle</name>
@@ -59,6 +54,24 @@ limited by heap and file system size.
             </roles>
         </developer>
     </developers>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://kenai.com/jira/browse/TRUEZIP</url>
+    </issueManagement>
+    <mailingLists>
+        <mailingList>
+            <name>Please refer to the project home page</name>
+            <subscribe/>
+            <post/>
+            <unsubscribe/>
+            <archive>http://kenai.com/projects/truezip/lists</archive>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7</developerConnection>
+        <url>http://kenai.com/projects/truezip/sources/v7/show</url>
+    </scm>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
