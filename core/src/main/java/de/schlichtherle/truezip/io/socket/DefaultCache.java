@@ -28,19 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Implements a write-back caching strategy for input and output sockets.
- * Using this class has the following effects:
- * <ul>
- * <li>Upon the first read operation, the data will be read and from the
- *     local target and stored in the cache.
- *     Subsequent or concurrent read operations will be served from the cache
- *     without re-reading the data from the local target again until the cache
- *     gets cleared.
- * <li>Any data written to the cache will get written to the local target if
- *     and only if the cache gets flushed.
- * <li>After a write operation, the data will be stored in the cache for
- *     subsequent read operations until the cache gets cleared.
- * </ul>
+ * Implements a write-through or write-back caching strategy for input and
+ * output sockets.
  * <p>
  * Note that the cache is only effective when the input and output sockets
  * are <em>not</em> connected to a peer socket!
@@ -49,7 +38,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
+final class DefaultCache<LT extends CommonEntry> implements IOCache<LT> {
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputSocketProxy inputProxy;
     private final OutputSocketProxy outputProxy;
@@ -92,7 +81,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     @Override
     public void flush() throws IOException {
-        if (null != buffer) {
+        if (null != buffer) { // DCL is OK in this context!
             synchronized (DefaultCache.this) {
                 if (null != buffer)
                     getOutputStrategy().release(buffer);
@@ -102,7 +91,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
 
     @Override
     public void clear() throws IOException {
-        if (null != buffer) {
+        if (null != buffer) { // DCL is OK in this context!
             synchronized (DefaultCache.this) {
                 final Buffer buffer = this.buffer;
                 if (null != buffer) {
@@ -216,10 +205,12 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
     final class WriteThroughOutputStrategy extends OutputStrategy {
         @Override
         public void release(final Buffer buf) throws IOException {
-            synchronized (DefaultCache.this) {
-                if (buf != buffer) {
-                    buffer = buf;
-                    super.release(buf);
+            if (buf != buffer) { // DCL is OK in this context!
+                synchronized (DefaultCache.this) {
+                    if (buf != buffer) {
+                        buffer = buf;
+                        super.release(buf);
+                    }
                 }
             }
         }
@@ -252,7 +243,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     getInputStrategy().release(Buffer.this);
                 }
             }
-        } // class ReadOnlyFile
+        } // class BufferReadOnlyFile
 
         final class BufferInputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
@@ -272,7 +263,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     getInputStrategy().release(Buffer.this);
                 }
             }
-        } // class InputStream
+        } // class BufferInputStream
 
         final class BufferOutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
@@ -292,7 +283,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
                     getOutputStrategy().release(Buffer.this);
                 }
             }
-        } // class OutputStream
+        } // class BufferOutputStream
     } // class Buffer
 
     private final class InputSocketProxy extends FilterInputSocket<LT> {
@@ -303,7 +294,14 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
-                // Dito.
+                // The data for connected sockets cannot not be cached because
+                // sockets may transfer different encoded data depending on
+                // the identity of their peer target!
+                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
+                // target, it transfers deflated data in order to omit
+                // redundant inflating of the data from the source archive file
+                // and deflating it again to the target archive file.
+                // So we must flush and bypass the cache.
                 flush();
                 return getBoundSocket().newReadOnlyFile();
             }
@@ -313,14 +311,7 @@ final class DefaultCache<LT extends CommonEntry> implements Cache<LT> {
         @Override
         public InputStream newInputStream() throws IOException {
             if (null != getPeerTarget()) {
-                // The data for connected sockets cannot not be cached because
-                // sockets may transfer different encoded data depending on
-                // the identity of their peer target!
-                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
-                // target, it transfers deflated data in order to omit
-                // redundant inflating of the data from the source archive file
-                // and deflating it again to the target archive file.
-                // So we must flush and bypass the cache.
+                // Dito.
                 flush();
                 return getBoundSocket().newInputStream();
             }

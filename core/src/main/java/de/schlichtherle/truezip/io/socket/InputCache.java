@@ -23,14 +23,14 @@ import java.io.IOException;
  * Using this interface has the following effects:
  * <ul>
  * <li>Upon the first read operation, the data will be read from the local
- *     target and stored in the cache.
- *     Subsequent or concurrent read operations will be served from the cache
- *     without re-reading the data from the local target again until the cache
- *     gets cleared.
+ *     target and temporarily stored in this cache.
+ *     Subsequent or concurrent read operations will be served from this cache
+ *     without re-reading the data from the local target again until this cache
+ *     gets {@link InputCache#clear cleared}.</li>
  * </ul>
  *
  * @see     OutputCache
- * @see     Cache
+ * @see     IOCache
  * @param   <LT> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -41,8 +41,8 @@ public interface InputCache<LT extends CommonEntry> {
     InputSocket<LT> getInputSocket();
 
     /**
-     * Clears the cache and triggers re-reading the data from the underlying
-     * storage upon the next read operation.
+     * Clears this cache and triggers re-reading the data from the local target
+     * upon the next read operation.
      */
     void clear() throws IOException;
 }

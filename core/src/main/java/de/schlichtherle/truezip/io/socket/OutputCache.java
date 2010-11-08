@@ -22,12 +22,13 @@ import java.io.IOException;
  * Implements a caching strategy for output sockets.
  * Using this interface has the following effects:
  * <ul>
- * <li>Any data written to the cache will get written to the local target if
- *     and only if the cache gets flushed.
+ * <li>At the discretion of the implementation, data written to this cache may
+ *     not be written to the local target until this cache gets
+ *     {@link OutputCache#flush flushed}.</li>
  * </ul>
  *
  * @see     InputCache
- * @see     Cache
+ * @see     IOCache
  * @param   <LT> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -38,13 +39,14 @@ public interface OutputCache<LT extends CommonEntry> {
     OutputSocket<LT> getOutputSocket();
 
     /**
-     * Writes the data in the cache to the underlying storage.
+     * Ensures that the last data written to this cache is written to the local
+     * target, too.
      */
     void flush() throws IOException;
 
     /**
-     * Clears the cache, effectively discarding any data which has not been
-     * {@link #flush() flushed} to the underlying storage before.
+     * Clears this cache, effectively discarding any written data which has not
+     * been {@link #flush() flushed} to the local target before.
      */
     void clear() throws IOException;
 }
