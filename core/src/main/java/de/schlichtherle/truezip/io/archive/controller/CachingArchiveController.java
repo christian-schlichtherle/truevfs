@@ -58,9 +58,9 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
  * </ul>
  * <p>
  * Caching an archive entry is automatically used for an
- * {@link #getInputSocket input socket} with the option
- * {@link InputOption#CACHE} or an {@link #getOutputSocket output socket} with
- * the option {@link InputOption#CACHE} set.
+ * {@link #getInputSocket input socket} with the input option
+ * {@link InputOption#CACHE} set or an {@link #getOutputSocket output socket}
+ * with the output option {@link OutputOption#CACHE} set.
  *
  * @author Christian Schlichtherle
  * @version $Id$
