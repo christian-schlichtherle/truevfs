@@ -24,24 +24,31 @@ import java.io.IOException;
  * Using this interface has the following effects:
  * <ul>
  * <li>Upon the first read operation, the data will be read from the local
- *     target and stored in the cache.
- *     Subsequent or concurrent read operations will be served from the cache
- *     without re-reading the data from the local target again until the cache
- *     gets cleared.
- * <li>Any data written to the cache will get written to the local target if
- *     and only if the cache gets flushed.
- * <li>After a write operation, the data will be stored in the cache for
- *     subsequent read operations until the cache gets cleared.
+ *     target and temporarily stored in this cache.
+ *     Subsequent or concurrent read operations will be served from this cache
+ *     without re-reading the data from the local target again until this cache
+ *     gets {@link InputCache#clear cleared}.</li>
+ * <li>At the discretion of the implementation, data written to this cache may
+ *     not be written to the local target until this cache gets
+ *     {@link OutputCache#flush flushed}.</li>
+ * <li>After a write operation, the data will be temporarily stored in this
+ *     cache for subsequent read operations until this cache gets
+ *     {@link OutputCache#clear cleared}.
  * </ul>
  *
  * @param   <LT> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface Cache<LT extends CommonEntry>
+public interface IOCache<LT extends CommonEntry>
 extends InputCache<LT>, OutputCache<LT> {
 
+    /** Provides different cache strategies. */
     enum Strategy {
+        /**
+         * As the name implies, any attempt to create a new cache for output
+         * will result in an {@link UnsupportedOperationException}.
+         */
         READ_ONLY {
             @Override
             public <LT extends CommonEntry>
@@ -51,7 +58,7 @@ extends InputCache<LT>, OutputCache<LT> {
 
             @Override
             public <LT extends CommonEntry>
-            Cache<LT> newCache( InputSocket<? extends LT> input,
+            IOCache<LT> newCache( InputSocket<? extends LT> input,
                                 OutputSocket<? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
@@ -64,6 +71,10 @@ extends InputCache<LT>, OutputCache<LT> {
             }
         },
 
+        /**
+         * A write-through cache flushes any written data as soon as the
+         * output stream created by the provided output socket gets closed.
+         */
         WRITE_THROUGH {
             @Override
             <LT extends CommonEntry>
@@ -73,6 +84,10 @@ extends InputCache<LT>, OutputCache<LT> {
             }
         },
 
+        /**
+         * A write-back cache flushes any written data if and only if it gets
+         * explicitly flushed.
+         */
         WRITE_BACK {
             @Override
             <LT extends CommonEntry>
@@ -82,6 +97,7 @@ extends InputCache<LT>, OutputCache<LT> {
             }
         };
 
+        /** Returns a new input cache. */
         public <LT extends CommonEntry>
         InputCache<LT> newCache(InputSocket <? extends LT> input) {
             if (null == input)
@@ -89,6 +105,7 @@ extends InputCache<LT>, OutputCache<LT> {
             return new DefaultCache<LT>(input, null, this);
         }
 
+        /** Returns a new output cache. */
         public <LT extends CommonEntry>
         OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
             if (null == output)
@@ -96,9 +113,10 @@ extends InputCache<LT>, OutputCache<LT> {
             return new DefaultCache<LT>(null, output, this);
         }
 
+        /** Returns a new input / output cache. */
         public <LT extends CommonEntry>
-        Cache<LT> newCache( InputSocket<? extends LT> input,
-                            OutputSocket<? extends LT> output) {
+        IOCache<LT> newCache(   InputSocket<? extends LT> input,
+                                OutputSocket<? extends LT> output) {
             if (null == input || null == output)
                 throw new NullPointerException();
             return new DefaultCache<LT>(input, output, this);

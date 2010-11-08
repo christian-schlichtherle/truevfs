@@ -39,7 +39,7 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (options.get(InputOption.CACHE))
-            input = Cache.Strategy.READ_ONLY.newCache(input).getInputSocket();
+            input = IOCache.Strategy.READ_ONLY.newCache(input).getInputSocket();
         return input;
     }
 
