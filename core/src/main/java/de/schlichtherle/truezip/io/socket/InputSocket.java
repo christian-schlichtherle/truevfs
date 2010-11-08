@@ -126,12 +126,34 @@ extends IOSocket<LT, CommonEntry> {
     }
 
     /**
+     * <b>Optional:</b> Returns a new read only file for reading bytes from
+     * the {@link #getLocalTarget() local target} in arbitrary order.
+     * <p>
+     * If this method is supported, implementations must enable calling it
+     * any number of times.
+     * Furthermore, the returned read only file should <em>not</em> be buffered.
+     * Buffering should be addressed by client applications instead.
+     *
+     * @throws UnsupportedOperationException if this operation is not supported
+     *         by the implementation.
+     * @throws FileNotFoundException if the local target does not exist or is
+     *         not accessible for some reason.
+     * @throws IOException on any other exceptional condition.
+     * @return A new read only file.
+     */
+    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
+
+    /**
      * Returns a new input stream for reading bytes from the
      * {@link #getLocalTarget() local target}.
      * <p>
      * Implementations must enable calling this method any number of times.
      * Furthermore, the returned input stream should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
+     * <p>
+     * The implementation in the class {@link InputSocket} calls
+     * {@link #newReadOnlyFile()} and wraps the resulting object in a new
+     * {@link ReadOnlyFileInputStream} as an adapter.
      *
      * @throws FileNotFoundException if the local target does not exist or is
      *         not accessible for some reason.
@@ -141,20 +163,4 @@ extends IOSocket<LT, CommonEntry> {
     public InputStream newInputStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }
-
-    /**
-     * <b>Optional:</b> Returns a new read only file for reading bytes from
-     * the {@link #getLocalTarget() local target} in arbitrary order.
-     * <p>
-     * If this method is supported, implementations must enable calling it
-     * any number of times.
-     * Furthermore, the returned read only file should <em>not</em> be buffered.
-     * Buffering should be addressed by client applications instead.
-     *
-     * @throws FileNotFoundException if the local target does not exist or is
-     *         not accessible for some reason.
-     * @throws IOException on any other exceptional condition.
-     * @return A new read only file.
-     */
-    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 }
