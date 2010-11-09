@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2010 Schlichtherle IT Services
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle</groupId>
+        <artifactId>asl20-oss-parent</artifactId>
+        <version>1</version>
+    </parent>
+
+    <groupId>de.schlichtherle.truezip</groupId>
+    <artifactId>truezip-parent</artifactId>
+    <version>7.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>TrueZIP ${project.version}</name>
+    <description>
+        TrueZIP is a Java based Virtual File System (VFS) to enable
+        transparent, multi-threaded read/write access to archive files
+        (ZIP, TAR etc.) as if they were directories.
+
+        Archive files may be arbitrarily nested and the nesting level is only
+        limited by heap and file system size.
+    </description>
+    <url>http://kenai.com/projects/truezip</url>
+    <inceptionYear>2005</inceptionYear>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://kenai.com/jira/browse/TRUEZIP</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:hg:https://hg.kenai.com/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.kenai.com/truezip~v7</developerConnection>
+        <url>http://kenai.com/projects/truezip/sources/v7/show</url>
+    </scm>
+
+    <modules>
+        <module>core</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+            <version>1.45</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
+            <version>2.2.7.5</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <groups>
+                        <group>
+                            <title>Presentation / Access Tier</title>
+                            <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample:de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
+                        </group>
+                        <group>
+                            <title>Application / Engine Tier</title>
+                            <packages>de.schlichtherle.truezip.io.archive*:de.schlichtherle.truezip.io.filesystem*</packages>
+                        </group>
+                        <group>
+                            <title>Data Tier</title>
+                            <packages>de.schlichtherle.truezip.io.zip:de.schlichtherle.truezip.crypto.io.raes</packages>
+                        </group>
+                    </groups>
+                    <links>
+                        <link>http://www.bouncycastle.org/docs/docs1.5/</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <compiler.source>1.5</compiler.source>
+        <compiler.target>1.5</compiler.target>
+    </properties>
+</project>
