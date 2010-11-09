@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>CUSTOM-source:jar javadoc:jar deploy</actionName>
+        <displayName>source:jar javadoc:jar deploy</displayName>
+        <goals>
+            <goal>source:jar</goal>
+            <goal>javadoc:jar</goal>
+            <goal>deploy</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-clean compile</actionName>
+        <displayName>clean compile</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>compile</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-clean package javadoc:jar</actionName>
+        <displayName>clean package javadoc:jar</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>package</goal>
+            <goal>javadoc:jar</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-verify</actionName>
+        <displayName>verify</displayName>
+        <goals>
+            <goal>verify</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-package</actionName>
+        <displayName>package</displayName>
+        <goals>
+            <goal>package</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>run</actionName>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
+        </goals>
+        <properties>
+            <exec.workingdir>C:\Users\christian\AppData\Local\Temp</exec.workingdir>
+            <exec.classpathScope>runtime</exec.classpathScope>
+            <exec.args>-classpath %classpath de.schlichtherle.truezip.io.sample.NZip cp christian.bmp outer.zip/christian.bmp</exec.args>
+            <exec.executable>java</exec.executable>
+        </properties>
+    </action>
+    <action>
+        <actionName>debug</actionName>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
+        </goals>
+        <properties>
+            <exec.workingdir>C:\Users\christian\AppData\Local\Temp</exec.workingdir>
+            <exec.classpathScope>runtime</exec.classpathScope>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath de.schlichtherle.truezip.io.sample.NZip cp christian.bmp outer.zip/christian.bmp</exec.args>
+            <jpda.listen>true</jpda.listen>
+            <exec.executable>java</exec.executable>
+        </properties>
+    </action>
+    <action>
+        <actionName>profile</actionName>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
+        </goals>
+        <properties>
+            <exec.workingdir>C:\Users\christian\AppData\Local\Temp</exec.workingdir>
+            <exec.args>${profiler.args} -classpath %classpath de.schlichtherle.truezip.io.sample.NZip cp christian.bmp outer.zip/christian.bmp</exec.args>
+            <profiler.action>profile</profiler.action>
+            <exec.executable>${profiler.java}</exec.executable>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-javadoc:jar</actionName>
+        <displayName>javadoc:jar</displayName>
+        <goals>
+            <goal>javadoc:jar</goal>
+        </goals>
+    </action>
+</actions>

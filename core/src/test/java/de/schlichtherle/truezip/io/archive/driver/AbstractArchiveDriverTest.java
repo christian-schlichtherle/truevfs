@@ -81,7 +81,7 @@ public class AbstractArchiveDriverTest extends TestCase {
     }
 
     public void testCharset() {
-        assertSame("US-ASCII", driver.getCharset()); // string literals are interned
+        assertEquals("US-ASCII", driver.getCharset());
     }
 
     public void testAssertEncodable() throws CharConversionException {
