@@ -20,7 +20,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>asl20-oss-parent</artifactId>
-        <version>2</version>
+        <version>4</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>TrueZIP ${project.version}</name>
+    <name>TrueZIP</name>
     <description>
         TrueZIP is a Java based Virtual File System (VFS) to enable
         transparent, multi-threaded read/write access to archive files
@@ -88,11 +88,11 @@
                 <configuration>
                     <groups>
                         <group>
-                            <title>Presentation / Access Tier</title>
+                            <title>Access Tier</title>
                             <packages>de.schlichtherle.truezip.io.file:de.schlichtherle.truezip.io.sample:de.schlichtherle.truezip.awt:de.schlichtherle.truezip.io.swing*:de.schlichtherle.truezip.swing*</packages>
                         </group>
                         <group>
-                            <title>Application / Engine Tier</title>
+                            <title>Engine Tier</title>
                             <packages>de.schlichtherle.truezip.io.archive*:de.schlichtherle.truezip.io.filesystem*</packages>
                         </group>
                         <group>
