@@ -23,8 +23,6 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.zip.ZipException;
 
 /**
  * A {@link ZipInputShop} which checks the CRC-32 value for all ZIP entries.
@@ -50,11 +48,7 @@ public class CheckedZipInputShop extends ZipInputShop {
             boolean preambled,
             boolean postambled,
             ZipEntryFactory<ZipEntry> factory)
-    throws  NullPointerException,
-            UnsupportedEncodingException,
-            FileNotFoundException,
-            ZipException,
-            IOException {
+    throws IOException {
         super(rof, charset, preambled, postambled, factory);
     }
 

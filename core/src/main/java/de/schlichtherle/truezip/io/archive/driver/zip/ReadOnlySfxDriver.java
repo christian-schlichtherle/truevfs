@@ -72,7 +72,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
 
     @Override
     protected ZipOutputShop newZipOutputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             OutputStream out,
             ZipInputShop source)
     throws IOException {

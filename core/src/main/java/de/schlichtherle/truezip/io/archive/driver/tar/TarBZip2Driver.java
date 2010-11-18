@@ -115,7 +115,7 @@ public class TarBZip2Driver extends TarDriver {
      */
     @Override
     protected TarInputShop newTarInputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final InputStream in)
     throws IOException {
         // Consume and check the first two magic bytes. This is required for
@@ -133,7 +133,7 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
@@ -141,7 +141,7 @@ public class TarBZip2Driver extends TarDriver {
         // CBZip2OutputStream class.
         out.write(new byte[] { 'B', 'Z' });
         return super.newTarOutputShop(
-                archive,
+                model,
                 new CBZip2OutputStream(
                     new BufferedOutputStream(out, BUFSIZE),
                     inBlockSize),

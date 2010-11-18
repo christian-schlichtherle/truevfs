@@ -80,7 +80,7 @@ public class CheckedZipDriver extends ZipDriver {
     
     @Override
     protected ZipInputShop newZipInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(

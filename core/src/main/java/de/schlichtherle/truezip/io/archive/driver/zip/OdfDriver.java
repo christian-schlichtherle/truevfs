@@ -78,14 +78,14 @@ public class OdfDriver extends JarDriver {
 
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             OutputSocket<?> output,
             InputShop<ZipEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
             return new OdfOutputShop(
-                    newZipOutputShop(archive, out, (ZipInputShop) source));
+                    newZipOutputShop(model, out, (ZipInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
