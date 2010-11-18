@@ -91,7 +91,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final OutputSocket<?> output,
             final InputShop<ZipEntry> source)
     throws IOException {
@@ -100,11 +100,11 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
         try {
             final RaesOutputStream ros;
             try {
-                ros = RaesOutputStream.getInstance(out, getRaesParameters(archive));
+                ros = RaesOutputStream.getInstance(out, getRaesParameters(model));
             } catch (RaesKeyException ex) {
                 throw new TabuFileException(ex);
             }
-            return newZipOutputShop(archive, ros, (ZipInputShop) source);
+            return newZipOutputShop(model, ros, (ZipInputShop) source);
         } catch (IOException cause) {
             try {
                 out.close();

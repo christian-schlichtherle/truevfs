@@ -106,7 +106,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      */
     @Override
     protected ZipInputShop newZipInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
@@ -118,6 +118,6 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
         return rof.length() > getAuthenticationTrigger()
                 ? new CheckedZipInputShop(
                     rof, getCharset(), getPreambled(), getPostambled(), this)
-                : super.newZipInputShop(archive, rof);
+                : super.newZipInputShop(model, rof);
     }
 }

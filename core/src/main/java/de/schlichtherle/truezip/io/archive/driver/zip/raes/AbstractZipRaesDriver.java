@@ -120,7 +120,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final InputSocket<?> target)
     throws IOException {
         class InputSocket extends FilterInputSocket<CommonEntry> {
@@ -134,7 +134,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                 try {
                     final RaesReadOnlyFile rrof;
                     try {
-                        rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(archive));
+                        rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
                         throw new TabuFileException(ex);
                     }
@@ -152,7 +152,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                 }
             }
         }
-        return super.newInputShop(archive, new InputSocket());
+        return super.newInputShop(model, new InputSocket());
     }
 
     /**
@@ -184,7 +184,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
@@ -200,7 +200,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                             .newOutputStream();
                 try {
                     try {
-                        return RaesOutputStream.getInstance(out, getRaesParameters(archive));
+                        return RaesOutputStream.getInstance(out, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
                         throw new TabuFileException(ex);
                     }
@@ -214,20 +214,20 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                 }
             }
         }
-        return super.newOutputShop(archive, new OutputSocket(), source);
+        return super.newOutputShop(model, new OutputSocket(), source);
     }
 
     /**
      * Returns the {@link RaesParameters} for the given canonical path name.
      * 
-     * @param archive The abstract archive representation which TrueZIP's
+     * @param model The abstract archive representation which TrueZIP's
      *        internal {@code ArchiveController} is processing
      *        - never {@code null}.
      *
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    public RaesParameters getRaesParameters(FileSystemModel archive) {
-        return new KeyManagerRaesParameters(archive.getMountPoint());
+    public RaesParameters getRaesParameters(FileSystemModel model) {
+        return new KeyManagerRaesParameters(model.getMountPoint());
     }
 }

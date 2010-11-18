@@ -200,12 +200,12 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public ZipInputShop newInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newZipInputShop(archive, rof);
+            return newZipInputShop(model, rof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
@@ -213,7 +213,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipInputShop newZipInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(
@@ -229,12 +229,12 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FileSystemModel archive, OutputSocket<?> output, InputShop<ZipEntry> source)
+            FileSystemModel model, OutputSocket<?> output, InputShop<ZipEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedArchiveOutputShop<ZipEntry>(
-                    newZipOutputShop(archive, out, (ZipInputShop) source));
+                    newZipOutputShop(model, out, (ZipInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
@@ -242,7 +242,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            FileSystemModel archive, OutputStream out, ZipInputShop source)
+            FileSystemModel model, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source);
     }

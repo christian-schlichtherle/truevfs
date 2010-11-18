@@ -97,7 +97,7 @@ public class TarGZipDriver extends TarDriver {
 
     @Override
     protected TarInputShop newTarInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             InputStream in)
     throws IOException {
         return new TarInputShop(new GZIPInputStream(in, BUFSIZE));
@@ -105,12 +105,12 @@ public class TarGZipDriver extends TarDriver {
 
     @Override
     protected TarOutputShop newTarOutputShop(
-            final FileSystemModel archive,
+            final FileSystemModel model,
             final OutputStream out,
             final TarInputShop source)
     throws IOException {
         return super.newTarOutputShop(
-                archive,
+                model,
                 new GZIPOutputStream(out, BUFSIZE, level),
                 source);
     }

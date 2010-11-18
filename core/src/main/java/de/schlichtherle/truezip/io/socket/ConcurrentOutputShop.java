@@ -32,8 +32,7 @@ import java.util.logging.Logger;
 
 /**
  * Decorates an {@code OutputShop} to add accounting and multithreading
- * synchronization for all output streams created by the target common
- * output.
+ * synchronization for all output streams created by the decorated output shop.
  *
  * @see     ConcurrentInputShop
  * @param   <CE> The type of the common entries.

@@ -118,19 +118,19 @@ extends AbstractArchiveDriver<TarEntry> {
      */
     @Override
     public TarInputShop newInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             InputSocket<?> input)
     throws IOException {
         final InputStream in = input.newInputStream();
         try {
-            return newTarInputShop(archive, in);
+            return newTarInputShop(model, in);
         } finally {
             in.close();
         }
     }
 
     protected TarInputShop newTarInputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             InputStream in)
     throws IOException {
         return new TarInputShop(in);
@@ -144,14 +144,14 @@ extends AbstractArchiveDriver<TarEntry> {
      */
     @Override
     public OutputShop<TarEntry> newOutputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             OutputSocket<?> output,
             InputShop<TarEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedArchiveOutputShop<TarEntry>(
-                    newTarOutputShop(archive, out, (TarInputShop) source));
+                    newTarOutputShop(model, out, (TarInputShop) source));
         } catch (IOException ex) {
             out.close();
             throw ex;
@@ -159,7 +159,7 @@ extends AbstractArchiveDriver<TarEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            FileSystemModel archive,
+            FileSystemModel model,
             OutputStream out,
             TarInputShop source)
     throws IOException {
