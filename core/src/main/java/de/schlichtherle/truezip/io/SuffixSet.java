@@ -102,7 +102,7 @@ public final class SuffixSet extends CanonicalStringSet {
      */
     public SuffixSet(final Collection<String> c) {
         super(SEPARATOR);
-        if (c != null)
+        if (null != c)
             super.addAll(c);
     }
 
@@ -110,11 +110,13 @@ public final class SuffixSet extends CanonicalStringSet {
      * Returns the canonical form of {@code suffix} or {@code null}
      * if the given suffix does not have a canonical form.
      * An example of the latter case is the empty string.
+     * <p>
+     * <b>WARNING:</b> This method may get called from the constructor of this
+     * class!
      */
     @Override
     protected String canonicalize(String suffix) {
-        assert suffix != null;
-        assert suffix.indexOf(SEPARATOR) < 0 : "separator in suffix is illegal";
+        assert 0 > suffix.indexOf(SEPARATOR) : "illegal separator position in suffix";
         if (suffix.length() > 0 && suffix.charAt(0) == PREFIX)
             suffix = suffix.substring(1);
         return suffix.length() > 0
@@ -136,11 +138,11 @@ public final class SuffixSet extends CanonicalStringSet {
             int c = 0;
             do {
                 final String suffix = i.next();
-                if (c++ > 0)
+                if (0 < c++)
                     sb.append('|'); // not SEPARATOR !!!
                 sb.append("\\Q").append(suffix).append("\\E"); // NOI18N
             } while (i.hasNext());
-            assert c > 0;
+            assert 0 < c;
             return sb.append(")[\\").append(File.separatorChar).append("/]*").toString();
         } else {
             return "\\00"; // NOT "\00"! Effectively never matches anything. // NOI18N

@@ -187,7 +187,7 @@ public class KeyManager {
      */
     public static synchronized boolean resetKeyProvider(final URI resource) {
         final KeyProvider<?> provider = providers.get(resource);
-        if (provider instanceof AbstractKeyProvider) {
+        if (provider instanceof AbstractKeyProvider<?>) {
             final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
             akp.reset();
             return true;
@@ -209,7 +209,7 @@ public class KeyManager {
     public static synchronized boolean resetAndRemoveKeyProvider(
             final URI resource) {
         final KeyProvider<?> provider = providers.get(resource);
-        if (provider instanceof AbstractKeyProvider) {
+        if (provider instanceof AbstractKeyProvider<?>) {
             final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
             akp.reset();
             final KeyProvider<?> result = akp.removeFromKeyManager(resource);
@@ -261,7 +261,7 @@ public class KeyManager {
 
             @Override
 			public void run(URI resource, KeyProvider<?> provider) {
-                if (provider instanceof AbstractKeyProvider) {
+                if (provider instanceof AbstractKeyProvider<?>) {
                     final AbstractKeyProvider<?> akp
                             = (AbstractKeyProvider<?>) provider;
                     akp.reset();
@@ -345,7 +345,7 @@ public class KeyManager {
         final KeyProvider<?> provider = providers.get(oldResource);
         if (provider == null)
             return false;
-        if (provider instanceof AbstractKeyProvider) {
+        if (provider instanceof AbstractKeyProvider<?>) {
             final AbstractKeyProvider<?> akp = (AbstractKeyProvider<?>) provider;
             // Implement transactional behaviour.
             akp.removeFromKeyManager(oldResource);
@@ -404,7 +404,7 @@ public class KeyManager {
                     + " must be a subclass or implementation of "
                     + forType.getName() + "!");
         try {
-            useType.getConstructor((Class[]) null);
+            useType.getConstructor((Class<?>[]) null);
         } catch (NoSuchMethodException noPublicNullaryConstructor) {
             throw new IllegalArgumentException(useType.getName()
             + " (no public nullary constructor)",
@@ -530,7 +530,7 @@ public class KeyManager {
         if (provider == null)
             throw new NullPointerException();
 
-        if (provider instanceof AbstractKeyProvider) {
+        if (provider instanceof AbstractKeyProvider<?>) {
             ((AbstractKeyProvider<?>) provider).addToKeyManager(resource);
         } else {
             mapKeyProvider(resource, provider);
