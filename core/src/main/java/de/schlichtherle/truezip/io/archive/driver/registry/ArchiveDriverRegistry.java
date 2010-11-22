@@ -62,6 +62,7 @@ public class ArchiveDriverRegistry implements Serializable {
     static final String KWD_DEFAULT = "DEFAULT";    // NOI18N
 
     final Map<String, Object> drivers = new HashMap<String, Object>();
+
     /**
      * The delegate used to lookup archive drivers when no driver is
      * configured locally.
@@ -212,8 +213,8 @@ public class ArchiveDriverRegistry implements Serializable {
         // Lookup driver locally.
         Object driver = drivers.get(suffix);
         if (!(driver instanceof ArchiveDriver<?>)) {
-            if (driver == null) {
-                if (drivers.containsKey(suffix) || delegate == null)
+            if (null == driver) {
+                if (drivers.containsKey(suffix) || null == delegate)
                     return null;
 
                 // Lookup the driver in the delegate and cache it in the
@@ -258,13 +259,13 @@ public class ArchiveDriverRegistry implements Serializable {
     }
 
     /**
-     * Returns the set of all suffixes which map to a valid archive driver in
-     * the registry.
-     * This includes the registry built by the entire chain, not just the
-     * local registry.
+     * Returns a new set of all suffixes which map to a valid archive driver in
+     * this registry.
+     * This includes the drivers found in the entire registry chain, not just
+     * this registry object.
      */
     public final SuffixSet suffixes() {
-        return decorate(delegate != null ? delegate.suffixes() : new SuffixSet());
+        return decorate(null != delegate ? delegate.suffixes() : new SuffixSet());
     }
 
     /**
@@ -278,10 +279,9 @@ public class ArchiveDriverRegistry implements Serializable {
      */
     public final SuffixSet decorate(final SuffixSet set) {
         final SuffixSet local = new SuffixSet(drivers.keySet());
-        for (final Iterator<String> i = local.iterator(); i.hasNext(); ) {
-            final String suffix = i.next();
+        for (final String suffix : local) {
             assert drivers.containsKey(suffix);
-            if (drivers.get(suffix) != null)
+            if (null != drivers.get(suffix))
                 set.addAll(suffix);
             else
                 set.removeAll(suffix);

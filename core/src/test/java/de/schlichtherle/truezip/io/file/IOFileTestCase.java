@@ -45,27 +45,27 @@ import junit.framework.TestCase;
  */
 public abstract class IOFileTestCase extends TestCase {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             IOFileTestCase.class.getName());
 
-    private static final java.io.File _tempDir = new java.io.File(
+    private static final java.io.File TEMP_DIR = new java.io.File(
             System.getProperty("java.io.tmpdir"));
 
     /** The data to get compressed. */
-    private static final byte[] _data = new byte[1024]; // enough to waste some heat on CPU cycles
+    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
+        LOGGER.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
-            logger.warning("Please enable assertions for additional white box testing.");
+            LOGGER.warning("Please enable assertions for additional white box testing.");
 
-        new Random().nextBytes(_data);
-        logger.log(Level.CONFIG, "Created {0} bytes of random data.", _data.length);
-        logger.log(Level.CONFIG, "Temporary directory: {0}", _tempDir.getPath());
-        logger.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
-        logger.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
-        logger.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
+        new Random().nextBytes(DATA);
+        LOGGER.log(Level.CONFIG, "Created {0} bytes of random data.", DATA.length);
+        LOGGER.log(Level.CONFIG, "Temporary directory: {0}", TEMP_DIR.getPath());
+        LOGGER.log(Level.CONFIG, "Free memory: {0}", mb(Runtime.getRuntime().freeMemory()));
+        LOGGER.log(Level.CONFIG, "Total memory: {0}", mb(Runtime.getRuntime().totalMemory()));
+        LOGGER.log(Level.CONFIG, "Max memory: {0}", mb(Runtime.getRuntime().maxMemory()));
     }
 
     private static String mb(long value) {
@@ -73,8 +73,6 @@ public abstract class IOFileTestCase extends TestCase {
     }
     
     protected byte[] data;
-    
-    protected java.io.File tempDir;
     
     protected String prefix;
     
@@ -104,9 +102,7 @@ public abstract class IOFileTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         if (data == null)
-            data = _data; // (byte[]) _data.clone();
-        if (tempDir == null)
-            tempDir = _tempDir;
+            data = DATA; // (byte[]) _data.clone();
         if (prefix == null)
             prefix = "tzp-test";
         if (suffix == null)
@@ -124,14 +120,13 @@ public abstract class IOFileTestCase extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         data = null;
-        tempDir = null;
         prefix = null;
         suffix = null;
 
         if (archive != null)
             archive.delete(); // archive, not _archive!
         if (_archive.exists() && !_archive.delete())
-            logger.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
+            LOGGER.log(Level.WARNING, "{0} (File.delete() failed)", _archive);
         _archive = archive = null;
 
         // sync now to delete temps and free memory.
@@ -597,7 +592,7 @@ public abstract class IOFileTestCase extends TestCase {
         try {
             new FileOutputStream(file2);
         } catch (FileBusyException busy) {
-            logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
+            LOGGER.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
 
         // fos1 is still open!
@@ -964,21 +959,21 @@ public abstract class IOFileTestCase extends TestCase {
             assertTrue(file.createNewFile());
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
+        LOGGER.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{i, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FilenameFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
+        LOGGER.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{j, time});
         
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++) {
             archive.listFiles((FileFilter) null);
         }
         time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
+        LOGGER.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{j, time});
         
         assertFalse(archive.delete()); // directory not empty!
         File.umount(); // allow external modifications!
@@ -1447,7 +1442,7 @@ public abstract class IOFileTestCase extends TestCase {
     
     private void testMultithreadedMultipleArchivesSingleEntryWriting(
             final int nThreads, final boolean updateIndividually)
-            throws Exception {
+    throws Exception {
         assertTrue(File.isLenient());
         
         class WritingThread extends Thread {
@@ -1519,7 +1514,7 @@ public abstract class IOFileTestCase extends TestCase {
     private java.io.File createTempFile(
             String prefix,
             String suffix)
-            throws IOException {
-        return File.createTempFile(prefix, suffix, tempDir).getCanonicalFile();
+    throws IOException {
+        return File.createTempFile(prefix, suffix, TEMP_DIR).getCanonicalFile();
     }
 }

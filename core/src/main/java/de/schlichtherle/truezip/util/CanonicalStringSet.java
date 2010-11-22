@@ -20,6 +20,7 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 /**
@@ -76,7 +77,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      */
     public CanonicalStringSet(final char separator, final CanonicalStringSet set) {
         this.separator = separator;
-        if (set != null)
+        if (null != set)
             addAll(set); // no dangerous constructor - method is final!
     }
 
@@ -86,6 +87,9 @@ public class CanonicalStringSet extends AbstractSet<String> {
      * <p>
      * The implementation in the class {@link CanonicalStringSet} simply
      * returns the method parameter.
+     * <p>
+     * <b>WARNING:</b> This method may get called from the constructor of this
+     * class!
      *
      * @param s The string to get canonicalized.
      *        Never {@code null} and never contains the separator.
@@ -93,8 +97,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      *         {@code s} does not have a canonical form.
      */
     protected String canonicalize(final String s) {
-        assert s != null;
-        assert s.indexOf(separator) < 0 : "separator in string is illegal";
+        assert 0 > s.indexOf(separator) : "illegal separator position in suffix";
         return s;
     }
 
@@ -262,8 +265,8 @@ public class CanonicalStringSet extends AbstractSet<String> {
         for (final Iterator<String> i = new StringIterator(list); i.hasNext(); ) {
             final String element = i.next();
             final String canonical = canonicalize(element);
-            if (canonical != null)
-                changed |= map.put(canonical, element) == null;
+            if (null != canonical)
+                changed |= null == map.put(canonical, element);
         }
         return changed;
     }
@@ -402,25 +405,20 @@ public class CanonicalStringSet extends AbstractSet<String> {
     } // class CanonicalSuffixIterator
 
     private class StringIterator implements Iterator<String> {
-        private final String[] split;
-        private int i = 0;
+        private final StringTokenizer i;
 
         private StringIterator(final String list) {
-            split = list.split("\\" + separator); // NOI18N
+            i = new StringTokenizer(list, "" + separator); // NOI18N
         }
 
         @Override
 		public boolean hasNext() {
-            return i < split.length;
+            return i.hasMoreTokens();
         }
 
         @Override
 		public String next() {
-            try {
-                return split[i++];
-            } catch (IndexOutOfBoundsException ex) {
-                throw new NoSuchElementException();
-            }
+            return i.nextToken();
         }
 
         @Override

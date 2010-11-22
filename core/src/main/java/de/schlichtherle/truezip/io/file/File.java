@@ -1528,7 +1528,7 @@ public class File extends java.io.File {
      */
     public static void setDefaultArchiveDetector(
             final ArchiveDetector detector) {
-        if (detector == null)
+        if (null == detector)
             throw new NullPointerException();
         File.defaultDetector = detector;
     }
