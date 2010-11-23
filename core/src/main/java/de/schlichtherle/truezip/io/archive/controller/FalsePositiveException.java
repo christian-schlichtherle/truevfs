@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import java.io.IOException;
 
 /**
@@ -26,10 +27,10 @@ import java.io.IOException;
  * @version $Id$
  */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FalsePositiveException extends ArchiveException {
+public final class FalsePositiveException extends FileSystemException {
 
     FalsePositiveException(ArchiveModel model, IOException cause) {
         super(model, cause);
-        assert !(cause instanceof ArchiveException);
+        assert !(cause instanceof FileSystemException);
     }
 }

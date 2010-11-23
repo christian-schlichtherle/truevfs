@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -29,7 +28,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ArchiveModel implements CompositeFileSystemModel {
+public final class ArchiveModel implements FileSystemModel {
     private final FileSystemModel parentModel;
     private final URI mountPoint;
     private final ReentrantLock readLock;

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -62,38 +63,38 @@ extends               AbstractArchiveController<AE> {
     @Override
     public <E extends IOException>
     void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
-    throws E, ArchiveException {
+    throws E, FileSystemException {
         getController().sync(builder, options);
     }
 
     @Override
-    public Icon getOpenIcon() throws ArchiveException {
+    public Icon getOpenIcon() throws FileSystemException {
         return getController().getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon() throws ArchiveException {
+    public Icon getClosedIcon() throws FileSystemException {
         return getController().getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly() throws ArchiveException {
+    public boolean isReadOnly() throws FileSystemException {
         return getController().isReadOnly();
     }
 
     @Override
     public Entry<? extends AE> getEntry(String path)
-    throws ArchiveException {
+    throws FileSystemException {
         return getController().getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws ArchiveException {
+    public boolean isReadable(String path) throws FileSystemException {
         return getController().isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws ArchiveException {
+    public boolean isWritable(String path) throws FileSystemException {
         return getController().isWritable(path);
     }
 

@@ -31,7 +31,7 @@ public class SyncWarningException extends SyncException {
 
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public SyncWarningException(CompositeFileSystemModel model, IOException cause) {
+    public SyncWarningException(FileSystemModel model, IOException cause) {
         super(model, cause, -1);
     }
 }

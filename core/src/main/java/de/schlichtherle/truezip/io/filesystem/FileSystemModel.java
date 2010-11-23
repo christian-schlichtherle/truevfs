@@ -44,4 +44,19 @@ public interface FileSystemModel {
      * @return A non-{@code null} URI for the mount point of the file system.
      */
     URI getMountPoint();
+
+    /**
+     * Returns the model of the parent file system of this composite file
+     * system or {@code null} if this composite file system is not a member of
+     * another file system.
+     */
+    FileSystemModel getParentModel();
+
+    /**
+     * Returns {@code true} if and only if the contents of this composite file
+     * system have been modified so that it needs
+     * {@link FileSystemController#sync synchronization} with its parent file
+     * system.
+     */
+    boolean isTouched();
 }
