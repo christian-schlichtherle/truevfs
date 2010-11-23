@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -262,11 +260,13 @@ public class ZipEntry implements Cloneable {
     }
 
     public void setTime(final long jTime) {
-        // Adjust to lower granularity of DOS date/time.
-        this.jTime = UNKNOWN != jTime
-                ? getDateTimeConverter().toJavaTime(
-                    getDateTimeConverter().toDosTime(jTime))
-                : UNKNOWN;
+        if (UNKNOWN == jTime) {
+            this.jTime = UNKNOWN;
+        } else {
+            // Adjust to lower granularity of DOS date/time.
+            DateTimeConverter dtc = getDateTimeConverter();
+            this.jTime = dtc.toJavaTime(dtc.toDosTime(jTime));
+        }
     }
 
     /**

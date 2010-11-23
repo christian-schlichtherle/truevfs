@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import java.util.Calendar;
@@ -29,7 +28,8 @@ import java.util.TimeZone;
  * the local system time, which is represented by a UNIX-like encoding
  * by the Java API.
  * <p>
- * This class is thread-safe.
+ * This base class is thread-safe if and only if a sub class is thread-safe,
+ * too.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -107,15 +107,15 @@ public abstract class DateTimeConverter {
      * which has its timezone set to the return value of
      * {@link #newTimeZone()}.
      *
-     * @param jTime The number of milliseconds since midnight, January 1st,
-     *        1970 AD UTC (called <i>the epoch</i> alias Java time).
+     * @param  jTime The number of milliseconds since midnight, January 1st,
+     *         1970 AD UTC (called <i>the epoch</i> alias Java time).
      * @return A DOS date/time value reflecting the local time zone and
      *         rounded down to even seconds which is minimum
      *         January 1<sup>st</sup>, 1980 AD 00:00:00.
      * @throws RuntimeException If {@code jTime} is negative
      *         or later than 2107 AD.
-     * @see #toJavaTime(long)
-     * @see #newTimeZone()
+     * @see    #toJavaTime(long)
+     * @see    #newTimeZone()
      */
     final long toDosTime(final long jTime) {
         if (jTime < 0)
@@ -169,16 +169,16 @@ public abstract class DateTimeConverter {
      * {@code dTime}.
      * Hence, interoperability is negatively affected in this case.
      *
-     * @param dTime The DOS date/time value.
-     * @return The number of milliseconds since midnight, January 1st,
-     *         1970 AD UTC (called <i>the epoch</i> alias Java time).
+     * @param  dTime The DOS date/time value.
      * @throws RuntimeException If {@code dTime} is earlier
      *         than 1980 AD
      *         or greater than {@code 0xffffffffL}
      *         or holds an illegal DOS date/time field combination
      *         and assertions are enabled.
-     * @see #toDosTime(long)
-     * @see #newTimeZone()
+     * @return The number of milliseconds since midnight, January 1st,
+     *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>).
+     * @see    #toDosTime(long)
+     * @see    #newTimeZone()
      */
     final long toJavaTime(final long dTime) {
         if (dTime < MIN_DOS_TIME)
@@ -247,12 +247,12 @@ public abstract class DateTimeConverter {
     protected abstract TimeZone newTimeZone();
 
     /**
-     * Returns whether a Java time should be rounded up or down to the next
-     * two second interval when converting it to a DOS date/time.
+     * Returns whether the given Java time should be rounded up or down to the
+     * next two second interval when converting it to a DOS date/time.
      *
-     * @param jTime The number of milliseconds since midnight, January 1st,
-     *        1970 AD UTC (called <i>the epoch</i> alias Java time).
-     * @return {@code yes} for round-up, {@code no} for round-down.
+     * @param  jTime The number of milliseconds since midnight, January 1st,
+     *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>).
+     * @return {@code true} for round-up, {@code false} for round-down.
      */
     protected abstract boolean roundUp(long jTime);
 

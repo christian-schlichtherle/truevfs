@@ -278,9 +278,7 @@ public class ArchiveDriverRegistry implements Serializable {
      *         local registry.
      */
     public final SuffixSet decorate(final SuffixSet set) {
-        final SuffixSet local = new SuffixSet(drivers.keySet());
-        for (final String suffix : local) {
-            assert drivers.containsKey(suffix);
+        for (final String suffix : drivers.keySet()) {
             if (null != drivers.get(suffix))
                 set.addAll(suffix);
             else
