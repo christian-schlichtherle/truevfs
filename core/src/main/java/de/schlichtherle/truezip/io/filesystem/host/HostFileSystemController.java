@@ -15,11 +15,15 @@
  */
 package de.schlichtherle.truezip.io.filesystem.host;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.AbstractCompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
@@ -45,8 +49,8 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 public final class HostFileSystemController
-extends            AbstractFileSystemController<FileEntry>
-implements         FileSystemModel {
+extends            AbstractCompositeFileSystemController<FileEntry>
+implements         FileSystemController<FileEntry>, FileSystemModel {
 
     private final URI mountPoint;
     private final File target;
@@ -64,6 +68,14 @@ implements         FileSystemModel {
     @Override
     public URI getMountPoint() {
         return mountPoint;
+    }
+
+    public FileSystemModel getParentModel() {
+        return null;
+    }
+
+    public boolean isTouched() {
+        return false;
     }
 
     @Override
@@ -163,5 +175,12 @@ implements         FileSystemModel {
         final File file = new File(target, path);
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options) {
+        throw new UnsupportedOperationException();
     }
 }

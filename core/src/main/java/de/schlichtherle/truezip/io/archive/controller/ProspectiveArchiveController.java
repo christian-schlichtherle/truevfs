@@ -15,10 +15,11 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.AbstractCompositeFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.net.URI;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -34,7 +35,6 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -56,9 +56,9 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class ProspectiveArchiveController<AE extends ArchiveEntry>
-extends     AbstractFileSystemController<CommonEntry            >
-implements  CompositeFileSystemController<CommonEntry           > {
+final class ProspectiveArchiveController <AE extends ArchiveEntry>
+extends     AbstractCompositeFileSystemController <CommonEntry            >
+implements  FileSystemController         <CommonEntry            > {
 
     private final ArchiveController<AE> controller;
     private final FileSystemController<?> parentController;
@@ -109,13 +109,9 @@ implements  CompositeFileSystemController<CommonEntry           > {
     }
 
     @Override
-    public CompositeFileSystemModel getModel() {
+    public FileSystemModel getModel() {
         return getController().getModel();
     }
-
-    /*boolean isTouched() {
-        return getController().isTouched();
-    }*/
 
     @Override
     public <E extends IOException>
@@ -124,7 +120,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
     throws E {
         try {
             getController().sync(builder, options);
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -135,7 +131,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParentController().getOpenIcon();
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -146,7 +142,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParentController().getClosedIcon();
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -157,7 +153,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParentController().isReadOnly();
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -168,7 +164,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParentController().getEntry(getParentPath(path));
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -179,7 +175,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParentController().isReadable(getParentPath(path));
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }
@@ -190,7 +186,7 @@ implements  CompositeFileSystemController<CommonEntry           > {
             return getController().isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParentController().isWritable(getParentPath(path));
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
     }

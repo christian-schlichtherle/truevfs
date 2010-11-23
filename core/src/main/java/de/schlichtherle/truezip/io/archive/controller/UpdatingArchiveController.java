@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -220,10 +221,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             autoMount(); // detect false positives!
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -233,10 +234,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             autoMount(); // detect false positives!
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             return null;
@@ -246,10 +247,10 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
     public final Entry<AE> getEntry(final String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             return autoMount().getEntry(path);
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             if (!isRoot(path))
@@ -308,7 +309,7 @@ extends     FileSystemArchiveController<AE> {
                     input.getDriverProduct(), getDriver(),
                     socket.getLocalTarget(), vetoableTouchListener,
                     readOnly));
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (TabuFileException ex) {
             throw ex;
@@ -322,7 +323,7 @@ extends     FileSystemArchiveController<AE> {
             // prompting.
             try {
                 makeOutput(options);
-            } catch (ArchiveException ex2) {
+            } catch (FileSystemException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
                 throw ex2;
@@ -361,7 +362,7 @@ extends     FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException, ArchiveException {
+    throws SyncException, FileSystemException {
         final ArchiveFileSystem<AE> fileSystem;
         final Entry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -377,7 +378,7 @@ extends     FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException, ArchiveException {
+    private boolean sync() throws SyncException, FileSystemException {
         sync(   new DefaultSyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -387,7 +388,7 @@ extends     FileSystemArchiveController<AE> {
 	public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, ArchiveException {
+    throws E, FileSystemException {
         assert !isTouched() || null != output; // file system touched => output archive
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))

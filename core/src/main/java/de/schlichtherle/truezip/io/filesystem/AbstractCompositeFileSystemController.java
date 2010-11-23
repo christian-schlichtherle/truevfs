@@ -21,8 +21,8 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractFileSystemController<CE extends CommonEntry>
-implements            FileSystemController        <CE> {
+public abstract class AbstractCompositeFileSystemController<CE extends CommonEntry>
+implements            CompositeFileSystemController<CE> {
 
     @Override
     public final String toString() {

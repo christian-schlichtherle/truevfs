@@ -38,11 +38,11 @@ public class SyncException extends ChainableIOException {
         super(message);
     }
 
-    public SyncException(CompositeFileSystemModel model, IOException cause) {
+    public SyncException(FileSystemModel model, IOException cause) {
         super(model.getMountPoint().getPath(), cause);
     }
 
-    public SyncException(CompositeFileSystemModel model, IOException cause, int priority) {
+    public SyncException(FileSystemModel model, IOException cause, int priority) {
         super(model.getMountPoint().getPath(), cause, priority);
     }
 }

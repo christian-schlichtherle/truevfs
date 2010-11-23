@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -60,7 +61,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, ArchiveException {
+    throws E, FileSystemException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -72,7 +73,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {
@@ -93,7 +94,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {
@@ -114,7 +115,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadOnly()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {
@@ -135,7 +136,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Entry<? extends AE> getEntry(String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {
@@ -156,7 +157,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadable(String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {
@@ -177,7 +178,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isWritable(String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             readLock().lock();
             try {

@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.host.HostFileSystemController;
@@ -73,8 +72,8 @@ public class Archives {
      * {@code FileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<CompositeFileSystemController<?>>> controllers
-            = new WeakHashMap<URI, Link<CompositeFileSystemController<?>>>();
+    private static final Map<URI, Link<FileSystemController<?>>> controllers
+            = new WeakHashMap<URI, Link<FileSystemController<?>>>();
 
     private Archives() {
     }
@@ -100,7 +99,7 @@ public class Archives {
             parentController = new HostFileSystemController(
                     mountPoint.resolve(".."));
         synchronized (controllers) {
-            CompositeFileSystemController<?> controller
+            FileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller) {
                 // If required, reconfiguration of the FileSystemController
@@ -122,7 +121,7 @@ public class Archives {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	static void scheduleSync(   final Link.Type type,
-                                final CompositeFileSystemController<?> controller) {
+                                final FileSystemController<?> controller) {
         synchronized (controllers) {
             controllers.put(controller.getModel().getMountPoint(),
                             (Link) type.newLink(controller));
@@ -178,7 +177,7 @@ public class Archives {
             // call the sync() method on each respective archive controller.
             // This ensures that an archive file will always be updated
             // before its parent archive file.
-            for (final CompositeFileSystemController<?> controller
+            for (final FileSystemController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     // Upon return, some new ArchiveWarningException's may
@@ -201,24 +200,24 @@ public class Archives {
         }
     }
 
-    static Set<CompositeFileSystemController<?>> getControllers() {
+    static Set<FileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<CompositeFileSystemController<?>> getControllers(
+    static Set<FileSystemController<?>> getControllers(
             URI prefix,
             final Comparator<FileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
         else
             prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
-        final Set<CompositeFileSystemController<?>> snapshot;
+        final Set<FileSystemController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<CompositeFileSystemController<?>>(comparator)
-                    : new HashSet<CompositeFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<CompositeFileSystemController<?>> link : controllers.values()) {
-                final CompositeFileSystemController<?> controller = Links.getTarget(link);
+                    ? new TreeSet<FileSystemController<?>>(comparator)
+                    : new HashSet<FileSystemController<?>>((int) (controllers.size() / .75f) + 1);
+            for (final Link<FileSystemController<?>> link : controllers.values()) {
+                final FileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()

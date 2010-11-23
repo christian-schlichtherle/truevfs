@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -145,10 +146,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isReadOnly()
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             return autoMount().isReadOnly();
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -157,10 +158,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isReadable(final String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             return autoMount().getEntry(path) != null;
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -169,10 +170,10 @@ extends        AbstractArchiveController<AE> {
 
     @Override
     public final boolean isWritable(final String path)
-    throws ArchiveException {
+    throws FileSystemException {
         try {
             return autoMount().isWritable(path);
-        } catch (ArchiveException ex) {
+        } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             return false;
@@ -394,5 +395,5 @@ extends        AbstractArchiveController<AE> {
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws SyncException, ArchiveException;
+    throws SyncException, FileSystemException;
 }

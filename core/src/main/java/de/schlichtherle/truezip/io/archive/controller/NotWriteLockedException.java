@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+
 /**
  * Indicates that a controller is not write locked and the lock cannot get
  * acquired by the current thread for some reason.
@@ -26,7 +28,7 @@ package de.schlichtherle.truezip.io.archive.controller;
  * @version $Id$
  */
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class NotWriteLockedException extends ArchiveException {
+public final class NotWriteLockedException extends FileSystemException {
 
     NotWriteLockedException(ArchiveModel model) {
         super(model);
