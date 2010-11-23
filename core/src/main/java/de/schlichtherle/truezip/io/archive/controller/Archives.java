@@ -15,15 +15,16 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.host.HostFileSystemController;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -46,10 +47,11 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTP
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * Provides static utility methods for {@link FileSystemController}s.
+ * Provides static utility methods for {@link ComponentFileSystemController}s.
  * This class cannot get instantiated outside its package.
  *
  * @author Christian Schlichtherle
@@ -57,10 +59,10 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class Archives {
 
-    private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
-            = new Comparator<FileSystemController<?>>() {
+    private static final Comparator<ComponentFileSystemController<?>> REVERSE_CONTROLLERS
+            = new Comparator<ComponentFileSystemController<?>>() {
         @Override
-		public int compare(FileSystemController<?> l, FileSystemController<?> r) {
+		public int compare(ComponentFileSystemController<?> l, ComponentFileSystemController<?> r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -68,24 +70,24 @@ public class Archives {
     /**
      * The map of all archive controllers.
      * The keys are plain {@link URI} instances and the values are either
-     * {@code FileSystemController}s or {@link WeakReference}s to
-     * {@code FileSystemController}s.
+     * {@code ComponentFileSystemController}s or {@link WeakReference}s to
+     * {@code ComponentFileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<FileSystemController<?>>> controllers
-            = new WeakHashMap<URI, Link<FileSystemController<?>>>();
+    private static final Map<URI, Link<ComponentFileSystemController<?>>> controllers
+            = new WeakHashMap<URI, Link<ComponentFileSystemController<?>>>();
 
     private Archives() {
     }
 
     /**
-     * Looks up a {@link FileSystemController} for the given mount point.
+     * Looks up a {@link ComponentFileSystemController} for the given mount point.
      */
     public static <AE extends ArchiveEntry>
-    FileSystemController<?> getController(
+    ComponentFileSystemController<?> getController(
             URI mountPoint,
             final ArchiveDriver<AE> driver,
-            FileSystemController<?> parentController) {
+            ComponentFileSystemController<?> parent) {
         // TODO: Make this method support arbitrary host file systems, e.g. by
         // using a factory from a service registry or similar.
         if (!"file".equals(mountPoint.getScheme()) || !mountPoint.isAbsolute()
@@ -95,36 +97,37 @@ public class Archives {
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == driver)
             return new HostFileSystemController(mountPoint);
-        if (null == parentController)
-            parentController = new HostFileSystemController(
-                    mountPoint.resolve(".."));
+        if (null == parent)
+            parent = new HostFileSystemController(mountPoint.resolve(".."));
         synchronized (controllers) {
-            FileSystemController<?> controller
+            ComponentFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
-            if (null != controller) {
-                // If required, reconfiguration of the FileSystemController
-                // must be deferred until we have released the lock on
-                // controllers in order to prevent dead locks.
-                //reconfigure = driver != null && driver != controller.getDriver();
+            if (null != controller)
                 return controller;
-            }
-            controller = new ProspectiveArchiveController<AE>(
-                    mountPoint, driver, parentController);
-            scheduleSync(WEAK, controller);
-            return controller;
+            final SyncScheduler syncScheduler = new SyncScheduler();
+            final ArchiveModel model = new ArchiveModel(
+                    mountPoint, parent.getModel(), syncScheduler);
+            syncScheduler.controller = new CompositeFileSystemController<AE>(
+                    driver.newController(model, parent), parent);
+            syncScheduler.setTouched(false);
+            return syncScheduler.controller;
         }
     }
 
-    /**
-     * Schedules the given archive controller for synchronization according to
-     * the given TypedLink Type.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	static void scheduleSync(   final Link.Type type,
-                                final FileSystemController<?> controller) {
-        synchronized (controllers) {
-            controllers.put(controller.getModel().getMountPoint(),
-                            (Link) type.newLink(controller));
+    private static class SyncScheduler implements TouchListener {
+        ComponentFileSystemController<?> controller;
+
+        /**
+         * Schedules the given archive controller for synchronization according
+         * to the given touch status.
+         */
+        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public final void setTouched(boolean touched) {
+            synchronized (controllers) {
+                controllers.put(controller.getModel().getMountPoint(),
+                                (Link) (touched ? STRONG : WEAK).newLink(controller));
+            }
         }
     }
 
@@ -140,7 +143,7 @@ public class Archives {
      *         This may be {@code null} or empty in order to select all
      *         accessed files systems.
      * @throws SyncWarningException if the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
+     *         {@link SyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective file system has been
      *         synchronized with constraints, e.g. a failure to set the last
@@ -148,7 +151,7 @@ public class Archives {
      *         modification time of the (virtual) root directory of its file
      *         system.
      * @throws SyncException if the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and any error
+     *         {@link SyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException if {@code builder} or {@code options} is
@@ -171,13 +174,13 @@ public class Archives {
         CountingReadOnlyFile.init();
         CountingOutputStream.init();
         try {
-            // The general algorithm is to sort the targets in descending order
-            // of their pathnames (considering the system's default name
-            // separator character) and then walk the array in reverse order to
-            // call the sync() method on each respective archive controller.
-            // This ensures that an archive file will always be updated
-            // before its parent archive file.
-            for (final FileSystemController<?> controller
+            // The general algorithm is to sort the mount points in descending
+            // order of their pathnames and then traverse the array in reverse
+            // order to call the sync() method on each respective archive
+            // controller.
+            // This ensures that an archive file system will always be synced
+            // before its parent archive file system.
+            for (final ComponentFileSystemController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     // Upon return, some new ArchiveWarningException's may
@@ -200,24 +203,24 @@ public class Archives {
         }
     }
 
-    static Set<FileSystemController<?>> getControllers() {
+    static Set<ComponentFileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<FileSystemController<?>> getControllers(
+    static Set<ComponentFileSystemController<?>> getControllers(
             URI prefix,
-            final Comparator<FileSystemController<?>> comparator) {
+            final Comparator<ComponentFileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
         else
             prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
-        final Set<FileSystemController<?>> snapshot;
+        final Set<ComponentFileSystemController<?>> snapshot;
         synchronized (controllers) {
             snapshot = null != comparator
-                    ? new TreeSet<FileSystemController<?>>(comparator)
-                    : new HashSet<FileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<FileSystemController<?>> link : controllers.values()) {
-                final FileSystemController<?> controller = Links.getTarget(link);
+                    ? new TreeSet<ComponentFileSystemController<?>>(comparator)
+                    : new HashSet<ComponentFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
+            for (final Link<ComponentFileSystemController<?>> link : controllers.values()) {
+                final ComponentFileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()
@@ -343,7 +346,7 @@ public class Archives {
                 } finally {
                     try {
                         sync(   null,
-                                new DefaultSyncExceptionBuilder(),
+                                new SyncExceptionBuilder(),
                                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
                     } catch (IOException ouch) {
                         // Logging doesn't work in a shutdown hook!

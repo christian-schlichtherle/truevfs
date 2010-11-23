@@ -37,7 +37,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public abstract class FilterArchiveController  <AE extends ArchiveEntry>
-extends               AbstractArchiveController<AE> {
+extends               ArchiveController        <AE                     > {
 
     private final ArchiveController<? extends AE> controller;
 
@@ -62,7 +62,8 @@ extends               AbstractArchiveController<AE> {
 
     @Override
     public <E extends IOException>
-    void sync(ExceptionBuilder<? super SyncException, E> builder, BitField<SyncOption> options)
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
     throws E, FileSystemException {
         getController().sync(builder, options);
     }

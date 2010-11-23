@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.ByteArrayInputStream;
@@ -157,7 +157,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
+        Reference<ComponentFileSystemController<?>> ref = new WeakReference<ComponentFileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -177,7 +177,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
+        Reference<ComponentFileSystemController<?>> ref = new WeakReference<ComponentFileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();
@@ -1018,7 +1018,7 @@ public abstract class IOFileTestCase extends TestCase {
         // Now set the system under stress so that the garbage collector will
         // most likely reclaim the chain of file objects and the archive
         // controllers once they have been updated.
-        // Note that FileSystemController.finalize() is called in no particular
+        // Note that ComponentFileSystemController.finalize() is called in no particular
         // order, i.e. the object graph is completely ignored! :-o
         byte[] buf1 = new byte[10 * 1024 * 1024];
         gc();

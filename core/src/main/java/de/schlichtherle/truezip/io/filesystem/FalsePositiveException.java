@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Schlichtherle IT Services
+ * Copyright (C) 2004-2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import java.io.IOException;
 
 /**
- * @author Christian Schlichtherle
+ * Indicates that a file system is a false positive file system.
+ *
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DefaultSyncExceptionBuilder
-extends ChainableIOExceptionBuilder<IOException, SyncException> {
-    public DefaultSyncExceptionBuilder() {
-        super(IOException.class, SyncException.class);
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+public final class FalsePositiveException extends FileSystemException {
+
+    public FalsePositiveException(FileSystemModel model, IOException cause) {
+        super(model, cause);
+        assert !(cause instanceof FileSystemException);
     }
 }

@@ -33,7 +33,12 @@ public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
-    /** For exclusive use by {@link DefaultSyncExceptionBuilder}. */
+    /**
+     * This constructor is for exclusive use by {@link SyncExceptionBuilder}.
+     *
+     * @deprecated This method is only public in order to allow reflective
+     *             access - do <em>not</em> call it directly!
+     */
     public SyncException(String message) {
         super(message);
     }

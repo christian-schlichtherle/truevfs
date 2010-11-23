@@ -19,7 +19,7 @@ import java.io.IOException;
 
 /**
  * Indicates an exceptional condition in a file system controller.
- * 
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -28,13 +28,13 @@ public abstract class FileSystemException extends IOException {
 
     private final FileSystemModel model;
 
-    protected FileSystemException( final FileSystemModel model) {
+    protected FileSystemException(final FileSystemModel model) {
         super.initCause(null);
         this.model = model;
     }
 
-    protected FileSystemException( final FileSystemModel model,
-                                            final IOException cause) {
+    protected FileSystemException(  final FileSystemModel model,
+                                    final IOException cause) {
         super.initCause(cause);
         this.model = model;
     }

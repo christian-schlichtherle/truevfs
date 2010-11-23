@@ -15,15 +15,13 @@
  */
 package de.schlichtherle.truezip.io.filesystem.host;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
-import de.schlichtherle.truezip.io.filesystem.AbstractCompositeFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
@@ -32,6 +30,7 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -49,17 +48,17 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 public final class HostFileSystemController
-extends            AbstractCompositeFileSystemController<FileEntry>
-implements         FileSystemController<FileEntry>, FileSystemModel {
+extends ComponentFileSystemController<FileEntry>
+implements FileSystemModel {
 
     private final URI mountPoint;
     private final File target;
 
     public HostFileSystemController(final URI mountPoint) {
-        assert "file".equals(mountPoint.getScheme());
-        assert !mountPoint.isOpaque();
-        assert mountPoint.getPath().endsWith(SEPARATOR);
-        assert mountPoint.equals(mountPoint.normalize());
+        if (!"file".equals(mountPoint.getScheme())) throw new IllegalArgumentException();
+        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
+        if (!mountPoint.getPath().endsWith(SEPARATOR)) throw new IllegalArgumentException();
+        if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
 
         this.mountPoint = mountPoint;
         this.target = new File(mountPoint);

@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemException;
  * Note that the write lock is required for any change to the state of the
  * archive controller - not only the state of the archive file system.
  *
- * @see     FalsePositiveException
  * @author  Christian Schlichtherle
  * @version $Id$
  */

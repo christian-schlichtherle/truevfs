@@ -15,8 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -98,7 +99,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @version $Id$
  */
 abstract class BasicArchiveController   <AE extends ArchiveEntry>
-extends        AbstractArchiveController<AE> {
+extends        ArchiveController<AE> {
 
     private final ArchiveModel model;
 
@@ -361,7 +362,7 @@ extends        AbstractArchiveController<AE> {
                 try {
                     // The parent archive controller will unlink our target
                     // archive file next, so we need to reset anyway.
-                    sync(   new DefaultSyncExceptionBuilder(),
+                    sync(   new SyncExceptionBuilder(),
                             BitField.of(ABORT_CHANGES));
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
@@ -370,7 +371,7 @@ extends        AbstractArchiveController<AE> {
             }
             if (!fileSystem.getEntry(path).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
-            sync(   new DefaultSyncExceptionBuilder(),
+            sync(   new SyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
         } else { // !isRoot(path)
             autoMount().unlink(path);

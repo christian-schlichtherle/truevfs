@@ -26,7 +26,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DefaultArchiveExceptionBuilder
+public final class ArchiveExceptionBuilder
 extends AbstractExceptionBuilder<IOException, ArchiveException> {
 
     @Override
@@ -55,7 +55,7 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link DefaultArchiveExceptionBuilder}
+     * The implementation in the class {@link ArchiveExceptionBuilder}
      * sorts the given exception chain by
      * {@link ChainableIOException#sortPriority() priority} and returns the
      * result.
