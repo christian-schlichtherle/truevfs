@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.LockingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -234,7 +234,7 @@ implements ArchiveDriver<AE>, Serializable {
     @Override
     public ArchiveController<AE> newController(
             ArchiveModel model,
-            FileSystemController<?> parentController) {
+            ComponentFileSystemController<?> parentController) {
         return new LockingArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.

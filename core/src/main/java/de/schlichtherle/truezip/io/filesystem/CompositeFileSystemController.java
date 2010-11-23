@@ -15,123 +15,308 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.controller.Archives;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.FilterInputSocket;
+import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+
 /**
- * Provides the methods to describe a composite file system and synchronize its
- * (virtual) file system with its parent file system.
+ * A composite file system controller implements a chain of responsibility
+ * in order to adapt a federated file system controller to a component file
+ * system controller.
+ * Whenever the controller for the prospective federated file system provided
+ * to the {@link #CompositeFileSystemController constructor}
+ * of this class throws a {@link FalsePositiveException}, the method call is
+ * delegated to the controller for the parent file system provided to the
+ * constructor.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface CompositeFileSystemController<CE extends CommonEntry> {
+public class CompositeFileSystemController<CE extends CommonEntry>
+extends ComponentFileSystemController<CommonEntry> {
 
-    /** Returns the non-{@code null} file system model. */
-    FileSystemModel getModel();
+    private final FileSystemController<CE> prospect;
+    private final ComponentFileSystemController<?> parent;
+    private final String parentPath;
 
-    Icon getOpenIcon() throws FileSystemException;
+    public CompositeFileSystemController(
+            final FileSystemController<CE> prospect,
+            final ComponentFileSystemController<?> parent) {
+        this.prospect = prospect;
+        this.parent = parent;
+        final URI mountPoint = prospect
+                .getModel()
+                .getMountPoint();
+        final URI parentMountPoint = parent
+                .getModel()
+                .getMountPoint()
+                .relativize(mountPoint);
+        if (parentMountPoint.equals(mountPoint))
+            throw new IllegalArgumentException("the given controller is not a member of its declared parent controller!");
+        this.parentPath = parentMountPoint.getPath();
+    }
 
-    Icon getClosedIcon() throws FileSystemException;
-
-    boolean isReadOnly() throws FileSystemException;
-
-    FileSystemEntry<? extends CE> getEntry(String path) throws FileSystemException;
-
-    boolean isReadable(String path) throws FileSystemException;
-
-    boolean isWritable(String path) throws FileSystemException;
-
-    void setReadOnly(String path) throws IOException;
-
-    boolean setTime(String path, BitField<Access> types, long value)
-    throws IOException;
-
-    /**
-     * Returns an input socket for reading the given entry from the file
-     * system.
-     *
-     * @param  path a non-{@code null} relative path name.
-     * @return A non-{@code null} {@code InputSocket}.
-     */
-    InputSocket<? extends CE> getInputSocket(   String path,
-                                                BitField<InputOption> options);
+    /** Returns the file system controller for the parent file system. */
+    private ComponentFileSystemController<?> getParent() {
+        return parent;
+    }
 
     /**
-     * Returns an output socket for writing the given entry to the file
-     * system.
-     *
-     * @param  path a non-{@code null} relative path name.
-     * @return A non-{@code null} {@code OutputSocket}.
+     * Resolves the given relative {@code path} against the relative path of
+     * this controller's target archive file within its parent file system.
      */
-    OutputSocket<? extends CE> getOutputSocket( String path,
-                                                BitField<OutputOption> options,
-                                                CommonEntry template);
+    private String getParentPath(String path) {
+        return isRoot(path)
+                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
+                : parentPath + path;
+    }
 
-    /**
-     * Creates or replaces and finally links a chain of one or more entries
-     * for the given {@code path} into the file system.
-     *
-     * @param  path a non-{@code null} relative path name.
-     * @param  type a non-{@code null} common entry type.
-     * @param  template if not {@code null}, then the file system entry
-     *         at the end of the chain shall inherit as much properties from
-     *         this common entry as possible - with the exception of its name
-     *         and type.
-     * @param  options if {@code CREATE_PARENTS} is set, any missing parent
-     *         directories will be created and linked into this file
-     *         system with its last modification time set to the system's
-     *         current time.
-     * @throws NullPointerException if {@code path} or {@code type} are
-     *         {@code null}.
-     * @throws IOException for some other I/O related reason, including but
-     *         not exclusively upon one or more of the following conditions:
-     *         <ul>
-     *         <li>The file system is read only.</li>
-     *         <li>{@code path} contains characters which are not
-     *             supported by the file system.</li>
-     *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.</li>
-     *         <li>The new entry already exists as a directory.</li>
-     *         <li>The new entry shall be a directory, but already exists.</li>
-     *         <li>A parent entry exists but is not a directory.</li>
-     *         <li>A parent entry is missing and {@code createParents} is
-     *             {@code false}.</li>
-     *         </ul>
-     */
-    boolean mknod(  String path, Type type,
-                    BitField<OutputOption> options, CommonEntry template)
-    throws IOException;
+    private FileSystemController<CE> getProspect() {
+        return prospect;
+    }
 
-    void unlink(String path) throws IOException;
+    @Override
+    public FileSystemModel getModel() {
+        return getProspect().getModel();
+    }
 
-    /**
-     * Writes all changes to the contents of this composite file system to its
-     * parent file system.
-     *
-     * @param  <E> the type of the assembled {@code IOException} to throw.
-     * @param  builder the non-{@code null} exception builder to use for the
-     *         assembly of an {@code IOException} from the given
-     *         {@code SyncException}s.
-     * @param  options the non-{@code null} synchronization options.
-     * @throws NullPointerException if {@code builder} or {@code options} is
-     *         {@code null}.
-     * @throws IOException if any exceptional condition occurs throughout the
-     *         synchronization of this composite file system.
-     * @see    CompositeFileSystemModel#isTouched
-     * @see    Archives#sync
-     */
-    <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
-                BitField<SyncOption> options)
-    throws E, FileSystemException;
+    @Override
+    public <E extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
+    throws E {
+        try {
+            getProspect().sync(builder, options);
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public Icon getOpenIcon() {
+        try {
+            return getProspect().getOpenIcon();
+        } catch (FalsePositiveException ex) {
+            return getParent().getOpenIcon();
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public Icon getClosedIcon() {
+        try {
+            return getProspect().getClosedIcon();
+        } catch (FalsePositiveException ex) {
+            return getParent().getClosedIcon();
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        try {
+            return getProspect().isReadOnly();
+        } catch (FalsePositiveException ex) {
+            return getParent().isReadOnly();
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public FileSystemEntry<?> getEntry(String path) {
+        try {
+            return getProspect().getEntry(path);
+        } catch (FalsePositiveException ex) {
+            return getParent().getEntry(getParentPath(path));
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public boolean isReadable(String path) {
+        try {
+            return getProspect().isReadable(path);
+        } catch (FalsePositiveException ex) {
+            return getParent().isReadable(getParentPath(path));
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public boolean isWritable(String path) {
+        try {
+            return getProspect().isWritable(path);
+        } catch (FalsePositiveException ex) {
+            return getParent().isWritable(getParentPath(path));
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    @Override
+    public void setReadOnly(String path)
+    throws IOException {
+        try {
+            getProspect().setReadOnly(path);
+        } catch (FalsePositiveException ex) {
+            getParent().setReadOnly(getParentPath(path));
+        }
+    }
+
+    @Override
+    public boolean setTime(String path, BitField<Access> types, long value)
+    throws IOException {
+        try {
+            return getProspect().setTime(path, types, value);
+        } catch (FalsePositiveException ex) {
+            return getParent().setTime(getParentPath(path), types, value);
+        }
+    }
+
+    @Override
+    public InputSocket<?> getInputSocket(
+            final String path,
+            final BitField<InputOption> options) {
+        return new Input(path, options);
+    }
+
+    private class Input extends FilterInputSocket<CommonEntry> {
+        final String path;
+        final BitField<InputOption> options;
+
+        Input(final String path, final BitField<InputOption> options) {
+            super(getProspect().getInputSocket(path, options));
+            this.path = path;
+            this.options = options;
+        }
+
+        @Override
+        public CommonEntry getLocalTarget() throws IOException {
+            try {
+                return getBoundSocket().getLocalTarget();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(getParentPath(path), options)
+                        .bind(this)
+                        .getLocalTarget();
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            try {
+                return getBoundSocket().newInputStream();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(getParentPath(path), options)
+                        .bind(this)
+                        .newInputStream();
+            }
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            try {
+                return getBoundSocket().newReadOnlyFile();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(getParentPath(path), options)
+                        .bind(this)
+                        .newReadOnlyFile();
+            }
+        }
+    } // class Input
+
+    @Override
+    public OutputSocket<?> getOutputSocket(
+            String path,
+            BitField<OutputOption> options,
+            CommonEntry template) {
+        return new Output(path, options, template);
+    }
+
+    private class Output extends FilterOutputSocket<CommonEntry> {
+        final String path;
+        final BitField<OutputOption> options;
+        final CommonEntry template;
+
+        Output( final String path,
+                final BitField<OutputOption> options,
+                final CommonEntry template) {
+            super(getProspect().getOutputSocket(path, options, template));
+            this.path = path;
+            this.options = options;
+            this.template = template;
+        }
+
+        @Override
+        public CommonEntry getLocalTarget() throws IOException {
+            try {
+                return getBoundSocket().getLocalTarget();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getOutputSocket(getParentPath(path), options, template)
+                        .bind(this)
+                        .getLocalTarget();
+            }
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            try {
+                return getBoundSocket().newOutputStream();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getOutputSocket(getParentPath(path), options, template)
+                        .bind(this)
+                        .newOutputStream();
+            }
+        }
+    } // class Output
+
+    @Override
+    public boolean mknod(   String path,
+                            CommonEntry.Type type,
+                            BitField<OutputOption> options,
+                            CommonEntry template)
+    throws IOException {
+        try {
+            return getProspect().mknod(path, type, options, template);
+        } catch (FalsePositiveException ex) {
+            return getParent().mknod(getParentPath(path), type, options, template);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("ThrowableInitCause")
+    public void unlink(String path)
+    throws IOException {
+        try {
+            getProspect().unlink(path);
+        } catch (FalsePositiveException ex) {
+            getParent().unlink(getParentPath(path));
+        }
+    }
 }

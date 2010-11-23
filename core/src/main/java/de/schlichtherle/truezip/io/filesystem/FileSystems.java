@@ -23,9 +23,9 @@ public class FileSystems {
      *         parent file system, if any.
      * @return A non-{@code null} file system controller.
      */
-    public static FileSystemController<?> getController(
+    public static ComponentFileSystemController<?> getController(
             final URI mountPoint,
-            final FileSystemController<?> parentController) {
+            final ComponentFileSystemController<?> parentController) {
         throw new UnsupportedOperationException();
     }
 }

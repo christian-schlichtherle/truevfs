@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.Archives;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
@@ -414,7 +414,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient FileSystemController<?> controller;
+    private transient ComponentFileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -836,7 +836,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller initialization has been deferred until now in
-            // order to provide the FileSystemController with an otherwise fully
+            // order to provide the ComponentFileSystemController with an otherwise fully
             // initialized object.
             initController();
         }
@@ -948,7 +948,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller init has been deferred until now in
-            // order to provide the FileSystemController with a fully
+            // order to provide the ComponentFileSystemController with a fully
             // initialized object.
             initController();
         }
@@ -1102,14 +1102,14 @@ public class File extends java.io.File {
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and <em>only</em>
+     *         {@link SyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
      *         This implies that the respective archive file has been updated
      *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
      * @throws ArchiveWarningException If the configuration uses the
-     *         {@link DefaultSyncExceptionBuilder} and any error
+     *         {@link SyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
      * @throws NullPointerException If {@code config} is {@code null}.
@@ -1120,7 +1120,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveException {
-        Archives.sync(null, new DefaultArchiveExceptionBuilder(), options);
+        Archives.sync(null, new ArchiveExceptionBuilder(), options);
     }
 
     /**
@@ -1203,7 +1203,7 @@ public class File extends java.io.File {
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
         Archives.sync(  archive.getCanOrAbsFile().toURI(),
-                        new DefaultArchiveExceptionBuilder(),
+                        new ArchiveExceptionBuilder(),
                         options);
     }
 
@@ -1831,7 +1831,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FileSystemController<?> getController() {
+    final ComponentFileSystemController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

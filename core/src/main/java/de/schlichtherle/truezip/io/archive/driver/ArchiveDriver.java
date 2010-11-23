@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -86,7 +86,7 @@ extends CommonEntryFactory<AE> {
      *         parent file system controller.
      */
     ArchiveController<AE> newController(ArchiveModel model,
-                                        FileSystemController<?> parentController);
+                                        ComponentFileSystemController<?> parentController);
 
     /**
      * Creates a new common input shop for reading the archive entries of the
@@ -94,7 +94,7 @@ extends CommonEntryFactory<AE> {
      * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link FileSystemController} is processing
+     *         internal {@link ComponentFileSystemController} is processing
      *         - {@code null} is not permitted.
      * @param  input the non-{@code null} input socket for reading
      *         the contents of the described archive from its target.
@@ -127,7 +127,7 @@ extends CommonEntryFactory<AE> {
      * target.
      * 
      * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link FileSystemController} is processing
+     *         internal {@link ComponentFileSystemController} is processing
      *         - {@code null} is not permitted.
      * @param  output the non-{@code null} output socket for writing
      *         the contents of the described archive to its target.

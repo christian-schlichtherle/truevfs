@@ -36,15 +36,15 @@ public final class ArchiveModel implements FileSystemModel {
     private final TouchListener touchListener;
     private boolean touched;
 
-    ArchiveModel(   final FileSystemModel parentModel,
-                    final URI mountPoint,
+    ArchiveModel(   final URI mountPoint,
+                    final FileSystemModel parent,
                     final TouchListener touchListener) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
 
-        this.parentModel = parentModel;
+        this.parentModel = parent;
         this.mountPoint = mountPoint;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
@@ -76,7 +76,13 @@ public final class ArchiveModel implements FileSystemModel {
 
     @Override
     public String toString() {
-        return "model:" + getMountPoint().toString() + "?touched=" + touched;
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append(":")
+                .append(getMountPoint().toString())
+                .append("?touched=")
+                .append(touched)
+                .toString();
     }
 
     private void notifyTouchListener() {

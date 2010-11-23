@@ -15,11 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.DefaultSyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.TabuFileException;
@@ -29,7 +30,7 @@ import java.io.CharConversionException;
 import java.util.Set;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import javax.swing.Icon;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -118,7 +119,7 @@ extends     FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      *
-     * @see Archives#getController(URI, ArchiveDriver, FileSystemController)
+     * @see Archives#getController(URI, ArchiveDriver, ComponentFileSystemController)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(InputShop<AE> input) {
@@ -138,7 +139,7 @@ extends     FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      *
-     * @see Archives#getController(URI, ArchiveDriver, FileSystemController)
+     * @see Archives#getController(URI, ArchiveDriver, ComponentFileSystemController)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(OutputShop<AE> output) {
@@ -159,7 +160,7 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private final FileSystemController<?> parentController;
+    private final ComponentFileSystemController<?> parentController;
     private final String parentPath;
     private final ArchiveDriver<AE> driver;
 
@@ -180,7 +181,7 @@ extends     FileSystemArchiveController<AE> {
 
     public UpdatingArchiveController(  final ArchiveModel model,
                                 final ArchiveDriver<AE> driver,
-                                final FileSystemController<?> parentController) {
+                                final ComponentFileSystemController<?> parentController) {
         super(model);
         assert null != driver;
         this.driver = driver;
@@ -205,7 +206,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     /** Returns the file system controller for the parent file system. */
-    private FileSystemController<?> getParentController() {
+    private ComponentFileSystemController<?> getParentController() {
         return parentController;
     }
 
@@ -295,7 +296,7 @@ extends     FileSystemArchiveController<AE> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final FileSystemController<?> parentController = getParentController();
+            final ComponentFileSystemController<?> parentController = getParentController();
             final String parentPath = getParentPath(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a HostFileSystemController and on stinky Windows
@@ -339,7 +340,7 @@ extends     FileSystemArchiveController<AE> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemController<?> parentController = getParentController();
+        final ComponentFileSystemController<?> parentController = getParentController();
         final String parentPath = getParentPath(ROOT);
         final OutputSocket<?> socket = parentController.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
@@ -379,7 +380,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     private boolean sync() throws SyncException, FileSystemException {
-        sync(   new DefaultSyncExceptionBuilder(),
+        sync(   new SyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
     }

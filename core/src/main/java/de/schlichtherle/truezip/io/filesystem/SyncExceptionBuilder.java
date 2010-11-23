@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Schlichtherle IT Services
+ * Copyright 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
+import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractCompositeFileSystemController<CE extends CommonEntry>
-implements            CompositeFileSystemController<CE> {
-
-    @Override
-    public final String toString() {
-        return "fileSystemController:" + getModel().getMountPoint().toString();
+public final class SyncExceptionBuilder
+extends ChainableIOExceptionBuilder<IOException, SyncException> {
+    public SyncExceptionBuilder() {
+        super(IOException.class, SyncException.class);
     }
 }

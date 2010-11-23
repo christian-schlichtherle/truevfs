@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 
@@ -47,7 +47,7 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     @Override
     public int getFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController<?> controller : Archives.getControllers())
+        for (ComponentFileSystemController<?> controller : Archives.getControllers())
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -56,7 +56,7 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     @Override
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (FileSystemController<?> controller : Archives.getControllers())
+        for (ComponentFileSystemController<?> controller : Archives.getControllers())
             if (null == controller.getModel().getParentModel())
                 result++;
         return result;
@@ -65,7 +65,7 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     @Override
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController<?> controller : Archives.getControllers()) {
+        for (ComponentFileSystemController<?> controller : Archives.getControllers()) {
             final FileSystemModel model = controller.getModel();
             if (null == model.getParentModel() && model.isTouched())
                 result++;
