@@ -33,18 +33,18 @@ import java.net.URI;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * A composite file system controller implements a chain of responsibility
- * in order to adapt a federated file system controller to a component file
- * system controller.
- * Whenever the controller for the prospective federated file system provided
- * to the {@link #CompositeFileSystemController constructor}
- * of this class throws a {@link FalsePositiveException}, the method call is
- * delegated to the controller for the parent file system provided to the
- * constructor in order to resolve the issue.
+ * in order to adapt a controller for a prospective file system to a controller
+ * for a component file system.
+ * Whenever the controller for the prospective file system provided to the
+ * {@link #CompositeFileSystemController constructor} of this class throws a
+ * {@link FalsePositiveException}, the method call is delegated to the
+ * controller for the parent component file system provided to the constructor
+ * in order to resolve the issue.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -61,35 +61,35 @@ extends ComponentFileSystemController<CommonEntry> {
             final ComponentFileSystemController<?> parent) {
         this.prospect = prospect;
         this.parent = parent;
-        final URI mountPoint = prospect
-                .getModel()
-                .getMountPoint();
-        final URI parentMountPoint = parent
-                .getModel()
-                .getMountPoint()
+        final FileSystemModel model = prospect.getModel();
+        final FileSystemModel parentModel = parent.getModel();
+        if (model.getParent() != parentModel)
+            throw new IllegalArgumentException("parent/member mismatch!");
+        final URI mountPoint = model.getMountPoint();
+        final URI parentMountPoint = parentModel.getMountPoint()
                 .relativize(mountPoint);
         if (parentMountPoint.equals(mountPoint))
-            throw new IllegalArgumentException("the given controller is not a member of its declared parent controller!");
+            throw new IllegalArgumentException("parent/member mismatch!");
         this.parentPath = parentMountPoint.getPath();
     }
 
-    /** Returns the file system controller for the parent file system. */
+    private FileSystemController<CE> getProspect() {
+        return prospect;
+    }
+
+    /** Returns the controller for the parent file system. */
     private ComponentFileSystemController<?> getParent() {
         return parent;
     }
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this controller's target archive file within its parent file system.
+     * this controller's mount point within its parent file system.
      */
-    private String getParentPath(String path) {
+    private String parentPath(String path) {
         return isRoot(path)
                 ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
                 : parentPath + path;
-    }
-
-    private FileSystemController<CE> getProspect() {
-        return prospect;
     }
 
     @Override
@@ -135,7 +135,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             return getProspect().getEntry(path);
         } catch (FalsePositiveException ex) {
-            return getParent().getEntry(getParentPath(path));
+            return getParent().getEntry(parentPath(path));
         } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
@@ -146,7 +146,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             return getProspect().isReadable(path);
         } catch (FalsePositiveException ex) {
-            return getParent().isReadable(getParentPath(path));
+            return getParent().isReadable(parentPath(path));
         } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
@@ -157,7 +157,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             return getProspect().isWritable(path);
         } catch (FalsePositiveException ex) {
-            return getParent().isWritable(getParentPath(path));
+            return getParent().isWritable(parentPath(path));
         } catch (FileSystemException ex) {
             throw new AssertionError(ex);
         }
@@ -169,7 +169,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             getProspect().setReadOnly(path);
         } catch (FalsePositiveException ex) {
-            getParent().setReadOnly(getParentPath(path));
+            getParent().setReadOnly(parentPath(path));
         }
     }
 
@@ -179,7 +179,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             return getProspect().setTime(path, types, value);
         } catch (FalsePositiveException ex) {
-            return getParent().setTime(getParentPath(path), types, value);
+            return getParent().setTime(parentPath(path), types, value);
         }
     }
 
@@ -206,7 +206,7 @@ extends ComponentFileSystemController<CommonEntry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(getParentPath(path), options)
+                        .getInputSocket(parentPath(path), options)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -218,7 +218,7 @@ extends ComponentFileSystemController<CommonEntry> {
                 return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(getParentPath(path), options)
+                        .getInputSocket(parentPath(path), options)
                         .bind(this)
                         .newInputStream();
             }
@@ -230,7 +230,7 @@ extends ComponentFileSystemController<CommonEntry> {
                 return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(getParentPath(path), options)
+                        .getInputSocket(parentPath(path), options)
                         .bind(this)
                         .newReadOnlyFile();
             }
@@ -265,7 +265,7 @@ extends ComponentFileSystemController<CommonEntry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(getParentPath(path), options, template)
+                        .getOutputSocket(parentPath(path), options, template)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -277,7 +277,7 @@ extends ComponentFileSystemController<CommonEntry> {
                 return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(getParentPath(path), options, template)
+                        .getOutputSocket(parentPath(path), options, template)
                         .bind(this)
                         .newOutputStream();
             }
@@ -293,7 +293,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             return getProspect().mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getParent().mknod(getParentPath(path), type, options, template);
+            return getParent().mknod(parentPath(path), type, options, template);
         }
     }
 
@@ -304,7 +304,7 @@ extends ComponentFileSystemController<CommonEntry> {
         try {
             getProspect().unlink(path);
         } catch (FalsePositiveException ex) {
-            getParent().unlink(getParentPath(path));
+            getParent().unlink(parentPath(path));
         }
     }
 

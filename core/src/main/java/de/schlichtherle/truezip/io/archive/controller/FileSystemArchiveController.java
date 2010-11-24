@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
  * @version $Id$
  */
 abstract class FileSystemArchiveController<AE extends ArchiveEntry>
-extends        BasicArchiveController     <AE> {
+extends BasicArchiveController<AE> {
 
     /** The mount state of the archive file system. */
     private MountState mountState = new ResetFileSystem();

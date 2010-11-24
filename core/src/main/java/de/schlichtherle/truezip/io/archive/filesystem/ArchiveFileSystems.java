@@ -22,8 +22,6 @@ import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-
 /**
  * Provides static utility methods for archive file systems.
  * This class cannot get instantiated outside its package.
@@ -103,14 +101,5 @@ public class ArchiveFileSystems {
         return readOnly
             ? new ReadOnlyArchiveFileSystem<AE>(container, factory, rootTemplate)
             : new ReadWriteArchiveFileSystem<AE>(container, factory, rootTemplate, vetoableTouchListener);
-    }
-
-    /**
-     * Returns {@code true} iff the given path name refers to the root
-     * directory.
-     */
-    public static boolean isRoot(String path) {
-        assert 0 == ROOT.length();
-        return 0 == path.length();
     }
 }
