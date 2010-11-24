@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * Defines the available options for archive synchronization operations, i.e.
- * {@link Controllers#sync} and {@link CompositeFileSystemController#sync}.
+ * {@link FileSystems#sync} and {@link CompositeFileSystemController#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
