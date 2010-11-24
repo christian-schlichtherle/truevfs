@@ -36,8 +36,8 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterArchiveController  <AE extends ArchiveEntry>
-extends               ArchiveController        <AE                     > {
+public abstract class FilterArchiveController<AE extends ArchiveEntry>
+extends ArchiveController<AE> {
 
     private final ArchiveController<? extends AE> controller;
 

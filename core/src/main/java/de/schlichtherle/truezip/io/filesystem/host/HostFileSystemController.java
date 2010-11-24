@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem.host;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -34,10 +33,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 
@@ -49,50 +46,19 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @version $Id$
  */
 public final class HostFileSystemController
-extends ComponentFileSystemController<FileEntry>
-implements FileSystemModel {
+extends ComponentFileSystemController<FileEntry> {
 
-    private final URI mountPoint;
+    private final FileSystemModel model;
     private final File target;
 
-    public HostFileSystemController(final URI mountPoint) {
-        if (!"file".equals(mountPoint.getScheme())) throw new IllegalArgumentException();
-        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
-        if (!mountPoint.getPath().endsWith(SEPARATOR)) throw new IllegalArgumentException();
-        if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
-
-        this.mountPoint = mountPoint;
-        this.target = new File(mountPoint);
-    }
-
-    @Override
-    public URI getMountPoint() {
-        return mountPoint;
-    }
-
-    @Override
-    public FileSystemModel getParent() {
-        return null;
-    }
-
-    @Override
-    public boolean isTouched() {
-        return false;
-    }
-
-    @Override
-    public void addFileSystemListener(FileSystemListener listener) {
-        // This implementation does not fire any events.
-    }
-
-    @Override
-    public void removeFileSystemListener(FileSystemListener listener) {
-        // This implementation does not fire any events.
+    public HostFileSystemController(final FileSystemModel model) {
+        this.model = model;
+        this.target = new File(model.getMountPoint());
     }
 
     @Override
     public FileSystemModel getModel() {
-        return this;
+        return model;
     }
 
     @Override

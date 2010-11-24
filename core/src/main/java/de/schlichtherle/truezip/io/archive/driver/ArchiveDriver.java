@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
@@ -96,9 +95,7 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      * the described {@code archive} from the given {@code input} socket's
      * target.
      * 
-     * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link ComponentFileSystemController} is processing
-     *         - {@code null} is not permitted.
+     * @param  model the non-{@code null} archive model.
      * @param  input the non-{@code null} input socket for reading
      *         the contents of the described archive from its target.
      * @throws TabuFileException if the target archive file is temporarily not
@@ -121,7 +118,7 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new common input shop.
      */
-    InputShop<AE> newInputShop(ArchiveModel archive, InputSocket<?> input)
+    InputShop<AE> newInputShop(ArchiveModel model, InputSocket<?> input)
     throws IOException;
 
     /**
@@ -129,9 +126,7 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      * the described {@code archive} to the given {@code output} socket's
      * target.
      * 
-     * @param  archive the abstract archive representation which TrueZIP's
-     *         internal {@link ComponentFileSystemController} is processing
-     *         - {@code null} is not permitted.
+     * @param  model the non-{@code null} archive model.
      * @param  output the non-{@code null} output socket for writing
      *         the contents of the described archive to its target.
      * @param  source the nullable {@link InputShop} if
@@ -162,7 +157,7 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
-    OutputShop<AE> newOutputShop(   ArchiveModel archive,
+    OutputShop<AE> newOutputShop(   ArchiveModel model,
                                     OutputSocket<?> output,
                                     InputShop<AE> source)
     throws IOException;
@@ -172,12 +167,12 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param  archive the archive file to display - never {@code null}.
+     * @param  model the non-{@code null} archive model.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getOpenIcon(ArchiveModel archive);
+    Icon getOpenIcon(ArchiveModel model);
 
     /**
      * Returns the icon that
@@ -186,10 +181,10 @@ extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param  archive the archive file to display - never {@code null}.
+     * @param  model the non-{@code null} archive model.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getClosedIcon(ArchiveModel archive);
+    Icon getClosedIcon(ArchiveModel model);
 }

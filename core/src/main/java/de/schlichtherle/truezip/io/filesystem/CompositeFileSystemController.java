@@ -29,12 +29,7 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import javax.swing.Icon;
-
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * A composite file system controller implements a chain of responsibility
@@ -54,47 +49,31 @@ extends ComponentFileSystemController<CommonEntry> {
 
     private final FileSystemController<CE> prospect;
     private final ComponentFileSystemController<?> parent;
-    private final String parentPath;
 
     CompositeFileSystemController(
             final FileSystemController<CE> prospect,
             final ComponentFileSystemController<?> parent) {
         this.prospect = prospect;
         this.parent = parent;
-        final FileSystemModel model = prospect.getModel();
-        final FileSystemModel parentModel = parent.getModel();
-        if (model.getParent() != parentModel)
-            throw new IllegalArgumentException("parent/member mismatch!");
-        final URI mountPoint = model.getMountPoint();
-        final URI parentMountPoint = parentModel.getMountPoint()
-                .relativize(mountPoint);
-        if (parentMountPoint.equals(mountPoint))
-            throw new IllegalArgumentException("parent/member mismatch!");
-        this.parentPath = parentMountPoint.getPath();
+        if (prospect.getModel().getParent() != parent.getModel())
+            throw new IllegalArgumentException("parent/member mismatch");
     }
 
     private FileSystemController<CE> getProspect() {
         return prospect;
     }
 
-    /** Returns the controller for the parent file system. */
+    @Override
+    public FileSystemModel getModel() {
+        return getProspect().getModel();
+    }
+
     private ComponentFileSystemController<?> getParent() {
         return parent;
     }
 
-    /**
-     * Resolves the given relative {@code path} against the relative path of
-     * this controller's mount point within its parent file system.
-     */
     private String parentPath(String path) {
-        return isRoot(path)
-                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
-                : parentPath + path;
-    }
-
-    @Override
-    public FileSystemModel getModel() {
-        return getProspect().getModel();
+        return getModel().parentPath(path);
     }
 
     @Override

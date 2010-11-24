@@ -75,7 +75,7 @@ public class FileSystems {
     /**
      * Returns a file system controller for the given mount point.
      * The returned file system controller will use the given parent file
-     * system controller to access its root file system entry.
+     * system controller to mount its file system.
      *
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
@@ -97,9 +97,9 @@ public class FileSystems {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == factory)
-            return new HostFileSystemController(mountPoint);
+            return new HostFileSystemController(new FileSystemModel(mountPoint, null)); // FIXME!
         if (null == parent)
-            parent = new HostFileSystemController(mountPoint.resolve(".."));
+            parent = new HostFileSystemController(new FileSystemModel(mountPoint.resolve(".."), null)); // FIXME!
         synchronized (controllers) {
             final ComponentFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
