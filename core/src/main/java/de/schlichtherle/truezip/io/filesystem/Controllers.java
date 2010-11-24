@@ -16,19 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEvent;
-import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.host.HostFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -49,8 +37,8 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
