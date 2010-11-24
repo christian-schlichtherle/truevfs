@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.archive.controller.Controllers;
+import de.schlichtherle.truezip.io.filesystem.Controllers;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
