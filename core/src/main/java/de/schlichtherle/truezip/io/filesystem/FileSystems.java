@@ -97,9 +97,11 @@ public class FileSystems {
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         if (null == factory)
-            return new HostFileSystemController(new FileSystemModel(mountPoint, null)); // FIXME!
+            return new HostFileSystemController(
+                    new FileSystemModel(mountPoint, null));
         if (null == parent)
-            parent = new HostFileSystemController(new FileSystemModel(mountPoint.resolve(".."), null)); // FIXME!
+            parent = new HostFileSystemController(
+                    new FileSystemModel(mountPoint.resolve(".."), null));
         synchronized (controllers) {
             final ComponentFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
