@@ -63,12 +63,10 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTP
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
@@ -156,9 +154,8 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private final ComponentFileSystemController<?> parent;
-    private final String parentPath;
     private final ArchiveDriver<AE> driver;
+    private final ComponentFileSystemController<?> parent;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -183,11 +180,6 @@ extends FileSystemArchiveController<AE> {
         assert null != driver;
         this.driver = driver;
         this.parent = parent;
-        this.parentPath = parent
-                .getModel()
-                .getMountPoint()
-                .relativize(model.getMountPoint())
-                .getPath();
     }
 
     /**
@@ -202,19 +194,12 @@ extends FileSystemArchiveController<AE> {
         return driver;
     }
 
-    /** Returns the controller for the parent file system. */
     private ComponentFileSystemController<?> getParent() {
         return parent;
     }
 
-    /**
-     * Resolves the given relative {@code path} against the relative path of
-     * this controller's mount point within its parent file system.
-     */
     private String parentPath(String path) {
-        return isRoot(path)
-                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
-                : parentPath + path;
+        return getModel().parentPath(path);
     }
 
     @Override
@@ -293,14 +278,14 @@ extends FileSystemArchiveController<AE> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final ComponentFileSystemController<?> parentController = getParent();
+            final ComponentFileSystemController<?> parent = getParent();
             final String parentPath = parentPath(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a HostFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
             // reading!
-            final boolean readOnly = !parentController.isWritable(parentPath);
-            final InputSocket<?> socket = parentController.getInputSocket(
+            final boolean readOnly = !parent.isWritable(parentPath);
+            final InputSocket<?> socket = parent.getInputSocket(
                     parentPath, BitField.of(InputOption.CACHE));
             input = new Input(getDriver().newInputShop(getModel(), socket));
             setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
@@ -337,9 +322,9 @@ extends FileSystemArchiveController<AE> {
     throws IOException {
         if (null != output)
             return;
-        final ComponentFileSystemController<?> parentController = getParent();
+        final ComponentFileSystemController<?> parent = getParent();
         final String parentPath = parentPath(ROOT);
-        final OutputSocket<?> socket = parentController.getOutputSocket(
+        final OutputSocket<?> socket = parent.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));

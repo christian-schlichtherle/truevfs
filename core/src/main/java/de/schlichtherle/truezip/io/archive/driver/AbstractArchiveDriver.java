@@ -253,10 +253,10 @@ implements ArchiveDriver<AE>, Serializable {
      * The implementation in the class {@code AbstractArchiveDriver} simply
      * returns {@code null}.
      *
-     * @param archive Ignored.
+     * @param model ignored.
      */
     @Override
-    public Icon getOpenIcon(ArchiveModel archive) {
+    public Icon getOpenIcon(ArchiveModel model) {
         return null;
     }
 
@@ -267,7 +267,7 @@ implements ArchiveDriver<AE>, Serializable {
      * returns {@code null}.
      */
     @Override
-    public Icon getClosedIcon(ArchiveModel archive) {
+    public Icon getClosedIcon(ArchiveModel model) {
         return null;
     }
 

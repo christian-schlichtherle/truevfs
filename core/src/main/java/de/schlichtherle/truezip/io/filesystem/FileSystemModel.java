@@ -17,13 +17,43 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import java.net.URI;
 
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
+
 /**
  * Defines the common properties of any file system.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemModel {
+public class FileSystemModel {
+    private final URI mountPoint;
+    private final FileSystemModel parent;
+    private final String parentPath;
+    private boolean touched;
+    private FileSystemListener listener;
+
+    public FileSystemModel(final URI mountPoint,
+                           final FileSystemModel parent) {
+        if (!"file".equals(mountPoint.getScheme())) throw new IllegalArgumentException();
+        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
+        if (!mountPoint.getPath().endsWith(SEPARATOR)) throw new IllegalArgumentException();
+        if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
+
+        this.mountPoint = mountPoint;
+        this.parent = parent;
+        if (null != parent) {
+            final URI parentMountPoint = parent.getMountPoint()
+                    .relativize(mountPoint);
+            if (parentMountPoint.equals(mountPoint))
+                throw new IllegalArgumentException("parent/member mismatch");
+            this.parentPath = parentMountPoint.getPath();
+        } else {
+            this.parentPath = null;
+        }
+    }
 
     /**
      * Returns an absolute, hierarchical and normalized Unique Resource
@@ -43,14 +73,32 @@ public interface FileSystemModel {
      *
      * @return A non-{@code null} URI for the mount point of the file system.
      */
-    URI getMountPoint();
+    public final URI getMountPoint() {
+        return mountPoint;
+    }
 
     /**
      * Returns the model of the parent file system of this composite file
      * system or {@code null} if this composite file system is not a member of
      * another file system.
      */
-    FileSystemModel getParent();
+    public final FileSystemModel getParent() {
+        return parent;
+    }
+
+    /**
+     * Resolves the given relative {@code path} against the relative path of
+     * this model's file system within its parent file system.
+     *
+     * @param  path a non-{@code null} common entry name.
+     * @throws RuntimeException if this file system model does not specify a
+     *         {@link #getParent() parent file system model}.
+     */
+    public String parentPath(String path) {
+        return isRoot(path)
+                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
+                : parentPath + path;
+    }
 
     /**
      * Returns {@code true} if and only if the contents of this composite file
@@ -58,9 +106,37 @@ public interface FileSystemModel {
      * {@link FileSystemController#sync synchronization} with its parent file
      * system.
      */
-    boolean isTouched();
+    public final boolean isTouched() {
+        return touched;
+    }
 
-    void addFileSystemListener(FileSystemListener listener);
+    public final void setTouched(final boolean newTouched) {
+        final boolean oldTouched = touched;
+        touched = newTouched;
+        if (newTouched != oldTouched)
+            if (null != listener)
+                listener.touchChanged(new FileSystemEvent(this));
+    }
 
-    void removeFileSystemListener(FileSystemListener listener);
+    public final void addFileSystemListener(final FileSystemListener listener) {
+        if (null != this.listener)
+            throw new UnsupportedOperationException("Not supported yet.");
+        this.listener = listener;
+    }
+
+    public final void removeFileSystemListener(final FileSystemListener listener) {
+        this.listener = null;
+    }
+
+    @Override
+    public final String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[mountPoint=")
+                .append(getMountPoint())
+                .append(",touched=")
+                .append(touched)
+                .append("]")
+                .toString();
+    }
 }

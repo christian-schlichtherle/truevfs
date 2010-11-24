@@ -292,7 +292,7 @@ implements ArchiveFileSystem<AE> {
     private void touch() throws ArchiveFileSystemException {
         if (touched)
             return;
-        // Order is important here because of exceptions!
+        // Order is important here because of veto exceptions!
         if (null != vetoableTouchListener) {
             try {
                 vetoableTouchListener.touch();
