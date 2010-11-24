@@ -203,7 +203,7 @@ extends     FileSystemArchiveController<AE> {
     }
 
     /** Returns the file system controller for the parent file system. */
-    private ComponentFileSystemController<?> getParentController() {
+    private ComponentFileSystemController<?> getParent() {
         return parent;
     }
 
@@ -253,7 +253,7 @@ extends     FileSystemArchiveController<AE> {
         } catch (IOException ex) {
             if (!isRoot(path))
                 return null;
-            final FileSystemEntry<?> entry = getParentController()
+            final FileSystemEntry<?> entry = getParent()
                     .getEntry(getParentPath(path));
             if (null == entry)
                 return null;
@@ -293,7 +293,7 @@ extends     FileSystemArchiveController<AE> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final ComponentFileSystemController<?> parentController = getParentController();
+            final ComponentFileSystemController<?> parentController = getParent();
             final String parentPath = getParentPath(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a HostFileSystemController and on stinky Windows
@@ -337,7 +337,7 @@ extends     FileSystemArchiveController<AE> {
     throws IOException {
         if (null != output)
             return;
-        final ComponentFileSystemController<?> parentController = getParentController();
+        final ComponentFileSystemController<?> parentController = getParent();
         final String parentPath = getParentPath(ROOT);
         final OutputSocket<?> socket = parentController.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
@@ -624,6 +624,6 @@ extends     FileSystemArchiveController<AE> {
     public void unlink(String path) throws IOException {
         super.unlink(path);
         if (isRoot(path))
-            getParentController().unlink(getParentPath(path));
+            getParent().unlink(getParentPath(path));
     }
 }

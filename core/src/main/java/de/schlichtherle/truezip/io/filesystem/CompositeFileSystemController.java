@@ -49,14 +49,14 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class CompositeFileSystemController<CE extends CommonEntry>
+class CompositeFileSystemController<CE extends CommonEntry>
 extends ComponentFileSystemController<CommonEntry> {
 
     private final FileSystemController<CE> prospect;
     private final ComponentFileSystemController<?> parent;
     private final String parentPath;
 
-    public CompositeFileSystemController(
+    CompositeFileSystemController(
             final FileSystemController<CE> prospect,
             final ComponentFileSystemController<?> parent) {
         this.prospect = prospect;
@@ -95,18 +95,6 @@ extends ComponentFileSystemController<CommonEntry> {
     @Override
     public FileSystemModel getModel() {
         return getProspect().getModel();
-    }
-
-    @Override
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
-                final BitField<SyncOption> options)
-    throws E {
-        try {
-            getProspect().sync(builder, options);
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
-        }
     }
 
     @Override
@@ -317,6 +305,18 @@ extends ComponentFileSystemController<CommonEntry> {
             getProspect().unlink(path);
         } catch (FalsePositiveException ex) {
             getParent().unlink(getParentPath(path));
+        }
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
+    throws E {
+        try {
+            getProspect().sync(builder, options);
+        } catch (FileSystemException ex) {
+            throw new AssertionError(ex);
         }
     }
 }

@@ -137,7 +137,7 @@ public abstract class FileSystemController<CE extends CommonEntry> {
      * @throws IOException if any exceptional condition occurs throughout the
      *         synchronization of this file system.
      * @see    FileSystemModel#isTouched
-     * @see    Controllers#sync
+     * @see    FileSystems#sync
      */
     public abstract <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,

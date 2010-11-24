@@ -401,14 +401,14 @@ String[] names = { <font color="#800080">&quot;a&quot;</font>, <font color="#800
             are easy to use, work reliably and provide superior performance.</p>
         <h4><a name="monitoring">Monitoring Progress</a></h4>
         <p>When unmounting, the client application can monitor the progress by another thread
-            using {@link de.schlichtherle.truezip.io.file.File#getLiveFileSystemStatistics()}. The returned
+            using {@link de.schlichtherle.truezip.io.file.File#getFileSystemStatistics()}. The returned
             instance is a proxy which returns live statistics about the updating process.</p>
         <p>Here&#39;s an example how to monitor unmounting progress on standard error output
             after an initial delay of two seconds:</p>
         <blockquote>
             <pre><code><b><font color="#000080">class</font></b> ProgressMonitor <b><font color="#000080">extends</font></b> Thread {
     Long[] args = <b><font color="#000080">new</font></b> Long[<font color="#800080">2</font>];
-    FileSystemStatistics liveStats = File.<b>getLiveFileSystemStatistics</b>();
+    FileSystemStatistics liveStats = File.<b>getFileSystemStatistics</b>();
 
     <b>ProgressMonitor</b>() {
         <b>setPriority</b>(Thread.MAX_PRIORITY);
