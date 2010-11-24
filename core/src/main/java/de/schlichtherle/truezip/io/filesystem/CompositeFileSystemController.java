@@ -44,7 +44,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * to the {@link #CompositeFileSystemController constructor}
  * of this class throws a {@link FalsePositiveException}, the method call is
  * delegated to the controller for the parent file system provided to the
- * constructor.
+ * constructor in order to resolve the issue.
  *
  * @author Christian Schlichtherle
  * @version $Id$

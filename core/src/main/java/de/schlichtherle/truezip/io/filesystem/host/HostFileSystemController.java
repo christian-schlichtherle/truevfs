@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.host;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -69,12 +70,24 @@ implements FileSystemModel {
         return mountPoint;
     }
 
-    public FileSystemModel getParentModel() {
+    @Override
+    public FileSystemModel getParent() {
         return null;
     }
 
+    @Override
     public boolean isTouched() {
         return false;
+    }
+
+    @Override
+    public void addFileSystemListener(FileSystemListener listener) {
+        // This implementation does not fire any events.
+    }
+
+    @Override
+    public void removeFileSystemListener(FileSystemListener listener) {
+        // This implementation does not fire any events.
     }
 
     @Override

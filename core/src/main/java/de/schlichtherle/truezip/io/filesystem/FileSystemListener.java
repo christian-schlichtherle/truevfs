@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-interface TouchListener {
-    void setTouched(boolean touched);
+public interface FileSystemListener extends java.util.EventListener {
+
+    /**
+     * Called if the value of the property
+     * {@link FileSystemModel#isTouched() touched} has changed in the source
+     * file system model.
+     */
+    void touchChanged(FileSystemEvent event);
 }
