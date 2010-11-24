@@ -245,6 +245,14 @@ public class Paths {
     }
 
     /**
+     * Returns {@code true} iff the given path name refers to the root
+     * directory, i.e. if it's empty.
+     */
+    public static boolean isRoot(String path) {
+        return 0 == path.length();
+    }
+
+    /**
      * Returns {@code true} iff the given path name is absolute.
      * Windows drives and UNC's are always recognized by this method, even
      * on non-Windows platforms in order to ease interoperability.

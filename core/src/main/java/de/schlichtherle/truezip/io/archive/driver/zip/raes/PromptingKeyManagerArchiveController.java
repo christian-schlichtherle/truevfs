@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;
 
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * This archive controller resets the key provider in the prompting key manager

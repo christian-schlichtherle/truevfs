@@ -64,12 +64,12 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
@@ -78,8 +78,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class UpdatingArchiveController  <AE extends ArchiveEntry>
-extends     FileSystemArchiveController<AE> {
+public final class UpdatingArchiveController<AE extends ArchiveEntry>
+extends FileSystemArchiveController<AE> {
 
     private static final class DummyInputService<CE extends CommonEntry>
     implements InputShop<CE> {
@@ -202,16 +202,16 @@ extends     FileSystemArchiveController<AE> {
         return driver;
     }
 
-    /** Returns the file system controller for the parent file system. */
+    /** Returns the controller for the parent file system. */
     private ComponentFileSystemController<?> getParent() {
         return parent;
     }
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this controller's target archive file within its parent file system.
+     * this controller's mount point within its parent file system.
      */
-    private String getParentPath(String path) {
+    private String parentPath(String path) {
         return isRoot(path)
                 ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
                 : parentPath + path;
@@ -254,7 +254,7 @@ extends     FileSystemArchiveController<AE> {
             if (!isRoot(path))
                 return null;
             final FileSystemEntry<?> entry = getParent()
-                    .getEntry(getParentPath(path));
+                    .getEntry(parentPath(path));
             if (null == entry)
                 return null;
             try {
@@ -294,7 +294,7 @@ extends     FileSystemArchiveController<AE> {
     throws IOException {
         try {
             final ComponentFileSystemController<?> parentController = getParent();
-            final String parentPath = getParentPath(ROOT);
+            final String parentPath = parentPath(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a HostFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
@@ -338,7 +338,7 @@ extends     FileSystemArchiveController<AE> {
         if (null != output)
             return;
         final ComponentFileSystemController<?> parentController = getParent();
-        final String parentPath = getParentPath(ROOT);
+        final String parentPath = parentPath(ROOT);
         final OutputSocket<?> socket = parentController.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
@@ -624,6 +624,6 @@ extends     FileSystemArchiveController<AE> {
     public void unlink(String path) throws IOException {
         super.unlink(path);
         if (isRoot(path))
-            getParent().unlink(getParentPath(path));
+            getParent().unlink(parentPath(path));
     }
 }

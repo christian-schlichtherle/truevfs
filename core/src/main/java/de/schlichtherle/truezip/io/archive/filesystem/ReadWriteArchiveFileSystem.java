@@ -42,8 +42,8 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * A read/write archive file system.

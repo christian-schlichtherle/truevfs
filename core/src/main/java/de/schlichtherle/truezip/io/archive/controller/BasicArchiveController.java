@@ -40,11 +40,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems.isRoot;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 
@@ -98,8 +98,8 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController   <AE extends ArchiveEntry>
-extends        ArchiveController<AE> {
+abstract class BasicArchiveController<AE extends ArchiveEntry>
+extends ArchiveController<AE> {
 
     private final ArchiveModel model;
 
