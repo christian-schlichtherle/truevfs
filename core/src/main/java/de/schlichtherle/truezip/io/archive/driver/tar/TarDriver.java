@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -117,9 +117,7 @@ extends AbstractArchiveDriver<TarEntry> {
      * {@link #newTarInputShop}.
      */
     @Override
-    public TarInputShop newInputShop(
-            FileSystemModel model,
-            InputSocket<?> input)
+    public TarInputShop newInputShop(ArchiveModel model, InputSocket<?> input)
     throws IOException {
         final InputStream in = input.newInputStream();
         try {
@@ -129,9 +127,7 @@ extends AbstractArchiveDriver<TarEntry> {
         }
     }
 
-    protected TarInputShop newTarInputShop(
-            FileSystemModel model,
-            InputStream in)
+    protected TarInputShop newTarInputShop(ArchiveModel model, InputStream in)
     throws IOException {
         return new TarInputShop(in);
     }
@@ -144,7 +140,7 @@ extends AbstractArchiveDriver<TarEntry> {
      */
     @Override
     public OutputShop<TarEntry> newOutputShop(
-            FileSystemModel model,
+            ArchiveModel model,
             OutputSocket<?> output,
             InputShop<TarEntry> source)
     throws IOException {
@@ -159,9 +155,7 @@ extends AbstractArchiveDriver<TarEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            FileSystemModel model,
-            OutputStream out,
-            TarInputShop source)
+            ArchiveModel model, OutputStream out, TarInputShop source)
     throws IOException {
         return new TarOutputShop(out);
     }

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.LockingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
@@ -232,6 +233,11 @@ implements ArchiveDriver<AE>, Serializable {
     }
 
     @Override
+    public ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
+        return new ArchiveModel(mountPoint, parent);
+    }
+
+    @Override
     public ArchiveController<AE> newController(
             ArchiveModel model,
             ComponentFileSystemController<?> parentController) {
@@ -250,7 +256,7 @@ implements ArchiveDriver<AE>, Serializable {
      * @param archive Ignored.
      */
     @Override
-    public Icon getOpenIcon(FileSystemModel archive) {
+    public Icon getOpenIcon(ArchiveModel archive) {
         return null;
     }
 
@@ -261,7 +267,7 @@ implements ArchiveDriver<AE>, Serializable {
      * returns {@code null}.
      */
     @Override
-    public Icon getClosedIcon(FileSystemModel archive) {
+    public Icon getClosedIcon(ArchiveModel archive) {
         return null;
     }
 

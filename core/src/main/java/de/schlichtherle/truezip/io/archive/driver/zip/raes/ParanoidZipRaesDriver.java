@@ -16,14 +16,15 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
+import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
@@ -82,8 +83,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
     /**
      * This implementation calls {@link #getRaesParameters}, with which it
      * initializes a new {@link RaesOutputStream}, and finally passes the
-     * resulting stream to
-     * {@link #newZipOutputShop(FileSystemModel, OutputStream, ZipInputShop)}.
+     * resulting stream to {@link ZipDriver#newZipOutputShop}.
      * <p>
      * Note that this limits the number of concurrent output entry streams
      * to one in order to inhibit writing unencrypted temporary files for
@@ -91,7 +91,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FileSystemModel model,
+            final ArchiveModel model,
             final OutputSocket<?> output,
             final InputShop<ZipEntry> source)
     throws IOException {

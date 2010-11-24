@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
@@ -79,9 +80,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
     }
     
     @Override
-    protected ZipInputShop newZipInputShop(
-            FileSystemModel model,
-            ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(ArchiveModel model, ReadOnlyFile rof)
     throws IOException {
         return new CheckedZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);

@@ -38,8 +38,8 @@ public final class ArchiveModel implements FileSystemModel {
     private boolean touched;
     private FileSystemListener listener;
 
-    ArchiveModel(   final URI mountPoint,
-                    final FileSystemModel parent) {
+    public ArchiveModel(final URI mountPoint,
+                        final FileSystemModel parent) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);

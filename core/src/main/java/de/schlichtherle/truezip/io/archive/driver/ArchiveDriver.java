@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.FileNotFoundException;
@@ -58,7 +59,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
-extends CommonEntryFactory<AE> {
+extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
 
     /**
      * Creates a new archive controller for the given archive model and
@@ -85,6 +86,7 @@ extends CommonEntryFactory<AE> {
      * @return A new archive controller for the given archive model and
      *         parent file system controller.
      */
+    @Override
     ArchiveController<AE> newController(
             ArchiveModel model,
             ComponentFileSystemController<?> parentController);
@@ -119,7 +121,7 @@ extends CommonEntryFactory<AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new common input shop.
      */
-    InputShop<AE> newInputShop(FileSystemModel archive, InputSocket<?> input)
+    InputShop<AE> newInputShop(ArchiveModel archive, InputSocket<?> input)
     throws IOException;
 
     /**
@@ -160,7 +162,7 @@ extends CommonEntryFactory<AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} reference to a new output archive object.
      */
-    OutputShop<AE> newOutputShop(   FileSystemModel archive,
+    OutputShop<AE> newOutputShop(   ArchiveModel archive,
                                     OutputSocket<?> output,
                                     InputShop<AE> source)
     throws IOException;
@@ -175,7 +177,7 @@ extends CommonEntryFactory<AE> {
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getOpenIcon(FileSystemModel archive);
+    Icon getOpenIcon(ArchiveModel archive);
 
     /**
      * Returns the icon that
@@ -189,5 +191,5 @@ extends CommonEntryFactory<AE> {
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getClosedIcon(FileSystemModel archive);
+    Icon getClosedIcon(ArchiveModel archive);
 }

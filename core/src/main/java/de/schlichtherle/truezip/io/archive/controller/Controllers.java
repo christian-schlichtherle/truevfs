@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEvent;
 import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
@@ -27,8 +29,6 @@ import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -87,10 +87,10 @@ public class Controllers {
     /**
      * Looks up a {@link ComponentFileSystemController} for the given mount point.
      */
-    public static <AE extends ArchiveEntry>
+    public static <FSM extends FileSystemModel, CE extends CommonEntry>
     ComponentFileSystemController<?> getController(
             URI mountPoint,
-            final ArchiveDriver<AE> driver,
+            final FileSystemFactory<FSM, CE> factory,
             ComponentFileSystemController<?> parent) {
         // TODO: Make this method support arbitrary host file systems, e.g. by
         // using a factory from a service registry or similar.
@@ -99,7 +99,7 @@ public class Controllers {
             throw new IllegalArgumentException();
         mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
         assert mountPoint.getPath().endsWith(SEPARATOR);
-        if (null == driver)
+        if (null == factory)
             return new HostFileSystemController(mountPoint);
         if (null == parent)
             parent = new HostFileSystemController(mountPoint.resolve(".."));
@@ -108,22 +108,21 @@ public class Controllers {
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller)
                 return controller;
-            final ArchiveModel model
-                    = new ArchiveModel(mountPoint, parent.getModel());
-            final ScheduledFileSystemController<AE> scheduledController
-                    = new ScheduledFileSystemController<AE>(
-                        driver.newController(model, parent), parent);
+            final FSM model = factory.newModel(mountPoint, parent.getModel());
+            final ScheduledFileSystemController<CE> scheduledController
+                    = new ScheduledFileSystemController<CE>(
+                        factory.newController(model, parent), parent);
             model.addFileSystemListener(scheduledController);
             return scheduledController;
         }
     }
 
-    private static final class ScheduledFileSystemController<AE extends ArchiveEntry>
-    extends CompositeFileSystemController<AE>
+    private static final class ScheduledFileSystemController<CE extends CommonEntry>
+    extends CompositeFileSystemController<CE>
     implements FileSystemListener {
 
         ScheduledFileSystemController(
-                final FileSystemController<AE> prospect,
+                final FileSystemController<CE> prospect,
                 final ComponentFileSystemController<?> parent) {
             super(prospect, parent);
             touchChanged(new FileSystemEvent(getModel()));
