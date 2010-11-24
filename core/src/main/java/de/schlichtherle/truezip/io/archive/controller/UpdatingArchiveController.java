@@ -160,7 +160,7 @@ extends     FileSystemArchiveController<AE> {
         }
     }
 
-    private final ComponentFileSystemController<?> parentController;
+    private final ComponentFileSystemController<?> parent;
     private final String parentPath;
     private final ArchiveDriver<AE> driver;
 
@@ -179,14 +179,15 @@ extends     FileSystemArchiveController<AE> {
     private final VetoableTouchListener vetoableTouchListener
             = new TouchListener();
 
-    public UpdatingArchiveController(  final ArchiveModel model,
-                                final ArchiveDriver<AE> driver,
-                                final ComponentFileSystemController<?> parentController) {
+    public UpdatingArchiveController(
+            final ArchiveModel model,
+            final ArchiveDriver<AE> driver,
+            final ComponentFileSystemController<?> parent) {
         super(model);
         assert null != driver;
         this.driver = driver;
-        this.parentController = parentController;
-        this.parentPath = parentController
+        this.parent = parent;
+        this.parentPath = parent
                 .getModel()
                 .getMountPoint()
                 .relativize(model.getMountPoint())
@@ -207,7 +208,7 @@ extends     FileSystemArchiveController<AE> {
 
     /** Returns the file system controller for the parent file system. */
     private ComponentFileSystemController<?> getParentController() {
-        return parentController;
+        return parent;
     }
 
     /**

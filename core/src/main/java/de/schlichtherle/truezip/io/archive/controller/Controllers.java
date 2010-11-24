@@ -15,22 +15,26 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEvent;
+import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.CompositeFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.host.HostFileSystemController;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
-import java.io.IOException;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
-import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
+import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Collection;
@@ -57,12 +61,12 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class Archives {
+public class Controllers {
 
-    private static final Comparator<ComponentFileSystemController<?>> REVERSE_CONTROLLERS
-            = new Comparator<ComponentFileSystemController<?>>() {
+    private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
+            = new Comparator<FileSystemController<?>>() {
         @Override
-		public int compare(ComponentFileSystemController<?> l, ComponentFileSystemController<?> r) {
+		public int compare(FileSystemController<?> l, FileSystemController<?> r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -74,10 +78,10 @@ public class Archives {
      * {@code ComponentFileSystemController}s.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<ComponentFileSystemController<?>>> controllers
-            = new WeakHashMap<URI, Link<ComponentFileSystemController<?>>>();
+    private static final Map<URI, Link<CompositeFileSystemController<?>>> controllers
+            = new WeakHashMap<URI, Link<CompositeFileSystemController<?>>>();
 
-    private Archives() {
+    private Controllers() {
     }
 
     /**
@@ -100,33 +104,44 @@ public class Archives {
         if (null == parent)
             parent = new HostFileSystemController(mountPoint.resolve(".."));
         synchronized (controllers) {
-            ComponentFileSystemController<?> controller
+            final ComponentFileSystemController<?> controller
                     = Links.getTarget(controllers.get(mountPoint));
             if (null != controller)
                 return controller;
-            final SyncScheduler syncScheduler = new SyncScheduler();
-            final ArchiveModel model = new ArchiveModel(
-                    mountPoint, parent.getModel(), syncScheduler);
-            syncScheduler.controller = new CompositeFileSystemController<AE>(
-                    driver.newController(model, parent), parent);
-            syncScheduler.setTouched(false);
-            return syncScheduler.controller;
+            final ArchiveModel model
+                    = new ArchiveModel(mountPoint, parent.getModel());
+            final ScheduledFileSystemController<AE> scheduledController
+                    = new ScheduledFileSystemController<AE>(
+                        driver.newController(model, parent), parent);
+            model.addFileSystemListener(scheduledController);
+            return scheduledController;
         }
     }
 
-    private static class SyncScheduler implements TouchListener {
-        ComponentFileSystemController<?> controller;
+    private static final class ScheduledFileSystemController<AE extends ArchiveEntry>
+    extends CompositeFileSystemController<AE>
+    implements FileSystemListener {
+
+        ScheduledFileSystemController(
+                final FileSystemController<AE> prospect,
+                final ComponentFileSystemController<?> parent) {
+            super(prospect, parent);
+            touchChanged(new FileSystemEvent(getModel()));
+        }
 
         /**
-         * Schedules the given archive controller for synchronization according
+         * Schedules the file system controller for synchronization according
          * to the given touch status.
          */
         @Override
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        public final void setTouched(boolean touched) {
+        public void touchChanged(final FileSystemEvent event) {
             synchronized (controllers) {
-                controllers.put(controller.getModel().getMountPoint(),
-                                (Link) (touched ? STRONG : WEAK).newLink(controller));
+                final FileSystemModel model = event.getSource();
+                assert getModel() == model;
+                controllers.put(model.getMountPoint(),
+                        (Link) (model.isTouched() ? STRONG : WEAK)
+                            .newLink(this));
             }
         }
     }
@@ -209,7 +224,7 @@ public class Archives {
 
     static Set<ComponentFileSystemController<?>> getControllers(
             URI prefix,
-            final Comparator<ComponentFileSystemController<?>> comparator) {
+            final Comparator<FileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
         else
@@ -219,7 +234,7 @@ public class Archives {
             snapshot = null != comparator
                     ? new TreeSet<ComponentFileSystemController<?>>(comparator)
                     : new HashSet<ComponentFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<ComponentFileSystemController<?>> link : controllers.values()) {
+            for (final Link<CompositeFileSystemController<?>> link : controllers.values()) {
                 final ComponentFileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
@@ -265,10 +280,10 @@ public class Archives {
 
     /**
      * This singleton shutdown hook thread class runs
-     * {@link Archives.ShutdownRunnables#SINGLETON} when the JVM terminates.
+     * {@link Controllers.ShutdownRunnables#SINGLETON} when the JVM terminates.
      * You cannot instantiate this class.
      *
-     * @see Archives#addToShutdownHook(java.lang.Runnable)
+     * @see Controllers#addToShutdownHook(java.lang.Runnable)
      */
     private static final class ShutdownHook extends Thread {
 
@@ -276,18 +291,18 @@ public class Archives {
         static final ShutdownHook SINGLETON = new ShutdownHook();
 
         ShutdownHook() {
-            super(  Archives.ShutdownRunnables.SINGLETON,
+            super(  Controllers.ShutdownRunnables.SINGLETON,
                     "TrueZIP ArchiveController Shutdown Hook");
             setPriority(Thread.MAX_PRIORITY);
         }
 
         /**
          * Adds the given {@code runnable} to the set of runnables to run by
-         * {@link Archives.ShutdownRunnables#SINGLETON} when the JVM
+         * {@link Controllers.ShutdownRunnables#SINGLETON} when the JVM
          * terminates.
          */
         void add(final Runnable runnable) {
-            Archives.ShutdownRunnables.SINGLETON.add(runnable);
+            Controllers.ShutdownRunnables.SINGLETON.add(runnable);
         }
     } // class JVMShutdownHook
 
@@ -340,7 +355,7 @@ public class Archives {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
                     // Logging doesn't work in a shutdown hook!
-                    //Archives.logger.setLevel(Level.OFF);
+                    //Controllers.logger.setLevel(Level.OFF);
                     for (Runnable runnable : runnables)
                         runnable.run();
                 } finally {

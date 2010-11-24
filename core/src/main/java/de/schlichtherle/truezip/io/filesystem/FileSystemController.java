@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.controller.Archives;
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -138,7 +138,7 @@ public abstract class FileSystemController<CE extends CommonEntry> {
      * @throws IOException if any exceptional condition occurs throughout the
      *         synchronization of this file system.
      * @see    FileSystemModel#isTouched
-     * @see    Archives#sync
+     * @see    Controllers#sync
      */
     public abstract <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
@@ -149,8 +149,9 @@ public abstract class FileSystemController<CE extends CommonEntry> {
     public final String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
-                .append(":")
-                .append(getModel().getMountPoint().toString())
+                .append("[model=")
+                .append(getModel())
+                .append("]")
                 .toString();
     }
 }

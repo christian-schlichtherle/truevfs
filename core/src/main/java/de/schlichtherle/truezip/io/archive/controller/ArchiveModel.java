@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemEvent;
+import de.schlichtherle.truezip.io.filesystem.FileSystemListener;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -29,37 +31,35 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR;
  * @version $Id$
  */
 public final class ArchiveModel implements FileSystemModel {
-    private final FileSystemModel parentModel;
     private final URI mountPoint;
+    private final FileSystemModel parent;
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
-    private final TouchListener touchListener;
     private boolean touched;
+    private FileSystemListener listener;
 
     ArchiveModel(   final URI mountPoint,
-                    final FileSystemModel parent,
-                    final TouchListener touchListener) {
+                    final FileSystemModel parent) {
         assert "file".equals(mountPoint.getScheme());
         assert !mountPoint.isOpaque();
         assert mountPoint.getPath().endsWith(SEPARATOR);
         assert mountPoint.equals(mountPoint.normalize());
 
-        this.parentModel = parent;
+        this.parent = parent;
         this.mountPoint = mountPoint;
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
-        this.touchListener = touchListener;
-    }
-
-    @Override
-    public FileSystemModel getParentModel() {
-        return parentModel;
     }
 
     @Override
     public URI getMountPoint() {
         return mountPoint;
+    }
+
+    @Override
+    public FileSystemModel getParent() {
+        return parent;
     }
 
     @Override
@@ -71,23 +71,24 @@ public final class ArchiveModel implements FileSystemModel {
         final boolean oldTouched = touched;
         touched = newTouched;
         if (newTouched != oldTouched)
-            notifyTouchListener();
+            notifyTouchChanged();
+    }
+
+    private void notifyTouchChanged() {
+        if (null != listener)
+            listener.touchChanged(new FileSystemEvent(this));
     }
 
     @Override
-    public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append(":")
-                .append(getMountPoint().toString())
-                .append("?touched=")
-                .append(touched)
-                .toString();
+    public void addFileSystemListener(final FileSystemListener listener) {
+        if (null != this.listener)
+            throw new UnsupportedOperationException("Not supported yet.");
+        this.listener = listener;
     }
 
-    private void notifyTouchListener() {
-        if (null != touchListener)
-            touchListener.setTouched(touched);
+    @Override
+    public void removeFileSystemListener(final FileSystemListener listener) {
+        this.listener = null;
     }
 
     ReentrantLock readLock() {
@@ -96,5 +97,17 @@ public final class ArchiveModel implements FileSystemModel {
 
     ReentrantLock writeLock() {
         return writeLock;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[mountPoint=")
+                .append(getMountPoint())
+                .append(", touched=")
+                .append(touched)
+                .append("]")
+                .toString();
     }
 }

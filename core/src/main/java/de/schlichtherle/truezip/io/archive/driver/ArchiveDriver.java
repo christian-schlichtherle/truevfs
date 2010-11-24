@@ -85,8 +85,9 @@ extends CommonEntryFactory<AE> {
      * @return A new archive controller for the given archive model and
      *         parent file system controller.
      */
-    ArchiveController<AE> newController(ArchiveModel model,
-                                        ComponentFileSystemController<?> parentController);
+    ArchiveController<AE> newController(
+            ArchiveModel model,
+            ComponentFileSystemController<?> parentController);
 
     /**
      * Creates a new common input shop for reading the archive entries of the

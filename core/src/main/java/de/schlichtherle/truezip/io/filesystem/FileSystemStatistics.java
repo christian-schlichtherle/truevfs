@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.controller.Archives;
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
 
 /**
  * Provides statistics about the total set of archive files accessed.
@@ -30,7 +30,7 @@ public interface FileSystemStatistics {
     /**
      * Returns the total number of bytes read from all <em>top level file
      * systems</em> which have been updated by a call to
-     * {@link Archives#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only input from top level file
      * systems which have been touched, i.e. archive files which are actually
@@ -47,14 +47,14 @@ public interface FileSystemStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see Archives#sync(URI, ExceptionBuilder, BitField)
+     * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     long getSyncTotalByteCountRead();
     
     /**
      * Returns the total number of bytes written to all <em>top level file
      * systems</em> which have been updated by a call to
-     * {@link Archives#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only output to top level file
      * systems which have been touched, i.e. archive files which are actually
@@ -71,7 +71,7 @@ public interface FileSystemStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see Archives#sync(URI, ExceptionBuilder, BitField)
+     * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
     long getSyncTotalByteCountWritten();
 
@@ -83,7 +83,7 @@ public interface FileSystemStatistics {
     /**
      * Returns the number of file systems which have been touched and
      * need synchronization by calling
-     * {@link Archives#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
@@ -98,7 +98,7 @@ public interface FileSystemStatistics {
     /**
      * Returns the number of top level file systems which have been touched and
      * need synchronization by calling
-     * {@link Archives#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link Controllers#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.

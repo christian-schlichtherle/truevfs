@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.SuffixSet;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -113,14 +112,14 @@ public class ArchiveDriverRegistry implements Serializable {
      * Processes the given {@code config} and adds the configured archive
      * driver mappings.
      * 
-     * @param config a map of suffix lists and archive driver IDs.
-     *        Each key in this map must be a non-null, non-empty suffix list,
-     *        obeying the usual syntax.
-     *        Each value must either be an archive driver instance, an archive
-     *        driver class, or a string with the fully qualified name name of
-     *        an archive driver class.
-     * @param eager iff {@code true}, archive drivers are immediately
-     *        instantiated and the keyword {@code DEFAULT} is not allowed.
+     * @param  config a map of suffix lists and archive driver IDs.
+     *         Each key in this map must be a non-null, non-empty suffix list,
+     *         obeying the usual syntax.
+     *         Each value must either be an archive driver instance, an archive
+     *         driver class, or a string with the fully qualified name name of
+     *         an archive driver class.
+     * @param  eager iff {@code true}, archive drivers are immediately
+     *         instantiated and the keyword {@code DEFAULT} is not allowed.
      * @throws NullPointerException if any parameter or config element
      *         is {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
@@ -216,9 +215,7 @@ public class ArchiveDriverRegistry implements Serializable {
             if (null == driver) {
                 if (drivers.containsKey(suffix) || null == delegate)
                     return null;
-
-                // Lookup the driver in the delegate and cache it in the
-                // local registry.
+                // Lookup the driver in the delegate.
                 driver = delegate.getArchiveDriver(suffix); // may be null!
             } else {
                 // We have found an entry in the drivers map, but it isn't
@@ -228,6 +225,7 @@ public class ArchiveDriverRegistry implements Serializable {
                 logger.log(Level.FINE, "installed", // NOI18N
                         new Object[] { suffix, driver });
             }
+            // Cache the driver in the local registry.
             drivers.put(suffix, driver); // may drivers null!
         }
         return (ArchiveDriver<?>) driver;

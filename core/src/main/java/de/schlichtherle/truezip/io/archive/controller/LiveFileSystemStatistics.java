@@ -41,13 +41,13 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
 
     @Override
     public int getFileSystemsTotal() {
-        return Archives.getControllers().size();
+        return Controllers.getControllers().size();
     }
 
     @Override
     public int getFileSystemsTouched() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : Archives.getControllers())
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers())
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -56,8 +56,8 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     @Override
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : Archives.getControllers())
-            if (null == controller.getModel().getParentModel())
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers())
+            if (null == controller.getModel().getParent())
                 result++;
         return result;
     }
@@ -65,9 +65,9 @@ final class LiveFileSystemStatistics implements FileSystemStatistics {
     @Override
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : Archives.getControllers()) {
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers()) {
             final FileSystemModel model = controller.getModel();
-            if (null == model.getParentModel() && model.isTouched())
+            if (null == model.getParent() && model.isTouched())
                 result++;
         }
         return result;

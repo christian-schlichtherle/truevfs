@@ -17,14 +17,14 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.archive.controller.Archives;
+import de.schlichtherle.truezip.io.archive.controller.Controllers;
 import de.schlichtherle.truezip.io.socket.InputClosedException;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
 
 /**
  * Defines the available options for archive synchronization operations, i.e.
- * {@link Archives#sync} and {@link CompositeFileSystemController#sync}.
+ * {@link Controllers#sync} and {@link CompositeFileSystemController#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$

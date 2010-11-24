@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public interface FileSystemModel {
      * system or {@code null} if this composite file system is not a member of
      * another file system.
      */
-    FileSystemModel getParentModel();
+    FileSystemModel getParent();
 
     /**
      * Returns {@code true} if and only if the contents of this composite file
@@ -59,4 +59,8 @@ public interface FileSystemModel {
      * system.
      */
     boolean isTouched();
+
+    void addFileSystemListener(FileSystemListener listener);
+
+    void removeFileSystemListener(FileSystemListener listener);
 }
