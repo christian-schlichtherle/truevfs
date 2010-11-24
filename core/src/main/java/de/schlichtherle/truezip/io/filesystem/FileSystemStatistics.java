@@ -17,13 +17,18 @@ package de.schlichtherle.truezip.io.filesystem;
 
 /**
  * Provides statistics about the total set of archive files accessed.
- * Client applications should never implement this interface because (a)
- * there is no need to and (b) it may get extended over time.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemStatistics {
+public final class FileSystemStatistics {
+
+    /** The singleton instance of this class. */
+    public static final FileSystemStatistics SINGLETON
+            = new FileSystemStatistics();
+
+    private FileSystemStatistics() {
+    }
 
     /**
      * Returns the total number of bytes read from all <em>top level file
@@ -47,8 +52,10 @@ public interface FileSystemStatistics {
      *
      * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
-    long getSyncTotalByteCountRead();
-    
+    public long getSyncTotalByteCountRead() {
+        return CountingReadOnlyFile.getTotal();
+    }
+
     /**
      * Returns the total number of bytes written to all <em>top level file
      * systems</em> which have been updated by a call to
@@ -71,13 +78,17 @@ public interface FileSystemStatistics {
      *
      * @see Controllers#sync(URI, ExceptionBuilder, BitField)
      */
-    long getSyncTotalByteCountWritten();
+    public long getSyncTotalByteCountWritten() {
+        return CountingOutputStream.getTotal();
+    }
 
     /**
      * Returns the total number of file systems processed.
      */
-    int getFileSystemsTotal();
-    
+    public int getFileSystemsTotal() {
+        return Controllers.getControllers().size();
+    }
+
     /**
      * Returns the number of file systems which have been touched and
      * need synchronization by calling
@@ -86,13 +97,25 @@ public interface FileSystemStatistics {
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getFileSystemsTouched();
+    public int getFileSystemsTouched() {
+        int result = 0;
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers())
+            if (controller.getModel().isTouched())
+                result++;
+        return result;
+    }
 
     /**
      * Returns the total number of top level file systems processed.
      */
-    int getTopLevelFileSystemsTotal();
-    
+    public int getTopLevelFileSystemsTotal() {
+        int result = 0;
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers())
+            if (null == controller.getModel().getParent())
+                result++;
+        return result;
+    }
+
     /**
      * Returns the number of top level file systems which have been touched and
      * need synchronization by calling
@@ -101,5 +124,13 @@ public interface FileSystemStatistics {
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
-    int getTopLevelFileSystemsTouched();
+    public int getTopLevelFileSystemsTouched() {
+        int result = 0;
+        for (ComponentFileSystemController<?> controller : Controllers.getControllers()) {
+            final FileSystemModel model = controller.getModel();
+            if (null == model.getParent() && model.isTouched())
+                result++;
+        }
+        return result;
+    }
 }

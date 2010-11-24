@@ -233,7 +233,7 @@ implements ArchiveDriver<AE>, Serializable {
     }
 
     @Override
-    public ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
+    public final ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
         return new ArchiveModel(mountPoint, parent);
     }
 

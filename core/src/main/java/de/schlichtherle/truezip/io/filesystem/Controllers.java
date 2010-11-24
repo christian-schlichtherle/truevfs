@@ -238,8 +238,8 @@ public class Controllers {
      * Returns a proxy instance which encapsulates <em>live</em> statistics
      * about the total set of archive files accessed by this package.
      * Any call to a method of the returned interface instance returns
-     * up-to-date data, so there is no need to repeatedly call this method in
-     * order to optain updated statistics.
+     * up-to-date data, so there is <em>no</em> need to repeatedly call this
+     * method in order to update the statistics.
      * <p>
      * Note that this method returns <em>live</em> statistics rather than
      * <em>real time</em> statistics.
@@ -247,8 +247,8 @@ public class Controllers {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static FileSystemStatistics getLiveStatistics() {
-        return LiveFileSystemStatistics.SINGLETON;
+    public static FileSystemStatistics getStatistics() {
+        return FileSystemStatistics.SINGLETON;
     }
 
     /**
