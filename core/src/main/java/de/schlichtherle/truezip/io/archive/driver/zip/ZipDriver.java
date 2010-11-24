@@ -16,12 +16,12 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -199,9 +199,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(
-            FileSystemModel model,
-            InputSocket<?> input)
+    public ZipInputShop newInputShop(ArchiveModel model, InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -212,9 +210,7 @@ implements ZipEntryFactory<ZipEntry> {
         }
     }
 
-    protected ZipInputShop newZipInputShop(
-            FileSystemModel model,
-            ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(ArchiveModel model, ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
@@ -229,7 +225,9 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FileSystemModel model, OutputSocket<?> output, InputShop<ZipEntry> source)
+            ArchiveModel model,
+            OutputSocket<?> output,
+            InputShop<ZipEntry> source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
@@ -242,7 +240,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            FileSystemModel model, OutputStream out, ZipInputShop source)
+            ArchiveModel model, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source);
     }

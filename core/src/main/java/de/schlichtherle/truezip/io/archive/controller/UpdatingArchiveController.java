@@ -118,8 +118,6 @@ extends     FileSystemArchiveController<AE> {
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
      * use at any time.
-     *
-     * @see Archives#getController(URI, ArchiveDriver, ComponentFileSystemController)
      */
     private final class Input extends ConcurrentInputShop<AE> {
         Input(InputShop<AE> input) {
@@ -138,8 +136,6 @@ extends     FileSystemArchiveController<AE> {
      * This is required by the memory management to ensure that for any
      * prospective archive file at most one archive controller object is in
      * use at any time.
-     *
-     * @see Archives#getController(URI, ArchiveDriver, ComponentFileSystemController)
      */
     private final class Output extends ConcurrentOutputShop<AE> {
         Output(OutputShop<AE> output) {

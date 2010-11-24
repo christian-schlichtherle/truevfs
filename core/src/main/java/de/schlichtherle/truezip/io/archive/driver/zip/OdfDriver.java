@@ -16,9 +16,9 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class OdfDriver extends JarDriver {
 
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            FileSystemModel model,
+            ArchiveModel model,
             OutputSocket<?> output,
             InputShop<ZipEntry> source)
     throws IOException {

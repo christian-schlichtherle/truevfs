@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.driver.zip.CheckedZipInputShop;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -105,9 +105,7 @@ public class SafeZipRaesDriver extends AbstractZipRaesDriver {
      * and CRC-32 authenticated.
      */
     @Override
-    protected ZipInputShop newZipInputShop(
-            FileSystemModel model,
-            ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(ArchiveModel model, ReadOnlyFile rof)
     throws IOException {
         // Optimization: If the read-only file is smaller than the
         // authentication trigger, then its entire cipher text has already

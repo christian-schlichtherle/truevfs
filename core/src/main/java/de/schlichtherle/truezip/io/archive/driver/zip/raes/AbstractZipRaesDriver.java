@@ -33,7 +33,6 @@ import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
@@ -120,7 +119,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final FileSystemModel model,
+            final ArchiveModel model,
             final InputSocket<?> target)
     throws IOException {
         class InputSocket extends FilterInputSocket<CommonEntry> {
@@ -184,7 +183,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final FileSystemModel model,
+            final ArchiveModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
@@ -227,7 +226,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    public RaesParameters getRaesParameters(FileSystemModel model) {
+    public RaesParameters getRaesParameters(ArchiveModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint());
     }
 }
