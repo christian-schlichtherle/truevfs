@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
@@ -237,7 +237,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    public final Entry<AE> getEntry(final String path)
+    public final ArchiveFileSystemEntry<AE> getEntry(final String path)
     throws FileSystemException {
         try {
             return autoMount().getEntry(path);
@@ -261,7 +261,7 @@ extends FileSystemArchiveController<AE> {
 
     private static final class SpecialFileEntry<AE extends ArchiveEntry>
     extends FilterCommonEntry<AE>
-    implements Entry<AE> {
+    implements ArchiveFileSystemEntry<AE> {
         SpecialFileEntry(AE entry) {
             super(entry);
         }
@@ -355,7 +355,7 @@ extends FileSystemArchiveController<AE> {
 	boolean autoSync(final String path, final Access intention)
     throws SyncException, FileSystemException {
         final ArchiveFileSystem<AE> fileSystem;
-        final Entry<AE> entry;
+        final ArchiveFileSystemEntry<AE> entry;
         if (null == (fileSystem = getFileSystem())
                 || null == (entry = fileSystem.getEntry(path)))
             return false;
@@ -537,7 +537,7 @@ extends FileSystemArchiveController<AE> {
                 final OutputService<AE> output,
                 final ExceptionHandler<IOException, E> handler)
     throws E {
-        for (final Entry<AE> fse : fileSystem) {
+        for (final ArchiveFileSystemEntry<AE> fse : fileSystem) {
             final AE ae = fse.getTarget();
             final String n = ae.getName();
             if (null != output.getEntry(n))

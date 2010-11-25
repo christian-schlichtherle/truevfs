@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.BitField;
 
 /**
@@ -36,42 +32,7 @@ import de.schlichtherle.truezip.util.BitField;
  * @version $Id$
  */
 public interface ArchiveFileSystem<AE extends ArchiveEntry>
-extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
-
-    /**
-     * A marker interface which distinguishes entries created by an archive
-     * file system from any other common entries, in particular those created
-     * by the {@link ArchiveDriver#newEntry factory method} of an archive
-     * driver.
-     * With the help of this marker interface, an archive file system ensures
-     * that when a new archive entry is created, the {@code template} parameter
-     * is <i>not</i> an instance of this interface, but possibly a product of
-     * the archive entry factory in the archive driver.
-     * This enables an archive driver to copy properties specific to its type
-     * of archive entries, e.g. the compressed size of ZIP entries.
-     */
-    interface Entry<AE extends ArchiveEntry> extends FileSystemEntry<AE> {
-    }
-
-    /**
-     * Represents an operation on a chain of one or more archive file system
-     * entries.
-     * The operation is run by its {@link #run} method and the head of the
-     * chain can be obtained by its {@link #getTarget} method.
-     * <p>
-     * Note that the state of the archive file system will not change until
-     * the {@link #run} method is called!
-     *
-     * @see #mknod
-     */
-    interface Operation<AE extends ArchiveEntry>
-    extends de.schlichtherle.truezip.util.Operation<ArchiveFileSystemException>,
-            Link<Entry<AE>> {
-
-        /** Executes this archive file system entry chain operation. */
-        @Override
-        void run() throws ArchiveFileSystemException;
-    }
+extends CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
 
     /**
      * Returns {@code true} if and only if this archive file system is
@@ -90,11 +51,12 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      * chain of one or more archive entries for the given {@code path} into
      * this archive file system.
      * <p>
-     * To commit the transaction, call {@link Operation#run} on the
-     * returned object, which will mark this archive file system as
-     * {@link #isTouched() touched} and set the last modification time of the
-     * created and linked archive file system entries to the system's current
-     * time at the moment of the call to this method.
+     * To commit the transaction, you need to call
+     * {@link ArchiveFileSystemOperation#run} on the returned object, which
+     * will mark this archive file system as {@link #isTouched() touched} and
+     * set the last modification time of the created and linked archive file
+     * system entries to the system's current time at the moment of the call
+     * to this method.
      *
      * @param  path a non-{@code null} relative path name.
      * @param  type a non-{@code null} common entry type.
@@ -120,13 +82,13 @@ extends CommonEntryContainer<ArchiveFileSystem.Entry<AE>> {
      *         <li>A parent entry is missing and {@code createParents} is
      *             {@code false}.</li>
      *         </ul>
-     * @return A new I/O operation on a chain of one or more archive file
-     *         system entries for the given path name which will be linked
-     *         into this archive file system upon a call to its
-     *         {@link Operation#run} method.
+     * @return A new archive file system operation on a chain of one or more
+     *         archive file system entries for the given path name which will
+     *         be linked into this archive file system upon a call to its
+     *         {@link ArchiveFileSystemOperation#run} method.
      */
-    Operation<AE> mknod(String path, Type type,
-                        boolean createParents, CommonEntry template)
+    ArchiveFileSystemOperation<AE> mknod(
+            String path, Type type, boolean createParents, CommonEntry template)
     throws ArchiveFileSystemException;
 
     /**

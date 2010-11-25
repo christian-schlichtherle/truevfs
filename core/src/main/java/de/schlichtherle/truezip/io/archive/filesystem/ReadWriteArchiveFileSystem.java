@@ -107,7 +107,7 @@ implements ArchiveFileSystem<AE> {
             final VetoableTouchListener vetoableTouchListener) {
         if (null == rootTemplate)
             throw new NullPointerException();
-        if (rootTemplate instanceof Entry<?>)
+        if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
             throw new IllegalArgumentException();
 
         this.factory = factory;
@@ -309,8 +309,8 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public Iterator<Entry<AE>> iterator() {
-        class ArchiveEntryIterator implements Iterator<Entry<AE>> {
+    public Iterator<ArchiveFileSystemEntry<AE>> iterator() {
+        class ArchiveEntryIterator implements Iterator<ArchiveFileSystemEntry<AE>> {
             final Iterator<BaseEntry<AE>> it = master.values().iterator();
 
             @Override
@@ -319,7 +319,7 @@ implements ArchiveFileSystem<AE> {
             }
 
             @Override
-			public Entry<AE> next() {
+			public ArchiveFileSystemEntry<AE> next() {
                 return it.next();
             }
 
@@ -332,7 +332,7 @@ implements ArchiveFileSystem<AE> {
     }
 
     @Override
-    public Entry<AE> getEntry(String path) {
+    public ArchiveFileSystemEntry<AE> getEntry(String path) {
         if (path == null)
             throw new NullPointerException();
         final BaseEntry<AE> entry = master.get(path);
@@ -354,7 +354,7 @@ implements ArchiveFileSystem<AE> {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
-        assert !(template instanceof Entry<?>);
+        assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
             return newEntry(path, factory.newEntry(path, type, template));
@@ -380,7 +380,7 @@ implements ArchiveFileSystem<AE> {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
-        assert !(template instanceof Entry<?>);
+        assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
             return newEntry(path, factory.newEntry(path, type, template));
@@ -413,7 +413,7 @@ implements ArchiveFileSystem<AE> {
      */
     private static abstract class BaseEntry<AE extends ArchiveEntry>
     extends FilterCommonEntry<AE>
-    implements Entry<AE>, Cloneable {
+    implements ArchiveFileSystemEntry<AE>, Cloneable {
         /** Constructs a new instance of {@code CommonEntry}. */
         BaseEntry(final AE entry) {
             super(entry);
@@ -560,7 +560,7 @@ implements ArchiveFileSystem<AE> {
     } // class NamedDirectoryEntry
 
     @Override
-    public Operation<AE> mknod(
+    public ArchiveFileSystemOperation<AE> mknod(
             final String path,
             final Type type,
             final boolean createParents,
@@ -577,12 +577,12 @@ implements ArchiveFileSystem<AE> {
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveFileSystemException(path,
                     "only FILE and DIRECTORY entries are currently supported");
-        while (template instanceof Entry<?>)
-            template = ((Entry<?>) template).getTarget();
+        while (template instanceof ArchiveFileSystemEntry<?>)
+            template = ((ArchiveFileSystemEntry<?>) template).getTarget();
         return new PathLink(path, type, template, createParents);
     }
 
-    private final class PathLink implements Operation<AE> {
+    private final class PathLink implements ArchiveFileSystemOperation<AE> {
         final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<AE>[] links;
@@ -668,7 +668,7 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        public Entry<AE> getTarget() {
+        public ArchiveFileSystemEntry<AE> getTarget() {
             return links[links.length - 1].getTarget();
         }
     } // class PathLink
@@ -678,7 +678,7 @@ implements ArchiveFileSystem<AE> {
      * {@link PathLink}.
      */
     private static final class SegmentLink<AE extends ArchiveEntry>
-    implements Link<Entry<AE>> {
+    implements Link<ArchiveFileSystemEntry<AE>> {
         final BaseEntry<AE> entry;
         final String base;
 
@@ -698,7 +698,7 @@ implements ArchiveFileSystem<AE> {
         }
 
         @Override
-        public Entry<AE> getTarget() {
+        public ArchiveFileSystemEntry<AE> getTarget() {
             return entry;
         }
     } // class SegmentLink

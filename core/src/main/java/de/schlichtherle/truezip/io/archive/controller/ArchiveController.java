@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 
 /**
@@ -33,7 +33,7 @@ extends FileSystemController<AE> {
     public abstract ArchiveModel getModel();
 
     @Override
-    public abstract Entry<? extends AE> getEntry(String path)
+    public abstract ArchiveFileSystemEntry<? extends AE> getEntry(String path)
     throws FileSystemException;
 
     /**
