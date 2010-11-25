@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
+//import de.schlichtherle.truezip.io.entry.FileEntry;
 import java.net.URI;
 
 /**
@@ -24,6 +25,16 @@ import java.net.URI;
  */
 public interface FileSystemFactory< FSM extends FileSystemModel,
                                     CE extends CommonEntry> {
+
+    /*FileSystemFactory<?, ?> NULL = new FileSystemFactory<FileSystemModel, FileEntry>() {
+        public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
+            return new FileSystemModel(mountPoint, parent);
+        }
+
+        public FileSystemController<FileEntry> newController(FileSystemModel model, ComponentFileSystemController<?> parent) {
+            return new HostFileSystemController(model);
+        }
+    };*/
 
     FSM newModel(URI mountPoint, FileSystemModel parent);
 

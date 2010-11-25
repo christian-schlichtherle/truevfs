@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem.host;
+package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -45,13 +41,13 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class HostFileSystemController
+final class HostFileSystemController
 extends ComponentFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
 
-    public HostFileSystemController(final FileSystemModel model) {
+    HostFileSystemController(final FileSystemModel model) {
         this.model = model;
         this.target = new File(model.getMountPoint());
     }
