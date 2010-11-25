@@ -34,7 +34,7 @@ import de.schlichtherle.truezip.util.BitField;
  * @version $Id$
  */
 final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
-extends ReadWriteArchiveFileSystem<AE> {
+extends ArchiveFileSystem<AE> {
 
     ReadOnlyArchiveFileSystem(
         final CommonEntryContainer<AE> container,

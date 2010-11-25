@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -296,7 +295,7 @@ extends FileSystemArchiveController<AE> {
             final InputSocket<?> socket = parent.getInputSocket(
                     parentPath, BitField.of(InputOption.CACHE));
             input = new Input(getDriver().newInputShop(getModel(), socket));
-            setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(
                     input.getDriverProduct(), getDriver(),
                     socket.getLocalTarget(), vetoableTouchListener,
                     readOnly));
@@ -321,7 +320,7 @@ extends FileSystemArchiveController<AE> {
             } catch (IOException ex2) {
                 throw new FalsePositiveException(getModel(), ex2);
             }
-            setFileSystem(ArchiveFileSystems.newArchiveFileSystem(
+            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(
                     getDriver(), vetoableTouchListener));
         }
     }
