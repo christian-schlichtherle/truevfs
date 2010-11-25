@@ -40,7 +40,6 @@ public class ArchiveModel extends FileSystemModel {
         writeLock = lock.writeLock();
     }
 
-
     final ReentrantLock readLock() {
         return readLock;
     }

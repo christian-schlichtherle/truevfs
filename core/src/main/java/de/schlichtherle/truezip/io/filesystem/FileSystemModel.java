@@ -41,14 +41,15 @@ public class FileSystemModel {
 
     public FileSystemModel(URI mountPoint,
                            final FileSystemModel parent) {
-        if (!"file".equals(mountPoint.getScheme())) throw new IllegalArgumentException();
-        if (mountPoint.isOpaque()) throw new IllegalArgumentException();
+        if (!mountPoint.isAbsolute())
+            throw new IllegalArgumentException();
         if (!mountPoint.getPath().endsWith(SEPARATOR))
             mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR);
-        mountPoint = mountPoint.normalize();
-        this.mountPoint = mountPoint;
+        this.mountPoint = mountPoint = mountPoint.normalize();
         this.parent = parent;
         if (null != parent) {
+            if (mountPoint.isOpaque())
+                throw new IllegalArgumentException();
             final URI parentMountPoint = parent.getMountPoint()
                     .relativize(mountPoint);
             if (parentMountPoint.equals(mountPoint))
@@ -58,7 +59,7 @@ public class FileSystemModel {
             this.parentPath = null;
         }
 
-        assert mountPoint.getPath().endsWith(SEPARATOR);
+        assert mountPoint.isOpaque() || mountPoint.getPath().endsWith(SEPARATOR);
         assert (null == parent && null == parentPath)
                 ^ (null != parent && parentPath.endsWith(SEPARATOR));
     }

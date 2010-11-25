@@ -53,6 +53,8 @@ extends ComponentFileSystemController<FileEntry> {
     }
 
     public HostFileSystemController(final FileSystemModel model) {
+        if (!"file".equals(model.getMountPoint().getScheme()))
+            throw new IllegalArgumentException();
         if (null != model.getParent())
             throw new IllegalArgumentException();
         this.model = model;

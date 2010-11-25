@@ -58,7 +58,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
-extends CommonEntryFactory<AE>, FileSystemFactory<ArchiveModel, AE> {
+extends FileSystemFactory<ArchiveModel, AE>, CommonEntryFactory<AE> {
 
     /**
      * Creates a new archive controller for the given archive model and
