@@ -49,6 +49,13 @@ public abstract class FileSystemController<CE extends CommonEntry> {
     /** Returns the non-{@code null} file system model. */
     public abstract FileSystemModel getModel();
 
+    /**
+     * Returns the controller of the parent file system or {@code null} if and
+     * only if this file system is not federated, i.e. if it's not a member of
+     * another file system.
+     */
+    public abstract ComponentFileSystemController<?> getParent();
+
     public abstract Icon getOpenIcon() throws FileSystemException;
 
     public abstract Icon getClosedIcon() throws FileSystemException;

@@ -32,7 +32,9 @@ public class ArchiveModel extends FileSystemModel {
 
     public ArchiveModel(final URI mountPoint,
                         final FileSystemModel parent) {
-        super(mountPoint, parent);
+        super(mountPoint, null != parent
+                ? parent
+                : new FileSystemModel(mountPoint.resolve("..")));
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();

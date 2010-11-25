@@ -15,47 +15,48 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
-import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import java.io.CharConversionException;
-import java.util.Set;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
-import javax.swing.Icon;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
-import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystems;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.HostFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
+import de.schlichtherle.truezip.io.InputBusyException;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.socket.ConcurrentInputShop;
+import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
+import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputService;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.ConcurrentInputShop;
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputService;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
-import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
+import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
@@ -174,12 +175,18 @@ extends FileSystemArchiveController<AE> {
 
     public UpdatingArchiveController(
             final ArchiveModel model,
-            final ArchiveDriver<AE> driver,
-            final ComponentFileSystemController<?> parent) {
+            final ComponentFileSystemController<?> parent,
+            final ArchiveDriver<AE> driver) {
         super(model);
         assert null != driver;
         this.driver = driver;
-        this.parent = parent;
+        if (null != parent) {
+            if (model.getParent() != parent.getModel())
+                throw new IllegalArgumentException("parent/member mismatch!");
+            this.parent = parent;
+        } else {
+            this.parent = new HostFileSystemController(model.getParent());
+        }
     }
 
     /**
@@ -194,7 +201,8 @@ extends FileSystemArchiveController<AE> {
         return driver;
     }
 
-    private ComponentFileSystemController<?> getParent() {
+    @Override
+    public ComponentFileSystemController<?> getParent() {
         return parent;
     }
 

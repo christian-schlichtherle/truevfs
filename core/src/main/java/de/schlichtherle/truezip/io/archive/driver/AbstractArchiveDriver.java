@@ -240,11 +240,11 @@ implements ArchiveDriver<AE>, Serializable {
     @Override
     public ArchiveController<AE> newController(
             ArchiveModel model,
-            ComponentFileSystemController<?> parentController) {
+            ComponentFileSystemController<?> parent) {
         return new ConcurrentArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                            model, this, parentController)));
+                            model, parent, this)));
     }
 
     /**

@@ -22,7 +22,9 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * Like it's super class, but does not throw {@link FileSystemException}s.
+ * Like it's super class, but does not throw {@link FileSystemException}s
+ * because either the file system is not federated or this exception type is
+ * handled by the implementation of this abstract class.
  *
  * @author  Christian Schlichtherle
  * @version $Id$

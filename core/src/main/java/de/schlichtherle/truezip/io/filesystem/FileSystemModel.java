@@ -35,13 +35,17 @@ public class FileSystemModel {
     private boolean touched;
     private FileSystemListener listener;
 
-    public FileSystemModel(final URI mountPoint,
+    public FileSystemModel(URI mountPoint) {
+        this(mountPoint, null);
+    }
+
+    public FileSystemModel(URI mountPoint,
                            final FileSystemModel parent) {
         if (!"file".equals(mountPoint.getScheme())) throw new IllegalArgumentException();
         if (mountPoint.isOpaque()) throw new IllegalArgumentException();
-        if (!mountPoint.getPath().endsWith(SEPARATOR)) throw new IllegalArgumentException();
-        if (!mountPoint.equals(mountPoint.normalize())) throw new IllegalArgumentException();
-
+        if (!mountPoint.getPath().endsWith(SEPARATOR))
+            mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR);
+        mountPoint = mountPoint.normalize();
         this.mountPoint = mountPoint;
         this.parent = parent;
         if (null != parent) {
@@ -53,6 +57,10 @@ public class FileSystemModel {
         } else {
             this.parentPath = null;
         }
+
+        assert mountPoint.getPath().endsWith(SEPARATOR);
+        assert (null == parent && null == parentPath)
+                ^ (null != parent && parentPath.endsWith(SEPARATOR));
     }
 
     /**
@@ -78,8 +86,8 @@ public class FileSystemModel {
     }
 
     /**
-     * Returns the model of the parent file system of this composite file
-     * system or {@code null} if this composite file system is not a member of
+     * Returns the model of the parent file system or {@code null} if and
+     * only if this file system is not federated, i.e. if it's not a member of
      * another file system.
      */
     public final FileSystemModel getParent() {
