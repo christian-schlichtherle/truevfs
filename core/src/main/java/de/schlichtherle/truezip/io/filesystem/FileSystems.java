@@ -116,7 +116,7 @@ public class FileSystems {
 
         ScheduledFileSystemController(FileSystemController<?> prospect) {
             super(prospect);
-            afterTouch(new FileSystemEvent(getModel()));
+            afterTouch(null);
         }
 
         /**
@@ -126,8 +126,8 @@ public class FileSystems {
         @Override
         public void afterTouch(final FileSystemEvent event) {
             synchronized (controllers) {
-                final FileSystemModel model = event.getSource();
-                assert getModel() == model;
+                final FileSystemModel model = getModel();
+                assert null == event || event.getSource() == model;
                 controllers.put(model.getMountPoint(),
                         (model.isTouched() ? STRONG : WEAK).newLink(this));
             }

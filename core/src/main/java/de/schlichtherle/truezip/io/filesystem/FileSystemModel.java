@@ -103,7 +103,7 @@ public class FileSystemModel {
      * @throws RuntimeException if this file system model does not specify a
      *         {@link #getParent() parent file system model}.
      */
-    public String parentPath(String path) {
+    public final String parentPath(String path) {
         return isRoot(path)
                 ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
                 : parentPath + path;
@@ -127,14 +127,22 @@ public class FileSystemModel {
                 listener.afterTouch(new FileSystemEvent(this));
     }
 
-    public final void addFileSystemListener(final FileSystemListener listener) {
+    /**
+     * @param  listener the non-{@code null} listener for file system events.
+     */
+    public final void addFileSystemListener(
+            final FileSystemListener listener) {
+        if (null == listener)
+            throw new NullPointerException();
         if (null != this.listener)
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException(); // TODO!
         this.listener = listener;
     }
 
-    public final void removeFileSystemListener(final FileSystemListener listener) {
-        this.listener = null;
+    public final void removeFileSystemListener(
+            final FileSystemListener listener) {
+        if (listener == this.listener)
+            this.listener = null;
     }
 
     @Override

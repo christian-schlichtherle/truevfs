@@ -147,10 +147,11 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private final class TouchListener implements ArchiveFileSystemListener<AE> {
+    private final class Listener implements ArchiveFileSystemListener<AE> {
         @Override
         public void beforeTouch(ArchiveFileSystemEvent<AE> event)
         throws IOException {
+            assert null == event || event.getSource() == getFileSystem();
             makeOutput(BitField.noneOf(OutputOption.class));
             getModel().setTouched(true);
         }
@@ -171,8 +172,7 @@ extends FileSystemArchiveController<AE> {
      */
     private Output output;
 
-    private final ArchiveFileSystemListener vetoableTouchListener
-            = new TouchListener();
+    private final ArchiveFileSystemListener<AE> listener = new Listener();
 
     public UpdatingArchiveController(
             final ArchiveModel model,
@@ -299,8 +299,7 @@ extends FileSystemArchiveController<AE> {
             input = new Input(getDriver().newInputShop(getModel(), socket));
             setFileSystem(ArchiveFileSystem.newArchiveFileSystem(
                     input.getDriverProduct(), getDriver(),
-                    socket.getLocalTarget(), vetoableTouchListener,
-                    readOnly));
+                    socket.getLocalTarget(), readOnly));
         } catch (FileSystemException ex) {
             throw ex;
         } catch (TabuFileException ex) {
@@ -322,9 +321,10 @@ extends FileSystemArchiveController<AE> {
             } catch (IOException ex2) {
                 throw new FalsePositiveException(getModel(), ex2);
             }
-            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(
-                    getDriver(), vetoableTouchListener));
+            listener.beforeTouch(null);
+            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(getDriver()));
         }
+        getFileSystem().addArchiveFileSystemListener(listener);
     }
 
     private void makeOutput(final BitField<OutputOption> options)
