@@ -247,7 +247,7 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName(), options);
         }
-        return FileSystems.getController(src.toURI(), null, null)
+        return FileSystems.getController(src.toURI())
                 .getInputSocket(ROOT, options);
     }
 
@@ -266,7 +266,7 @@ class Files {
                         .getOutputSocket(   file.getInnerEntryName(),
                                             options, template);
         }
-        return FileSystems.getController(dst.toURI(), null, null)
+        return FileSystems.getController(dst.toURI())
                 .getOutputSocket(ROOT, options, template);
     }
 

@@ -44,14 +44,14 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class CompositeFileSystemController<CE extends CommonEntry>
+class CompositeFileSystemController
 extends ComponentFileSystemController<CommonEntry> {
 
-    private final FileSystemController<CE> prospect;
+    private final FileSystemController<?> prospect;
     private final ComponentFileSystemController<?> parent;
 
     CompositeFileSystemController(
-            final FileSystemController<CE> prospect,
+            final FileSystemController<?> prospect,
             final ComponentFileSystemController<?> parent) {
         this.prospect = prospect;
         this.parent = parent;
@@ -59,7 +59,7 @@ extends ComponentFileSystemController<CommonEntry> {
             throw new IllegalArgumentException("parent/member mismatch");
     }
 
-    private FileSystemController<CE> getProspect() {
+    private FileSystemController<?> getProspect() {
         return prospect;
     }
 
