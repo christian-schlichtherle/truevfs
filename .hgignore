@@ -3,8 +3,6 @@
 \.chg\..*$
 \.rej$
 \.conflict\~$
-glob:*/target/
 glob:**/*.log
 glob:**/*.log.xml
-glob:core/nb-configuration.xml
-glob:core/nbactions.xml
+glob:target/
