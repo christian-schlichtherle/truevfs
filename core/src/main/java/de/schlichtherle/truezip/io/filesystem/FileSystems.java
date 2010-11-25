@@ -59,16 +59,19 @@ public class FileSystems {
     };
 
     /**
-     * The map of all archive controllers.
-     * The keys are plain {@link URI} instances and the values are either
-     * {@code ComponentFileSystemController}s or {@link WeakReference}s to
-     * {@code ComponentFileSystemController}s.
+     * The map of all scheduled file system controllers, keyed by their mount
+     * points.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<CompositeFileSystemController<?>>> controllers
-            = new WeakHashMap<URI, Link<CompositeFileSystemController<?>>>();
+    private static final Map<URI, Link<ScheduledFileSystemController>> controllers
+            = new WeakHashMap<URI, Link<ScheduledFileSystemController>>();
 
     private FileSystems() {
+    }
+
+    public static <FSM extends FileSystemModel, CE extends CommonEntry>
+    ComponentFileSystemController<?> getController(URI mountPoint) {
+        return getController(mountPoint, null, null);
     }
 
     /**
@@ -79,6 +82,7 @@ public class FileSystems {
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
      *         of the (virtual) file system.
+     * @param  factory the nullable file system factory.
      * @param  parent the nullable file system controller for the parent file
      *         system.
      * @return A non-{@code null} file system controller.
@@ -107,20 +111,20 @@ public class FileSystems {
             if (null != controller)
                 return controller;
             final FSM model = factory.newModel(mountPoint, parent.getModel());
-            final ScheduledFileSystemController<CE> scheduledController
-                    = new ScheduledFileSystemController<CE>(
+            final ScheduledFileSystemController scheduledController
+                    = new ScheduledFileSystemController(
                         factory.newController(model, parent), parent);
             model.addFileSystemListener(scheduledController);
             return scheduledController;
         }
     }
 
-    private static final class ScheduledFileSystemController<CE extends CommonEntry>
-    extends CompositeFileSystemController<CE>
+    private static final class ScheduledFileSystemController
+    extends CompositeFileSystemController
     implements FileSystemListener {
 
         ScheduledFileSystemController(
-                final FileSystemController<CE> prospect,
+                final FileSystemController<?> prospect,
                 final ComponentFileSystemController<?> parent) {
             super(prospect, parent);
             touchChanged(new FileSystemEvent(getModel()));
@@ -131,14 +135,12 @@ public class FileSystems {
          * to the given touch status.
          */
         @Override
-        @SuppressWarnings({ "unchecked", "rawtypes" })
         public void touchChanged(final FileSystemEvent event) {
             synchronized (controllers) {
                 final FileSystemModel model = event.getSource();
                 assert getModel() == model;
                 controllers.put(model.getMountPoint(),
-                        (Link) (model.isTouched() ? STRONG : WEAK)
-                            .newLink(this));
+                        (model.isTouched() ? STRONG : WEAK).newLink(this));
             }
         }
     }
@@ -231,7 +233,7 @@ public class FileSystems {
             snapshot = null != comparator
                     ? new TreeSet<ComponentFileSystemController<?>>(comparator)
                     : new HashSet<ComponentFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<CompositeFileSystemController<?>> link : controllers.values()) {
+            for (final Link<ScheduledFileSystemController> link : controllers.values()) {
                 final ComponentFileSystemController<?> controller = Links.getTarget(link);
                 if (null != controller && controller
                         .getModel()
