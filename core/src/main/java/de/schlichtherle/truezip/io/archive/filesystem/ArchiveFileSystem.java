@@ -647,14 +647,13 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * to this method.
      *
      * @param  path a non-{@code null} relative path name.
-     * @param  type a non-{@code null} common entry type.
+     * @param  type a non-{@code null} entry type.
      * @param  createParents if {@code true}, any missing parent directories
      *         will be created and linked into this archive file system with
      *         its last modification time set to the system's current time.
      * @param  template if not {@code null}, then the archive file system entry
      *         at the end of the chain shall inherit as much properties from
-     *         this common entry as possible - with the exception of its name
-     *         and type.
+     *         this entry as possible - with the exception of its name and type.
      * @throws NullPointerException if {@code path} or {@code type} are
      *         {@code null}.
      * @throws ArchiveReadOnlyExceptionn If this archive file system is read

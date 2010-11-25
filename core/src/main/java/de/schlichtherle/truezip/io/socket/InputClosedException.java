@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.socket;
 import java.io.IOException;
 
 /**
- * Indicates that an input stream or read only file for a common entry has been
+ * Indicates that an input stream or read only file for an entry has been
  * forced to close.
  *
  * @see OutputClosedException

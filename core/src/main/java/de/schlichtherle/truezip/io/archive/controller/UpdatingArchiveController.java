@@ -79,8 +79,8 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public final class UpdatingArchiveController<AE extends ArchiveEntry>
 extends FileSystemArchiveController<AE> {
 
-    private static final class DummyInputService<CE extends Entry>
-    implements InputShop<CE> {
+    private static final class DummyInputService<E extends Entry>
+    implements InputShop<E> {
 
         @Override
         public void close() throws IOException {
@@ -93,17 +93,17 @@ extends FileSystemArchiveController<AE> {
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
-        public Iterator<CE> iterator() {
+        public Iterator<E> iterator() {
             return (Iterator) Collections.emptyList().iterator();
         }
 
         @Override
-        public CE getEntry(String name) {
+        public E getEntry(String name) {
             return null;
         }
 
         @Override
-        public InputSocket<? extends CE> getInputSocket(String name) {
+        public InputSocket<? extends E> getInputSocket(String name) {
             if (null == name)
                 throw new NullPointerException();
             throw new UnsupportedOperationException();

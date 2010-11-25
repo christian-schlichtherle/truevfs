@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.Closeable;
 
 /**
- * A closable common output service.
+ * A closable output service.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have just been partially written yet, i.e. which have not already
@@ -28,11 +28,11 @@ import java.io.Closeable;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the common entries.
+ * @param   <E> The type of the entries.
  * @see     InputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputShop<CE extends Entry>
-extends Closeable, OutputService<CE> {
+public interface OutputShop<E extends Entry>
+extends Closeable, OutputService<E> {
 }

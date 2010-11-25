@@ -20,19 +20,20 @@ import de.schlichtherle.truezip.util.Link;
 import java.util.Set;
 
 /**
- * A file system entry is a common entry which can list directory members.
- * Optionally, it may also provide access to another common entry which is
- * decorated by it.
+ * A file system entry is an entry which can list directory members.
+ * Optionally, it may also provide access to another entry which is decorated
+ * by it.
  *
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry<CE extends Entry>
-extends Entry, Link<CE> {
+public interface FileSystemEntry<E extends Entry>
+extends Entry, Link<E> {
 
     /**
      * Returns the non-{@code null} <i>path name</i>.
-     * A path name is a {@link Entry#getName() common entry name}
+     * A path name is an {@link Entry#getName() entry name}
      * which meets the following additional requirement:
      * <ol>
      * <li>A path name <em>must not</em> end with a separator character.</li>
@@ -53,11 +54,11 @@ extends Entry, Link<CE> {
     /**
      * {@inheritDoc}
      *
-     * @return The decorated common entry or {@code this} if this file system
-     *         entry does not decorate a common entry or does not want to
-     *         provide access to it.
-     *         {@code null} is an illegal return value.
+     * @return The decorated entry or {@code this} if this file system entry
+     *         does not decorate an entry or does not want to provide access
+     *         to it.
+     *         {@code null} is an illegal return value!
      */
     @Override
-    CE getTarget();
+    E getTarget();
 }

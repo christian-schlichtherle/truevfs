@@ -99,7 +99,7 @@ public class FileSystemModel {
      * Resolves the given relative {@code path} against the relative path of
      * this model's file system within its parent file system.
      *
-     * @param  path a non-{@code null} common entry name.
+     * @param  path a non-{@code null} entry name.
      * @throws RuntimeException if this file system model does not specify a
      *         {@link #getParent() parent file system model}.
      */

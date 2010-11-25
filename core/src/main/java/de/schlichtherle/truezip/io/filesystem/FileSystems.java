@@ -67,7 +67,7 @@ public class FileSystems {
     private FileSystems() {
     }
 
-    public static <FSM extends FileSystemModel, CE extends Entry>
+    public static <FSM extends FileSystemModel, E extends Entry>
     ComponentFileSystemController<?> getController(URI mountPoint) {
         return getController(mountPoint, null, null);
     }
@@ -85,11 +85,11 @@ public class FileSystems {
      * @param  factory the nullable file system factory.
      * @return A non-{@code null} file system controller.
      */
-    public static <FSM extends FileSystemModel, CE extends Entry>
+    public static <FSM extends FileSystemModel, E extends Entry>
     ComponentFileSystemController<?> getController(
             URI mountPoint,
             final ComponentFileSystemController<?> parent,
-            final FileSystemFactory<FSM, CE> factory) {
+            final FileSystemFactory<FSM, E> factory) {
         if (null == factory) {
             if (null != parent)
                 throw new IllegalArgumentException();

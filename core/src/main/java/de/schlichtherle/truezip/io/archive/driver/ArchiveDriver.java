@@ -69,9 +69,9 @@ extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
      * <li>An archive driver could decorate the default chain of archive
      *     controllers in order to implement additional aspects such as
      *     managing authentication keys for encrypted archive files or logging.
-     * <li>An archive driver could use the provided parent file system
-     *     controller to request a common entry for the archive model's
-     *     mountpoint and use its properties in order to resolve an appropriate
+     * <li>An archive driver could use the provided parent component file
+     *     system controller to request an entry for the archive model's mount
+     *     point and use its properties in order to resolve an appropriate
      *     update strategy.
      *     E.g. an archive driver for ZIP files could return an archive
      *     controller which uses an append-strategy rather than the usual
@@ -80,7 +80,7 @@ extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
      * </ol>
      *
      * @param  model the non-{@code null} archive model.
-     * @param  parentController the non-{@code null} parent file system
+     * @param  parent the non-{@code null} parent file system
      *         controller.
      * @return A new archive controller for the given archive model and
      *         parent file system controller.
@@ -88,12 +88,11 @@ extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
     @Override
     ArchiveController<AE> newController(
             ArchiveModel model,
-            ComponentFileSystemController<?> parentController);
+            ComponentFileSystemController<?> parent);
 
     /**
-     * Creates a new common input shop for reading the archive entries of the
-     * the described {@code archive} from the given {@code input} socket's
-     * target.
+     * Creates a new input shop for reading the archive entries of the the
+     * described {@code archive} from the given {@code input} socket's target.
      * 
      * @param  model the non-{@code null} archive model.
      * @param  input the non-{@code null} input socket for reading
@@ -116,15 +115,14 @@ extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
-     * @return A non-{@code null} reference to a new common input shop.
+     * @return A non-{@code null} input shop.
      */
     InputShop<AE> newInputShop(ArchiveModel model, InputSocket<?> input)
     throws IOException;
 
     /**
-     * Creates a new common output shop for writing archive entries to the
-     * the described {@code archive} to the given {@code output} socket's
-     * target.
+     * Creates a new output shop for writing archive entries to the the
+     * described {@code archive} to the given {@code output} socket's target.
      * 
      * @param  model the non-{@code null} archive model.
      * @param  output the non-{@code null} output socket for writing
@@ -155,7 +153,7 @@ extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
-     * @return A non-{@code null} reference to a new output archive object.
+     * @return A non-{@code null} output shop.
      */
     OutputShop<AE> newOutputShop(   ArchiveModel model,
                                     OutputSocket<?> output,

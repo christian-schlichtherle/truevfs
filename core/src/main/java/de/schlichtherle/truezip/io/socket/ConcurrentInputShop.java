@@ -39,12 +39,12 @@ import java.util.logging.Logger;
  * decorated input shop.
  *
  * @see     ConcurrentOutputShop
- * @param   <CE> The type of the common entries.
+ * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentInputShop<CE extends Entry>
-extends FilterInputShop<CE, InputShop<CE>> {
+public class ConcurrentInputShop<E extends Entry>
+extends FilterInputShop<E, InputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentInputShop.class.getName();
@@ -59,7 +59,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * stream if there are no more references to it.
      * This reduces the likeliness of an {@link InputBusyException}
      * in case a sloppy client application has forgot to close a stream before
-     * the common input gets closed.
+     * this input shop gets closed.
      */
     private final Map<Closeable, Thread> threads
             = new WeakHashMap<Closeable, Thread>();
@@ -72,7 +72,7 @@ extends FilterInputShop<CE, InputShop<CE>> {
      * @param  input the shop to decorate.
      * @throws NullPointerException if {@code input} is {@code null}.
      */
-    public ConcurrentInputShop(final InputShop<CE> input) {
+    public ConcurrentInputShop(final InputShop<E> input) {
         super(input);
         if (null == input)
             throw new NullPointerException();
@@ -178,11 +178,11 @@ extends FilterInputShop<CE, InputShop<CE>> {
     }
 
     @Override
-    public final InputSocket<? extends CE> getInputSocket(final String name) {
+    public final InputSocket<? extends E> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends FilterInputSocket<CE> {
+        class Input extends FilterInputSocket<E> {
             Input() {
                 super(ConcurrentInputShop.super.getInputSocket(name));
             }
@@ -313,8 +313,8 @@ extends FilterInputShop<CE, InputShop<CE>> {
 
         /**
          * The finalizer in this class forces this input stream to close.
-         * This ensures that a common input can be updated although the client
-         * application may have "forgot" to close this instance.
+         * This ensures that an input target can be updated although the
+         * client application may have "forgot" to close this instance before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
@@ -377,8 +377,8 @@ extends FilterInputShop<CE, InputShop<CE>> {
         /**
          * The finalizer in this class forces this input read only file to
          * close.
-         * This ensures that a common input can be updated although the client
-         * application may have "forgot" to close this instance.
+         * This ensures that an input target can be updated although the
+         * client application may have "forgot" to close this instance before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")
