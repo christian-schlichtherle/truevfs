@@ -15,16 +15,20 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.util.EventListener;
+
 /**
+ * Used to notify implementations of an event in a {@link FileSystemModel}.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemListener extends java.util.EventListener {
+public interface FileSystemListener extends EventListener {
 
     /**
-     * Called if the value of the property
+     * Called whenever the value of the property
      * {@link FileSystemModel#isTouched() touched} has changed in the source
      * file system model.
      */
-    void touchChanged(FileSystemEvent event);
+    void afterTouch(FileSystemEvent event);
 }

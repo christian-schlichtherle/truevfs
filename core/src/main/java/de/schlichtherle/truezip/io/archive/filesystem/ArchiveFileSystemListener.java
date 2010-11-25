@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.io.IOException;
+import java.util.EventListener;
 
 /**
- * Used to notify the implementation that an archive file system will be
- * modified (touched).
- * 
- * @author Christian Schlichtherle
+ * Used to notify implementations of an event in an {@link ArchiveFileSystem}.
+ *
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface VetoableTouchListener {
+public interface ArchiveFileSystemListener<AE extends ArchiveEntry>
+extends EventListener {
 
     /**
-     * Called whenever an archive file system will be <i>touched</i>,
-     * i.e. modified.
+     * Called whenever the value of the property
+     * {@link ArchiveFileSystem#isTouched() touched} is going to change in the
+     * source archive file system model.
      * If this method throws an {@code IOException}), the modification of the
      * archive file system is vetoed.
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void touch() throws IOException;
+    void beforeTouch(ArchiveFileSystemEvent<AE> event) throws IOException;
 }

@@ -15,11 +15,12 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemListener;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.FilterEntry;
@@ -146,9 +147,10 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private final class TouchListener implements VetoableTouchListener {
+    private final class TouchListener implements ArchiveFileSystemListener<AE> {
         @Override
-        public void touch() throws IOException {
+        public void beforeTouch(ArchiveFileSystemEvent<AE> event)
+        throws IOException {
             makeOutput(BitField.noneOf(OutputOption.class));
             getModel().setTouched(true);
         }
@@ -169,7 +171,7 @@ extends FileSystemArchiveController<AE> {
      */
     private Output output;
 
-    private final VetoableTouchListener vetoableTouchListener
+    private final ArchiveFileSystemListener vetoableTouchListener
             = new TouchListener();
 
     public UpdatingArchiveController(

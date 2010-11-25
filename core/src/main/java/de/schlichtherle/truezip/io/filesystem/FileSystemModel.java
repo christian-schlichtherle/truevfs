@@ -124,7 +124,7 @@ public class FileSystemModel {
         touched = newTouched;
         if (newTouched != oldTouched)
             if (null != listener)
-                listener.touchChanged(new FileSystemEvent(this));
+                listener.afterTouch(new FileSystemEvent(this));
     }
 
     public final void addFileSystemListener(final FileSystemListener listener) {
