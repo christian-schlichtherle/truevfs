@@ -19,16 +19,16 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.Closeable;
 
 /**
- * A closable common input service.
+ * A closable input service.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <CE> The type of the common entries.
+ * @param   <E> The type of the entries.
  * @see     OutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputShop<CE extends Entry>
-extends Closeable, InputService<CE> {
+public interface InputShop<E extends Entry>
+extends Closeable, InputService<E> {
 }

@@ -35,12 +35,12 @@ import java.util.logging.Logger;
  * synchronization for all output streams created by the decorated output shop.
  *
  * @see     ConcurrentInputShop
- * @param   <CE> The type of the common entries.
+ * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentOutputShop<CE extends Entry>
-extends FilterOutputShop<CE, OutputShop<CE>> {
+public class ConcurrentOutputShop<E extends Entry>
+extends FilterOutputShop<E, OutputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
@@ -55,7 +55,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
      * stream if there are no more references to it.
      * This reduces the likeliness of an {@link OutputBusyException}
      * in case a sloppy client application has forgot to close a stream before
-     * the common output gets closed.
+     * this output shop gets closed.
      */
     private final Map<Closeable, Thread> threads
             = new WeakHashMap<Closeable, Thread>();
@@ -68,7 +68,7 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
      * @param  output the shop to decorate.
      * @throws NullPointerException if {@code output} is {@code null}.
      */
-    public ConcurrentOutputShop(final OutputShop<CE> output) {
+    public ConcurrentOutputShop(final OutputShop<E> output) {
         super(output);
         if (null == output)
             throw new NullPointerException();
@@ -175,11 +175,11 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
     }
 
     @Override
-    public final OutputSocket<? extends CE> getOutputSocket(final CE entry) {
+    public final OutputSocket<? extends E> getOutputSocket(final E entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class OutputSocket extends FilterOutputSocket<CE> {
+        class OutputSocket extends FilterOutputSocket<E> {
             OutputSocket() {
                 super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
@@ -261,10 +261,9 @@ extends FilterOutputShop<CE, OutputShop<CE>> {
         }
 
         /**
-         * The finalizer in this class forces this common entry output stream
-         * to close.
-         * This ensures that a common output can be updated although the client
-         * application may have "forgot" to close this output stream before.
+         * The finalizer in this class forces this output stream to close.
+         * This ensures that an output target can be updated although the
+         * client application may have "forgot" to close this instance before.
          */
         @Override
         @SuppressWarnings("FinalizeDeclaration")

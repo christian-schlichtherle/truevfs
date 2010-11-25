@@ -18,17 +18,17 @@ package de.schlichtherle.truezip.io.entry;
 /**
  * A decorator for file system entries.
  *
- * @param <CE> The type of the decorated file system entry.
+ * @param <E> The type of the decorated entry.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterEntry<CE extends Entry>
+public class FilterEntry<E extends Entry>
 implements Entry {
 
     /** The decorated file system entry. */
-    protected CE entry;
+    protected E entry;
 
-    protected FilterEntry(final CE target) {
+    protected FilterEntry(final E target) {
         this.entry = target;
     }
 

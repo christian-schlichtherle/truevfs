@@ -26,23 +26,23 @@ import java.io.IOException;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <CE> The type of the common entries.
+ * @param <E> The type of the entries.
  * @see FilterOutputShop
  * @author Christian Schlichtherle
  * @version $Id$
  */
 public class FilterInputShop<
-        CE extends Entry,
-        CI extends InputShop<CE>>
-extends    FilterEntryContainer<CE, CI>
-implements InputShop<CE> {
+        E extends Entry,
+        CI extends InputShop<E>>
+extends    FilterEntryContainer<E, CI>
+implements InputShop<E> {
 
     protected FilterInputShop(final CI input) {
         super(input);
     }
 
     @Override
-    public InputSocket<? extends CE> getInputSocket(String name) {
+    public InputSocket<? extends E> getInputSocket(String name) {
         if (null == name)
             throw new NullPointerException();
 

@@ -41,10 +41,11 @@ import javax.swing.Icon;
  * against the {@link FileSystemModel#getMountPoint() mount point} of this
  * controller's federated file system.
  *
+ * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileSystemController<CE extends Entry> {
+public abstract class FileSystemController<E extends Entry> {
 
     /** Returns the non-{@code null} file system model. */
     public abstract FileSystemModel getModel();
@@ -62,7 +63,7 @@ public abstract class FileSystemController<CE extends Entry> {
 
     public abstract boolean isReadOnly() throws FileSystemException;
 
-    public abstract FileSystemEntry<? extends CE> getEntry(String path)
+    public abstract FileSystemEntry<? extends E> getEntry(String path)
     throws FileSystemException;
 
     public abstract boolean isReadable(String path) throws FileSystemException;
@@ -82,7 +83,7 @@ public abstract class FileSystemController<CE extends Entry> {
      * @param  path a non-{@code null} relative path name.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    public abstract InputSocket<? extends CE> getInputSocket(
+    public abstract InputSocket<? extends E> getInputSocket(
             String path, BitField<InputOption> options);
 
     /**
@@ -92,7 +93,7 @@ public abstract class FileSystemController<CE extends Entry> {
      * @param  path a non-{@code null} relative path name.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    public abstract OutputSocket<? extends CE> getOutputSocket(
+    public abstract OutputSocket<? extends E> getOutputSocket(
             String path, BitField<OutputOption> options, Entry template);
 
     /**
@@ -100,11 +101,10 @@ public abstract class FileSystemController<CE extends Entry> {
      * for the given {@code path} into the file system.
      *
      * @param  path a non-{@code null} relative path name.
-     * @param  type a non-{@code null} common entry type.
+     * @param  type a non-{@code null} entry type.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
-     *         this common entry as possible - with the exception of its name
-     *         and type.
+     *         this entry as possible - with the exception of its name and type.
      * @param  options if {@code CREATE_PARENTS} is set, any missing parent
      *         directories will be created and linked into this file
      *         system with its last modification time set to the system's

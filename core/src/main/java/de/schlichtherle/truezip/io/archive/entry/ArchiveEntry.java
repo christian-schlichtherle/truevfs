@@ -38,11 +38,10 @@ public interface ArchiveEntry extends Entry {
 
     /**
      * Returns the non-{@code null} <i>archive entry name</i>.
-     * An archive entry name is a
-     * {@link Entry#getName() common entry name} which meets the
-     * following additional requirement:
+     * An archive entry name is an {@link Entry#getName() entry name} which
+     * meets the following additional requirement:
      * <ol>
-     * <li>A common entry name may end with one or more separator
+     * <li>An archive entry name may end with one or more separator
      *     characters (e.g. to identify a directory entry).</li>
      * </ol>
      * For example, {@code "foo/bar/"} and

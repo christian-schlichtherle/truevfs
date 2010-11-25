@@ -24,12 +24,12 @@ import java.util.Iterator;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <CE> The type of the entries.
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface EntryContainer<CE extends Entry>
-extends Iterable<CE> {
+public interface EntryContainer<E extends Entry>
+extends Iterable<E> {
 
     /** Returns the number of entries in this container. */
     int size();
@@ -50,7 +50,7 @@ extends Iterable<CE> {
      *         container.
      */
     @Override
-    Iterator<CE> iterator();
+    Iterator<E> iterator();
 
     /**
      * Returns the entry for the given
@@ -61,5 +61,5 @@ extends Iterable<CE> {
      * @return The entry for the given <i>entry name</i> or
      *         {@code null} if no entry with this name exists in this container.
      */
-    CE getEntry(String name);
+    E getEntry(String name);
 }

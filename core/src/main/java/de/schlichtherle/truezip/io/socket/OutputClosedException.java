@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.socket;
 import java.io.IOException;
 
 /**
- * Indicates that an output stream for a common entry has been forced to close.
+ * Indicates that an output stream for an entry has been forced to close.
  *
  * @see InputClosedException
  * @author Christian Schlichtherle

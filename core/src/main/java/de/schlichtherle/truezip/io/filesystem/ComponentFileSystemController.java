@@ -26,11 +26,12 @@ import javax.swing.Icon;
  * because either the file system is not federated or this exception type is
  * handled by the implementation of this abstract class.
  *
+ * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ComponentFileSystemController<CE extends Entry>
-extends FileSystemController<CE> {
+public abstract class ComponentFileSystemController<E extends Entry>
+extends FileSystemController<E> {
 
     @Override
     public abstract Icon getOpenIcon();
@@ -42,7 +43,7 @@ extends FileSystemController<CE> {
     public abstract boolean isReadOnly();
 
     @Override
-    public abstract FileSystemEntry<? extends CE> getEntry(String path);
+    public abstract FileSystemEntry<? extends E> getEntry(String path);
 
     @Override
     public abstract boolean isReadable(String path);
