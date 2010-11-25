@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.IOException;
 
 /**
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputCache<LT extends CommonEntry> {
+public interface OutputCache<LT extends Entry> {
 
     /** Returns an output socket for cached write operations. */
     OutputSocket<LT> getOutputSocket();

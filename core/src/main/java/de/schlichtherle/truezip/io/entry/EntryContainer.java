@@ -19,16 +19,16 @@ package de.schlichtherle.truezip.io.entry;
 import java.util.Iterator;
 
 /**
- * An iterable container for common entries.
+ * An iterable container for entries.
  * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <CE> The type of the common entries.
+ * @param <CE> The type of the entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonEntryContainer<CE extends CommonEntry>
+public interface EntryContainer<CE extends Entry>
 extends Iterable<CE> {
 
     /** Returns the number of entries in this container. */
@@ -54,11 +54,11 @@ extends Iterable<CE> {
 
     /**
      * Returns the entry for the given
-     * {@link CommonEntry#getName() common entry name} or {@code null} if no
+     * {@link Entry#getName() entry name} or {@code null} if no
      * entry with this name exists in this container.
      *
-     * @param  name a non-{@code null} <i>common entry name</i>.
-     * @return The entry for the given <i>common entry name</i> or
+     * @param  name a non-{@code null} <i>entry name</i>.
+     * @return The entry for the given <i>entry name</i> or
      *         {@code null} if no entry with this name exists in this container.
      */
     CE getEntry(String name);

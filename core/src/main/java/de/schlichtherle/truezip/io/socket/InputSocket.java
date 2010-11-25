@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
 import java.io.FileNotFoundException;
@@ -39,13 +39,13 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class InputSocket<LT extends CommonEntry>
-extends IOSocket<LT, CommonEntry> {
+public abstract class InputSocket<LT extends Entry>
+extends IOSocket<LT, Entry> {
 
     private OutputSocket<?> peer;
 
     @Override
-    public CommonEntry getPeerTarget() throws IOException {
+    public Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 

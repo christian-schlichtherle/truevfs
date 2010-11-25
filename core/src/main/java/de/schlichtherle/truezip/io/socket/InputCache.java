@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.IOException;
 
 /**
@@ -35,7 +35,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputCache<LT extends CommonEntry> {
+public interface InputCache<LT extends Entry> {
 
     /** Returns an input socket for cached read operations. */
     InputSocket<LT> getInputSocket();

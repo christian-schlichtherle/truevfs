@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.io.entry.FileEntry;
@@ -30,8 +30,8 @@ import java.io.OutputStream;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CACHE;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
 /**
  * @see     FileInputSocket
@@ -40,7 +40,7 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
  */
 public final class FileOutputSocket extends OutputSocket<FileEntry> {
     private final FileEntry file;
-    private final CommonEntry template;
+    private final Entry template;
     private final BitField<OutputOption> options;
     private final Pool<FileEntry, IOException> pool;
 
@@ -51,13 +51,13 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
     public static OutputSocket<FileEntry> get(
             FileEntry file,
             BitField<OutputOption> options,
-            CommonEntry template) {
+            Entry template) {
         return new FileOutputSocket(file, options, template);
     }
 
     private FileOutputSocket(   final FileEntry file,
                                 final BitField<OutputOption> options,
-                                final CommonEntry template) {
+                                final Entry template) {
         if (null == file || null == options)
             throw new NullPointerException();
         this.file = file;

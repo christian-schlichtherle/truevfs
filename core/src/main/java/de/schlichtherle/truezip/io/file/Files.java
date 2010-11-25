@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.FileSystems;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -31,7 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.ROOT;
+import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.Files.contains;
 
@@ -213,7 +213,7 @@ class Files {
         try {
             final InputSocket<?> input = getInputSocket(src,
                     BitField.noneOf(InputOption.class));
-            final CommonEntry template = preserve ? input.getLocalTarget() : null;
+            final Entry template = preserve ? input.getLocalTarget() : null;
             final OutputSocket<?> output = getOutputSocket(dst,
                     BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()),
                     template);
@@ -254,7 +254,7 @@ class Files {
     static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
             final BitField<OutputOption> options,
-            final CommonEntry template)
+            final Entry template)
     throws IOException {
         assert dst != null;
 

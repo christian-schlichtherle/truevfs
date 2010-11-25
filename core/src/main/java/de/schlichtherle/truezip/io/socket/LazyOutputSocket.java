@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class LazyOutputSocket<LT extends CommonEntry>
+public final class LazyOutputSocket<LT extends Entry>
 extends FilterOutputSocket<LT> {
 
     public LazyOutputSocket(final OutputSocket<? extends LT> output) {

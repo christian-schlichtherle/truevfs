@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterInputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ConcurrentInputShop<CE extends CommonEntry>
+public class ConcurrentInputShop<CE extends Entry>
 extends FilterInputShop<CE, InputShop<CE>> {
 
     private static final String CLASS_NAME

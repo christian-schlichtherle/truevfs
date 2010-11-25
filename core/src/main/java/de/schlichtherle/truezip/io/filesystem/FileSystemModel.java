@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import java.net.URI;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 

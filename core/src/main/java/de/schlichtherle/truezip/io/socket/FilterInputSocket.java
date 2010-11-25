@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterInputSocket<LT extends CommonEntry>
+public class FilterInputSocket<LT extends Entry>
 extends InputSocket<LT> {
 
     private InputSocket<? extends LT> input;
@@ -59,7 +59,7 @@ extends InputSocket<LT> {
     }
 
     @Override
-    public CommonEntry getPeerTarget() throws IOException {
+    public Entry getPeerTarget() throws IOException {
         return getBoundSocket().getPeerTarget();
     }
 

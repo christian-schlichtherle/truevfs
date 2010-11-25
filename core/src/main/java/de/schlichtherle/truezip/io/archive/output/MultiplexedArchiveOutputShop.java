@@ -17,15 +17,15 @@ package de.schlichtherle.truezip.io.archive.output;
 
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Size;
+import de.schlichtherle.truezip.io.entry.Entry.Size;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.FilterOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -206,7 +206,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         private final FileEntry temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
-        private final CommonEntry peer;
+        private final Entry peer;
         private final InputSocket<?> input;
         private boolean closed;
 
@@ -218,15 +218,15 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             this.output = output;
             this.local = output.getLocalTarget();
             this.peer = output.getPeerTarget();
-            class ProxyInput extends FilterInputSocket<CommonEntry> {
-                private final CommonEntry target = null != peer ? peer : temp;
+            class ProxyInput extends FilterInputSocket<Entry> {
+                private final Entry target = null != peer ? peer : temp;
 
                 ProxyInput() {
                     super(FileInputSocket.get(temp));
                 }
 
                 @Override
-                public CommonEntry getLocalTarget() {
+                public Entry getLocalTarget() {
                     return target;
                 }
             }
@@ -250,7 +250,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
                 try {
                     super.close();
                 } finally {
-                    final CommonEntry src = input.getLocalTarget();
+                    final Entry src = input.getLocalTarget();
                     final AE dst = output.getLocalTarget();
                     for (final Size type : BitField.allOf(Size.class))
                         if (UNKNOWN == dst.getSize(type))

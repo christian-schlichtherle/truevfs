@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.EntryContainer;
+import de.schlichtherle.truezip.io.entry.Entry;
 
 /**
  * A container and output socket factory for common entries.
@@ -33,8 +33,8 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE> {
+public interface OutputService<CE extends Entry>
+extends EntryContainer<CE> {
 
     /**
      * Returns a non-{@code null} output socket for write access to the given

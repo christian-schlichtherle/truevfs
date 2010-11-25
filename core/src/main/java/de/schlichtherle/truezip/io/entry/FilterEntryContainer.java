@@ -15,40 +15,42 @@
  */
 package de.schlichtherle.truezip.io.entry;
 
-/**
- * A decorator for file system entries.
+import java.util.Iterator;
+
+/*
+ * Decorates a {@code EntryContainer}.
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe:
+ * Multithreading needs to be addressed by client applications.
  *
- * @param <CE> The type of the decorated file system entry.
+ * @param <CE> The type of the entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterCommonEntry<CE extends CommonEntry>
-implements CommonEntry {
+public abstract class FilterEntryContainer<
+        CE  extends Entry,
+        CEC extends EntryContainer<CE>>
+implements EntryContainer<CE> {
 
-    /** The decorated file system entry. */
-    protected CE entry;
+    /** The decorated entry container. */
+    protected CEC target;
 
-    protected FilterCommonEntry(final CE target) {
-        this.entry = target;
+    protected FilterEntryContainer(final CEC target) {
+        this.target = target;
     }
 
     @Override
-    public String getName() {
-        return entry.getName();
+    public int size() {
+        return target.size();
     }
 
     @Override
-    public Type getType() {
-        return entry.getType();
+    public Iterator<CE> iterator() {
+        return target.iterator();
     }
 
     @Override
-    public long getSize(Size type) {
-        return entry.getSize(type);
-    }
-
-    @Override
-    public long getTime(Access type) {
-        return entry.getTime(type);
+    public CE getEntry(String name) {
+        return target.getEntry(name);
     }
 }

@@ -22,9 +22,9 @@ import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.util.Links;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -40,10 +40,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
@@ -250,7 +250,7 @@ extends ArchiveController<AE> {
     public final OutputSocket<AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options,
-            final CommonEntry template) {
+            final Entry template) {
         class Output extends OutputSocket<AE> {
             ArchiveFileSystemOperation<AE> link;
 
@@ -322,7 +322,7 @@ extends ArchiveController<AE> {
             final String path,
             final Type type,
             final BitField<OutputOption> options,
-            final CommonEntry template)
+            final Entry template)
     throws IOException {
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(),

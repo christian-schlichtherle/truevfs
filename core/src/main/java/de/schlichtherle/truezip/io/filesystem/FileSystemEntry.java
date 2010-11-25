@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Link;
 import java.util.Set;
 
@@ -27,12 +27,12 @@ import java.util.Set;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry<CE extends CommonEntry>
-extends CommonEntry, Link<CE> {
+public interface FileSystemEntry<CE extends Entry>
+extends Entry, Link<CE> {
 
     /**
      * Returns the non-{@code null} <i>path name</i>.
-     * A path name is a {@link CommonEntry#getName() common entry name}
+     * A path name is a {@link Entry#getName() common entry name}
      * which meets the following additional requirement:
      * <ol>
      * <li>A path name <em>must not</em> end with a separator character.</li>

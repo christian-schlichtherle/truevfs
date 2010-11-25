@@ -20,9 +20,9 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.VetoableTouchListener;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.FilterEntry;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -63,10 +63,10 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTP
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.READ;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
@@ -79,7 +79,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public final class UpdatingArchiveController<AE extends ArchiveEntry>
 extends FileSystemArchiveController<AE> {
 
-    private static final class DummyInputService<CE extends CommonEntry>
+    private static final class DummyInputService<CE extends Entry>
     implements InputShop<CE> {
 
         @Override
@@ -259,14 +259,14 @@ extends FileSystemArchiveController<AE> {
     }
 
     private static final class SpecialFileEntry<AE extends ArchiveEntry>
-    extends FilterCommonEntry<AE>
+    extends FilterEntry<AE>
     implements ArchiveFileSystemEntry<AE> {
         SpecialFileEntry(AE entry) {
             super(entry);
         }
 
         @Override
-        public CommonEntry.Type getType() {
+        public Entry.Type getType() {
             return SPECIAL; // drivers could ignore this type, so we must ignore them!
         }
 
@@ -519,7 +519,7 @@ extends FileSystemArchiveController<AE> {
             // entries with valid path names, so the following test should be
             // enough:
             String path = entry.getName();
-            //path = de.schlichtherle.truezip.io.Paths.normalize(path, CommonEntry.SEPARATOR_CHAR);
+            //path = de.schlichtherle.truezip.io.Paths.normalize(path, Entry.SEPARATOR_CHAR);
             if (null == fileSystem.getEntry(path)) {
                 // The entry has been written out already, but also
                 // has been deleted from the master directory meanwhile.

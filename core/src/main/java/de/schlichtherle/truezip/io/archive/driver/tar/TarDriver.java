@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 
 /**
  * An archive driver which builds TAR files.
@@ -82,7 +82,7 @@ extends AbstractArchiveDriver<TarEntry> {
     public TarEntry newEntry(
             String name,
             final Type type,
-            final CommonEntry template)
+            final Entry template)
     throws CharConversionException {
         name = toZipOrTarEntryName(name, type);
         final TarEntry entry;

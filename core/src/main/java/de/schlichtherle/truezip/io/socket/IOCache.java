@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOCache<LT extends CommonEntry>
+public interface IOCache<LT extends Entry>
 extends InputCache<LT>, OutputCache<LT> {
 
     /** Provides different cache strategies. */
@@ -51,20 +51,20 @@ extends InputCache<LT>, OutputCache<LT> {
          */
         READ_ONLY {
             @Override
-            public <LT extends CommonEntry>
+            public <LT extends Entry>
             OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
 
             @Override
-            public <LT extends CommonEntry>
+            public <LT extends Entry>
             IOCache<LT> newCache( InputSocket<? extends LT> input,
                                 OutputSocket<? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
 
             @Override
-            <LT extends CommonEntry>
+            <LT extends Entry>
             Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
                 throw new AssertionError();
@@ -77,7 +77,7 @@ extends InputCache<LT>, OutputCache<LT> {
          */
         WRITE_THROUGH {
             @Override
-            <LT extends CommonEntry>
+            <LT extends Entry>
             Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
                 return cache.new WriteThroughOutputStrategy();
@@ -90,7 +90,7 @@ extends InputCache<LT>, OutputCache<LT> {
          */
         WRITE_BACK {
             @Override
-            <LT extends CommonEntry>
+            <LT extends Entry>
             Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                     DefaultCache<LT> cache) {
                 return cache.new WriteBackOutputStrategy();
@@ -98,7 +98,7 @@ extends InputCache<LT>, OutputCache<LT> {
         };
 
         /** Returns a new input cache. */
-        public <LT extends CommonEntry>
+        public <LT extends Entry>
         InputCache<LT> newCache(InputSocket <? extends LT> input) {
             if (null == input)
                 throw new NullPointerException();
@@ -106,7 +106,7 @@ extends InputCache<LT>, OutputCache<LT> {
         }
 
         /** Returns a new output cache. */
-        public <LT extends CommonEntry>
+        public <LT extends Entry>
         OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
             if (null == output)
                 throw new NullPointerException();
@@ -114,7 +114,7 @@ extends InputCache<LT>, OutputCache<LT> {
         }
 
         /** Returns a new input / output cache. */
-        public <LT extends CommonEntry>
+        public <LT extends Entry>
         IOCache<LT> newCache(   InputSocket<? extends LT> input,
                                 OutputSocket<? extends LT> output) {
             if (null == input || null == output)
@@ -122,7 +122,7 @@ extends InputCache<LT>, OutputCache<LT> {
             return new DefaultCache<LT>(input, output, this);
         }
 
-        abstract <LT extends CommonEntry>
+        abstract <LT extends Entry>
         Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
                 DefaultCache<LT> cache);
     }

@@ -17,11 +17,11 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.io.entry.EntryContainer;
+import de.schlichtherle.truezip.io.entry.EntryFactory;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.util.BitField;
 
 /**
@@ -37,9 +37,9 @@ final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
 extends ArchiveFileSystem<AE> {
 
     ReadOnlyArchiveFileSystem(
-        final CommonEntryContainer<AE> container,
-        final CommonEntryFactory<AE> factory,
-        final CommonEntry rootTemplate) {
+        final EntryContainer<AE> container,
+        final EntryFactory<AE> factory,
+        final Entry rootTemplate) {
         super(container, factory, rootTemplate, null);
     }
 
@@ -57,7 +57,7 @@ extends ArchiveFileSystem<AE> {
 
     @Override
     public ArchiveFileSystemOperation<AE> mknod( String path, Type type,
-                                boolean createParents, CommonEntry template)
+                                boolean createParents, Entry template)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

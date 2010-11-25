@@ -16,8 +16,8 @@
 
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.FilterCommonEntryContainer;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.FilterEntryContainer;
 import java.io.IOException;
 
 /**
@@ -32,9 +32,9 @@ import java.io.IOException;
  * @version $Id$
  */
 public class FilterOutputShop<
-        CE extends CommonEntry,
+        CE extends Entry,
         CO extends OutputShop<CE>>
-extends FilterCommonEntryContainer<CE, CO>
+extends FilterEntryContainer<CE, CO>
 implements OutputShop<CE> {
 
     protected FilterOutputShop(final CO output) {

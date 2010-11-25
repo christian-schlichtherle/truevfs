@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
@@ -67,7 +67,7 @@ public class FileSystems {
     private FileSystems() {
     }
 
-    public static <FSM extends FileSystemModel, CE extends CommonEntry>
+    public static <FSM extends FileSystemModel, CE extends Entry>
     ComponentFileSystemController<?> getController(URI mountPoint) {
         return getController(mountPoint, null, null);
     }
@@ -85,7 +85,7 @@ public class FileSystems {
      * @param  factory the nullable file system factory.
      * @return A non-{@code null} file system controller.
      */
-    public static <FSM extends FileSystemModel, CE extends CommonEntry>
+    public static <FSM extends FileSystemModel, CE extends Entry>
     ComponentFileSystemController<?> getController(
             URI mountPoint,
             final ComponentFileSystemController<?> parent,

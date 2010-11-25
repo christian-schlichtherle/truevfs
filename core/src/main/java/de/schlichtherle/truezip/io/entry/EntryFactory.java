@@ -16,42 +16,42 @@
 
 package de.schlichtherle.truezip.io.entry;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import java.io.CharConversionException;
 
 /**
- * An immutable, thread-safe factory for common entries.
+ * An immutable, thread-safe factory for entries.
  *
- * @param <CE> The type of the common entries.
+ * @param <E> The type of the entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface CommonEntryFactory<CE extends CommonEntry> {
+public interface EntryFactory<E extends Entry> {
 
     /**
-     * Returns a new common entry for the given name.
+     * Returns a new entry for the given name.
      * The implementation may need to fix this name in order to 
-     * form a valid {@link CommonEntry#getName() entry name} for their
+     * form a valid {@link Entry#getName() entry name} for their
      * particular requirements.
      * <p>
-     * If {@code template} is not {@code null}, then the returned common entry
-     * shall inherit as much properties from this template as possible - with
-     * the exception of its name and type.
+     * If {@code template} is not {@code null}, then the returned entry shall
+     * inherit as much properties from this template as possible - with the
+     * exception of its name and type.
      * Furthermore, if {@code name} and {@code type} are equal to the name and
      * type of this template, then the returned entry shall be a clone of the
      * template which shares no mutable objects with the template.
      *
      * @param  name a non-{@code null} entry name.
      * @param  type a non-{@code null} entry type.
-     * @param  template if not {@code null}, then the new common entry shall
-     *         inherit as much properties from this common entry as possible
-     *         - with the exception of its name and type.
-     * @return A new common entry for the given name.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.
      * @throws NullPointerException if {@code name} or {@code type} are
      *         {@code null}.
      */
-    CE newEntry(String name, Type type, CommonEntry template)
+    E newEntry(String name, Type type, Entry template)
     throws CharConversionException;
 }
