@@ -78,7 +78,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private final ArchiveFileSystemListener<AE> listener;
+    private ArchiveFileSystemListener<AE> listener;
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -87,26 +87,17 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * The file system is modifiable and marked as touched!
      *
      * @param  factory the archive entry factory to use.
-     * @param  listener the nullable listener for archive file system events.
-     *         If not {@code null}, its {@link ArchiveFileSystemListener#beforeTouch}
-     *         method will be called at the end of this constructor and whenever
-     *         a client class changes the state of the property {@code touch}.
      * @throws NullPointerException If {@code factory} is {@code null}.
      * @throws ArchiveFileSystemException if touching the archive file system
      *         has been vetoed by the {@code vetoableTouchListener}.
      */
     public static <AE extends ArchiveEntry>
-    ArchiveFileSystem<AE> newArchiveFileSystem(
-            EntryFactory<AE> factory,
-            ArchiveFileSystemListener<AE> listener)
+    ArchiveFileSystem<AE> newArchiveFileSystem(EntryFactory<AE> factory)
     throws ArchiveFileSystemException {
-        return new ArchiveFileSystem<AE>(factory, listener);
+        return new ArchiveFileSystem<AE>(factory);
     }
 
-    private ArchiveFileSystem(
-            final EntryFactory<AE> factory,
-            final ArchiveFileSystemListener<AE> listener)
-    throws ArchiveFileSystemException {
+    private ArchiveFileSystem(final EntryFactory<AE> factory) {
         assert factory != null;
 
         this.factory = factory;
@@ -117,9 +108,11 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
         for (Access access : BitField.allOf(Access.class))
             root.getTarget().setTime(access, System.currentTimeMillis());
         master.put(ROOT, root);
-
-        this.listener = listener;
-        touch();
+        try {
+            touch();
+        } catch (ArchiveFileSystemException ex) {
+            throw new AssertionError("veto without a listener!?");
+        }
     }
 
     /**
@@ -144,10 +137,6 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * @param  rootTemplate The last modification time of the root of the populated
      *         file system in milliseconds since the epoch.
      * @param  factory the archive entry factory to use.
-     * @param  listener the nullable listener for archive file system events.
-     *         If not {@code null}, its {@link ArchiveFileSystemListener#beforeTouch}
-     *         method will be called whenever a client class changes the state
-     *         of the property {@code touch}.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link ReadOnlyArchiveFileSystemException}.
@@ -161,18 +150,16 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
             EntryContainer<AE> container,
             EntryFactory<AE> factory,
             Entry rootTemplate,
-            ArchiveFileSystemListener<AE> listener,
             boolean readOnly) {
         return readOnly
             ? new ReadOnlyArchiveFileSystem<AE>(container, factory, rootTemplate)
-            : new ArchiveFileSystem<AE>(container, factory, rootTemplate, listener);
+            : new ArchiveFileSystem<AE>(container, factory, rootTemplate);
     }
 
     ArchiveFileSystem(
             final EntryContainer<AE> container,
             final EntryFactory<AE> factory,
-            final Entry rootTemplate,
-            final ArchiveFileSystemListener<AE> listener) {
+            final Entry rootTemplate) {
         if (null == rootTemplate)
             throw new NullPointerException();
         if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
@@ -204,8 +191,6 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
             if (isValidPath(path))
                 fsck.fix(path);
         }
-
-        this.listener = listener;
     }
 
     private static class Normalizer
@@ -376,6 +361,25 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
             }
         }
         touched = true;
+    }
+
+    /**
+     * @param  listener the non-{@code null} listener for archive file system
+     *         events.
+     */
+    public final void addArchiveFileSystemListener(
+            final ArchiveFileSystemListener<AE> listener) {
+        if (null == listener)
+            throw new NullPointerException();
+        if (null != this.listener)
+            throw new UnsupportedOperationException(); // TODO!
+        this.listener = listener;
+    }
+
+    public final void removeArchiveFileSystemListener(
+            final ArchiveFileSystemListener<AE> listener) {
+        if (listener == this.listener)
+            this.listener = null;
     }
 
     @Override

@@ -40,7 +40,7 @@ extends ArchiveFileSystem<AE> {
         final EntryContainer<AE> container,
         final EntryFactory<AE> factory,
         final Entry rootTemplate) {
-        super(container, factory, rootTemplate, null);
+        super(container, factory, rootTemplate);
     }
 
     /** The implementation in this class returns {@code true}. */
