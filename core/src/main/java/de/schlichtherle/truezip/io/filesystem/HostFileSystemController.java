@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
@@ -41,13 +42,19 @@ import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class HostFileSystemController
+public final class HostFileSystemController
 extends ComponentFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
 
-    HostFileSystemController(final FileSystemModel model) {
+    public HostFileSystemController(final URI mountPoint) {
+        this(new FileSystemModel(mountPoint));
+    }
+
+    public HostFileSystemController(final FileSystemModel model) {
+        if (null != model.getParent())
+            throw new IllegalArgumentException();
         this.model = model;
         this.target = new File(model.getMountPoint());
     }
@@ -55,6 +62,11 @@ extends ComponentFileSystemController<FileEntry> {
     @Override
     public FileSystemModel getModel() {
         return model;
+    }
+
+    @Override
+    public ComponentFileSystemController<?> getParent() {
+        return null;
     }
 
     @Override

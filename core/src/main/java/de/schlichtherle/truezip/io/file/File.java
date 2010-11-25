@@ -723,8 +723,8 @@ public class File extends java.io.File {
         final java.io.File target = getRealFile(delegate);
         this.controller = FileSystems.getController(
                 target.toURI(),
-                detector.getArchiveDriver(target.getPath()),
-                null == enclArchive ? null : enclArchive.getController());
+                null == enclArchive ? null : enclArchive.getController(),
+                detector.getArchiveDriver(target.getPath()));
     }
 
     /**

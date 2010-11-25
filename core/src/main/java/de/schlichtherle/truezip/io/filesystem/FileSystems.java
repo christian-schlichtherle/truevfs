@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Comparator;
@@ -36,7 +35,6 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -82,40 +80,33 @@ public class FileSystems {
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
      *         of the (virtual) file system.
-     * @param  factory the nullable file system factory.
      * @param  parent the nullable file system controller for the parent file
      *         system.
+     * @param  factory the nullable file system factory.
      * @return A non-{@code null} file system controller.
      */
     public static <FSM extends FileSystemModel, CE extends CommonEntry>
     ComponentFileSystemController<?> getController(
             URI mountPoint,
-            final FileSystemFactory<FSM, CE> factory,
-            ComponentFileSystemController<?> parent) {
-        // TODO: Make this method support arbitrary host file systems, e.g. by
-        // using a factory from a service registry or similar.
-        if (!"file".equals(mountPoint.getScheme()) || !mountPoint.isAbsolute()
-                || mountPoint.isOpaque())
-            throw new IllegalArgumentException();
-        mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR).normalize();
-        assert mountPoint.getPath().endsWith(SEPARATOR);
-        if (null == factory)
-            return new HostFileSystemController(
-                    new FileSystemModel(mountPoint, null));
-        if (null == parent)
-            parent = new HostFileSystemController(
-                    new FileSystemModel(mountPoint.resolve(".."), null));
+            final ComponentFileSystemController<?> parent,
+            final FileSystemFactory<FSM, CE> factory) {
+        if (null == factory) {
+            if (null != parent)
+                throw new IllegalArgumentException();
+            return new HostFileSystemController(mountPoint);
+        }
+        final FSM model = factory.newModel(mountPoint,
+                null == parent ? null : parent.getModel());
+        mountPoint = model.getMountPoint(); // mind URI normalization!
         synchronized (controllers) {
-            final ComponentFileSystemController<?> controller
+            ScheduledFileSystemController controller
                     = Links.getTarget(controllers.get(mountPoint));
-            if (null != controller)
-                return controller;
-            final FSM model = factory.newModel(mountPoint, parent.getModel());
-            final ScheduledFileSystemController scheduledController
-                    = new ScheduledFileSystemController(
-                        factory.newController(model, parent), parent);
-            model.addFileSystemListener(scheduledController);
-            return scheduledController;
+            if (null == controller) {
+                controller = new ScheduledFileSystemController(
+                        factory.newController(model, parent));
+                model.addFileSystemListener(controller);
+            }
+            return controller;
         }
     }
 
@@ -123,10 +114,8 @@ public class FileSystems {
     extends CompositeFileSystemController
     implements FileSystemListener {
 
-        ScheduledFileSystemController(
-                final FileSystemController<?> prospect,
-                final ComponentFileSystemController<?> parent) {
-            super(prospect, parent);
+        ScheduledFileSystemController(FileSystemController<?> prospect) {
+            super(prospect);
             touchChanged(new FileSystemEvent(getModel()));
         }
 

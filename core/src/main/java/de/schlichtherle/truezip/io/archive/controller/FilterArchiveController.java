@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -58,6 +59,11 @@ extends ArchiveController<AE> {
     @Override
     public final ArchiveModel getModel() {
         return getController().getModel();
+    }
+
+    @Override
+    public ComponentFileSystemController<?> getParent() {
+        return getController().getParent();
     }
 
     @Override

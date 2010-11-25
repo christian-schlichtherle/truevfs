@@ -33,13 +33,15 @@ import javax.swing.Icon;
 
 /**
  * A composite file system controller implements a chain of responsibility
- * in order to adapt a controller for a prospective file system to a controller
- * for a component file system.
- * Whenever the controller for the prospective file system provided to the
- * {@link #CompositeFileSystemController constructor} of this class throws a
+ * in order to resolve {@link FalsePositiveException}s thrown by the
+ * prospective file system provided to its
+ * {@link #CompositeFileSystemController constructor}.
+ * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
- * controller for the parent component file system provided to the constructor
- * in order to resolve the issue.
+ * controller for its parent file system in order to resolve the requested
+ * operation.
+ * As a desired side effect, it also adapts the controller for the prospective
+ * file system to a controller for a component file system.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -48,15 +50,11 @@ class CompositeFileSystemController
 extends ComponentFileSystemController<CommonEntry> {
 
     private final FileSystemController<?> prospect;
-    private final ComponentFileSystemController<?> parent;
 
-    CompositeFileSystemController(
-            final FileSystemController<?> prospect,
-            final ComponentFileSystemController<?> parent) {
+    CompositeFileSystemController(final FileSystemController<?> prospect) {
+        if (null == prospect.getParent())
+            throw new IllegalArgumentException();
         this.prospect = prospect;
-        this.parent = parent;
-        if (prospect.getModel().getParent() != parent.getModel())
-            throw new IllegalArgumentException("parent/member mismatch");
     }
 
     private FileSystemController<?> getProspect() {
@@ -68,8 +66,9 @@ extends ComponentFileSystemController<CommonEntry> {
         return getProspect().getModel();
     }
 
-    private ComponentFileSystemController<?> getParent() {
-        return parent;
+    @Override
+    public ComponentFileSystemController<?> getParent() {
+        return getProspect().getParent();
     }
 
     private String parentPath(String path) {
