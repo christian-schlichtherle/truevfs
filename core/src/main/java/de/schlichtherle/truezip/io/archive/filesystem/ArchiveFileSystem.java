@@ -57,6 +57,29 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public class ArchiveFileSystem<AE extends ArchiveEntry>
 implements EntryContainer<ArchiveFileSystemEntry<AE>> {
 
+    /** The controller that this filesystem belongs to. */
+    private final EntryFactory<AE> factory;
+
+    /**
+     * The map of archive entries in this file system.
+     * If this is a read-only file system, this is actually an unmodifiable
+     * map.
+     * This field should be considered final!
+     * <p>
+     * Note that the archive entries in this map are shared with the
+     * {@link EntryContainer} object provided to the constructor of
+     * this class.
+     */
+    private Map<String, BaseEntry<AE>> master;
+
+    /** The file system entry for the (virtual) root of this file system. */
+    private final BaseEntry<AE> root;
+
+    /** Whether or not this file system has been modified (touched). */
+    private boolean touched;
+
+    private final ArchiveFileSystemListener<AE> listener;
+
     /**
      * Returns a new archive file system and ensures its integrity.
      * The root directory is created with its last modification time set to
@@ -64,10 +87,10 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * The file system is modifiable and marked as touched!
      *
      * @param  factory the archive entry factory to use.
-     * @param  vetoableTouchListener the nullable listener for touch events.
-     *         If not {@code null}, its {@link VetoableTouchListener#touch()}
+     * @param  listener the nullable listener for archive file system events.
+     *         If not {@code null}, its {@link ArchiveFileSystemListener#beforeTouch}
      *         method will be called at the end of this constructor and whenever
-     *         a client class changes the state of this archive file system.
+     *         a client class changes the state of the property {@code touch}.
      * @throws NullPointerException If {@code factory} is {@code null}.
      * @throws ArchiveFileSystemException if touching the archive file system
      *         has been vetoed by the {@code vetoableTouchListener}.
@@ -75,9 +98,28 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
             EntryFactory<AE> factory,
-            VetoableTouchListener vetoableTouchListener)
+            ArchiveFileSystemListener<AE> listener)
     throws ArchiveFileSystemException {
-        return new ArchiveFileSystem<AE>(factory, vetoableTouchListener);
+        return new ArchiveFileSystem<AE>(factory, listener);
+    }
+
+    private ArchiveFileSystem(
+            final EntryFactory<AE> factory,
+            final ArchiveFileSystemListener<AE> listener)
+    throws ArchiveFileSystemException {
+        assert factory != null;
+
+        this.factory = factory;
+        master = new LinkedHashMap<String, BaseEntry<AE>>(64);
+
+        // Setup root.
+        root = newEntryUnchecked(ROOT, DIRECTORY, null);
+        for (Access access : BitField.allOf(Access.class))
+            root.getTarget().setTime(access, System.currentTimeMillis());
+        master.put(ROOT, root);
+
+        this.listener = listener;
+        touch();
     }
 
     /**
@@ -102,10 +144,10 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * @param  rootTemplate The last modification time of the root of the populated
      *         file system in milliseconds since the epoch.
      * @param  factory the archive entry factory to use.
-     * @param  vetoableTouchListener the nullable listener for touch events.
-     *         If not {@code null}, its {@link VetoableTouchListener#touch()}
+     * @param  listener the nullable listener for archive file system events.
+     *         If not {@code null}, its {@link ArchiveFileSystemListener#beforeTouch}
      *         method will be called whenever a client class changes the state
-     *         of the archive file system.
+     *         of the property {@code touch}.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link ReadOnlyArchiveFileSystemException}.
@@ -119,60 +161,18 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
             EntryContainer<AE> container,
             EntryFactory<AE> factory,
             Entry rootTemplate,
-            VetoableTouchListener vetoableTouchListener,
+            ArchiveFileSystemListener<AE> listener,
             boolean readOnly) {
         return readOnly
             ? new ReadOnlyArchiveFileSystem<AE>(container, factory, rootTemplate)
-            : new ArchiveFileSystem<AE>(container, factory, rootTemplate, vetoableTouchListener);
-    }
-
-    /** The controller that this filesystem belongs to. */
-    private final EntryFactory<AE> factory;
-
-    /**
-     * The map of archive entries in this file system.
-     * If this is a read-only file system, this is actually an unmodifiable
-     * map.
-     * This field should be considered final!
-     * <p>
-     * Note that the archive entries in this map are shared with the
-     * {@link EntryContainer} object provided to the constructor of
-     * this class.
-     */
-    private Map<String, BaseEntry<AE>> master;
-
-    /** The file system entry for the (virtual) root of this file system. */
-    private final BaseEntry<AE> root;
-
-    /** Whether or not this file system has been modified (touched). */
-    private boolean touched;
-
-    private final VetoableTouchListener vetoableTouchListener;
-
-    ArchiveFileSystem(
-            final EntryFactory<AE> factory,
-            final VetoableTouchListener vetoableTouchListener)
-    throws ArchiveFileSystemException {
-        assert factory != null;
-
-        this.factory = factory;
-        master = new LinkedHashMap<String, BaseEntry<AE>>(64);
-
-        // Setup root.
-        root = newEntryUnchecked(ROOT, DIRECTORY, null);
-        for (Access access : BitField.allOf(Access.class))
-            root.getTarget().setTime(access, System.currentTimeMillis());
-        master.put(ROOT, root);
-
-        this.vetoableTouchListener = vetoableTouchListener;
-        touch();
+            : new ArchiveFileSystem<AE>(container, factory, rootTemplate, listener);
     }
 
     ArchiveFileSystem(
             final EntryContainer<AE> container,
             final EntryFactory<AE> factory,
             final Entry rootTemplate,
-            final VetoableTouchListener vetoableTouchListener) {
+            final ArchiveFileSystemListener<AE> listener) {
         if (null == rootTemplate)
             throw new NullPointerException();
         if (rootTemplate instanceof ArchiveFileSystemEntry<?>)
@@ -205,7 +205,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
                 fsck.fix(path);
         }
 
-        this.vetoableTouchListener = vetoableTouchListener;
+        this.listener = listener;
     }
 
     private static class Normalizer
@@ -361,16 +361,16 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      *
      * @throws ArchiveReadOnlyExceptionn If this (virtual) archive file system
      *         is read only.
-     * @throws ArchiveFileSystemException If the listener vetoed the touch
+     * @throws ArchiveFileSystemException If the listener vetoed the beforeTouch
      *         operation for any reason.
      */
     private void touch() throws ArchiveFileSystemException {
         if (touched)
             return;
         // Order is important here because of veto exceptions!
-        if (null != vetoableTouchListener) {
+        if (null != listener) {
             try {
-                vetoableTouchListener.touch();
+                listener.beforeTouch(new ArchiveFileSystemEvent<AE>(this));
             } catch (IOException ex) {
                 throw new ArchiveFileSystemException(null, "touch vetoed", ex);
             }
@@ -772,7 +772,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
                 final String base = link.base;
                 assert DIRECTORY == parent.getType();
                 master.put(entry.getName(), entry);
-                if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never touch ghosts!
+                if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never beforeTouch ghosts!
                     parent.getTarget().setTime(Access.WRITE, time);
                 parent = entry;
             }
@@ -853,7 +853,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
         assert ok : "The parent directory of \"" + path
                     + "\" does not contain this entry - archive file system is corrupted!";
         touch();
-        if (parent.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+        if (parent.getTime(Access.WRITE) != UNKNOWN) // never beforeTouch ghosts!
             parent.getTarget().setTime(Access.WRITE, System.currentTimeMillis());
     }
 

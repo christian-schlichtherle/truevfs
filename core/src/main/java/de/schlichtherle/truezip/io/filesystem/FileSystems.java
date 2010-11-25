@@ -116,7 +116,7 @@ public class FileSystems {
 
         ScheduledFileSystemController(FileSystemController<?> prospect) {
             super(prospect);
-            touchChanged(new FileSystemEvent(getModel()));
+            afterTouch(new FileSystemEvent(getModel()));
         }
 
         /**
@@ -124,7 +124,7 @@ public class FileSystems {
          * to the given touch status.
          */
         @Override
-        public void touchChanged(final FileSystemEvent event) {
+        public void afterTouch(final FileSystemEvent event) {
             synchronized (controllers) {
                 final FileSystemModel model = event.getSource();
                 assert getModel() == model;
