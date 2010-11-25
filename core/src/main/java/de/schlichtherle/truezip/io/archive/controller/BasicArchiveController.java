@@ -30,7 +30,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Operation;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemOperation;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -252,7 +252,7 @@ extends ArchiveController<AE> {
             final BitField<OutputOption> options,
             final CommonEntry template) {
         class Output extends OutputSocket<AE> {
-            Operation<AE> link;
+            ArchiveFileSystemOperation<AE> link;
 
             AE getEntry() throws IOException {
                 if (autoSync(path, WRITE))
@@ -342,7 +342,7 @@ extends ArchiveController<AE> {
             final ArchiveFileSystem<AE> fileSystem
                     = autoMount(options.get(CREATE_PARENTS), options);
             final boolean created = null == fileSystem.getEntry(path);
-            final Operation<AE> link = fileSystem.mknod(
+            final ArchiveFileSystemOperation<AE> link = fileSystem.mknod(
                     path, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             if (created)

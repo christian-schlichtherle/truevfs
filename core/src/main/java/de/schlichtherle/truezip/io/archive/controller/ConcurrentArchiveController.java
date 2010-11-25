@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
@@ -135,7 +135,7 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public Entry<? extends AE> getEntry(String path)
+    public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
     throws FileSystemException {
         try {
             readLock().lock();

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -89,7 +89,7 @@ public class ArchiveFileSystems {
      * @throws NullPointerException If {@code container}, {@code factory} or
      *         {@code rootTemplate} are {@code null}.
      * @throws IllegalArgumentException If {@code rootTemplate} is an instance
-     *         of {@link Entry}.
+     *         of {@link ArchiveFileSystemEntry}.
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(

@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.Entry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
 import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
@@ -90,7 +90,7 @@ extends ArchiveController<AE> {
     }
 
     @Override
-    public Entry<? extends AE> getEntry(String path)
+    public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
     throws FileSystemException {
         return getController().getEntry(path);
     }
