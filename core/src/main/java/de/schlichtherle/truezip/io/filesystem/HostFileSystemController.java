@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
@@ -33,7 +33,7 @@ import java.net.URI;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 
 /**
  * Note that this class <em>must</em> be immutable because it's instances are
@@ -134,7 +134,7 @@ extends ComponentFileSystemController<FileEntry> {
     public OutputSocket<FileEntry> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template) {
+            Entry template) {
         return FileOutputSocket.get(FileEntry.get(target, path), options, template);
     }
 
@@ -142,7 +142,7 @@ extends ComponentFileSystemController<FileEntry> {
     public boolean mknod(   String path,
                             Type type,
                             BitField<OutputOption> options,
-                            CommonEntry template)
+                            Entry template)
     throws IOException {
         final File file = new File(target, path);
         switch (type) {

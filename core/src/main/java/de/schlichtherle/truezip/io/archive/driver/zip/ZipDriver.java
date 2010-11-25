@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.archive.driver.AbstractArchiveDriver;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -31,8 +31,8 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import static java.util.zip.Deflater.NO_COMPRESSION;
@@ -164,7 +164,7 @@ implements ZipEntryFactory<ZipEntry> {
     public ZipEntry newEntry(
             String name,
             final Type type,
-            final CommonEntry template)
+            final Entry template)
     throws CharConversionException {
         name = toZipOrTarEntryName(name, type);
         final ZipEntry entry;

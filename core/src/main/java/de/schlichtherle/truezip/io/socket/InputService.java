@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.EntryContainer;
+import de.schlichtherle.truezip.io.entry.Entry;
 
 /**
  * A container and input socket factory for common entries.
@@ -29,8 +29,8 @@ import de.schlichtherle.truezip.io.entry.CommonEntry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputService<CE extends CommonEntry>
-extends CommonEntryContainer<CE> {
+public interface InputService<CE extends Entry>
+extends EntryContainer<CE> {
 
     /**
      * Returns a non-{@code null} input socket for read access to the given

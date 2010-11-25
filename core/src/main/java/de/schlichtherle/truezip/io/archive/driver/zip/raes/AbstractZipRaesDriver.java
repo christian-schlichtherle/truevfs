@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
@@ -122,7 +122,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final ArchiveModel model,
             final InputSocket<?> target)
     throws IOException {
-        class InputSocket extends FilterInputSocket<CommonEntry> {
+        class InputSocket extends FilterInputSocket<Entry> {
             InputSocket() {
                 super(target);
             }
@@ -164,7 +164,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     public ZipEntry newEntry(
             final String path,
             final Type type,
-            final CommonEntry template)
+            final Entry template)
     throws CharConversionException {
         final JarEntry entry = (JarEntry) super.newEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {
@@ -187,7 +187,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
-        class OutputSocket extends FilterOutputSocket<CommonEntry> {
+        class OutputSocket extends FilterOutputSocket<Entry> {
             OutputSocket() {
                 super(target);
             }
@@ -195,7 +195,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 final OutputStream out
-                        = new LazyOutputSocket<CommonEntry>(getBoundSocket())
+                        = new LazyOutputSocket<Entry>(getBoundSocket())
                             .newOutputStream();
                 try {
                     try {

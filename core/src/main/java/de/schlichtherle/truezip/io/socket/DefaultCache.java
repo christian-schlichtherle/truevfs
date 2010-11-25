@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.FileEntry;
 import de.schlichtherle.truezip.io.entry.TempFilePool;
 import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
@@ -38,7 +38,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultCache<LT extends CommonEntry> implements IOCache<LT> {
+final class DefaultCache<LT extends Entry> implements IOCache<LT> {
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputSocketProxy inputProxy;
     private final OutputSocketProxy outputProxy;
@@ -111,7 +111,7 @@ final class DefaultCache<LT extends CommonEntry> implements IOCache<LT> {
                     final InputSocket<? extends LT> input
                             = inputProxy.getBoundSocket();
                     assert null == input.getPeerTarget();
-                    class ProxyOutput extends OutputSocket<CommonEntry> {
+                    class ProxyOutput extends OutputSocket<Entry> {
                         FileEntry temp;
 
                         FileEntry getTemp() throws IOException {
@@ -119,8 +119,8 @@ final class DefaultCache<LT extends CommonEntry> implements IOCache<LT> {
                         }
 
                         @Override
-                        public CommonEntry getLocalTarget() throws IOException {
-                            return CommonEntry.NULL;
+                        public Entry getLocalTarget() throws IOException {
+                            return Entry.NULL;
                         }
 
                         @Override
@@ -159,14 +159,14 @@ final class DefaultCache<LT extends CommonEntry> implements IOCache<LT> {
                 final OutputSocket<? extends LT> output
                         = outputProxy.getBoundSocket();
                 assert null == output.getPeerTarget();
-                class ProxyInput extends FilterInputSocket<CommonEntry> {
+                class ProxyInput extends FilterInputSocket<Entry> {
                     ProxyInput() {
                         super(FileInputSocket.get(buf.file));
                     }
 
                     @Override
-                    public CommonEntry getLocalTarget() throws IOException {
-                        return CommonEntry.NULL;
+                    public Entry getLocalTarget() throws IOException {
+                        return Entry.NULL;
                     }
                 }
                 IOSocket.copy(new ProxyInput(), output);

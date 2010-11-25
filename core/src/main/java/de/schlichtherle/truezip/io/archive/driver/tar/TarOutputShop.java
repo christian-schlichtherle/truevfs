@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
@@ -37,8 +37,8 @@ import org.apache.tools.tar.TarOutputStream;
 
 import static de.schlichtherle.truezip.io.archive.driver.tar.TarDriver.TEMP_FILE_PREFIX;
 import static de.schlichtherle.truezip.io.Files.createTempFile;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Size.DATA;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
 /**
  * An implementation of {@link OutputShop} to write TAR archives.
@@ -110,7 +110,7 @@ implements OutputShop<TarEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final CommonEntry peer = getPeerTarget();
+                final Entry peer = getPeerTarget();
                 long size;
                 if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);

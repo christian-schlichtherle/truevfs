@@ -23,10 +23,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.SPECIAL;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 
 /**
  * Adapts a {@link File} instance to a {@link FileSystemEntry}.
@@ -120,7 +120,7 @@ public class FileEntry implements FileSystemEntry<FileEntry> {
 
     /** Returns the type of this file entry. */
     @Override
-    public final CommonEntry.Type getType() {
+    public final Entry.Type getType() {
         return file.isDirectory() ? DIRECTORY
                 :   file.isFile() ? FILE
                 :   file.exists() ? SPECIAL

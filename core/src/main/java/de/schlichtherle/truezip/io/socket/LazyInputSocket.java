@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterInputStream;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class LazyInputSocket<LT extends CommonEntry>
+public final class LazyInputSocket<LT extends Entry>
 extends FilterInputSocket<LT> {
 
     public LazyInputSocket( final InputSocket<? extends LT> input) {

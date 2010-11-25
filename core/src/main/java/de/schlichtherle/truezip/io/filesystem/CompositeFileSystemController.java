@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.FilterInputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
@@ -47,7 +47,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 class CompositeFileSystemController
-extends ComponentFileSystemController<CommonEntry> {
+extends ComponentFileSystemController<Entry> {
 
     private final FileSystemController<?> prospect;
 
@@ -168,7 +168,7 @@ extends ComponentFileSystemController<CommonEntry> {
         return new Input(path, options);
     }
 
-    private class Input extends FilterInputSocket<CommonEntry> {
+    private class Input extends FilterInputSocket<Entry> {
         final String path;
         final BitField<InputOption> options;
 
@@ -179,7 +179,7 @@ extends ComponentFileSystemController<CommonEntry> {
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -219,18 +219,18 @@ extends ComponentFileSystemController<CommonEntry> {
     public OutputSocket<?> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template) {
+            Entry template) {
         return new Output(path, options, template);
     }
 
-    private class Output extends FilterOutputSocket<CommonEntry> {
+    private class Output extends FilterOutputSocket<Entry> {
         final String path;
         final BitField<OutputOption> options;
-        final CommonEntry template;
+        final Entry template;
 
         Output( final String path,
                 final BitField<OutputOption> options,
-                final CommonEntry template) {
+                final Entry template) {
             super(getProspect().getOutputSocket(path, options, template));
             this.path = path;
             this.options = options;
@@ -238,7 +238,7 @@ extends ComponentFileSystemController<CommonEntry> {
         }
 
         @Override
-        public CommonEntry getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
             try {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
@@ -264,9 +264,9 @@ extends ComponentFileSystemController<CommonEntry> {
 
     @Override
     public boolean mknod(   String path,
-                            CommonEntry.Type type,
+                            Entry.Type type,
                             BitField<OutputOption> options,
-                            CommonEntry template)
+                            Entry template)
     throws IOException {
         try {
             return getProspect().mknod(path, type, options, template);

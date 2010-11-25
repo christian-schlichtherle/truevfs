@@ -20,9 +20,9 @@ import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -127,7 +127,7 @@ extends ArchiveController<AE> {
     public OutputSocket<? extends AE> getOutputSocket(
             String path,
             BitField<OutputOption> options,
-            CommonEntry template) {
+            Entry template) {
         return getController().getOutputSocket(path, options, template);
     }
 
@@ -135,7 +135,7 @@ extends ArchiveController<AE> {
     public boolean mknod(   String path,
                             Type type,
                             BitField<OutputOption> options,
-                            CommonEntry template)
+                            Entry template)
     throws IOException {
         return getController().mknod(path, type, options, template);
     }

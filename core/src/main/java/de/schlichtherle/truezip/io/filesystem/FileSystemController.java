@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -44,7 +44,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileSystemController<CE extends CommonEntry> {
+public abstract class FileSystemController<CE extends Entry> {
 
     /** Returns the non-{@code null} file system model. */
     public abstract FileSystemModel getModel();
@@ -93,7 +93,7 @@ public abstract class FileSystemController<CE extends CommonEntry> {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     public abstract OutputSocket<? extends CE> getOutputSocket(
-            String path, BitField<OutputOption> options, CommonEntry template);
+            String path, BitField<OutputOption> options, Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -127,7 +127,7 @@ public abstract class FileSystemController<CE extends CommonEntry> {
      */
     public abstract boolean mknod(  String path, Type type,
                                     BitField<OutputOption> options,
-                                    CommonEntry template)
+                                    Entry template)
     throws IOException;
 
     public abstract void unlink(String path) throws IOException;

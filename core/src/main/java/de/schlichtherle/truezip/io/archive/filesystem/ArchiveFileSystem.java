@@ -16,13 +16,13 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Access;
-import de.schlichtherle.truezip.io.entry.FilterCommonEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.entry.FilterEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry.Type;
-import de.schlichtherle.truezip.io.entry.CommonEntryContainer;
-import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.io.entry.EntryContainer;
+import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.util.Link;
 import java.io.CharConversionException;
@@ -34,13 +34,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.ROOT;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
@@ -55,7 +55,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 public class ArchiveFileSystem<AE extends ArchiveEntry>
-implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
+implements EntryContainer<ArchiveFileSystemEntry<AE>> {
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -74,7 +74,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
-            CommonEntryFactory<AE> factory,
+            EntryFactory<AE> factory,
             VetoableTouchListener vetoableTouchListener)
     throws ArchiveFileSystemException {
         return new ArchiveFileSystem<AE>(factory, vetoableTouchListener);
@@ -116,9 +116,9 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
      */
     public static <AE extends ArchiveEntry>
     ArchiveFileSystem<AE> newArchiveFileSystem(
-            CommonEntryContainer<AE> container,
-            CommonEntryFactory<AE> factory,
-            CommonEntry rootTemplate,
+            EntryContainer<AE> container,
+            EntryFactory<AE> factory,
+            Entry rootTemplate,
             VetoableTouchListener vetoableTouchListener,
             boolean readOnly) {
         return readOnly
@@ -127,7 +127,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     }
 
     /** The controller that this filesystem belongs to. */
-    private final CommonEntryFactory<AE> factory;
+    private final EntryFactory<AE> factory;
 
     /**
      * The map of archive entries in this file system.
@@ -136,7 +136,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
      * This field should be considered final!
      * <p>
      * Note that the archive entries in this map are shared with the
-     * {@link CommonEntryContainer} object provided to the constructor of
+     * {@link EntryContainer} object provided to the constructor of
      * this class.
      */
     private Map<String, BaseEntry<AE>> master;
@@ -150,7 +150,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     private final VetoableTouchListener vetoableTouchListener;
 
     ArchiveFileSystem(
-            final CommonEntryFactory<AE> factory,
+            final EntryFactory<AE> factory,
             final VetoableTouchListener vetoableTouchListener)
     throws ArchiveFileSystemException {
         assert factory != null;
@@ -169,9 +169,9 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     }
 
     ArchiveFileSystem(
-            final CommonEntryContainer<AE> container,
-            final CommonEntryFactory<AE> factory,
-            final CommonEntry rootTemplate,
+            final EntryContainer<AE> container,
+            final EntryFactory<AE> factory,
+            final Entry rootTemplate,
             final VetoableTouchListener vetoableTouchListener) {
         if (null == rootTemplate)
             throw new NullPointerException();
@@ -227,7 +227,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
      * is relative, does not identify the dot directory ({@code "."}) or
      * the dot-dot directory ({@code ".."}) or any of their descendants.
      *
-     * @see    CommonEntryFactory#newEntry Common Requirements For Operation Names
+     * @see    EntryFactory#newEntry Common Requirements For Operation Names
      * @param  name a non-{@code null} path name.
      */
     private static boolean isValidPath(final String name) {
@@ -415,7 +415,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     }
 
     /**
-     * Like {@link #newEntryChecked(String, CommonEntry.Type, CommonEntry)
+     * Like {@link #newEntryChecked(String, Entry.Type, Entry)
      * newEntry(path, type, null)}, but throws an
      * {@link AssertionError} instead of a {@link CharConversionException}.
      *
@@ -425,7 +425,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     private BaseEntry<AE> newEntryUnchecked(
             final String path,
             final Type type,
-            final CommonEntry template) {
+            final Entry template) {
         assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
@@ -450,7 +450,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     private BaseEntry<AE> newEntryChecked(
             final String path,
             final Type type,
-            final CommonEntry template)
+            final Entry template)
     throws ArchiveFileSystemException {
         assert isValidPath(path);
         assert type != null;
@@ -465,7 +465,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
     }
 
     /**
-     * Constructs a new instance of {@code CommonEntry}
+     * Constructs a new instance of {@code Entry}
      * which decorates (wraps) the given archive entry.
      *
      * @throws NullPointerException If {@code entry} is {@code null}.
@@ -487,16 +487,16 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
      * required to implement the concept of a directory.
      */
     private static abstract class BaseEntry<AE extends ArchiveEntry>
-    extends FilterCommonEntry<AE>
+    extends FilterEntry<AE>
     implements ArchiveFileSystemEntry<AE>, Cloneable {
-        /** Constructs a new instance of {@code CommonEntry}. */
+        /** Constructs a new instance of {@code Entry}. */
         BaseEntry(final AE entry) {
             super(entry);
             assert entry != null;
         }
 
         @SuppressWarnings("unchecked")
-        BaseEntry<AE> clone(final CommonEntryFactory<AE> factory) {
+        BaseEntry<AE> clone(final EntryFactory<AE> factory) {
             final BaseEntry<AE> clone;
             try {
                 clone = (BaseEntry<AE>) clone();
@@ -547,7 +547,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
         public final AE getTarget() {
             return entry;
         }
-    } // class CommonEntry
+    } // class Entry
 
     /** A file entry. */
     private static class FileEntry<AE extends ArchiveEntry>
@@ -594,7 +594,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
         }
 
         @Override
-        BaseEntry<AE> clone(final CommonEntryFactory<AE> factory) {
+        BaseEntry<AE> clone(final EntryFactory<AE> factory) {
             final DirectoryEntry<AE> clone = (DirectoryEntry<AE>) super.clone(factory);
             clone.members = Collections.unmodifiableSet(clone.members);
             return clone;
@@ -679,7 +679,7 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
             final String path,
             final Type type,
             final boolean createParents,
-            CommonEntry template)
+            Entry template)
     throws ArchiveFileSystemException {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
@@ -704,8 +704,8 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
 
         PathLink(
                 final String entryPath,
-                final CommonEntry.Type entryType,
-                final CommonEntry template,
+                final Entry.Type entryType,
+                final Entry template,
                 final boolean createParents)
         throws ArchiveFileSystemException {
             this.createParents = createParents;
@@ -715,8 +715,8 @@ implements CommonEntryContainer<ArchiveFileSystemEntry<AE>> {
         @SuppressWarnings({ "unchecked", "rawtypes" })
 		private SegmentLink<AE>[] newSegmentLinks(
                 final String entryPath,
-                final CommonEntry.Type entryType,
-                final CommonEntry template,
+                final Entry.Type entryType,
+                final Entry template,
                 final int level)
         throws ArchiveFileSystemException {
             final String split[] = splitter.split(entryPath);

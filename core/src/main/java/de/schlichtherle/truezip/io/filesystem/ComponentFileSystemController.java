@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ComponentFileSystemController<CE extends CommonEntry>
+public abstract class ComponentFileSystemController<CE extends Entry>
 extends FileSystemController<CE> {
 
     @Override

@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
-import de.schlichtherle.truezip.io.entry.CommonEntryFactory;
+import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
@@ -58,7 +58,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
-extends FileSystemFactory<ArchiveModel, AE>, CommonEntryFactory<AE> {
+extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
 
     /**
      * Creates a new archive controller for the given archive model and

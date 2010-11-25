@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.CommonEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
@@ -37,7 +37,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.schlichtherle.truezip.io.entry.CommonEntry.Type.FILE;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 
@@ -138,18 +138,18 @@ extends FilterArchiveController<AE> {
     public OutputSocket<AE> getOutputSocket(
             final String path,
             final BitField<OutputOption> options,
-            final CommonEntry template) {
+            final Entry template) {
         return new Output(path, options, template);
     }
 
     private class Output extends FilterOutputSocket<AE> {
         final String path;
         final BitField<OutputOption> options;
-        final CommonEntry template;
+        final Entry template;
 
         Output( final String path,
                 final BitField<OutputOption> options,
-                final CommonEntry template) {
+                final Entry template) {
             super(getController().getOutputSocket(path, options, template));
             this.path = path;
             this.options = options;
