@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
- * A virtual read/write file system for archive entries.
+ * A base class for a virtual file system for archive entries.
  * <p>
  * This class is <em>not</em> thread-safe!
  * Multithreading needs to be addressed by client classes.
