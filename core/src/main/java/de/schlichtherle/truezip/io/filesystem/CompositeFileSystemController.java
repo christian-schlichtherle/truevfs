@@ -46,7 +46,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-class CompositeFileSystemController
+final class CompositeFileSystemController
 extends ComponentFileSystemController<Entry> {
 
     private final FileSystemController<?> prospect;

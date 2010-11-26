@@ -57,12 +57,12 @@ public class FileSystems {
     };
 
     /**
-     * The map of all scheduled file system controllers, keyed by their mount
-     * points.
+     * The map of all schedulers for composite file system controllers,
+     * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<ScheduledFileSystemController>> controllers
-            = new WeakHashMap<URI, Link<ScheduledFileSystemController>>();
+    private static final Map<URI, Link<Scheduler>> schedulers
+            = new WeakHashMap<URI, Link<Scheduler>>();
 
     private FileSystems() {
     }
@@ -98,24 +98,22 @@ public class FileSystems {
         final FSM model = factory.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
-        synchronized (controllers) {
-            ScheduledFileSystemController controller
-                    = Links.getTarget(controllers.get(mountPoint));
-            if (null == controller) {
-                controller = new ScheduledFileSystemController(
-                        factory.newController(model, parent));
-                model.addFileSystemListener(controller);
+        synchronized (schedulers) {
+            Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
+            if (null == scheduler) {
+                scheduler = new Scheduler(factory.newController(model, parent));
+                model.addFileSystemListener(scheduler);
             }
-            return controller;
+            return scheduler.controller;
         }
     }
 
-    private static final class ScheduledFileSystemController
-    extends CompositeFileSystemController
-    implements FileSystemListener {
+    private static final class Scheduler implements FileSystemListener {
 
-        ScheduledFileSystemController(FileSystemController<?> prospect) {
-            super(prospect);
+        final ComponentFileSystemController<?> controller;
+
+        Scheduler(FileSystemController<?> prospect) {
+            controller = new CompositeFileSystemController(prospect);
             afterTouch(null);
         }
 
@@ -125,10 +123,10 @@ public class FileSystems {
          */
         @Override
         public void afterTouch(final FileSystemEvent event) {
-            synchronized (controllers) {
-                final FileSystemModel model = getModel();
+            synchronized (schedulers) {
+                final FileSystemModel model = controller.getModel();
                 assert null == event || event.getSource() == model;
-                controllers.put(model.getMountPoint(),
+                schedulers.put(model.getMountPoint(),
                         (model.isTouched() ? STRONG : WEAK).newLink(this));
             }
         }
@@ -218,12 +216,14 @@ public class FileSystems {
         else
             prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
         final Set<ComponentFileSystemController<?>> snapshot;
-        synchronized (controllers) {
+        synchronized (schedulers) {
             snapshot = null != comparator
                     ? new TreeSet<ComponentFileSystemController<?>>(comparator)
-                    : new HashSet<ComponentFileSystemController<?>>((int) (controllers.size() / .75f) + 1);
-            for (final Link<ScheduledFileSystemController> link : controllers.values()) {
-                final ComponentFileSystemController<?> controller = Links.getTarget(link);
+                    : new HashSet<ComponentFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
+            for (final Link<Scheduler> link : schedulers.values()) {
+                final Scheduler scheduler = Links.getTarget(link);
+                final ComponentFileSystemController<?> controller
+                        = null == scheduler ? null : scheduler.controller;
                 if (null != controller && controller
                         .getModel()
                         .getMountPoint()
