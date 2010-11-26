@@ -53,7 +53,7 @@ public class Links {
      * @return A nullable typed link to the given target.
      */
     public static <T> Link<T> newLink(final Type type, final T target) {
-        return target == null ? null : type.newLink(target);
+        return null == target ? null : type.newLink(target);
     }
 
     /**
@@ -66,6 +66,6 @@ public class Links {
      * @return The nullable {@link Link#getTarget() target} of the given link.
      */
     public static <T> T getTarget(final Link<T> link) {
-        return link == null ? null : link.getTarget();
+        return null == link ? null : link.getTarget();
     }
 }
