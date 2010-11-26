@@ -19,6 +19,7 @@ import java.net.URI;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
 
 /**
  * @author Christian Schlichtherle
@@ -58,6 +59,11 @@ public class FileSystemModelTest {
             model = new FileSystemModel(mountPoint);
             assert expectedMountPoint.equals(model.getMountPoint());
             assert null == model.getParent();
+            try {
+                model.parentPath(ROOT);
+                fail();
+            } catch (RuntimeException expected) {
+            }
             assert !model.isTouched();
         }
     }
