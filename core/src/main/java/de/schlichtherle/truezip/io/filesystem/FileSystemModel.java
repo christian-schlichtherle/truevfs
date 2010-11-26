@@ -48,8 +48,6 @@ public class FileSystemModel {
         this.mountPoint = mountPoint = mountPoint.normalize();
         this.parent = parent;
         if (null != parent) {
-            if (mountPoint.isOpaque())
-                throw new IllegalArgumentException();
             final URI parentMountPoint = parent.getMountPoint()
                     .relativize(mountPoint);
             if (parentMountPoint.equals(mountPoint))
