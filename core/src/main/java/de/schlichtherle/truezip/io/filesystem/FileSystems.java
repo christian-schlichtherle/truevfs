@@ -98,23 +98,24 @@ public class FileSystems {
         final FSM model = factory.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
+        Scheduler scheduler;
         synchronized (schedulers) {
-            Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
-            if (null == scheduler) {
+            scheduler = Links.getTarget(schedulers.get(mountPoint));
+            if (null == scheduler)
                 scheduler = new Scheduler(factory.newController(model, parent));
-                model.addFileSystemListener(scheduler);
-            }
-            return scheduler.controller;
         }
+        return scheduler.controller;
     }
 
     private static final class Scheduler implements FileSystemListener {
 
         final ComponentFileSystemController<?> controller;
 
-        Scheduler(FileSystemController<?> prospect) {
+        @SuppressWarnings("LeakingThisInConstructor")
+        Scheduler(final FileSystemController<?> prospect) {
             controller = new CompositeFileSystemController(prospect);
-            afterTouch(null);
+            controller.getModel().addFileSystemListener(this);
+            afterTouch(null); // setup schedule
         }
 
         /**
