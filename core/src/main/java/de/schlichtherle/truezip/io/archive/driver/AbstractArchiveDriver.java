@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ConcurrentArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;

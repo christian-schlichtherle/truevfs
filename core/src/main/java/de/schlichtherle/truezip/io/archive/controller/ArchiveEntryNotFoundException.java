@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;

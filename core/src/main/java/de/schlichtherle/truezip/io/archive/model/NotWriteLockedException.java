@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.archive.model;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 
@@ -26,8 +26,9 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public final class NotWriteLockedException extends FileSystemException {
+
+    private static final long serialVersionUID = 2345952581284762637L;
 
     NotWriteLockedException(ArchiveModel model) {
         super(model);

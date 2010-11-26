@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -382,7 +383,7 @@ extends FileSystemArchiveController<AE> {
                 final BitField<SyncOption> options)
     throws E, FileSystemException {
         assert !isTouched() || null != output; // file system touched => output archive
-        assertWriteLockedByCurrentThread();
+        getModel().assertWriteLockedByCurrentThread();
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         awaitSync(builder, options);
