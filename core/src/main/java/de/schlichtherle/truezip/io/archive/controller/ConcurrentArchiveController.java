@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -49,12 +50,17 @@ extends FilterArchiveController<AE> {
         super(controller);
     }
 
-    ReentrantLock readLock() {
+    private ReentrantLock readLock() {
         return getModel().readLock();
     }
 
-    ReentrantLock writeLock() {
+    private ReentrantLock writeLock() {
         return getModel().writeLock();
+    }
+
+    private void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)
+    throws NotWriteLockedException {
+        getModel().assertNotReadLockedByCurrentThread(ex);
     }
 
     @Override

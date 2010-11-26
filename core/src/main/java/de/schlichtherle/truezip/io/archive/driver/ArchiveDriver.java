@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;

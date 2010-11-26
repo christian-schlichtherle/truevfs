@@ -165,7 +165,7 @@ extends FilterArchiveController<AE> {
                     || options.get(OutputOption.APPEND)
                     || null != template) {
                 if (null != cache) {
-                    assertWriteLockedByCurrentThread();
+                    getModel().assertWriteLockedByCurrentThread();
                     try {
                         cache.flush();
                     } finally {
@@ -246,7 +246,7 @@ extends FilterArchiveController<AE> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                assertWriteLockedByCurrentThread();
+                getModel().assertWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
                 caches.put(path, EntryCache.this);
                 return in;
@@ -254,7 +254,7 @@ extends FilterArchiveController<AE> {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                assertWriteLockedByCurrentThread();
+                getModel().assertWriteLockedByCurrentThread();
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
                 caches.put(path, EntryCache.this);
                 return rof;

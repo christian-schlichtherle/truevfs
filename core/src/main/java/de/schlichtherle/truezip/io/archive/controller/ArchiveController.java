@@ -15,14 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 
 /**
- * @see     ComponentFileSystemController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -35,26 +34,4 @@ extends FileSystemController<AE> {
     @Override
     public abstract ArchiveFileSystemEntry<? extends AE> getEntry(String path)
     throws FileSystemException;
-
-    /**
-     * @throws NotWriteLockedException if the <i>write lock</i> is not
-     *         held by the current thread.
-     */
-    final void assertWriteLockedByCurrentThread()
-    throws NotWriteLockedException {
-        final ArchiveModel model = getModel();
-        if (!model.writeLock().isHeldByCurrentThread())
-            throw new NotWriteLockedException(model);
-    }
-
-    /**
-     * @throws NotWriteLockedException if the <i>read lock</i> is
-     *         held by the current thread.
-     */
-    final void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)
-    throws NotWriteLockedException {
-        final ArchiveModel model = getModel();
-        if (model.readLock().isHeldByCurrentThread())
-            throw new NotWriteLockedException(model, ex);
-    }
 }

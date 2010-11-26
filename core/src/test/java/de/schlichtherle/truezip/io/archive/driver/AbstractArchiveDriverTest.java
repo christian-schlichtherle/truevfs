@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;

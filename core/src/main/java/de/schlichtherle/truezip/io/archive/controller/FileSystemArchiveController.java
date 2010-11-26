@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -104,7 +105,7 @@ extends BasicArchiveController<AE> {
         ArchiveFileSystem<AE> autoMount(final boolean autoCreate,
                                         final BitField<OutputOption> options)
         throws IOException {
-            assertWriteLockedByCurrentThread();
+            getModel().assertWriteLockedByCurrentThread();
             try {
                 mount(autoCreate, options);
             } catch (FalsePositiveException ex) {

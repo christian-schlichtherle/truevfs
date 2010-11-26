@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;

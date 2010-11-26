@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.archive.controller.ArchiveModel;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
