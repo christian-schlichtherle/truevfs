@@ -382,10 +382,9 @@ extends FileSystemArchiveController<AE> {
                 final BitField<SyncOption> options)
     throws E, FileSystemException {
         assert !isTouched() || null != output; // file system touched => output archive
-
+        assertWriteLockedByCurrentThread();
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
-        assertWriteLockedByCurrentThread();
         awaitSync(builder, options);
         commenceSync(builder);
         try {
