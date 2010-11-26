@@ -31,11 +31,19 @@ extends EventListener {
     /**
      * Called whenever the value of the property
      * {@link ArchiveFileSystem#isTouched() touched} is going to change in the
-     * source archive file system model.
-     * If this method throws an {@code IOException}), the modification of the
-     * archive file system is vetoed.
+     * source archive file system model, but before the change has actually
+     * happened.
+     * If this method throws an {@code IOException}), then the change of the
+     * archive file system is effectively vetoed.
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void beforeTouch(ArchiveFileSystemEvent<AE> event) throws IOException;
+    void beforeTouch(ArchiveFileSystemEvent<? extends AE> event) throws IOException;
+
+    /**
+     * Called whenever the value of the property
+     * {@link ArchiveFileSystem#isTouched() touched} has changed
+     * in the source archive file system model.
+     */
+    void afterTouch(ArchiveFileSystemEvent<? extends AE> event);
 }

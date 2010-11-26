@@ -148,12 +148,18 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private final class Listener implements ArchiveFileSystemListener<AE> {
+    private final class Listener
+    implements ArchiveFileSystemListener<ArchiveEntry> {
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<AE> event)
+        public void beforeTouch(ArchiveFileSystemEvent<?> event)
         throws IOException {
             assert null == event || event.getSource() == getFileSystem();
             makeOutput(BitField.noneOf(OutputOption.class));
+        }
+
+        @Override
+        public void afterTouch(ArchiveFileSystemEvent<?> event) {
+            assert null == event || event.getSource() == getFileSystem();
             getModel().setTouched(true);
         }
     }
@@ -173,7 +179,8 @@ extends FileSystemArchiveController<AE> {
      */
     private Output output;
 
-    private final ArchiveFileSystemListener<AE> listener = new Listener();
+    private final ArchiveFileSystemListener<ArchiveEntry> listener
+            = new Listener();
 
     public UpdatingArchiveController(
             final ArchiveModel model,
@@ -324,6 +331,7 @@ extends FileSystemArchiveController<AE> {
             }
             listener.beforeTouch(null);
             setFileSystem(ArchiveFileSystem.newArchiveFileSystem(getDriver()));
+            listener.afterTouch(null);
         }
         getFileSystem().addArchiveFileSystemListener(listener);
     }

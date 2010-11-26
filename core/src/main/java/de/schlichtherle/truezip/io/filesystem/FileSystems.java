@@ -115,7 +115,7 @@ public class FileSystems {
         Scheduler(final FileSystemController<?> prospect) {
             controller = new CompositeFileSystemController(prospect);
             controller.getModel().addFileSystemListener(this);
-            afterTouch(null); // setup schedule
+            touchChanged(null); // setup schedule
         }
 
         /**
@@ -123,7 +123,7 @@ public class FileSystems {
          * to the given touch status.
          */
         @Override
-        public void afterTouch(final FileSystemEvent event) {
+        public void touchChanged(final FileSystemEvent event) {
             synchronized (schedulers) {
                 final FileSystemModel model = controller.getModel();
                 assert null == event || event.getSource() == model;

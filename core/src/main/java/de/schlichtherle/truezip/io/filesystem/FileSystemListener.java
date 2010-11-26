@@ -27,8 +27,8 @@ public interface FileSystemListener extends EventListener {
 
     /**
      * Called whenever the value of the property
-     * {@link FileSystemModel#isTouched() touched} has changed in the source
-     * file system model.
+     * {@link FileSystemModel#isTouched() touched} has changed
+     * in the source file system model.
      */
-    void afterTouch(FileSystemEvent event);
+    void touchChanged(FileSystemEvent event);
 }

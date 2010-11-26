@@ -78,7 +78,8 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private ArchiveFileSystemListener<AE> listener;
+    private LinkedHashSet<ArchiveFileSystemListener<? super AE>> listeners
+            = new LinkedHashSet<ArchiveFileSystemListener<? super AE>>();
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -88,12 +89,9 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      *
      * @param  factory the archive entry factory to use.
      * @throws NullPointerException If {@code factory} is {@code null}.
-     * @throws ArchiveFileSystemException if touching the archive file system
-     *         has been vetoed by the {@code vetoableTouchListener}.
      */
     public static <AE extends ArchiveEntry>
-    ArchiveFileSystem<AE> newArchiveFileSystem(EntryFactory<AE> factory)
-    throws ArchiveFileSystemException {
+    ArchiveFileSystem<AE> newArchiveFileSystem(EntryFactory<AE> factory) {
         return new ArchiveFileSystem<AE>(factory);
     }
 
@@ -134,9 +132,9 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      *
      * @param  container The archive entry container to read the entries for
      *         the population of the file system.
+     * @param  factory the archive entry factory to use.
      * @param  rootTemplate The last modification time of the root of the populated
      *         file system in milliseconds since the epoch.
-     * @param  factory the archive entry factory to use.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link ReadOnlyArchiveFileSystemException}.
@@ -353,33 +351,58 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
         if (touched)
             return;
         // Order is important here because of veto exceptions!
-        if (null != listener) {
-            try {
-                listener.beforeTouch(new ArchiveFileSystemEvent<AE>(this));
-            } catch (IOException ex) {
-                throw new ArchiveFileSystemException(null, "touch vetoed", ex);
-            }
+        final ArchiveFileSystemEvent<AE> event
+                = new ArchiveFileSystemEvent<AE>(this);
+        final Iterable<ArchiveFileSystemListener<? super AE>> listeners
+                = getArchiveFileSystemListeners();
+        try {
+            for (ArchiveFileSystemListener<? super AE> listener : listeners)
+                listener.beforeTouch(event);
+        } catch (IOException ex) {
+            throw new ArchiveFileSystemException(null, "touch vetoed", ex);
         }
         touched = true;
+        for (ArchiveFileSystemListener<? super AE> listener : listeners)
+            listener.afterTouch(event);
     }
 
     /**
-     * @param  listener the non-{@code null} listener for archive file system
-     *         events.
+     * Returns a protective copy of the set of archive file system listeners.
+     *
+     * @return A clone of the set of archive file system listeners.
      */
-    public final void addArchiveFileSystemListener(
-            final ArchiveFileSystemListener<AE> listener) {
-        if (null == listener)
-            throw new NullPointerException();
-        if (null != this.listener)
-            throw new UnsupportedOperationException(); // TODO!
-        this.listener = listener;
+    @SuppressWarnings("unchecked")
+    protected final Set<ArchiveFileSystemListener<? super AE>>
+    getArchiveFileSystemListeners() {
+        return (Set<ArchiveFileSystemListener<? super AE>>) listeners.clone();
     }
 
+    /**
+     * Adds the given listener to the set of archive file system listeners.
+     *
+     * @param  listener the non-{@code null} listener for archive file system
+     *         events.
+     * @throws NullPointerException if {@code listener} is {@code null}.
+     */
+    public final void addArchiveFileSystemListener(
+            final ArchiveFileSystemListener<? super AE> listener) {
+        if (null == listener)
+            throw new NullPointerException();
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes the given listener from the set of archive file system listeners.
+     *
+     * @param  listener the non-{@code null} listener for archive file system
+     *         events.
+     * @throws NullPointerException if {@code listener} is {@code null}.
+     */
     public final void removeArchiveFileSystemListener(
-            final ArchiveFileSystemListener<AE> listener) {
-        if (listener == this.listener)
-            this.listener = null;
+            final ArchiveFileSystemListener<? super AE> listener) {
+        if (null == listener)
+            throw new NullPointerException();
+        listeners.remove(listener);
     }
 
     @Override

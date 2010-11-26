@@ -28,8 +28,8 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * A file system controller provides thread-safe read/write access
- * to a federation of one or more file systems which is addressed by the
+ * A file system controller provides read/write access to a federation of one
+ * or more file systems which is addressed by the
  * {@link FileSystemModel#getMountPoint() mount point} of its
  * {@link #getModel() file system model}.
  * <p>
@@ -41,6 +41,10 @@ import javax.swing.Icon;
  * be resolved against the
  * {@link FileSystemModel#getMountPoint() mount point} URI of this
  * controller's federated file system.
+ * <p>
+ * There is no requirement for an implementation to be thread-safe.
+ * However, all implementations should clearly state their level of
+ * thread-safety.
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
@@ -73,8 +77,7 @@ public interface FileSystemController<E extends Entry> {
 
     void setReadOnly(String path) throws IOException;
 
-    boolean setTime(String path,
-                                    BitField<Access> types, long value)
+    boolean setTime(String path, BitField<Access> types, long value)
     throws IOException;
 
     /**

@@ -15,7 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.util.Set;
 import java.net.URI;
+import java.util.LinkedHashSet;
 
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
@@ -24,6 +26,9 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * Defines the common properties of any file system.
+ * <p>
+ * This class is <em>not</em> thread-safe!
+ * Multithreading needs to be addressed by client classes.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -33,7 +38,8 @@ public class FileSystemModel {
     private final FileSystemModel parent;
     private final String parentPath;
     private boolean touched;
-    private FileSystemListener listener;
+    private LinkedHashSet<FileSystemListener> listeners
+            = new LinkedHashSet<FileSystemListener>();
 
     public FileSystemModel(URI mountPoint) {
         this(mountPoint, null);
@@ -120,27 +126,47 @@ public class FileSystemModel {
     public final void setTouched(final boolean newTouched) {
         final boolean oldTouched = touched;
         touched = newTouched;
-        if (newTouched != oldTouched)
-            if (null != listener)
-                listener.afterTouch(new FileSystemEvent(this));
+        if (newTouched != oldTouched) {
+            final FileSystemEvent event = new FileSystemEvent(this);
+            for (FileSystemListener listener : getFileSystemListeners())
+                listener.touchChanged(event);
+        }
     }
 
     /**
+     * Returns a protective copy of the set of file system listeners.
+     * 
+     * @return A clone of the set of file system listeners.
+     */
+    @SuppressWarnings("unchecked")
+    protected final Set<FileSystemListener> getFileSystemListeners() {
+        return (Set<FileSystemListener>) listeners.clone();
+    }
+
+    /**
+     * Adds the given listener to the set of file system listeners.
+     *
      * @param  listener the non-{@code null} listener for file system events.
+     * @throws NullPointerException if {@code listener} is {@code null}.
      */
     public final void addFileSystemListener(
             final FileSystemListener listener) {
         if (null == listener)
             throw new NullPointerException();
-        if (null != this.listener)
-            throw new UnsupportedOperationException(); // TODO!
-        this.listener = listener;
+        listeners.add(listener);
     }
 
+    /**
+     * Removes the given listener from the set of file system listeners.
+     *
+     * @param  listener the non-{@code null} listener for file system events.
+     * @throws NullPointerException if {@code listener} is {@code null}.
+     */
     public final void removeFileSystemListener(
             final FileSystemListener listener) {
-        if (listener == this.listener)
-            this.listener = null;
+        if (null == listener)
+            throw new NullPointerException();
+        listeners.remove(listener);
     }
 
     @Override
