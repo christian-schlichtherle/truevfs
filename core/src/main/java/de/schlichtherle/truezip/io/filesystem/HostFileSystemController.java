@@ -43,7 +43,8 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
  * @version $Id$
  */
 public final class HostFileSystemController
-extends ComponentFileSystemController<FileEntry> {
+extends AbstractFileSystemController<FileEntry>
+implements ComponentFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
