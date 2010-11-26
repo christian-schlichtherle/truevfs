@@ -33,46 +33,47 @@ import javax.swing.Icon;
  * {@link FileSystemModel#getMountPoint() mount point} of its
  * {@link #getModel() file system model}.
  * <p>
- * All method implementations of this abstract base class must be reentrant on
+ * All method implementations of this interface must be reentrant on
  * exceptions - so client applications may repeatedly call them.
  * <p>
- * Where the methods of this abstract base class accept a path name string as a
- * parameter, this must be a relative, hierarchical URI which is resolved
- * against the {@link FileSystemModel#getMountPoint() mount point} of this
+ * Where the methods of this interface accept a
+ * {@link FileSystemEntry#getName path name} string as a parameter, this will
+ * be resolved against the
+ * {@link FileSystemModel#getMountPoint() mount point} URI of this
  * controller's federated file system.
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileSystemController<E extends Entry> {
+public interface FileSystemController<E extends Entry> {
 
     /** Returns the non-{@code null} file system model. */
-    public abstract FileSystemModel getModel();
+    FileSystemModel getModel();
 
     /**
      * Returns the controller of the parent file system or {@code null} if and
      * only if this file system is not federated, i.e. if it's not a member of
      * another file system.
      */
-    public abstract ComponentFileSystemController<?> getParent();
+    ComponentFileSystemController<?> getParent();
 
-    public abstract Icon getOpenIcon() throws FileSystemException;
+    Icon getOpenIcon() throws FileSystemException;
 
-    public abstract Icon getClosedIcon() throws FileSystemException;
+    Icon getClosedIcon() throws FileSystemException;
 
-    public abstract boolean isReadOnly() throws FileSystemException;
+    boolean isReadOnly() throws FileSystemException;
 
-    public abstract FileSystemEntry<? extends E> getEntry(String path)
+    FileSystemEntry<? extends E> getEntry(String path)
     throws FileSystemException;
 
-    public abstract boolean isReadable(String path) throws FileSystemException;
+    boolean isReadable(String path) throws FileSystemException;
 
-    public abstract boolean isWritable(String path) throws FileSystemException;
+    boolean isWritable(String path) throws FileSystemException;
 
-    public abstract void setReadOnly(String path) throws IOException;
+    void setReadOnly(String path) throws IOException;
 
-    public abstract boolean setTime(String path,
+    boolean setTime(String path,
                                     BitField<Access> types, long value)
     throws IOException;
 
@@ -83,7 +84,7 @@ public abstract class FileSystemController<E extends Entry> {
      * @param  path a non-{@code null} relative path name.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    public abstract InputSocket<? extends E> getInputSocket(
+    InputSocket<? extends E> getInputSocket(
             String path, BitField<InputOption> options);
 
     /**
@@ -93,7 +94,7 @@ public abstract class FileSystemController<E extends Entry> {
      * @param  path a non-{@code null} relative path name.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    public abstract OutputSocket<? extends E> getOutputSocket(
+    OutputSocket<? extends E> getOutputSocket(
             String path, BitField<OutputOption> options, Entry template);
 
     /**
@@ -125,12 +126,12 @@ public abstract class FileSystemController<E extends Entry> {
      *             {@code false}.</li>
      *         </ul>
      */
-    public abstract boolean mknod(  String path, Type type,
+    boolean mknod(  String path, Type type,
                                     BitField<OutputOption> options,
                                     Entry template)
     throws IOException;
 
-    public abstract void unlink(String path) throws IOException;
+    void unlink(String path) throws IOException;
 
     /**
      * Writes all changes to the contents of this file system to its
@@ -146,12 +147,12 @@ public abstract class FileSystemController<E extends Entry> {
      * @see    FileSystemModel#isTouched
      * @see    FileSystems#sync
      */
-    public abstract <E extends IOException>
+    <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
     throws E, FileSystemException;
 
-    @Override
+    /*@Override
     public final String toString() {
         return new StringBuilder()
                 .append(getClass().getName())
@@ -159,5 +160,5 @@ public abstract class FileSystemController<E extends Entry> {
                 .append(getModel())
                 .append("]")
                 .toString();
-    }
+    }*/
 }

@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.entry.Entry;
 
 /**
+ * Provides an implementation for the method {@link #toString}.
+ *
+ * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveController<AE extends ArchiveEntry>
-extends FileSystemController<AE> {
+public abstract class AbstractFileSystemController<E extends Entry>
+implements FileSystemController<E> {
 
     @Override
-    ArchiveModel getModel();
-
-    @Override
-    ArchiveFileSystemEntry<? extends AE> getEntry(String path)
-    throws FileSystemException;
+    public final String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[model=")
+                .append(getModel())
+                .append("]")
+                .toString();
+    }
 }

@@ -22,7 +22,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * Like it's super class, but does not throw {@link FileSystemException}s
+ * Like it's super type, but does not throw {@link FileSystemException}s
  * because either the file system is not federated or this exception type is
  * handled by the implementation of this abstract class.
  *
@@ -30,29 +30,29 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ComponentFileSystemController<E extends Entry>
+public interface ComponentFileSystemController<E extends Entry>
 extends FileSystemController<E> {
 
     @Override
-    public abstract Icon getOpenIcon();
+    Icon getOpenIcon();
 
     @Override
-    public abstract Icon getClosedIcon();
+    Icon getClosedIcon();
 
     @Override
-    public abstract boolean isReadOnly();
+    boolean isReadOnly();
 
     @Override
-    public abstract FileSystemEntry<? extends E> getEntry(String path);
+    FileSystemEntry<? extends E> getEntry(String path);
 
     @Override
-    public abstract boolean isReadable(String path);
+    boolean isReadable(String path);
 
     @Override
-    public abstract boolean isWritable(String path);
+    boolean isWritable(String path);
 
     @Override
-    public abstract <E extends IOException>
+    <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
     throws E;
