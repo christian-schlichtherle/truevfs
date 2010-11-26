@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.net.URI;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
@@ -57,14 +58,14 @@ public class FileSystemModelTest {
         }) {
             final URI mountPoint = URI.create(uri);
             model = new FileSystemModel(mountPoint);
-            assert expectedMountPoint.equals(model.getMountPoint());
-            assert null == model.getParent();
+            assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
+            assertThat(model.getParent(), nullValue());
             try {
                 model.parentPath(ROOT);
                 fail();
             } catch (RuntimeException expected) {
             }
-            assert !model.isTouched();
+            assertThat(model.isTouched(), is(false));
         }
     }
 
@@ -107,10 +108,89 @@ public class FileSystemModelTest {
             final String parentPath = uri[3];
             final String path = uri[4];
             model = new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint));
-            assert expectedMountPoint.equals(model.getMountPoint());
-            assert parentMountPoint.equals(model.getParent().getMountPoint());
-            assert parentPath.equals(model.parentPath(path));
-            assert !model.isTouched();
+            assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
+            assertThat(model.getParent(), notNullValue());
+            assertThat(model.getParent().getMountPoint(), equalTo(parentMountPoint));
+            assertThat(model.parentPath(path), equalTo(parentPath));
+            assertThat(model.isTouched(), is(false));
+        }
+    }
+
+    @Test
+    public void testAddRemoveFileSystemListeners() {
+        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar"));
+
+        try {
+            model.addFileSystemListener(null);
+        } catch (NullPointerException expected) {
+        }
+        assertThat(model.getFileSystemListeners(), notNullValue());
+        assertThat(model.getFileSystemListeners().size(), is(0));
+
+        final Listener listener1 = new Listener(model);
+        model.addFileSystemListener(listener1);
+        assertThat(model.getFileSystemListeners().size(), is(1));
+
+        final Listener listener2 = new Listener(model);
+        model.addFileSystemListener(listener2);
+        assertThat(model.getFileSystemListeners().size(), is(2));
+
+        model.getFileSystemListeners().clear();
+        assertThat(model.getFileSystemListeners().size(), is(2));
+
+        try {
+            model.removeFileSystemListener(null);
+        } catch (NullPointerException expected) {
+        }
+        assertThat(model.getFileSystemListeners().size(), is(2));
+
+        model.removeFileSystemListener(listener1);
+        model.removeFileSystemListener(listener1);
+        assertThat(model.getFileSystemListeners().size(), is(1));
+
+        model.removeFileSystemListener(listener2);
+        model.removeFileSystemListener(listener2);
+        assertThat(model.getFileSystemListeners().size(), is(0));
+    }
+
+    @Test
+    public void testNotifyFileSystemListeners() {
+        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar"));
+        final Listener listener1 = new Listener(model);
+        final Listener listener2 = new Listener(model);
+
+        model.setTouched(false);
+        assertThat(listener1.changes, is(0));
+        assertThat(listener2.changes, is(0));
+
+        model.setTouched(true);
+        assertThat(listener1.changes, is(1));
+        assertThat(listener2.changes, is(1));
+
+        model.setTouched(true);
+        assertThat(listener1.changes, is(1));
+        assertThat(listener2.changes, is(1));
+
+        model.setTouched(false);
+        assertThat(listener1.changes, is(2));
+        assertThat(listener2.changes, is(2));
+    }
+
+    private static class Listener implements FileSystemListener {
+        final FileSystemModel model;
+        int changes;
+
+        @SuppressWarnings("LeakingThisInConstructor")
+        Listener(final FileSystemModel model) {
+            this.model = model;
+            model.addFileSystemListener(this);
+        }
+
+        @Override
+        public void touchChanged(FileSystemEvent event) {
+            assertThat(event, notNullValue());
+            assertThat(event.getSource(), sameInstance(model));
+            changes++;
         }
     }
 }
