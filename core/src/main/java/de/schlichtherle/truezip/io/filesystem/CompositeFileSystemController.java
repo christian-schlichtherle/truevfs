@@ -143,8 +143,7 @@ implements ComponentFileSystemController<Entry> {
     }
 
     @Override
-    public void setReadOnly(String path)
-    throws IOException {
+    public void setReadOnly(String path) throws IOException {
         try {
             getProspect().setReadOnly(path);
         } catch (FalsePositiveException ex) {
@@ -277,9 +276,7 @@ implements ComponentFileSystemController<Entry> {
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
-    public void unlink(String path)
-    throws IOException {
+    public void unlink(String path) throws IOException {
         try {
             getProspect().unlink(path);
         } catch (FalsePositiveException ex) {
