@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.Set;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
@@ -34,6 +35,8 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 public class FileSystemModel {
+    private static final String BANG_SEPARATOR = "!" + SEPARATOR;
+
     private final URI mountPoint;
     private final FileSystemModel parent;
     private final String parentPath;
@@ -42,30 +45,68 @@ public class FileSystemModel {
             = new LinkedHashSet<FileSystemListener>();
 
     public FileSystemModel(URI mountPoint) {
-        this(mountPoint, null);
+        this(mountPoint, null, null);
     }
 
-    public FileSystemModel(URI mountPoint,
-                           final FileSystemModel parent) {
+    public FileSystemModel( final URI mountPoint,
+                            final FileSystemModel parent) {
+        this(mountPoint, parent, null);
+    }
+
+    public FileSystemModel( final URI mountPoint,
+                            final FileSystemFactory<?, ?> factory) {
+        this(mountPoint, null, factory);
+    }
+
+    public FileSystemModel( URI mountPoint,
+                            final FileSystemModel parent,
+                            final FileSystemFactory<?, ?> factory) {
         if (!mountPoint.isAbsolute())
             throw new IllegalArgumentException();
-        if (!mountPoint.getPath().endsWith(SEPARATOR))
-            mountPoint = URI.create(mountPoint.toString() + SEPARATOR_CHAR);
-        this.mountPoint = mountPoint = mountPoint.normalize();
-        this.parent = parent;
-        if (null != parent) {
-            final URI parentMountPoint = parent.getMountPoint()
-                    .relativize(mountPoint);
-            if (parentMountPoint.equals(mountPoint))
-                throw new IllegalArgumentException("parent/member mismatch");
-            this.parentPath = parentMountPoint.getPath();
-        } else {
-            this.parentPath = null;
+        if (null != mountPoint.getFragment())
+            throw new IllegalArgumentException();
+        try {
+            if (!mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR))
+                mountPoint = new URI(   mountPoint.getScheme(),
+                                        mountPoint.getSchemeSpecificPart()
+                                            + SEPARATOR_CHAR,
+                                        null);
+            if (mountPoint.isOpaque()) {
+                if (null != parent)
+                    throw new IllegalArgumentException();
+                final String ssp = mountPoint.getSchemeSpecificPart();
+                final int i = ssp.lastIndexOf(BANG_SEPARATOR);
+                if (0 >= i)
+                    throw new IllegalArgumentException();
+                final URI parentMountPoint = new URI(ssp.substring(0, i))
+                        .normalize();
+                final URI parentPathURI = new URI(ssp.substring(i + 2))
+                        .normalize();
+                this.parentPath = parentPathURI.getPath();
+                this.parent = factory.newModel(parentMountPoint, null);
+                this.mountPoint = new URI(mountPoint.getScheme(), parentMountPoint.toString() + BANG_SEPARATOR + parentPath, null);
+            } else {
+                mountPoint = mountPoint.normalize();
+                if (null != parent) {
+                    final URI parentPathURI = parent.getMountPoint()
+                            .relativize(mountPoint);
+                    if (parentPathURI.equals(mountPoint))
+                        throw new IllegalArgumentException("parent/member mismatch");
+                    assert null == parentPathURI.getScheme();
+                    this.parentPath = parentPathURI.getPath();
+                } else {
+                    this.parentPath = null;
+                }
+                this.parent = parent;
+                this.mountPoint = mountPoint;
+            }
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
         }
 
-        assert mountPoint.isOpaque() || mountPoint.getPath().endsWith(SEPARATOR);
-        assert (null == parent && null == parentPath)
-                ^ (null != parent && parentPath.endsWith(SEPARATOR));
+        assert (null == this.parent && null == this.parentPath)
+                ^ (null != this.parent && this.parentPath.endsWith(SEPARATOR));
+        assert this.mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR);
     }
 
     /**
@@ -90,8 +131,14 @@ public class FileSystemModel {
         return mountPoint;
     }
 
+    public final URI resolveURI(String path) {
+        return mountPoint.isOpaque()
+                ? URI.create(mountPoint + path)
+                : mountPoint.resolve(path);
+    }
+
     /**
-     * Returns the model of the parent file system or {@code null} if and
+     * Returns the model of the parentPath file system or {@code null} if and
      * only if this file system is not federated, i.e. if it's not a member of
      * another file system.
      */
@@ -101,11 +148,11 @@ public class FileSystemModel {
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this model's file system within its parent file system.
+     * this model's file system within its parentPath file system.
      *
      * @param  path a non-{@code null} entry name.
      * @throws RuntimeException if this file system model does not specify a
-     *         {@link #getParent() parent file system model}.
+     *         {@link #getParent() parentPath file system model}.
      */
     public final String parentPath(String path) {
         return isRoot(path)
@@ -116,7 +163,7 @@ public class FileSystemModel {
     /**
      * Returns {@code true} if and only if the contents of this composite file
      * system have been modified so that it needs
-     * {@link FileSystemController#sync synchronization} with its parent file
+     * {@link FileSystemController#sync synchronization} with its parentPath file
      * system.
      */
     public final boolean isTouched() {

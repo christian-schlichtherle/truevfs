@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.entry.Entry;
 import java.net.URI;
 import org.junit.Test;
 
@@ -29,11 +30,10 @@ import static org.junit.Assert.*;
 public class FileSystemModelTest {
 
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testMountPointConstructor() {
-        FileSystemModel model;
-
         try {
-            model = new FileSystemModel(null);
+            new FileSystemModel(null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -44,7 +44,7 @@ public class FileSystemModelTest {
         }) {
             final URI mountPoint = URI.create(uri);
             try {
-                model = new FileSystemModel(mountPoint);
+                new FileSystemModel(mountPoint);
                 fail();
             } catch (RuntimeException expected) {
             }
@@ -57,7 +57,7 @@ public class FileSystemModelTest {
             "foo:/bar//",
         }) {
             final URI mountPoint = URI.create(uri);
-            model = new FileSystemModel(mountPoint);
+            final FileSystemModel model = new FileSystemModel(mountPoint);
             assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
             assertThat(model.getParent(), nullValue());
             try {
@@ -70,11 +70,10 @@ public class FileSystemModelTest {
     }
 
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testMountPointAndParentConstructor() {
-        FileSystemModel model;
-
         try {
-            model = new FileSystemModel(null, null);
+            new FileSystemModel(null, (FileSystemModel) null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -84,12 +83,12 @@ public class FileSystemModelTest {
             { "/bar", "/" },
             { "foo:/bar", "foo:/baz" },
             { "foo:/bar/", "foo:/baz/" },
-            { "foo:bar:a!/b/", "bar:a" },
+            { "foo:bar:/a!/b", "bar:/a" },
         }) {
             final URI mountPoint = URI.create(uri[0]);
             final URI parentMountPoint = URI.create(uri[1]);
             try {
-                model = new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint));
+                new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint));
                 fail();
             } catch (RuntimeException expected) {
             }
@@ -107,12 +106,72 @@ public class FileSystemModelTest {
             final URI parentMountPoint = URI.create(uri[2]);
             final String parentPath = uri[3];
             final String path = uri[4];
-            model = new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint));
+
+            final FileSystemModel model = new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint));
             assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
             assertThat(model.getParent(), notNullValue());
             assertThat(model.getParent().getMountPoint(), equalTo(parentMountPoint));
             assertThat(model.parentPath(path), equalTo(parentPath));
             assertThat(model.isTouched(), is(false));
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testMountPointAndFactoryConstructor() {
+        try {
+            new FileSystemModel(null, (FileSystemFactory<?, ?>) null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        for (final String[] uri : new String[][] {
+            { "/bar" },
+            { "foo:bar" },
+            { "foo:bar:a!/b" },
+        }) {
+            final URI mountPoint = URI.create(uri[0]);
+            try {
+                new FileSystemModel(mountPoint, new DummyFactory());
+                fail();
+            } catch (RuntimeException expected) {
+            }
+        }
+
+        for (final String[] uri : new String[][] {
+            { "foo:/bar/", "foo:/bar", null, null, null },
+            { "foo:bar:/a!/b/", "foo:bar:/a!/b", "bar:/a/", "b", "" },
+            { "foo:bar:/a!/b/", "foo:bar:/a!/b", "bar:/a/", "b/c", "c" },
+        }) {
+            final URI expectedMountPoint = URI.create(uri[0]);
+            final URI mountPoint = URI.create(uri[1]);
+            final URI parentMountPoint = null == uri[2] ? null : URI.create(uri[2]);
+            final String parentPath = uri[3];
+            final String path = uri[4];
+            final FileSystemModel model = new FileSystemModel(mountPoint, new DummyFactory());
+            assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
+            if (null != parentMountPoint) {
+                assertThat(model.getParent(), notNullValue());
+                assertThat(model.getParent().getMountPoint(), equalTo(parentMountPoint));
+                assertThat(model.parentPath(path), equalTo(parentPath));
+            } else {
+                assertThat(model.getParent(), nullValue());
+            }
+            assertThat(model.isTouched(), is(false));
+        }
+    }
+
+    private static class DummyFactory
+    implements FileSystemFactory<FileSystemModel, Entry> {
+
+        @Override
+        public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
+            return new FileSystemModel(mountPoint, this);
+        }
+
+        @Override
+        public FileSystemController<Entry> newController(FileSystemModel model, ComponentFileSystemController<?> parent) {
+            throw new UnsupportedOperationException();
         }
     }
 

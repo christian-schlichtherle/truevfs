@@ -32,8 +32,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 
     private static final long serialVersionUID = 2972350932856838564L;
 
-    private final URI mountPoint;
-    private final String path;
+    private final URI path;
 
     ArchiveEntryNotFoundException(
             final ArchiveModel model,
@@ -42,8 +41,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(msg);
         assert path != null;
         assert msg != null;
-        this.mountPoint = model.getMountPoint();
-        this.path = path;
+        this.path = model.resolveURI(path);
     }
 
     ArchiveEntryNotFoundException(
@@ -53,28 +51,14 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(cause == null ? null : cause.toString());
         assert path != null;
         super.initCause(cause);
-        this.mountPoint = model.getMountPoint();
-        this.path = path;
-    }
-
-    /**
-     * Returns the <em>canonical path</em> of the file system entry which
-     * caused this exception to be created when processing it.
-     * A canonical path is absolute, hierarchical and unique within the
-     * federated name space.
-     *
-     * @return A non-{@code null} URI representing the canonical path of the
-     *         target entry in the federated file system.
-     */
-    private String getCanonicalPath() {
-        return mountPoint.resolve(path).getPath();
+        this.path = model.resolveURI(path);
     }
 
     @Override
     public String getLocalizedMessage() {
         final String msg = getMessage();
         return msg != null
-                ? new StringBuilder(getCanonicalPath()).append(" (").append(msg).append(")").toString()
-                : getCanonicalPath();
+                ? new StringBuilder(path.toString()).append(" (").append(msg).append(")").toString()
+                : path.toString();
     }
 }
