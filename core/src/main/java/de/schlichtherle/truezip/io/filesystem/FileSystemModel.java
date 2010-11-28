@@ -84,10 +84,13 @@ public class FileSystemModel {
                         .normalize();
                 this.parentPath = parentPathURI.getPath();
                 this.parent = factory.newModel(parentMountPoint, null);
-                this.mountPoint = new URI(mountPoint.getScheme(), parentMountPoint.toString() + BANG_SEPARATOR + parentPath, null);
+                this.mountPoint = new URI(mountPoint.getScheme(),
+                        parentMountPoint + BANG_SEPARATOR + parentPath, null);
             } else {
                 mountPoint = mountPoint.normalize();
                 if (null != parent) {
+                    if (null != factory)
+                        throw new IllegalArgumentException();
                     final URI parentPathURI = parent.getMountPoint()
                             .relativize(mountPoint);
                     if (parentPathURI.equals(mountPoint))
