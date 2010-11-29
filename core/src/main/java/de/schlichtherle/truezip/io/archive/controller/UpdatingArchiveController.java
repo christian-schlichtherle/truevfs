@@ -194,8 +194,8 @@ extends FileSystemArchiveController<AE> {
                 throw new IllegalArgumentException("parent/member mismatch!");
             this.parent = parent;
         } else {
-            this.parent = FileFileSystemFactory.INSTANCE.newController(
-                    model.getParent());
+            this.parent = FileFileSystemFactory.INSTANCE
+                    .newController(model.getParent());
         }
     }
 

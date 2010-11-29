@@ -22,14 +22,14 @@ import java.net.URI;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileFileSystemFactory
+public final class FileFileSystemFactory
 implements FileSystemFactory<FileSystemModel, FileEntry> {
 
     /** The default instance. */
     public static final FileFileSystemFactory INSTANCE
             = new FileFileSystemFactory();
 
-    protected FileFileSystemFactory() {
+    private FileFileSystemFactory() {
     }
 
     public FileSystemModel newModel(URI mountPoint) {
