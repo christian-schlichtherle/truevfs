@@ -113,6 +113,7 @@ implements ArchiveController<AE> {
      */
     BasicArchiveController(final ArchiveModel model) {
         assert null != model;
+        assert null != model.getParent();
         this.model = model;
     }
 

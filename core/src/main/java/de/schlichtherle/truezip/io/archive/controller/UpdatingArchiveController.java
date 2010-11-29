@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileFileSystemFactory;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -29,7 +30,6 @@ import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.HostFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -194,7 +194,8 @@ extends FileSystemArchiveController<AE> {
                 throw new IllegalArgumentException("parent/member mismatch!");
             this.parent = parent;
         } else {
-            this.parent = new HostFileSystemController(model.getParent());
+            this.parent = FileFileSystemFactory.INSTANCE.newController(
+                    model.getParent());
         }
     }
 
@@ -298,7 +299,7 @@ extends FileSystemArchiveController<AE> {
             final ComponentFileSystemController<?> parent = getParent();
             final String parentPath = parentPath(ROOT);
             // readOnly must be set first because the parent archive controller
-            // could be a HostFileSystemController and on stinky Windows
+            // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
             // reading!
             final boolean readOnly = !parent.isWritable(parentPath);

@@ -69,20 +69,25 @@ public class FileSystems {
 
     public static <FSM extends FileSystemModel, E extends Entry>
     ComponentFileSystemController<?> getController(URI mountPoint) {
-        return getController(mountPoint, null, null);
+        return getController(mountPoint, null, FileFileSystemFactory.INSTANCE);
     }
 
     /**
      * Returns a file system controller for the given mount point.
      * The returned file system controller will use the given parent file
-     * system controller to mount its file system.
+     * system controller to mount its file system when required.
+     * Mind that the mount point gets normalized and may or may not be
+     * identical to the mount point of the file system model of the returned
+     * file system controller.
      *
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
      *         of the (virtual) file system.
      * @param  parent the nullable file system controller for the parent file
      *         system.
-     * @param  factory the nullable file system factory.
+     * @param  factory the non-{@code null} file system factory which will be
+     *         used to create a file system model and the file system
+     *         controller if required.
      * @return A non-{@code null} file system controller.
      */
     public static <FSM extends FileSystemModel, E extends Entry>
@@ -90,30 +95,33 @@ public class FileSystems {
             URI mountPoint,
             final ComponentFileSystemController<?> parent,
             final FileSystemFactory<FSM, E> factory) {
-        if (null == factory) {
-            if (null != parent)
-                throw new IllegalArgumentException();
-            return new HostFileSystemController(mountPoint);
-        }
         final FSM model = factory.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
         Scheduler scheduler;
         synchronized (schedulers) {
             scheduler = Links.getTarget(schedulers.get(mountPoint));
-            if (null == scheduler)
-                scheduler = new Scheduler(factory.newController(model, parent));
+            if (null == scheduler) {
+                final FileSystemController<E> prospect
+                        = factory.newController(model, parent);
+                if (null == prospect.getParent())
+                    return (ComponentFileSystemController<?>) prospect;
+                scheduler = new Scheduler(prospect);
+            }
         }
         return scheduler.controller;
     }
 
     private static final class Scheduler implements FileSystemListener {
 
-        final ComponentFileSystemController<?> controller;
+        final CompositeFileSystemController controller;
 
         @SuppressWarnings("LeakingThisInConstructor")
         Scheduler(final FileSystemController<?> prospect) {
-            controller = new CompositeFileSystemController(prospect);
+            if (prospect instanceof CompositeFileSystemController)
+                controller = (CompositeFileSystemController) prospect;
+            else
+                controller = new CompositeFileSystemController(prospect);
             controller.getModel().addFileSystemListener(this);
             touchChanged(null); // setup schedule
         }

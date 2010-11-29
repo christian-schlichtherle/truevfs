@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.model;
 
+import de.schlichtherle.truezip.io.filesystem.FileFileSystemFactory;
+import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -31,10 +33,14 @@ public class ArchiveModel extends FileSystemModel {
     private final ReentrantLock writeLock;
 
     public ArchiveModel(final URI mountPoint,
-                        final FileSystemModel parent) {
-        super(mountPoint, null != parent
-                ? parent
-                : new FileSystemModel(mountPoint.resolve("..")));
+                        final FileSystemModel parent,
+                        final FileSystemFactory<?, ?> factory) {
+        super(mountPoint,
+                null != parent
+                    ? parent
+                    : FileFileSystemFactory.INSTANCE.newModel(
+                        mountPoint.resolve("..")),
+                factory);
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
