@@ -64,20 +64,6 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
-                final BitField<SyncOption> options)
-    throws E, FileSystemException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
-        try {
-            getController().sync(builder, options);
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    @Override
     public Icon getOpenIcon()
     throws FileSystemException {
         try {
@@ -356,6 +342,20 @@ extends FilterArchiveController<AE> {
         writeLock().lock();
         try {
             getController().unlink(path);
+        } finally {
+            writeLock().unlock();
+        }
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
+    throws E, FileSystemException {
+        assertNotReadLockedByCurrentThread(null);
+        writeLock().lock();
+        try {
+            getController().sync(builder, options);
         } finally {
             writeLock().unlock();
         }

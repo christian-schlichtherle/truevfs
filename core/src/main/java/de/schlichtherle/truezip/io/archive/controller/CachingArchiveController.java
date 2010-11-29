@@ -77,34 +77,6 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
-                final BitField<SyncOption> options)
-    throws E, FileSystemException {
-        assert getModel().writeLock().isHeldByCurrentThread();
-
-        final boolean flush = options.get(FLUSH_CACHE);
-        if (flush && options.get(ABORT_CHANGES))
-            throw new IllegalArgumentException();
-        for (final EntryCache cache : caches.values()) {
-            try {
-                if (flush)
-                    cache.flush();
-            } catch (IOException ex) {
-                throw builder.fail(new SyncException(getModel(), ex));
-            } finally  {
-                try {
-                    cache.clear();
-                } catch (IOException ex) {
-                    builder.warn(new SyncWarningException(getModel(), ex));
-                }
-            }
-        }
-        caches.clear();
-        getController().sync(builder, options.clear(FLUSH_CACHE));
-    }
-
-    @Override
     public InputSocket<AE> getInputSocket(
             final String path,
             final BitField<InputOption> options) {
@@ -195,6 +167,34 @@ extends FilterArchiveController<AE> {
         final IOCache<AE> cache = caches.remove(path);
         if (null != cache)
             cache.clear();
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+                final BitField<SyncOption> options)
+    throws E, FileSystemException {
+        assert getModel().writeLock().isHeldByCurrentThread();
+
+        final boolean flush = options.get(FLUSH_CACHE);
+        if (flush && options.get(ABORT_CHANGES))
+            throw new IllegalArgumentException();
+        for (final EntryCache cache : caches.values()) {
+            try {
+                if (flush)
+                    cache.flush();
+            } catch (IOException ex) {
+                throw builder.fail(new SyncException(getModel(), ex));
+            } finally  {
+                try {
+                    cache.clear();
+                } catch (IOException ex) {
+                    builder.warn(new SyncWarningException(getModel(), ex));
+                }
+            }
+        }
+        caches.clear();
+        getController().sync(builder, options.clear(FLUSH_CACHE));
     }
 
     private final class EntryCache implements IOCache<AE> {

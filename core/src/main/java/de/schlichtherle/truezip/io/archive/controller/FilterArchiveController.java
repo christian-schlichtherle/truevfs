@@ -70,14 +70,6 @@ implements ArchiveController<AE> {
     }
 
     @Override
-    public <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
-                BitField<SyncOption> options)
-    throws E, FileSystemException {
-        getController().sync(builder, options);
-    }
-
-    @Override
     public Icon getOpenIcon() throws FileSystemException {
         return getController().getOpenIcon();
     }
@@ -146,5 +138,13 @@ implements ArchiveController<AE> {
     @Override
     public void unlink(String path) throws IOException {
         getController().unlink(path);
+    }
+
+    @Override
+    public <E extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+                BitField<SyncOption> options)
+    throws E, FileSystemException {
+        getController().sync(builder, options);
     }
 }

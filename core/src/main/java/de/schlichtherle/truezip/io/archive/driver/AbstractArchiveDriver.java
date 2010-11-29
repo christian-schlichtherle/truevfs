@@ -234,7 +234,7 @@ implements ArchiveDriver<AE>, Serializable {
 
     @Override
     public ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
-        return new ArchiveModel(mountPoint, parent);
+        return new ArchiveModel(mountPoint, parent, null);
     }
 
     @Override

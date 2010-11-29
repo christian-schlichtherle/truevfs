@@ -29,31 +29,27 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 
 /**
- * Note that this class <em>must</em> be immutable because it's instances are
- * used like transient objects.
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class HostFileSystemController
+final class FileFileSystemController
 extends AbstractFileSystemController<FileEntry>
 implements ComponentFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
 
-    public HostFileSystemController(final URI mountPoint) {
+    /*FileFileSystemController(final URI mountPoint) {
         this(new FileSystemModel(mountPoint));
-    }
+    }*/
 
-    public HostFileSystemController(final FileSystemModel model) {
+    FileFileSystemController(final FileSystemModel model) {
         if (!"file".equals(model.getMountPoint().getScheme()))
             throw new IllegalArgumentException();
         if (null != model.getParent())

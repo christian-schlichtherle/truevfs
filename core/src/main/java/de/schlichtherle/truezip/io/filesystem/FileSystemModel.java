@@ -44,21 +44,21 @@ public class FileSystemModel {
     private LinkedHashSet<FileSystemListener> listeners
             = new LinkedHashSet<FileSystemListener>();
 
-    public FileSystemModel(URI mountPoint) {
+    /*FileSystemModel(URI mountPoint) {
         this(mountPoint, null, null);
-    }
+    }*/
 
-    public FileSystemModel( final URI mountPoint,
+    /*protected FileSystemModel( final URI mountPoint,
                             final FileSystemModel parent) {
         this(mountPoint, parent, null);
-    }
+    }*/
 
-    public FileSystemModel( final URI mountPoint,
+    /*public FileSystemModel( final URI mountPoint,
                             final FileSystemFactory<?, ?> factory) {
         this(mountPoint, null, factory);
-    }
+    }*/
 
-    public FileSystemModel( URI mountPoint,
+    protected FileSystemModel( URI mountPoint,
                             final FileSystemModel parent,
                             final FileSystemFactory<?, ?> factory) {
         if (!mountPoint.isAbsolute())
@@ -85,12 +85,13 @@ public class FileSystemModel {
                 this.parentPath = parentPathURI.getPath();
                 this.parent = factory.newModel(parentMountPoint, null);
                 this.mountPoint = new URI(mountPoint.getScheme(),
-                        parentMountPoint + BANG_SEPARATOR + parentPath, null);
+                        parentMountPoint + BANG_SEPARATOR + parentPath,
+                        null);
             } else {
                 mountPoint = mountPoint.normalize();
                 if (null != parent) {
-                    if (null != factory)
-                        throw new IllegalArgumentException();
+                    /*if (null != factory)
+                        throw new IllegalArgumentException();*/
                     final URI parentPathURI = parent.getMountPoint()
                             .relativize(mountPoint);
                     if (parentPathURI.equals(mountPoint))
