@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.entry;
+package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.Files;
 import de.schlichtherle.truezip.util.Pool;

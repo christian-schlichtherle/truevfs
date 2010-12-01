@@ -152,7 +152,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * Registers the given archive {@code id} for the given
      * list of {@code suffixes}.
      * 
-     * @param eager Whether the archive driver shall be instantiated or not.
+     * @param  eager Whether the archive driver shall get instantiated now or
+     *         later.
      * @throws NullPointerException If {@code id} is {@code null}.
      * @throws ClassCastException If {@code eager} is {@code false}
      *         and {@code driver} isn't a string.
@@ -174,7 +175,7 @@ public class ArchiveDriverRegistry implements Serializable {
             else
                 logger.log(Level.WARNING, "noSuffixes"); // NOI18N
         } else {
-            driver = eager ? (Object) newArchiveDriver(driver) : (String) driver; // force cast
+            driver = eager ? newArchiveDriver(driver) : (String) driver; // force cast
             for (String suffix : set)
                 drivers.put(suffix, driver);
         }

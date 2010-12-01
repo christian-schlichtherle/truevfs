@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Pool;
-import de.schlichtherle.truezip.io.entry.TempFilePool;
-import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
+import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.FilterOutputStream;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;

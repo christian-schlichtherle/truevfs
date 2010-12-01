@@ -15,20 +15,17 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.Entry;
 import java.net.URI;
 
 /**
  * @param   <FSM> The type of the file system models.
- * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemFactory< FSM extends FileSystemModel,
-                                    E extends Entry> {
+public interface FileSystemDriver<FSM extends FileSystemModel> {
 
     FSM newModel(URI mountPoint, FileSystemModel parent);
 
-    FileSystemController<E> newController(
+    FileSystemController<?> newController(
             FSM model, ComponentFileSystemController<?> parent);
 }

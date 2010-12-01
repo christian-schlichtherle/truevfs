@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
@@ -69,7 +70,7 @@ public class FileSystems {
 
     public static <FSM extends FileSystemModel, E extends Entry>
     ComponentFileSystemController<?> getController(URI mountPoint) {
-        return getController(mountPoint, null, FileFileSystemFactory.INSTANCE);
+        return getController(mountPoint, null, FileDriver.INSTANCE);
     }
 
     /**
@@ -90,11 +91,11 @@ public class FileSystems {
      *         controller if required.
      * @return A non-{@code null} file system controller.
      */
-    public static <FSM extends FileSystemModel, E extends Entry>
+    public static <FSM extends FileSystemModel>
     ComponentFileSystemController<?> getController(
             URI mountPoint,
             final ComponentFileSystemController<?> parent,
-            final FileSystemFactory<FSM, E> factory) {
+            final FileSystemDriver<FSM> factory) {
         final FSM model = factory.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
@@ -102,7 +103,7 @@ public class FileSystems {
         synchronized (schedulers) {
             scheduler = Links.getTarget(schedulers.get(mountPoint));
             if (null == scheduler) {
-                final FileSystemController<E> prospect
+                final FileSystemController<?> prospect
                         = factory.newController(model, parent);
                 if (null == prospect.getParent())
                     return (ComponentFileSystemController<?>) prospect;

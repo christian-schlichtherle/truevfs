@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemFactory;
+import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.FileNotFoundException;
@@ -58,7 +58,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
-extends FileSystemFactory<ArchiveModel, AE>, EntryFactory<AE> {
+extends FileSystemDriver<ArchiveModel>, EntryFactory<AE> {
 
     /**
      * Creates a new archive controller for the given archive model and

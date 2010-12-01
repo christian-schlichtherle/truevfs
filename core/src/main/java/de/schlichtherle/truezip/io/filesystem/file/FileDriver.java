@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.net.URI;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileFileSystemFactory
-implements FileSystemFactory<FileSystemModel, FileEntry> {
+public final class FileDriver implements FileSystemDriver<FileSystemModel> {
 
     /** The default instance. */
-    public static final FileFileSystemFactory INSTANCE
-            = new FileFileSystemFactory();
+    public static final FileDriver INSTANCE
+            = new FileDriver();
 
-    private FileFileSystemFactory() {
+    private FileDriver() {
     }
 
     public FileSystemModel newModel(URI mountPoint) {
@@ -43,13 +45,13 @@ implements FileSystemFactory<FileSystemModel, FileEntry> {
 
     public ComponentFileSystemController<FileEntry> newController(
             FileSystemModel model) {
-        return new FileFileSystemController(model);
+        return new FileController(model);
     }
 
     @Override
     public FileSystemController<FileEntry> newController(
             FileSystemModel model,
             ComponentFileSystemController<?> parent) {
-        return new FileFileSystemController(model);
+        return new FileController(model);
     }
 }
