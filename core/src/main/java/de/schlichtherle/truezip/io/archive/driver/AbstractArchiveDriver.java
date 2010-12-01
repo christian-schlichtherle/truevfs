@@ -79,8 +79,7 @@ implements ArchiveDriver<AE>, Serializable {
      * @param charset The name of a character set to use by default for all
      *        entry names and probably other meta data when reading or writing
      *        archive files.
-     * @throws NullPointerException If {@code charset} is
-     *         {@code null}.
+     * @throws NullPointerException If {@code charset} is {@code null}.
      * @throws UnsupportedCharsetException If {@code charset} is not
      *         supported by both the JSE 1.1 API and JSE 1.4 API.
      * @throws InconsistentCharsetSupportError If {@code charset} is

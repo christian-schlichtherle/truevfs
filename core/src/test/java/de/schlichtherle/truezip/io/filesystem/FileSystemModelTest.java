@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import java.net.URI;
 import org.junit.Test;
 
@@ -124,7 +124,7 @@ public class FileSystemModelTest {
         }) {
             final URI mountPoint = URI.create(uri[0]);
             try {
-                new FileSystemModel(mountPoint, null, new DummyFactory());
+                new FileSystemModel(mountPoint, null, FileDriver.INSTANCE);
                 fail();
             } catch (RuntimeException expected) {
             }
@@ -140,7 +140,7 @@ public class FileSystemModelTest {
             final URI parentMountPoint = null == uri[2] ? null : URI.create(uri[2]);
             final String parentPath = uri[3];
             final String path = uri[4];
-            final FileSystemModel model = new FileSystemModel(mountPoint, null, new DummyFactory());
+            final FileSystemModel model = new FileSystemModel(mountPoint, null, FileDriver.INSTANCE);
             assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
             if (null != parentMountPoint) {
                 assertThat(model.getParent(), notNullValue());
@@ -150,20 +150,6 @@ public class FileSystemModelTest {
                 assertThat(model.getParent(), nullValue());
             }
             assertThat(model.isTouched(), is(false));
-        }
-    }
-
-    private static class DummyFactory
-    implements FileSystemFactory<FileSystemModel, Entry> {
-
-        @Override
-        public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
-            return new FileSystemModel(mountPoint, null, this);
-        }
-
-        @Override
-        public FileSystemController<Entry> newController(FileSystemModel model, ComponentFileSystemController<?> parent) {
-            throw new UnsupportedOperationException();
         }
     }
 

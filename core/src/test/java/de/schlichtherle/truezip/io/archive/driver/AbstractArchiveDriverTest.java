@@ -48,7 +48,7 @@ public class AbstractArchiveDriverTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        driver = new DummyArchiveDriver();
+        driver = new DummyArchiveDriver("US-ASCII");
     }
 
     @Override
@@ -62,9 +62,9 @@ public class AbstractArchiveDriverTest extends TestCase {
             fail("Expected NullPointerException!");
         } catch (NullPointerException expected) {
         }
-        
+
         try {
-            new DummyArchiveDriver("FooBar");
+            new DummyArchiveDriver("foo");
             fail("Expected RuntimeException!");
         } catch (RuntimeException expected) {
         }
@@ -171,10 +171,6 @@ public class AbstractArchiveDriverTest extends TestCase {
 
         static final Icon ICON = new ImageIcon(
                 DummyArchiveDriver.class.getResource("empty.gif"));
-
-        DummyArchiveDriver() {
-            this("US-ASCII");
-        }
 
         DummyArchiveDriver(final String encoding) {
             super(encoding);

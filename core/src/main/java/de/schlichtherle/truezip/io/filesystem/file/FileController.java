@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.filesystem.file;
 
+import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.entry.FileEntry;
+import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
 import de.schlichtherle.truezip.io.socket.FileOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -38,20 +43,23 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FileFileSystemController
+public final class FileController
 extends AbstractFileSystemController<FileEntry>
 implements ComponentFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
 
-    /*FileFileSystemController(final URI mountPoint) {
+    /*FileController(final URI mountPoint) {
         this(new FileSystemModel(mountPoint));
     }*/
 
-    FileFileSystemController(final FileSystemModel model) {
-        if (!"file".equals(model.getMountPoint().getScheme()))
+    public FileController(final FileSystemModel model) {
+        final URI mountPoint = model.getMountPoint();
+        if (!"file".equals(mountPoint.getScheme()))
             throw new IllegalArgumentException();
+        /*if (!mountPoint.isAbsolute())
+            throw new IllegalArgumentException();*/
         if (null != model.getParent())
             throw new IllegalArgumentException();
         this.model = model;

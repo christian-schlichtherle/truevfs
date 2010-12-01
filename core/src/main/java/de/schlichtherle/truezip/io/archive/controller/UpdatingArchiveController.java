@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileFileSystemFactory;
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -194,7 +194,7 @@ extends FileSystemArchiveController<AE> {
                 throw new IllegalArgumentException("parent/member mismatch!");
             this.parent = parent;
         } else {
-            this.parent = FileFileSystemFactory.INSTANCE
+            this.parent = FileDriver.INSTANCE
                     .newController(model.getParent());
         }
     }

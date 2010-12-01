@@ -48,19 +48,19 @@ public class FileSystemModel {
         this(mountPoint, null, null);
     }*/
 
-    /*protected FileSystemModel( final URI mountPoint,
+    /*public FileSystemModel( final URI mountPoint,
                             final FileSystemModel parent) {
         this(mountPoint, parent, null);
     }*/
 
     /*public FileSystemModel( final URI mountPoint,
-                            final FileSystemFactory<?, ?> factory) {
+                            final FileSystemDriver<?, ?> factory) {
         this(mountPoint, null, factory);
     }*/
 
-    protected FileSystemModel( URI mountPoint,
+    public FileSystemModel( URI mountPoint,
                             final FileSystemModel parent,
-                            final FileSystemFactory<?, ?> factory) {
+                            final FileSystemDriver<?> factory) {
         if (!mountPoint.isAbsolute())
             throw new IllegalArgumentException();
         if (null != mountPoint.getFragment())
