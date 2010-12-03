@@ -17,9 +17,10 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
@@ -148,21 +149,23 @@ public class FileOutputStream extends FilterOutputStream {
     private static OutputStream newOutputStream(    final java.io.File dst,
                                                     final boolean append)
     throws FileNotFoundException {
+        final OutputSocket<?> output = Files.getOutputSocket(dst,
+                BitField.noneOf(OutputOption.class)
+                    .set(APPEND, append)
+                    .set(CREATE_PARENTS, File.isLenient()),
+                null);
         try {
-            return Files.getOutputSocket(dst,
-                    BitField.noneOf(OutputOption.class)
-                        .set(APPEND, append)
-                        .set(CREATE_PARENTS, File.isLenient()),
-                    null).newOutputStream();
+            return output.newOutputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (SyncException ex) {
             throw ex.getCause() instanceof FileBusyException
                     ? (FileBusyException) ex.getCause()
-                    : (FileNotFoundException) new FileNotFoundException(ex.toString()).initCause(ex);
+                    : (FileNotFoundException) new FileNotFoundException(
+                        ex.toString()).initCause(ex);
         } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(ex.toString())
-                    .initCause(ex);
+            throw (FileNotFoundException) new FileNotFoundException(
+                    ex.toString()).initCause(ex);
         }
     }
 }

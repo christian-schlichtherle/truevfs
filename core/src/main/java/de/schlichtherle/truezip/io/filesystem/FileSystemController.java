@@ -33,18 +33,23 @@ import javax.swing.Icon;
  * {@link FileSystemModel#getMountPoint() mount point} of its
  * {@link #getModel() file system model}.
  * <p>
- * All method implementations of this interface must be reentrant on
- * exceptions - so client applications may repeatedly call them.
- * <p>
  * Where the methods of this interface accept a
  * {@link FileSystemEntry#getName path name} string as a parameter, this will
  * be resolved against the
  * {@link FileSystemModel#getMountPoint() mount point} URI of this
- * controller's federated file system.
+ * controller's file system.
  * <p>
- * There is no requirement for an implementation to be thread-safe.
- * However, all implementations should clearly state their level of
+ * All method implementations of this interface must be reentrant on
+ * exceptions - so client applications may repeatedly call them.
+ * However, there is no requirement for an implementation to be thread-safe.
+ * Therefore, all implementations should clearly state their level of
  * thread-safety.
+ * <p>
+ * <b>Warning:</b> You should <em>not</em> implement this interface directly,
+ * but rather extend one of the provided implementation classes instead.
+ * This is required so that future versions of TrueZIP can add more methods to
+ * this interface without breaking binary compatibility to your existing
+ * application!
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle

@@ -43,7 +43,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class FileController
+final class FileController
 extends AbstractFileSystemController<FileEntry>
 implements ComponentFileSystemController<FileEntry> {
 
@@ -58,8 +58,6 @@ implements ComponentFileSystemController<FileEntry> {
         final URI mountPoint = model.getMountPoint();
         if (!"file".equals(mountPoint.getScheme()))
             throw new IllegalArgumentException();
-        /*if (!mountPoint.isAbsolute())
-            throw new IllegalArgumentException();*/
         if (null != model.getParent())
             throw new IllegalArgumentException();
         this.model = model;

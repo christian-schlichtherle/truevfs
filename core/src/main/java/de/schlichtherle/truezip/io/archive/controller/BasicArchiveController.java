@@ -264,10 +264,10 @@ implements ArchiveController<AE> {
                 if (null == link) {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
-                    link = autoMount(!isRoot(path) && options.get(CREATE_PARENTS),
-                                     options)
-                            .mknod( path, FILE,
-                                    options.get(CREATE_PARENTS), template);
+                    link = autoMount(   !isRoot(path)
+                                        && options.get(CREATE_PARENTS), options)
+                            .mknod( path, FILE, options.get(CREATE_PARENTS),
+                                    template);
                 }
                 return link.getTarget().getTarget();
             }

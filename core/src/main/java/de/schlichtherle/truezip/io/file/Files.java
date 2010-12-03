@@ -15,23 +15,26 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.FileSystems;
-import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
+import de.schlichtherle.truezip.io.filesystem.FileSystems;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 
 import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.Files.contains;
 
@@ -210,13 +213,13 @@ class Files {
             final java.io.File src,
             final java.io.File dst)
     throws IOException {
+        final InputSocket<?> input = getInputSocket(src,
+                BitField.noneOf(InputOption.class));
+        final OutputSocket<?> output = getOutputSocket(dst,
+                BitField.noneOf(OutputOption.class)
+                    .set(CREATE_PARENTS, File.isLenient()),
+                preserve ? input.getLocalTarget() : null);
         try {
-            final InputSocket<?> input = getInputSocket(src,
-                    BitField.noneOf(InputOption.class));
-            final Entry template = preserve ? input.getLocalTarget() : null;
-            final OutputSocket<?> output = getOutputSocket(dst,
-                    BitField.noneOf(OutputOption.class).set(CREATE_PARENTS, File.isLenient()),
-                    template);
             IOSocket.copy(input, output);
         } catch (FileNotFoundException ex) {
             throw ex;
@@ -236,10 +239,7 @@ class Files {
 
     static InputSocket<?> getInputSocket(
             final java.io.File src,
-            final BitField<InputOption> options)
-    throws IOException {
-        assert src != null;
-
+            final BitField<InputOption> options) {
         if (src instanceof File) {
             final File file = (File) src;
             final File archive = file.getInnerArchive();
@@ -247,17 +247,18 @@ class Files {
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName(), options);
         }
-        return FileSystems.getController(src.toURI())
+        // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        return FileSystems
+                .getController( FileDriver.INSTANCE,
+                                URI.create( src.toURI().toString()
+                                            + SEPARATOR_CHAR))
                 .getInputSocket(ROOT, options);
     }
 
     static OutputSocket<?> getOutputSocket(
             final java.io.File dst,
             final BitField<OutputOption> options,
-            final Entry template)
-    throws IOException {
-        assert dst != null;
-
+            final Entry template) {
         if (dst instanceof File) {
             final File file = (File) dst;
             final File archive = file.getInnerArchive();
@@ -266,7 +267,11 @@ class Files {
                         .getOutputSocket(   file.getInnerEntryName(),
                                             options, template);
         }
-        return FileSystems.getController(dst.toURI())
+        // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        return FileSystems
+                .getController( FileDriver.INSTANCE,
+                                URI.create( dst.toURI().toString()
+                                            + SEPARATOR_CHAR))
                 .getOutputSocket(ROOT, options, template);
     }
 

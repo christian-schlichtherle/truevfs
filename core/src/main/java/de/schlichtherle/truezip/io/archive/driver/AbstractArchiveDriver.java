@@ -233,7 +233,7 @@ implements ArchiveDriver<AE>, Serializable {
 
     @Override
     public ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
-        return new ArchiveModel(mountPoint, parent, null);
+        return new ArchiveModel(mountPoint, parent);
     }
 
     @Override
@@ -243,7 +243,7 @@ implements ArchiveDriver<AE>, Serializable {
         return new ConcurrentArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                            model, parent, this)));
+                            this, model, parent)));
     }
 
     /**

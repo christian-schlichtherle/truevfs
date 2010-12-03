@@ -183,19 +183,21 @@ extends FileSystemArchiveController<AE> {
             = new Listener();
 
     public UpdatingArchiveController(
+            final ArchiveDriver<AE> driver,
             final ArchiveModel model,
-            final ComponentFileSystemController<?> parent,
-            final ArchiveDriver<AE> driver) {
+            final ComponentFileSystemController<?> parent) {
         super(model);
-        assert null != driver;
+        assert null != model.getParent();
+        if (null == driver)
+            throw new IllegalArgumentException();
         this.driver = driver;
         if (null != parent) {
-            if (model.getParent() != parent.getModel())
-                throw new IllegalArgumentException("parent/member mismatch!");
+            if (parent.getModel() != model.getParent())
+                throw new IllegalArgumentException("parent/member mismatch");
             this.parent = parent;
         } else {
-            this.parent = FileDriver.INSTANCE
-                    .newController(model.getParent());
+            // FIXME: Replace FileDriver.INSTANCE with a service locator!
+            this.parent = FileDriver.INSTANCE.newController(model.getParent());
         }
     }
 
@@ -371,9 +373,11 @@ extends FileSystemArchiveController<AE> {
                 || null == (entry = fileSystem.getEntry(path)))
             return false;
         String n = null;
-        if (null != output && null != output.getEntry(n = entry.getTarget().getName()))
+        if (null != output && null != output.getEntry(
+                n = entry.getTarget().getName()))
             return sync();
-        if (null != input && null != input.getEntry(null != n ? n : (n = entry.getTarget().getName())))
+        if (null != input && null != input.getEntry(
+                null != n ? n : (n = entry.getTarget().getName())))
             return false;
         if (READ == intention)
             return sync();

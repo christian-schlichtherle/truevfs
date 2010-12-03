@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
-import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
@@ -24,6 +22,7 @@ import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -32,6 +31,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import static de.schlichtherle.truezip.io.filesystem.FileSystemModel.BANG_SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
@@ -42,7 +42,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
  * Provides static utility methods for {@link ComponentFileSystemController}s.
- * This class cannot get instantiated outside its package.
+ * This class cannot get instantiated.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -68,9 +68,15 @@ public class FileSystems {
     private FileSystems() {
     }
 
-    public static <FSM extends FileSystemModel, E extends Entry>
-    ComponentFileSystemController<?> getController(URI mountPoint) {
-        return getController(mountPoint, null, FileDriver.INSTANCE);
+    /**
+     * Equivalent to
+     * {@link #getController(FileSystemDriver, URI, ComponentFileSystemController) getController(driver, mountPoint, null)}.
+     */
+    public static <FSM extends FileSystemModel>
+    ComponentFileSystemController<?> getController(
+            FileSystemDriver<FSM> driver,
+            URI mountPoint) {
+        return getController(driver, mountPoint, null);
     }
 
     /**
@@ -81,22 +87,39 @@ public class FileSystems {
      * identical to the mount point of the file system model of the returned
      * file system controller.
      *
+     * @param  driver the non-{@code null} file system driver which will be
+     *         used to create the file system model and the file system
+     *         controller.
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
-     *         of the (virtual) file system.
+     *         of the (federated) file system.
      * @param  parent the nullable file system controller for the parent file
      *         system.
-     * @param  factory the non-{@code null} file system factory which will be
-     *         used to create a file system model and the file system
-     *         controller if required.
-     * @return A non-{@code null} file system controller.
+     * @return A non-{@code null} component file system controller.
      */
     public static <FSM extends FileSystemModel>
     ComponentFileSystemController<?> getController(
+            final FileSystemDriver<FSM> driver,
             URI mountPoint,
-            final ComponentFileSystemController<?> parent,
-            final FileSystemDriver<FSM> factory) {
-        final FSM model = factory.newModel(mountPoint,
+            ComponentFileSystemController<?> parent) {
+        if (null == parent && mountPoint.isOpaque()) {
+            try {
+                String ssp = mountPoint.getSchemeSpecificPart();
+                if (!ssp.endsWith(BANG_SEPARATOR))
+                    throw new URISyntaxException(   mountPoint.toString(),
+                                                    "Doesn't end with the bang separator \""
+                                                    + BANG_SEPARATOR + '"');
+                final int split = ssp.lastIndexOf(SEPARATOR_CHAR, ssp.length() - 2);
+                if (0 > split)
+                    throw new URISyntaxException(   mountPoint.toString(),
+                                                    "Missing separator '"
+                                                    + SEPARATOR_CHAR + "'");
+                parent = getController(driver,new URI(ssp.substring(0, split + 1)), null);
+            } catch (URISyntaxException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+        }
+        final FSM model = driver.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
         Scheduler scheduler;
@@ -104,7 +127,7 @@ public class FileSystems {
             scheduler = Links.getTarget(schedulers.get(mountPoint));
             if (null == scheduler) {
                 final FileSystemController<?> prospect
-                        = factory.newController(model, parent);
+                        = driver.newController(model, parent);
                 if (null == prospect.getParent())
                     return (ComponentFileSystemController<?>) prospect;
                 scheduler = new Scheduler(prospect);
@@ -360,7 +383,8 @@ public class FileSystems {
                     try {
                         sync(   null,
                                 new SyncExceptionBuilder(),
-                                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                                BitField.of(    FORCE_CLOSE_INPUT,
+                                                FORCE_CLOSE_OUTPUT));
                     } catch (IOException ouch) {
                         // Logging doesn't work in a shutdown hook!
                         ouch.printStackTrace();

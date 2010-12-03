@@ -54,7 +54,7 @@ implements ComponentFileSystemController<Entry> {
 
     CompositeFileSystemController(final FileSystemController<?> prospect) {
         if (null == prospect.getParent())
-            throw new IllegalArgumentException();
+            throw new NullPointerException();
         if (prospect instanceof ComponentFileSystemController<?>)
             throw new IllegalArgumentException();
         this.prospect = prospect;
