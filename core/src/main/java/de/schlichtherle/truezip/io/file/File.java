@@ -55,6 +55,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTP
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
@@ -710,7 +711,7 @@ public class File extends java.io.File {
                 this.innerArchive = this.enclArchive = innerArchive;
                 this.enclEntryName
                         = path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                        .replace(separatorChar, ArchiveEntry.SEPARATOR_CHAR);
+                        .replace(separatorChar, SEPARATOR_CHAR);
             }
         } else {
             this.detector = detector;
@@ -722,9 +723,9 @@ public class File extends java.io.File {
     private void initController() {
         final java.io.File target = getRealFile(delegate);
         this.controller = FileSystems.getController(
-                target.toURI(),
-                null == enclArchive ? null : enclArchive.getController(),
-                detector.getArchiveDriver(target.getPath()));
+                detector.getArchiveDriver(target.getPath()),
+                URI.create(target.toURI().toString() + SEPARATOR_CHAR),
+                null == enclArchive ? null : enclArchive.getController());
     }
 
     /**

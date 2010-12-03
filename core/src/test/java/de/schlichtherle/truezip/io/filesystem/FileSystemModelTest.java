@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import java.net.URI;
 import org.junit.Test;
 
@@ -31,9 +30,9 @@ public class FileSystemModelTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructor() {
+    public void testConstructorWithNull() {
         try {
-            new FileSystemModel(null, null, null);
+            new FileSystemModel(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -41,27 +40,29 @@ public class FileSystemModelTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testMountPointConstructor() {
+    public void testConstructorWithMountPoint() {
         for (final String uri : new String[] {
+            "foo",
             "foo:bar",
+            "foo:bar:/",
             "/bar",
         }) {
             final URI mountPoint = URI.create(uri);
             try {
-                new FileSystemModel(mountPoint, null, null);
+                new FileSystemModel(mountPoint, null);
                 fail();
             } catch (RuntimeException expected) {
             }
         }
 
-        final URI expectedMountPoint = URI.create("foo:/bar/");
-        for (final String uri : new String[] {
-            "foo:/bar",
-            "foo:/bar/",
-            "foo:/bar//",
+        for (final String[] params : new String[][] {
+            { "foo:/bar/", "foo:/bar/" },
+            { "foo:/bar/", "foo:/bar/" },
+            { "foo:/bar/", "foo:/bar//" },
         }) {
-            final URI mountPoint = URI.create(uri);
-            final FileSystemModel model = new FileSystemModel(mountPoint, null, null);
+            final URI expectedMountPoint = URI.create(params[0]);
+            final URI mountPoint = URI.create(params[1]);
+            final FileSystemModel model = new FileSystemModel(mountPoint, null);
             assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
             assertThat(model.getParent(), nullValue());
             try {
@@ -75,87 +76,56 @@ public class FileSystemModelTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testMountPointAndParentConstructor() {
-        for (final String[] uri : new String[][] {
+    public void testConstructorWithMountPointAndParent() {
+        for (final String[] params : new String[][] {
             { "foo:bar", "foo:/" },
-            { "/bar", "/" },
-            { "foo:/bar", "foo:/baz" },
+            { "foo:/bar", "foo:/baz/" },
             { "foo:/bar/", "foo:/baz/" },
-            { "foo:bar:/a!/b", "bar:/a" },
+            { "foo:/baz/bang", "foo:/baz/" },
+            { "jar:file:/lib.jar", "file:/" },
+            { "jar:file:/lib.jar!", "file:/" },
+            { "jar:file:/lib.jar!/entry", "file:/" },
         }) {
-            final URI mountPoint = URI.create(uri[0]);
-            final URI parentMountPoint = URI.create(uri[1]);
+            final URI mountPoint = URI.create(params[0]);
+            final URI parentMountPoint = URI.create(params[1]);
+            final FileSystemModel parent = new FileSystemModel(parentMountPoint, null);
             try {
-                new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint, null, null), null);
+                new FileSystemModel(mountPoint, parent);
                 fail();
             } catch (RuntimeException expected) {
             }
         }
 
-        for (final String[] uri : new String[][] {
-            { "foo:/bar/", "foo:/bar", "foo:/", "bar", "" },
-            { "foo:/bar/", "foo:/bar/", "foo:/", "bar", "" },
-            { "foo:/bar/", "foo:/bar//", "foo:/", "bar", "" },
-            { "foo:/bar/", "foo:/bar//", "foo:/", "bar/baz", "baz" },
-            { "foo:/bar/", "foo:/bar//", "foo:/", "bar/baz/", "baz/" },
+        for (final String[] params : new String[][] {
+            { "foo:bar:/baz/a!/", "foo:bar:/baz/a!/", "bar:/baz/", "bar:/baz/", "a", "" },
+            { "foo:bar:/baz/a!/", "foo:bar:/baz/a!/", "bar:/baz/", "bar:/baz/", "a/b", "b" },
+            { "foo:bar:/baz/a!/", "foo:bar:/baz/a!/", "bar:/baz/", "bar:/baz/", "a/b/", "b/" },
+            { "foo:bar:/baz/a!/", "foo:bar:/baz/a!/", "bar:/baz/", "bar:/baz//", "a/b//", "b//" },
+            { "bar:/baz/a/", "bar:/baz/a/", "bar:/baz/", "bar:/baz/", "a", "" },
+            { "bar:/baz/a/", "bar:/baz/a/", "bar:/baz/", "bar:/baz/", "a/b", "b" },
+            { "bar:/baz/a/", "bar:/baz//a/", "bar:/baz/", "bar:/baz/", "a/b/", "b/" },
+            { "bar:/baz/a/", "bar:/baz//a//", "bar:/baz/", "bar:/baz//", "a/b//", "b//" },
         }) {
-            final URI expectedMountPoint = URI.create(uri[0]);
-            final URI mountPoint = URI.create(uri[1]);
-            final URI parentMountPoint = URI.create(uri[2]);
-            final String parentPath = uri[3];
-            final String path = uri[4];
+            final URI expectedMountPoint = URI.create(params[0]);
+            final URI mountPoint = URI.create(params[1]);
+            final URI expectedParentMountPoint = URI.create(params[2]);
+            final URI parentMountPoint = URI.create(params[3]);
+            final String parentPath = params[4];
+            final String path = params[5];
+            final FileSystemModel parent = new FileSystemModel(parentMountPoint, null);
+            final FileSystemModel model = new FileSystemModel(mountPoint, parent);
 
-            final FileSystemModel model = new FileSystemModel(mountPoint, new FileSystemModel(parentMountPoint, null, null), null);
+            assertThat(parent.getMountPoint(), equalTo(expectedParentMountPoint));
             assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
-            assertThat(model.getParent(), notNullValue());
-            assertThat(model.getParent().getMountPoint(), equalTo(parentMountPoint));
+            assertThat(model.getParent(), sameInstance(parent));
             assertThat(model.parentPath(path), equalTo(parentPath));
             assertThat(model.isTouched(), is(false));
         }
     }
 
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testMountPointAndFactoryConstructor() {
-        for (final String[] uri : new String[][] {
-            { "/bar" },
-            { "foo:bar" },
-            { "foo:bar:a!/b" },
-        }) {
-            final URI mountPoint = URI.create(uri[0]);
-            try {
-                new FileSystemModel(mountPoint, null, FileDriver.INSTANCE);
-                fail();
-            } catch (RuntimeException expected) {
-            }
-        }
-
-        for (final String[] uri : new String[][] {
-            { "foo:/bar/", "foo:/bar", null, null, null },
-            { "foo:bar:/a!/b/", "foo:bar:/a!/b", "bar:/a/", "b", "" },
-            { "foo:bar:/a!/b/", "foo:bar:/a!/b", "bar:/a/", "b/c", "c" },
-        }) {
-            final URI expectedMountPoint = URI.create(uri[0]);
-            final URI mountPoint = URI.create(uri[1]);
-            final URI parentMountPoint = null == uri[2] ? null : URI.create(uri[2]);
-            final String parentPath = uri[3];
-            final String path = uri[4];
-            final FileSystemModel model = new FileSystemModel(mountPoint, null, FileDriver.INSTANCE);
-            assertThat(model.getMountPoint(), equalTo(expectedMountPoint));
-            if (null != parentMountPoint) {
-                assertThat(model.getParent(), notNullValue());
-                assertThat(model.getParent().getMountPoint(), equalTo(parentMountPoint));
-                assertThat(model.parentPath(path), equalTo(parentPath));
-            } else {
-                assertThat(model.getParent(), nullValue());
-            }
-            assertThat(model.isTouched(), is(false));
-        }
-    }
-
-    @Test
     public void testAddRemoveFileSystemListeners() {
-        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar"), null, null);
+        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar/"), null);
 
         try {
             model.addFileSystemListener(null);
@@ -192,7 +162,7 @@ public class FileSystemModelTest {
 
     @Test
     public void testNotifyFileSystemListeners() {
-        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar"), null, null);
+        final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar/"), null);
         final Listener listener1 = new Listener(model);
         final Listener listener2 = new Listener(model);
 

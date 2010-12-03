@@ -26,7 +26,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
- * Defines the common properties of any file system.
+ * Defines the common properties of a file system.
  * <p>
  * This class is <em>not</em> thread-safe!
  * Multithreading needs to be addressed by client classes.
@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 public class FileSystemModel {
-    private static final String BANG_SEPARATOR = "!" + SEPARATOR;
+    static final String BANG_SEPARATOR = "!" + SEPARATOR;
 
     private final URI mountPoint;
     private final FileSystemModel parent;
@@ -44,73 +44,60 @@ public class FileSystemModel {
     private LinkedHashSet<FileSystemListener> listeners
             = new LinkedHashSet<FileSystemListener>();
 
-    /*FileSystemModel(URI mountPoint) {
-        this(mountPoint, null, null);
-    }*/
-
-    /*public FileSystemModel( final URI mountPoint,
-                            final FileSystemModel parent) {
-        this(mountPoint, parent, null);
-    }*/
-
-    /*public FileSystemModel( final URI mountPoint,
-                            final FileSystemDriver<?, ?> factory) {
-        this(mountPoint, null, factory);
-    }*/
-
     public FileSystemModel( URI mountPoint,
-                            final FileSystemModel parent,
-                            final FileSystemDriver<?> factory) {
+                            final FileSystemModel parent) {
         if (!mountPoint.isAbsolute())
             throw new IllegalArgumentException();
-        if (null != mountPoint.getFragment())
+        if (!mountPoint.getRawSchemeSpecificPart().endsWith(SEPARATOR))
+            throw new IllegalArgumentException();
+        if (null != mountPoint.getRawFragment())
             throw new IllegalArgumentException();
         try {
-            if (!mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR))
-                mountPoint = new URI(   mountPoint.getScheme(),
-                                        mountPoint.getSchemeSpecificPart()
-                                            + SEPARATOR_CHAR,
-                                        null);
             if (mountPoint.isOpaque()) {
-                if (null != parent)
-                    throw new IllegalArgumentException();
+                if (null == parent)
+                    throw new NullPointerException("Missing parent!");
                 final String ssp = mountPoint.getSchemeSpecificPart();
-                final int i = ssp.lastIndexOf(BANG_SEPARATOR);
-                if (0 >= i)
-                    throw new IllegalArgumentException();
-                final URI parentMountPoint = new URI(ssp.substring(0, i))
-                        .normalize();
-                final URI parentPathURI = new URI(ssp.substring(i + 2))
-                        .normalize();
-                this.parentPath = parentPathURI.getPath();
-                this.parent = factory.newModel(parentMountPoint, null);
-                this.mountPoint = new URI(mountPoint.getScheme(),
-                        parentMountPoint + BANG_SEPARATOR + parentPath,
-                        null);
+                if (!ssp.endsWith(BANG_SEPARATOR))
+                    throw new URISyntaxException(   mountPoint.toString(),
+                                                    "Doesn't end with the bang separator \""
+                                                    + BANG_SEPARATOR + '"');
+                final String pmp = parent.getMountPoint().toString();
+                if (!ssp.startsWith(pmp))
+                    throw new URISyntaxException(   mountPoint.toString(),
+                                                    "Parent/member mismatch");
+                this.parentPath = ssp.substring(pmp.length(), ssp.length() - 2)
+                        + SEPARATOR_CHAR;
             } else {
+                if (null != mountPoint.getRawQuery())
+                    throw new IllegalArgumentException();
                 mountPoint = mountPoint.normalize();
                 if (null != parent) {
-                    /*if (null != factory)
-                        throw new IllegalArgumentException();*/
-                    final URI parentPathURI = parent.getMountPoint()
-                            .relativize(mountPoint);
-                    if (parentPathURI.equals(mountPoint))
-                        throw new IllegalArgumentException("parent/member mismatch");
-                    assert null == parentPathURI.getScheme();
-                    this.parentPath = parentPathURI.getPath();
+                    final URI pp = parent.getMountPoint().relativize(mountPoint);
+                    if (pp.equals(mountPoint))
+                        throw new URISyntaxException(   mountPoint.toString(),
+                                                        "Parent/member mismatch");
+                    assert null == pp.getScheme();
+                    this.parentPath = pp.getPath();
                 } else {
                     this.parentPath = null;
                 }
-                this.parent = parent;
-                this.mountPoint = mountPoint;
             }
+            if (null != this.parentPath
+                    && (this.parentPath.startsWith(".." + SEPARATOR)
+                        || this.parentPath.equals("..")))
+                throw new URISyntaxException(   mountPoint.toString(),
+                                                "Illegal parent path");
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
+        this.parent = parent;
+        this.mountPoint = mountPoint;
 
+        assert this.mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR);
         assert (null == this.parent && null == this.parentPath)
                 ^ (null != this.parent && this.parentPath.endsWith(SEPARATOR));
-        assert this.mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR);
+        assert null == this.parentPath
+                || !this.parentPath.startsWith(".." + SEPARATOR);
     }
 
     /**

@@ -27,7 +27,7 @@ import java.net.URI;
  */
 public final class FileDriver implements FileSystemDriver<FileSystemModel> {
 
-    /** The default instance. */
+    /** The default instance. FIXME: Remove this! */
     public static final FileDriver INSTANCE
             = new FileDriver();
 
@@ -35,12 +35,7 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
     }
 
     public FileSystemModel newModel(URI mountPoint) {
-        return new FileSystemModel(mountPoint, null, this);
-    }
-
-    @Override
-    public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
-        return new FileSystemModel(mountPoint, parent, this);
+        return new FileSystemModel(mountPoint, null);
     }
 
     public ComponentFileSystemController<FileEntry> newController(
@@ -49,9 +44,18 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
     }
 
     @Override
+    public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
+        if (null != parent)
+            throw new IllegalArgumentException();
+        return new FileSystemModel(mountPoint, null);
+    }
+
+    @Override
     public FileSystemController<FileEntry> newController(
             FileSystemModel model,
             ComponentFileSystemController<?> parent) {
+        if (null != parent)
+            throw new IllegalArgumentException();
         return new FileController(model);
     }
 }

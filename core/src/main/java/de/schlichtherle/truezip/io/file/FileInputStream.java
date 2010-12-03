@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.FilterInputStream;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
@@ -114,18 +115,20 @@ public class FileInputStream extends FilterInputStream {
 
     private static InputStream newInputStream(final java.io.File src)
     throws FileNotFoundException {
+        final InputSocket<?> input = Files.getInputSocket(src,
+                    BitField.noneOf(InputOption.class));
         try {
-            return Files.getInputSocket(src,
-                    BitField.noneOf(InputOption.class))
-                    .newInputStream();
+            return input.newInputStream();
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (SyncException ex) {
             throw ex.getCause() instanceof FileBusyException
                     ? (FileBusyException) ex.getCause()
-                    : (FileNotFoundException) new FileNotFoundException(ex.toString()).initCause(ex);
+                    : (FileNotFoundException) new FileNotFoundException(
+                        ex.toString()).initCause(ex);
         } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(ex.toString()).initCause(ex);
+            throw (FileNotFoundException) new FileNotFoundException(
+                    ex.toString()).initCause(ex);
         }
     }
 }
