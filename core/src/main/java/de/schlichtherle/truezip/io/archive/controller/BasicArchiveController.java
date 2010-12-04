@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -27,14 +29,13 @@ import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
-import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
@@ -400,5 +401,5 @@ implements ArchiveController<AE> {
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws FileSystemException;
+    throws SyncException, FileSystemException;
 }

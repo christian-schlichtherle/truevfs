@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**
@@ -27,7 +28,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class SyncException extends FileSystemException {
+public class SyncException extends ChainableIOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
@@ -42,10 +43,16 @@ public class SyncException extends FileSystemException {
     }
 
     public SyncException(FileSystemModel model, IOException cause) {
-        super(model, cause);
+        super(model.getMountPoint().toString(), cause);
     }
 
     SyncException(FileSystemModel model, IOException cause, int priority) {
-        super(model, cause, priority);
+        super(model.getMountPoint().toString(), cause, priority);
+    }
+
+    /** Returns the nullable cause of this exception. */
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
     }
 }

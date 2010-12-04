@@ -27,7 +27,7 @@ import java.util.Arrays;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystems;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -415,7 +415,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient ComponentFileSystemController<?> controller;
+    private transient FederatedFileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -837,7 +837,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller initialization has been deferred until now in
-            // order to provide the ComponentFileSystemController with an otherwise fully
+            // order to provide the FederatedFileSystemController with an otherwise fully
             // initialized object.
             initController();
         }
@@ -949,7 +949,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller init has been deferred until now in
-            // order to provide the ComponentFileSystemController with a fully
+            // order to provide the FederatedFileSystemController with a fully
             // initialized object.
             initController();
         }
@@ -1832,7 +1832,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final ComponentFileSystemController<?> getController() {
+    final FederatedFileSystemController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

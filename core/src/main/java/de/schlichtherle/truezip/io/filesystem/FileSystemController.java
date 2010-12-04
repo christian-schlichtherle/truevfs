@@ -28,9 +28,9 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * A file system controller provides read/write access to a federation of one
- * or more file systems which is addressed by the
- * {@link FileSystemModel#getMountPoint() mount point} of its
+ * A file system controller provides read/write access to a file system.
+ * The file system is addressed by the
+ * {@link FileSystemModel#getMountPoint() mount point} of the
  * {@link #getModel() file system model}.
  * <p>
  * Where the methods of this interface accept a
@@ -65,20 +65,20 @@ public interface FileSystemController<E extends Entry> {
      * only if this file system is not federated, i.e. if it's not a member of
      * another file system.
      */
-    ComponentFileSystemController<?> getParent();
+    FederatedFileSystemController<?> getParent();
 
-    Icon getOpenIcon() throws IOException;
+    Icon getOpenIcon() throws FileSystemException;
 
-    Icon getClosedIcon() throws IOException;
+    Icon getClosedIcon() throws FileSystemException;
 
-    boolean isReadOnly() throws IOException;
+    boolean isReadOnly() throws FileSystemException;
 
     FileSystemEntry<? extends E> getEntry(String path)
-    throws IOException;
+    throws FileSystemException;
 
-    boolean isReadable(String path) throws IOException;
+    boolean isReadable(String path) throws FileSystemException;
 
-    boolean isWritable(String path) throws IOException;
+    boolean isWritable(String path) throws FileSystemException;
 
     void setReadOnly(String path) throws IOException;
 
@@ -157,5 +157,5 @@ public interface FileSystemController<E extends Entry> {
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws IOException;
+    throws E, FileSystemException;
 }

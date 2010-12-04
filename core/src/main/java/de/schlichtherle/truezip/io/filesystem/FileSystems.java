@@ -40,7 +40,7 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * Provides static utility methods for {@link ComponentFileSystemController}s.
+ * Provides static utility methods for {@link FederatedFileSystemController}s.
  * This class cannot get instantiated.
  *
  * @author Christian Schlichtherle
@@ -65,15 +65,15 @@ public class FileSystems {
     private static final Map<URI, Link<Scheduler>> schedulers
             = new WeakHashMap<URI, Link<Scheduler>>();
 
-    private FileSystems() {
+    public FileSystems() {
     }
 
     /**
      * Equivalent to
-     * {@link #getController(FileSystemDriver, URI, ComponentFileSystemController) getController(driver, mountPoint, null)}.
+     * {@link #getController(FileSystemDriver, URI, FederatedFileSystemController) getController(driver, mountPoint, null)}.
      */
     public static <FSM extends FileSystemModel>
-    ComponentFileSystemController<?> getController(
+    FederatedFileSystemController<?> getController(
             FileSystemDriver<FSM> driver,
             URI mountPoint) {
         return getController(driver, mountPoint, null);
@@ -98,10 +98,10 @@ public class FileSystems {
      * @return A non-{@code null} component file system controller.
      */
     public static <FSM extends FileSystemModel>
-    ComponentFileSystemController<?> getController(
+    FederatedFileSystemController<?> getController(
             final FileSystemDriver<FSM> driver,
             URI mountPoint,
-            ComponentFileSystemController<?> parent) {
+            FederatedFileSystemController<?> parent) {
         if (null == parent && mountPoint.isOpaque()) {
             try {
                 String ssp = mountPoint.getSchemeSpecificPart();
@@ -129,7 +129,7 @@ public class FileSystems {
                 final FileSystemController<?> prospect
                         = driver.newController(model, parent);
                 if (null == prospect.getParent())
-                    return (ComponentFileSystemController<?>) prospect;
+                    return (FederatedFileSystemController<?>) prospect;
                 scheduler = new Scheduler(prospect);
             }
         }
@@ -213,7 +213,7 @@ public class FileSystems {
             // controller.
             // This ensures that an archive file system will always be synced
             // before its parent archive file system.
-            for (final ComponentFileSystemController<?> controller
+            for (final FederatedFileSystemController<?> controller
                     : getControllers(prefix, REVERSE_CONTROLLERS)) {
                 try {
                     // Upon return, some new ArchiveWarningException's may
@@ -236,22 +236,22 @@ public class FileSystems {
         }
     }
 
-    static Set<ComponentFileSystemController<?>> getControllers() {
+    static Set<FederatedFileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<ComponentFileSystemController<?>> getControllers(
+    static Set<FederatedFileSystemController<?>> getControllers(
             URI prefix,
-            final Comparator<? super ComponentFileSystemController<?>> comparator) {
+            final Comparator<? super FederatedFileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
         else
             prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
-        final Set<ComponentFileSystemController<?>> snapshot;
+        final Set<FederatedFileSystemController<?>> snapshot;
         synchronized (schedulers) {
             snapshot = null != comparator
-                    ? new TreeSet<ComponentFileSystemController<?>>(comparator)
-                    : new HashSet<ComponentFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
+                    ? new TreeSet<FederatedFileSystemController<?>>(comparator)
+                    : new HashSet<FederatedFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
             for (final Link<Scheduler> link : schedulers.values()) {
                 final Scheduler scheduler = Links.getTarget(link);
                 final CompositeFileSystemController controller

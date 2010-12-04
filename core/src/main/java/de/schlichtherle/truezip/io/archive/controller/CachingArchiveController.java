@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -172,7 +173,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws IOException {
+    throws E, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (0 < caches.size()) {

@@ -99,7 +99,7 @@ public final class FileSystemStatistics {
      */
     public int getFileSystemsTouched() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : FileSystems.getControllers())
+        for (FederatedFileSystemController<?> controller : FileSystems.getControllers())
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -110,7 +110,7 @@ public final class FileSystemStatistics {
      */
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : FileSystems.getControllers())
+        for (FederatedFileSystemController<?> controller : FileSystems.getControllers())
             if (null == controller.getModel().getParent())
                 result++;
         return result;
@@ -126,7 +126,7 @@ public final class FileSystemStatistics {
      */
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (ComponentFileSystemController<?> controller : FileSystems.getControllers()) {
+        for (FederatedFileSystemController<?> controller : FileSystems.getControllers()) {
             final FileSystemModel model = controller.getModel();
             if (null == model.getParent() && model.isTouched())
                 result++;

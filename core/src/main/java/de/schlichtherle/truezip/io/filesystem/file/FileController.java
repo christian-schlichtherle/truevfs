@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
  */
 final class FileController
 extends AbstractFileSystemController<FileEntry>
-implements ComponentFileSystemController<FileEntry> {
+implements FederatedFileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
@@ -70,7 +70,7 @@ implements ComponentFileSystemController<FileEntry> {
     }
 
     @Override
-    public ComponentFileSystemController<?> getParent() {
+    public FederatedFileSystemController<?> getParent() {
         return null;
     }
 
