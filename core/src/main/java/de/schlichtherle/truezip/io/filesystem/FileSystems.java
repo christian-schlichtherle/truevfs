@@ -35,7 +35,6 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemModel.BANG_SEPARA
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -202,7 +201,6 @@ public class FileSystems {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-        options = options.set(FLUSH_CACHE);
 
         // Reset statistics if it hasn't happened yet.
         CountingReadOnlyFile.init();

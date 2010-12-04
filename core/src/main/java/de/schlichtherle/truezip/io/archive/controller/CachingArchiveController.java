@@ -39,7 +39,7 @@ import java.util.Map;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FLUSH_CACHE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
 /**
  * A caching archive controller implements a caching strategy for entries
@@ -176,9 +176,8 @@ extends FilterArchiveController<AE> {
     throws E, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        final boolean flush = options.get(FLUSH_CACHE);
-        if (flush && options.get(ABORT_CHANGES))
-            throw new IllegalArgumentException();
+        final boolean flush = !options.get(ABORT_CHANGES);
+        final boolean clear = !flush || options.get(CLEAR_CACHE);
         for (final EntryCache cache : caches.values()) {
             try {
                 if (flush)
@@ -187,14 +186,16 @@ extends FilterArchiveController<AE> {
                 throw builder.fail(new SyncException(getModel(), ex));
             } finally  {
                 try {
-                    cache.clear();
+                    if (clear)
+                        cache.clear();
                 } catch (IOException ex) {
                     builder.warn(new SyncWarningException(getModel(), ex));
                 }
             }
         }
-        caches.clear();
-        getController().sync(builder, options.clear(FLUSH_CACHE));
+        if (clear)
+            caches.clear();
+        getController().sync(builder, options.clear(CLEAR_CACHE));
     }
 
     private final class EntryCache implements IOCache<AE> {

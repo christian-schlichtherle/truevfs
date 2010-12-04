@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystems;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import java.io.FileFilter;
@@ -50,6 +49,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
@@ -1126,19 +1126,19 @@ public class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(BitField.of(UMOUNT, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(BitField)
      */
     public static void umount()
     throws ArchiveException {
-        sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(UMOUNT)
+        sync(   BitField.of(CLEAR_CACHE)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
      * }.
@@ -1147,14 +1147,14 @@ public class File extends java.io.File {
      */
     public static void umount(boolean closeStreams)
     throws ArchiveException {
-        sync(   BitField.noneOf(SyncOption.class)
+        sync(   BitField.of(CLEAR_CACHE)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(UMOUNT)
+        sync(   BitField.of(CLEAR_CACHE)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1167,7 +1167,7 @@ public class File extends java.io.File {
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
-        sync(   BitField.noneOf(SyncOption.class)
+        sync(   BitField.of(CLEAR_CACHE)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1203,7 +1203,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FileSystems.sync(   archive.getCanOrAbsFile().toURI(),
+        FileSystems.sync(   URI.create(archive.getCanOrAbsFile().toURI().toString() + SEPARATOR_CHAR),
                             new ArchiveExceptionBuilder(),
                             options);
     }
@@ -1211,7 +1211,7 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(UMOUNT, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
      * }.
      *
      * @see #sync(File, BitField)
@@ -1219,13 +1219,13 @@ public class File extends java.io.File {
     public static void umount(File archive)
     throws ArchiveException {
         sync(   archive,
-                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(UMOUNT)
+                BitField.of(CLEAR_CACHE)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
      * }.
@@ -1235,7 +1235,7 @@ public class File extends java.io.File {
     public static void umount(File archive, boolean closeStreams)
     throws ArchiveException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
+                BitField.of(CLEAR_CACHE)
                 .set(FORCE_CLOSE_INPUT, closeStreams)
                 .set(FORCE_CLOSE_OUTPUT, closeStreams));
     }
@@ -1243,7 +1243,7 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(UMOUNT)
+                BitField.of(CLEAR_CACHE)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
@@ -1257,7 +1257,7 @@ public class File extends java.io.File {
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
         sync(   archive,
-                BitField.noneOf(SyncOption.class)
+                BitField.of(CLEAR_CACHE)
                 .set(WAIT_CLOSE_INPUT, waitForInputStreams)
                 .set(FORCE_CLOSE_INPUT, closeInputStreams)
                 .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
