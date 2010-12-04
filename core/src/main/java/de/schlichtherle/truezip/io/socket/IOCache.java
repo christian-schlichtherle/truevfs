@@ -58,8 +58,8 @@ extends InputCache<LT>, OutputCache<LT> {
 
             @Override
             public <LT extends Entry>
-            IOCache<LT> newCache( InputSocket<? extends LT> input,
-                                OutputSocket<? extends LT> output) {
+            IOCache<LT> newCache(   InputSocket<? extends LT> input,
+                                    OutputSocket<? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
 
