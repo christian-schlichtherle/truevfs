@@ -90,12 +90,12 @@ implements Serializable {
      * The canonical list of archive file suffixes in the global registry
      * which have been configured to be recognized by default.
      */
-    public final String defaultSuffixes;
+    public final String DEFAULT_SUFFIXES;
 
     /**
      * The canonical list of all archive file suffixes in the global registry.
      */
-    public final String allSuffixes;
+    public final String ALL_SUFFIXES;
 
     static {
         logger.config("banner"); // NOI18N
@@ -120,8 +120,8 @@ implements Serializable {
         // Note that retrieval of the default suffix list must be done first
         // in order to remove the DEFAULT key from the drivers map if present.
         // The driver lookup would throw an exception on this entry otherwise.
-        defaultSuffixes = defaultSuffixes().toString();
-        allSuffixes = suffixes().toString();
+        DEFAULT_SUFFIXES = getDefaultSuffixes().toString();
+        ALL_SUFFIXES = getSuffixes().toString();
 
         logConfiguration();
     }
@@ -241,7 +241,7 @@ implements Serializable {
      *         entry with the key {@code DEFAULT} in the map of drivers.
      *         May be empty, but never {@code null}.
      */
-    private SuffixSet defaultSuffixes() {
+    private SuffixSet getDefaultSuffixes() {
         final SuffixSet set;
         final String defaultSuffixesProperty
                 = System.getProperty(PROP_KEY_DEFAULT_SUFFIXES);
@@ -253,7 +253,7 @@ implements Serializable {
                 return new SuffixSet();
         }
 
-        final SuffixSet all = suffixes();
+        final SuffixSet all = getSuffixes();
         boolean clear = false;
         boolean addAll = false;
         for (final Iterator<String> i = set.originalIterator(); i.hasNext(); ) {
@@ -285,9 +285,9 @@ implements Serializable {
                         new Object[] { entry.getKey(), entry.getValue() });
             } while (i.hasNext());
 
-            logger.log(Level.CONFIG, "allSuffixList", allSuffixes); // NOI18N
-            if (defaultSuffixes.length() > 0)
-                logger.log(Level.CONFIG, "defaultSuffixList", defaultSuffixes); // NOI18N
+            logger.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
+            if (DEFAULT_SUFFIXES.length() > 0)
+                logger.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
             else
                 logger.config("noDefaultSuffixes"); // NOI18N
         } else {

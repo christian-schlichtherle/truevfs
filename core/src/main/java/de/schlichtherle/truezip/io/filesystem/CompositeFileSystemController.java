@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.Icon;
 
 /**
@@ -84,8 +85,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -95,8 +96,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -106,8 +107,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -117,8 +118,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(parentPath(path));
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -128,8 +129,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(parentPath(path));
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -139,8 +140,8 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(parentPath(path));
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -293,8 +294,8 @@ implements ComponentFileSystemController<Entry> {
     throws E {
         try {
             getProspect().sync(builder, options);
-        } catch (FileSystemException ex) {
-            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw (E) ex;
         }
     }
 }

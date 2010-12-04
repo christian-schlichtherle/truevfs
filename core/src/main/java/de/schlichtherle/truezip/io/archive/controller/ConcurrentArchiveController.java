@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -65,7 +64,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getOpenIcon()
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -86,7 +85,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public Icon getClosedIcon()
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -107,7 +106,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadOnly()
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -128,7 +127,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -149,7 +148,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isReadable(String path)
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -170,7 +169,7 @@ extends FilterArchiveController<AE> {
 
     @Override
     public boolean isWritable(String path)
-    throws FileSystemException {
+    throws IOException {
         try {
             readLock().lock();
             try {
@@ -351,7 +350,7 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, FileSystemException {
+    throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {

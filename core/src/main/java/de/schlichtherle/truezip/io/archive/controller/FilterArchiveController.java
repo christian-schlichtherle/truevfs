@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
@@ -70,33 +69,33 @@ implements ArchiveController<AE> {
     }
 
     @Override
-    public Icon getOpenIcon() throws FileSystemException {
+    public Icon getOpenIcon() throws IOException {
         return getController().getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon() throws FileSystemException {
+    public Icon getClosedIcon() throws IOException {
         return getController().getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly() throws FileSystemException {
+    public boolean isReadOnly() throws IOException {
         return getController().isReadOnly();
     }
 
     @Override
     public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
-    throws FileSystemException {
+    throws IOException {
         return getController().getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws FileSystemException {
+    public boolean isReadable(String path) throws IOException {
         return getController().isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws FileSystemException {
+    public boolean isWritable(String path) throws IOException {
         return getController().isWritable(path);
     }
 
@@ -144,7 +143,7 @@ implements ArchiveController<AE> {
     public <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws E, FileSystemException {
+    throws IOException {
         getController().sync(builder, options);
     }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.archive.driver.registry.GlobalArchiveDriverRegistry;
@@ -119,7 +118,7 @@ implements Serializable {
     public DefaultArchiveDetector(final String list) {
         registry = GlobalArchiveDriverRegistry.INSTANCE;
         final SuffixSet set = new SuffixSet(list);
-        final SuffixSet all = registry.suffixes();
+        final SuffixSet all = registry.getSuffixes();
         if (set.retainAll(all)) {
             final SuffixSet unknown = new SuffixSet(set);
             unknown.removeAll(all);

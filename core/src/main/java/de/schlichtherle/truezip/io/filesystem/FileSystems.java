@@ -51,7 +51,8 @@ public class FileSystems {
     private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
         @Override
-		public int compare(FileSystemController<?> l, FileSystemController<?> r) {
+		public int compare( FileSystemController<?> l,
+                            FileSystemController<?> r) {
             return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
@@ -241,7 +242,7 @@ public class FileSystems {
 
     static Set<ComponentFileSystemController<?>> getControllers(
             URI prefix,
-            final Comparator<FileSystemController<?>> comparator) {
+            final Comparator<? super ComponentFileSystemController<?>> comparator) {
         if (null == prefix)
             prefix = URI.create(""); // catch all
         else
@@ -253,7 +254,7 @@ public class FileSystems {
                     : new HashSet<ComponentFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
             for (final Link<Scheduler> link : schedulers.values()) {
                 final Scheduler scheduler = Links.getTarget(link);
-                final ComponentFileSystemController<?> controller
+                final CompositeFileSystemController controller
                         = null == scheduler ? null : scheduler.controller;
                 if (null != controller && controller
                         .getModel()

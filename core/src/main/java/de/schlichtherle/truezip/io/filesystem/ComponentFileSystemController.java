@@ -22,9 +22,9 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * Like it's super type, but does not throw {@link FileSystemException}s
- * because either the file system is not federated or this exception type is
- * handled by the implementation of this abstract class.
+ * Like it's super type, but does not throw {@link IOException}s from certain
+ * methods because either the file system is not federated or this exception
+ * type is handled by the implementation of this abstract class.
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle

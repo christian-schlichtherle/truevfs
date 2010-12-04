@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -26,7 +27,6 @@ import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -394,11 +394,11 @@ implements ArchiveController<AE> {
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
      * @see    ArchiveController#sync(ExceptionBuilder, BitField)
-     * @throws SyncException If any exceptional condition occurs
+     * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws NotWriteLockedException
      * @return Whether or not a synchronization has been performed.
      */
     abstract boolean autoSync(String path, Access intention)
-    throws SyncException, FileSystemException;
+    throws FileSystemException;
 }
