@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.ChainableIOException;
@@ -47,7 +46,7 @@ public class SyncException extends ChainableIOException {
         super(model.getMountPoint().getPath(), cause);
     }
 
-    public SyncException(FileSystemModel model, IOException cause, int priority) {
+    SyncException(FileSystemModel model, IOException cause, int priority) {
         super(model.getMountPoint().getPath(), cause, priority);
     }
 }
