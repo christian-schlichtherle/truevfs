@@ -366,7 +366,7 @@ extends FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws SyncException, FileSystemException {
+    throws FileSystemException {
         final ArchiveFileSystem<AE> fileSystem;
         final ArchiveFileSystemEntry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -384,7 +384,8 @@ extends FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws SyncException, FileSystemException {
+    private boolean sync() throws FileSystemException {
+        getModel().assertWriteLockedByCurrentThread();
         sync(   new SyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
         return true;
@@ -394,9 +395,10 @@ extends FileSystemArchiveController<AE> {
 	public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, FileSystemException {
+    throws E {
         assert !isTouched() || null != output; // file system touched => output archive
-        getModel().assertWriteLockedByCurrentThread();
+        assert getModel().writeLock().isHeldByCurrentThread();
+
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
         awaitSync(builder, options);

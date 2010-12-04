@@ -67,18 +67,18 @@ public interface FileSystemController<E extends Entry> {
      */
     ComponentFileSystemController<?> getParent();
 
-    Icon getOpenIcon() throws FileSystemException;
+    Icon getOpenIcon() throws IOException;
 
-    Icon getClosedIcon() throws FileSystemException;
+    Icon getClosedIcon() throws IOException;
 
-    boolean isReadOnly() throws FileSystemException;
+    boolean isReadOnly() throws IOException;
 
     FileSystemEntry<? extends E> getEntry(String path)
-    throws FileSystemException;
+    throws IOException;
 
-    boolean isReadable(String path) throws FileSystemException;
+    boolean isReadable(String path) throws IOException;
 
-    boolean isWritable(String path) throws FileSystemException;
+    boolean isWritable(String path) throws IOException;
 
     void setReadOnly(String path) throws IOException;
 
@@ -134,9 +134,8 @@ public interface FileSystemController<E extends Entry> {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  String path, Type type,
-                                    BitField<OutputOption> options,
-                                    Entry template)
+    boolean mknod(  String path, Type type, BitField<OutputOption> options,
+                    Entry template)
     throws IOException;
 
     void unlink(String path) throws IOException;
@@ -158,15 +157,5 @@ public interface FileSystemController<E extends Entry> {
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws E, FileSystemException;
-
-    /*@Override
-    public final String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[model=")
-                .append(getModel())
-                .append("]")
-                .toString();
-    }*/
+    throws IOException;
 }

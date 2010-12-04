@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -173,28 +172,30 @@ extends FilterArchiveController<AE> {
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
-    throws E, FileSystemException {
+    throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        final boolean flush = !options.get(ABORT_CHANGES);
-        final boolean clear = !flush || options.get(CLEAR_CACHE);
-        for (final EntryCache cache : caches.values()) {
-            try {
-                if (flush)
-                    cache.flush();
-            } catch (IOException ex) {
-                throw builder.fail(new SyncException(getModel(), ex));
-            } finally  {
+        if (0 < caches.size()) {
+            final boolean flush = !options.get(ABORT_CHANGES);
+            final boolean clear = !flush || options.get(CLEAR_CACHE);
+            for (final EntryCache cache : caches.values()) {
                 try {
-                    if (clear)
-                        cache.clear();
+                    if (flush)
+                        cache.flush();
                 } catch (IOException ex) {
-                    builder.warn(new SyncWarningException(getModel(), ex));
+                    throw builder.fail(new SyncException(getModel(), ex));
+                } finally  {
+                    try {
+                        if (clear)
+                            cache.clear();
+                    } catch (IOException ex) {
+                        builder.warn(new SyncWarningException(getModel(), ex));
+                    }
                 }
             }
+            if (clear)
+                caches.clear();
         }
-        if (clear)
-            caches.clear();
         getController().sync(builder, options.clear(CLEAR_CACHE));
     }
 

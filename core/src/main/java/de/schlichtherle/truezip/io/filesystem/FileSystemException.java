@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,38 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**
- * Indicates an exceptional condition in a file system controller.
+ * Indicates an exceptional condition in a {@link FileSystemController}.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileSystemException extends IOException {
+public abstract class FileSystemException extends ChainableIOException {
+
     private static final long serialVersionUID = 2947623946725372554L;
 
-    private final FileSystemModel model;
-
-    protected FileSystemException(final FileSystemModel model) {
-        super.initCause(null);
-        this.model = model;
+    FileSystemException(String message) {
+        super(message);
     }
 
-    protected FileSystemException(  final FileSystemModel model,
-                                    final IOException cause) {
-        super.initCause(cause);
-        this.model = model;
+    protected FileSystemException(FileSystemModel model) {
+        super(model.getMountPoint().toString());
+    }
+
+    protected FileSystemException(FileSystemModel model, IOException cause) {
+        super(model.getMountPoint().toString(), cause);
+    }
+
+    FileSystemException(FileSystemModel model, IOException cause, int priority) {
+        super(model.getMountPoint().toString(), cause, priority);
     }
 
     /** Returns the nullable cause of this exception. */
     @Override
     public IOException getCause() {
         return (IOException) super.getCause();
-    }
-
-    /** Returns the path of the mount point of the file system model. */
-    @Override
-    public String getMessage() {
-        return model.getMountPoint().getPath();
     }
 }

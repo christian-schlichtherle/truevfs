@@ -263,8 +263,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * This includes the drivers found in the entire registry chain, not just
      * this registry object.
      */
-    public final SuffixSet suffixes() {
-        return decorate(null != delegate ? delegate.suffixes() : new SuffixSet());
+    public final SuffixSet getSuffixes() {
+        return decorate(null != delegate ? delegate.getSuffixes() : new SuffixSet());
     }
 
     /**

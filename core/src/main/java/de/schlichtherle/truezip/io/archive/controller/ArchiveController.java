@@ -16,10 +16,10 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import java.io.IOException;
 
 /**
  * @author  Christian Schlichtherle
@@ -33,5 +33,5 @@ extends FileSystemController<AE> {
 
     @Override
     ArchiveFileSystemEntry<? extends AE> getEntry(String path)
-    throws FileSystemException;
+    throws IOException;
 }

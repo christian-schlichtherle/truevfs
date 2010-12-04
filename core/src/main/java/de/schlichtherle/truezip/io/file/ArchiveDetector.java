@@ -90,7 +90,7 @@ public interface ArchiveDetector extends FileFactory {
      * @see GlobalArchiveDriverRegistry
      */
     DefaultArchiveDetector DEFAULT = new DefaultArchiveDetector(
-            GlobalArchiveDriverRegistry.INSTANCE.defaultSuffixes);
+            GlobalArchiveDriverRegistry.INSTANCE.DEFAULT_SUFFIXES);
 
     /**
      * Recognizes all archive file suffixes registered in the global archive
@@ -102,7 +102,7 @@ public interface ArchiveDetector extends FileFactory {
      * @see GlobalArchiveDriverRegistry
      */
     DefaultArchiveDetector ALL = new DefaultArchiveDetector(
-            GlobalArchiveDriverRegistry.INSTANCE.allSuffixes);
+            GlobalArchiveDriverRegistry.INSTANCE.ALL_SUFFIXES);
 
     /**
      * Detects whether the given {@code path} identifies a prospective
