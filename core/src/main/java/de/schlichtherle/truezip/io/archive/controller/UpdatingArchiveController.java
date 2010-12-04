@@ -26,7 +26,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemListener;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.FilterEntry;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
@@ -165,7 +165,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private final ArchiveDriver<AE> driver;
-    private final ComponentFileSystemController<?> parent;
+    private final FederatedFileSystemController<?> parent;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -185,7 +185,7 @@ extends FileSystemArchiveController<AE> {
     public UpdatingArchiveController(
             final ArchiveDriver<AE> driver,
             final ArchiveModel model,
-            final ComponentFileSystemController<?> parent) {
+            final FederatedFileSystemController<?> parent) {
         super(model);
         assert null != model.getParent();
         if (null == driver)
@@ -214,7 +214,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    public ComponentFileSystemController<?> getParent() {
+    public FederatedFileSystemController<?> getParent() {
         return parent;
     }
 
@@ -298,7 +298,7 @@ extends FileSystemArchiveController<AE> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final ComponentFileSystemController<?> parent = getParent();
+            final FederatedFileSystemController<?> parent = getParent();
             final String parentPath = parentPath(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
@@ -343,7 +343,7 @@ extends FileSystemArchiveController<AE> {
     throws IOException {
         if (null != output)
             return;
-        final ComponentFileSystemController<?> parent = getParent();
+        final FederatedFileSystemController<?> parent = getParent();
         final String parentPath = parentPath(ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
@@ -366,7 +366,7 @@ extends FileSystemArchiveController<AE> {
 
     @Override
 	boolean autoSync(final String path, final Access intention)
-    throws FileSystemException {
+    throws SyncException, FileSystemException {
         final ArchiveFileSystem<AE> fileSystem;
         final ArchiveFileSystemEntry<AE> entry;
         if (null == (fileSystem = getFileSystem())
@@ -384,7 +384,7 @@ extends FileSystemArchiveController<AE> {
         return false;
     }
 
-    private boolean sync() throws FileSystemException {
+    private boolean sync() throws SyncException, FileSystemException {
         getModel().assertWriteLockedByCurrentThread();
         sync(   new SyncExceptionBuilder(),
                 BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));

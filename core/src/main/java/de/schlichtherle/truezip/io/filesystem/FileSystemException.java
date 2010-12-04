@@ -15,33 +15,25 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.ChainableIOException;
 import java.io.IOException;
 
 /**
- * Indicates an exceptional condition in a {@link FileSystemController}.
+ * Indicates an exceptional condition which is specific to a file system.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FileSystemException extends ChainableIOException {
+public abstract class FileSystemException extends IOException {
 
     private static final long serialVersionUID = 2947623946725372554L;
-
-    FileSystemException(String message) {
-        super(message);
-    }
 
     protected FileSystemException(FileSystemModel model) {
         super(model.getMountPoint().toString());
     }
 
     protected FileSystemException(FileSystemModel model, IOException cause) {
-        super(model.getMountPoint().toString(), cause);
-    }
-
-    FileSystemException(FileSystemModel model, IOException cause, int priority) {
-        super(model.getMountPoint().toString(), cause, priority);
+        super(model.getMountPoint().toString());
+        super.initCause(cause);
     }
 
     /** Returns the nullable cause of this exception. */

@@ -49,14 +49,14 @@ import javax.swing.Icon;
  */
 final class CompositeFileSystemController
 extends AbstractFileSystemController<Entry>
-implements ComponentFileSystemController<Entry> {
+implements FederatedFileSystemController<Entry> {
 
     private final FileSystemController<?> prospect;
 
     CompositeFileSystemController(final FileSystemController<?> prospect) {
         if (null == prospect.getParent())
             throw new NullPointerException();
-        if (prospect instanceof ComponentFileSystemController<?>)
+        if (prospect instanceof FederatedFileSystemController<?>)
             throw new IllegalArgumentException();
         this.prospect = prospect;
     }
@@ -71,7 +71,7 @@ implements ComponentFileSystemController<Entry> {
     }
 
     @Override
-    public ComponentFileSystemController<?> getParent() {
+    public FederatedFileSystemController<?> getParent() {
         return getProspect().getParent();
     }
 
@@ -85,7 +85,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -96,7 +96,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -107,7 +107,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -118,7 +118,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(parentPath(path));
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -129,7 +129,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(parentPath(path));
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -140,7 +140,7 @@ implements ComponentFileSystemController<Entry> {
             return getProspect().isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(parentPath(path));
-        } catch (IOException ex) {
+        } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }
@@ -288,14 +288,15 @@ implements ComponentFileSystemController<Entry> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, E> builder,
                 final BitField<SyncOption> options)
     throws E {
         try {
             getProspect().sync(builder, options);
-        } catch (IOException ex) {
-            throw (E) ex;
+        } catch (FileSystemException ex) {
+            throw new UndeclaredThrowableException(ex);
         }
     }
 }

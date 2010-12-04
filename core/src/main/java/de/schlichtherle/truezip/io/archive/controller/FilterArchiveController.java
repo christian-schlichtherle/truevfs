@@ -24,7 +24,8 @@ import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -64,38 +65,38 @@ implements ArchiveController<AE> {
     }
 
     @Override
-    public ComponentFileSystemController<?> getParent() {
+    public FederatedFileSystemController<?> getParent() {
         return getController().getParent();
     }
 
     @Override
-    public Icon getOpenIcon() throws IOException {
+    public Icon getOpenIcon() throws FileSystemException {
         return getController().getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon() throws IOException {
+    public Icon getClosedIcon() throws FileSystemException {
         return getController().getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
+    public boolean isReadOnly() throws FileSystemException {
         return getController().isReadOnly();
     }
 
     @Override
     public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
-    throws IOException {
+    throws FileSystemException {
         return getController().getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws IOException {
+    public boolean isReadable(String path) throws FileSystemException {
         return getController().isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws IOException {
+    public boolean isWritable(String path) throws FileSystemException {
         return getController().isWritable(path);
     }
 
@@ -143,7 +144,7 @@ implements ArchiveController<AE> {
     public <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,
                 BitField<SyncOption> options)
-    throws IOException {
+    throws E, FileSystemException {
         getController().sync(builder, options);
     }
 }

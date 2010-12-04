@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
@@ -38,7 +38,7 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
         return new FileSystemModel(mountPoint, null);
     }
 
-    public ComponentFileSystemController<FileEntry> newController(
+    public FederatedFileSystemController<FileEntry> newController(
             FileSystemModel model) {
         return new FileController(model);
     }
@@ -53,7 +53,7 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
     @Override
     public FileSystemController<FileEntry> newController(
             FileSystemModel model,
-            ComponentFileSystemController<?> parent) {
+            FederatedFileSystemController<?> parent) {
         if (null != parent)
             throw new IllegalArgumentException();
         return new FileController(model);

@@ -20,7 +20,7 @@ import java.net.URI;
 import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ConcurrentArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -239,7 +239,7 @@ implements ArchiveDriver<AE>, Serializable {
     @Override
     public ArchiveController<AE> newController(
             ArchiveModel model,
-            ComponentFileSystemController<?> parent) {
+            FederatedFileSystemController<?> parent) {
         return new ConcurrentArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.

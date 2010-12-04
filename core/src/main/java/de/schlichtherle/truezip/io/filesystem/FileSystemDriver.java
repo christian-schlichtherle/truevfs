@@ -27,5 +27,5 @@ public interface FileSystemDriver<FSM extends FileSystemModel> {
     FSM newModel(URI mountPoint, FileSystemModel parent);
 
     FileSystemController<?> newController(
-            FSM model, ComponentFileSystemController<?> parent);
+            FSM model, FederatedFileSystemController<?> parent);
 }

@@ -23,7 +23,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.filesystem.ComponentFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -88,7 +88,7 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<AE> {
     @Override
     ArchiveController<AE> newController(
             ArchiveModel model,
-            ComponentFileSystemController<?> parent);
+            FederatedFileSystemController<?> parent);
 
     /**
      * Creates a new input shop for reading the archive entries of the the

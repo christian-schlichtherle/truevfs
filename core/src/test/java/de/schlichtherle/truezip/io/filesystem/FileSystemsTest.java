@@ -44,7 +44,7 @@ public class FileSystemsTest {
             { "zip:file:/outer.zip!/" },
             { "zip:zip:file:/outer.zip!/inner.zip!/" },
         }) {
-            final ComponentFileSystemController<?> controller
+            final FederatedFileSystemController<?> controller
                     = FileSystems.getController(    Driver.INSTANCE,
                                                     URI.create(params[0]),
                                                     null);
@@ -58,7 +58,7 @@ public class FileSystemsTest {
             { new ZipDriver(), "file:/outer.zip/", FileDriver.INSTANCE, "file:/" },
             { new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/" },
         }) {
-            final ComponentFileSystemController<?> controller
+            final FederatedFileSystemController<?> controller
                     = FileSystems.getController(
                         (FileSystemDriver<?>) params[0],
                         URI.create((String) params[1]),
@@ -91,7 +91,7 @@ public class FileSystemsTest {
         @Override
         public FileSystemController<?> newController(
                 final FileSystemModel model,
-                final ComponentFileSystemController<?> parent) {
+                final FederatedFileSystemController<?> parent) {
             assert null == model.getParent()
                     ? null == parent
                     : model.getParent() == parent.getModel();
