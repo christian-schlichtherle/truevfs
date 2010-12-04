@@ -27,11 +27,7 @@ import java.net.URI;
  */
 public final class FileDriver implements FileSystemDriver<FileSystemModel> {
 
-    /** The default instance. FIXME: Remove this! */
-    public static final FileDriver INSTANCE
-            = new FileDriver();
-
-    private FileDriver() {
+    public FileDriver() {
     }
 
     public FileSystemModel newModel(URI mountPoint) {

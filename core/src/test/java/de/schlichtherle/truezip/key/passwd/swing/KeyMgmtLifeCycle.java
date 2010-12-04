@@ -87,7 +87,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     }
 
     private void createResource() throws UnknownKeyException {
-        final KeyManager manager = KeyManager.getInstance();
+        final KeyManager manager = KeyManager.get();
         final KeyProvider provider = getKeyProvider(manager, id);
 
         // Store the key, so we can later check the key stored in the
@@ -104,7 +104,7 @@ public class KeyMgmtLifeCycle implements Runnable {
     }
 
     private void openResource() throws UnknownKeyException {
-        final KeyManager manager = KeyManager.getInstance();
+        final KeyManager manager = KeyManager.get();
         final KeyProvider provider = getKeyProvider(manager, id);
 
         boolean correct = false;

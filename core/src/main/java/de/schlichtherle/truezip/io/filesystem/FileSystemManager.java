@@ -40,20 +40,22 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * Provides static utility methods for {@link FederatedFileSystemController}s.
- * This class cannot get instantiated.
+ * Manages {@link FederatedFileSystemController}s and provides associated
+ * utilities.
+ * <p>
+ * Note that this class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystems {
+public final class FileSystemManager {
 
     private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
         @Override
 		public int compare( FileSystemController<?> l,
                             FileSystemController<?> r) {
-            return  r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
+            return r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
         }
     };
 
@@ -62,17 +64,25 @@ public class FileSystems {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private static final Map<URI, Link<Scheduler>> schedulers
+    private final Map<URI, Link<Scheduler>> schedulers
             = new WeakHashMap<URI, Link<Scheduler>>();
 
-    public FileSystems() {
+    private ShutdownThread shutdownThread; // lazily initialized
+
+    private static final FileSystemManager instance = new FileSystemManager();
+
+    public static FileSystemManager get() {
+        return instance;
+    }
+
+    FileSystemManager() {
     }
 
     /**
      * Equivalent to
      * {@link #getController(FileSystemDriver, URI, FederatedFileSystemController) getController(driver, mountPoint, null)}.
      */
-    public static <FSM extends FileSystemModel>
+    public <FSM extends FileSystemModel>
     FederatedFileSystemController<?> getController(
             FileSystemDriver<FSM> driver,
             URI mountPoint) {
@@ -97,7 +107,7 @@ public class FileSystems {
      *         system.
      * @return A non-{@code null} component file system controller.
      */
-    public static <FSM extends FileSystemModel>
+    public <FSM extends FileSystemModel>
     FederatedFileSystemController<?> getController(
             final FileSystemDriver<FSM> driver,
             URI mountPoint,
@@ -136,7 +146,7 @@ public class FileSystems {
         return scheduler.controller;
     }
 
-    private static final class Scheduler implements FileSystemListener {
+    private final class Scheduler implements FileSystemListener {
 
         final CompositeFileSystemController controller;
 
@@ -194,7 +204,7 @@ public class FileSystems {
      *         {@code FORCE_CLOSE_INPUT} is {@code false} and
      *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
      */
-    public static <E extends IOException>
+    public <E extends IOException>
     void sync(  final URI prefix,
                 final ExceptionBuilder<? super IOException, E> builder,
                 BitField<SyncOption> options)
@@ -236,11 +246,11 @@ public class FileSystems {
         }
     }
 
-    static Set<FederatedFileSystemController<?>> getControllers() {
+    Set<FederatedFileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
-    static Set<FederatedFileSystemController<?>> getControllers(
+    Set<FederatedFileSystemController<?>> getControllers(
             URI prefix,
             final Comparator<? super FederatedFileSystemController<?>> comparator) {
         if (null == prefix)
@@ -269,10 +279,10 @@ public class FileSystems {
 
     /**
      * Returns a proxy instance which encapsulates <em>live</em> statistics
-     * about the total set of archive files accessed by this package.
+     * about the total set of federated file systems managed by this instance.
      * Any call to a method of the returned interface instance returns
-     * up-to-date data, so there is <em>no</em> need to repeatedly call this
-     * method in order to update the statistics.
+     * up-to-date data, so there is no need to repeatedly call this method in
+     * order to update the statistics.
      * <p>
      * Note that this method returns <em>live</em> statistics rather than
      * <em>real time</em> statistics.
@@ -280,8 +290,8 @@ public class FileSystems {
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
      */
-    public static FileSystemStatistics getStatistics() {
-        return FileSystemStatistics.SINGLETON;
+    public FileSystemStatistics getStatistics() {
+        return new FileSystemStatistics(this);
     }
 
     /**
@@ -289,42 +299,49 @@ public class FileSystems {
      * shutdown hook.
      * This is typically used to delete archive files or entries.
      */
-    public static void addToShutdownHook(final Runnable runnable) {
-        //ShutdownRunnables.SINGLETON.add(runnable);
-        ShutdownHook.SINGLETON.add(runnable);
+    public void addShutdownHook(final Runnable runnable) {
+        getShutdownHook().add(runnable);
     }
 
-    static {
-        Runtime.getRuntime().addShutdownHook(ShutdownHook.SINGLETON);
+    private synchronized ShutdownThread getShutdownHook() {
+        if (null == shutdownThread) {
+            shutdownThread = new ShutdownThread(new ShutdownRunnable());
+            Runtime.getRuntime().addShutdownHook(shutdownThread);
+        }
+        return shutdownThread;
     }
 
     /**
      * This singleton shutdown hook thread class runs
-     * {@link FileSystems.ShutdownRunnables#SINGLETON} when the JVM terminates.
+     * {@link ShutdownRunnable.ShutdownRunnables#SINGLETON} when the JVM terminates.
      * You cannot instantiate this class.
      *
-     * @see FileSystems#addToShutdownHook(java.lang.Runnable)
+     * @see FileSystemManager#addShutdownHook(java.lang.Runnable)
      */
-    private static final class ShutdownHook extends Thread {
+    private static final class ShutdownThread extends Thread {
 
-        /** The singleton instance of this class. */
-        static final ShutdownHook SINGLETON = new ShutdownHook();
+        final ShutdownRunnable runnables;
 
-        ShutdownHook() {
-            super(  FileSystems.ShutdownRunnables.SINGLETON,
-                    "TrueZIP ArchiveController Shutdown Hook");
-            setPriority(Thread.MAX_PRIORITY);
+        ShutdownThread(final ShutdownRunnable runnables) {
+            super("TrueZIP FileSystemProvider Shutdown Hook");
+            super.setPriority(Thread.MAX_PRIORITY);
+            this.runnables = runnables;
         }
 
         /**
          * Adds the given {@code runnable} to the set of runnables to run by
-         * {@link FileSystems.ShutdownRunnables#SINGLETON} when the JVM
+         * {@link ShutdownRunnable.ShutdownRunnables#SINGLETON} when the JVM
          * terminates.
          */
         void add(final Runnable runnable) {
-            FileSystems.ShutdownRunnables.SINGLETON.add(runnable);
+            runnables.add(runnable);
         }
-    } // class JVMShutdownHook
+
+        @Override
+        public void run() {
+            runnables.run();
+        }
+    } // class ShutdownHook
 
     /**
      * This singleton shutdown hook runnable class runs a set of user-provided
@@ -332,20 +349,17 @@ public class FileSystems {
      * method is invoked.
      * This is typically used to delete archive files or entries.
      */
-    private static final class ShutdownRunnables implements Runnable {
-
-        /** The singleton instance of this class. */
-        static final ShutdownRunnables SINGLETON = new ShutdownRunnables();
+    private final class ShutdownRunnable implements Runnable {
 
         final Collection<Runnable> runnables = new HashSet<Runnable>();
 
-        ShutdownRunnables() {
+        ShutdownRunnable() {
             // Force loading the key manager now in order to prevent class
             // loading when running the shutdown hook.
             // This may help if this shutdown hook is run as a JVM shutdown
             // hook in an app server environment where class loading is
             // disabled.
-            PromptingKeyManager.getInstance();
+            PromptingKeyManager.get();
         }
 
         /**
@@ -375,7 +389,7 @@ public class FileSystems {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
                     // Logging doesn't work in a shutdown hook!
-                    //FileSystems.logger.setLevel(Level.OFF);
+                    //FileSystemManager.logger.setLevel(Level.OFF);
                     for (Runnable runnable : runnables)
                         runnable.run();
                 } finally {

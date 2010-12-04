@@ -197,7 +197,7 @@ extends FileSystemArchiveController<AE> {
             this.parent = parent;
         } else {
             // FIXME: Replace FileDriver.INSTANCE with a service locator!
-            this.parent = FileDriver.INSTANCE.newController(model.getParent());
+            this.parent = new FileDriver().newController(model.getParent());
         }
     }
 

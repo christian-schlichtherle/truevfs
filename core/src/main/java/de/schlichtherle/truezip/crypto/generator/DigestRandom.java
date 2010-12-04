@@ -33,8 +33,8 @@ import org.bouncycastle.crypto.Digest;
  */
 public class DigestRandom extends Random {
 
-    private static final SecureRandom seeder = new SecureRandom();
     private static final long serialVersionUID = 1236745263589856228L;
+    private static final SecureRandom seeder = new SecureRandom();
 
     private final byte[] in;
     private long counter;
@@ -100,15 +100,13 @@ public class DigestRandom extends Random {
      */
     @Override
     final protected int next(final int numBits) {
-	final int numBytes = (numBits + 7) >>> 3; // round up
-
+        final int numBytes = (numBits + 7) >>> 3; // round up
         int next = 0;
-	for (int i = numBytes; --i >= 0; ) {
+        for (int i = numBytes; --i >= 0; ) {
             update();
-	    next = (next << 8) | (out[outOff++] & 0xFF);
+            next = (next << 8) | (out[outOff++] & 0xFF);
         }
-
-	return next >>> ((numBytes << 3) - numBits); // shift away rounded bits
+        return next >>> ((numBytes << 3) - numBits); // shift away rounded bits
     }
 
     private void update() {

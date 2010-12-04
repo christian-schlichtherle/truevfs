@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import java.net.URI;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -27,12 +28,21 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystemsTest {
+public class FileSystemManagerTest {
+
+    private FileSystemManager manager;
+    private FileSystemDriver<FileSystemModel> driver;
+
+    @Before
+    public void setUp() {
+        manager = new FileSystemManager();
+        driver = new Driver();
+    }
 
     @Test
     public void testGetControllerWithNull() {
         try {
-            FileSystems.getController(null, null, null);
+            manager.getController(null, null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -45,9 +55,9 @@ public class FileSystemsTest {
             { "zip:zip:file:/outer.zip!/inner.zip!/" },
         }) {
             final FederatedFileSystemController<?> controller
-                    = FileSystems.getController(    Driver.INSTANCE,
-                                                    URI.create(params[0]),
-                                                    null);
+                    = manager.getController(driver,
+                                            URI.create(params[0]),
+                                            null);
         }
     }
 
@@ -55,16 +65,16 @@ public class FileSystemsTest {
     public void testGetControllerWithHierarchicalMountPoint() {
         for (final Object[] params : new Object[][] {
             { new ZipDriver(), "file:/outer.zip/", null, null },
-            { new ZipDriver(), "file:/outer.zip/", FileDriver.INSTANCE, "file:/" },
+            { new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
             { new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/" },
         }) {
             final FederatedFileSystemController<?> controller
-                    = FileSystems.getController(
+                    = manager.getController(
                         (FileSystemDriver<?>) params[0],
                         URI.create((String) params[1]),
                         null == params[2]
                             ? null
-                            : FileSystems.getController(
+                            : manager.getController(
                                 (FileSystemDriver<?>) params[2],
                                 URI.create((String) params[3]),
                                 null));
@@ -72,8 +82,6 @@ public class FileSystemsTest {
     }
 
     private static class Driver implements FileSystemDriver<FileSystemModel> {
-
-        static final Driver INSTANCE = new Driver();
 
         @Override
         public FileSystemModel newModel(
@@ -98,7 +106,7 @@ public class FileSystemsTest {
             final String scheme = model.getMountPoint().getScheme();
             if ("file".equals(scheme)) {
                 // FIXME: Replace FileDriver.INSTANCE with a service locator!
-                return FileDriver.INSTANCE.newController(model);
+                return new FileDriver().newController(model);
             } else if ("zip".equals(scheme)) {
                 return new ZipDriver().newController((ArchiveModel) model, parent);
             } else

@@ -26,15 +26,15 @@ import java.util.Set;
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
- * An abstract class which maintains a static map of {@link KeyProvider}
- * instances for any protected resource which clients need to create or open.
+ * An abstract class which maintains a map of {@link KeyProvider} instances for
+ * any protected resource which clients need to create or open.
  * This key manager class is designed to be of general purpose:
  * Resources are simply represented by a string as their identifier, called
  * the <i>resource identifier</i> or <i>resource ID</i> for short.
  * For each resource ID, a key provider may be associated to it which handles
  * the actual retrieval of the key.
  * <p>
- * Clients need to call {@link #getInstance} to get the default instance.
+ * Clients need to call {@link #get} to get the default instance.
  * Because the map of key providers and some associated methods are static
  * members of this class, the default instance of this class may be changed
  * dynamically (using {@link #setInstance}) without affecting already mapped
@@ -61,9 +61,9 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class KeyManager {
+public abstract class KeyManager {
 
-    private static volatile KeyManager keyManager;
+    private static volatile KeyManager instance;
 
     /** Maps resource IDs to providers. */
     private static final Map<URI, KeyProvider<?>> providers
@@ -112,22 +112,22 @@ public class KeyManager {
      * @throws UndeclaredThrowableException If any other precondition on the
      *         value of the system property does not hold.
      */
-    public static synchronized KeyManager getInstance() {
-        if (keyManager != null)
-            return keyManager;
+    public static synchronized KeyManager get() {
+        if (instance != null)
+            return instance;
 
         final String n = System.getProperty(KeyManager.class.getName(),
                 getDefaultKeyManagerClassName());
         try {
             Class<?> c = loadClass(n, KeyManager.class);
-            keyManager = (KeyManager) c.newInstance();
+            instance = (KeyManager) c.newInstance();
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new UndeclaredThrowableException(ex);
         }
 
-        return keyManager;
+        return instance;
     }
 
     private static String getDefaultKeyManagerClassName() {
@@ -147,10 +147,10 @@ public class KeyManager {
      *
      * @param keyManager The key manager to use as the default instance.
      *        If this is set to {@code null}, on the next call to
-     *        {@link #getInstance} the default instance will be recreated.
+     *        {@link #get} a new instance will be created.
      */
     public static void setInstance(final KeyManager keyManager) {
-        KeyManager.keyManager = keyManager;
+        KeyManager.instance = keyManager;
     }
 
     /**
@@ -371,7 +371,7 @@ public class KeyManager {
      * This class does <em>not</em> map any key provider types.
      * This must be done in the subclass using {@link #mapKeyProviderType}.
      */
-    public KeyManager() {
+    protected KeyManager() {
     }
 
     /**
@@ -433,7 +433,7 @@ public class KeyManager {
      * for a protected resource.
      * <pre>
      * URI resource = file.getCanonicalFile().toURI();
-     * KeyManager km = KeyManager.getInstance();
+     * KeyManager km = KeyManager.get();
      * KeyProvider kp = km.getKeyProvider(resource, AesKeyProvider.class);
      * Object key = kp.getCreateKey(); // may prompt the user
      * int ks;
@@ -470,7 +470,7 @@ public class KeyManager {
      *         of the {@code KeyProvider} interface.
      * @throws IllegalArgumentException if any other precondition on the
      *         parameter {@code type} does not hold.
-     * @see    #getInstance
+     * @see    #get
      */
     public synchronized KeyProvider<?> getKeyProvider(
             final URI resource,
