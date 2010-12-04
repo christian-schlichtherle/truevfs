@@ -87,20 +87,14 @@ public enum SyncOption {
     /**
      * If this option is set, all pending changes are aborted.
      * This option will leave a corrupted target archive file and is only
-     * meaningful if the target archive file gets deleted immediately.
-     * <p>
-     * Note that this option is mutually exclusive with {@link #FLUSH_CACHE}.
-     * If both are set, an {@code IllegalArgumentException} is thrown.
+     * meaningful immediately before the target archive file gets deleted.
      */
     ABORT_CHANGES,
 
     /**
-     * Suppose an archive controller has cached output data for archive entries.
-     * Then if this option is set, the cached data gets written to the
-     * target archive file when it gets synchronized.
-     * <p>
-     * Note that this option is mutually exclusive with {@link #ABORT_CHANGES}.
-     * If both are set, an {@code IllegalArgumentException} is thrown.
+     * Suppose an archive controller has cached data for archive entries.
+     * Then if this option is set, the cache contents get cleared after
+     * flushing them to the target archive file when it gets synchronized.
      */
-    FLUSH_CACHE,
+    CLEAR_CACHE,
 }
