@@ -23,17 +23,16 @@ package de.schlichtherle.truezip.io.filesystem;
  */
 public final class FileSystemStatistics {
 
-    /** The singleton instance of this class. */
-    public static final FileSystemStatistics SINGLETON
-            = new FileSystemStatistics();
+    private final FileSystemManager manager;
 
-    private FileSystemStatistics() {
+    FileSystemStatistics(final FileSystemManager provider) {
+        this.manager = provider;
     }
 
     /**
      * Returns the total number of bytes read from all <em>top level file
      * systems</em> which have been updated by a call to
-     * {@link FileSystems#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only input from top level file
      * systems which have been touched, i.e. archive files which are actually
@@ -50,7 +49,7 @@ public final class FileSystemStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see FileSystems#sync(URI, ExceptionBuilder, BitField)
+     * @see FileSystemManager#sync(URI, ExceptionBuilder, BitField)
      */
     public long getSyncTotalByteCountRead() {
         return CountingReadOnlyFile.getTotal();
@@ -59,7 +58,7 @@ public final class FileSystemStatistics {
     /**
      * Returns the total number of bytes written to all <em>top level file
      * systems</em> which have been updated by a call to
-     * {@link FileSystems#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
      * <p>
      * Please note that this method counts only output to top level file
      * systems which have been touched, i.e. archive files which are actually
@@ -76,7 +75,7 @@ public final class FileSystemStatistics {
      * For an example how to use this please refer to the source
      * code for {@code nzip.ProgressMonitor} in the base package.
      *
-     * @see FileSystems#sync(URI, ExceptionBuilder, BitField)
+     * @see FileSystemManager#sync(URI, ExceptionBuilder, BitField)
      */
     public long getSyncTotalByteCountWritten() {
         return CountingOutputStream.getTotal();
@@ -86,20 +85,20 @@ public final class FileSystemStatistics {
      * Returns the total number of file systems processed.
      */
     public int getFileSystemsTotal() {
-        return FileSystems.getControllers().size();
+        return manager.getControllers().size();
     }
 
     /**
      * Returns the number of file systems which have been touched and
      * need synchronization by calling
-     * {@link FileSystems#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
     public int getFileSystemsTouched() {
         int result = 0;
-        for (FederatedFileSystemController<?> controller : FileSystems.getControllers())
+        for (FederatedFileSystemController<?> controller : manager.getControllers())
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -110,7 +109,7 @@ public final class FileSystemStatistics {
      */
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (FederatedFileSystemController<?> controller : FileSystems.getControllers())
+        for (FederatedFileSystemController<?> controller : manager.getControllers())
             if (null == controller.getModel().getParent())
                 result++;
         return result;
@@ -119,14 +118,14 @@ public final class FileSystemStatistics {
     /**
      * Returns the number of top level file systems which have been touched and
      * need synchronization by calling
-     * {@link FileSystems#sync(URI, ExceptionBuilder, BitField)}.
+     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
      * Note that you should <em>not</em> use the returned value to call this
      * method conditionally - this is unreliable!
      * Instead, you should always call one of those methods unconditionally.
      */
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (FederatedFileSystemController<?> controller : FileSystems.getControllers()) {
+        for (FederatedFileSystemController<?> controller : manager.getControllers()) {
             final FileSystemModel model = controller.getModel();
             if (null == model.getParent() && model.isTouched())
                 result++;

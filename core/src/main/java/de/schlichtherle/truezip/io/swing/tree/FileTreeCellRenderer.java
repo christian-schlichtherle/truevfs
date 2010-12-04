@@ -16,17 +16,17 @@
 
 package de.schlichtherle.truezip.io.swing.tree;
 
-import de.schlichtherle.truezip.io.swing.FileSystemView;
 import de.schlichtherle.truezip.io.swing.JFileTree;
 import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * A {@link javax.swing.tree.TreeCellRenderer} which uses an instance of
- * {@link FileSystemView} to display the system icon for each node in a
- * {@link JFileTree} wherever possible.
+ * {@link de.schlichtherle.truezip.io.swing.FileSystemView} to display the
+ * system icon for each node in a {@link JFileTree} wherever possible.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -34,6 +34,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = 1045639746091876245L;
 
+    private final FileSystemView view = de.schlichtherle.truezip.io.swing.FileSystemView.getFileSystemView();
     private final JFileTree fileTree;
 
     public FileTreeCellRenderer(final JFileTree fileTree) {
@@ -51,7 +52,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         // the icon for all other nodes than the edited one.
         final java.io.File node = fileTree.getEditedNode();
         return node != null
-                ? FileSystemView.getFileSystemView().getSystemIcon(node)
+                ? view.getSystemIcon(node)
                 : super.getOpenIcon();
     }
 
@@ -66,7 +67,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         // the icon for all other nodes than the edited one.
         final java.io.File node = fileTree.getEditedNode();
         return node != null
-                ? FileSystemView.getFileSystemView().getSystemIcon(node)
+                ? view.getSystemIcon(node)
                 : super.getClosedIcon();
     }
 
@@ -81,7 +82,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         // the icon for all other nodes than the edited one.
         final java.io.File node = fileTree.getEditedNode();
         return node != null
-                ? FileSystemView.getFileSystemView().getSystemIcon(node)
+                ? view.getSystemIcon(node)
                 : super.getLeafIcon();
     }
 
@@ -96,7 +97,7 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
             final boolean hasFocus) {
         super.getTreeCellRendererComponent(
                 tree, value, selected, expanded, leaf, row, hasFocus);
-        setIcon(FileSystemView.getFileSystemView().getSystemIcon((java.io.File) value));
+        setIcon(view.getSystemIcon((java.io.File) value));
         return this;
     }
 }

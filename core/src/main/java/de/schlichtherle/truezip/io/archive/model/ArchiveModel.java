@@ -36,7 +36,7 @@ public class ArchiveModel extends FileSystemModel {
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
         super(mountPoint, null != parent
                 ? parent
-                : FileDriver.INSTANCE.newModel(mountPoint.resolve("..")));
+                : new FileDriver().newModel(mountPoint.resolve("..")));
         assert null != getParent();
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
