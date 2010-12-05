@@ -33,7 +33,7 @@ public class KeyManagerTest extends TestCase {
     @Override
     protected void setUp() {
         KeyManager.setInstance(null);
-        instance = KeyManager.get();
+        instance = KeyManager.getKeyManager();
     }
 
     @Override
@@ -45,18 +45,18 @@ public class KeyManagerTest extends TestCase {
      * Test of get/setInstance method, of class de.schlichtherle.truezip.key.KeyManager.
      */
     public void testInstance() {
-        final KeyManager inst1 = KeyManager.get();
+        final KeyManager inst1 = KeyManager.getKeyManager();
         assertNotNull(inst1);
 
         KeyManager.setInstance(null);
-        final KeyManager inst2 = KeyManager.get();
+        final KeyManager inst2 = KeyManager.getKeyManager();
         assertNotNull(inst2);
         assertNotSame(inst1, inst2);
 
         final KeyManager inst3 = new PromptingKeyManager();
 
         KeyManager.setInstance(inst3);
-        final KeyManager inst4 = KeyManager.get();
+        final KeyManager inst4 = KeyManager.getKeyManager();
         assertNotNull(inst4);
 
         assertSame(inst3, inst4);

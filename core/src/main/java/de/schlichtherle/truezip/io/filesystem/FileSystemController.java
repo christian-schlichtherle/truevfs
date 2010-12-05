@@ -152,7 +152,7 @@ public interface FileSystemController<E extends Entry> {
      * @throws IOException if any exceptional condition occurs throughout the
      *         synchronization of this file system.
      * @see    FileSystemModel#isTouched
-     * @see    FileSystems#sync
+     * @see    FileSystemManager#sync
      */
     <E extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, E> builder,

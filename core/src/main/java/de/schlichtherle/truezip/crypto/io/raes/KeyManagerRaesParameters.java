@@ -62,7 +62,7 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
     public KeyManagerRaesParameters(URI resource) {
         if (!resource.isAbsolute())
             throw new IllegalArgumentException();
-        this.manager = KeyManager.get();
+        this.manager = KeyManager.getKeyManager();
         this.resource = resource;
     }
 

@@ -248,7 +248,7 @@ class Files {
                         .getInputSocket(file.getInnerEntryName(), options);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
-        return FileSystemManager.get()
+        return FileSystemManager.getFileSystemManager()
                 .getController( new FileDriver(),
                                 URI.create( src.toURI().toString()
                                             + SEPARATOR_CHAR))
@@ -268,7 +268,7 @@ class Files {
                                             options, template);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
-        return FileSystemManager.get()
+        return FileSystemManager.getFileSystemManager()
                 .getController( new FileDriver(),
                                 URI.create( dst.toURI().toString()
                                             + SEPARATOR_CHAR))

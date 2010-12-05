@@ -25,7 +25,7 @@ import java.util.Arrays;
  * penalty if a wrong key was provided.
  * The user is prompted via an instance of the {@link PromptingKeyProviderUI}
  * user interface which is determined by the default instance of
- * {@link PromptingKeyManager} as returned by {@link KeyManager#getInstance}.
+ * {@link PromptingKeyManager} as returned by {@link KeyManager#getKeyManager}.
  * <p>
  * Like its base class, this class does not impose a certain run time type
  * of the key.

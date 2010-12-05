@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * For each resource ID, a key provider may be associated to it which handles
  * the actual retrieval of the key.
  * <p>
- * Clients need to call {@link #get} to get the default instance.
+ * Clients need to call {@link #getKeyManager} to get the default instance.
  * Because the map of key providers and some associated methods are static
  * members of this class, the default instance of this class may be changed
  * dynamically (using {@link #setInstance}) without affecting already mapped
@@ -112,12 +112,12 @@ public abstract class KeyManager {
      * @throws UndeclaredThrowableException If any other precondition on the
      *         value of the system property does not hold.
      */
-    public static synchronized KeyManager get() {
+    public static synchronized KeyManager getKeyManager() {
         if (instance != null)
             return instance;
 
         final String n = System.getProperty(KeyManager.class.getName(),
-                getDefaultKeyManagerClassName());
+                getKeyManagerClassName());
         try {
             Class<?> c = loadClass(n, KeyManager.class);
             instance = (KeyManager) c.newInstance();
@@ -130,7 +130,7 @@ public abstract class KeyManager {
         return instance;
     }
 
-    private static String getDefaultKeyManagerClassName() {
+    private static String getKeyManagerClassName() {
         if (GraphicsEnvironment.isHeadless()) {
             try {
                 Class.forName("java.io.Console");
@@ -147,7 +147,7 @@ public abstract class KeyManager {
      *
      * @param keyManager The key manager to use as the default instance.
      *        If this is set to {@code null}, on the next call to
-     *        {@link #get} a new instance will be created.
+     *        {@link #getKeyManager} a new instance will be created.
      */
     public static void setInstance(final KeyManager keyManager) {
         KeyManager.instance = keyManager;
@@ -433,7 +433,7 @@ public abstract class KeyManager {
      * for a protected resource.
      * <pre>
      * URI resource = file.getCanonicalFile().toURI();
-     * KeyManager km = KeyManager.get();
+     * KeyManager km = KeyManager.getKeyManager();
      * KeyProvider kp = km.getKeyProvider(resource, AesKeyProvider.class);
      * Object key = kp.getCreateKey(); // may prompt the user
      * int ks;
@@ -470,7 +470,7 @@ public abstract class KeyManager {
      *         of the {@code KeyProvider} interface.
      * @throws IllegalArgumentException if any other precondition on the
      *         parameter {@code type} does not hold.
-     * @see    #get
+     * @see    #getKeyManager
      */
     public synchronized KeyProvider<?> getKeyProvider(
             final URI resource,
