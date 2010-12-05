@@ -59,16 +59,6 @@ public final class FileSystemManager {
         }
     };
 
-    /**
-     * The map of all schedulers for composite file system controllers,
-     * keyed by the mount point of their respective file system model.
-     * All access to this map must be externally synchronized!
-     */
-    private final Map<URI, Link<Scheduler>> schedulers
-            = new WeakHashMap<URI, Link<Scheduler>>();
-
-    private ShutdownThread shutdownThread; // lazily initialized
-
     private static final FileSystemManager instance = new FileSystemManager();
 
     public static FileSystemManager getFileSystemManager() {
@@ -77,6 +67,14 @@ public final class FileSystemManager {
 
     FileSystemManager() {
     }
+
+    /**
+     * The map of all schedulers for composite file system controllers,
+     * keyed by the mount point of their respective file system model.
+     * All access to this map must be externally synchronized!
+     */
+    private final Map<URI, Link<Scheduler>> schedulers
+            = new WeakHashMap<URI, Link<Scheduler>>();
 
     /**
      * Equivalent to
@@ -124,7 +122,8 @@ public final class FileSystemManager {
                     throw new URISyntaxException(   mountPoint.toString(),
                                                     "Missing separator '"
                                                     + SEPARATOR_CHAR + "'");
-                parent = getController(driver,new URI(ssp.substring(0, split + 1)), null);
+                parent = getController(
+                        driver, new URI(ssp.substring(0, split + 1)), null);
             } catch (URISyntaxException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -156,8 +155,8 @@ public final class FileSystemManager {
                 controller = (CompositeFileSystemController) prospect;
             else
                 controller = new CompositeFileSystemController(prospect);
-            controller.getModel().addFileSystemListener(this);
             touchChanged(null); // setup schedule
+            controller.getModel().addFileSystemListener(this);
         }
 
         /**
@@ -212,10 +211,6 @@ public final class FileSystemManager {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-
-        // Reset statistics if it hasn't happened yet.
-        CountingReadOnlyFile.init();
-        CountingOutputStream.init();
         try {
             // The general algorithm is to sort the mount points in descending
             // order of their pathnames and then traverse the array in reverse
@@ -241,8 +236,7 @@ public final class FileSystemManager {
             }
             builder.check();
         } finally {
-            CountingReadOnlyFile.resetOnInit();
-            CountingOutputStream.resetOnInit();
+            statistics = new FileSystemStatistics(this);
         }
     }
 
@@ -277,6 +271,8 @@ public final class FileSystemManager {
         return snapshot;
     }
 
+    private FileSystemStatistics statistics = new FileSystemStatistics(this);
+
     /**
      * Returns a proxy instance which encapsulates <em>live</em> statistics
      * about the total set of federated file systems managed by this instance.
@@ -291,7 +287,7 @@ public final class FileSystemManager {
      * This delay increases if the system is under heavy load.
      */
     public FileSystemStatistics getStatistics() {
-        return new FileSystemStatistics(this);
+        return statistics;
     }
 
     /**
@@ -302,6 +298,8 @@ public final class FileSystemManager {
     public void addShutdownHook(final Runnable runnable) {
         getShutdownHook().add(runnable);
     }
+
+    private ShutdownThread shutdownThread; // lazily initialized
 
     private synchronized ShutdownThread getShutdownHook() {
         if (null == shutdownThread) {

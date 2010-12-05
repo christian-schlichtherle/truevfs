@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * A file system controller provides read/write access to a file system.
+ * Provides read/write access to a file system.
  * The file system is addressed by the
  * {@link FileSystemModel#getMountPoint() mount point} of the
  * {@link #getModel() file system model}.
@@ -61,9 +61,9 @@ public interface FileSystemController<E extends Entry> {
     FileSystemModel getModel();
 
     /**
-     * Returns the controller of the parent file system or {@code null} if and
-     * only if this file system is not federated, i.e. if it's not a member of
-     * another file system.
+     * Returns the controller for the parent federated file system or
+     * {@code null} if and only if this file system is not a member of another
+     * file system.
      */
     FederatedFileSystemController<?> getParent();
 
@@ -144,7 +144,7 @@ public interface FileSystemController<E extends Entry> {
      * Writes all changes to the contents of this file system to its
      * parent file system.
      *
-     * @param  <E> the type of the assembled {@code IOException} to throw.
+     * @param  <X> the type of the assembled {@code IOException} to throw.
      * @param  builder the non-{@code null} exception builder to use for the
      *         assembly of an {@code IOException} from the given
      *         {@code SyncException}s.
@@ -154,8 +154,8 @@ public interface FileSystemController<E extends Entry> {
      * @see    FileSystemModel#isTouched
      * @see    FileSystemManager#sync
      */
-    <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+    <X extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, X> builder,
                 BitField<SyncOption> options)
-    throws E, FileSystemException;
+    throws X, FileSystemException;
 }

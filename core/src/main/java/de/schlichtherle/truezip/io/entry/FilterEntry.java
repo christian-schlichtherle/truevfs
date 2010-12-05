@@ -22,7 +22,7 @@ package de.schlichtherle.truezip.io.entry;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterEntry<E extends Entry>
+public abstract class FilterEntry<E extends Entry>
 implements Entry {
 
     /** The decorated file system entry. */

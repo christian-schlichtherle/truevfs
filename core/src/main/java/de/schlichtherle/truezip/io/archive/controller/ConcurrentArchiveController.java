@@ -40,13 +40,14 @@ import java.io.OutputStream;
 import javax.swing.Icon;
 
 /**
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ConcurrentArchiveController<AE extends ArchiveEntry>
-extends FilterArchiveController<AE> {
+public final class ConcurrentArchiveController<E extends ArchiveEntry>
+extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
-    public ConcurrentArchiveController(ArchiveController<? extends AE> controller) {
+    public ConcurrentArchiveController(ArchiveController<? extends E> controller) {
         super(controller);
     }
 
@@ -69,7 +70,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return getController().getOpenIcon();
+                return controller.getOpenIcon();
             } finally {
                 readLock().unlock();
             }
@@ -77,7 +78,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().getOpenIcon();
+                return controller.getOpenIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -90,7 +91,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return getController().getClosedIcon();
+                return controller.getClosedIcon();
             } finally {
                 readLock().unlock();
             }
@@ -98,7 +99,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().getClosedIcon();
+                return controller.getClosedIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -111,7 +112,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return getController().isReadOnly();
+                return controller.isReadOnly();
             } finally {
                 readLock().unlock();
             }
@@ -119,7 +120,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().isReadOnly();
+                return controller.isReadOnly();
             } finally {
                 writeLock().unlock();
             }
@@ -127,12 +128,12 @@ extends FilterArchiveController<AE> {
     }
 
     @Override
-    public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
+    public ArchiveFileSystemEntry<? extends E> getEntry(String path)
     throws FileSystemException {
         try {
             readLock().lock();
             try {
-                return getController().getEntry(path);
+                return controller.getEntry(path);
             } finally {
                 readLock().unlock();
             }
@@ -140,7 +141,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().getEntry(path);
+                return controller.getEntry(path);
             } finally {
                 writeLock().unlock();
             }
@@ -153,7 +154,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return getController().isReadable(path);
+                return controller.isReadable(path);
             } finally {
                 readLock().unlock();
             }
@@ -161,7 +162,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().isReadable(path);
+                return controller.isReadable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -174,7 +175,7 @@ extends FilterArchiveController<AE> {
         try {
             readLock().lock();
             try {
-                return getController().isWritable(path);
+                return controller.isWritable(path);
             } finally {
                 readLock().unlock();
             }
@@ -182,7 +183,7 @@ extends FilterArchiveController<AE> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return getController().isWritable(path);
+                return controller.isWritable(path);
             } finally {
                 writeLock().unlock();
             }
@@ -195,7 +196,7 @@ extends FilterArchiveController<AE> {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            getController().setReadOnly(path);
+            controller.setReadOnly(path);
         } finally {
             writeLock().unlock();
         }
@@ -207,25 +208,25 @@ extends FilterArchiveController<AE> {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return getController().setTime(path, types, value);
+            return controller.setTime(path, types, value);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public InputSocket<AE> getInputSocket(  String path,
+    public InputSocket<E> getInputSocket(  String path,
                                             BitField<InputOption> options) {
-        return new Input(getController().getInputSocket(path, options));
+        return new Input(controller.getInputSocket(path, options));
     }
 
-    private class Input extends FilterInputSocket<AE> {
-        Input(InputSocket<? extends AE> input) {
+    private class Input extends FilterInputSocket<E> {
+        Input(InputSocket<? extends E> input) {
             super(input);
         }
 
         @Override
-        public AE getLocalTarget() throws IOException {
+        public E getLocalTarget() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -286,19 +287,19 @@ extends FilterArchiveController<AE> {
     } // class Input
 
     @Override
-    public OutputSocket<AE> getOutputSocket(String path,
+    public OutputSocket<E> getOutputSocket(String path,
                                             BitField<OutputOption> options,
                                             Entry template) {
-        return new Output(getController().getOutputSocket(path, options, template));
+        return new Output(controller.getOutputSocket(path, options, template));
     }
 
-    private class Output extends FilterOutputSocket<AE> {
-        Output(OutputSocket<? extends AE> output) {
+    private class Output extends FilterOutputSocket<E> {
+        Output(OutputSocket<? extends E> output) {
             super(output);
         }
 
         @Override
-        public AE getLocalTarget() throws IOException {
+        public E getLocalTarget() throws IOException {
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
@@ -329,7 +330,7 @@ extends FilterArchiveController<AE> {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return getController().mknod(path, type, options, template);
+            return controller.mknod(path, type, options, template);
         } finally {
             writeLock().unlock();
         }
@@ -341,21 +342,21 @@ extends FilterArchiveController<AE> {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            getController().unlink(path);
+            controller.unlink(path);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+    public <X extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options)
-    throws E, FileSystemException {
+    throws X, FileSystemException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            getController().sync(builder, options);
+            controller.sync(builder, options);
         } finally {
             writeLock().unlock();
         }

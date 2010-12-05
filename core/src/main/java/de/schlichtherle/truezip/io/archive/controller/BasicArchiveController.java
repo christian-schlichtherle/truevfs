@@ -98,12 +98,13 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * extensions of TrueZIP, where different synchronization strategies may be
  * implemented.
  * 
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-abstract class BasicArchiveController<AE extends ArchiveEntry>
-extends AbstractFileSystemController<AE>
-implements ArchiveController<AE> {
+abstract class BasicArchiveController<E extends ArchiveEntry>
+extends AbstractFileSystemController<E>
+implements ArchiveController<E> {
 
     private final ArchiveModel model;
 
@@ -123,7 +124,7 @@ implements ArchiveController<AE> {
         return model;
     }
 
-    final ArchiveFileSystem<AE> autoMount()
+    final ArchiveFileSystem<E> autoMount()
     throws IOException {
         return autoMount(false, BitField.noneOf(OutputOption.class));
     }
@@ -146,7 +147,7 @@ implements ArchiveController<AE> {
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
      */
-    abstract ArchiveFileSystem<AE> autoMount(   boolean autoCreate,
+    abstract ArchiveFileSystem<E> autoMount(   boolean autoCreate,
                                                 BitField<OutputOption> options)
     throws IOException;
 
@@ -203,14 +204,14 @@ implements ArchiveController<AE> {
     }
 
     @Override
-    public final InputSocket<AE> getInputSocket(
+    public final InputSocket<E> getInputSocket(
             final String path,
             final BitField<InputOption> options) {
-        class Input extends InputSocket<AE> {
+        class Input extends InputSocket<E> {
             boolean recursion;
 
             @Override
-            public AE getLocalTarget() throws IOException {
+            public E getLocalTarget() throws IOException {
                 if (!autoSync(path, READ) && !recursion) {
                     autoMount(); // detect false positives!
                     recursion = true;
@@ -220,15 +221,15 @@ implements ArchiveController<AE> {
                         recursion = false;
                     }
                 }
-                final AE entry = Links.getTarget(autoMount().getEntry(path));
+                final E entry = Links.getTarget(autoMount().getEntry(path));
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
                             path, "no such file or directory");
                 return entry;
             }
 
-            final InputSocket<? extends AE> getBoundSocket() throws IOException {
-                final AE entry = getLocalTarget();
+            final InputSocket<? extends E> getBoundSocket() throws IOException {
+                final E entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(),
                             path, "cannot read directories");
@@ -249,17 +250,17 @@ implements ArchiveController<AE> {
         return new Input();
     }
 
-    abstract InputSocket<? extends AE> getInputSocket(String name) throws IOException;
+    abstract InputSocket<? extends E> getInputSocket(String name) throws IOException;
 
     @Override
-    public final OutputSocket<AE> getOutputSocket(
+    public final OutputSocket<E> getOutputSocket(
             final String path,
             final BitField<OutputOption> options,
             final Entry template) {
-        class Output extends OutputSocket<AE> {
-            ArchiveFileSystemOperation<AE> link;
+        class Output extends OutputSocket<E> {
+            ArchiveFileSystemOperation<E> link;
 
-            AE getEntry() throws IOException {
+            E getEntry() throws IOException {
                 if (autoSync(path, WRITE))
                     link = null;
                 if (null == link) {
@@ -279,7 +280,7 @@ implements ArchiveController<AE> {
             }
 
             @Override
-            public AE getLocalTarget() throws IOException {
+            public E getLocalTarget() throws IOException {
                 if (options.get(APPEND))
                     return null; // FIXME: broken interface contract!
                 return getEntry();
@@ -287,8 +288,8 @@ implements ArchiveController<AE> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                final AE entry = getEntry();
-                final OutputSocket<? extends AE> output = getOutputSocket(entry);
+                final E entry = getEntry();
+                final OutputSocket<? extends E> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
                         ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
                         : null;
@@ -320,7 +321,7 @@ implements ArchiveController<AE> {
         return new Output();
     }
 
-    abstract OutputSocket<? extends AE> getOutputSocket(AE entry) throws IOException;
+    abstract OutputSocket<? extends E> getOutputSocket(E entry) throws IOException;
 
     @Override
     public final boolean mknod(
@@ -344,10 +345,10 @@ implements ArchiveController<AE> {
             throw new ArchiveEntryNotFoundException(getModel(),
                     path, "directory exists already");
         } else { // !isRoot(entryName)
-            final ArchiveFileSystem<AE> fileSystem
+            final ArchiveFileSystem<E> fileSystem
                     = autoMount(options.get(CREATE_PARENTS), options);
             final boolean created = null == fileSystem.getEntry(path);
-            final ArchiveFileSystemOperation<AE> link = fileSystem.mknod(
+            final ArchiveFileSystemOperation<E> link = fileSystem.mknod(
                     path, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             if (created)
@@ -360,7 +361,7 @@ implements ArchiveController<AE> {
     public void unlink(final String path) throws IOException {
         autoSync(path, null);
         if (isRoot(path)) {
-            final ArchiveFileSystem<AE> fileSystem;
+            final ArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
             } catch (FalsePositiveException ex) {

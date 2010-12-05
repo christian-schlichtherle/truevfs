@@ -76,11 +76,12 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * This archive controller implements the mounting/unmounting strategy
  * by performing a full update of the target archive file.
  *
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class UpdatingArchiveController<AE extends ArchiveEntry>
-extends FileSystemArchiveController<AE> {
+public final class UpdatingArchiveController<E extends ArchiveEntry>
+extends FileSystemArchiveController<E> {
 
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
@@ -120,13 +121,13 @@ extends FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      */
-    private final class Input extends ConcurrentInputShop<AE> {
-        Input(InputShop<AE> input) {
+    private final class Input extends ConcurrentInputShop<E> {
+        Input(InputShop<E> input) {
             super(input);
         }
 
         /** Returns the product of the archive driver this input is wrapping. */
-        InputShop<AE> getDriverProduct() {
+        InputShop<E> getDriverProduct() {
             return target;
         }
     }
@@ -138,13 +139,13 @@ extends FileSystemArchiveController<AE> {
      * prospective archive file at most one archive controller object is in
      * use at any time.
      */
-    private final class Output extends ConcurrentOutputShop<AE> {
-        Output(OutputShop<AE> output) {
+    private final class Output extends ConcurrentOutputShop<E> {
+        Output(OutputShop<E> output) {
             super(output);
         }
 
         /** Returns the product of the archive driver this output is wrapping. */
-        OutputShop<AE> getDriverProduct() {
+        OutputShop<E> getDriverProduct() {
             return target;
         }
     }
@@ -165,7 +166,7 @@ extends FileSystemArchiveController<AE> {
         }
     }
 
-    private final ArchiveDriver<AE> driver;
+    private final ArchiveDriver<E> driver;
     private final FederatedFileSystemController<?> parent;
 
     /**
@@ -184,7 +185,7 @@ extends FileSystemArchiveController<AE> {
             = new Listener();
 
     public UpdatingArchiveController(
-            final ArchiveDriver<AE> driver,
+            final ArchiveDriver<E> driver,
             final ArchiveModel model,
             final FederatedFileSystemController<?> parent) {
         super(model);
@@ -210,7 +211,7 @@ extends FileSystemArchiveController<AE> {
      * @return A valid reference to an {@link ArchiveDriver} object
      *         - never {@code null}.
      */
-    private ArchiveDriver<AE> getDriver() {
+    private ArchiveDriver<E> getDriver() {
         return driver;
     }
 
@@ -250,7 +251,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    public final ArchiveFileSystemEntry<AE> getEntry(final String path)
+    public final ArchiveFileSystemEntry<E> getEntry(final String path)
     throws FileSystemException {
         try {
             return autoMount().getEntry(path);
@@ -264,7 +265,7 @@ extends FileSystemArchiveController<AE> {
             if (null == entry)
                 return null;
             try {
-                return new SpecialFileEntry<AE>(
+                return new SpecialFileEntry<E>(
                         getDriver().newEntry(ROOT, SPECIAL, entry.getTarget()));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
@@ -353,13 +354,13 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-    InputSocket<? extends AE> getInputSocket(final String name)
+    InputSocket<? extends E> getInputSocket(final String name)
     throws IOException {
         return input.getInputSocket(name);
     }
 
     @Override
-    OutputSocket<? extends AE> getOutputSocket(final AE entry)
+    OutputSocket<? extends E> getOutputSocket(final E entry)
     throws IOException {
         makeOutput(BitField.noneOf(OutputOption.class));
         return output.getOutputSocket(entry);
@@ -368,8 +369,8 @@ extends FileSystemArchiveController<AE> {
     @Override
 	boolean autoSync(final String path, final Access intention)
     throws SyncException, FileSystemException {
-        final ArchiveFileSystem<AE> fileSystem;
-        final ArchiveFileSystemEntry<AE> entry;
+        final ArchiveFileSystem<E> fileSystem;
+        final ArchiveFileSystemEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
                 || null == (entry = fileSystem.getEntry(path)))
             return false;
@@ -393,10 +394,10 @@ extends FileSystemArchiveController<AE> {
     }
 
     @Override
-	public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+	public <X extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options)
-    throws E {
+    throws X {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -420,11 +421,11 @@ extends FileSystemArchiveController<AE> {
         builder.check();
     }
 
-    private <E extends IOException>
+    private <X extends IOException>
     void awaitSync(
-            final ExceptionBuilder<? super SyncException, E> builder,
+            final ExceptionBuilder<? super SyncException, X> builder,
             final BitField<SyncOption> options)
-    throws E {
+    throws X {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
         // don't even need to check open input streams if there are
@@ -457,18 +458,18 @@ extends FileSystemArchiveController<AE> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private <E extends IOException>
-    void commenceSync(final ExceptionHandler<? super SyncException, E> handler)
-    throws E {
+    private <X extends IOException>
+    void commenceSync(final ExceptionHandler<? super SyncException, X> handler)
+    throws X {
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, E> {
+        implements ExceptionHandler<IOException, X> {
             @Override
-			public E fail(IOException cannotHappen) {
+			public X fail(IOException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
 
             @Override
-			public void warn(IOException cause) throws E {
+			public void warn(IOException cause) throws X {
                 if (null == cause)
                     throw new NullPointerException();
                 handler.warn(new SyncWarningException(getModel(), cause));
@@ -477,9 +478,9 @@ extends FileSystemArchiveController<AE> {
 
         final FilterExceptionHandler decoratorHandler = new FilterExceptionHandler();
         if (output != null)
-            output.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
+            output.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
         if (input != null)
-            input.closeAll((ExceptionHandler<IOException, E>) decoratorHandler);
+            input.closeAll((ExceptionHandler<IOException, X>) decoratorHandler);
     }
 
     /**
@@ -490,25 +491,25 @@ extends FileSystemArchiveController<AE> {
      * @throws IOException If any exceptional condition occurs throughout the
      *         processing of the target archive file.
      */
-    private <E extends IOException>
-    void performSync(final ExceptionHandler<? super SyncException, E> handler)
-    throws E {
+    private <X extends IOException>
+    void performSync(final ExceptionHandler<? super SyncException, X> handler)
+    throws X {
         assert isTouched();
         assert output != null;
         assert checkNoDeletedEntriesWithNewData();
 
         class FilterExceptionHandler
-        implements ExceptionHandler<IOException, E> {
+        implements ExceptionHandler<IOException, X> {
             IOException last;
 
             @Override
-			public E fail(final IOException cause) {
+			public X fail(final IOException cause) {
                 last = cause;
                 return handler.fail(new SyncException(getModel(), cause));
             }
 
             @Override
-			public void warn(final IOException cause) throws E {
+			public void warn(final IOException cause) throws X {
                 assert null != cause;
                 final IOException old = last;
                 last = cause;
@@ -519,9 +520,11 @@ extends FileSystemArchiveController<AE> {
         } // class FilterExceptionHandler
 
         copy(   getFileSystem(),
-                null == input ? new DummyInputService<AE>() : input.getDriverProduct(),
+                null == input
+                    ? new DummyInputService<E>()
+                    : input.getDriverProduct(),
                 output.getDriverProduct(),
-                (ExceptionHandler<IOException, E>) new FilterExceptionHandler());
+                (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 
     private boolean checkNoDeletedEntriesWithNewData() {
@@ -530,8 +533,8 @@ extends FileSystemArchiveController<AE> {
         // Check if we have written out any entries that have been
         // deleted from the archive file system meanwhile and prepare
         // to throw a warning exception.
-        final ArchiveFileSystem<AE> fileSystem = getFileSystem();
-        for (final AE entry : output) {
+        final ArchiveFileSystem<E> fileSystem = getFileSystem();
+        for (final E entry : output) {
             assert DIRECTORY != entry.getType();
             // At this point in time we could have written only file archive
             // entries with valid path names, so the following test should be
@@ -548,14 +551,14 @@ extends FileSystemArchiveController<AE> {
         return true;
     }
 
-    private static <AE extends ArchiveEntry, E extends IOException>
-    void copy(  final ArchiveFileSystem<AE> fileSystem,
-                final InputService<AE> input,
-                final OutputService<AE> output,
-                final ExceptionHandler<IOException, E> handler)
-    throws E {
-        for (final ArchiveFileSystemEntry<AE> fse : fileSystem) {
-            final AE ae = fse.getTarget();
+    private static <E extends ArchiveEntry, X extends IOException>
+    void copy(  final ArchiveFileSystem<E> fileSystem,
+                final InputService<E> input,
+                final OutputService<E> output,
+                final ExceptionHandler<IOException, X> handler)
+    throws X {
+        for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
+            final E ae = fse.getTarget();
             final String n = ae.getName();
             if (null != output.getEntry(n))
                 continue; // we have already written this entry
@@ -590,9 +593,9 @@ extends FileSystemArchiveController<AE> {
      * @throws SyncException If any exceptional condition occurs
      *         throughout the processing of the target archive file.
      */
-    private <E extends IOException>
-    void commitSync(final ExceptionHandler<? super SyncException, E> handler)
-    throws E {
+    private <X extends IOException>
+    void commitSync(final ExceptionHandler<? super SyncException, X> handler)
+    throws X {
         setFileSystem(null);
 
         // The output archive must be closed BEFORE the input archive is
@@ -626,7 +629,7 @@ extends FileSystemArchiveController<AE> {
     }
 
     private boolean isTouched() {
-        final ArchiveFileSystem<AE> fileSystem = getFileSystem();
+        final ArchiveFileSystem<E> fileSystem = getFileSystem();
         return null != fileSystem && fileSystem.isTouched();
     }
 

@@ -63,48 +63,46 @@ public class ArchiveDriverRegistry implements Serializable {
     final Map<String, Object> drivers = new HashMap<String, Object>();
 
     /**
-     * The delegate used to lookup archive drivers when no driver is
-     * configured locally.
+     * The parent archive driver registry is used to lookup archive drivers
+     * when no archive driver is configured locally.
      * May be {@code null}.
      */
-    private final ArchiveDriverRegistry delegate;
+    private final ArchiveDriverRegistry parent;
 
-    /**
-     * Creates an empty {@code ArchiveDriverRegistry}.
-     */
-    public ArchiveDriverRegistry() {
-        this.delegate = null;
+    /** Creates an empty {@code ArchiveDriverRegistry}. */
+    ArchiveDriverRegistry() {
+        this.parent = null;
     }
 
     /**
      * Creates a new {@link ArchiveDriverRegistry} by decorating the
-     * configuration of {@code delegate} with mappings for all entries in
+     * configuration of {@code parent} with mappings for all entries in
      * {@code config}.
      * 
-     * @param delegate The {@code ArchiveDriverRegistry} which's
-     *        configuration is to be virtually inherited.
-     * @param config A map of suffix lists and archive drivers.
-     *        Each key in this map must be a non-null, non-empty archive file
-     *        suffix list, obeying the usual syntax.
-     *        Each value must either be an archive driver instance, an archive
-     *        driver class, a string with the fully qualified name name of
-     *        an archive driver class, or {@code null}.
-     *        A {@code null} archive driver may be used to shadow a
-     *        mapping for the same archive driver in {@code delegate},
-     *        effectively removing it.
-     * @throws NullPointerException If any parameter or configuration element
+     * @param  parent the {@code ArchiveDriverRegistry} which's
+     *         configuration is to be virtually inherited.
+     * @param  config a map of suffix lists and archive drivers.
+     *         Each key in this map must be a non-{@code null}, non-empty
+     *         archive file suffix list, obeying the usual syntax.
+     *         Each value must either be an archive driver instance, an archive
+     *         driver class, a string with the fully qualified name name of
+     *         an archive driver class, or {@code null}.
+     *         A {@code null} archive driver may be used to shadow a
+     *         mapping for the same archive driver in {@code delegate},
+     *         effectively removing it.
+     * @throws NullPointerException if any parameter or configuration element
      *         other than an archive driver is {@code null}.
-     * @throws IllegalArgumentException If any other parameter precondition
+     * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold or an illegal keyword is found in the
      *         configuration.
-     * @see SuffixSet Syntax Definition for Suffix Lists
+     * @see    SuffixSet Syntax Definition for Suffix Lists
      */
     public ArchiveDriverRegistry(
-            final ArchiveDriverRegistry delegate,
-            final Map<String, Object> config) {
-        if (delegate == null)
+            final ArchiveDriverRegistry parent,
+            final Map<String, ?> config) {
+        if (parent == null)
             throw new NullPointerException(getString("null", "delegate")); // NOI18N
-        this.delegate = delegate;
+        this.parent = parent;
         registerArchiveDrivers(config, true);
     }
 
@@ -125,9 +123,9 @@ public class ArchiveDriverRegistry implements Serializable {
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold or the keyword {@code DRIVER} is found.
      */
-    final void registerArchiveDrivers(	final Map<String, Object> config,
+    final void registerArchiveDrivers(	final Map<String, ?> config,
     									final boolean eager) {
-        for (final Map.Entry<String, Object> entry : config.entrySet()) {
+        for (final Map.Entry<String, ?> entry : config.entrySet()) {
             final String key = entry.getKey();
             if (KWD_DRIVER.equals(key))
                 throw new IllegalArgumentException(
@@ -187,7 +185,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * <p>
      * This instance is the head element of the registry chain.
      * If this head element does not hold an archive driver for the given
-     * suffix, then the next element in the registry chain is searched.
+     * suffix, then the next element in the registry chain (i.e. its parent)
+     * is searched.
      * This repeats recursively until either an archive driver is found or
      * the end of the chain is reached.
      * <p>
@@ -214,10 +213,10 @@ public class ArchiveDriverRegistry implements Serializable {
         Object driver = drivers.get(suffix);
         if (!(driver instanceof ArchiveDriver<?>)) {
             if (null == driver) {
-                if (drivers.containsKey(suffix) || null == delegate)
+                if (drivers.containsKey(suffix) || null == parent)
                     return null;
                 // Lookup the driver in the delegate.
-                driver = delegate.getArchiveDriver(suffix); // may be null!
+                driver = parent.getArchiveDriver(suffix); // may be null!
             } else {
                 // We have found an entry in the drivers map, but it isn't
                 // an ArchiveDriver, so we probably need to load its class
@@ -264,7 +263,7 @@ public class ArchiveDriverRegistry implements Serializable {
      * this registry object.
      */
     public final SuffixSet getSuffixes() {
-        return decorate(null != delegate ? delegate.getSuffixes() : new SuffixSet());
+        return decorate(null != parent ? parent.getSuffixes() : new SuffixSet());
     }
 
     /**

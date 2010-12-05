@@ -26,26 +26,21 @@ import java.io.IOException;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <E> The type of the entries.
- * @see FilterInputShop
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @see     FilterInputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputShop<
-        E extends Entry,
-        CO extends OutputShop<E>>
-extends FilterEntryContainer<E, CO>
+public abstract class FilterOutputShop<E extends Entry, O extends OutputShop<E>>
+extends FilterEntryContainer<E, O>
 implements OutputShop<E> {
 
-    protected FilterOutputShop(final CO output) {
+    protected FilterOutputShop(final O output) {
         super(output);
     }
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(E entry) {
-        if (null == entry)
-            throw new NullPointerException();
-
         return target.getOutputSocket(entry);
     }
 

@@ -26,7 +26,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterInputSocket<LT extends Entry>
+public abstract class FilterInputSocket<LT extends Entry>
 extends InputSocket<LT> {
 
     private InputSocket<? extends LT> input;

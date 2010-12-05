@@ -22,9 +22,8 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * A federated file system controller provides read/write access to one or more
- * file systems which are organized in a chain of responsibility for file
- * system federation.
+ * Provides read/write access to one or more file systems which are organized
+ * in a chain of responsibility for file system federation.
  * Hence, implementations of this interface must not throw a
  * {@link FileSystemException}, but rather resolve the issue internally instead.
  * The file system at the head of the chain is addressed by the
@@ -57,8 +56,8 @@ extends FileSystemController<E> {
     boolean isWritable(String path);
 
     @Override
-    <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
+    <X extends IOException>
+    void sync(  ExceptionBuilder<? super SyncException, X> builder,
                 BitField<SyncOption> options)
-    throws E;
+    throws X;
 }

@@ -23,18 +23,19 @@ import java.util.Iterator;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <E> The type of the entries.
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterEntryContainer< E extends Entry,
-                                            EC extends EntryContainer<E>>
+public abstract class FilterEntryContainer<
+        E extends Entry,
+        C extends EntryContainer<E>>
 implements EntryContainer<E> {
 
     /** The decorated entry container. */
-    protected EC target;
+    protected C target;
 
-    protected FilterEntryContainer(final EC target) {
+    protected FilterEntryContainer(final C target) {
         this.target = target;
     }
 

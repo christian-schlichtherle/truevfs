@@ -18,133 +18,37 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionBuilder;
-import java.io.IOException;
-import javax.swing.Icon;
+import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
 
 /**
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterArchiveController<AE extends ArchiveEntry>
-extends AbstractFileSystemController<AE>
-implements ArchiveController<AE> {
-
-    private final ArchiveController<? extends AE> controller;
+public abstract class FilterArchiveController<
+        E extends ArchiveEntry,
+        FSC extends ArchiveController<? extends E>>
+extends FilterFileSystemController<E, FSC>
+implements ArchiveController<E> {
 
     /**
      * Constructs a new filter archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
-    protected FilterArchiveController(final ArchiveController<? extends AE> controller) {
-        assert null != controller;
-        this.controller = controller;
-    }
-
-    protected final ArchiveController<? extends AE> getController() {
-        return controller;
+    protected FilterArchiveController(final FSC controller) {
+        super(controller);
     }
 
     @Override
-    public final ArchiveModel getModel() {
-        return getController().getModel();
+    public ArchiveModel getModel() {
+        return controller.getModel();
     }
 
     @Override
-    public FederatedFileSystemController<?> getParent() {
-        return getController().getParent();
-    }
-
-    @Override
-    public Icon getOpenIcon() throws FileSystemException {
-        return getController().getOpenIcon();
-    }
-
-    @Override
-    public Icon getClosedIcon() throws FileSystemException {
-        return getController().getClosedIcon();
-    }
-
-    @Override
-    public boolean isReadOnly() throws FileSystemException {
-        return getController().isReadOnly();
-    }
-
-    @Override
-    public ArchiveFileSystemEntry<? extends AE> getEntry(String path)
+    public ArchiveFileSystemEntry<? extends E> getEntry(String path)
     throws FileSystemException {
-        return getController().getEntry(path);
-    }
-
-    @Override
-    public boolean isReadable(String path) throws FileSystemException {
-        return getController().isReadable(path);
-    }
-
-    @Override
-    public boolean isWritable(String path) throws FileSystemException {
-        return getController().isWritable(path);
-    }
-
-    @Override
-    public void setReadOnly(String path) throws IOException {
-        getController().setReadOnly(path);
-    }
-
-    @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
-    throws IOException {
-        return getController().setTime(path, types, value);
-    }
-
-    @Override
-    public InputSocket<? extends AE> getInputSocket(
-            final String path,
-            final BitField<InputOption> options) {
-        return getController().getInputSocket(path, options);
-    }
-
-    @Override
-    public OutputSocket<? extends AE> getOutputSocket(
-            String path,
-            BitField<OutputOption> options,
-            Entry template) {
-        return getController().getOutputSocket(path, options, template);
-    }
-
-    @Override
-    public boolean mknod(   String path,
-                            Type type,
-                            BitField<OutputOption> options,
-                            Entry template)
-    throws IOException {
-        return getController().mknod(path, type, options, template);
-    }
-
-    @Override
-    public void unlink(String path) throws IOException {
-        getController().unlink(path);
-    }
-
-    @Override
-    public <E extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, E> builder,
-                BitField<SyncOption> options)
-    throws E, FileSystemException {
-        getController().sync(builder, options);
+        return controller.getEntry(path);
     }
 }

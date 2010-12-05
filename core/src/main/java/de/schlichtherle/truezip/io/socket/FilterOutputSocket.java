@@ -25,7 +25,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputSocket<LT extends Entry>
+public abstract class FilterOutputSocket<LT extends Entry>
 extends OutputSocket<LT> {
 
     private OutputSocket<? extends LT> output;
