@@ -15,16 +15,19 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
+import de.schlichtherle.truezip.io.InputBusyException;
+import de.schlichtherle.truezip.io.InputException;
+import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemListener;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.FilterEntry;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
@@ -34,9 +37,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
-import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -48,7 +49,6 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputService;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -59,16 +59,17 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.newArchiveFileSystem;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
-import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
@@ -308,7 +309,7 @@ extends FileSystemArchiveController<AE> {
             final InputSocket<?> socket = parent.getInputSocket(
                     parentPath, BitField.of(InputOption.CACHE));
             input = new Input(getDriver().newInputShop(getModel(), socket));
-            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(
+            setFileSystem(newArchiveFileSystem(
                     input.getDriverProduct(), getDriver(),
                     socket.getLocalTarget(), readOnly));
         } catch (FileSystemException ex) {
@@ -333,7 +334,7 @@ extends FileSystemArchiveController<AE> {
                 throw new FalsePositiveException(getModel(), ex2);
             }
             listener.beforeTouch(null);
-            setFileSystem(ArchiveFileSystem.newArchiveFileSystem(getDriver()));
+            setFileSystem(newArchiveFileSystem(getDriver()));
             listener.afterTouch(null);
         }
         getFileSystem().addArchiveFileSystemListener(listener);

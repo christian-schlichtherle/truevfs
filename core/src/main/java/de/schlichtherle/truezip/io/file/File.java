@@ -722,7 +722,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = FileSystemManager.get().getController(
+        this.controller = FileSystemManager.getFileSystemManager().getController(
                 detector.getArchiveDriver(target.getPath()),
                 URI.create(target.toURI().toString() + SEPARATOR_CHAR),
                 null == enclArchive ? null : enclArchive.getController());
@@ -1121,7 +1121,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveException {
-        FileSystemManager.get().sync(null, new ArchiveExceptionBuilder(), options);
+        FileSystemManager.getFileSystemManager().sync(null, new ArchiveExceptionBuilder(), options);
     }
 
     /**
@@ -1203,7 +1203,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FileSystemManager.get().sync(
+        FileSystemManager.getFileSystemManager().sync(
                 URI.create(archive.getCanOrAbsFile().toURI().toString() + SEPARATOR_CHAR),
                 new ArchiveExceptionBuilder(),
                 options);
@@ -1386,7 +1386,7 @@ public class File extends java.io.File {
      * This delay increases if the system is under heavy load.
      */
     public static FileSystemStatistics getFileSystemStatistics() {
-        return FileSystemManager.get().getStatistics();
+        return FileSystemManager.getFileSystemManager().getStatistics();
     }
 
     /**
@@ -2762,7 +2762,7 @@ public class File extends java.io.File {
                 }
             }
         }
-        FileSystemManager.get().addShutdownHook(new DeleteOnExit());
+        FileSystemManager.getFileSystemManager().addShutdownHook(new DeleteOnExit());
     }
 
     /**

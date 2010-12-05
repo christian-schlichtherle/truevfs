@@ -71,7 +71,7 @@ public final class FileSystemManager {
 
     private static final FileSystemManager instance = new FileSystemManager();
 
-    public static FileSystemManager get() {
+    public static FileSystemManager getFileSystemManager() {
         return instance;
     }
 
@@ -312,9 +312,8 @@ public final class FileSystemManager {
     }
 
     /**
-     * This singleton shutdown hook thread class runs
-     * {@link ShutdownRunnable.ShutdownRunnables#SINGLETON} when the JVM terminates.
-     * You cannot instantiate this class.
+     * This shutdown thread class runs the runnable provided to its constructor
+     * when it starts execution.
      *
      * @see FileSystemManager#addShutdownHook(java.lang.Runnable)
      */
@@ -329,9 +328,8 @@ public final class FileSystemManager {
         }
 
         /**
-         * Adds the given {@code runnable} to the set of runnables to run by
-         * {@link ShutdownRunnable.ShutdownRunnables#SINGLETON} when the JVM
-         * terminates.
+         * Adds the given {@code runnable} to the set of runnables to run
+         * when this thread starts execution.
          */
         void add(final Runnable runnable) {
             runnables.add(runnable);
@@ -359,7 +357,7 @@ public final class FileSystemManager {
             // This may help if this shutdown hook is run as a JVM shutdown
             // hook in an app server environment where class loading is
             // disabled.
-            PromptingKeyManager.get();
+            PromptingKeyManager.getKeyManager();
         }
 
         /**
