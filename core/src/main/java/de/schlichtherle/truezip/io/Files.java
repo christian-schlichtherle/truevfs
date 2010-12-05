@@ -148,7 +148,6 @@ public class Files extends Paths {
                     // Be conservative: We don't allow writing to this file!
                     return false;
                 }
-
                 boolean ok;
                 try {
                     // Open the file for reading and writing, requiring any
@@ -172,7 +171,6 @@ public class Files extends Paths {
                         } else {
                             empty = false;
                         }
-
                         // Let's test if we can overwrite the first byte.
                         // See issue #29.
                         raf.seek(0);
@@ -202,11 +200,11 @@ public class Files extends Paths {
                     }
                 }
                 return ok;
-            } else { // if (!file.createNewFile() && !file.canWrite()) {
+            } else { // if (!file.canWrite()) {
                 return false;
             }
         } catch (IOException ex) {
-            return false; // don't allow writing if anything goes wrong!
+            return false;
         }
     }
 

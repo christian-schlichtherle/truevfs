@@ -28,7 +28,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterOutputStream extends OutputStream {
+public abstract class FilterOutputStream extends OutputStream {
 
     /** The decorated output stream. */
     protected OutputStream out;
@@ -39,7 +39,7 @@ public class FilterOutputStream extends OutputStream {
      *
      * @param out the output stream to wrap in this decorator.
      */
-    public FilterOutputStream(final OutputStream out) {
+    protected FilterOutputStream(final OutputStream out) {
         this.out = out;
     }
 

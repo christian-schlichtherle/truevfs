@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterInputStream extends InputStream {
+public abstract class FilterInputStream extends InputStream {
 
     /** The decorated input stream. */
     protected InputStream in;
@@ -38,7 +38,7 @@ public class FilterInputStream extends InputStream {
      *
      * @param in the input stream to wrap in this decorator.
      */
-    public FilterInputStream(final InputStream in) {
+    protected FilterInputStream(final InputStream in) {
         this.in = in;
     }
 

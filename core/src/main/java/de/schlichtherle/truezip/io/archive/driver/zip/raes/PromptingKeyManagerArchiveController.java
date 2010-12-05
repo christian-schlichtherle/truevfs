@@ -31,7 +31,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 final class PromptingKeyManagerArchiveController
-extends     FilterArchiveController<ZipEntry> {
+extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
 
     /**
      * Constructs a new prompting key manager archive controller.
@@ -45,7 +45,7 @@ extends     FilterArchiveController<ZipEntry> {
 
     @Override
     public void unlink(String path) throws IOException {
-        getController().unlink(path);
+        controller.unlink(path);
         if (isRoot(path))
             PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
     }

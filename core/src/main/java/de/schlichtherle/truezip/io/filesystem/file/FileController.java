@@ -50,11 +50,7 @@ implements FederatedFileSystemController<FileEntry> {
     private final FileSystemModel model;
     private final File target;
 
-    /*FileController(final URI mountPoint) {
-        this(new FileSystemModel(mountPoint));
-    }*/
-
-    public FileController(final FileSystemModel model) {
+    FileController(final FileSystemModel model) {
         final URI mountPoint = model.getMountPoint();
         if (!"file".equals(mountPoint.getScheme()))
             throw new IllegalArgumentException();
@@ -105,7 +101,6 @@ implements FederatedFileSystemController<FileEntry> {
     public boolean isWritable(String path) {
         final File file = new File(target, path);
         return isCreatableOrWritable(file);
-        //return FileEntry.get(target, path).canWrite();
     }
 
     @Override
@@ -169,8 +164,8 @@ implements FederatedFileSystemController<FileEntry> {
     }
 
     @Override
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+    public <X extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options) {
         throw new UnsupportedOperationException();
     }

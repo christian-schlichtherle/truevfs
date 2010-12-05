@@ -33,10 +33,9 @@ import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.Icon;
 
 /**
- * A composite file system controller implements a chain of responsibility
- * in order to resolve {@link FalsePositiveException}s thrown by the
- * prospective file system provided to its
- * {@link #CompositeFileSystemController constructor}.
+ * Implements a chain of responsibility in order to resolve
+ * {@link FalsePositiveException}s thrown by the prospective file system
+ * provided to its {@link #CompositeFileSystemController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
@@ -54,10 +53,8 @@ implements FederatedFileSystemController<Entry> {
     private final FileSystemController<?> prospect;
 
     CompositeFileSystemController(final FileSystemController<?> prospect) {
-        if (null == prospect.getParent())
-            throw new NullPointerException();
-        if (prospect instanceof FederatedFileSystemController<?>)
-            throw new IllegalArgumentException();
+        assert null != prospect.getParent();
+        assert !(prospect instanceof FederatedFileSystemController<?>);
         this.prospect = prospect;
     }
 
@@ -289,10 +286,10 @@ implements FederatedFileSystemController<Entry> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, E> builder,
+    public <X extends IOException>
+    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options)
-    throws E {
+    throws X {
         try {
             getProspect().sync(builder, options);
         } catch (FileSystemException ex) {

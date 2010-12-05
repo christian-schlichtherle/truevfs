@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -26,26 +25,21 @@ import java.io.IOException;
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  *
- * @param <E> The type of the entries.
- * @see FilterOutputShop
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @see     FilterOutputShop
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FilterInputShop<
-        E extends Entry,
-        CI extends InputShop<E>>
-extends    FilterEntryContainer<E, CI>
+public abstract class FilterInputShop<E extends Entry, I extends InputShop<E>>
+extends FilterEntryContainer<E, I>
 implements InputShop<E> {
 
-    protected FilterInputShop(final CI input) {
+    protected FilterInputShop(final I input) {
         super(input);
     }
 
     @Override
     public InputSocket<? extends E> getInputSocket(String name) {
-        if (null == name)
-            throw new NullPointerException();
-
         return target.getInputSocket(name);
     }
 

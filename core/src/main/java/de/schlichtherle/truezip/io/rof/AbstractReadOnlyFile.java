@@ -41,9 +41,9 @@ public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
     @Override
 	public void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
-        int total = 0;
+        int total = 0, read;
         do {
-            final int read = read(buf, off + total, len - total);
+            read = read(buf, off + total, len - total);
             if (read < 0)
                 throw new EOFException();
             total += read;

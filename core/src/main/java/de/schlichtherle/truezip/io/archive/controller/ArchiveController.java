@@ -22,16 +22,17 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 
 /**
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveController<AE extends ArchiveEntry>
-extends FileSystemController<AE> {
+public interface ArchiveController<E extends ArchiveEntry>
+extends FileSystemController<E> {
 
     @Override
     ArchiveModel getModel();
 
     @Override
-    ArchiveFileSystemEntry<? extends AE> getEntry(String path)
+    ArchiveFileSystemEntry<? extends E> getEntry(String path)
     throws FileSystemException;
 }
