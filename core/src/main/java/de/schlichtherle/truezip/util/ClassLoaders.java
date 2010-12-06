@@ -56,12 +56,12 @@ public class ClassLoaders {
             l1 = ClassLoader.getSystemClassLoader(); // just in case somebody adds TrueZIP to the Boot Class Path
         try {
             return l1.loadClass(classToLoad);
-        } catch (ClassNotFoundException cnfe) {
+        } catch (ClassNotFoundException ex) {
             ClassLoader l2 = Thread.currentThread().getContextClassLoader();
             if (l2 == null)
                 l2 = ClassLoader.getSystemClassLoader();
             if (l1 == l2)
-                throw cnfe; // optimization: there's no point in trying this twice.
+                throw ex; // optimization: there's no point in trying this twice.
             return l2.loadClass(classToLoad);
         }
     }

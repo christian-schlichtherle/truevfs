@@ -24,20 +24,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Provides statistics for the file systems managed by a single file system
- * manager.
+ * Provides statistics for the federated file systems managed by a single file
+ * system manager.
+ * <p>
+ * Note that this class is thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class FileSystemStatistics {
 
-    private final FileSystemManager manager;
+    private final StatisticsFederatedFileSystemManager manager;
     private volatile long read;
     private volatile long written;
 
-    FileSystemStatistics(final FileSystemManager provider) {
-        this.manager = provider;
+    FileSystemStatistics(final StatisticsFederatedFileSystemManager manager) {
+        this.manager = manager;
     }
 
     ReadOnlyFile countBytes(ReadOnlyFile rof) {
@@ -93,28 +95,14 @@ public final class FileSystemStatistics {
     } // CountingInputStream
 
     /**
-     * Returns the total number of bytes read from all <em>top level file
-     * systems</em> which have been updated by a call to
-     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
+     * Returns the total number of bytes read from all <em>top level</em>
+     * federated file systems, i.e. all file systems which are not a member
+     * of another federated file system.
      * <p>
-     * Please note that this method counts only input from top level file
-     * systems which have been touched, i.e. archive files which are actually
-     * updated and are not contained in other file systems and hence are
-     * present in the host file system.
-     * <p>
-     * This method is intended to be used for progress monitors and is a rough
-     * indicator about what is going on inside the TrueZIP API.
-     * The return value will be reset automatically where required,
-     * so if this value is going to {@code 0} again you know that a knew
-     * update cycle has begun.
-     * Other than this, you should not rely on its actual value.
-     * <p>
-     * For an example how to use this please refer to the source
-     * code for {@code nzip.ProgressMonitor} in the base package.
-     *
-     * @see FileSystemManager#sync(URI, ExceptionBuilder, BitField)
+     * This method is intended to be used to monitor the progress of the
+     * method {@link FileSystemManager#sync}.
      */
-    public long getSyncTotalByteCountRead() {
+    public long getTopLevelRead() {
         return read;
     }
 
@@ -141,34 +129,18 @@ public final class FileSystemStatistics {
     } // class CountingOutputStream
 
     /**
-     * Returns the total number of bytes written to all <em>top level file
-     * systems</em> which have been updated by a call to
-     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
+     * Returns the total number of bytes written to all <em>top level</em>
+     * federated file systems, i.e. all file systems which are not a member
+     * of another federated file system.
      * <p>
-     * Please note that this method counts only output to top level file
-     * systems which have been touched, i.e. archive files which are actually
-     * updated and are not contained in other file systems and hence are
-     * present in the host file system.
-     * <p>
-     * This method is intended to be used for progress monitors and is a rough
-     * indicator about what is going on inside the TrueZIP API.
-     * The return value will be reset automatically where required,
-     * so if this value is going to {@code 0} again you know that a knew
-     * update cycle has begun.
-     * Other than this, you should not rely on its actual value.
-     * <p>
-     * For an example how to use this please refer to the source
-     * code for {@code nzip.ProgressMonitor} in the base package.
-     *
-     * @see FileSystemManager#sync(URI, ExceptionBuilder, BitField)
+     * This method is intended to be used to monitor the progress of the
+     * method {@link FileSystemManager#sync}.
      */
-    public long getSyncTotalByteCountWritten() {
+    public long getTopLevelWritten() {
         return written;
     }
 
-    /**
-     * Returns the total number of file systems processed.
-     */
+    /** Returns the total number of managed federated file systems. */
     public int getFileSystemsTotal() {
         return manager.getControllers().size();
     }

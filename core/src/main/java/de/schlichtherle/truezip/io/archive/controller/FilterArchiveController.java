@@ -28,8 +28,8 @@ import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
  */
 public abstract class FilterArchiveController<
         E extends ArchiveEntry,
-        FSC extends ArchiveController<? extends E>>
-extends FilterFileSystemController<E, FSC>
+        C extends ArchiveController<? extends E>>
+extends FilterFileSystemController<E, C>
 implements ArchiveController<E> {
 
     /**
@@ -37,7 +37,7 @@ implements ArchiveController<E> {
      *
      * @param controller the non-{@code null} archive controller.
      */
-    protected FilterArchiveController(final FSC controller) {
+    protected FilterArchiveController(final C controller) {
         super(controller);
     }
 

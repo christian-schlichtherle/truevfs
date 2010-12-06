@@ -57,6 +57,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
             = ResourceBundle.getBundle(CLASS_NAME);
     private static final String PACKAGE_NAME
             = PromptingKeyProviderUI.class.getPackage().getName();
+    static final URI INITIAL_RESOURCE = URI.create("null:/");
 
     /**
      * The timeout for the EDT to <em>start</em> prompting for a key in
@@ -81,7 +82,7 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    static URI lastResource = URI.create("null:/"); // NOI18N
+    static URI lastResource = INITIAL_RESOURCE; // NOI18N
 
     private Feedback unknownCreateKeyFeedback;
     private Feedback invalidCreateKeyFeedback;

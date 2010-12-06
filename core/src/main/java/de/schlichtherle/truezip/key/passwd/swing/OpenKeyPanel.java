@@ -105,7 +105,8 @@ public class OpenKeyPanel extends EnhancedPanel {
      */
     public void setResource(final URI resource) {
         final URI lastResource = PromptingKeyProviderUI.lastResource;
-        if (!lastResource.equals(resource) && !"".equals(lastResource)) {
+        if (!lastResource.equals(resource)
+                && !lastResource.equals(PromptingKeyProviderUI.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);

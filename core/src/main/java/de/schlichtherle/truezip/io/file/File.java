@@ -28,7 +28,7 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FileSystemManager;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import java.io.FileFilter;
@@ -722,7 +722,7 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = FileSystemManager.getFileSystemManager().getController(
+        this.controller = FederatedFileSystemManager.getInstance().getController(
                 detector.getArchiveDriver(target.getPath()),
                 URI.create(target.toURI().toString() + SEPARATOR_CHAR),
                 null == enclArchive ? null : enclArchive.getController());
@@ -1121,7 +1121,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveException {
-        FileSystemManager.getFileSystemManager().sync(null, new ArchiveExceptionBuilder(), options);
+        FederatedFileSystemManager.getInstance().sync(null, new ArchiveExceptionBuilder(), options);
     }
 
     /**
@@ -1203,7 +1203,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FileSystemManager.getFileSystemManager().sync(
+        FederatedFileSystemManager.getInstance().sync(
                 URI.create(archive.getCanOrAbsFile().toURI().toString() + SEPARATOR_CHAR),
                 new ArchiveExceptionBuilder(),
                 options);
@@ -1373,29 +1373,12 @@ public class File extends java.io.File {
     }
 
     /**
-     * Returns a proxy instance which encapsulates <em>live</em> statistics
-     * about the total map of archive files accessed by this package.
-     * Any call to a method of the returned interface instance returns
-     * up-to-date data, so there is no need to repeatedly call this method in
-     * order to optain updated statistics.
-     * <p>
-     * Note that this method returns <em>live</em> statistics rather than
-     * <em>real time</em> statistics.
-     * So there may be a slight delay until the values returned reflect
-     * the actual state of this package.
-     * This delay increases if the system is under heavy load.
-     */
-    public static FileSystemStatistics getFileSystemStatistics() {
-        return FileSystemManager.getFileSystemManager().getStatistics();
-    }
-
-    /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemManager.strict}.
+     * {@code de.schlichtherle.truezip.io.archive.controllers.FederatedFileSystemManager.strict}.
      * In other words, this returns {@code true} unless you map the
      * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FileSystemManager.strict}
+     * {@code de.schlichtherle.truezip.io.archive.controllers.FederatedFileSystemManager.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
      * @see #setLenient(boolean)
@@ -2762,7 +2745,7 @@ public class File extends java.io.File {
                 }
             }
         }
-        FileSystemManager.getFileSystemManager().addShutdownHook(new DeleteOnExit());
+        FederatedFileSystemManager.getInstance().addShutdownHook(new DeleteOnExit());
     }
 
     /**

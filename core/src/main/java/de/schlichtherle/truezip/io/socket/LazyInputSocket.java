@@ -36,14 +36,55 @@ extends FilterInputSocket<LT> {
     }
 
     @Override
+    public final ReadOnlyFile newReadOnlyFile() throws IOException {
+        return new LazyReadOnlyFile();
+    }
+
+    @Override
     public final InputStream newInputStream() throws IOException {
         return new LazyInputStream();
     }
 
-    @Override
-    public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new LazyReadOnlyFile();
-    }
+    private class LazyReadOnlyFile extends FilterReadOnlyFile {
+        LazyReadOnlyFile() {
+            super(null);
+        }
+
+        ReadOnlyFile getReadOnlyFile() throws IOException {
+            return null != rof ? rof : (rof = getBoundSocket().newReadOnlyFile());
+        }
+
+        @Override
+        public long length() throws IOException {
+            return getReadOnlyFile().length();
+        }
+
+        @Override
+        public long getFilePointer() throws IOException {
+            return getReadOnlyFile().getFilePointer();
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            getReadOnlyFile().seek(pos);
+        }
+
+        @Override
+        public int read() throws IOException {
+            return getReadOnlyFile().read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return getReadOnlyFile().read(b, off, len);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (null != rof)
+                rof.close();
+        }
+    } // class LazyReadOnlyFile
 
     private class LazyInputStream extends FilterInputStream {
         LazyInputStream() {
@@ -108,45 +149,4 @@ extends FilterInputSocket<LT> {
             }
         }
     } // class LazyInputStream
-
-    private class LazyReadOnlyFile extends FilterReadOnlyFile {
-        LazyReadOnlyFile() {
-            super(null);
-        }
-
-        ReadOnlyFile getReadOnlyFile() throws IOException {
-            return null != rof ? rof : (rof = getBoundSocket().newReadOnlyFile());
-        }
-
-        @Override
-        public long length() throws IOException {
-            return getReadOnlyFile().length();
-        }
-
-        @Override
-        public long getFilePointer() throws IOException {
-            return getReadOnlyFile().getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            getReadOnlyFile().seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            return getReadOnlyFile().read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            return getReadOnlyFile().read(b, off, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (null != rof)
-                rof.close();
-        }
-    } // class LazyReadOnlyFile
 }

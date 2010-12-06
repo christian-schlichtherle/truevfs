@@ -153,7 +153,7 @@ abstract class CommandLineUtility {
     protected static class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final FileSystemStatistics liveStats = File.getFileSystemStatistics();
+        private final FileSystemStatistics stats = null;
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
@@ -191,10 +191,8 @@ abstract class CommandLineUtility {
          */
         private void showProgress() {
             // Round up to kilobytes.
-            args[0] = new Long(
-                    (liveStats.getSyncTotalByteCountRead() + 1023) / 1024);
-            args[1] = new Long(
-                    (liveStats.getSyncTotalByteCountWritten() + 1023) / 1024);
+            args[0] = new Long((stats.getTopLevelRead() + 1023) / 1024);
+            args[1] = new Long((stats.getTopLevelWritten() + 1023) / 1024);
             err.print(MessageFormat.format(
                     "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
             err.flush();
@@ -202,9 +200,6 @@ abstract class CommandLineUtility {
 
         @SuppressWarnings("CallToThreadDumpStack")
         private void shutdown() {
-            /*if (err != System.err && err != System.out)
-                return;*/
-
             interrupt();
             try {
                 join();

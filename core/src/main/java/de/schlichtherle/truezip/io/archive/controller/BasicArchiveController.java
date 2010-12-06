@@ -237,13 +237,13 @@ implements ArchiveController<E> {
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
-                return getBoundSocket().newInputStream();
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return getBoundSocket().newReadOnlyFile();
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getBoundSocket().newReadOnlyFile();
+            public InputStream newInputStream() throws IOException {
+                return getBoundSocket().newInputStream();
             }
         } // class Input
 

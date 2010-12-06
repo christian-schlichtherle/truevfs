@@ -372,7 +372,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * @return A clone of the set of archive file system listeners.
      */
     @SuppressWarnings("unchecked")
-    protected final Set<ArchiveFileSystemListener<? super AE>>
+    final Set<ArchiveFileSystemListener<? super AE>>
     getArchiveFileSystemListeners() {
         return (Set<ArchiveFileSystemListener<? super AE>>) listeners.clone();
     }

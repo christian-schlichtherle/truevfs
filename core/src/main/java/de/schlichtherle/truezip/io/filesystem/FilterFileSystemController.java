@@ -33,14 +33,14 @@ import javax.swing.Icon;
  */
 public abstract class FilterFileSystemController<
         E extends Entry,
-        FSC extends FileSystemController<? extends E>>
+        C extends FileSystemController<? extends E>>
 extends AbstractFileSystemController<E>
 implements FileSystemController<E> {
 
     /** The decorated file system controller. */
-    protected FSC controller;
+    protected C controller;
 
-    protected FilterFileSystemController(final FSC controller) {
+    protected FilterFileSystemController(final C controller) {
         this.controller = controller;
     }
 

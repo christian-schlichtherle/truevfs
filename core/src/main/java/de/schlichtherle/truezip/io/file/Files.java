@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
-import de.schlichtherle.truezip.io.filesystem.FileSystemManager;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -248,7 +248,7 @@ class Files {
                         .getInputSocket(file.getInnerEntryName(), options);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
-        return FileSystemManager.getFileSystemManager()
+        return FederatedFileSystemManager.getInstance()
                 .getController( new FileDriver(),
                                 URI.create( src.toURI().toString()
                                             + SEPARATOR_CHAR))
@@ -268,7 +268,7 @@ class Files {
                                             options, template);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
-        return FileSystemManager.getFileSystemManager()
+        return FederatedFileSystemManager.getInstance()
                 .getController( new FileDriver(),
                                 URI.create( dst.toURI().toString()
                                             + SEPARATOR_CHAR))

@@ -167,6 +167,5 @@ implements FederatedFileSystemController<FileEntry> {
     public <X extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options) {
-        throw new UnsupportedOperationException();
     }
 }
