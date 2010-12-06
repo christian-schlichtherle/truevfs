@@ -104,6 +104,7 @@ public abstract class KeyManager {
         KeyManager manager = instance;
         if (null == manager) {
             synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
+                manager = instance;
                 if (null == manager) {
                     final String n = System.getProperty(
                             KeyManager.class.getName(),

@@ -45,7 +45,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
     private final Strategy factory;
     private Pool<Buffer, IOException> inputStrategy;
     private Pool<Buffer, IOException> outputStrategy;
-    private Buffer buffer;
+    private volatile Buffer buffer;
 
     DefaultCache(   final InputSocket <? extends LT> input,
                     final OutputSocket<? extends LT> output,
@@ -83,6 +83,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
     public void flush() throws IOException {
         if (null != buffer) { // DCL is OK in this context!
             synchronized (DefaultCache.this) {
+                final Buffer buffer = this.buffer;
                 if (null != buffer)
                     getOutputStrategy().release(buffer);
             }
@@ -107,6 +108,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (DefaultCache.this) {
+                Buffer buffer = DefaultCache.this.buffer;
                 if (null == buffer) {
                     final InputSocket<? extends LT> input
                             = inputProxy.getBoundSocket();
@@ -130,7 +132,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    buffer = new Buffer(output.getTemp());
+                    DefaultCache.this.buffer = buffer = new Buffer(output.getTemp());
                 }
                 buffer.used++;
                 return buffer;
@@ -138,11 +140,11 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         }
 
         @Override
-        public void release(final Buffer buf) throws IOException {
+        public void release(final Buffer buffer) throws IOException {
             synchronized (DefaultCache.this) {
-                buf.used--;
-                if (buf != buffer && 0 == buf.used)
-                    pool.release(buf.file);
+                buffer.used--;
+                if (buffer != DefaultCache.this.buffer && 0 == buffer.used)
+                    pool.release(buffer.file);
             }
         }
     } // class InputStrategy
@@ -154,14 +156,14 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         }
 
         @Override
-        public void release(final Buffer buf) throws IOException {
+        public void release(final Buffer buffer) throws IOException {
             try {
                 final OutputSocket<? extends LT> output
                         = outputProxy.getBoundSocket();
                 assert null == output.getPeerTarget();
                 class ProxyInput extends FilterInputSocket<Entry> {
                     ProxyInput() {
-                        super(FileInputSocket.get(buf.file));
+                        super(FileInputSocket.get(buffer.file));
                     }
 
                     @Override
@@ -171,7 +173,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                 }
                 IOSocket.copy(new ProxyInput(), output);
             } catch (IOException ex) {
-                pool.release(buf.file);
+                pool.release(buffer.file);
                 throw ex;
             }
         }
@@ -181,22 +183,22 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         @Override
         public Buffer allocate() throws IOException {
             synchronized (DefaultCache.this) {
-                final Buffer buf = super.allocate();
-                buf.dirty = true;
-                return buf;
+                final Buffer buffer = super.allocate();
+                buffer.dirty = true;
+                return buffer;
             }
         }
 
         @Override
-        public void release(final Buffer buf) throws IOException {
-            if (!buf.dirty)
+        public void release(final Buffer buffer) throws IOException {
+            if (!buffer.dirty)
                 return;
             synchronized (DefaultCache.this) {
-                if (buf != buffer) {
-                    buffer = buf;
+                if (buffer != DefaultCache.this.buffer) {
+                    DefaultCache.this.buffer = buffer;
                 } else {
-                    buf.dirty = false;
-                    super.release(buf);
+                    buffer.dirty = false;
+                    super.release(buffer);
                 }
             }
         }
@@ -204,12 +206,12 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
 
     final class WriteThroughOutputStrategy extends OutputStrategy {
         @Override
-        public void release(final Buffer buf) throws IOException {
-            if (buf != buffer) { // DCL is OK in this context!
+        public void release(final Buffer buffer) throws IOException {
+            if (buffer != DefaultCache.this.buffer) { // DCL is OK in this context!
                 synchronized (DefaultCache.this) {
-                    if (buf != buffer) {
-                        buffer = buf;
-                        super.release(buf);
+                    if (buffer != DefaultCache.this.buffer) {
+                        DefaultCache.this.buffer = buffer;
+                        super.release(buffer);
                     }
                 }
             }
