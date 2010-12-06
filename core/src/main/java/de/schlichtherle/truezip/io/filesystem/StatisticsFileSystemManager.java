@@ -37,6 +37,19 @@ extends FederatedFileSystemManager {
     public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
             final FileSystemDriver<M> driver,
+            final URI mountPoint) {
+        final FederatedFileSystemController<?> controller
+                = super.getController(driver, mountPoint);
+        return controller instanceof ManagedFileSystemController
+                && !(controller.getParent() instanceof ManagedFileSystemController)
+                ? new StatisticsFileSystemController(controller, this)
+                : controller;
+    }
+
+    @Override
+    public <M extends FileSystemModel>
+    FederatedFileSystemController<?> getController(
+            final FileSystemDriver<M> driver,
             final URI mountPoint,
             final FederatedFileSystemController<?> parent) {
         final FederatedFileSystemController<?> controller

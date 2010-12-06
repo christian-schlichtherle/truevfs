@@ -57,19 +57,19 @@ public class FileSystemManagerTest {
             { "zip:zip:zip:file:/outer.zip!/inner.zip!/nuts.zip!/" },
         }) {
             final FederatedFileSystemController<?> controller
-                    = manager.getController(driver,
-                                            URI.create(params[0]),
-                                            null);
+                    = manager.getController(driver, URI.create(params[0]));
         }
     }
 
     @Test
     public void testGetControllerWithHierarchicalMountPoint() {
+        final FileSystemDriver<?> file = new FileDriver();
+        final FileSystemDriver<?> zip = new ZipDriver();
         for (final Object[] params : new Object[][] {
-            { new FileDriver(), "file:/" },
-            { new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
-            { new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
-            { new ZipDriver(), "file:/outer.zip/inner.zip/nuts.zip/", new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
+            { file, "file:/" },
+            { zip, "file:/outer.zip/", file, "file:/" },
+            { zip, "file:/outer.zip/inner.zip/", zip, "file:/outer.zip/", file, "file:/" },
+            { zip, "file:/outer.zip/inner.zip/nuts.zip/", zip, "file:/outer.zip/inner.zip/", zip, "file:/outer.zip/", file, "file:/" },
         }) {
             FederatedFileSystemController<?> controller = null;
             for (int i = params.length; 0 <= --i; ) {
