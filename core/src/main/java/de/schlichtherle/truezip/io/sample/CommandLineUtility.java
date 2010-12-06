@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.sample;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.file.File;
+import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
+import de.schlichtherle.truezip.io.filesystem.ManagedFileSystemStatistics;
+import de.schlichtherle.truezip.io.filesystem.StatisticsFileSystemManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -38,7 +39,7 @@ abstract class CommandLineUtility {
     protected final PrintStream err;
 
     /** The command line progress monitor. */
-    protected final ProgressMonitor progressMonitor;
+    protected final ProgressMonitor monitor;
 
     /**
      * Equivalent to
@@ -76,15 +77,15 @@ abstract class CommandLineUtility {
         this.err = err instanceof PrintStream
                 ? (PrintStream) err
                 : new PrintStream(err, autoFlush);
-        this.progressMonitor = new ProgressMonitor(this.err);
-        configKeyManager();
+        this.monitor = new ProgressMonitor(this.err);
+        configureKeyManager();
     }
 
     /**
      * Configure the key manager to use when prompting the user for keys for
      * RAES encrypted ZIP files.
      */
-    private static void configKeyManager() {
+    private static void configureKeyManager() {
         String feedback;
         feedback = "de.schlichtherle.truezip.key.passwd.swing.InvalidOpenKeyFeedback";
         System.setProperty(feedback,
@@ -110,12 +111,12 @@ abstract class CommandLineUtility {
     public final int run(final String[] args) {
         try {
             try {
-                return runChecked(args) ? 0 : 1;
+                return runChecked(args);
             } finally {
                 try {
                     File.umount();
                 } finally {
-                    progressMonitor.shutdown();
+                    monitor.shutdown();
                 }
             }
         } catch (IllegalUsageException ex) {
@@ -131,34 +132,36 @@ abstract class CommandLineUtility {
      * Runs this command line utility.
      * Throws an exception if an error occurs.
      *
-     * @param args A non-empty array of Unix-like commands and optional
-     *        parameters.
-     * @return {@code false} iff the command is a test which fails,
-     *         {@code true} otherwise.
+     * @param  args a non-{@code null} array of command line parameters.
+     * @return the return code for {@link System#exit}.
      * @throws IllegalUsageException If {@code args} does not contain
      *         correct commands or parameters.
      * @throws IOException On any I/O related exception.
      */
-    public abstract boolean runChecked(String[] args)
+    public abstract int runChecked(String[] args)
     throws IllegalUsageException, IOException;
 
-    protected static abstract class IllegalUsageException extends IllegalArgumentException {
+    protected static class IllegalUsageException extends Exception {
         private static final long serialVersionUID = 1985623981423542464L;
 
-        IllegalUsageException(String msg) {
+        public IllegalUsageException(String msg) {
             super(msg);
         }
     } // class IllegalUsageException
 
-    protected static class ProgressMonitor extends Thread {
+    protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final FileSystemStatistics stats = null;
+        private final ManagedFileSystemStatistics stats;
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
+            final StatisticsFileSystemManager manager
+                    = new StatisticsFileSystemManager();
+            this.stats = manager.getStatistics();
+            FederatedFileSystemManager.setInstance(manager);
         }
 
         @Override

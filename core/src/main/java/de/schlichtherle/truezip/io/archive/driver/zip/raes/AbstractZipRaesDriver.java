@@ -122,8 +122,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final ArchiveModel model,
             final InputSocket<?> target)
     throws IOException {
-        class InputSocket extends FilterInputSocket<Entry> {
-            InputSocket() {
+        class Input extends FilterInputSocket<Entry> {
+            Input() {
                 super(target);
             }
 
@@ -150,8 +150,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                     throw ex;
                 }
             }
-        }
-        return super.newInputShop(model, new InputSocket());
+        } // class Input
+
+        return super.newInputShop(model, new Input());
     }
 
     /**
@@ -187,8 +188,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
-        class OutputSocket extends FilterOutputSocket<Entry> {
-            OutputSocket() {
+        class Output extends FilterOutputSocket<Entry> {
+            Output() {
                 super(target);
             }
 
@@ -212,8 +213,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                     throw cause;
                 }
             }
-        }
-        return super.newOutputShop(model, new OutputSocket(), source);
+        } // class Output
+
+        return super.newOutputShop(model, new Output(), source);
     }
 
     /**

@@ -179,8 +179,8 @@ extends FilterOutputShop<E, OutputShop<E>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class OutputSocket extends FilterOutputSocket<E> {
-            OutputSocket() {
+        class Output extends FilterOutputSocket<E> {
+            Output() {
                 super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
 
@@ -195,7 +195,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
             }
         } // class Output
 
-        return new OutputSocket();
+        return new Output();
     }
 
     private final class SynchronizedConcurrentOutputStream

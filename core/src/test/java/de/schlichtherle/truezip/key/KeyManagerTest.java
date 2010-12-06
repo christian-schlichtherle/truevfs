@@ -17,33 +17,31 @@
 package de.schlichtherle.truezip.key;
 
 import java.net.URI;
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class KeyManagerTest extends TestCase {
+public class KeyManagerTest {
     private KeyManager instance;
 
-    public KeyManagerTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() {
-        KeyManager.setInstance(null);
+    @Before
+    public void setUp() {
         instance = KeyManager.getInstance();
     }
 
-    @Override
-    protected void tearDown() {
+    @After
+    public void tearDown() {
+        KeyManager.resetAndRemoveKeyProviders();
         KeyManager.setInstance(null);
     }
 
-    /**
-     * Test of get/setInstance method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testInstance() {
         final KeyManager inst1 = KeyManager.getInstance();
         assertNotNull(inst1);
@@ -62,9 +60,7 @@ public class KeyManagerTest extends TestCase {
         assertSame(inst3, inst4);
     }
 
-    /**
-     * Test of get/setKeyProvider method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testKeyProvider() {
         final URI idA = URI.create("keyProviderA");
 
@@ -116,16 +112,7 @@ public class KeyManagerTest extends TestCase {
         }
     }
 
-    static class SucceedingKeyProvider extends PromptingKeyProvider {
-    }
-
-    /** The key manager cannot instantiate this private class. */
-    private static class FailingKeyProvider extends PromptingKeyProvider {
-    }
-
-    /**
-     * Test of resetKeyProvider method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testResetKeyProvider() {
         final URI id = URI.create("resetKeyProvider");
 
@@ -140,9 +127,7 @@ public class KeyManagerTest extends TestCase {
         assertSame(provider, instance.getKeyProvider(id, (Class) KeyProvider.class));
     }
 
-    /**
-     * Test of resetAndRemoveKeyProvider method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testResetAndRemoveKeyProvider() {
         final URI idA = URI.create("resetAndRemoveKeyProviderA");
         final URI idB = URI.create("resetAndRemoveKeyProviderB");
@@ -170,9 +155,7 @@ public class KeyManagerTest extends TestCase {
         assertNotSame(provB1, provB2);
     }
 
-    /**
-     * Test of resetKeyProviders method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testResetKeyProviders() {
         final URI idA = URI.create("resetKeyProvidersA");
         final URI idB = URI.create("resetKeyProvidersB");
@@ -193,9 +176,7 @@ public class KeyManagerTest extends TestCase {
         assertTrue(provB.reset);
     }
 
-    /**
-     * Test of resetAndClearKeyProviders method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testResetAndRemoveKeyProviders() {
         final URI idA = URI.create("resetAndRemoveKeyProvidersA");
         final URI idB = URI.create("resetAndRemoveKeyProvidersB");
@@ -221,9 +202,7 @@ public class KeyManagerTest extends TestCase {
         assertNotSame(provB1, provB2);
     }
 
-    /**
-     * Test of moveKeyProvider method, of class de.schlichtherle.truezip.key.KeyManager.
-     */
+    @Test
     public void testMoveKeyProvider() {
         final URI oldID = URI.create("moveKeyProviderA");
         final URI newID = URI.create("moveKeyProviderB");
@@ -264,9 +243,12 @@ public class KeyManagerTest extends TestCase {
         assertSame(newID, provB1.getResource());
     }
 
-    //
-    // Inner classes.
-    //
+    static class SucceedingKeyProvider extends PromptingKeyProvider<char[]> {
+    }
+
+    /** The key manager cannot instantiate this private class. */
+    private static class FailingKeyProvider extends PromptingKeyProvider<char[]> {
+    }
 
     static class SimpleKeyProvider implements KeyProvider<char[]> {
         @Override

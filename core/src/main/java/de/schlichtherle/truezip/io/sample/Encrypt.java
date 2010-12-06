@@ -60,24 +60,15 @@ public class Encrypt extends CommandLineUtility {
     }
 
     @Override
-	public boolean runChecked(final String[] args)
+	public int runChecked(final String[] args)
     throws IllegalUsageException, IOException {
         if (args.length != 2)
-            throw new IllegalUsageException();
+            throw new IllegalUsageException(resources.getString("usage"));
 
         if (new File(args[1]).isEntry())
-            progressMonitor.start();
+            monitor.start();
 
         RaesFiles.encrypt(args[0], args[1]);
-        return true;
+        return 0;
     }
-
-    public class IllegalUsageException
-            extends CommandLineUtility.IllegalUsageException {
-        private static final long serialVersionUID = 2456163893462987342L;
-
-        private IllegalUsageException() {
-            super(resources.getString("usage"));
-        }
-    } // class IllegalUsageException
 }

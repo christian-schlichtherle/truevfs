@@ -42,7 +42,7 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * Manages federated file systems.
+ * A container which manages the lifecycle of federated file system controllers.
  * <p>
  * Note that this class is thread-safe.
  *
@@ -128,7 +128,7 @@ public class FederatedFileSystemManager {
      *         managed file systems.
      */
     public static synchronized void setInstance(final FederatedFileSystemManager manager) {
-        final int count = instance.schedulers.size();
+        final int count = null == instance ? 0 : instance.schedulers.size();
         if (0 < count)
             throw new IllegalStateException("There are " + count + " managed federated file systems!");
         if (null == manager)
@@ -224,10 +224,10 @@ public class FederatedFileSystemManager {
 
     private final class Scheduler implements FileSystemListener {
 
-        final CompositeFileSystemController controller;
+        final ManagedFileSystemController controller;
 
         Scheduler(final FileSystemController<?> prospect) {
-            controller = new CompositeFileSystemController(prospect);
+            controller = new ManagedFileSystemController(prospect);
             touchChanged(null); // setup schedule
         }
 
@@ -322,7 +322,7 @@ public class FederatedFileSystemManager {
                     : new HashSet<FederatedFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
             for (final Link<Scheduler> link : schedulers.values()) {
                 final Scheduler scheduler = Links.getTarget(link);
-                final CompositeFileSystemController controller
+                final ManagedFileSystemController controller
                         = null == scheduler ? null : scheduler.controller;
                 if (null != controller && controller
                         .getModel()

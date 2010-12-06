@@ -32,20 +32,71 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileSystemStatistics {
+public final class ManagedFileSystemStatistics {
 
-    private final StatisticsFederatedFileSystemManager manager;
+    private final StatisticsFileSystemManager manager;
     private volatile long read;
     private volatile long written;
+    private boolean closed;
 
-    FileSystemStatistics(final StatisticsFederatedFileSystemManager manager) {
+    ManagedFileSystemStatistics(final StatisticsFileSystemManager manager) {
         this.manager = manager;
+    }
+
+    /**
+     * Returns the total number of managed federated file systems.
+     */
+    public int getFileSystemsTotal() {
+        return manager.getControllers().size();
+    }
+
+    /**
+     * Returns the number of managed federated file systems which have been
+     * touched and need synchronization by calling
+     * {@link StatisticsFileSystemManager#sync}.
+     * <p>
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this is unreliable!
+     */
+    public int getFileSystemsTouched() {
+        int result = 0;
+        for (FederatedFileSystemController<?> controller : manager.getControllers())
+            if (controller.getModel().isTouched())
+                result++;
+        return result;
+    }
+
+    /**
+     * Returns the total number of <em>top level</em> managed federated file
+     * systems.
+     */
+    public int getTopLevelFileSystemsTotal() {
+        int result = 0;
+        for (FederatedFileSystemController<?> controller : manager.getControllers())
+            if (!(controller.getParent() instanceof ManagedFileSystemController))
+                result++;
+        return result;
+    }
+
+    /**
+     * Returns the number of <em>top level</em> managed federated file systems
+     * which have been touched and need synchronization by calling
+     * {@link StatisticsFileSystemManager#sync}.
+     */
+    public int getTopLevelFileSystemsTouched() {
+        int result = 0;
+        for (FederatedFileSystemController<?> controller : manager.getControllers()) {
+            if (!(controller.getParent() instanceof ManagedFileSystemController))
+                if (controller.getModel().isTouched())
+                    result++;
+        }
+        return result;
     }
 
     ReadOnlyFile countBytes(ReadOnlyFile rof) {
         return new CountingReadOnlyFile(rof);
     }
-    
+
     private final class CountingReadOnlyFile extends FilterReadOnlyFile {
         CountingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
@@ -96,11 +147,11 @@ public final class FileSystemStatistics {
 
     /**
      * Returns the total number of bytes read from all <em>top level</em>
-     * federated file systems, i.e. all file systems which are not a member
-     * of another federated file system.
+     * managed federated file systems, i.e. all file systems which are not a
+     * member of another federated file system.
      * <p>
      * This method is intended to be used to monitor the progress of the
-     * method {@link FileSystemManager#sync}.
+     * method {@link StatisticsFileSystemManager#sync}.
      */
     public long getTopLevelRead() {
         return read;
@@ -130,63 +181,28 @@ public final class FileSystemStatistics {
 
     /**
      * Returns the total number of bytes written to all <em>top level</em>
-     * federated file systems, i.e. all file systems which are not a member
-     * of another federated file system.
+     * managed federated file systems, i.e. all file systems which are not a
+     * member of another federated file system.
      * <p>
      * This method is intended to be used to monitor the progress of the
-     * method {@link FileSystemManager#sync}.
+     * method {@link StatisticsFileSystemManager#sync}.
      */
     public long getTopLevelWritten() {
         return written;
     }
 
-    /** Returns the total number of managed federated file systems. */
-    public int getFileSystemsTotal() {
-        return manager.getControllers().size();
+    void close() {
+        closed = true;
     }
 
     /**
-     * Returns the number of file systems which have been touched and
-     * need synchronization by calling
-     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
-     * Note that you should <em>not</em> use the returned value to call this
-     * method conditionally - this is unreliable!
-     * Instead, you should always call one of those methods unconditionally.
+     * Returns {@code true} iff this statistics instance has been closed and
+     * should not receive any more updates.
+     *
+     * @return {@code true} iff this statistics instance has been closed and
+     *         should not receive any more updates.
      */
-    public int getFileSystemsTouched() {
-        int result = 0;
-        for (FederatedFileSystemController<?> controller : manager.getControllers())
-            if (controller.getModel().isTouched())
-                result++;
-        return result;
-    }
-
-    /**
-     * Returns the total number of top level file systems processed.
-     */
-    public int getTopLevelFileSystemsTotal() {
-        int result = 0;
-        for (FederatedFileSystemController<?> controller : manager.getControllers())
-            if (null == controller.getModel().getParent())
-                result++;
-        return result;
-    }
-
-    /**
-     * Returns the number of top level file systems which have been touched and
-     * need synchronization by calling
-     * {@link FileSystemManager#sync(URI, ExceptionBuilder, BitField)}.
-     * Note that you should <em>not</em> use the returned value to call this
-     * method conditionally - this is unreliable!
-     * Instead, you should always call one of those methods unconditionally.
-     */
-    public int getTopLevelFileSystemsTouched() {
-        int result = 0;
-        for (FederatedFileSystemController<?> controller : manager.getControllers()) {
-            final FileSystemModel model = controller.getModel();
-            if (null == model.getParent() && model.isTouched())
-                result++;
-        }
-        return result;
+    public boolean isClosed() {
+        return closed;
     }
 }

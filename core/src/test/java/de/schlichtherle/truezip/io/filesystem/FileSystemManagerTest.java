@@ -51,8 +51,10 @@ public class FileSystemManagerTest {
     @Test
     public void testGetControllerWithOpaqueMountPoint() {
         for (final String[] params : new String[][] {
+            { "file:/" },
             { "zip:file:/outer.zip!/" },
             { "zip:zip:file:/outer.zip!/inner.zip!/" },
+            { "zip:zip:zip:file:/outer.zip!/inner.zip!/nuts.zip!/" },
         }) {
             final FederatedFileSystemController<?> controller
                     = manager.getController(driver,
@@ -64,20 +66,17 @@ public class FileSystemManagerTest {
     @Test
     public void testGetControllerWithHierarchicalMountPoint() {
         for (final Object[] params : new Object[][] {
-            { new ZipDriver(), "file:/outer.zip/", null, null },
+            { new FileDriver(), "file:/" },
             { new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
-            { new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/" },
+            { new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
+            { new ZipDriver(), "file:/outer.zip/inner.zip/nuts.zip/", new ZipDriver(), "file:/outer.zip/inner.zip/", new ZipDriver(), "file:/outer.zip/", new FileDriver(), "file:/" },
         }) {
-            final FederatedFileSystemController<?> controller
-                    = manager.getController(
-                        (FileSystemDriver<?>) params[0],
-                        URI.create((String) params[1]),
-                        null == params[2]
-                            ? null
-                            : manager.getController(
-                                (FileSystemDriver<?>) params[2],
-                                URI.create((String) params[3]),
-                                null));
+            FederatedFileSystemController<?> controller = null;
+            for (int i = params.length; 0 <= --i; ) {
+                final URI mountPoint = URI.create((String) params[i--]);
+                final FileSystemDriver<?> driver = (FileSystemDriver<?>) params[i];
+                controller = manager.getController(driver, mountPoint, controller);
+            }
         }
     }
 

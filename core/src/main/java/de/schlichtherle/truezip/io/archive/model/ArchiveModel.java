@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.archive.model;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
@@ -33,11 +32,10 @@ public class ArchiveModel extends FileSystemModel {
 
     public ArchiveModel(final URI mountPoint,
                         final FileSystemModel parent) {
-        // FIXME: Replace FileDriver.INSTANCE with a service locator!
-        super(mountPoint, null != parent
-                ? parent
-                : new FileDriver().newModel(mountPoint.resolve("..")));
-        assert null != getParent();
+        super(mountPoint, parent);
+        if (null == parent)
+            throw new NullPointerException();
+        assert parent == getParent();
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();
