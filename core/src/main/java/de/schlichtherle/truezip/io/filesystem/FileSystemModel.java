@@ -213,7 +213,7 @@ public class FileSystemModel {
                 .append(getClass().getName())
                 .append("[mountPoint=")
                 .append(getMountPoint())
-                .append("[,parent=")
+                .append(",parent=")
                 .append(getParent())
                 .append(",touched=")
                 .append(touched)
