@@ -144,15 +144,11 @@ public class FederatedFileSystemManager {
     private final Map<URI, Link<Scheduler>> schedulers
             = new WeakHashMap<URI, Link<Scheduler>>();
 
-    /**
-     * Equivalent to
-     * {@link #getController(FileSystemDriver, URI, FederatedFileSystemController) getController(driver, mountPoint, null)}.
-     */
-    public final <FSM extends FileSystemModel>
+    public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
-            FileSystemDriver<FSM> driver,
+            final FileSystemDriver<M> driver,
             URI mountPoint) {
-        return getController(driver, mountPoint, null);
+        return getController0(driver, mountPoint, null);
     }
 
     /**
@@ -175,9 +171,20 @@ public class FederatedFileSystemManager {
      */
     public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
+            FileSystemDriver<M> driver,
+            URI mountPoint,
+            FederatedFileSystemController<?> parent) {
+        if (mountPoint.isOpaque())
+            throw new IllegalArgumentException();
+        return getController0(driver, mountPoint, parent);
+    }
+
+    private <M extends FileSystemModel>
+    FederatedFileSystemController<?> getController0(
             final FileSystemDriver<M> driver,
             URI mountPoint,
             FederatedFileSystemController<?> parent) {
+        assert !mountPoint.isOpaque() || null == parent;
         if (null == parent && mountPoint.isOpaque()) {
             try {
                 String ssp = mountPoint.getSchemeSpecificPart();
@@ -190,7 +197,7 @@ public class FederatedFileSystemManager {
                     throw new URISyntaxException(   mountPoint.toString(),
                                                     "Missing separator '"
                                                     + SEPARATOR_CHAR + "'");
-                parent = getController(
+                parent = getController0(
                         driver, new URI(ssp.substring(0, split + 1)), null);
             } catch (URISyntaxException ex) {
                 throw new IllegalArgumentException(ex);
