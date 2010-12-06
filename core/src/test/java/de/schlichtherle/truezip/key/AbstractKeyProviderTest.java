@@ -8,21 +8,17 @@
 package de.schlichtherle.truezip.key;
 
 import java.util.Arrays;
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AbstractKeyProviderTest extends TestCase {
+public class AbstractKeyProviderTest {
 
-    public AbstractKeyProviderTest(String testName) {
-        super(testName);
-    }
-
-    /**
-     * Test of cloneKey method, of class truevfs.key.AbstractKeyProvider.
-     */
+    @Test
     public void testClone() {
         Cloneable[] keys = {
             "test".getBytes(),
@@ -52,6 +48,30 @@ public class AbstractKeyProviderTest extends TestCase {
         }
     }
 
+    public void testClone(final Cloneable key, final Cloneable clone) {
+        assertNotSame(key, clone);
+        if (key instanceof byte[])
+            assertTrue(Arrays.equals((byte[]) key, (byte[]) clone));
+        else if (key instanceof char[])
+            assertTrue(Arrays.equals((char[]) key, (char[]) clone));
+        else if (key instanceof short[])
+            assertTrue(Arrays.equals((short[]) key, (short[]) clone));
+        else if (key instanceof int[])
+            assertTrue(Arrays.equals((int[]) key, (int[]) clone));
+        else if (key instanceof long[])
+            assertTrue(Arrays.equals((long[]) key, (long[]) clone));
+        else if (key instanceof float[])
+            assertTrue(Arrays.equals((float[]) key, (float[]) clone));
+        else if (key instanceof double[])
+            assertTrue(Arrays.equals((double[]) key, (double[]) clone));
+        else if (key instanceof boolean[])
+            assertTrue(Arrays.equals((boolean[]) key, (boolean[]) clone));
+        else if (key instanceof Object[])
+            assertTrue(Arrays.equals((Object[]) key, (Object[]) clone));
+        else
+            assertEquals(key, clone);
+    }
+
     private static class CloneMe implements Cloneable {
         private final int rnd = (int) Math.random();
 
@@ -75,29 +95,5 @@ public class AbstractKeyProviderTest extends TestCase {
             hash = 59 * hash + this.rnd;
             return hash;
         }
-    }
-
-    public void testClone(final Cloneable key, final Cloneable clone) {
-        assertNotSame(key, clone);
-        if (key instanceof byte[])
-            assertTrue(Arrays.equals((byte[]) key, (byte[]) clone));
-        else if (key instanceof char[])
-            assertTrue(Arrays.equals((char[]) key, (char[]) clone));
-        else if (key instanceof short[])
-            assertTrue(Arrays.equals((short[]) key, (short[]) clone));
-        else if (key instanceof int[])
-            assertTrue(Arrays.equals((int[]) key, (int[]) clone));
-        else if (key instanceof long[])
-            assertTrue(Arrays.equals((long[]) key, (long[]) clone));
-        else if (key instanceof float[])
-            assertTrue(Arrays.equals((float[]) key, (float[]) clone));
-        else if (key instanceof double[])
-            assertTrue(Arrays.equals((double[]) key, (double[]) clone));
-        else if (key instanceof boolean[])
-            assertTrue(Arrays.equals((boolean[]) key, (boolean[]) clone));
-        else if (key instanceof Object[])
-            assertTrue(Arrays.equals((Object[]) key, (Object[]) clone));
-        else
-            assertEquals(key, clone);
     }
 }

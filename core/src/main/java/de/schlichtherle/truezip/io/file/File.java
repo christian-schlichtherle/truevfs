@@ -17,20 +17,20 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.util.BitField;
-import java.util.Collection;
-import java.util.Arrays;
-import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
+import de.schlichtherle.truezip.io.Paths.Splitter;
+import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -44,6 +44,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -722,10 +724,22 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        this.controller = FederatedFileSystemManager.getInstance().getController(
-                detector.getArchiveDriver(target.getPath()),
-                URI.create(target.toURI().toString() + SEPARATOR_CHAR),
-                null == enclArchive ? null : enclArchive.getController());
+        final ArchiveDriver<?> driver
+                = detector.getArchiveDriver(target.getPath());
+        final URI mountPoint
+                = URI.create(target.toURI().toString() + SEPARATOR_CHAR);
+        FederatedFileSystemController<?> parentController;
+        if (null != enclArchive) {
+            parentController = enclArchive.getController();
+        } else {
+            final FileDriver parentDriver = new FileDriver();
+            final FileSystemModel parentModel
+                    = parentDriver.newModel(mountPoint.resolve(".."));
+            parentController = parentDriver.newController(parentModel);
+        }
+        this.controller = FederatedFileSystemManager
+                .getInstance()
+                .getController(driver, mountPoint, parentController);
     }
 
     /**
@@ -1375,13 +1389,12 @@ public class File extends java.io.File {
     /**
      * Returns the value of the class property {@code lenient}.
      * By default, this is the inverse of the boolean system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FederatedFileSystemManager.strict}.
+     * {@code de.schlichtherle.truezip.io.file.strict}.
      * In other words, this returns {@code true} unless you map the
-     * system property
-     * {@code de.schlichtherle.truezip.io.archive.controllers.FederatedFileSystemManager.strict}
+     * system property {@code de.schlichtherle.truezip.io.file.strict}
      * to {@code true} or call {@link #setLenient(boolean) setLenient(false)}.
      *
-     * @see #setLenient(boolean)
+     * @see #setLenient
      */
     public static boolean isLenient() {
         return lenient;

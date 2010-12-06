@@ -75,8 +75,8 @@ implements de.schlichtherle.truezip.key.PromptingKeyProviderUI<Cloneable, P> {
     // output.
     public static final int KEY_FILE_LEN = 512;
 
-    private static final Map<PromptingKeyProvider, OpenKeyPanel> openKeyPanels
-            = new WeakHashMap<PromptingKeyProvider, OpenKeyPanel>();
+    private static final Map<PromptingKeyProvider<?>, OpenKeyPanel> openKeyPanels
+            = new WeakHashMap<PromptingKeyProvider<?>, OpenKeyPanel>();
 
     /**
      * The last resource ID used when prompting.

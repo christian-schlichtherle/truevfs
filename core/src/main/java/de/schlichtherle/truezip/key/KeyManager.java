@@ -393,7 +393,7 @@ public abstract class KeyManager {
      *         {@code forType}, or if {@code useType} does not
      *         provide a public constructor with no parameters.
      */
-    protected final synchronized <K extends Cloneable, P extends KeyProvider<K>>
+    protected final synchronized <K extends Cloneable, P extends KeyProvider<? extends K>>
     void mapKeyProviderType(
             final Class<P> forType,
             final Class<? extends P> useType) {

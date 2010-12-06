@@ -30,7 +30,8 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class StatisticsFederatedFileSystemManager extends FederatedFileSystemManager {
+public final class StatisticsFileSystemManager
+extends FederatedFileSystemManager {
 
     @Override
     public <M extends FileSystemModel>
@@ -40,31 +41,34 @@ public final class StatisticsFederatedFileSystemManager extends FederatedFileSys
             final FederatedFileSystemController<?> parent) {
         final FederatedFileSystemController<?> controller
                 = super.getController(driver, mountPoint, parent);
-        return null != controller.getParent()
-                ? controller
-                : new StatisticsFileSystemController(controller, this);
+        return controller instanceof ManagedFileSystemController
+                && !(controller.getParent() instanceof ManagedFileSystemController)
+                ? new StatisticsFileSystemController(controller, this)
+                : controller;
     }
 
-    private FileSystemStatistics statistics = new FileSystemStatistics(this);
+    private ManagedFileSystemStatistics statistics
+            = new ManagedFileSystemStatistics(this);
 
     /**
-     * Returns a non-{@code null} object which provides asynchronously updated
-     * statistics about the set of federated file systems managed by this
-     * instance.
-     * Any call to a method of the returned object returns up-to-date data,
-     * so there is no need to repeatedly call this method in order to update
-     * the statistics.
+     * Returns a non-{@code null} object which provides statistics about the
+     * set of federated file systems managed by this instance.
+     * The statistics provided by the returned object get asynchronously
+     * updated up to the next call to {@link #sync}. The
      * <p>
      * Note that there may be a slight delay until the values returned reflect
      * the actual state of this package.
      * This delay increases if the system is under heavy load.
+     *
+     * @see #sync
+     * @see ManagedFileSystemStatistics#isClosed
      */
-    public FileSystemStatistics getStatistics() {
+    public synchronized ManagedFileSystemStatistics getStatistics() {
         return statistics;
     }
 
     @Override
-    public <E extends IOException>
+    public synchronized <E extends IOException>
     void sync(  URI prefix,
                 ExceptionBuilder<? super IOException, E> builder,
                 BitField<SyncOption> options)
@@ -72,7 +76,8 @@ public final class StatisticsFederatedFileSystemManager extends FederatedFileSys
         try {
             super.sync(prefix, builder, options);
         } finally {
-            statistics = new FileSystemStatistics(this);
+            statistics.close();
+            statistics = new ManagedFileSystemStatistics(this);
         }
     }
 

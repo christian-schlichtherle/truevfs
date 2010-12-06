@@ -37,10 +37,11 @@ extends FilterFederatedFileSystemController<
         Entry,
         FederatedFileSystemController<?>>{
 
-    private final StatisticsFederatedFileSystemManager manager;
+    private final StatisticsFileSystemManager manager;
 
-    StatisticsFileSystemController(  FederatedFileSystemController<?> controller,
-                                    StatisticsFederatedFileSystemManager manager) {
+    StatisticsFileSystemController(
+            FederatedFileSystemController<?> controller,
+            StatisticsFileSystemManager manager) {
         super(controller);
         this.manager = manager;
     }

@@ -37,7 +37,6 @@ import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.ConcurrentInputShop;
 import de.schlichtherle.truezip.io.socket.ConcurrentOutputShop;
 import de.schlichtherle.truezip.io.socket.InputOption;
@@ -189,18 +188,12 @@ extends FileSystemArchiveController<E> {
             final ArchiveModel model,
             final FederatedFileSystemController<?> parent) {
         super(model);
-        assert null != model.getParent();
         if (null == driver)
-            throw new IllegalArgumentException();
+            throw new NullPointerException();
+        if (parent.getModel() != model.getParent())
+            throw new IllegalArgumentException("parent/member mismatch");
         this.driver = driver;
-        if (null != parent) {
-            if (parent.getModel() != model.getParent())
-                throw new IllegalArgumentException("parent/member mismatch");
-            this.parent = parent;
-        } else {
-            // FIXME: Replace FileDriver.INSTANCE with a service locator!
-            this.parent = new FileDriver().newController(model.getParent());
-        }
+        this.parent = parent;
     }
 
     /**

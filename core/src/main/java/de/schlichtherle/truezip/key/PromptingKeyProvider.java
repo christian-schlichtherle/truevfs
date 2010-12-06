@@ -25,7 +25,7 @@ import java.util.Arrays;
  * penalty if a wrong key was provided.
  * The user is prompted via an instance of the {@link PromptingKeyProviderUI}
  * user interface which is determined by the default instance of
- * {@link PromptingKeyManager} as returned by {@link KeyManager#getKeyManager}.
+ * {@link PromptingKeyManager} as returned by {@link KeyManager#getInstance}.
  * <p>
  * Like its base class, this class does not impose a certain run time type
  * of the key.
@@ -46,10 +46,10 @@ import java.util.Arrays;
  * <p>
  * This class is thread safe.
  *
- * @see PromptingKeyProviderUI
- * @see KeyProvider
- * @see PromptingKeyManager
- * @author Christian Schlichtherle
+ * @see     PromptingKeyProviderUI
+ * @see     KeyProvider
+ * @see     PromptingKeyManager
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class PromptingKeyProvider<K extends Cloneable>
@@ -134,7 +134,7 @@ extends AbstractKeyProvider<K> {
      * The implementation in this class simply returns its class object,
      * {@code PromptingKeyProvider.class}.
      */
-    @SuppressWarnings({ "unchecked", "raw-types" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Class<? extends PromptingKeyProvider<?>> getUITypeKey() {
         return (Class) PromptingKeyProvider.class;
     }

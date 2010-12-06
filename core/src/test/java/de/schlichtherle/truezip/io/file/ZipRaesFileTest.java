@@ -53,6 +53,7 @@ public class ZipRaesFileTest extends IOFileTestCase {
     protected void tearDown() throws Exception {
         cancelling = false;
         super.tearDown();
+        KeyManager.resetAndRemoveKeyProviders();
         KeyManager.setInstance(null);
     }
 
@@ -124,7 +125,7 @@ public class ZipRaesFileTest extends IOFileTestCase {
     }
 
     public static class CustomKeyManager extends KeyManager {
-        @SuppressWarnings("unchecked")
+        //@SuppressWarnings("unchecked")
 		public CustomKeyManager() {
             mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
         }

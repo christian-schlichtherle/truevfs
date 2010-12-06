@@ -7,28 +7,25 @@
 
 package de.schlichtherle.truezip.key;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version @version@
  */
-public class PromptingKeyProviderTest extends TestCase {
+public class PromptingKeyProviderTest {
 
     private PromptingKeyProvider<Cloneable> instance;
 
-    public PromptingKeyProviderTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         instance = new PromptingKeyProvider<Cloneable>();
     }
 
-    /**
-     * Test of getKey method, of class truevfs.key.AbstractKeyProvider.
-     */
+    @Test
     public void testKey() {
         assertNull(instance.getKey());
         Cloneable result = new char[0];

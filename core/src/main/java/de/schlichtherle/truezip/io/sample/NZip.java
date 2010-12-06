@@ -144,7 +144,7 @@ public class NZip extends CommandLineUtility {
      * @throws IOException On any I/O related exception.
      */
     @Override
-	public boolean runChecked(String[] args)
+	public int runChecked(String[] args)
     throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
@@ -193,15 +193,15 @@ public class NZip extends CommandLineUtility {
             } else if ("rmr".equals(cmd)) {
                 rm(args, true);
             } else if ("isarchive".equals(cmd)) {
-                return isArchive(args);
+                return isArchive(args) ? 0 : 1;
             } else if ("isdirectory".equals(cmd)) {
-                return isDirectory(args);
+                return isDirectory(args) ? 0 : 1;
             } else if ("isfile".equals(cmd)) {
-                return isFile(args);
+                return isFile(args) ? 0 : 1;
             } else if ("exists".equals(cmd)) {
-                return exists(args);
+                return exists(args) ? 0 : 1;
             } else if ("length".equals(cmd)) {
-                return length(args);
+                return length(args) ? 0 : 1;
             } else {
                 throw new IllegalUsageException();
             }
@@ -209,7 +209,7 @@ public class NZip extends CommandLineUtility {
             File.setDefaultArchiveDetector(oldDetector);
         }
 
-        return true;
+        return 0;
     }
 
     private static String[] lshift(final String[] args) {
@@ -301,7 +301,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void cat(final String[] args)
-    throws IOException {
+    throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
 
@@ -316,7 +316,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void cpOrMv(final String[] args, final boolean mv)
-    throws IOException {
+    throws IllegalUsageException, IOException {
         if (args.length < 2)
             throw new IllegalUsageException();
 
@@ -378,7 +378,7 @@ public class NZip extends CommandLineUtility {
             throw new IllegalUsageException();
 
         if (dst.isArchive() || dst.isEntry())
-            progressMonitor.start();
+            monitor.start();
 
         for (int i = srcI; i < dstI; i++) {
             final File src = new File(args[i], srcDetector);
@@ -398,7 +398,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void touch(final String[] args)
-    throws IOException {
+    throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
 
@@ -425,7 +425,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void mkdir(final String[] args, final boolean recursive)
-    throws IOException {
+    throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
 
@@ -448,7 +448,7 @@ public class NZip extends CommandLineUtility {
     }
 
     private void rm(final String[] args, final boolean recursive)
-    throws IOException {
+    throws IllegalUsageException, IOException {
         if (args.length < 1)
             throw new IllegalUsageException();
 
@@ -475,7 +475,8 @@ public class NZip extends CommandLineUtility {
         }
     }
 
-    private boolean isArchive(final String[] args) {
+    private boolean isArchive(final String[] args)
+    throws IllegalUsageException {
         if (args.length != 1)
             throw new IllegalUsageException();
 
@@ -484,7 +485,8 @@ public class NZip extends CommandLineUtility {
         return success;
     }
 
-    private boolean isDirectory(final String[] args) {
+    private boolean isDirectory(final String[] args)
+    throws IllegalUsageException {
         if (args.length != 1)
             throw new IllegalUsageException();
 
@@ -493,7 +495,8 @@ public class NZip extends CommandLineUtility {
         return success;
     }
 
-    private boolean isFile(final String[] args) {
+    private boolean isFile(final String[] args)
+    throws IllegalUsageException {
         if (args.length != 1)
             throw new IllegalUsageException();
 
@@ -502,7 +505,8 @@ public class NZip extends CommandLineUtility {
         return success;
     }
 
-    private boolean exists(final String[] args) {
+    private boolean exists(final String[] args)
+    throws IllegalUsageException {
         if (args.length != 1)
             throw new IllegalUsageException();
 
@@ -511,7 +515,8 @@ public class NZip extends CommandLineUtility {
         return success;
     }
 
-    private boolean length(final String[] args) {
+    private boolean length(final String[] args)
+    throws IllegalUsageException {
         if (args.length != 1)
             throw new IllegalUsageException();
 

@@ -22,8 +22,9 @@ import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
 
 /**
- * Defines the available options for archive synchronization operations, i.e.
- * {@link FileSystemManager#sync} and {@link FileSystemController#sync}.
+ * Defines the available options for file system synchronization operations,
+ * i.e. {@link FileSystemController#sync} and
+ * {@link FederatedFileSystemManager#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$

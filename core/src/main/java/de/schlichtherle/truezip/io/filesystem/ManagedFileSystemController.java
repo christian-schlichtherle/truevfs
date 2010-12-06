@@ -35,7 +35,7 @@ import javax.swing.Icon;
 /**
  * Implements a chain of responsibility in order to resolve
  * {@link FalsePositiveException}s thrown by the prospective file system
- * provided to its {@link #CompositeFileSystemController constructor}.
+ * provided to its {@link #ManagedFileSystemController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
@@ -46,26 +46,12 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class CompositeFileSystemController
-extends AbstractFileSystemController<Entry>
+final class ManagedFileSystemController
+extends FilterFileSystemController<Entry, FileSystemController<?>>
 implements FederatedFileSystemController<Entry> {
 
-    private final FileSystemController<?> prospect;
-
-    CompositeFileSystemController(final FileSystemController<?> prospect) {
-        assert null != prospect.getParent();
-        assert !(prospect instanceof FederatedFileSystemController<?>);
-        this.prospect = prospect;
-    }
-
-    @Override
-    public FileSystemModel getModel() {
-        return prospect.getModel();
-    }
-
-    @Override
-    public FederatedFileSystemController<?> getParent() {
-        return prospect.getParent();
+    ManagedFileSystemController(final FileSystemController<?> controller) {
+        super(controller);
     }
 
     private String parentPath(String path) {
@@ -75,7 +61,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public Icon getOpenIcon() {
         try {
-            return prospect.getOpenIcon();
+            return controller.getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
         } catch (FileSystemException ex) {
@@ -86,7 +72,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public Icon getClosedIcon() {
         try {
-            return prospect.getClosedIcon();
+            return controller.getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
         } catch (FileSystemException ex) {
@@ -97,7 +83,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isReadOnly() {
         try {
-            return prospect.isReadOnly();
+            return controller.isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
         } catch (FileSystemException ex) {
@@ -108,7 +94,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public FileSystemEntry<?> getEntry(String path) {
         try {
-            return prospect.getEntry(path);
+            return controller.getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(parentPath(path));
         } catch (FileSystemException ex) {
@@ -119,7 +105,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isReadable(String path) {
         try {
-            return prospect.isReadable(path);
+            return controller.isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(parentPath(path));
         } catch (FileSystemException ex) {
@@ -130,7 +116,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isWritable(String path) {
         try {
-            return prospect.isWritable(path);
+            return controller.isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(parentPath(path));
         } catch (FileSystemException ex) {
@@ -141,7 +127,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public void setReadOnly(String path) throws IOException {
         try {
-            prospect.setReadOnly(path);
+            controller.setReadOnly(path);
         } catch (FalsePositiveException ex) {
             getParent().setReadOnly(parentPath(path));
         }
@@ -151,7 +137,7 @@ implements FederatedFileSystemController<Entry> {
     public boolean setTime(String path, BitField<Access> types, long value)
     throws IOException {
         try {
-            return prospect.setTime(path, types, value);
+            return controller.setTime(path, types, value);
         } catch (FalsePositiveException ex) {
             return getParent().setTime(parentPath(path), types, value);
         }
@@ -169,7 +155,7 @@ implements FederatedFileSystemController<Entry> {
         final BitField<InputOption> options;
 
         Input(final String path, final BitField<InputOption> options) {
-            super(prospect.getInputSocket(path, options));
+            super(controller.getInputSocket(path, options));
             this.path = path;
             this.options = options;
         }
@@ -227,7 +213,7 @@ implements FederatedFileSystemController<Entry> {
         Output( final String path,
                 final BitField<OutputOption> options,
                 final Entry template) {
-            super(prospect.getOutputSocket(path, options, template));
+            super(controller.getOutputSocket(path, options, template));
             this.path = path;
             this.options = options;
             this.template = template;
@@ -265,7 +251,7 @@ implements FederatedFileSystemController<Entry> {
                             Entry template)
     throws IOException {
         try {
-            return prospect.mknod(path, type, options, template);
+            return controller.mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
             return getParent().mknod(parentPath(path), type, options, template);
         }
@@ -274,20 +260,19 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public void unlink(String path) throws IOException {
         try {
-            prospect.unlink(path);
+            controller.unlink(path);
         } catch (FalsePositiveException ex) {
             getParent().unlink(parentPath(path));
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <X extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options)
     throws X {
         try {
-            prospect.sync(builder, options);
+            controller.sync(builder, options);
         } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
