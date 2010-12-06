@@ -177,7 +177,7 @@ public class FileSystemModel {
      * @return A clone of the set of file system listeners.
      */
     @SuppressWarnings("unchecked")
-    protected final Set<FileSystemListener> getFileSystemListeners() {
+    final Set<FileSystemListener> getFileSystemListeners() {
         return (Set<FileSystemListener>) listeners.clone();
     }
 

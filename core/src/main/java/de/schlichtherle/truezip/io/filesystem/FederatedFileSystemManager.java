@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2010 Schlichtherle IT Services
+ * Copyright (C) 2010 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -36,19 +37,19 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * Manages {@link FederatedFileSystemController}s and provides associated
- * utilities.
+ * Manages federated file systems.
  * <p>
  * Note that this class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class FileSystemManager {
+public class FederatedFileSystemManager {
 
     private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
@@ -59,13 +60,80 @@ public final class FileSystemManager {
         }
     };
 
-    private static final FileSystemManager instance = new FileSystemManager();
+    private static volatile FederatedFileSystemManager instance; // volatile required for DCL in JSE 5!
 
-    public static FileSystemManager getFileSystemManager() {
-        return instance;
+    /**
+     * Returns the non-{@code null} federated file system manager class
+     * property instance.
+     * <p>
+     * If the class property has been explicitly set using
+     * {@link #setInstance}, then this instance is returned.
+     * <p>
+     * Otherwise, the value of the system property
+     * {@code de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager}
+     * is considered:
+     * <p>
+     * If this system property is set, it must denote the fully qualified
+     * class name of a subclass of this class. The class is loaded and
+     * instantiated using its public, no-arguments constructor.
+     * <p>
+     * Otherwise, this class is instantiated.
+     * <p>
+     * In order to support this plug-in architecture, you should <em>not</em>
+     * cache the instance returned by this method!
+     *
+     * @throws ClassCastException If the class name in the system property
+     *         does not denote a subclass of this class.
+     * @throws UndeclaredThrowableException If any other precondition on the
+     *         value of the system property does not hold.
+     * @return The non-{@code null} federated file system manager class
+     *         property instance.
+     */
+    public static FederatedFileSystemManager getInstance() {
+        FederatedFileSystemManager manager = instance;
+        if (null == manager) {
+            synchronized (FederatedFileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
+                manager = instance;
+                if (null == manager) {
+                    final String n = System.getProperty(
+                            FederatedFileSystemManager.class.getName(),
+                            FederatedFileSystemManager.class.getName());
+                    try {
+                        Class<?> c = loadClass(n, FederatedFileSystemManager.class);
+                        instance = manager = (FederatedFileSystemManager) c.newInstance();
+                    } catch (RuntimeException ex) {
+                        throw ex;
+                    } catch (Exception ex) {
+                        throw new UndeclaredThrowableException(ex);
+                    }
+                }
+            }
+        }
+        return manager;
     }
 
-    FileSystemManager() {
+    /**
+     * Sets the federated file system manager class property instance.
+     * If the current federated file system manager has any managed federated
+     * file systems, an {@link IllegalStateException} is thrown.
+     * Call {@link #sync} and make sure to purge all references to the
+     * federated file system controllers which have been returned by
+     * {@link #getController} to prevent this.
+     *
+     * @param  manager The file system manager instance to use as the class
+     *         property.
+     *         If this is {@code null}, a new instance will be created on the
+     *         next call to {@link #getInstance}.
+     * @throws IllegalStateException if the current file system manager has any
+     *         managed file systems.
+     */
+    public static synchronized void setInstance(final FederatedFileSystemManager manager) {
+        final int count = instance.schedulers.size();
+        if (0 < count)
+            throw new IllegalStateException("There are " + count + " managed federated file systems!");
+        if (null == manager)
+            throw new NullPointerException();
+        instance = manager;
     }
 
     /**
@@ -80,7 +148,7 @@ public final class FileSystemManager {
      * Equivalent to
      * {@link #getController(FileSystemDriver, URI, FederatedFileSystemController) getController(driver, mountPoint, null)}.
      */
-    public <FSM extends FileSystemModel>
+    public final <FSM extends FileSystemModel>
     FederatedFileSystemController<?> getController(
             FileSystemDriver<FSM> driver,
             URI mountPoint) {
@@ -88,26 +156,26 @@ public final class FileSystemManager {
     }
 
     /**
-     * Returns a file system controller for the given mount point.
-     * The returned file system controller will use the given parent file
-     * system controller to mount its file system when required.
-     * Mind that the mount point gets normalized and may or may not be
-     * identical to the mount point of the file system model of the returned
-     * file system controller.
+     * Returns a federated file system controller for the given mount point.
+     * The returned file system controller will use the given parent federated
+     * file system controller to mount its file system when required.
+     * Mind that the given mount point gets normalized and is not necessarily
+     * {@link Object#equals equal} to the mount point of the file system model
+     * of the returned federated file system controller.
      *
      * @param  driver the non-{@code null} file system driver which will be
-     *         used to create the file system model and the file system
+     *         used to create a file system model and optionally a file system
      *         controller.
      * @param  mountPoint the non-{@code null}
      *         {@link FileSystemModel#getMountPoint() mount point}
-     *         of the (federated) file system.
-     * @param  parent the nullable file system controller for the parent file
+     *         of the federated file system.
+     * @param  parent the nullable controller for the parent federated file
      *         system.
-     * @return A non-{@code null} component file system controller.
+     * @return A non-{@code null} federated file system controller.
      */
-    public <FSM extends FileSystemModel>
+    public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
-            final FileSystemDriver<FSM> driver,
+            final FileSystemDriver<M> driver,
             URI mountPoint,
             FederatedFileSystemController<?> parent) {
         if (null == parent && mountPoint.isOpaque()) {
@@ -128,35 +196,39 @@ public final class FileSystemManager {
                 throw new IllegalArgumentException(ex);
             }
         }
-        final FSM model = driver.newModel(mountPoint,
+        final M model = driver.newModel(mountPoint,
                 null == parent ? null : parent.getModel());
         mountPoint = model.getMountPoint(); // mind URI normalization!
-        Scheduler scheduler;
+        FederatedFileSystemController<?> controller;
         synchronized (schedulers) {
-            scheduler = Links.getTarget(schedulers.get(mountPoint));
-            if (null == scheduler) {
-                final FileSystemController<?> prospect
+            Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
+            if (null != scheduler) {
+                controller = scheduler.controller;
+            } else {
+                final FileSystemController<?> c
                         = driver.newController(model, parent);
-                if (null == prospect.getParent())
-                    return (FederatedFileSystemController<?>) prospect;
-                scheduler = new Scheduler(prospect);
+                if (null == c.getParent()) {
+                    controller = (FederatedFileSystemController<?>) c;
+                } else {
+                    scheduler = new Scheduler(c);
+                    controller = scheduler.controller;
+                    model.addFileSystemListener(scheduler);
+                }
+                assert model == controller.getModel();
             }
         }
-        return scheduler.controller;
+        assert (null != controller.getModel().getParent())
+                == (null != controller.getParent());
+        return controller;
     }
 
     private final class Scheduler implements FileSystemListener {
 
         final CompositeFileSystemController controller;
 
-        @SuppressWarnings("LeakingThisInConstructor")
         Scheduler(final FileSystemController<?> prospect) {
-            if (prospect instanceof CompositeFileSystemController)
-                controller = (CompositeFileSystemController) prospect;
-            else
-                controller = new CompositeFileSystemController(prospect);
+            controller = new CompositeFileSystemController(prospect);
             touchChanged(null); // setup schedule
-            controller.getModel().addFileSystemListener(this);
         }
 
         /**
@@ -172,7 +244,7 @@ public final class FileSystemManager {
                         (model.isTouched() ? STRONG : WEAK).newLink(this));
             }
         }
-    }
+    } // class Scheduler
 
     /**
      * Writes all changes to the contents of the file systems who's canonical
@@ -211,40 +283,32 @@ public final class FileSystemManager {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-        try {
-            // The general algorithm is to sort the mount points in descending
-            // order of their pathnames and then traverse the array in reverse
-            // order to call the sync() method on each respective archive
-            // controller.
-            // This ensures that an archive file system will always be synced
-            // before its parent archive file system.
-            for (final FederatedFileSystemController<?> controller
-                    : getControllers(prefix, REVERSE_CONTROLLERS)) {
-                try {
-                    // Upon return, some new ArchiveWarningException's may
-                    // have been generated. We need to remember them for
-                    // later throwing.
-                    controller.sync(builder, options);
-                } catch (IOException ex) {
-                    // Updating the archive file or wrapping it back into
-                    // one of it's parent archive files resulted in an
-                    // I/O exception for some reason.
-                    // We are bullheaded and store the exception for later
-                    // throwing and continue updating the rest.
-                    builder.warn(ex);
-                }
+        // The general algorithm is to sort the mount points in descending
+        // order of their pathnames and then traverse the array in reverse
+        // order to call the sync() method on each respective archive
+        // controller.
+        // This ensures that an archive file system will always be synced
+        // before its parent archive file system.
+        for (final FederatedFileSystemController<?> controller
+                : getControllers(prefix, REVERSE_CONTROLLERS)) {
+            try {
+                // Upon return, some new ArchiveWarningException's may
+                // have been generated. We need to remember them for
+                // later throwing.
+                controller.sync(builder, options);
+            } catch (IOException ex) {
+                // Updating the archive file or wrapping it back into
+                // one of it's parent archive files resulted in an
+                // I/O exception for some reason.
+                // We are bullheaded and store the exception for later
+                // throwing and continue updating the rest.
+                builder.warn(ex);
             }
-            builder.check();
-        } finally {
-            statistics = new FileSystemStatistics(this);
         }
+        builder.check();
     }
 
-    Set<FederatedFileSystemController<?>> getControllers() {
-        return getControllers(null, null);
-    }
-
-    Set<FederatedFileSystemController<?>> getControllers(
+    final Set<FederatedFileSystemController<?>> getControllers(
             URI prefix,
             final Comparator<? super FederatedFileSystemController<?>> comparator) {
         if (null == prefix)
@@ -271,25 +335,6 @@ public final class FileSystemManager {
         return snapshot;
     }
 
-    private FileSystemStatistics statistics = new FileSystemStatistics(this);
-
-    /**
-     * Returns a proxy instance which encapsulates <em>live</em> statistics
-     * about the total set of federated file systems managed by this instance.
-     * Any call to a method of the returned interface instance returns
-     * up-to-date data, so there is no need to repeatedly call this method in
-     * order to update the statistics.
-     * <p>
-     * Note that this method returns <em>live</em> statistics rather than
-     * <em>real time</em> statistics.
-     * So there may be a slight delay until the values returned reflect
-     * the actual state of this package.
-     * This delay increases if the system is under heavy load.
-     */
-    public FileSystemStatistics getStatistics() {
-        return statistics;
-    }
-
     /**
      * Adds the given {@code runnable} to the set of runnables to run by a
      * shutdown hook.
@@ -313,7 +358,7 @@ public final class FileSystemManager {
      * This shutdown thread class runs the runnable provided to its constructor
      * when it starts execution.
      *
-     * @see FileSystemManager#addShutdownHook(java.lang.Runnable)
+     * @see FederatedFileSystemManager#addShutdownHook(java.lang.Runnable)
      */
     private static final class ShutdownThread extends Thread {
 
@@ -337,7 +382,7 @@ public final class FileSystemManager {
         public void run() {
             runnables.run();
         }
-    } // class ShutdownHook
+    } // class ShutdownThread
 
     /**
      * This singleton shutdown hook runnable class runs a set of user-provided
@@ -355,7 +400,7 @@ public final class FileSystemManager {
             // This may help if this shutdown hook is run as a JVM shutdown
             // hook in an app server environment where class loading is
             // disabled.
-            PromptingKeyManager.getKeyManager();
+            PromptingKeyManager.getInstance();
         }
 
         /**
@@ -385,7 +430,7 @@ public final class FileSystemManager {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
                     // Logging doesn't work in a shutdown hook!
-                    //FileSystemManager.logger.setLevel(Level.OFF);
+                    //FederatedFileSystemManager.logger.setLevel(Level.OFF);
                     for (Runnable runnable : runnables)
                         runnable.run();
                 } finally {
@@ -401,5 +446,5 @@ public final class FileSystemManager {
                 }
             }
         }
-    } // class ShutdownRunnables
+    } // class ShutdownRunnable
 }

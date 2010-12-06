@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key;
 
 import java.net.URI;
@@ -34,7 +33,7 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  * For each resource ID, a key provider may be associated to it which handles
  * the actual retrieval of the key.
  * <p>
- * Clients need to call {@link #getKeyManager} to get the default instance.
+ * Clients need to call {@link #getInstance} to get the default instance.
  * Because the map of key providers and some associated methods are static
  * members of this class, the default instance of this class may be changed
  * dynamically (using {@link #setInstance}) without affecting already mapped
@@ -63,28 +62,16 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  */
 public abstract class KeyManager {
 
-    private static volatile KeyManager instance;
-
     /** Maps resource IDs to providers. */
     private static final Map<URI, KeyProvider<?>> providers
             = new HashMap<URI, KeyProvider<?>>();
 
-    /**
-     * Maps key provider types (should be interfaces) to key provider types
-     * (their implementing classes).
-     */
-    private final Map<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>
-            types = new HashMap<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>();
-    //private final Map types = new HashMap(); // look at the beauty of this instead!
-
-    //
-    // Static Methods.
-    //
+    private static volatile KeyManager instance; // volatile required for DCL in JSE 5!
 
     /**
-     * Returns the default instance of the key manager.
+     * Returns the non-{@code null} key manager class property instance.
      * <p>
-     * If the default instance has been explicitly set using
+     * If the class property has been explicitly set using
      * {@link #setInstance}, then this instance is returned.
      * <p>
      * Otherwise, the value of the system property
@@ -111,23 +98,28 @@ public abstract class KeyManager {
      *         does not denote a subclass of this class.
      * @throws UndeclaredThrowableException If any other precondition on the
      *         value of the system property does not hold.
+     * @return The non-{@code null} key manager class property instance.
      */
-    public static synchronized KeyManager getKeyManager() {
-        if (instance != null)
-            return instance;
-
-        final String n = System.getProperty(KeyManager.class.getName(),
-                getKeyManagerClassName());
-        try {
-            Class<?> c = loadClass(n, KeyManager.class);
-            instance = (KeyManager) c.newInstance();
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new UndeclaredThrowableException(ex);
+    public static KeyManager getInstance() {
+        KeyManager manager = instance;
+        if (null == manager) {
+            synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
+                if (null == manager) {
+                    final String n = System.getProperty(
+                            KeyManager.class.getName(),
+                            getKeyManagerClassName());
+                    try {
+                        Class<?> c = loadClass(n, KeyManager.class);
+                        instance = manager = (KeyManager) c.newInstance();
+                    } catch (RuntimeException ex) {
+                        throw ex;
+                    } catch (Exception ex) {
+                        throw new UndeclaredThrowableException(ex);
+                    }
+                }
+            }
         }
-
-        return instance;
+        return manager;
     }
 
     private static String getKeyManagerClassName() {
@@ -143,14 +135,20 @@ public abstract class KeyManager {
     }
 
     /**
-     * Sets the default instance of the key manager explicitly.
+     * Sets the key manager class property instance.
+     * If the current key manager has any key providers,
+     * an {@link IllegalStateException} is thrown.
+     * Call {@link #resetAndRemoveKeyProviders} to prevent this.
      *
-     * @param keyManager The key manager to use as the default instance.
-     *        If this is set to {@code null}, on the next call to
-     *        {@link #getKeyManager} a new instance will be created.
+     * @param  manager The key manager instance to use as the class property.
+     *         If this is {@code null}, a new instance will be created on the
+     *         next call to {@link #getInstance}.
      */
-    public static void setInstance(final KeyManager keyManager) {
-        KeyManager.instance = keyManager;
+    public static synchronized void setInstance(final KeyManager manager) {
+        final int count = providers.size();
+        if (0 < count)
+            throw new IllegalStateException("There are " + count + " key providers!");
+        KeyManager.instance = manager;
     }
 
     /**
@@ -199,7 +197,7 @@ public abstract class KeyManager {
      * Resets the key provider for the given resource identifier, causing it
      * to forget its common key, and throws the key provider away.
      * If the key provider associated with the given resource identifier is
-     * not an instance of {@link AbstractKeyProvider}, it is just removed from
+     * not an instance of {@link AbstractKeyProvider}, it is only removed from
      * the map.
      *
      * @param resource The resource identifier.
@@ -243,9 +241,6 @@ public abstract class KeyManager {
     /**
      * Resets all key providers, causing them to forget their key, and removes
      * them from the map.
-     * If the key provider associated with the given resource identifier is
-     * not an instance of {@link AbstractKeyProvider}, it is just removed from
-     * the map.
      *
      * @throws IllegalStateException If resetting or unmapping one or more
      *         key providers is prohibited by a constraint in a subclass of
@@ -362,9 +357,12 @@ public abstract class KeyManager {
         return true;
     }
 
-    //
-    // Instance methods:
-    //
+    /**
+     * Maps key provider types (should be interfaces) to key provider types
+     * (their implementing classes).
+     */
+    private final Map<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>
+            types = new HashMap<Class<? extends KeyProvider<?>>, Class<? extends KeyProvider<?>>>();
 
     /**
      * Creates a new {@code KeyManager}.
@@ -433,7 +431,7 @@ public abstract class KeyManager {
      * for a protected resource.
      * <pre>
      * URI resource = file.getCanonicalFile().toURI();
-     * KeyManager km = KeyManager.getKeyManager();
+     * KeyManager km = KeyManager.getInstance();
      * KeyProvider kp = km.getKeyProvider(resource, AesKeyProvider.class);
      * Object key = kp.getCreateKey(); // may prompt the user
      * int ks;
@@ -470,7 +468,7 @@ public abstract class KeyManager {
      *         of the {@code KeyProvider} interface.
      * @throws IllegalArgumentException if any other precondition on the
      *         parameter {@code type} does not hold.
-     * @see    #getKeyManager
+     * @see    #getInstance
      */
     public synchronized KeyProvider<?> getKeyProvider(
             final URI resource,

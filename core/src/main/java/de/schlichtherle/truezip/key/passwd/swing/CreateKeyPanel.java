@@ -113,7 +113,8 @@ public class CreateKeyPanel extends EnhancedPanel {
     public void setResource(final URI resource) {
         final URI lastResource = PromptingKeyProviderUI.lastResource;
         assert lastResource != null : "violation of contract in PromptingKeyProvider";
-        if (!lastResource.equals(resource) && !"".equals(lastResource)) {
+        if (!lastResource.equals(resource)
+                && !lastResource.equals(PromptingKeyProviderUI.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);

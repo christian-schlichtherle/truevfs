@@ -30,7 +30,7 @@ import javax.swing.Icon;
 /**
  * Provides read/write access to a file system.
  * The file system is addressed by the
- * {@link FileSystemModel#getMountPoint() mount point} of the
+ * {@link FileSystemModel#getMountPoint() mount point} of its
  * {@link #getModel() file system model}.
  * <p>
  * Where the methods of this interface accept a

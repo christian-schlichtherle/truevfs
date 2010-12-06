@@ -28,11 +28,11 @@ import javax.swing.Icon;
  */
 public abstract class FilterFederatedFileSystemController<
         E extends Entry,
-        FSC extends FederatedFileSystemController<? extends E>>
-extends FilterFileSystemController<E, FSC>
+        C extends FederatedFileSystemController<? extends E>>
+extends FilterFileSystemController<E, C>
 implements FederatedFileSystemController<E> {
 
-    protected FilterFederatedFileSystemController(FSC controller) {
+    protected FilterFederatedFileSystemController(C controller) {
         super(controller);
     }
 

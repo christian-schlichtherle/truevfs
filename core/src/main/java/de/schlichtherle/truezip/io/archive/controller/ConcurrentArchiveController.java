@@ -246,26 +246,6 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
-            try {
-                readLock().lock();
-                try {
-                    return getBoundSocket().newInputStream();
-                } finally {
-                    readLock().unlock();
-                }
-            } catch (NotWriteLockedException ex) {
-                assertNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
-                try {
-                    return getBoundSocket().newInputStream();
-                } finally {
-                    writeLock().unlock();
-                }
-            }
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 readLock().lock();
@@ -279,6 +259,26 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
                 writeLock().lock();
                 try {
                     return getBoundSocket().newReadOnlyFile();
+                } finally {
+                    writeLock().unlock();
+                }
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            try {
+                readLock().lock();
+                try {
+                    return getBoundSocket().newInputStream();
+                } finally {
+                    readLock().unlock();
+                }
+            } catch (NotWriteLockedException ex) {
+                assertNotReadLockedByCurrentThread(ex);
+                writeLock().lock();
+                try {
+                    return getBoundSocket().newInputStream();
                 } finally {
                     writeLock().unlock();
                 }

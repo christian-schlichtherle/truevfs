@@ -18,14 +18,14 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.net.URI;
 
 /**
- * @param   <FSM> The type of the file system models.
+ * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemDriver<FSM extends FileSystemModel> {
+public interface FileSystemDriver<M extends FileSystemModel> {
 
-    FSM newModel(URI mountPoint, FileSystemModel parent);
+    M newModel(URI mountPoint, FileSystemModel parent);
 
     FileSystemController<?> newController(
-            FSM model, FederatedFileSystemController<?> parent);
+            M model, FederatedFileSystemController<?> parent);
 }

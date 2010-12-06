@@ -58,18 +58,14 @@ implements FederatedFileSystemController<Entry> {
         this.prospect = prospect;
     }
 
-    private FileSystemController<?> getProspect() {
-        return prospect;
-    }
-
     @Override
     public FileSystemModel getModel() {
-        return getProspect().getModel();
+        return prospect.getModel();
     }
 
     @Override
     public FederatedFileSystemController<?> getParent() {
-        return getProspect().getParent();
+        return prospect.getParent();
     }
 
     private String parentPath(String path) {
@@ -79,7 +75,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public Icon getOpenIcon() {
         try {
-            return getProspect().getOpenIcon();
+            return prospect.getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
         } catch (FileSystemException ex) {
@@ -90,7 +86,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public Icon getClosedIcon() {
         try {
-            return getProspect().getClosedIcon();
+            return prospect.getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
         } catch (FileSystemException ex) {
@@ -101,7 +97,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isReadOnly() {
         try {
-            return getProspect().isReadOnly();
+            return prospect.isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
         } catch (FileSystemException ex) {
@@ -112,7 +108,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public FileSystemEntry<?> getEntry(String path) {
         try {
-            return getProspect().getEntry(path);
+            return prospect.getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(parentPath(path));
         } catch (FileSystemException ex) {
@@ -123,7 +119,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isReadable(String path) {
         try {
-            return getProspect().isReadable(path);
+            return prospect.isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(parentPath(path));
         } catch (FileSystemException ex) {
@@ -134,7 +130,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public boolean isWritable(String path) {
         try {
-            return getProspect().isWritable(path);
+            return prospect.isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(parentPath(path));
         } catch (FileSystemException ex) {
@@ -145,7 +141,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public void setReadOnly(String path) throws IOException {
         try {
-            getProspect().setReadOnly(path);
+            prospect.setReadOnly(path);
         } catch (FalsePositiveException ex) {
             getParent().setReadOnly(parentPath(path));
         }
@@ -155,7 +151,7 @@ implements FederatedFileSystemController<Entry> {
     public boolean setTime(String path, BitField<Access> types, long value)
     throws IOException {
         try {
-            return getProspect().setTime(path, types, value);
+            return prospect.setTime(path, types, value);
         } catch (FalsePositiveException ex) {
             return getParent().setTime(parentPath(path), types, value);
         }
@@ -173,7 +169,7 @@ implements FederatedFileSystemController<Entry> {
         final BitField<InputOption> options;
 
         Input(final String path, final BitField<InputOption> options) {
-            super(getProspect().getInputSocket(path, options));
+            super(prospect.getInputSocket(path, options));
             this.path = path;
             this.options = options;
         }
@@ -191,18 +187,6 @@ implements FederatedFileSystemController<Entry> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
-            try {
-                return getBoundSocket().newInputStream();
-            } catch (FalsePositiveException ex) {
-                return getParent()
-                        .getInputSocket(parentPath(path), options)
-                        .bind(this)
-                        .newInputStream();
-            }
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 return getBoundSocket().newReadOnlyFile();
@@ -211,6 +195,18 @@ implements FederatedFileSystemController<Entry> {
                         .getInputSocket(parentPath(path), options)
                         .bind(this)
                         .newReadOnlyFile();
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            try {
+                return getBoundSocket().newInputStream();
+            } catch (FalsePositiveException ex) {
+                return getParent()
+                        .getInputSocket(parentPath(path), options)
+                        .bind(this)
+                        .newInputStream();
             }
         }
     } // class Input
@@ -231,7 +227,7 @@ implements FederatedFileSystemController<Entry> {
         Output( final String path,
                 final BitField<OutputOption> options,
                 final Entry template) {
-            super(getProspect().getOutputSocket(path, options, template));
+            super(prospect.getOutputSocket(path, options, template));
             this.path = path;
             this.options = options;
             this.template = template;
@@ -269,7 +265,7 @@ implements FederatedFileSystemController<Entry> {
                             Entry template)
     throws IOException {
         try {
-            return getProspect().mknod(path, type, options, template);
+            return prospect.mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
             return getParent().mknod(parentPath(path), type, options, template);
         }
@@ -278,7 +274,7 @@ implements FederatedFileSystemController<Entry> {
     @Override
     public void unlink(String path) throws IOException {
         try {
-            getProspect().unlink(path);
+            prospect.unlink(path);
         } catch (FalsePositiveException ex) {
             getParent().unlink(parentPath(path));
         }
@@ -291,7 +287,7 @@ implements FederatedFileSystemController<Entry> {
                 final BitField<SyncOption> options)
     throws X {
         try {
-            getProspect().sync(builder, options);
+            prospect.sync(builder, options);
         } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }

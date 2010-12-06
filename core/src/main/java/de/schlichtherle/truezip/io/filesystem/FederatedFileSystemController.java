@@ -27,7 +27,7 @@ import javax.swing.Icon;
  * Hence, implementations of this interface must not throw a
  * {@link FileSystemException}, but rather resolve the issue internally instead.
  * The file system at the head of the chain is addressed by the
- * {@link FileSystemModel#getMountPoint() mount point} of the
+ * {@link FileSystemModel#getMountPoint() mount point} of its
  * {@link #getModel() file system model}.
  *
  * @param   <E> The type of the entries.

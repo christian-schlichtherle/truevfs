@@ -30,12 +30,12 @@ import static org.junit.Assert.*;
  */
 public class FileSystemManagerTest {
 
-    private FileSystemManager manager;
+    private FederatedFileSystemManager manager;
     private FileSystemDriver<FileSystemModel> driver;
 
     @Before
     public void setUp() {
-        manager = new FileSystemManager();
+        manager = new FederatedFileSystemManager();
         driver = new Driver();
     }
 
