@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -24,7 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.ZipException;
