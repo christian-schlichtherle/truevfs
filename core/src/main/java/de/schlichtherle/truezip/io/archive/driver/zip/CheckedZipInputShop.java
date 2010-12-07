@@ -59,10 +59,9 @@ public class CheckedZipInputShop extends ZipInputShop {
             throw new NullPointerException();
 
         class Input extends InputSocket<ZipEntry> {
-            final ZipEntry entry = getEntry(name);
-
             @Override
             public ZipEntry getLocalTarget() throws IOException {
+                final ZipEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
@@ -71,7 +70,7 @@ public class CheckedZipInputShop extends ZipInputShop {
             @Override
             public InputStream newInputStream() throws IOException {
                 return CheckedZipInputShop.this.getInputStream(
-                        entry.getName(),
+                        getLocalTarget().getName(),
                         true,
                         !(getPeerTarget() instanceof ZipEntry));
             }

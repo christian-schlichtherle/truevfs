@@ -52,10 +52,9 @@ implements InputShop<ZipEntry> {
             throw new NullPointerException();
 
         class Input extends InputSocket<ZipEntry> {
-            final ZipEntry entry = getEntry(name);
-
             @Override
             public ZipEntry getLocalTarget() throws IOException {
+                final ZipEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
