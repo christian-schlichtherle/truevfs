@@ -199,17 +199,17 @@ implements InputShop<TarEntry> {
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return entries.size();
     }
 
     @Override
-    public Iterator<TarEntry> iterator() {
+    public final Iterator<TarEntry> iterator() {
         return entries.values().iterator();
     }
 
     @Override
-    public TarEntry getEntry(String name) {
+    public final TarEntry getEntry(String name) {
         return entries.get(name);
     }
 
@@ -219,10 +219,9 @@ implements InputShop<TarEntry> {
             throw new NullPointerException();
 
         class Input extends InputSocket<TarEntry> {
-            final TarEntry entry = getEntry(name);
-
             @Override
             public TarEntry getLocalTarget() throws IOException {
+                final TarEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
