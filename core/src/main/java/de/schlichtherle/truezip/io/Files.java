@@ -94,16 +94,19 @@ public class Files extends Paths {
      * Returns the canonical path of the given file or the normalized absolute
      * path if canonicalizing the path fails due to an {@code IOException}.
      *
+     * @param  file the nullable file.
      * @return The canonical or absolute path of this file as a
-     *         {@code File} instance.
-     * @throws NullPointerException If {@code file} is {@code null}.
+     *         {@code File} instance or {@code null} iff {@code file} is
+     *         {@code null}.
      */
     public static File getRealFile(final File file) {
+        if (null == file)
+            return null;
         try {
             return file.getCanonicalFile();
         } catch (IOException ex) {
             final File parent = file.getParentFile();
-            return normalize(parent != null
+            return normalize(null != parent
                     ? new File(getRealFile0(parent), file.getName())
                     : file.getAbsoluteFile());
         }
@@ -114,7 +117,7 @@ public class Files extends Paths {
             return file.getCanonicalFile();
         } catch (IOException ex) {
             final File parent = file.getParentFile();
-            return parent != null
+            return null != parent
                     ? new File(getRealFile0(parent), file.getName())
                     : file.getAbsoluteFile();
         }
@@ -223,9 +226,7 @@ public class Files extends Paths {
     public static File normalize(final File file) {
         final String path = file.getPath();
         final String newPath = normalize(path, separatorChar);
-        return newPath != path // mind contract of Paths.normalize!
-                ? new File(newPath)
-                : file;
+        return newPath != path ? new File(newPath) : file; // mind contract!
     }
 
     /**
@@ -273,9 +274,7 @@ public class Files extends Paths {
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
-        a = getRealFile(a);
-        b = getRealFile(b);
-        return contains(a.getPath(), b.getPath());
+        return contains(getRealFile(a).getPath(), getRealFile(b).getPath());
     }
 
     /**
