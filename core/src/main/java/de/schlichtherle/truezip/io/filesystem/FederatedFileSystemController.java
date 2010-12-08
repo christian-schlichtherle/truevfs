@@ -24,16 +24,18 @@ import javax.swing.Icon;
 /**
  * Provides read/write access to one or more file systems which are organized
  * in a chain of responsibility for file system federation.
- * Hence, implementations of this interface must not throw a
+ * The {@link FileSystemModel#getMountPoint() mount point} of the
+ * {@link #getModel() file system model} addresses the file system at the head
+ * of the chain of federated file systems.
+ * <p>
+ * Implementations of this interface must not throw a
  * {@link FileSystemException}, but rather resolve the issue internally instead.
- * The file system at the head of the chain is addressed by the
- * {@link FileSystemModel#getMountPoint() mount point} of its
- * {@link #getModel() file system model}.
  *
  * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// FIXME: Push this back to FileSystemController and remove this interface!
 public interface FederatedFileSystemController<E extends Entry>
 extends FileSystemController<E> {
 
