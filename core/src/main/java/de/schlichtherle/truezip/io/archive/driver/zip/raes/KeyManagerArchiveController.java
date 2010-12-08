@@ -34,7 +34,7 @@ final class KeyManagerArchiveController
 extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
 
     /**
-     * Constructs a new prompting key manager archive controller.
+     * Constructs a new key manager archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
