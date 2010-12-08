@@ -342,11 +342,7 @@ public class FederatedFileSystemManager {
         return snapshot;
     }
 
-    /**
-     * Adds the given {@code runnable} to the set of runnables to run by a
-     * shutdown hook.
-     * This is typically used to delete archive files or entries.
-     */
+    /** FIXME: Remove this! */
     public void addShutdownHook(final Runnable runnable) {
         getShutdownHook().add(runnable);
     }
