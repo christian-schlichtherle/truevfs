@@ -20,6 +20,7 @@ import java.io.IOException;
 /**
  * Indicates an exceptional condition which is specific to a file system.
  *
+ * @see     FileSystemController
  * @author  Christian Schlichtherle
  * @version $Id$
  */

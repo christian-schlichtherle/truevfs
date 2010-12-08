@@ -424,21 +424,29 @@ extends FileSystemArchiveController<E> {
         // don't even need to check open input streams if there are
         // some open output streams.
         if (output != null) {
-            final int outStreams = output.waitCloseOthers(options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
+            final int outStreams = output.waitCloseOthers(
+                    options.get(WAIT_CLOSE_OUTPUT) ? 0 : 50);
             if (outStreams > 0) {
-                final String message = "Number of open output streams: " + outStreams;
+                final String message =  "Number of open output streams: "
+                                        + outStreams;
                 if (!options.get(FORCE_CLOSE_OUTPUT))
-                    throw builder.fail(new SyncException(getModel(), new OutputBusyException(message)));
-                builder.warn(new SyncWarningException(getModel(), new OutputBusyException(message)));
+                    throw builder.fail( new SyncException(getModel(),
+                                            new OutputBusyException(message)));
+                builder.warn(   new SyncWarningException(getModel(),
+                                    new OutputBusyException(message)));
             }
         }
         if (input != null) {
-            final int inStreams = input.waitCloseOthers(options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
+            final int inStreams = input.waitCloseOthers(
+                    options.get(WAIT_CLOSE_INPUT) ? 0 : 50);
             if (inStreams > 0) {
-                final String message = "Number of open input streams: " + inStreams;
+                final String message =  "Number of open input streams: "
+                                        + inStreams;
                 if (!options.get(FORCE_CLOSE_INPUT))
-                    throw builder.fail(new SyncException(getModel(), new InputBusyException(message)));
-                builder.warn(new SyncWarningException(getModel(), new InputBusyException(message)));
+                    throw builder.fail( new SyncException(getModel(),
+                                            new InputBusyException(message)));
+                builder.warn(   new SyncWarningException(getModel(),
+                                    new InputBusyException(message)));
             }
         }
     }
