@@ -96,7 +96,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     public ArchiveController<ZipEntry> newController(
             ArchiveModel model,
             FederatedFileSystemController<?> parent) {
-        return new PromptingKeyManagerArchiveController(
+        return new KeyManagerArchiveController(
                 super.newController(model, parent));
     }
 

@@ -15,22 +15,22 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
-import de.schlichtherle.truezip.key.PromptingKeyManager;
 import java.io.IOException;
 
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
- * This archive controller resets the key provider in the prompting key manager
- * if the target RAES encrypted ZIP archive file gets deleted.
+ * This archive controller resets the key provider in the key manager if the
+ * target RAES encrypted ZIP archive file gets deleted.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class PromptingKeyManagerArchiveController
+final class KeyManagerArchiveController
 extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
 
     /**
@@ -38,7 +38,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
      *
      * @param controller the non-{@code null} archive controller.
      */
-    PromptingKeyManagerArchiveController(
+    KeyManagerArchiveController(
             ArchiveController<? extends ZipEntry> controller) {
         super(controller);
     }
@@ -47,6 +47,6 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
     public void unlink(String path) throws IOException {
         controller.unlink(path);
         if (isRoot(path))
-            PromptingKeyManager.resetKeyProvider(getModel().getMountPoint());
+            KeyManager.resetKeyProvider(getModel().getMountPoint());
     }
 }
