@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
 
 /**
  * Represents an identifier in the name space of a federated file system.
@@ -78,6 +77,10 @@ public final class Path implements Serializable, Comparable<Path> {
 
     /**
      * Constructs a new path.
+     * This static factory method calls
+     * {@link #Path(URI) new Path(path)}
+     * and wraps any thrown {@link URISyntaxException} in an
+     * {@link IllegalArgumentException}.
      * <p>
      * If the given path name is opaque, its parent path name is parsed
      * according to the syntax specification for paths
@@ -86,10 +89,32 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @param  path the non-{@code null} {@link #getPath() path name}.
      * @throws NullPointerException if {@code name} is {@code null}.
-     * @throws IllegalArgumentException if {@code name} does not conform to
+     * @throws URISyntaxException if {@code name} does not conform to
+     *         the additional constraints for paths.
+     * @return A non-{@code null} path.
+     */
+    public static Path create(URI path) {
+        try {
+            return new Path(path);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    /**
+     * Constructs a new path.
+     * <p>
+     * If the given path name is opaque, its parent path name is parsed
+     * according to the syntax specification for paths
+     * and the result is used to compute the
+     * {@link #getParent() parent path}.
+     *
+     * @param  path the non-{@code null} {@link #getPath() path name}.
+     * @throws NullPointerException if {@code name} is {@code null}.
+     * @throws URISyntaxException if {@code name} does not conform to
      *         the additional constraints for paths.
      */
-    public Path(URI path) {
+    public Path(URI path) throws URISyntaxException {
         this(path, null);
     }
 
@@ -104,59 +129,55 @@ public final class Path implements Serializable, Comparable<Path> {
      * {@link #getParent() parent path}.
      * <p>
      * If the given path name is hierarchical and the given parent path is
-     * not {@code null}, the parent path's path name must be a true ancestor
+     * not {@code null}, the parent path's path name must be an ancestor
      * of the given path name, i.e. the member name must not be empty.
      *
      * @param  path the non-{@code null} {@link #getPath() path name}.
      * @param  parent the nullable {@link #getParent() parent path}.
      * @throws NullPointerException if {@code name} is {@code null}.
-     * @throws IllegalArgumentException if {@code name} does not conform to
+     * @throws URISyntaxException if {@code name} does not conform to
      *         the additional constraints for paths
      *         or {@code parent} is not a valid parent path.
      */
-    public Path(final URI path, Path parent) {
+    Path(final URI path, Path parent) throws URISyntaxException {
         final URI member;
-        try {
-            if (null != path.getRawFragment())
+        if (null != path.getRawFragment())
+            throw new URISyntaxException(path.toString(),
+                    "Fragment component not allowed");
+        if (path.isOpaque()) {
+            final String ssp = path.getSchemeSpecificPart();
+            final int i = ssp.lastIndexOf(BANG_SLASH);
+            if (0 > i)
                 throw new URISyntaxException(path.toString(),
-                        "Fragment component not allowed");
-            if (path.isOpaque()) {
-                final String ssp = path.getSchemeSpecificPart();
-                final int i = ssp.lastIndexOf(BANG_SLASH);
-                if (0 > i)
+                        "Missing separator \"" + BANG_SLASH + '"');
+            final URI parentPath = new URI(ssp.substring(0, i));
+            if (parentPath.getRawSchemeSpecificPart().endsWith(SEPARATOR))
+                throw new URISyntaxException(parentPath.toString(),
+                        "Must not end with a separator \"" + SEPARATOR + '"');
+            member = new URI(null, ssp.substring(i + 2), null);
+            final String m = member.toString();
+            if (member.normalize() != member
+                    || m.equals("..")
+                    || m.startsWith(SEPARATOR)
+                    || m.startsWith(".." + SEPARATOR))
+                throw new URISyntaxException(m, "Illegal member name");
+            if (null == parent)
+                parent = new Path(parentPath);
+            else if (!parent.getPath().equals(parentPath))
+                throw new URISyntaxException(path.toString(),
+                        parent.toString() + ": not a parent of");
+        } else {
+            if (path.normalize() != path)
+                throw new URISyntaxException(path.toString(),
+                        "Not in normal form");
+            if (null != parent) {
+                member = parent.getPath().relativize(path);
+                if (member == path || 0 == member.toString().length())
                     throw new URISyntaxException(path.toString(),
-                            "Missing separator \"" + BANG_SLASH + '"');
-                final URI parentPath = new URI(ssp.substring(0, i));
-                if (parentPath.getRawSchemeSpecificPart().endsWith(SEPARATOR))
-                    throw new URISyntaxException(parentPath.toString(),
-                            "Must not end with a separator \"" + SEPARATOR + '"');
-                member = new URI(null, ssp.substring(i + 2), null);
-                final String m = member.toString();
-                if (member.normalize() != member
-                        || m.equals("..")
-                        || m.startsWith(SEPARATOR)
-                        || m.startsWith(".." + SEPARATOR))
-                    throw new URISyntaxException(m, "Illegal member name");
-                if (null == parent)
-                    parent = new Path(parentPath);
-                else if (!parent.getPath().equals(parentPath))
-                    throw new URISyntaxException(path.toString(),
-                            parent.toString() + ": not a parent of");
+                            parent.toString() + ": not an ancestor of");
             } else {
-                if (path.normalize() != path)
-                    throw new URISyntaxException(path.toString(),
-                            "Not in normal form");
-                if (null != parent) {
-                    member = parent.getPath().relativize(path);
-                    if (member == path || 0 == member.toString().length())
-                        throw new URISyntaxException(path.toString(),
-                                parent.toString() + ": not a true ancestor of");
-                } else {
-                    member = null;
-                }
+                member = null;
             }
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
         }
         this.path = path;
         this.parent = parent;

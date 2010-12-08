@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -29,7 +30,13 @@ public class PathTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithNull() {
+    public void testConstructorWithNull() throws URISyntaxException {
+        try {
+            Path.create(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
         try {
             new Path(null);
             fail();
@@ -52,7 +59,7 @@ public class PathTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithPath() {
+    public void testConstructorWithPath() throws URISyntaxException {
         for (final String param : new String[] {
             "foo//",
             "foo/.",
@@ -84,7 +91,7 @@ public class PathTest {
         }) {
             final URI name = URI.create(param);
             try {
-                new Path(name);
+                Path.create(name);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
@@ -103,7 +110,7 @@ public class PathTest {
             "foo:/bar/",
             "foo:/bar/baz/",
         }) {
-            final URI name = URI.create(param);
+            final URI name = new URI(param);
             final Path path = new Path(name);
             assertThat(path.getPath(), sameInstance(name));
             assertThat(path.getMember(), nullValue());
@@ -121,9 +128,9 @@ public class PathTest {
             { "foo:bar:baz:/bang!/boom!/plonk", "bar:baz:/bang!/boom", "plonk" },
             { "foo:bar:baz:/bang!/boom!/plonk/", "bar:baz:/bang!/boom", "plonk/" },
         }) {
-            final URI name = URI.create(params[0]);
-            final URI parentName = URI.create(params[1]);
-            final URI member = URI.create(params[2]);
+            final URI name = new URI(params[0]);
+            final URI parentName = new URI(params[1]);
+            final URI member = new URI(params[2]);
             final Path path = new Path(name);
             assertThat(path.getPath(), sameInstance(name));
             assertThat(path.getMember(), equalTo(member));
@@ -137,7 +144,7 @@ public class PathTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithPathAndParent() {
+    public void testConstructorWithPathAndParent() throws URISyntaxException {
         for (final String[] params : new String[][] {
             { "foo:bar", "foo:/" },
             { "foo:/bar", "foo:/ba" },
@@ -151,13 +158,13 @@ public class PathTest {
             { "jar:file:/lib.jar!//", "file:/" },
             { "jar:file:/lib.jar!/entry", "file:/" },
         }) {
-            final URI name = URI.create(params[0]);
-            final URI parentName = URI.create(params[1]);
+            final URI name = new URI(params[0]);
+            final URI parentName = new URI(params[1]);
             final Path parent = new Path(parentName);
             try {
                 new Path(name, parent);
                 fail(params[0]);
-            } catch (IllegalArgumentException expected) {
+            } catch (URISyntaxException expected) {
             }
         }
 
@@ -172,9 +179,9 @@ public class PathTest {
             { "foo:bar:/baz!/a", "bar:/baz", "a" },
             { "foo:bar:/baz!/a/", "bar:/baz", "a/" },
         }) {
-            final URI name = URI.create(params[0]);
-            final URI parentName = URI.create(params[1]);
-            final URI member = URI.create(params[2]);
+            final URI name = new URI(params[0]);
+            final URI parentName = new URI(params[1]);
+            final URI member = new URI(params[2]);
             final Path parent = new Path(parentName);
             final Path path = new Path(name, parent);
             assertThat(path.getPath(), sameInstance(name));
