@@ -61,17 +61,6 @@ public class PathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithPath() throws URISyntaxException {
         for (final String param : new String[] {
-            "foo//",
-            "foo/.",
-            "foo/./",
-            "foo/..",
-            "foo/../",
-            "/./foo",
-            "foo:/bar//",
-            "foo:/bar/.",
-            "foo:/bar/./",
-            "foo:/bar/..",
-            "foo:/bar/../",
             "foo:bar",
             "foo:bar:/",
             "foo:bar:/baz!/..",
@@ -82,11 +71,8 @@ public class PathTest {
             "foo:bar:/baz!/a/..",
             "foo:bar:/baz!/a/../",
             "foo:bar:/baz/!/",
-            "foo:bar:/baz/.!/",
             "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
             "foo:bar:/baz/../!/",
-            "foo:bar:/baz/../bang!/",
             "foo:bar:/baz/!/../bang",
         }) {
             final URI name = URI.create(param);
@@ -98,6 +84,17 @@ public class PathTest {
         }
 
         for (final String param : new String[] {
+            "foo//",
+            "foo/.",
+            "foo/./",
+            "foo/..",
+            "foo/../",
+            "/./foo",
+            "foo:/bar//",
+            "foo:/bar/.",
+            "foo:/bar/./",
+            "foo:/bar/..",
+            "foo:/bar/../",
             "foo",
             "foo/bar",
             "foo/bar/",
@@ -112,15 +109,18 @@ public class PathTest {
         }) {
             final URI name = new URI(param);
             final Path path = new Path(name);
-            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getName(), sameInstance(name));
             assertThat(path.getMember(), nullValue());
             assertThat(path.getParent(), nullValue());
-            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path.toString(), equalTo(path.getName().toString()));
             assertThat(path, equalTo(path));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
 
         for (final String[] params : new String[][] {
+            { "foo:bar:/baz/.!/", "bar:/baz/.", "" },
+            { "foo:bar:/baz/..!/", "bar:/baz/..", "" },
+            { "foo:bar:/baz/../bang!/", "bar:/baz/../bang", "" },
             { "foo:bar:/baz!/", "bar:/baz", "" },
             { "foo:bar:/baz!/bang", "bar:/baz", "bang" },
             { "foo:bar:/baz!/bang/", "bar:/baz", "bang/" },
@@ -132,10 +132,10 @@ public class PathTest {
             final URI parentName = new URI(params[1]);
             final URI member = new URI(params[2]);
             final Path path = new Path(name);
-            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getName(), sameInstance(name));
             assertThat(path.getMember(), equalTo(member));
-            assertThat(path.getParent().getPath(), equalTo(parentName));
-            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path.getParent().getName(), equalTo(parentName));
+            assertThat(path.toString(), equalTo(path.getName().toString()));
             assertThat(path, equalTo(path));
             assertThat(path, not(equalTo(path.getParent())));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
@@ -184,10 +184,10 @@ public class PathTest {
             final URI member = new URI(params[2]);
             final Path parent = new Path(parentName);
             final Path path = new Path(name, parent);
-            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getName(), sameInstance(name));
             assertThat(path.getMember(), equalTo(member));
             assertThat(path.getParent(), sameInstance(parent));
-            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path.toString(), equalTo(path.getName().toString()));
             assertThat(path, equalTo(path));
             assertThat(path, not(equalTo(parent)));
             assertThat(path.hashCode(), equalTo(path.hashCode()));

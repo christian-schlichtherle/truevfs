@@ -25,16 +25,14 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * Represents an identifier in the name space of a federated file system.
  * Note that this class is immutable and final, hence thread-safe, too.
  * <p>
- * Every path has a {@link #getPath() path name}, an optional
+ * Every path has a {@link #getName() path name}, an optional
  * {@link #getMember() member name} and an optional
  * {@link #getParent() parent path}.
- *
  * <p>
  * The path name is a {@link URI Uniform Resource Identifier}
  * which conforms to the following additional constraints for paths:
  * <ol>
  * <li>The path name must not have a fragment component.
- * <li>If the path name is hierarchical, it must be in normal form.
  * <li>If the path name is opaque, its scheme specific part must contain at
  *     least one bang slash separator {@code "!/"}.
  *     The part after the last bang slash separator is parsed as a relative URI
@@ -48,13 +46,13 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * Examples for valid path names are:
  * <ul>
  * <li>{@code foo}
+ * <li>{@code foo/.}
+ * <li>{@code foo:/bar/.}
  * <li>{@code foo:/bar}
  * <li>{@code foo:bar:/baz!/bang}
  * </ul>
  * Examples for invalid path names are:
  * <ul>
- * <li>{@code foo/.} (not in normal form)
- * <li>{@code foo:/bar/.} (dito)
  * <li>{@code foo:bar} (Missing bang slash separator)
  * <li>{@code foo:bar:/baz/../bang!/} (parent path name not in normal form)
  * <li>{@code foo:bar:/baz/!/../bang} (member name starts with {@code "../"})
@@ -71,9 +69,8 @@ public final class Path implements Serializable, Comparable<Path> {
     /** The separator which is used to split opaque path names into segments. */
     public static final String BANG_SLASH = "!" + SEPARATOR;
 
-    private final URI path;
+    private final URI name, member;
     private final Path parent;
-    private final URI member;
 
     /**
      * Constructs a new path.
@@ -87,7 +84,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * and the result is used to compute the
      * {@link #getParent() parent path}.
      *
-     * @param  path the non-{@code null} {@link #getPath() path name}.
+     * @param  path the non-{@code null} {@link #getName() path name}.
      * @throws NullPointerException if {@code name} is {@code null}.
      * @throws URISyntaxException if {@code name} does not conform to
      *         the additional constraints for paths.
@@ -109,13 +106,13 @@ public final class Path implements Serializable, Comparable<Path> {
      * and the result is used to compute the
      * {@link #getParent() parent path}.
      *
-     * @param  path the non-{@code null} {@link #getPath() path name}.
+     * @param  name the non-{@code null} {@link #getName() path name}.
      * @throws NullPointerException if {@code name} is {@code null}.
      * @throws URISyntaxException if {@code name} does not conform to
      *         the additional constraints for paths.
      */
-    public Path(URI path) throws URISyntaxException {
-        this(path, null);
+    public Path(URI name) throws URISyntaxException {
+        this(name, null);
     }
 
     /**
@@ -132,23 +129,23 @@ public final class Path implements Serializable, Comparable<Path> {
      * not {@code null}, the parent path's path name must be an ancestor
      * of the given path name, i.e. the member name must not be empty.
      *
-     * @param  path the non-{@code null} {@link #getPath() path name}.
+     * @param  name the non-{@code null} {@link #getName() path name}.
      * @param  parent the nullable {@link #getParent() parent path}.
      * @throws NullPointerException if {@code name} is {@code null}.
      * @throws URISyntaxException if {@code name} does not conform to
      *         the additional constraints for paths
      *         or {@code parent} is not a valid parent path.
      */
-    Path(final URI path, Path parent) throws URISyntaxException {
+    Path(final URI name, Path parent) throws URISyntaxException {
         final URI member;
-        if (null != path.getRawFragment())
-            throw new URISyntaxException(path.toString(),
+        if (null != name.getRawFragment())
+            throw new URISyntaxException(name.toString(),
                     "Fragment component not allowed");
-        if (path.isOpaque()) {
-            final String ssp = path.getSchemeSpecificPart();
+        if (name.isOpaque()) {
+            final String ssp = name.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(BANG_SLASH);
             if (0 > i)
-                throw new URISyntaxException(path.toString(),
+                throw new URISyntaxException(name.toString(),
                         "Missing separator \"" + BANG_SLASH + '"');
             final URI parentPath = new URI(ssp.substring(0, i));
             if (parentPath.getRawSchemeSpecificPart().endsWith(SEPARATOR))
@@ -163,23 +160,20 @@ public final class Path implements Serializable, Comparable<Path> {
                 throw new URISyntaxException(m, "Illegal member name");
             if (null == parent)
                 parent = new Path(parentPath);
-            else if (!parent.getPath().equals(parentPath))
-                throw new URISyntaxException(path.toString(),
+            else if (!parent.getName().equals(parentPath))
+                throw new URISyntaxException(name.toString(),
                         parent.toString() + ": not a parent of");
         } else {
-            if (path.normalize() != path)
-                throw new URISyntaxException(path.toString(),
-                        "Not in normal form");
             if (null != parent) {
-                member = parent.getPath().relativize(path);
-                if (member == path || 0 == member.toString().length())
-                    throw new URISyntaxException(path.toString(),
+                member = parent.getName().relativize(name);
+                if (member == name || 0 == member.toString().length())
+                    throw new URISyntaxException(name.toString(),
                             parent.toString() + ": not an ancestor of");
             } else {
                 member = null;
             }
         }
-        this.path = path;
+        this.name = name;
         this.parent = parent;
         this.member = member;
 
@@ -187,20 +181,18 @@ public final class Path implements Serializable, Comparable<Path> {
     }
 
     private boolean invariants() {
-        assert null != path;
-        assert null == path.getRawFragment();
-        if (path.isOpaque()) {
-            assert path.toString().contains(BANG_SLASH);
+        assert null != name;
+        assert null == name.getRawFragment();
+        if (name.isOpaque()) {
+            assert name.toString().contains(BANG_SLASH);
             assert null != parent;
-        } else {
-            assert path.normalize() == path;
         }
         if (null != member) {
             assert null != parent;
             assert !member.isAbsolute();
             assert member.normalize() == member;
             final String m = member.toString();
-            assert path.isOpaque() || 0 != m.length();
+            assert name.isOpaque() || 0 != m.length();
             assert !m.equals("..");
             assert !m.startsWith(SEPARATOR);
             assert !m.startsWith(".." + SEPARATOR);
@@ -241,8 +233,8 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The non-{@code null} path name.
      */
-    public URI getPath() {
-        return path;
+    public URI getName() {
+        return name;
     }
 
     /**
@@ -254,7 +246,7 @@ public final class Path implements Serializable, Comparable<Path> {
     public boolean equals(final Object that) {
         return this == that
                 || that instanceof Path
-                    && this.getPath().equals(((Path) that).getPath());
+                    && this.getName().equals(((Path) that).getName());
     }
 
     /**
@@ -263,7 +255,7 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     @Override
     public int compareTo(final Path that) {
-        return this.getPath().compareTo(that.getPath());
+        return this.getName().compareTo(that.getName());
     }
 
     /**
@@ -271,14 +263,14 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     @Override
     public int hashCode() {
-        return getPath().hashCode();
+        return getName().hashCode();
     }
 
     /**
-     * Equivalent to <code>{@link #getPath()}.{@link Object#toString()}</code>.
+     * Equivalent to <code>{@link #getName()}.{@link Object#toString()}</code>.
      */
     @Override
     public String toString() {
-        return getPath().toString();
+        return getName().toString();
     }
 }
