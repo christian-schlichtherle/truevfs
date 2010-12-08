@@ -31,7 +31,8 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * This class is <em>not</em> thread-safe!
  * Multithreading needs to be addressed by client classes.
  *
- * @author Christian Schlichtherle
+ * @see     FileSystemController
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileSystemModel {
