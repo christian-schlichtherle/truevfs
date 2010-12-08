@@ -2742,6 +2742,8 @@ public class File extends java.io.File {
             return;
         }
 
+        /** FIXME: Remove this! */
+
         if (isArchive()) {
             // We cannot prompt the user for a password in the shutdown hook
             // in case this is a RAES encrypted ZIP file.
