@@ -30,32 +30,26 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * {@link #getParent() parent path}.
  * <p>
  * The path name is a {@link URI Uniform Resource Identifier}
- * which conforms to the following additional constraints for paths:
- * <ol>
- * <li>The path name must not have a fragment component.
- * <li>If the path name is opaque, its scheme specific part must contain at
- *     least one bang slash separator {@code "!/"}.
- *     The part after the last bang slash separator is parsed as a relative URI
- *     which must be in normal form, must not be equal to {@code ".."} and must
- *     not start with a {@code "/"} or {@code "../"}.
- *     Finally, the part before the last bang slash separator is recursively
- *     parsed as a path again - so it must conform to all these constraints,
- *     too.
- * </ol>
+ * which conforms to the following additional constraint for paths:
+ * <p>
+ * If the path name is opaque, its scheme specific part must contain at least
+ * one bang slash separator {@code "!/"}.
+ * The part after the last bang slash separator is parsed as a relative URI.
+ * The part before the last bang slash separator is recursively parsed as a
+ * path again.
  * <p>
  * Examples for valid path names are:
  * <ul>
  * <li>{@code foo}
  * <li>{@code foo/.}
- * <li>{@code foo:/bar/.}
  * <li>{@code foo:/bar}
+ * <li>{@code foo:/bar/.}
  * <li>{@code foo:bar:/baz!/bang}
  * </ul>
  * Examples for invalid path names are:
  * <ul>
  * <li>{@code foo:bar} (Missing bang slash separator)
- * <li>{@code foo:bar:/baz/../bang!/} (parent path name not in normal form)
- * <li>{@code foo:bar:/baz/!/../bang} (member name starts with {@code "../"})
+ * <li>{@code foo:bar:baz:/bang!/} (dito)
  * </ul>
  *
  * @see     MountPoint
@@ -138,9 +132,6 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     Path(final URI name, Path parent) throws URISyntaxException {
         final URI member;
-        if (null != name.getRawFragment())
-            throw new URISyntaxException(name.toString(),
-                    "Fragment component not allowed");
         if (name.isOpaque()) {
             final String ssp = name.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(BANG_SLASH);
@@ -148,31 +139,18 @@ public final class Path implements Serializable, Comparable<Path> {
                 throw new URISyntaxException(name.toString(),
                         "Missing separator \"" + BANG_SLASH + '"');
             final URI parentPath = new URI(ssp.substring(0, i));
-            if (parentPath.getRawSchemeSpecificPart().endsWith(SEPARATOR))
-                throw new URISyntaxException(parentPath.toString(),
-                        "Must not end with a separator \"" + SEPARATOR + '"');
-            member = new URI(null, ssp.substring(i + 2), null);
-            final String m = member.toString();
-            if (member.normalize() != member
-                    || m.equals("..")
-                    || m.startsWith(SEPARATOR)
-                    || m.startsWith(".." + SEPARATOR))
-                throw new URISyntaxException(m, "Illegal member name");
+            member = new URI(null, ssp.substring(i + 2), name.getFragment());
             if (null == parent)
                 parent = new Path(parentPath);
             else if (!parent.getName().equals(parentPath))
                 throw new URISyntaxException(name.toString(),
                         parent.toString() + ": not a parent of");
-        } else {
-            if (null != parent) {
-                member = parent.getName().relativize(name);
-                if (member == name || 0 == member.toString().length())
-                    throw new URISyntaxException(name.toString(),
-                            parent.toString() + ": not an ancestor of");
-            } else {
-                member = null;
-            }
-        }
+        } else if (null == parent)
+            member = null;
+        else if ((member = parent.getName().relativize(name)) == name
+                || 0 == member.toString().length())
+            throw new URISyntaxException(name.toString(),
+                    parent.toString() + ": not an ancestor of");
         this.name = name;
         this.parent = parent;
         this.member = member;
@@ -182,7 +160,6 @@ public final class Path implements Serializable, Comparable<Path> {
 
     private boolean invariants() {
         assert null != name;
-        assert null == name.getRawFragment();
         if (name.isOpaque()) {
             assert name.toString().contains(BANG_SLASH);
             assert null != parent;
@@ -190,12 +167,7 @@ public final class Path implements Serializable, Comparable<Path> {
         if (null != member) {
             assert null != parent;
             assert !member.isAbsolute();
-            assert member.normalize() == member;
-            final String m = member.toString();
-            assert name.isOpaque() || 0 != m.length();
-            assert !m.equals("..");
-            assert !m.startsWith(SEPARATOR);
-            assert !m.startsWith(".." + SEPARATOR);
+            assert name.isOpaque() || 0 != member.toString().length();
         } else {
             assert null == parent;
         }

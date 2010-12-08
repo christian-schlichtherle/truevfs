@@ -62,18 +62,15 @@ public class PathTest {
     public void testConstructorWithPath() throws URISyntaxException {
         for (final String param : new String[] {
             "foo:bar",
+            "foo:bar:",
             "foo:bar:/",
-            "foo:bar:/baz!/..",
-            "foo:bar:/baz!/../",
-            "foo:bar:/baz!/a//",
-            "foo:bar:/baz!/a/.",
-            "foo:bar:/baz!/a/./",
-            "foo:bar:/baz!/a/..",
-            "foo:bar:/baz!/a/../",
-            "foo:bar:/baz/!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/../!/",
-            "foo:bar:/baz/!/../bang",
+            "foo:bar:/baz",
+            "foo:bar:/baz!",
+            "foo:bar:/baz/",
+            "foo:bar:baz:/bang",
+            "foo:bar:baz:/bang!",
+            "foo:bar:baz:/bang/",
+            "foo:bar:baz:/bang!/",
         }) {
             final URI name = URI.create(param);
             try {
@@ -84,27 +81,32 @@ public class PathTest {
         }
 
         for (final String param : new String[] {
+            "/../foo#boo",
+            "/../foo#",
+            "/../foo",
+            "/./foo",
+            "//foo",
+            "/foo",
+            "/foo/bar",
+            "/foo/bar/",
+            "/",
+            "foo",
+            "foo/",
             "foo//",
             "foo/.",
             "foo/./",
             "foo/..",
             "foo/../",
-            "/./foo",
+            "foo/bar",
+            "foo/bar/",
+            "foo:/bar",
+            "foo:/bar/",
             "foo:/bar//",
             "foo:/bar/.",
             "foo:/bar/./",
             "foo:/bar/..",
             "foo:/bar/../",
-            "foo",
-            "foo/bar",
-            "foo/bar/",
-            "/foo",
-            "/foo/bar",
-            "/foo/bar/",
-            "//foo",
-            "/../foo",
-            "foo:/bar",
-            "foo:/bar/",
+            "foo:/bar/baz",
             "foo:/bar/baz/",
         }) {
             final URI name = new URI(param);
@@ -118,15 +120,60 @@ public class PathTest {
         }
 
         for (final String[] params : new String[][] {
-            { "foo:bar:/baz/.!/", "bar:/baz/.", "" },
-            { "foo:bar:/baz/..!/", "bar:/baz/..", "" },
-            { "foo:bar:/baz/../bang!/", "bar:/baz/../bang", "" },
-            { "foo:bar:/baz!/", "bar:/baz", "" },
-            { "foo:bar:/baz!/bang", "bar:/baz", "bang" },
-            { "foo:bar:/baz!/bang/", "bar:/baz", "bang/" },
-            { "foo:bar:baz:/bang!/boom!/", "bar:baz:/bang!/boom", "" },
-            { "foo:bar:baz:/bang!/boom!/plonk", "bar:baz:/bang!/boom", "plonk" },
+            { "foo:bar:baz:/bang!/boom!/plonk/#boo", "bar:baz:/bang!/boom", "plonk/#boo" },
+            { "foo:bar:baz:/bang!/boom!/plonk/#", "bar:baz:/bang!/boom", "plonk/#" },
             { "foo:bar:baz:/bang!/boom!/plonk/", "bar:baz:/bang!/boom", "plonk/" },
+            { "foo:bar:baz:/bang!/boom!/plonk", "bar:baz:/bang!/boom", "plonk" },
+            { "foo:bar:baz:/bang!/boom!/", "bar:baz:/bang!/boom", "" },
+
+            { "foo:bar:/baz!/bang/../", "bar:/baz", "bang/../" },
+            { "foo:bar:/baz!/bang/..", "bar:/baz", "bang/.." },
+            { "foo:bar:/baz!/bang/./", "bar:/baz", "bang/./" },
+            { "foo:bar:/baz!/bang/.", "bar:/baz", "bang/." },
+
+            { "foo:bar:/baz!/../bang/", "bar:/baz", "../bang/" },
+            { "foo:bar:/baz!/./bang/", "bar:/baz", "./bang/" },
+            { "foo:bar:/baz/../!/bang/", "bar:/baz/../", "bang/" },
+            { "foo:bar:/baz/..!/bang/", "bar:/baz/..", "bang/" },
+            { "foo:bar:/baz/./!/bang/", "bar:/baz/./", "bang/" },
+            { "foo:bar:/baz/.!/bang/", "bar:/baz/.", "bang/" },
+            { "foo:bar:/../baz/!/bang/", "bar:/../baz/", "bang/" },
+            { "foo:bar:/./baz/!/bang/", "bar:/./baz/", "bang/" },
+            { "foo:bar://baz/!/bang/", "bar://baz/", "bang/" }, // baz is authority!
+            { "foo:bar://baz!/bang/", "bar://baz", "bang/" }, // baz is authority!
+            { "foo:bar:/baz!/bang/", "bar:/baz", "bang/" },
+            { "foo:bar:/!/bang/", "bar:/", "bang/" },
+
+            { "foo:bar:/baz!/../bang", "bar:/baz", "../bang" },
+            { "foo:bar:/baz!/./bang", "bar:/baz", "./bang" },
+            { "foo:bar:/baz/../!/bang", "bar:/baz/../", "bang" },
+            { "foo:bar:/baz/..!/bang", "bar:/baz/..", "bang" },
+            { "foo:bar:/baz/./!/bang", "bar:/baz/./", "bang" },
+            { "foo:bar:/baz/.!/bang", "bar:/baz/.", "bang" },
+            { "foo:bar:/../baz/!/bang", "bar:/../baz/", "bang" },
+            { "foo:bar:/./baz/!/bang", "bar:/./baz/", "bang" },
+            { "foo:bar://baz/!/bang", "bar://baz/", "bang" }, // baz is authority!
+            { "foo:bar://baz!/bang", "bar://baz", "bang" }, // baz is authority!
+            { "foo:bar:/baz!/bang", "bar:/baz", "bang" },
+            { "foo:bar:/!/bang", "bar:/", "bang" },
+
+            { "foo:bar:/baz!/../", "bar:/baz", "../" },
+            { "foo:bar:/baz!/..", "bar:/baz", ".." },
+            { "foo:bar:/baz!/./", "bar:/baz", "./" },
+            { "foo:bar:/baz!/.", "bar:/baz", "." },
+            { "foo:bar:/baz!//", "bar:/baz", "/" },
+            { "foo:bar:/baz!/", "bar:/baz", "" },
+
+            { "foo:bar:/baz/!/", "bar:/baz/", "" },
+            { "foo:bar:/baz//!/", "bar:/baz//", "" },
+            { "foo:bar:/baz/./!/", "bar:/baz/./", "" },
+            { "foo:bar:/baz/..!/", "bar:/baz/..", "" },
+            { "foo:bar:/baz/../!/", "bar:/baz/../", "" },
+            { "foo:bar:/baz!/bang//", "bar:/baz", "bang//" },
+            { "foo:bar:/baz!/bang/.", "bar:/baz", "bang/." },
+            { "foo:bar:/baz!/bang/./", "bar:/baz", "bang/./" },
+            { "foo:bar:/baz!/bang/..", "bar:/baz", "bang/.." },
+            { "foo:bar:/baz!/bang/../", "bar:/baz", "bang/../" },
         }) {
             final URI name = new URI(params[0]);
             final URI parentName = new URI(params[1]);
