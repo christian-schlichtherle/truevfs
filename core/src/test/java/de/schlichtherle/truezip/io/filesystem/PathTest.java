@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.net.URI;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -53,7 +52,7 @@ public class PathTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithUri() {
+    public void testConstructorWithPath() {
         for (final String param : new String[] {
             "foo//",
             "foo/.",
@@ -68,10 +67,24 @@ public class PathTest {
             "foo:/bar/../",
             "foo:bar",
             "foo:bar:/",
+            "foo:bar:/baz!/..",
+            "foo:bar:/baz!/../",
+            "foo:bar:/baz!/a//",
+            "foo:bar:/baz!/a/.",
+            "foo:bar:/baz!/a/./",
+            "foo:bar:/baz!/a/..",
+            "foo:bar:/baz!/a/../",
+            "foo:bar:/baz/!/",
+            "foo:bar:/baz/.!/",
+            "foo:bar:/baz/./!/",
+            "foo:bar:/baz/..!/",
+            "foo:bar:/baz/../!/",
+            "foo:bar:/baz/../bang!/",
+            "foo:bar:/baz/!/../bang",
         }) {
-            final URI uri = URI.create(param);
+            final URI name = URI.create(param);
             try {
-                new Path(uri);
+                new Path(name);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
@@ -88,63 +101,89 @@ public class PathTest {
             "/../foo",
             "foo:/bar",
             "foo:/bar/",
+            "foo:/bar/baz/",
         }) {
-            final URI uri = URI.create(param);
-            final Path path = new Path(uri);
-            assertThat(path.getUri(), sameInstance(uri));
+            final URI name = URI.create(param);
+            final Path path = new Path(name);
+            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getMember(), nullValue());
             assertThat(path.getParent(), nullValue());
-            try {
-                path.parentPath(ROOT);
-                fail(param);
-            } catch (NullPointerException expected) {
-            }
+            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path, equalTo(path));
+            assertThat(path.hashCode(), equalTo(path.hashCode()));
+        }
+
+        for (final String[] params : new String[][] {
+            { "foo:bar:/baz!/", "bar:/baz", "" },
+            { "foo:bar:/baz!/bang", "bar:/baz", "bang" },
+            { "foo:bar:/baz!/bang/", "bar:/baz", "bang/" },
+            { "foo:bar:baz:/bang!/boom!/", "bar:baz:/bang!/boom", "" },
+            { "foo:bar:baz:/bang!/boom!/plonk", "bar:baz:/bang!/boom", "plonk" },
+            { "foo:bar:baz:/bang!/boom!/plonk/", "bar:baz:/bang!/boom", "plonk/" },
+        }) {
+            final URI name = URI.create(params[0]);
+            final URI parentName = URI.create(params[1]);
+            final URI member = URI.create(params[2]);
+            final Path path = new Path(name);
+            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getMember(), equalTo(member));
+            assertThat(path.getParent().getPath(), equalTo(parentName));
+            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path, equalTo(path));
+            assertThat(path, not(equalTo(path.getParent())));
+            assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
     }
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithUriAndParent() {
+    public void testConstructorWithPathAndParent() {
         for (final String[] params : new String[][] {
             { "foo:bar", "foo:/" },
+            { "foo:/bar", "foo:/ba" },
+            { "foo:/bar", "foo:/bar" },
             { "foo:/bar", "foo:/baz/" },
+            { "foo:/bar/", "foo:/bar" },
+            { "foo:/bar/", "foo:/bar/" },
             { "foo:/bar/", "foo:/baz/" },
             { "jar:file:/lib.jar", "file:/" },
             { "jar:file:/lib.jar!", "file:/" },
             { "jar:file:/lib.jar!//", "file:/" },
             { "jar:file:/lib.jar!/entry", "file:/" },
         }) {
-            final URI uri = URI.create(params[0]);
-            final URI parentURI = URI.create(params[1]);
-            final Path parent = new Path(parentURI);
+            final URI name = URI.create(params[0]);
+            final URI parentName = URI.create(params[1]);
+            final Path parent = new Path(parentName);
             try {
-                new Path(uri, parent);
+                new Path(name, parent);
                 fail(params[0]);
             } catch (IllegalArgumentException expected) {
             }
         }
 
         for (final String[] params : new String[][] {
-            { "foo:bar:/baz/a!/", "bar:/", "", "baz/a/" },
-            { "foo:bar:/baz/a!/", "bar:/baz", "", "/a/" },
-            { "foo:bar:/baz/a!/", "bar:/baz", "b", "/a/b" },
-            { "foo:bar:/baz/a!/", "bar:/baz", "b/", "/a/b/" },
-            { "foo:bar:/baz/a!/", "bar:/baz/", "", "a/" },
-            { "foo:bar:/baz/a!/", "bar:/baz/", "b", "a/b" },
-            { "foo:bar:/baz/a!/", "bar:/baz/", "b/", "a/b/" },
-            { "bar:/baz/a/", "bar:/baz/", "", "a/" },
-            { "bar:/baz/a/", "bar:/baz/", "b", "a/b" },
-            { "bar:/baz/a/", "bar:/baz/", "b/", "a/b/" },
+            { "foo:/bar", "foo:/", "bar" },
+            { "foo:/bar/", "foo:/", "bar/" },
+            { "foo:/bar/baz", "foo:/bar", "baz" },
+            { "foo:/bar/baz/", "foo:/bar", "baz/" },
+            { "foo:/bar/baz", "foo:/bar/", "baz" },
+            { "foo:/bar/baz/", "foo:/bar/", "baz/" },
+            { "foo:bar:/baz!/", "bar:/baz", "" },
+            { "foo:bar:/baz!/a", "bar:/baz", "a" },
+            { "foo:bar:/baz!/a/", "bar:/baz", "a/" },
         }) {
-            final URI uri = URI.create(params[0]);
-            final URI parentUri = URI.create(params[1]);
-            final String name = params[2];
-            final String parentName = params[3];
-            final Path parent = new Path(parentUri);
-            final Path path = new Path(uri, parent);
-
-            assertThat(path.getUri(), sameInstance(uri));
+            final URI name = URI.create(params[0]);
+            final URI parentName = URI.create(params[1]);
+            final URI member = URI.create(params[2]);
+            final Path parent = new Path(parentName);
+            final Path path = new Path(name, parent);
+            assertThat(path.getPath(), sameInstance(name));
+            assertThat(path.getMember(), equalTo(member));
             assertThat(path.getParent(), sameInstance(parent));
-            assertThat(path.parentPath(name).toString(), equalTo(parentName));
+            assertThat(path.toString(), equalTo(path.getPath().toString()));
+            assertThat(path, equalTo(path));
+            assertThat(path, not(equalTo(parent)));
+            assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
     }
 }
