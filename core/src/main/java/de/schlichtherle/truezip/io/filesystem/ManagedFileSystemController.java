@@ -52,6 +52,7 @@ implements FederatedFileSystemController<Entry> {
 
     ManagedFileSystemController(final FileSystemController<?> controller) {
         super(controller);
+        assert null != getParent();
     }
 
     private String parentPath(String path) {
