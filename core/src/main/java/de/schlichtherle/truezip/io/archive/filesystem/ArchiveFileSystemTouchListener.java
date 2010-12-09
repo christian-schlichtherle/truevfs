@@ -25,25 +25,23 @@ import java.util.EventListener;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemListener<AE extends ArchiveEntry>
+public interface ArchiveFileSystemTouchListener<AE extends ArchiveEntry>
 extends EventListener {
 
     /**
-     * Called whenever the value of the property
-     * {@link ArchiveFileSystem#isTouched() touched} is going to change in the
-     * source archive file system model, but before the change has actually
-     * happened.
-     * If this method throws an {@code IOException}), then the change of the
-     * archive file system is effectively vetoed.
+     * Called immediately before the source archive file system is going to
+     * get modified (touched) for the first time.
+     * If this method throws an {@code IOException}), then the modification
+     * is effectively vetoed.
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void beforeTouch(ArchiveFileSystemEvent<? extends AE> event) throws IOException;
+    void beforeTouch(ArchiveFileSystemEvent<? extends AE> event)
+    throws IOException;
 
     /**
-     * Called whenever the value of the property
-     * {@link ArchiveFileSystem#isTouched() touched} has changed
-     * in the source archive file system model.
+     * Called immediately after the source archive file system has been
+     * modified (touched) for the first time.
      */
     void afterTouch(ArchiveFileSystemEvent<? extends AE> event);
 }
