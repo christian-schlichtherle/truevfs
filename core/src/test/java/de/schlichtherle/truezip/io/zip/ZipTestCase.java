@@ -37,6 +37,8 @@ import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import junit.framework.TestCase;
 
+import static de.schlichtherle.truezip.io.zip.ZipConstants.*;
+
 /**
  * Tests compression of data.
  * Subclasses must override {@link #setUp}.
@@ -511,7 +513,7 @@ public abstract class ZipTestCase extends TestCase {
     }
 
     public void testBadGetCheckedInputStream() throws IOException {
-        if (ZIP.ZIP64_EXT)
+        if (ZIP64_EXT)
             fail("TODO: Adapt this test so that it works when ZIP64 extensions have been forced to use!");
 
         for (int i = 0; i < 4; i++) {
