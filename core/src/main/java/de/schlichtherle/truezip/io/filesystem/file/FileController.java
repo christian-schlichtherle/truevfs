@@ -52,7 +52,7 @@ implements FederatedFileSystemController<FileEntry> {
 
     FileController(final FileSystemModel model) {
         final URI mountPoint = model.getMountPoint();
-        if (!"file".equals(mountPoint.getScheme()))
+        if (!"file".equalsIgnoreCase(mountPoint.getScheme()))
             throw new IllegalArgumentException();
         if (null != model.getParent())
             throw new IllegalArgumentException();
