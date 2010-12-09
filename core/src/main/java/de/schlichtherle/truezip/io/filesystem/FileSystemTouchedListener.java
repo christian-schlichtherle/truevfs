@@ -23,12 +23,12 @@ import java.util.EventListener;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemListener extends EventListener {
+public interface FileSystemTouchedListener extends EventListener {
 
     /**
      * Called whenever the value of the property
      * {@link FileSystemModel#isTouched() touched} has changed
      * in the source file system model.
      */
-    void touchChanged(FileSystemEvent event);
+    void touchedChanged(FileSystemEvent event);
 }

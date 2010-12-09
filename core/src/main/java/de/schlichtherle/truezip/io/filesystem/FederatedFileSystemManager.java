@@ -219,7 +219,7 @@ public class FederatedFileSystemManager {
                 } else {
                     scheduler = new Scheduler(c);
                     controller = scheduler.controller;
-                    model.addFileSystemListener(scheduler);
+                    model.addFileSystemTouchedListener(scheduler);
                 }
                 assert model == controller.getModel();
             }
@@ -229,13 +229,13 @@ public class FederatedFileSystemManager {
         return controller;
     }
 
-    private final class Scheduler implements FileSystemListener {
+    private final class Scheduler implements FileSystemTouchedListener {
 
         final ManagedFileSystemController controller;
 
         Scheduler(final FileSystemController<?> prospect) {
             controller = new ManagedFileSystemController(prospect);
-            touchChanged(null); // setup schedule
+            touchedChanged(null); // setup schedule
         }
 
         /**
@@ -243,7 +243,7 @@ public class FederatedFileSystemManager {
          * to the given touch status.
          */
         @Override
-        public void touchChanged(final FileSystemEvent event) {
+        public void touchedChanged(final FileSystemEvent event) {
             synchronized (schedulers) {
                 final FileSystemModel model = controller.getModel();
                 assert null == event || event.getSource() == model;
