@@ -100,7 +100,8 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
         try {
             final RaesOutputStream ros;
             try {
-                ros = RaesOutputStream.getInstance(out, getRaesParameters(model));
+                ros = RaesOutputStream.getInstance(
+                        out, getRaesParameters(model));
             } catch (RaesKeyException ex) {
                 throw new TabuFileException(ex);
             }
