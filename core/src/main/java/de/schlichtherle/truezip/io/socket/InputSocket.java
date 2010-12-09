@@ -63,7 +63,7 @@ extends IOSocket<LT, Entry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	public final InputSocket<LT> bind(final InputSocket<?> to) {
+    public final InputSocket<LT> bind(final InputSocket<?> to) {
         final OutputSocket<?> newPeer = to.peer;
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
@@ -89,7 +89,7 @@ extends IOSocket<LT, Entry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-	final InputSocket<LT> connect(final OutputSocket<?> newPeer) {
+    final InputSocket<LT> connect(final OutputSocket<?> newPeer) {
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
