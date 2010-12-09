@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PathTest {
+public class PathNameTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -111,10 +111,10 @@ public class PathTest {
         }) {
             final URI name = new URI(param);
             final Path path = new Path(name);
-            assertThat(path.getPathName(), sameInstance(name));
+            assertThat(path.toUri(), sameInstance(name));
             assertThat(path.getEntryName(), nullValue());
             assertThat(path.getMountPoint(), nullValue());
-            assertThat(path.toString(), equalTo(path.getPathName().toString()));
+            assertThat(path.toString(), equalTo(path.toUri().toString()));
             assertThat(path, equalTo(path));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
@@ -179,10 +179,10 @@ public class PathTest {
             final URI mountPointName = new URI(params[1]);
             final URI entry = new URI(params[2]);
             final Path path = new Path(name);
-            assertThat(path.getPathName(), sameInstance(name));
+            assertThat(path.toUri(), sameInstance(name));
             assertThat(path.getEntryName(), equalTo(entry));
-            assertThat(path.getMountPoint().getPathName(), equalTo(mountPointName));
-            assertThat(path.toString(), equalTo(path.getPathName().toString()));
+            assertThat(path.getMountPoint().toUri(), equalTo(mountPointName));
+            assertThat(path.toString(), equalTo(path.toUri().toString()));
             assertThat(path, equalTo(path));
             assertThat(path, not(equalTo(path.getMountPoint())));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
@@ -231,10 +231,10 @@ public class PathTest {
             final URI entryName = new URI(params[2]);
             final Path mountPoint = new Path(mountPointName);
             final Path path = new Path(pathName, mountPoint);
-            assertThat(path.getPathName(), sameInstance(pathName));
+            assertThat(path.toUri(), sameInstance(pathName));
             assertThat(path.getEntryName(), equalTo(entryName));
             assertThat(path.getMountPoint(), sameInstance(mountPoint));
-            assertThat(path.toString(), equalTo(path.getPathName().toString()));
+            assertThat(path.toString(), equalTo(path.toUri().toString()));
             assertThat(path, equalTo(path));
             assertThat(path, not(equalTo(mountPoint)));
             assertThat(path.hashCode(), equalTo(path.hashCode()));

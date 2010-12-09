@@ -128,36 +128,36 @@ public class FileSystemModelTest {
         final FileSystemModel model = new FileSystemModel(URI.create("foo:/bar/"), null);
 
         try {
-            model.addFileSystemListener(null);
+            model.addFileSystemTouchedListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getFileSystemListeners(), notNullValue());
-        assertThat(model.getFileSystemListeners().size(), is(0));
+        assertThat(model.getFileSystemTouchedListeners(), notNullValue());
+        assertThat(model.getFileSystemTouchedListeners().size(), is(0));
 
         final Listener listener1 = new Listener(model);
-        model.addFileSystemListener(listener1);
-        assertThat(model.getFileSystemListeners().size(), is(1));
+        model.addFileSystemTouchedListener(listener1);
+        assertThat(model.getFileSystemTouchedListeners().size(), is(1));
 
         final Listener listener2 = new Listener(model);
-        model.addFileSystemListener(listener2);
-        assertThat(model.getFileSystemListeners().size(), is(2));
+        model.addFileSystemTouchedListener(listener2);
+        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
 
-        model.getFileSystemListeners().clear();
-        assertThat(model.getFileSystemListeners().size(), is(2));
+        model.getFileSystemTouchedListeners().clear();
+        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
 
         try {
-            model.removeFileSystemListener(null);
+            model.removeFileSystemTouchedListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getFileSystemListeners().size(), is(2));
+        assertThat(model.getFileSystemTouchedListeners().size(), is(2));
 
-        model.removeFileSystemListener(listener1);
-        model.removeFileSystemListener(listener1);
-        assertThat(model.getFileSystemListeners().size(), is(1));
+        model.removeFileSystemTouchedListener(listener1);
+        model.removeFileSystemTouchedListener(listener1);
+        assertThat(model.getFileSystemTouchedListeners().size(), is(1));
 
-        model.removeFileSystemListener(listener2);
-        model.removeFileSystemListener(listener2);
-        assertThat(model.getFileSystemListeners().size(), is(0));
+        model.removeFileSystemTouchedListener(listener2);
+        model.removeFileSystemTouchedListener(listener2);
+        assertThat(model.getFileSystemTouchedListeners().size(), is(0));
     }
 
     @Test
@@ -183,18 +183,18 @@ public class FileSystemModelTest {
         assertThat(listener2.changes, is(2));
     }
 
-    private static class Listener implements FileSystemListener {
+    private static class Listener implements FileSystemTouchedListener {
         final FileSystemModel model;
         int changes;
 
         @SuppressWarnings("LeakingThisInConstructor")
         Listener(final FileSystemModel model) {
             this.model = model;
-            model.addFileSystemListener(this);
+            model.addFileSystemTouchedListener(this);
         }
 
         @Override
-        public void touchChanged(FileSystemEvent event) {
+        public void touchedChanged(FileSystemEvent event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance(model));
             changes++;
