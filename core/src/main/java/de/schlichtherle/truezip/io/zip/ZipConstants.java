@@ -17,20 +17,20 @@
 package de.schlichtherle.truezip.io.zip;
 
 /**
- * A package private interface with some useful constants for ZIP compatible files.
+ * A package private interface with some useful constants for ZipConstants compatible files.
  * Public classes <em>must not</em> implement this interface - otherwise the
  * constants become part of the public API.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-interface ZIP {
+interface ZipConstants {
 
     /**
      * This boolean field is set by the system property
      * {@code de.schlichtherle.truezip.io.zip.zip64ext}.
      * If this property is set to {@code true} (case is ignored),
-     * then ZIP64 extensions are always added when writing a ZIP archive file,
+     * then ZIP64 extensions are always added when writing a ZipConstants archive file,
      * regardless of its size.
      * This system property is intended for testing purposes only.
      * During normal operations, it should not be set as many
@@ -143,10 +143,10 @@ interface ZIP {
     String UTF8 = "UTF-8";
 
     /**
-     * The default character set used for entry names and comments in ZIP
+     * The default character set used for entry names and comments in ZipConstants
      * compatible files.
      * This is {@value} for compatibility with Sun's JDK implementation.
-     * Note that you should use &quot;IBM437&quot; for ordinary ZIP files
+     * Note that you should use &quot;IBM437&quot; for ordinary ZipConstants files
      * instead.
      */
     String DEFAULT_CHARSET = UTF8;

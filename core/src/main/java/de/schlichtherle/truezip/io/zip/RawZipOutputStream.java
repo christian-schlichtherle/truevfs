@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.PLATFORM_FAT;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
- * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
+ * Provides unsafe (raw) access to a ZipConstants file using unsynchronized methods and
  * shared {@link ZipEntry} instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
@@ -49,11 +49,11 @@ extends FilterOutputStream
 implements Iterable<E> {
 
     /**
-     * The default character set used for entry names and comments in ZIP
+     * The default character set used for entry names and comments in ZipConstants
      * compatible files.
      * This is {@value} for compatibility with Sun's JDK implementation.
      */
-    public static final String DEFAULT_CHARSET = ZIP.DEFAULT_CHARSET;
+    public static final String DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
 
     /** The charset to use for entry names and comments. */
     private final Charset charset;
@@ -65,7 +65,7 @@ implements Iterable<E> {
     private final ZipDeflater def = new ZipDeflater();
 
     /** This buffer holds deflated data for output. */
-    private final byte[] dbuf = new byte[ZIP.FLATER_BUF_LENGTH];
+    private final byte[] dbuf = new byte[ZipConstants.FLATER_BUF_LENGTH];
 
     private final byte[] sbuf = new byte[1];
 
@@ -76,7 +76,7 @@ implements Iterable<E> {
     private short method = DEFLATED;
 
     /**
-     * The list of ZIP entries started to be written so far.
+     * The list of ZipConstants entries started to be written so far.
      * Maps entry names to zip entries.
      */
     private final Map<String, E> entries = new LinkedHashMap<String, E>();
@@ -97,12 +97,12 @@ implements Iterable<E> {
     /**
      * Whether or not we need to deflate the current entry.
      * This can be used together with the {@code DEFLATED} method to
-     * write already compressed entry data into the ZIP file.
+     * write already compressed entry data into the ZipConstants file.
      */
     private boolean deflate;
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
+     * Constructs a ZipConstants output stream which decorates the given output stream
      * using the given charset.
      *
      * @throws NullPointerException If any parameter is {@code null}.
@@ -119,11 +119,11 @@ implements Iterable<E> {
     }
 
     /**
-     * Constructs a ZIP output stream which decorates the given output stream
-     * and apppends to the given raw ZIP file.
+     * Constructs a ZipConstants output stream which decorates the given output stream
+     * and apppends to the given raw ZipConstants file.
      * <p>
-     * In order to append entries to an existing ZIP file, {@code out} must be
-     * set up so that it appends to the same ZIP file from which
+     * In order to append entries to an existing ZipConstants file, {@code out} must be
+     * set up so that it appends to the same ZipConstants file from which
      * {@code appendee} is reading.
      * {@code appendee} may already be closed.
      *
@@ -166,16 +166,16 @@ implements Iterable<E> {
     }
 
     /**
-     * Returns the number of ZIP entries written so far.
+     * Returns the number of ZipConstants entries written so far.
      */
     public int size() {
         return entries.size();
     }
 
     /**
-     * Returns an enumeration of all entries written to this ZIP file so far.
+     * Returns an enumeration of all entries written to this ZipConstants file so far.
      * Note that the enumerated entries are shared with this class.
-     * It is illegal to put more entries into this ZIP output stream
+     * It is illegal to put more entries into this ZipConstants output stream
      * concurrently or modify the state of the enumerated entries.
      *
      * @deprecated Use {@link #iterator()} instead.
@@ -186,10 +186,10 @@ implements Iterable<E> {
     }
 
     /**
-     * Returns an iteration of all entries written to this ZIP file so far.
+     * Returns an iteration of all entries written to this ZipConstants file so far.
      * Note that the iteration supports element removal and the returned
      * entries are shared with this instance.
-     * It is illegal to put more entries into this ZIP output stream
+     * It is illegal to put more entries into this ZipConstants output stream
      * concurrently or modify the state of the iterated entries.
      */
     @Override
@@ -203,7 +203,7 @@ implements Iterable<E> {
      * Note that the returned entry is shared with this instance.
      * It is illegal to change its state!
      *
-     * @param name the name of the ZIP entry.
+     * @param name the name of the ZipConstants entry.
      */
     public E getEntry(String name) {
         return entries.get(name);
@@ -278,7 +278,7 @@ implements Iterable<E> {
 
     /**
      * Returns {@code true} if and only if this
-     * {@code RawZipOutputStream} is currently writing a ZIP entry.
+     * {@code RawZipOutputStream} is currently writing a ZipConstants entry.
      */
     public boolean isBusy() {
         return entry != null;
@@ -294,25 +294,25 @@ implements Iterable<E> {
     }
 
     /**
-     * Starts writing the next ZIP entry to the underlying stream.
+     * Starts writing the next ZipConstants entry to the underlying stream.
      * Note that if two or more entries with the same name are written
      * consecutively to this stream, the last entry written will shadow
-     * all other entries, i.e. all of them are written to the ZIP compatible
+     * all other entries, i.e. all of them are written to the ZipConstants compatible
      * file (and hence require space), but only the last will be accessible
      * from the central directory.
      * This is unlike the genuine {@link java.util.zip.ZipOutputStream
      * java.util.zip.ZipOutputStream} which would throw a {@link ZipException}
      * in this method when the second entry with the same name is to be written.
      *
-     * @param entry The ZIP entry to write.
+     * @param entry The ZipConstants entry to write.
      * @param deflate Whether or not the entry data should be deflated.
      *        This should be set to {@code false} if and only if you are
-     *        writing data which has been read from a ZIP archive file and
+     *        writing data which has been read from a ZipConstants archive file and
      *        has not been inflated again.
      *        The entries' properties CRC, compressed size and uncompressed
      *        size must be set appropriately.
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
+     *         because the resulting file would not comply to the ZipConstants file
      *         format specification.
      * @throws IOException On any I/O related issue.
      */
@@ -399,11 +399,11 @@ implements Iterable<E> {
                 =  csize  >= UInt.MAX_VALUE
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
-                || ZIP.ZIP64_EXT;
+                || ZipConstants.ZIP64_EXT;
 
         // Compose General Purpose Bit Flag.
-        // See appendix D of PKWARE's ZIP File Format Specification.
-        final boolean utf8 = ZIP.UTF8.equalsIgnoreCase(charset.name());
+        // See appendix D of PKWARE's ZipConstants File Format Specification.
+        final boolean utf8 = ZipConstants.UTF8.equalsIgnoreCase(charset.name());
         final int general = (dd   ? (1 <<  3) : 0)
                           | (utf8 ? (1 << 11) : 0);
 
@@ -411,7 +411,7 @@ implements Iterable<E> {
         finished = false;
 
         // Local File Header Signature.
-        dos.writeInt(ZIP.LFH_SIG);
+        dos.writeInt(ZipConstants.LFH_SIG);
 
         // Version Needed To Extract.
         dos.writeShort(zip64 ? 45 : dd ? 20 : 10);
@@ -505,7 +505,7 @@ implements Iterable<E> {
      * Writes all necessary data for this entry to the underlying stream.
      *
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
+     *         because the resulting file would not comply to the ZipConstants file
      *         format specification.
      * @throws IOException On any I/O related issue.
      */
@@ -584,15 +584,15 @@ implements Iterable<E> {
         final long size = entry.getSize();
         final long offset = entry.getOffset();
         // Offset MUST be considered in decision about ZIP64 format - see
-        // description of Data Descriptor in ZIP File Format Specification!
+        // description of Data Descriptor in ZipConstants File Format Specification!
         final boolean zip64 // ZIP64 extensions?
                 =  csize  >= UInt.MAX_VALUE
                 || size   >= UInt.MAX_VALUE
                 || offset >= UInt.MAX_VALUE
-                || ZIP.ZIP64_EXT;
+                || ZipConstants.ZIP64_EXT;
 
         // Data Descriptor Signature.
-        dos.writeInt(ZIP.DD_SIG);
+        dos.writeInt(ZipConstants.DD_SIG);
 
         // CRC-32.
         dos.writeInt((int) crc);
@@ -616,13 +616,13 @@ implements Iterable<E> {
      * <ul>
      * <li>The underlying stream is not closed.</li>
      * <li>Unlike Sun's implementation in J2SE 1.4.2, you may continue to use
-     *     this ZIP output stream with putNextEntry(...) and the like.
+     *     this ZipConstants output stream with putNextEntry(...) and the like.
      *     When you finally close the stream, the central directory will
      *     contain <em>all</em> entries written.</li>
      * </ul>
      *
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
+     *         because the resulting file would not comply to the ZipConstants file
      *         format specification.
      * @throws IOException On any I/O related issue.
      */
@@ -657,10 +657,10 @@ implements Iterable<E> {
                 =  csize32  >= UInt.MAX_VALUE
                 || size32   >= UInt.MAX_VALUE
                 || offset32 >= UInt.MAX_VALUE
-                || ZIP.ZIP64_EXT;
+                || ZipConstants.ZIP64_EXT;
 
         // Central File Header.
-        dos.writeInt(ZIP.CFH_SIG);
+        dos.writeInt(ZipConstants.CFH_SIG);
 
         // Version Made By.
         dos.writeShort((entry.getPlatform() << 8) | 63);
@@ -732,9 +732,9 @@ implements Iterable<E> {
         final long cdEntries = entries.size();
         final long cdSize = dos.size() - cdOffset;
         final long cdOffset = this.cdOffset;
-        final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || ZIP.ZIP64_EXT;
-        final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || ZIP.ZIP64_EXT;
-        final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || ZIP.ZIP64_EXT;
+        final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || ZipConstants.ZIP64_EXT;
+        final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || ZipConstants.ZIP64_EXT;
+        final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || ZipConstants.ZIP64_EXT;
         final int cdEntries16 = cdEntriesZip64 ? UShort.MAX_VALUE : (int) cdEntries;
         final long cdSize32   = cdSizeZip64    ? UInt  .MAX_VALUE : cdSize;
         final long cdOffset32 = cdOffsetZip64  ? UInt  .MAX_VALUE : cdOffset;
@@ -748,10 +748,10 @@ implements Iterable<E> {
                     = dos.size();
 
             // ZIP64 End Of Central Directory record signature.
-            dos.writeInt(ZIP.ZIP64_EOCD_SIG);
+            dos.writeInt(ZipConstants.ZIP64_EOCD_SIG);
 
             // Size Of ZIP64 End Of Central Directory record.
-            dos.writeLong(ZIP.ZIP64_EOCD_MIN_LEN - 12);
+            dos.writeLong(ZipConstants.ZIP64_EOCD_MIN_LEN - 12);
 
             // Version Made By.
             dos.writeShort(63);
@@ -779,7 +779,7 @@ implements Iterable<E> {
             dos.writeLong(cdOffset);
 
             // ZIP64 End Of Central Directory Locator signature.
-            dos.writeInt(ZIP.ZIP64_EOCDL_SIG);
+            dos.writeInt(ZipConstants.ZIP64_EOCDL_SIG);
 
             // Number Of The Disk With The Start Of The ZIP64 End Of Central Directory.
             dos.writeInt(0);
@@ -792,7 +792,7 @@ implements Iterable<E> {
         }
 
         // End Of Central Directory record signature.
-        dos.writeInt(ZIP.EOCD_SIG);
+        dos.writeInt(ZipConstants.EOCD_SIG);
 
         // Disk numbers.
         dos.writeShort(0);
@@ -806,7 +806,7 @@ implements Iterable<E> {
         dos.writeInt((int) cdSize32);
         dos.writeInt((int) cdOffset32);
 
-        // ZIP file comment.
+        // ZipConstants file comment.
         String comment = getComment();
         if (comment == null)
             comment = "";
@@ -818,7 +818,7 @@ implements Iterable<E> {
     /**
      * Closes this output stream and releases any system resources
      * associated with the stream.
-     * This closes the open output stream writing to this ZIP file,
+     * This closes the open output stream writing to this ZipConstants file,
      * if any.
      *
      * @throws IOException On any I/O related issue.

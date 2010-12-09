@@ -21,7 +21,7 @@ import java.util.TreeMap;
 
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may
- * be present at several locations in ZIP archive files.
+ * be present at several locations in ZipConstants archive files.
  * <p>
  * This class is <em>not</em> thread-safe.
  * 
@@ -138,7 +138,7 @@ final class ExtraFields implements Cloneable {
         final int size = getExtraLength();
         UShort.check(size);
         if (size == 0)
-            return ZIP.EMPTY;
+            return ZipConstants.EMPTY;
 
         final byte[] data = new byte[size];
         writeTo(data, 0);
