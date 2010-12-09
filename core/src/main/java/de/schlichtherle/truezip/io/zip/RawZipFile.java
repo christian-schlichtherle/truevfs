@@ -36,21 +36,22 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipException;
 
+import static de.schlichtherle.truezip.io.zip.ZipConstants.*;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
 import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
 
 /**
- * Provides unsafe (raw) access to a ZipConstants file using unsynchronized methods and
+ * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
  * shared {@link ZipEntry} instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  * <p>
  * Where the constructors of this class accept a {@code charset}
- * parameter, this is used to decode comments and entry names in the ZipConstants file.
+ * parameter, this is used to decode comments and entry names in the ZIP file.
  * However, if an entry has bit 11 set in its General Purpose Bit Flag,
  * then this parameter is ignored and "UTF-8" is used for this entry.
- * This is in accordance to Appendix D of PKWARE's ZipConstants File Format
+ * This is in accordance to Appendix D of PKWARE's ZIP File Format
  * Specification, version 6.3.0 and later.
  * <p>
  * This class is able to skip a preamble like the one found in self extracting
@@ -74,10 +75,9 @@ implements Iterable<E>, Closeable {
             /* uncompressed size               */ 4;
 
     /**
-     * The default character set used for entry names and comments in ZipConstants
-     * compatible files.
+     * The default character set used for entry names and comments in ZIP files.
      * This is {@value} for compatibility with Sun's JDK implementation.
-     * Note that you should use &quot;IBM437&quot; for ordinary ZipConstants files
+     * Note that you should use &quot;IBM437&quot; for ordinary ZIP files
      * instead.
      */
     public static final String DEFAULT_CHARSET = ZipConstants.DEFAULT_CHARSET;
@@ -88,19 +88,19 @@ implements Iterable<E>, Closeable {
     /** The charset to use for entry names and comments. */
     private Charset charset;
 
-    /** The comment of this ZipConstants compatible file. */
+    /** The comment of this ZIP file. */
     private String comment;
 
-    /** The total number of bytes in this ZipConstants file. */
+    /** The total number of bytes in this ZIP file. */
     private long length = -1;
 
-    /** The number of bytes in the preamble of this ZipConstants compatible file. */
+    /** The number of bytes in the preamble of this ZIP file. */
     private long preamble;
 
-    /** The number of bytes in the postamble of this ZipConstants compatible file. */
+    /** The number of bytes in the postamble of this ZIP file. */
     private long postamble;
 
-    /** Maps offsets specified in the ZipConstants file to real offsets in the file. */
+    /** Maps offsets specified in the ZIP file to real offsets in the file. */
     private OffsetMapper mapper;
 
     private final ZipEntryFactory<E> factory;
@@ -108,35 +108,35 @@ implements Iterable<E>, Closeable {
     /** The nullable data source. */
     private ReadOnlyFile archive;
 
-    /** The number of fetch streams reading from this ZipConstants file. */
+    /** The number of fetch streams reading from this ZIP file. */
     private int openStreams;
 
     /**
      * Reads the given {@code archive} in order to provide random access
-     * to its ZipConstants entries.
+     * to its ZIP entries.
      *
      * @param archive the {@link ReadOnlyFile} instance to be read in order to
-     *        provide random access to its ZipConstants entries.
-     * @param charset the charset to use for decoding entry names and ZipConstants file
+     *        provide random access to its ZIP entries.
+     * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
-     * @param preambled if this is {@code true}, then the ZipConstants file may have a
+     * @param preambled if this is {@code true}, then the ZIP file may have a
      *        preamble.
-     *        Otherwise, the ZipConstants file must start with either a Local File
+     *        Otherwise, the ZIP file must start with either a Local File
      *        Header (LFH) signature or an End Of Central Directory (EOCD)
      *        Header, causing this constructor to fail if the file is actually
-     *        a false positive ZipConstants file, i.e. not compatible to the ZipConstants File
+     *        a false positive ZIP file, i.e. not compatible to the ZIP File
      *        Format Specification.
-     *        This may be useful to read Self Extracting ZipConstants files (SFX), which
+     *        This may be useful to read Self Extracting ZIP files (SFX), which
      *        usually contain the application code required for extraction in
      *        the preamble.
-     * @param postambled if this is {@code true}, then the ZipConstants file may have a
+     * @param postambled if this is {@code true}, then the ZIP file may have a
      *        postamble of arbitrary length.
-     *        Otherwise, the ZipConstants file must not have a postamble which exceeds
+     *        Otherwise, the ZIP file must not have a postamble which exceeds
      *        64KB size, including the End Of Central Directory record
-     *        (i.e. including the ZipConstants file comment), causing this constructor
-     *        to fail if the file is actually a false positive ZipConstants file, i.e.
-     *        not compatible to the ZipConstants File Format Specification.
-     *        This may be useful to read Self Extracting ZipConstants files (SFX) with
+     *        (i.e. including the ZIP file comment), causing this constructor
+     *        to fail if the file is actually a false positive ZIP file, i.e.
+     *        not compatible to the ZIP File Format Specification.
+     *        This may be useful to read Self Extracting ZIP files (SFX) with
      *        large postambles.
      * @param factory a factory for {@link ZipEntry}s.
      * @throws NullPointerException if any reference parameter is {@code null}.
@@ -144,7 +144,7 @@ implements Iterable<E>, Closeable {
      *         by this JVM.
      * @throws FileNotFoundException if {@code archive} cannot get opened for
      *         reading.
-     * @throws ZipException if {@code archive} is not compatible with the ZipConstants
+     * @throws ZipException if {@code archive} is not compatible to the ZIP
      *         File Format Specification.
      * @throws IOException on any other I/O related issue.
      */
@@ -218,7 +218,8 @@ implements Iterable<E>, Closeable {
      * the central directory alone, but not the data that requires the
      * local file header or additional data to be read.
      *
-     * @throws ZipException If the file is not ZipConstants compatible.
+     * @throws ZipException If the file is not compatible to the ZIP File
+     *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
     private void mountCentralDirectory(
@@ -232,10 +233,10 @@ implements Iterable<E>, Closeable {
         preamble = Long.MAX_VALUE;
 
         final byte[] sig = new byte[4];
-        final byte[] cfh = new byte[ZipConstants.CFH_MIN_LEN - sig.length];
+        final byte[] cfh = new byte[CFH_MIN_LEN - sig.length];
         for (; ; numEntries--) {
             rof.readFully(sig);
-            if (LittleEndian.readUInt(sig, 0) != ZipConstants.CFH_SIG)
+            if (LittleEndian.readUInt(sig, 0) != CFH_SIG)
                 break;
 
             rof.readFully(cfh);
@@ -244,10 +245,10 @@ implements Iterable<E>, Closeable {
             final byte[] name = new byte[nameLen];
             rof.readFully(name);
 
-            // See appendix D of PKWARE's ZipConstants File Format Specification.
+            // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = (general & (1 << 11)) != 0;
             if (utf8)
-                charset = Charset.forName(ZipConstants.UTF8);
+                charset = Charset.forName(UTF8);
             final E entry = factory.newEntry(decode(name));
             try {
                 int off = 0;
@@ -329,7 +330,7 @@ implements Iterable<E>, Closeable {
             // Map the entry using the name that has been determined
             // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
-            // in the ZipConstants file!
+            // in the ZIP file!
             entries.put(entry.getName(), entry);
         }
 
@@ -337,7 +338,7 @@ implements Iterable<E>, Closeable {
         // declared in the (ZIP64) End Of Central Directory header.
         // Sometimes, legacy ZIP32 archives (those without ZIP64 extensions)
         // contain more than the maximum number of entries specified in the
-        // ZipConstants File Format Specification, which is 65535 (= 0xffff, a two byte
+        // ZIP File Format Specification, which is 65535 (= 0xffff, a two byte
         // unsigned integer).
         // In this case, the declared number of entries usually overflows and
         // may get negative (Java does not support unsigned integers).
@@ -360,13 +361,13 @@ implements Iterable<E>, Closeable {
 
     /**
      * Positions the file pointer at the first Central File Header.
-     * Performs some means to check that this is really a ZipConstants compatible
-     * file.
+     * Performs some means to check that this is really a ZIP file.
      * <p>
      * As a side effect, both {@code mapper} and }postamble}
      * will be set.
      *
-     * @throws ZipException If the file is not ZipConstants compatible.
+     * @throws ZipException If the file is not compatible to the ZIP File
+     *         Format Specification.
      * @throws IOException On any other I/O related issue.
      */
     private int findCentralDirectory(
@@ -379,20 +380,20 @@ implements Iterable<E>, Closeable {
             rof.seek(0);
             rof.readFully(sig);
             final long signature = LittleEndian.readUInt(sig, 0);
-            // Constraint: A ZipConstants file must start with a Local File Header
+            // Constraint: A ZIP file must start with a Local File Header
             // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
-            preambled = signature == ZipConstants.LFH_SIG
-                      || signature == ZipConstants.ZIP64_EOCD_SIG
-                      || signature == ZipConstants.EOCD_SIG;
+            preambled = signature == LFH_SIG
+                      || signature == ZIP64_EOCD_SIG
+                      || signature == EOCD_SIG;
         }
         if (preambled) {
             length = rof.length();
-            final long max = length - ZipConstants.EOCD_MIN_LEN;
+            final long max = length - EOCD_MIN_LEN;
             final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
             for (long eocdrOffset = max; eocdrOffset >= min; eocdrOffset--) {
                 rof.seek(eocdrOffset);
                 rof.readFully(sig);
-                if (LittleEndian.readUInt(sig, 0) != ZipConstants.EOCD_SIG)
+                if (LittleEndian.readUInt(sig, 0) != EOCD_SIG)
                     continue;
 
                 long diskNo;        // number of this disk
@@ -401,12 +402,12 @@ implements Iterable<E>, Closeable {
                 long cdEntries;     // total number of entries in the central directory
                 long cdSize;        // size of the central directory
                 long cdOffset;      // offset of start of central directory with respect to the starting disk number
-                int commentLen;     // .ZipConstants file comment length
+                int commentLen;     // .ZIP file comment length
 
                 int off = 0;
 
                 // Process EOCDR.
-                final byte[] eocdr = new byte[ZipConstants.EOCD_MIN_LEN - sig.length];
+                final byte[] eocdr = new byte[EOCD_MIN_LEN - sig.length];
                 rof.readFully(eocdr);
 
                 diskNo = LittleEndian.readUShort(eocdr, off);
@@ -444,15 +445,15 @@ implements Iterable<E>, Closeable {
                 // Check for ZIP64 End Of Central Directory Locator.
                 try {
                     // Read Zip64 End Of Central Directory Locator.
-                    final byte[] zip64eocdl = new byte[ZipConstants.ZIP64_EOCDL_LEN];
-                    rof.seek(eocdrOffset - ZipConstants.ZIP64_EOCDL_LEN);
+                    final byte[] zip64eocdl = new byte[ZIP64_EOCDL_LEN];
+                    rof.seek(eocdrOffset - ZIP64_EOCDL_LEN);
                     rof.readFully(zip64eocdl);
 
                     off = 0; // reuse
 
                     final long zip64eocdlSig = LittleEndian.readUInt(zip64eocdl, off);
                     off += 4;
-                    if (zip64eocdlSig != ZipConstants.ZIP64_EOCDL_SIG)
+                    if (zip64eocdlSig != ZIP64_EOCDL_SIG)
                         throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
                                 "Expected ZIP64 End Of Central Directory Locator signature!");
 
@@ -474,14 +475,14 @@ implements Iterable<E>, Closeable {
                                 "ZIP file spanning/splitting is not supported!");
 
                     // Read Zip64 End Of Central Directory Record.
-                    final byte[] zip64eocdr = new byte[ZipConstants.ZIP64_EOCD_MIN_LEN];
+                    final byte[] zip64eocdr = new byte[ZIP64_EOCD_MIN_LEN];
                     rof.seek(zip64eocdrOffset);
                     rof.readFully(zip64eocdr);
                     off = 0; // reuse
 
                     final long zip64eocdrSig = LittleEndian.readUInt(zip64eocdr, off);
                     off += 4;
-                    if (zip64eocdrSig != ZipConstants.ZIP64_EOCD_SIG)
+                    if (zip64eocdrSig != ZIP64_EOCD_SIG)
                         throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
                                 "Expected ZIP64 End Of Central Directory Record signature!");
 
@@ -547,8 +548,8 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the comment of this ZipConstants compatible file or {@code null}
-     * if no comment exists.
+     * Returns the comment of this ZIP file or {@code null} if no comment
+     * exists.
      */
     public String getComment() {
         return comment;
@@ -560,7 +561,7 @@ implements Iterable<E>, Closeable {
 
     /**
      * Returns {@code true} if and only if some input streams are busy with
-     * reading from this ZipConstants  file.
+     * reading from this ZIP file.
      */
     public boolean busy() {
         return openStreams > 0;
@@ -572,14 +573,14 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the number of entries in this ZipConstants compatible file.
+     * Returns the number of entries in this ZIP file.
      */
     public int size() {
         return entries.size();
     }
 
     /**
-     * Returns an iteration of all entries in this ZipConstants file.
+     * Returns an iteration of all entries in this ZIP file.
      * Note that the iteration supports element removal and the returned
      * entries are shared with this instance.
      * It is illegal to change their state!
@@ -595,24 +596,24 @@ implements Iterable<E>, Closeable {
      * Note that the returned entry is shared with this instance.
      * It is illegal to change its state!
      *
-     * @param name the name of the ZipConstants entry.
+     * @param name the name of the ZIP entry.
      */
     public E getEntry(String name) {
         return entries.get(name);
     }
 
     /**
-     * Returns the file length of this ZipConstants compatible file in bytes.
+     * Returns the file length of this ZIP file in bytes.
      */
     public long length() {
         return length;
     }
 
     /**
-     * Returns the length of the preamble of this ZipConstants compatible file in bytes.
+     * Returns the length of the preamble of this ZIP file in bytes.
      *
-     * @return A positive value or zero to indicate that this ZipConstants compatible
-     *         file does not have a preamble.
+     * @return A positive value or zero to indicate that this ZIP file does
+     *         not have a preamble.
      *
      */
     public long getPreambleLength() {
@@ -620,8 +621,7 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns an {@link InputStream} to read the preamble of this ZipConstants
-     * compatible file.
+     * Returns an {@link InputStream} to read the preamble of this ZIP file.
      * <p>
      * Note that the returned stream is a <i>lightweight</i> stream,
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
@@ -632,7 +632,7 @@ implements Iterable<E>, Closeable {
      * streams, which is important if the client application wants to work on
      * the underlying file again (e.g. update or delete it).
      *
-     * @throws ZipException If this ZipConstants file has been closed.
+     * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPreambleInputStream() throws IOException {
         assertOpen();
@@ -640,18 +640,17 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns the length of the postamble of this ZipConstants compatible file in bytes.
+     * Returns the length of the postamble of this ZIP file in bytes.
      *
-     * @return A positive value or zero to indicate that this ZipConstants compatible
-     *         file does not have a postamble.
+     * @return A positive value or zero to indicate that this ZIP file does
+     *         not have a postamble.
      */
     public long getPostambleLength() {
         return postamble;
     }
 
     /**
-     * Returns an {@link InputStream} to read the postamble of this ZipConstants
-     * compatible file.
+     * Returns an {@link InputStream} to read the postamble of this ZIP file.
      * <p>
      * Note that the returned stream is a <i>lightweight</i> stream,
      * i.e. there is no external resource such as a {@link ReadOnlyFile}
@@ -662,7 +661,7 @@ implements Iterable<E>, Closeable {
      * streams, which is important if the client application wants to work on
      * the underlying file again (e.g. update or delete it).
      *
-     * @throws ZipException If this ZipConstants file has been closed.
+     * @throws ZipException If this ZIP file has been closed.
      */
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
@@ -674,7 +673,7 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns {@code true} if and only if the offsets in this ZipConstants file
+     * Returns {@code true} if and only if the offsets in this ZIP file
      * are relative to the start of the file, rather than the first Local
      * File Header.
      * <p>
@@ -732,7 +731,7 @@ implements Iterable<E>, Closeable {
      *        - may <em>not</em> be {@code null}!
      * @param check Whether or not the entry's CRC-32 value is checked.
      *        If and only if this parameter is true, two additional checks are
-     *        performed for the ZipConstants entry:
+     *        performed for the ZIP entry:
      *        <ol>
      *        <li>All entry headers are checked to have consistent declarations
      *            of the CRC-32 value for the inflated entry data.
@@ -755,7 +754,7 @@ implements Iterable<E>, Closeable {
      * @throws NullPointerException If {@code name} is {@code null}.
      * @throws CRC32Exception If the declared CRC-32 values of the inflated
      *         entry data are inconsistent across the entry headers.
-     * @throws ZipException If this file is not compatible to the ZipConstants File
+     * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
      */
@@ -778,13 +777,13 @@ implements Iterable<E>, Closeable {
         // and needs to be resolved first.
         offset = mapper.location(offset);
         archive.seek(offset);
-        final byte[] lfh = new byte[ZipConstants.LFH_MIN_LEN];
+        final byte[] lfh = new byte[LFH_MIN_LEN];
         archive.readFully(lfh);
         final long lfhSig = LittleEndian.readUInt(lfh, 0);
-        if (lfhSig != ZipConstants.LFH_SIG)
+        if (lfhSig != LFH_SIG)
             throw new ZipException(name
             + " (expected Local File Header Signature)");
-        offset += ZipConstants.LFH_MIN_LEN
+        offset += LFH_MIN_LEN
                 + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
                 + LittleEndian.readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
 
@@ -801,7 +800,7 @@ implements Iterable<E>, Closeable {
                 archive.seek(offset + entry.getCompressedSize());
                 archive.readFully(dd);
                 final long ddSig = LittleEndian.readUInt(dd, 0);
-                localCrc = ddSig == ZipConstants.DD_SIG
+                localCrc = ddSig == DD_SIG
                         ? LittleEndian.readUInt(dd, 4)
                         : ddSig;
             } else {
@@ -844,10 +843,10 @@ implements Iterable<E>, Closeable {
 
     private static int getBufferSize(final ZipEntry entry) {
         long size = entry.getSize();
-        if (size > ZipConstants.FLATER_BUF_LENGTH)
-            size = ZipConstants.FLATER_BUF_LENGTH;
-        else if (size < ZipConstants.FLATER_BUF_LENGTH / 8)
-            size = ZipConstants.FLATER_BUF_LENGTH / 8;
+        if (size > FLATER_BUF_LENGTH)
+            size = FLATER_BUF_LENGTH;
+        else if (size < FLATER_BUF_LENGTH / 8)
+            size = FLATER_BUF_LENGTH / 8;
         return (int) size;
     }
 
@@ -1061,7 +1060,7 @@ implements Iterable<E>, Closeable {
 
     /**
      * Closes the file.
-     * This closes any fetch input streams reading from this ZipConstants file.
+     * This closes any fetch input streams reading from this ZIP file.
      *
      * @throws IOException if an error occurs closing the file.
      */

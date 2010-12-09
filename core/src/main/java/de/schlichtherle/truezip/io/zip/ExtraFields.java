@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.io.zip;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static de.schlichtherle.truezip.io.zip.ZipConstants.*;
+
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may
  * be present at several locations in ZipConstants archive files.
@@ -138,7 +140,7 @@ final class ExtraFields implements Cloneable {
         final int size = getExtraLength();
         UShort.check(size);
         if (size == 0)
-            return ZipConstants.EMPTY;
+            return EMPTY;
 
         final byte[] data = new byte[size];
         writeTo(data, 0);
