@@ -22,37 +22,31 @@ import java.net.URISyntaxException;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 
 /**
- * Represents an identifier in the name space of a federated file system.
- * Note that this class is immutable and final, hence thread-safe, too.
- * <p>
- * Every path has a {@link #getName() path name}, an optional
- * {@link #getMember() member name} and an optional
- * {@link #getParent() parent path}.
- * <p>
- * The path name is a {@link URI Uniform Resource Identifier}
- * which conforms to the following additional constraint for paths:
+ * Addresses an entry in a federated file system.
+ * Every path instance has a {@link #getPathName() path name}.
+ * The path name is a {@link URI Uniform Resource Identifier} which conforms
+ * to the following additional syntax constraints for Paths:
  * <p>
  * If the path name is opaque, its scheme specific part must contain at least
  * one bang slash separator {@code "!/"}.
- * The part after the last bang slash separator is parsed as a relative URI.
- * The part before the last bang slash separator is recursively parsed as a
- * path again.
+ * The part <em>after</em> the last bang slash separator is parsed as a
+ * relative URI to form the {@link #getEntryName() entry name}.
+ * The part <em>before</em> the last bang slash separator is recursively parsed
+ * as a Path again to form the {@link #getMountPoint() mount point}.
  * <p>
  * Examples for valid path names are:
  * <ul>
- * <li>{@code foo}
- * <li>{@code foo/.}
- * <li>{@code foo:/bar}
- * <li>{@code foo:/bar/.}
- * <li>{@code foo:bar:/baz!/bang}
+ * <li>{@code foo:bar:/baz!/bang} (mountPoint.pathName="bar:/baz", entryname="bang")
+ * <li>{@code foo:/bar/} (there are no constraints for hierarchical URIs.
  * </ul>
  * Examples for invalid path names are:
  * <ul>
- * <li>{@code foo:bar} (Missing bang slash separator)
+ * <li>{@code foo:bar} (opaque URI w/o bang slash separator)
  * <li>{@code foo:bar:baz:/bang!/} (dito)
  * </ul>
+ * <p>
+ * Note that this class is immutable and final, hence thread-safe, too.
  *
- * @see     MountPoint
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -63,50 +57,40 @@ public final class Path implements Serializable, Comparable<Path> {
     /** The separator which is used to split opaque path names into segments. */
     public static final String BANG_SLASH = "!" + SEPARATOR;
 
-    private final URI name, member;
-    private final Path parent;
+    private final URI pathName, entryName;
+    private final Path mountPoint;
 
     /**
-     * Constructs a new path.
+     * Constructs a new Path.
      * This static factory method calls
      * {@link #Path(URI) new Path(path)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
-     * <p>
-     * If the given path name is opaque, its parent path name is parsed
-     * according to the syntax specification for paths
-     * and the result is used to compute the
-     * {@link #getParent() parent path}.
      *
-     * @param  path the non-{@code null} {@link #getName() path name}.
+     * @param  pathName the non-{@code null} {@link #getPathName() path name}.
      * @throws NullPointerException if {@code name} is {@code null}.
-     * @throws URISyntaxException if {@code name} does not conform to
-     *         the additional constraints for paths.
-     * @return A non-{@code null} path.
+     * @throws URISyntaxException if {@code pathName} does not conform to
+     *         the additional syntax constraints for Paths.
+     * @return A non-{@code null} Path.
      */
-    public static Path create(URI path) {
+    public static Path create(URI pathName) {
         try {
-            return new Path(path);
+            return new Path(pathName);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /**
-     * Constructs a new path.
-     * <p>
-     * If the given path name is opaque, its parent path name is parsed
-     * according to the syntax specification for paths
-     * and the result is used to compute the
-     * {@link #getParent() parent path}.
+     * Constructs a new Path.
      *
-     * @param  name the non-{@code null} {@link #getName() path name}.
+     * @param  pathName the non-{@code null} {@link #getPathName() path name}.
      * @throws NullPointerException if {@code name} is {@code null}.
-     * @throws URISyntaxException if {@code name} does not conform to
-     *         the additional constraints for paths.
+     * @throws URISyntaxException if {@code pathName} does not conform to
+     *         the additional syntax constraints for Paths.
      */
-    public Path(URI name) throws URISyntaxException {
-        this(name, null);
+    public Path(URI pathName) throws URISyntaxException {
+        this(pathName, null);
     }
 
     /**
@@ -115,88 +99,92 @@ public final class Path implements Serializable, Comparable<Path> {
      * If the given path name is opaque, its parent path name is parsed
      * according to the syntax specification for paths.
      * Then, if {@code parent} is {@code null}, the result is used to compute
-     * the {@link #getParent() parent path}.
-     * Otherwise, the result must compare {@link #equals equal} to the given
-     * {@link #getParent() parent path}.
+     * the {@link #getMountPoint() mount point} and
+     * {@link #getEntryName() entry name}.
+     * Otherwise, the computed result must compare {@link #equals equal} to the
+     * given {@link #getMountPoint() mount point}.
      * <p>
      * If the given path name is hierarchical and the given parent path is
      * not {@code null}, the parent path's path name must be an ancestor
      * of the given path name, i.e. the member name must not be empty.
      *
-     * @param  name the non-{@code null} {@link #getName() path name}.
-     * @param  parent the nullable {@link #getParent() parent path}.
+     * @param  pathName the non-{@code null} {@link #getPathName() path name}.
+     * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
      * @throws NullPointerException if {@code name} is {@code null}.
-     * @throws URISyntaxException if {@code name} does not conform to
-     *         the additional constraints for paths
-     *         or {@code parent} is not a valid parent path.
+     * @throws URISyntaxException if {@code pathName} does not conform to
+     *         the additional syntax constraints for paths
+     *         or {@code mountPoint} is not a valid mount point.
      */
-    Path(final URI name, Path parent) throws URISyntaxException {
-        final URI member;
-        if (name.isOpaque()) {
-            final String ssp = name.getSchemeSpecificPart();
+    Path(final URI pathName, Path mountPoint) throws URISyntaxException {
+        final URI entryName;
+        if (pathName.isOpaque()) {
+            final String ssp = pathName.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(BANG_SLASH);
             if (0 > i)
-                throw new URISyntaxException(name.toString(),
+                throw new URISyntaxException(pathName.toString(),
                         "Missing separator \"" + BANG_SLASH + '"');
-            final URI parentPath = new URI(ssp.substring(0, i));
-            member = new URI(null, ssp.substring(i + 2), name.getFragment());
-            if (null == parent)
-                parent = new Path(parentPath);
-            else if (!parent.getName().equals(parentPath))
-                throw new URISyntaxException(name.toString(),
-                        parent.toString() + ": not a parent of");
-        } else if (null == parent)
-            member = null;
-        else if ((member = parent.getName().relativize(name)) == name
-                || 0 == member.toString().length())
-            throw new URISyntaxException(name.toString(),
-                    parent.toString() + ": not an ancestor of");
-        this.name = name;
-        this.parent = parent;
-        this.member = member;
+            final URI mountPointPathName = new URI(ssp.substring(0, i));
+            entryName = new URI(null, ssp.substring(i + 2), pathName.getFragment());
+            if (null == mountPoint)
+                mountPoint = new Path(mountPointPathName);
+            else if (!mountPoint.getPathName().equals(mountPointPathName))
+                throw new URISyntaxException(pathName.toString(),
+                        mountPoint.toString() + ": not a parent of");
+        } else if (null != mountPoint)
+            throw new IllegalArgumentException();
+        else
+            entryName = null;
+        this.pathName = pathName;
+        this.mountPoint = mountPoint;
+        this.entryName = entryName;
 
         assert invariants();
     }
 
     private boolean invariants() {
-        assert null != name;
-        if (name.isOpaque()) {
-            assert name.toString().contains(BANG_SLASH);
-            assert null != parent;
+        assert null != pathName;
+        if (pathName.isOpaque()) {
+            assert pathName.toString().contains(BANG_SLASH);
+            assert null != mountPoint;
         }
-        if (null != member) {
-            assert null != parent;
-            assert !member.isAbsolute();
-            assert name.isOpaque() || 0 != member.toString().length();
+        if (null != entryName) {
+            assert null != mountPoint;
+            assert !entryName.isAbsolute();
+            assert pathName.isOpaque() || 0 != entryName.toString().length();
         } else {
-            assert null == parent;
+            assert null == mountPoint;
         }
         return true;
     }
 
-    /**
-     * Returns the nullable parent path.
-     * If a parent path was provided to the constructor, it's returned.
-     * Otherwise, if the path name provided to the constructor is opaque,
-     * a parent path is returned which has been computed from the path name.
-     * Otherwise, {@code null} is returned.
-     *
-     * @return The nullable parent path.
-     */
-    public Path getParent() {
-        return parent;
-    }
+    //boolean isMountPoint();
 
     /**
-     * Returns the nullable member name.
-     * If this path has a {@link #getParent() parent path}, then this path's
-     * path name relative to the parent path's path name is returned.
+     * Returns the nullable mount point.
+     * Iff the path name provided to the constructor is hierarchical,
+     * {@code null} is returned.
+     * If the path name provided to the constructor is opaque, it must specify
+     * a mount point is returned which has been computed from the path name.
+     * {@code null} is returned.
+     *
+     * @return The nullable mount point.
+     */
+    public Path getMountPoint() {
+        return mountPoint;
+    }
+
+    //boolean isEntry();
+
+    /**
+     * Returns the nullable entry name.
+     * If this path has a {@link #getMountPoint() mount point}, then this
+     * path's path name relative to the mount point's path name is returned.
      * Otherwise, {@code null} is returned.
      *
-     * @return The nullable member name.
+     * @return The nullable entry name.
      */
-    public URI getMember() {
-        return member;
+    public URI getEntryName() {
+        return entryName;
     }
 
     /**
@@ -205,20 +193,20 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The non-{@code null} path name.
      */
-    public URI getName() {
-        return name;
+    public URI getPathName() {
+        return pathName;
     }
 
     /**
      * Returns {@code true} iff the given object is a path and its path name
      * {@link URI#equals(Object) equals} this path's path name.
-     * Note that this ignores the parent path and member name.
+     * Note that this ignores the mount point and entry name.
      */
     @Override
     public boolean equals(final Object that) {
         return this == that
                 || that instanceof Path
-                    && this.getName().equals(((Path) that).getName());
+                    && this.getPathName().equals(((Path) that).getPathName());
     }
 
     /**
@@ -227,7 +215,7 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     @Override
     public int compareTo(final Path that) {
-        return this.getName().compareTo(that.getName());
+        return this.getPathName().compareTo(that.getPathName());
     }
 
     /**
@@ -235,14 +223,14 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return getPathName().hashCode();
     }
 
     /**
-     * Equivalent to <code>{@link #getName()}.{@link Object#toString()}</code>.
+     * Equivalent to calling {@link URI#toString()} on {@link #getPathName()}.
      */
     @Override
     public String toString() {
-        return getName().toString();
+        return getPathName().toString();
     }
 }

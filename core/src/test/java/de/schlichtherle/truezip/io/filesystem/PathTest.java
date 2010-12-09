@@ -111,10 +111,10 @@ public class PathTest {
         }) {
             final URI name = new URI(param);
             final Path path = new Path(name);
-            assertThat(path.getName(), sameInstance(name));
-            assertThat(path.getMember(), nullValue());
-            assertThat(path.getParent(), nullValue());
-            assertThat(path.toString(), equalTo(path.getName().toString()));
+            assertThat(path.getPathName(), sameInstance(name));
+            assertThat(path.getEntryName(), nullValue());
+            assertThat(path.getMountPoint(), nullValue());
+            assertThat(path.toString(), equalTo(path.getPathName().toString()));
             assertThat(path, equalTo(path));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
@@ -176,15 +176,15 @@ public class PathTest {
             { "foo:bar:/baz!/bang/../", "bar:/baz", "bang/../" },
         }) {
             final URI name = new URI(params[0]);
-            final URI parentName = new URI(params[1]);
-            final URI member = new URI(params[2]);
+            final URI mountPointName = new URI(params[1]);
+            final URI entry = new URI(params[2]);
             final Path path = new Path(name);
-            assertThat(path.getName(), sameInstance(name));
-            assertThat(path.getMember(), equalTo(member));
-            assertThat(path.getParent().getName(), equalTo(parentName));
-            assertThat(path.toString(), equalTo(path.getName().toString()));
+            assertThat(path.getPathName(), sameInstance(name));
+            assertThat(path.getEntryName(), equalTo(entry));
+            assertThat(path.getMountPoint().getPathName(), equalTo(mountPointName));
+            assertThat(path.toString(), equalTo(path.getPathName().toString()));
             assertThat(path, equalTo(path));
-            assertThat(path, not(equalTo(path.getParent())));
+            assertThat(path, not(equalTo(path.getMountPoint())));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
     }
@@ -193,50 +193,50 @@ public class PathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithPathAndParent() throws URISyntaxException {
         for (final String[] params : new String[][] {
-            { "foo:bar", "foo:/" },
+            /*{ "foo:bar", "foo:/" },
             { "foo:/bar", "foo:/ba" },
             { "foo:/bar", "foo:/bar" },
             { "foo:/bar", "foo:/baz/" },
             { "foo:/bar/", "foo:/bar" },
             { "foo:/bar/", "foo:/bar/" },
-            { "foo:/bar/", "foo:/baz/" },
+            { "foo:/bar/", "foo:/baz/" },*/
             { "jar:file:/lib.jar", "file:/" },
             { "jar:file:/lib.jar!", "file:/" },
             { "jar:file:/lib.jar!//", "file:/" },
             { "jar:file:/lib.jar!/entry", "file:/" },
         }) {
             final URI name = new URI(params[0]);
-            final URI parentName = new URI(params[1]);
-            final Path parent = new Path(parentName);
+            final URI mountPointName = new URI(params[1]);
+            final Path mountPoint = new Path(mountPointName);
             try {
-                new Path(name, parent);
+                new Path(name, mountPoint);
                 fail(params[0]);
             } catch (URISyntaxException expected) {
             }
         }
 
         for (final String[] params : new String[][] {
-            { "foo:/bar", "foo:/", "bar" },
+            /*{ "foo:/bar", "foo:/", "bar" },
             { "foo:/bar/", "foo:/", "bar/" },
             { "foo:/bar/baz", "foo:/bar", "baz" },
             { "foo:/bar/baz/", "foo:/bar", "baz/" },
             { "foo:/bar/baz", "foo:/bar/", "baz" },
-            { "foo:/bar/baz/", "foo:/bar/", "baz/" },
+            { "foo:/bar/baz/", "foo:/bar/", "baz/" },*/
             { "foo:bar:/baz!/", "bar:/baz", "" },
             { "foo:bar:/baz!/a", "bar:/baz", "a" },
             { "foo:bar:/baz!/a/", "bar:/baz", "a/" },
         }) {
-            final URI name = new URI(params[0]);
-            final URI parentName = new URI(params[1]);
-            final URI member = new URI(params[2]);
-            final Path parent = new Path(parentName);
-            final Path path = new Path(name, parent);
-            assertThat(path.getName(), sameInstance(name));
-            assertThat(path.getMember(), equalTo(member));
-            assertThat(path.getParent(), sameInstance(parent));
-            assertThat(path.toString(), equalTo(path.getName().toString()));
+            final URI pathName = new URI(params[0]);
+            final URI mountPointName = new URI(params[1]);
+            final URI entryName = new URI(params[2]);
+            final Path mountPoint = new Path(mountPointName);
+            final Path path = new Path(pathName, mountPoint);
+            assertThat(path.getPathName(), sameInstance(pathName));
+            assertThat(path.getEntryName(), equalTo(entryName));
+            assertThat(path.getMountPoint(), sameInstance(mountPoint));
+            assertThat(path.toString(), equalTo(path.getPathName().toString()));
             assertThat(path, equalTo(path));
-            assertThat(path, not(equalTo(parent)));
+            assertThat(path, not(equalTo(mountPoint)));
             assertThat(path.hashCode(), equalTo(path.hashCode()));
         }
     }
