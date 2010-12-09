@@ -87,9 +87,9 @@ public class FileSystemManagerTest {
                 final URI mountPoint,
                 final FileSystemModel parent) {
             final String scheme = mountPoint.getScheme();
-            if ("file".equals(scheme)) {
+            if ("file".equalsIgnoreCase(scheme)) {
                 return new FileSystemModel(mountPoint, parent);
-            } else if ("zip".equals(scheme)) {
+            } else if ("zip".equalsIgnoreCase(scheme)) {
                 return new ArchiveModel(mountPoint, parent);
             } else
                 throw new IllegalArgumentException();
@@ -103,10 +103,10 @@ public class FileSystemManagerTest {
                     ? null == parent
                     : model.getParent() == parent.getModel();
             final String scheme = model.getMountPoint().getScheme();
-            if ("file".equals(scheme)) {
+            if ("file".equalsIgnoreCase(scheme)) {
                 // FIXME: Replace FileDriver.INSTANCE with a service locator!
                 return new FileDriver().newController(model);
-            } else if ("zip".equals(scheme)) {
+            } else if ("zip".equalsIgnoreCase(scheme)) {
                 return new ZipDriver().newController((ArchiveModel) model, parent);
             } else
                 throw new IllegalArgumentException();
