@@ -78,8 +78,8 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private LinkedHashSet<ArchiveFileSystemListener<? super AE>> listeners
-            = new LinkedHashSet<ArchiveFileSystemListener<? super AE>>();
+    private LinkedHashSet<ArchiveFileSystemTouchListener<? super AE>> touchListeners
+            = new LinkedHashSet<ArchiveFileSystemTouchListener<? super AE>>();
 
     /**
      * Returns a new archive file system and ensures its integrity.
@@ -353,16 +353,16 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
         // Order is important here because of veto exceptions!
         final ArchiveFileSystemEvent<AE> event
                 = new ArchiveFileSystemEvent<AE>(this);
-        final Iterable<ArchiveFileSystemListener<? super AE>> listeners
-                = getArchiveFileSystemListeners();
+        final Iterable<ArchiveFileSystemTouchListener<? super AE>> listeners
+                = getArchiveFileSystemTouchListeners();
         try {
-            for (ArchiveFileSystemListener<? super AE> listener : listeners)
+            for (ArchiveFileSystemTouchListener<? super AE> listener : listeners)
                 listener.beforeTouch(event);
         } catch (IOException ex) {
             throw new ArchiveFileSystemException(null, "touch vetoed", ex);
         }
         touched = true;
-        for (ArchiveFileSystemListener<? super AE> listener : listeners)
+        for (ArchiveFileSystemTouchListener<? super AE> listener : listeners)
             listener.afterTouch(event);
     }
 
@@ -372,9 +372,9 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      * @return A clone of the set of archive file system listeners.
      */
     @SuppressWarnings("unchecked")
-    final Set<ArchiveFileSystemListener<? super AE>>
-    getArchiveFileSystemListeners() {
-        return (Set<ArchiveFileSystemListener<? super AE>>) listeners.clone();
+    final Set<ArchiveFileSystemTouchListener<? super AE>>
+    getArchiveFileSystemTouchListeners() {
+        return (Set<ArchiveFileSystemTouchListener<? super AE>>) touchListeners.clone();
     }
 
     /**
@@ -384,11 +384,11 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      *         events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void addArchiveFileSystemListener(
-            final ArchiveFileSystemListener<? super AE> listener) {
+    public final void addArchiveFileSystemTouchListener(
+            final ArchiveFileSystemTouchListener<? super AE> listener) {
         if (null == listener)
             throw new NullPointerException();
-        listeners.add(listener);
+        touchListeners.add(listener);
     }
 
     /**
@@ -398,11 +398,11 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
      *         events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void removeArchiveFileSystemListener(
-            final ArchiveFileSystemListener<? super AE> listener) {
+    public final void removeArchiveFileSystemTouchListener(
+            final ArchiveFileSystemTouchListener<? super AE> listener) {
         if (null == listener)
             throw new NullPointerException();
-        listeners.remove(listener);
+        touchListeners.remove(listener);
     }
 
     @Override
