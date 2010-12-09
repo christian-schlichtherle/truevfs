@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
@@ -32,6 +31,8 @@ import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+
+import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
 
 /**
  * Reads a type 0 RAES file.
@@ -74,7 +75,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         assert parameters != null;
 
         // Load header data.
-        final byte[] header = new byte[RAES.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
+        final byte[] header = new byte[ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
         final long fileLength = rof.length();
         rof.seek(0);
         rof.readFully(header);
@@ -140,7 +141,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             paramGen.init(pass, salt, iCount);
             cipherParam
                     = (ParametersWithIV) paramGen.generateDerivedParameters(
-                        keySize, RAES.AES_BLOCK_SIZE);
+                        keySize, AES_BLOCK_SIZE);
             macParam = paramGen.generateDerivedMacParameters(keySize);
             for (int i = pass.length; --i >= 0; ) // nullify password buffer
                 pass[i] = 0;

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.io.CipherReadOnlyFile;
@@ -23,6 +22,8 @@ import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
 
 /**
  * This class implements a {@link de.schlichtherle.truezip.io.rof.ReadOnlyFile}
@@ -90,7 +91,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      * Creates a new instance of {@code RaesReadOnlyFile}.
      *
      * @param file The file to read.
-     * @param parameters The {@link RaesParameters} required to access the
+     * @param params The {@link RaesParameters} required to access the
      *        RAES type actually found in the file.
      *        If the run time class of this parameter does not match the
      *        required parameter interface according to the RAES type found
@@ -108,14 +109,14 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      */
     public static RaesReadOnlyFile getInstance(
             final File file,
-            final RaesParameters parameters)
+            final RaesParameters params)
     throws  FileNotFoundException,
             RaesParametersException,
             RaesException,
             IOException {
         final ReadOnlyFile rof = new SimpleReadOnlyFile(file);
         try {
-            return getInstance(rof, parameters);
+            return getInstance(rof, params);
         } catch (IOException failure) {
             rof.close();
             throw failure;
@@ -149,12 +150,12 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
             throw new NullPointerException();
 
         // Load header data.
-        final byte[] leadIn = new byte[RAES.LEAD_IN_LENGTH];
+        final byte[] leadIn = new byte[LEAD_IN_LENGTH];
         rof.seek(0);
         rof.readFully(leadIn);
 
         // Check header data.
-        if (readUInt(leadIn, 0) != RAES.SIGNATURE)
+        if (readUInt(leadIn, 0) != SIGNATURE)
             throw new RaesException("No RAES signature!");
         final int type = readUByte(leadIn, 4);
         switch (type) {
@@ -168,15 +169,15 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         }
     }
 
-    private static RaesParameters findParameters(
-            final Class<? extends RaesParameters> type,
+    private static <P extends RaesParameters> P findParameters(
+            final Class<P> type,
             final RaesParameters parameters)
     throws RaesParametersException {
         // Order is important here to support multiple interface implementations!
         if (parameters == null) {
             throw new RaesParametersException();
         } else if (type.isAssignableFrom(parameters.getClass())) {
-            return parameters;
+            return (P) parameters;
         } else if (parameters instanceof RaesParametersAgent) {
             return findParameters(type,
                     ((RaesParametersAgent) parameters).getParameters(type));

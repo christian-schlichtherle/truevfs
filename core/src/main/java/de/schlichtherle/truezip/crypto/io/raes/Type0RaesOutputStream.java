@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.generator.DigestRandom;
@@ -33,6 +32,8 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+
+import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
 
 /**
  * Writes a type 0 RAES file.
@@ -115,7 +116,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         // reset the digest object!
         final ParametersWithIV cipherParam
                 = (ParametersWithIV) paramGen.generateDerivedParameters(
-                    keyStrengthBits, RAES.AES_BLOCK_SIZE);
+                    keyStrengthBits, AES_BLOCK_SIZE);
         final CipherParameters macParam
                 = paramGen.generateDerivedMacParameters(keyStrengthBits);
         for (int i = pass.length; --i >= 0; ) // nullify password buffer
@@ -143,15 +144,15 @@ class Type0RaesOutputStream extends RaesOutputStream {
         this.out = new MacOutputStream(dos, mac);
 
         // Write data envelope header.
-        dos.writeInt(RAES.SIGNATURE);
-        dos.writeByte(RAES.ENVELOPE_TYPE_0);
+        dos.writeInt(SIGNATURE);
+        dos.writeByte(ENVELOPE_TYPE_0);
         dos.writeByte(keyStrength);
         dos.writeShort(ITERATION_COUNT);
         dos.write(salt);
 
         // Init start.
         start = dos.size();
-        assert start == RAES.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length;
+        assert start == ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length;
 
         // Now that everything went OK, finally init the super class cipher.
         this.cipher = cipher;

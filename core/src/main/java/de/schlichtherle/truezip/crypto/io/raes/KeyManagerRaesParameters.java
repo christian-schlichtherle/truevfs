@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.key.AesKeyProvider;
@@ -23,13 +22,13 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
 
 /**
- * A facade which retrieves {@link RaesParameters} by using the
+ * An adapter which retrieves {@link RaesParameters} by using the
  * {@link KeyManager}.
  * The {@link KeyManager} usually prompts the user via a pluggable user
  * interface.
  * <p>
  * According to the current state of RAES, only password based encryption
- * is supported. The facade pattern allows this class to be changed to
+ * is supported. The adapter pattern allows this class to be changed to
  * support other encryption and authentication schemes in the future without
  * requiring to change the client code.
  * <p>
@@ -48,7 +47,7 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class KeyManagerRaesParameters implements RaesParametersAgent {
+public final class KeyManagerRaesParameters implements RaesParametersAgent {
 
     private final KeyManager manager;
     private final URI resource;
@@ -67,7 +66,7 @@ public class KeyManagerRaesParameters implements RaesParametersAgent {
     }
 
     @Override
-	public RaesParameters getParameters(Class<? extends RaesParameters> type) {
+    public RaesParameters getParameters(Class<? extends RaesParameters> type) {
         return new Type0();
     }
 
