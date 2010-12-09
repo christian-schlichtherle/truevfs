@@ -296,7 +296,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
-                // The data for connected sockets cannot not be cached because
+                // The data for connected sockets cannot not get cached because
                 // sockets may transfer different encoded data depending on
                 // the identity of their peer target!
                 // E.g. if the ZipDriver recognizes a ZipEntry as its peer
