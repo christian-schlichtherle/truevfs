@@ -57,7 +57,7 @@ public class ZipEntry implements Cloneable {
     public static final int DEFLATED = 8;
 
     /**
-     * Smallest supported DOS date/time value in a ZIP file,
+     * Smallest supported DOS date/time value in a ZipConstants file,
      * which is January 1<sup>st</sup>, 1980 AD 00:00:00 local time.
      */
     public static final long MIN_DOS_TIME = DateTimeConverter.MIN_DOS_TIME;
@@ -85,7 +85,7 @@ public class ZipEntry implements Cloneable {
     /** {@code null} if no comment field. */
     private String comment;
 
-    /** Constructs a new ZIP entry with the specified name. */
+    /** Constructs a new ZipConstants entry with the specified name. */
     public ZipEntry(final String name) {
         setName0(name);
     }
@@ -100,7 +100,7 @@ public class ZipEntry implements Cloneable {
     }*/
 
     /**
-     * Constructs a new ZIP entry with the given name which has all other
+     * Constructs a new ZipConstants entry with the given name which has all other
      * properties copied from the given template.
      */
     public ZipEntry(final String name, final ZipEntry template) {
@@ -144,7 +144,7 @@ public class ZipEntry implements Cloneable {
             this.init &= ~(1 << index);
     }
 
-    /** Returns the ZIP entry name. */
+    /** Returns the ZipConstants entry name. */
     public String getName() {
         return name;
     }
@@ -164,7 +164,7 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Returns true if and only if this ZIP entry represents a directory entry
+     * Returns true if and only if this ZipConstants entry represents a directory entry
      * (i.e. end with {@code '/'}).
      */
     public boolean isDirectory() {
@@ -298,7 +298,7 @@ public class ZipEntry implements Cloneable {
     long getCompressedSize32() {
         if (csize == UNKNOWN)
             return UNKNOWN;
-        return csize > UInt.MAX_VALUE || ZIP.ZIP64_EXT ? UInt.MAX_VALUE : csize;
+        return csize > UInt.MAX_VALUE || ZipConstants.ZIP64_EXT ? UInt.MAX_VALUE : csize;
     }
 
     void setCompressedSize32(final long csize) {
@@ -338,7 +338,7 @@ public class ZipEntry implements Cloneable {
     long getSize32() {
         if (size == UNKNOWN)
             return UNKNOWN;
-        return size > UInt.MAX_VALUE || ZIP.ZIP64_EXT ? UInt.MAX_VALUE : size;
+        return size > UInt.MAX_VALUE || ZipConstants.ZIP64_EXT ? UInt.MAX_VALUE : size;
     }
 
     void setSize32(final long size) {
@@ -378,7 +378,7 @@ public class ZipEntry implements Cloneable {
     long getOffset32() {
         if (offset == UNKNOWN)
             return UNKNOWN;
-        return offset > UInt.MAX_VALUE || ZIP.ZIP64_EXT ? UInt.MAX_VALUE : offset;
+        return offset > UInt.MAX_VALUE || ZipConstants.ZIP64_EXT ? UInt.MAX_VALUE : offset;
     }
 
     void setOffset32(final long offset) {
@@ -424,7 +424,7 @@ public class ZipEntry implements Cloneable {
      */
     byte[] getExtra(final boolean zip64) {
         final ExtraFields fields = getFields(zip64);
-        return fields != null ? fields.getExtra() : ZIP.EMPTY;
+        return fields != null ? fields.getExtra() : ZipConstants.EMPTY;
     }
 
     private ExtraFields getFields(final boolean zip64) {
@@ -537,21 +537,21 @@ public class ZipEntry implements Cloneable {
 
         // Write out Uncompressed Size.
         final long size = getSize();
-        if (size >= UInt.MAX_VALUE || ZIP.ZIP64_EXT && size >= 0) {
+        if (size >= UInt.MAX_VALUE || ZipConstants.ZIP64_EXT && size >= 0) {
             LittleEndian.writeLong(size, data, off);
             off += 8;
         }
 
         // Write out Compressed Size.
         final long csize = getCompressedSize();
-        if (csize >= UInt.MAX_VALUE || ZIP.ZIP64_EXT && csize >= 0) {
+        if (csize >= UInt.MAX_VALUE || ZipConstants.ZIP64_EXT && csize >= 0) {
             LittleEndian.writeLong(csize, data, off);
             off += 8;
         }
 
         // Write out Relative Header Offset.
         final long offset = getOffset();
-        if (offset >= UInt.MAX_VALUE || ZIP.ZIP64_EXT && offset >= 0) {
+        if (offset >= UInt.MAX_VALUE || ZipConstants.ZIP64_EXT && offset >= 0) {
             LittleEndian.writeLong(offset, data, off);
             off += 8;
         }

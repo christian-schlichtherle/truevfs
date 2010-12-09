@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Abstract base class for an Extra Field in a Local or Central Header of a
- * ZIP archive.
+ * ZipConstants archive.
  * It defines the common properties of all Extra Fields and how to
  * serialize/deserialize them to/from byte arrays.
  * <p>
@@ -123,7 +123,7 @@ abstract class ExtraField {
         final int size = getDataSize();
         UShort.check(size);
         if (size == 0)
-            return ZIP.EMPTY;
+            return ZipConstants.EMPTY;
 
         final byte[] data = new byte[size];
         writeTo(data, 0);
