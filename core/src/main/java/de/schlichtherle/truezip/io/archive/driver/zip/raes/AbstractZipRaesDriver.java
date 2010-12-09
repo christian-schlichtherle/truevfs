@@ -229,7 +229,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    public RaesParameters getRaesParameters(ArchiveModel model) {
+    protected RaesParameters getRaesParameters(ArchiveModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint());
     }
 }
