@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.io.zip;
 import java.util.Arrays;
 import junit.framework.TestCase;
 
+import static de.schlichtherle.truezip.io.zip.ZipConstants.*;
+
 /**
  * @author Christian Schlichtherle
  * @version $Id$
@@ -259,7 +261,7 @@ public class ZipEntryTest extends TestCase {
 
         assertEquals(ZipEntry.UNKNOWN, entry.getCompressedSize32());
         entry.setCompressedSize32(0);
-        assertEquals(ZIP.ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getCompressedSize32());
+        assertEquals(ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getCompressedSize32());
         entry.setCompressedSize32(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getCompressedSize32());
         entry.setCompressedSize32(ZipEntry.UNKNOWN);
@@ -301,7 +303,7 @@ public class ZipEntryTest extends TestCase {
 
         assertEquals(ZipEntry.UNKNOWN, entry.getSize32());
         entry.setSize32(0);
-        assertEquals(ZIP.ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getSize32());
+        assertEquals(ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getSize32());
         entry.setSize32(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getSize32());
         entry.setSize32(ZipEntry.UNKNOWN);
@@ -341,7 +343,7 @@ public class ZipEntryTest extends TestCase {
 
         assertEquals(ZipEntry.UNKNOWN, entry.getOffset32());
         entry.setOffset32(0);
-        assertEquals(ZIP.ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getOffset32());
+        assertEquals(ZIP64_EXT ? UInt.MAX_VALUE : 0, entry.getOffset32());
         entry.setOffset32(UInt.MAX_VALUE);
         assertEquals(UInt.MAX_VALUE, entry.getOffset32());
         entry.setOffset32(ZipEntry.UNKNOWN);
