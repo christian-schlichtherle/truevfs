@@ -133,7 +133,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                 try {
                     final RaesReadOnlyFile rrof;
                     try {
-                        rrof = RaesReadOnlyFile.getInstance(rof, getRaesParameters(model));
+                        rrof = RaesReadOnlyFile.getInstance(
+                                rof, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
                         throw new TabuFileException(ex);
                     }
@@ -200,7 +201,8 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
                             .newOutputStream();
                 try {
                     try {
-                        return RaesOutputStream.getInstance(out, getRaesParameters(model));
+                        return RaesOutputStream.getInstance(
+                                out, getRaesParameters(model));
                     } catch (RaesKeyException ex) {
                         throw new TabuFileException(ex);
                     }
@@ -224,7 +226,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @param model The abstract archive representation which TrueZIP's
      *        internal {@code ArchiveController} is processing
      *        - never {@code null}.
-     *
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
