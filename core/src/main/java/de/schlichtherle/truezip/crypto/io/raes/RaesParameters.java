@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 /**
@@ -25,7 +24,6 @@ package de.schlichtherle.truezip.crypto.io.raes;
  * which extends this marker interface.
  * 
  * @see Type0RaesParameters
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */

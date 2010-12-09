@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 /**
  * This interfaces contains constants used to read or write files
- * according to the Random Access Encryption Specification (RAES).
+ * according to the Random Access Encryption Specification (RaesConstants).
  * Public classes <em>must not</em> implement this interface - otherwise the
  * constants become part of the public API.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-interface RAES {
+interface RaesConstants {
 
     /**
-     * The signature of any RAES compatible content in little endian format
-     * ({@code "RAES"} as a US-ASCII character sequence).
+     * The signature of any RaesConstants compatible content in little endian format
+     * ({@code "RaesConstants"} as a US-ASCII character sequence).
      */
     int SIGNATURE = 'R' | (('A' | (('E' | ('S' << 8)) << 8)) << 8);
 

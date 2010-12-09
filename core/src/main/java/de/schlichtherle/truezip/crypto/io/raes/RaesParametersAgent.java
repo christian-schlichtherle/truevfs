@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 /**
@@ -38,7 +37,7 @@ package de.schlichtherle.truezip.crypto.io.raes;
 public interface RaesParametersAgent extends RaesParameters {
 
     /**
-     * Requests an {@link RaesParameters} instance of the given
+     * Requests a {@link RaesParameters} instance of the given
      * {@code type}.
      * It is permissible to return an instance of any other implementation
      * of the {@code RaesParameters} interface.
