@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemListener;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemTouchListener;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -149,8 +149,8 @@ extends FileSystemArchiveController<E> {
         }
     }
 
-    private final class Listener
-    implements ArchiveFileSystemListener<ArchiveEntry> {
+    private final class TouchListener
+    implements ArchiveFileSystemTouchListener<ArchiveEntry> {
         @Override
         public void beforeTouch(ArchiveFileSystemEvent<?> event)
         throws IOException {
@@ -180,8 +180,8 @@ extends FileSystemArchiveController<E> {
      */
     private Output output;
 
-    private final ArchiveFileSystemListener<ArchiveEntry> listener
-            = new Listener();
+    private final ArchiveFileSystemTouchListener<ArchiveEntry> touchListener
+            = new TouchListener();
 
     public UpdatingArchiveController(
             final ArchiveDriver<E> driver,
@@ -327,11 +327,11 @@ extends FileSystemArchiveController<E> {
             } catch (IOException ex2) {
                 throw new FalsePositiveException(getModel(), ex2);
             }
-            listener.beforeTouch(null);
+            touchListener.beforeTouch(null);
             setFileSystem(newArchiveFileSystem(getDriver()));
-            listener.afterTouch(null);
+            touchListener.afterTouch(null);
         }
-        getFileSystem().addArchiveFileSystemListener(listener);
+        getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
     private void makeOutput(final BitField<OutputOption> options)
