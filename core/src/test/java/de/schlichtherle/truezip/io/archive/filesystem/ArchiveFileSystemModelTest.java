@@ -17,11 +17,8 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.util.BitField;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -37,36 +34,36 @@ public class ArchiveFileSystemModelTest {
                 = ArchiveFileSystem.newArchiveFileSystem(new ZipDriver());
 
         try {
-            model.addArchiveFileSystemListener(null);
+            model.addArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getArchiveFileSystemListeners(), notNullValue());
-        assertThat(model.getArchiveFileSystemListeners().size(), is(0));
+        assertThat(model.getArchiveFileSystemTouchListeners(), notNullValue());
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(0));
 
         final Listener listener1 = new Listener(model);
-        model.addArchiveFileSystemListener(listener1);
-        assertThat(model.getArchiveFileSystemListeners().size(), is(1));
+        model.addArchiveFileSystemTouchListener(listener1);
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(1));
 
         final Listener listener2 = new Listener(model);
-        model.addArchiveFileSystemListener(listener2);
-        assertThat(model.getArchiveFileSystemListeners().size(), is(2));
+        model.addArchiveFileSystemTouchListener(listener2);
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
 
-        model.getArchiveFileSystemListeners().clear();
-        assertThat(model.getArchiveFileSystemListeners().size(), is(2));
+        model.getArchiveFileSystemTouchListeners().clear();
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
 
         try {
-            model.removeArchiveFileSystemListener(null);
+            model.removeArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(model.getArchiveFileSystemListeners().size(), is(2));
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(2));
 
-        model.removeArchiveFileSystemListener(listener1);
-        model.removeArchiveFileSystemListener(listener1);
-        assertThat(model.getArchiveFileSystemListeners().size(), is(1));
+        model.removeArchiveFileSystemTouchListener(listener1);
+        model.removeArchiveFileSystemTouchListener(listener1);
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(1));
 
-        model.removeArchiveFileSystemListener(listener2);
-        model.removeArchiveFileSystemListener(listener2);
-        assertThat(model.getArchiveFileSystemListeners().size(), is(0));
+        model.removeArchiveFileSystemTouchListener(listener2);
+        model.removeArchiveFileSystemTouchListener(listener2);
+        assertThat(model.getArchiveFileSystemTouchListeners().size(), is(0));
     }
 
     /*@Test
@@ -91,7 +88,7 @@ public class ArchiveFileSystemModelTest {
     }*/
 
     private static class Listener
-    implements ArchiveFileSystemListener<ArchiveEntry> {
+    implements ArchiveFileSystemTouchListener<ArchiveEntry> {
         final ArchiveFileSystem<?> model;
         int before;
         int after;
@@ -99,7 +96,7 @@ public class ArchiveFileSystemModelTest {
         @SuppressWarnings("LeakingThisInConstructor")
         Listener(final ArchiveFileSystem<?> model) {
             this.model = model;
-            model.addArchiveFileSystemListener(this);
+            model.addArchiveFileSystemTouchListener(this);
         }
 
         @Override
