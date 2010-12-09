@@ -24,9 +24,8 @@ import java.io.OutputStream;
 /**
  * Addresses a target for I/O operations provided by sub class implementations.
  * <p>
- * A key feature of an I/O socket is that it's targets can be resolved eagerly
- * or lazily, i.e. the local or peer target may get resolved by a constructor
- * or a method of a sub class.
+ * A key feature of an I/O socket is that it's targets can be resolved lazily,
+ * i.e. the local or peer target may get resolved by a method of a sub class.
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
@@ -59,7 +58,7 @@ public abstract class IOSocket<LT, RT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
-	public abstract LT getLocalTarget() throws IOException;
+    public abstract LT getLocalTarget() throws IOException;
 
     /**
      * Returns the nullable <i>peer target</i> for I/O operations.
@@ -104,7 +103,7 @@ public abstract class IOSocket<LT, RT> {
     }
 
     /**
-     * Returns a string representing a connection of the local and remote
+     * Returns a string representing a connection of the local and peer
      * targets.
      */
     @Override
