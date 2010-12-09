@@ -100,8 +100,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
             return (null != cache ? cache : new EntryCache(path,
-                        options,
-                        BitField.noneOf(OutputOption.class)))
+                        options, BitField.noneOf(OutputOption.class)))
                     .getInputSocket()
                     .bind(this);
         }
@@ -153,8 +152,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             controller.mknod(path, FILE, options, null);
             getModel().setTouched(true);
             return (null != cache ? cache : new EntryCache(path,
-                        BitField.noneOf(InputOption.class),
-                        options))
+                        BitField.noneOf(InputOption.class), options))
                     .getOutputSocket()
                     .bind(this);
         }
