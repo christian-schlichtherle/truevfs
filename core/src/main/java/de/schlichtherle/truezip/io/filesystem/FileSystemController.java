@@ -55,6 +55,7 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// FIXME: Make this an abstract class again to allow future extensions.
 public interface FileSystemController<E extends Entry> {
 
     /** Returns the non-{@code null} file system model. */

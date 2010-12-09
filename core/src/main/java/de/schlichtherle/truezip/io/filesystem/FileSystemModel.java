@@ -42,8 +42,8 @@ public class FileSystemModel {
     private final FileSystemModel parent;
     private final String parentPath;
     private boolean touched;
-    private LinkedHashSet<FileSystemListener> listeners
-            = new LinkedHashSet<FileSystemListener>();
+    private LinkedHashSet<FileSystemTouchedListener> touchedListeners
+            = new LinkedHashSet<FileSystemTouchedListener>();
 
     public FileSystemModel( URI mountPoint,
                             final FileSystemModel parent) {
@@ -130,8 +130,8 @@ public class FileSystemModel {
     }
 
     /**
-     * Returns the model of the parentPath file system or {@code null} if and
-     * only if this file system is not federated, i.e. if it's not a member of
+     * Returns the model of the parent file system or {@code null} if and
+     * only if the file system is not federated, i.e. if it's not a member of
      * another file system.
      */
     public final FileSystemModel getParent() {
@@ -140,11 +140,11 @@ public class FileSystemModel {
 
     /**
      * Resolves the given relative {@code path} against the relative path of
-     * this model's file system within its parentPath file system.
+     * the file system within its parent file system.
      *
      * @param  path a non-{@code null} entry name.
      * @throws RuntimeException if this file system model does not specify a
-     *         {@link #getParent() parentPath file system model}.
+     *         {@link #getParent() parent file system model}.
      */
     public final String parentPath(String path) {
         return isRoot(path)
@@ -153,59 +153,63 @@ public class FileSystemModel {
     }
 
     /**
-     * Returns {@code true} if and only if the contents of this composite file
+     * Returns {@code true} if and only if the contents of the federated file
      * system have been modified so that it needs
-     * {@link FileSystemController#sync synchronization} with its parentPath file
+     * {@link FileSystemController#sync synchronization} with its parent file
      * system.
      */
     public final boolean isTouched() {
         return touched;
     }
 
+    /**
+     * Sets the value of the property {@code touched} to the new value and
+     * notifies all listeners if it has effectively changed.
+     */
     public final void setTouched(final boolean newTouched) {
         final boolean oldTouched = touched;
         touched = newTouched;
         if (newTouched != oldTouched) {
             final FileSystemEvent event = new FileSystemEvent(this);
-            for (FileSystemListener listener : getFileSystemListeners())
-                listener.touchChanged(event);
+            for (FileSystemTouchedListener listener : getFileSystemTouchedListeners())
+                listener.touchedChanged(event);
         }
     }
 
     /**
-     * Returns a protective copy of the set of file system listeners.
+     * Returns a protective copy of the set of file system touched listeners.
      * 
      * @return A clone of the set of file system listeners.
      */
     @SuppressWarnings("unchecked")
-    final Set<FileSystemListener> getFileSystemListeners() {
-        return (Set<FileSystemListener>) listeners.clone();
+    final Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
+        return (Set<FileSystemTouchedListener>) touchedListeners.clone();
     }
 
     /**
-     * Adds the given listener to the set of file system listeners.
+     * Adds the given listener to the set of file system touched listeners.
      *
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void addFileSystemListener(
-            final FileSystemListener listener) {
+    public final void addFileSystemTouchedListener(
+            final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
-        listeners.add(listener);
+        touchedListeners.add(listener);
     }
 
     /**
-     * Removes the given listener from the set of file system listeners.
+     * Removes the given listener from the set of file system touched listeners.
      *
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void removeFileSystemListener(
-            final FileSystemListener listener) {
+    public final void removeFileSystemTouchedListener(
+            final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
-        listeners.remove(listener);
+        touchedListeners.remove(listener);
     }
 
     @Override
