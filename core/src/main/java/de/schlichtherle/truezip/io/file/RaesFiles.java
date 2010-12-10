@@ -20,7 +20,9 @@ import de.schlichtherle.truezip.crypto.io.raes.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.io.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.io.raes.RaesReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -66,20 +68,18 @@ public class RaesFiles {
             final ArchiveDetector detector)
     throws IOException {
         final File plainFile = getNonArchiveFile(plainFilePath, detector);
+        final File raesFile = getNonArchiveFile(raesFilePath, detector);
+        final RaesParameters params = new KeyManagerRaesParameters(
+                raesFile.getCanonicalFile().toURI());
         final InputStream in = detector.newFileInputStream(plainFile);
-        final RaesOutputStream out;
         try {
-            final File raesFile = getNonArchiveFile(raesFilePath, detector);
-            final RaesParameters params = new KeyManagerRaesParameters(
-                    raesFile.getCanonicalFile().toURI());
-            out = RaesOutputStream.getInstance(
+            final RaesOutputStream out = RaesOutputStream.getInstance(
                     detector.newFileOutputStream(raesFile, false),
                     params);
-        } catch (IOException failure) {
+            File.cp(in, out);
+        } finally {
             in.close();
-            throw failure;
         }
-        File.cp(in, out);
     }
 
     /**
@@ -116,23 +116,22 @@ public class RaesFiles {
             final ArchiveDetector detector)
     throws IOException {
         final File raesFile = getNonArchiveFile(raesFilePath, detector);
+        final File plainFile = getNonArchiveFile(plainFilePath, detector);
         final RaesParameters params = new KeyManagerRaesParameters(
                 raesFile.getCanonicalFile().toURI());
-        final RaesReadOnlyFile rrof
-                = RaesReadOnlyFile.getInstance(raesFile, params);
-        final InputStream in;
-        final OutputStream out;
+        final ReadOnlyFile rof = new SimpleReadOnlyFile(raesFile);
         try {
+            final RaesReadOnlyFile rrof
+                    = RaesReadOnlyFile.getInstance(rof, params);
             if (strongAuthentication)
                 rrof.authenticate();
-            in = new ReadOnlyFileInputStream(rrof);
-            final File plainFile = getNonArchiveFile(plainFilePath, detector);
-            out = detector.newFileOutputStream(plainFile, false);
-        } catch (IOException failure) {
-            rrof.close();
-            throw failure;
+            final InputStream in = new ReadOnlyFileInputStream(rrof);
+            final OutputStream out
+                    = detector.newFileOutputStream(plainFile, false);
+            File.cp(in, out);
+        } finally {
+            rof.close();
         }
-        File.cp(in, out);
     }
 
     /**
