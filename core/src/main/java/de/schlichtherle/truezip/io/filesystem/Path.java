@@ -207,7 +207,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * Note that this ignores the mount point and entry name.
      */
     @Override
-    public boolean equals(final Object that) {
+    public boolean equals(Object that) {
         return this == that
                 || that instanceof Path
                     && this.uri.equals(((Path) that).uri);
@@ -218,7 +218,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(final Path that) {
+    public int compareTo(Path that) {
         return this.uri.compareTo(that.uri);
     }
 

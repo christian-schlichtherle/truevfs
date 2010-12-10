@@ -119,6 +119,7 @@ public class PathTest {
             "foo/../",
             "foo/bar",
             "foo/bar/",
+            "foo:/",
             "foo:/bar",
             "foo:/bar/",
             "foo:/bar//",

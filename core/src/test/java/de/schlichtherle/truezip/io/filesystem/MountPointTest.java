@@ -142,4 +142,24 @@ public class MountPointTest {
             assertThat(mountPoint.hashCode(), equalTo(mountPoint.hashCode()));
         }
     }
+
+    /*@Test
+    public void testResolve() throws URISyntaxException {
+        for (final String[] params : new String[][] {
+            { "foo:bar:/baz/!/", "bang/", "baz/bang/" },
+            { "foo:bar:/baz!/", "bang/", "baz/bang/" },
+            { "foo:bar:/baz/!/", "bang", "baz/bang" },
+            { "foo:bar:/baz!/", "bang", "baz/bang" },
+            { "foo:bar:/!/", "baz/", "baz/" },
+            { "foo:bar:/!/", "baz", "baz" },
+        }) {
+            final URI mountPointUri = new URI(params[0]);
+            final URI entryNameUri = new URI(params[1]);
+            final URI parentEntryNameUri = new URI(params[2]);
+            final MountPoint mountPoint = new MountPoint(mountPointUri);
+            final EntryName entryName = new EntryName(entryNameUri);
+            final EntryName parentEntryName = mountPoint.resolve(entryName);
+            assertThat(parentEntryName.getUri(), equalTo(parentEntryNameUri));
+        }
+    }*/
 }
