@@ -18,7 +18,9 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
 
 /**
@@ -129,8 +131,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(pathUri.toString(), "Not absolute");
-            final EntryName entryName = path.getEntryName();
-            if (null != entryName && 0 == entryName.toString().length())
+            if (pathUri.isOpaque()
+                    && 0 >= path.getEntryName().toString().length())
                 throw new URISyntaxException(pathUri.toString(), "Empty entry name");
             if (normalize) {
                 final URI nuri = new URI(
@@ -181,8 +183,11 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      */
     public MountPoint(final String scheme, final Path path)
     throws URISyntaxException {
-        if (!isScheme(scheme))
-            throw new URISyntaxException(scheme, "Not a scheme");
+        this(new Scheme(scheme), path);
+    }
+
+    private MountPoint(final Scheme scheme, final Path path)
+    throws URISyntaxException {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
             throw new URISyntaxException(pathUri.toString(), "Not absolute");
@@ -191,29 +196,62 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         final EntryName entryName = path.getEntryName();
         if (null != entryName && 0 == entryName.toString().length())
             throw new URISyntaxException(pathUri.toString(), "Empty entry name in opaque path");
-        this.uri = new URI(scheme, path.toString() + BANG_SLASH, null);
+        this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
         this.path = path;
 
         assert invariants();
     }
 
-    /** Checks if the given string is a scheme according to RFC 2396. */
-    private static boolean isScheme(final String scheme) {
-        int i = scheme.length();
-        if (0 >= i)
-            return false;
-        char c;
-        c = scheme.charAt(0);
-        // TODO: Character class is no help here - consider table lookup!
-        if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c))
-            return false;
-        while (--i >= 1) {
-            c = scheme.charAt(i);
-            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
-                    && c != '+' && c != '-' && c != '.')
-                return false;
+    /**
+     * Represents a scheme according to the syntax constraints defined in RFC
+     * 2396.
+     */
+    private static final class Scheme
+    implements Serializable, Comparable<Scheme> {
+
+        private static final long serialVersionUID = 2765230379628276648L;
+
+        private final String scheme;
+
+        Scheme(final String scheme) throws URISyntaxException {
+            int i = scheme.length();
+            if (0 >= i)
+                throw new URISyntaxException(scheme, "Empty scheme");
+            char c;
+            c = scheme.charAt(0);
+            // TODO: Character class is no help here - consider table lookup!
+            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c))
+                throw new URISyntaxException(scheme, "Illegal character in scheme", 0);
+            while (--i >= 1) {
+                c = scheme.charAt(i);
+                if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
+                        && c != '+' && c != '-' && c != '.')
+                    throw new URISyntaxException(scheme, "Illegal character in scheme", i);
+            }
+            this.scheme = scheme;
         }
-        return true;
+
+        @Override
+        public boolean equals(Object that) {
+            return this == that
+                    || that instanceof Scheme
+                        && this.scheme.equalsIgnoreCase(((Scheme) that).scheme);
+        }
+
+        @Override
+        public int compareTo(Scheme that) {
+            return this.scheme.compareTo(that.scheme);
+        }
+
+        @Override
+        public int hashCode() {
+            return scheme.toLowerCase(Locale.ENGLISH).hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return scheme;
+        }
     }
 
     private boolean invariants() {
@@ -246,6 +284,32 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
+     * Returns the nullable parent mount point, i.e. the mount point of the
+     * parent file system or {@code null} iff this mount point does not name
+     * a parent mount point.
+     * 
+     * @return The nullable parent mount point.
+     */
+    /*public MountPoint getParent() {
+        return path.getMountPoint();
+    }*/
+
+    /**
+     * Resolves the given entry name against the entry name of this mount
+     * point in its parent file system.
+     *
+     * @param  entryName a non-{@code null} entry name relative to this mount
+     *         point.
+     * @throws NullPointerException if this mount point does not name a parent
+     *         mount point.
+     * @return a non-{@code null} entry name relative to the parent mount
+     *         point.
+     */
+    /*public EntryName resolve(EntryName entryName) {
+        return new EntryName(path.getEntryName(), entryName);
+    }*/
+
+    /**
      * Returns the non-{@code null} URI.
      *
      * @return The non-{@code null} URI.
@@ -260,7 +324,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Note that this ignores the scheme and path.
      */
     @Override
-    public boolean equals(final Object that) {
+    public boolean equals(Object that) {
         return this == that
                 || that instanceof MountPoint
                     && this.uri.equals(((MountPoint) that).uri);
@@ -271,7 +335,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(final MountPoint that) {
+    public int compareTo(MountPoint that) {
         return this.uri.compareTo(that.uri);
     }
 

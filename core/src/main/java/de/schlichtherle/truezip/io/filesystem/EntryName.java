@@ -54,6 +54,8 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  */
 public final class EntryName implements Serializable, Comparable<EntryName> {
 
+    static EntryName NULL = EntryName.create(URI.create(""));
+
     private final URI uri;
 
     /**
@@ -142,6 +144,20 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
         assert invariants();
     }
 
+    /**
+     * Constructs a new entry name by resolving the given member entry name
+     * against the given parent entry name.
+     *
+     * @param  parent a non-{@code null} entry name.
+     * @param  member a non-{@code null} entry name.
+     * @throws NullPointerException if any parameter is {@code null}.
+     */
+    EntryName(final EntryName parent, final EntryName member) {
+        uri = parent.uri.resolve(member.uri);
+
+        assert invariants();
+    }
+
     private boolean invariants() {
         assert null != uri;
         assert !uri.isAbsolute();
@@ -168,7 +184,7 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
      * {@link URI#equals(Object) equals} the URI of this entry name.
      */
     @Override
-    public boolean equals(final Object that) {
+    public boolean equals(Object that) {
         return this == that
                 || that instanceof EntryName
                     && this.uri.equals(((EntryName) that).uri);
@@ -179,7 +195,7 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(final EntryName that) {
+    public int compareTo(EntryName that) {
         return this.uri.compareTo(that.uri);
     }
 
