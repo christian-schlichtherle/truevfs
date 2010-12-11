@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
 
 /**
@@ -117,8 +116,6 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      */
     public MountPoint(URI uri, final boolean normalize)
     throws URISyntaxException {
-        if (!uri.isAbsolute())
-            throw new URISyntaxException(uri.toString(), "Not absolute");
         if (null != uri.getRawFragment())
             throw new URISyntaxException(uri.toString(), "Fragment not allowed");
         if (uri.isOpaque()) {
@@ -142,6 +139,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
                 throw new URISyntaxException(pathUri.toString(),
                         "Path not in normal form");
         } else {
+            if (!uri.isAbsolute())
+                throw new URISyntaxException(uri.toString(), "Not absolute");
             if (normalize)
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
