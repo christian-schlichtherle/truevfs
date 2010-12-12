@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
 
 /**
@@ -127,16 +128,16 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             path = new Path(new URI(ssp.substring(0, i)), normalize);
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
-                throw new URISyntaxException(pathUri.toString(), "Not absolute");
-            if (pathUri.isOpaque()
-                    && 0 == path.getEntryName().toString().length())
-                throw new URISyntaxException(pathUri.toString(), "Empty entry name");
+                throw new URISyntaxException(uri.toString(), "Path not absolute");
+            final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
+            if (0 == pathEntryNameUriPath.length() || pathEntryNameUriPath.endsWith(SEPARATOR))
+                throw new URISyntaxException(uri.toString(), "Illegal entry name");
             if (normalize) {
                 final URI nuri = new URI(
                         uri.getScheme(), pathUri.toString() + BANG_SLASH, null);
                 uri = uri.equals(nuri) ? uri : nuri;
             } else if (pathUri.normalize() != pathUri)
-                throw new URISyntaxException(pathUri.toString(),
+                throw new URISyntaxException(uri.toString(),
                         "Path not in normal form");
         } else {
             if (!uri.isAbsolute())
@@ -189,10 +190,10 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     throws URISyntaxException {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
-            throw new URISyntaxException(pathUri.toString(), "Not absolute");
-        final EntryName entryName = path.getEntryName();
-        if (pathUri.isOpaque() && 0 == entryName.toString().length())
-            throw new URISyntaxException(pathUri.toString(), "Empty entry name in opaque path");
+            throw new URISyntaxException(pathUri.toString(), "Path not absolute");
+        final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
+        if (0 == pathEntryNameUriPath.length() || pathEntryNameUriPath.endsWith(SEPARATOR))
+            throw new URISyntaxException(pathUri.toString(), "Illegal entry name");
         this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
         this.path = path;
 
@@ -252,19 +253,20 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     } // class Scheme
 
     private boolean invariants() {
-        assert null != uri;
-        assert uri.isAbsolute();
-        assert null == uri.getRawFragment();
-        if (uri.isOpaque()) {
-            assert uri.getRawSchemeSpecificPart().endsWith(BANG_SLASH);
-            assert null != path;
-            assert path.getUri().isAbsolute();
-            assert null == path.getUri().getRawFragment();
-            assert !path.getUri().isOpaque()
-                    || 0 != path.getEntryName().toString().length();
+        assert null != getUri();
+        assert getUri().isAbsolute();
+        assert null == getUri().getRawFragment();
+        if (getUri().isOpaque()) {
+            assert getUri().getRawSchemeSpecificPart().endsWith(BANG_SLASH);
+            assert null != getPath();
+            assert getPath().getUri().isAbsolute();
+            assert null == getPath().getUri().getRawFragment();
+            assert 0 != path.getEntryName().getUri().getPath().length();
+            assert !path.getEntryName().getUri().getPath().endsWith(SEPARATOR);
+            assert 0 != getPath().getEntryName().toString().length();
         } else {
-            assert uri.normalize() == uri;
-            assert null == path;
+            assert getUri().normalize() == getUri();
+            assert null == getPath();
         }
         return true;
     }
@@ -286,9 +288,9 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * 
      * @return The nullable parent mount point.
      */
-    /*public MountPoint getParent() {
-        return path.getMountPoint();
-    }*/
+    public MountPoint getParent() {
+        return null == path ? null : path.getMountPoint();
+    }
 
     /**
      * Resolves the given entry name against the entry name of this mount
@@ -296,14 +298,12 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @param  entryName a non-{@code null} entry name relative to this mount
      *         point.
-     * @throws NullPointerException if this mount point does not name a parent
-     *         mount point.
      * @return a non-{@code null} entry name relative to the parent mount
      *         point.
      */
-    /*public EntryName resolve(EntryName entryName) {
-        return new EntryName(path.getEntryName(), entryName);
-    }*/
+    public EntryName resolve(EntryName entryName) {
+        return null == path ? entryName : new EntryName(path.getEntryName(), entryName);
+    }
 
     /**
      * Returns the non-{@code null} URI.

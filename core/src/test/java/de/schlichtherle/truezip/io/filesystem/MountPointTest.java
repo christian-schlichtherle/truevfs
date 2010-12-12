@@ -121,7 +121,9 @@ public class MountPointTest {
 
         for (final String[] params : new String[][] {
             { "foo:/bar/", "foo:/baz/" },
-            { "foo", "bar:baz:/!/" },
+            { "foo", "bar:baz:/bang!/boom/" },
+            { "foo", "bar:baz:/bang!/" },
+            { "foo", "bar:/baz/" },
         }) {
             final String scheme = params[0];
             final Path path = new Path(URI.create(params[1]));
@@ -158,17 +160,10 @@ public class MountPointTest {
         }
 
         for (final String[] params : new String[][] {
-            { "foo:bar:baz:/bang/./!/boom/./!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang/.!/boom/.!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang/!/boom/!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang/!/boom/./!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang/!/boom/.!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang/!/boom/!/", "foo", "bar:baz:/bang/!/boom/" },
-            { "foo:bar:baz:/bang!/boom/!/", "foo", "bar:baz:/bang!/boom/" },
+            { "foo:bar:baz:/bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo", "bar:baz:/bang!/boom" },
-            { "foo:bar:/baz/!/", "foo", "bar:/baz/" },
-            { "foo:bar:/baz!/", "foo", "bar:/baz" },
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
+            { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
             MountPoint mountPoint = new MountPoint(URI.create(params[0]), true);
             final String scheme = params[1];
@@ -190,23 +185,18 @@ public class MountPointTest {
         assertThat(mountPoint.hashCode(), equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode()));
     }
 
-    /*@Test
+    @Test
     public void testResolve() throws URISyntaxException {
         for (final String[] params : new String[][] {
-            { "foo:bar:/baz/!/", "bang/", "baz/bang/" },
+            { "foo:bar:/baz?boom!/", "bang/?plonk", "baz/bang/?plonk" },
+            { "foo:bar:/baz!/", "bang/?boom", "baz/bang/?boom" },
             { "foo:bar:/baz!/", "bang/", "baz/bang/" },
-            { "foo:bar:/baz/!/", "bang", "baz/bang" },
             { "foo:bar:/baz!/", "bang", "baz/bang" },
-            { "foo:bar:/!/", "baz/", "baz/" },
-            { "foo:bar:/!/", "baz", "baz" },
         }) {
-            final URI mountPointUri = new URI(params[0]);
-            final URI entryNameUri = new URI(params[1]);
-            final URI parentEntryNameUri = new URI(params[2]);
-            final MountPoint mountPoint = new MountPoint(mountPointUri);
-            final EntryName entryName = new EntryName(entryNameUri);
-            final EntryName parentEntryName = mountPoint.resolve(entryName);
-            assertThat(parentEntryName.getUri(), equalTo(parentEntryNameUri));
+            final MountPoint mountPoint = new MountPoint(URI.create(params[0]));
+            final EntryName entryName = new EntryName(URI.create(params[1]));
+            final EntryName parentEntryName = new EntryName(URI.create(params[2]));
+            assertThat(mountPoint.resolve(entryName), equalTo(parentEntryName));
         }
-    }*/
+    }
 }
