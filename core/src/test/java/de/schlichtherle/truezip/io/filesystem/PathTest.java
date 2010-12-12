@@ -178,8 +178,10 @@ public class PathTest {
             { "foo:bar:/baz!/./", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/.", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
+            { "foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk" },
 
             { "foo:bar:/baz/!/", "foo:bar:/baz/!/", "" },
+            { "foo:bar:/baz/?bang!/?plonk", "foo:bar:/baz/?bang!/", "?plonk" },
             { "foo:bar:/baz//!/", "foo:bar:/baz/!/", "" },
             { "foo:bar:/baz/./!/", "foo:bar:/baz/!/", "" },
             { "foo:bar:/baz/..!/", "foo:bar:/!/", "" },
@@ -208,7 +210,9 @@ public class PathTest {
             { "foo:/bar/..", "foo:/", "" },
             { "foo:/bar/../", "foo:/", "" },
             { "foo:/bar/baz", "foo:/bar/", "baz" },
+            { "foo:/bar/baz?bang", "foo:/bar/", "baz?bang" },
             { "foo:/bar/baz/", "foo:/bar/baz/", "" },
+            { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
         }) {
             Path path = new Path(URI.create(params[0]), true);
             final MountPoint mountPoint = null == params[1] ? null : new MountPoint(URI.create(params[1]));
