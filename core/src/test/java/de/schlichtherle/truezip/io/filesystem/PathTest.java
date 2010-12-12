@@ -114,6 +114,35 @@ public class PathTest {
             "foo:bar:/baz/./!/",
             "foo:bar:/baz/..!/",
             "foo:bar:/baz/../!/",
+
+            "foo:bar:/baz/../!/bang/",
+            "foo:bar:/baz/..!/bang/",
+            "foo:bar:/baz/./!/bang/",
+            "foo:bar:/baz/.!/bang/",
+            "foo:bar:/../baz/!/bang/",
+            "foo:bar:/./baz/!/bang/",
+            "foo:bar://baz/!/bang/", // baz is authority!
+            "foo:bar://baz!/bang/", // baz is authority!
+
+            "foo:bar:/!/bang/",
+
+            "foo:bar:/baz/../!/bang",
+            "foo:bar:/baz/..!/bang",
+            "foo:bar:/baz/./!/bang",
+            "foo:bar:/baz/.!/bang",
+            "foo:bar:/../baz/!/bang",
+            "foo:bar:/./baz/!/bang",
+            "foo:bar://baz/!/bang", // baz is authority!
+            "foo:bar://baz!/bang", // baz is authority!
+
+            "foo:bar:/!/bang",
+
+            "foo:bar:/baz/!/",
+            "foo:bar:/baz/?bang!/?plonk",
+            "foo:bar:/baz//!/",
+            "foo:bar:/baz/./!/",
+            "foo:bar:/baz/..!/",
+            "foo:bar:/baz/../!/",
         }) {
             final URI uri = URI.create(param);
 
@@ -153,39 +182,15 @@ public class PathTest {
             { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
 
-            { "foo:bar:/baz/../!/bang/", "foo:bar:/!/", "bang/" },
-            { "foo:bar:/baz/..!/bang/", "foo:bar:/!/", "bang/" },
-            { "foo:bar:/baz/./!/bang/", "foo:bar:/baz/!/", "bang/" },
-            { "foo:bar:/baz/.!/bang/", "foo:bar:/baz/!/", "bang/" },
-            { "foo:bar:/../baz/!/bang/", "foo:bar:/../baz/!/", "bang/" },
-            { "foo:bar:/./baz/!/bang/", "foo:bar:/baz/!/", "bang/" },
-            { "foo:bar://baz/!/bang/", "foo:bar://baz/!/", "bang/" }, // baz is authority!
-            { "foo:bar://baz!/bang/", "foo:bar://baz!/", "bang/" }, // baz is authority!
             { "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/!/bang/", "foo:bar:/!/", "bang/" },
 
-            { "foo:bar:/baz/../!/bang", "foo:bar:/!/", "bang" },
-            { "foo:bar:/baz/..!/bang", "foo:bar:/!/", "bang" },
-            { "foo:bar:/baz/./!/bang", "foo:bar:/baz/!/", "bang" },
-            { "foo:bar:/baz/.!/bang", "foo:bar:/baz/!/", "bang" },
-            { "foo:bar:/../baz/!/bang", "foo:bar:/../baz/!/", "bang" },
-            { "foo:bar:/./baz/!/bang", "foo:bar:/baz/!/", "bang" },
-            { "foo:bar://baz/!/bang", "foo:bar://baz/!/", "bang" }, // baz is authority!
-            { "foo:bar://baz!/bang", "foo:bar://baz!/", "bang" }, // baz is authority!
             { "foo:bar:/baz!/bang", "foo:bar:/baz!/", "bang" },
-            { "foo:bar:/!/bang", "foo:bar:/!/", "bang" },
 
             { "foo:bar:/baz!/./", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/.", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk" },
 
-            { "foo:bar:/baz/!/", "foo:bar:/baz/!/", "" },
-            { "foo:bar:/baz/?bang!/?plonk", "foo:bar:/baz/?bang!/", "?plonk" },
-            { "foo:bar:/baz//!/", "foo:bar:/baz/!/", "" },
-            { "foo:bar:/baz/./!/", "foo:bar:/baz/!/", "" },
-            { "foo:bar:/baz/..!/", "foo:bar:/!/", "" },
-            { "foo:bar:/baz/../!/", "foo:bar:/!/", "" },
             { "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },

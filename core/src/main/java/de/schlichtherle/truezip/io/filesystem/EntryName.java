@@ -135,24 +135,41 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
     /**
      * Constructs a new entry name by resolving the given member entry name
      * against the given parent entry name.
+     * Note that the URI of the parent entry name is considered to name a
+     * directory even if it's not ending with a
+     * {@link FileSystemEntry#SEPARATOR}, so calling this constructor with
+     * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
+     * entry names respectively will result in the URI {@code "foo/bar"} for
+     * the resulting entry name.
      *
      * @param  parent a non-{@code null} entry name.
      * @param  member a non-{@code null} entry name.
      * @throws NullPointerException if any parameter is {@code null}.
      */
     EntryName(final EntryName parent, final EntryName member) {
-        uri = parent.uri.resolve(member.uri);
+        final URI parentUri = parent.uri;
+        final URI memberUri = member.uri;
+        try {
+            uri = 0 == parentUri.getPath().length()
+                    ? memberUri
+                    : 0 == memberUri.getPath().length()
+                        ? parentUri
+                        : new URI(null, null, parentUri.getPath() + SEPARATOR, parentUri.getQuery(), null)
+                            .resolve(memberUri);
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
 
         assert invariants();
     }
 
     private boolean invariants() {
-        assert null != uri;
-        assert !uri.isAbsolute();
-        assert null == uri.getRawAuthority();
-        assert null == uri.getRawFragment();
-        assert uri.normalize() == uri;
-        String p = uri.getRawPath();
+        assert null != getUri();
+        assert !getUri().isAbsolute();
+        assert null == getUri().getRawAuthority();
+        assert null == getUri().getRawFragment();
+        assert getUri().normalize() == getUri();
+        String p = getUri().getRawPath();
         assert !"..".equals(p);
         assert !p.startsWith(SEPARATOR);
         assert !p.startsWith("." + SEPARATOR);

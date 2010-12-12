@@ -192,20 +192,20 @@ public final class Path implements Serializable, Comparable<Path> {
     }
 
     private boolean invariants() {
-        assert null != uri;
-        assert null == uri.getRawFragment();
-        assert (null != mountPoint) == uri.isAbsolute();
-        assert null != entryName;
-        if (uri.isOpaque()) {
-            assert uri.getRawSchemeSpecificPart().contains(BANG_SLASH);
-            assert uri.equals(URI.create(   mountPoint.getUri().toString()
-                                            + entryName.getUri().toString()));
-        } else if (uri.isAbsolute()) {
-            assert uri.normalize() == uri;
-            assert uri.equals(mountPoint.getUri().resolve(entryName.getUri()));
+        assert null != getUri();
+        assert null == getUri().getRawFragment();
+        assert (null != getMountPoint()) == getUri().isAbsolute();
+        assert null != getEntryName();
+        if (getUri().isOpaque()) {
+            assert getUri().getRawSchemeSpecificPart().contains(BANG_SLASH);
+            assert getUri().equals(URI.create(  getMountPoint().getUri().toString()
+                                                + getEntryName().getUri().toString()));
+        } else if (getUri().isAbsolute()) {
+            assert getUri().normalize() == getUri();
+            assert getUri().equals(getMountPoint().getUri().resolve(getEntryName().getUri()));
         } else {
-            assert uri.normalize() == uri;
-            assert entryName.getUri() == uri;
+            assert getUri().normalize() == getUri();
+            assert getEntryName().getUri() == getUri();
         }
         return true;
     }
