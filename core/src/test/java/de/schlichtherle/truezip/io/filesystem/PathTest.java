@@ -30,7 +30,7 @@ public class PathTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithUri() throws URISyntaxException {
+    public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
             Path.create(null);
             fail();
@@ -67,37 +67,10 @@ public class PathTest {
         } catch (NullPointerException expected) {
         }
 
-        for (final String param : new String[] {
-            "foo:bar",
-            "foo:bar:",
-            "foo:bar:/",
-            "foo:bar:/baz",
-            "foo:bar:/baz!",
-            "foo:bar:/baz/",
-            "foo:bar:/baz!//",
-            "foo:bar:/baz!/.",
-            "foo:bar:/baz!/./",
-            "foo:bar:/baz!/..",
-            "foo:bar:/baz!/../",
-            "foo:bar:/baz!/bang/.",
-            "foo:bar:/baz!/bang/./",
-            "foo:bar:/baz!/bang/..",
-            "foo:bar:/baz!/bang/../",
-            "foo:bar:baz:/bang",
-            "foo:bar:baz:/bang!",
-            "foo:bar:baz:/bang/",
-            "foo:bar:baz:/bang!/",
-            "foo:bar:/baz/.!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
-            "foo:bar:/baz/../!/",
-        }) {
-            final URI uri = URI.create(param);
-            try {
-                Path.create(uri);
-                fail(param);
-            } catch (IllegalArgumentException expected) {
-            }
+        try {
+            new Path(null, null);
+            fail();
+        } catch (NullPointerException expected) {
         }
 
         for (final String param : new String[] {
@@ -110,39 +83,67 @@ public class PathTest {
             "/foo/bar",
             "/foo/bar/",
             "/",
-            "foo",
-            "foo/",
             "foo//",
             "foo/.",
             "foo/./",
             "foo/..",
             "foo/../",
-            "foo/bar",
-            "foo/bar/",
-            "foo:/",
-            "foo:/bar",
-            "foo:/bar/",
-            "foo:/bar//",
-            "foo:/bar/.",
-            "foo:/bar/./",
-            "foo:/bar/..",
-            "foo:/bar/../",
-            "foo:/bar/baz",
-            "foo:/bar/baz/",
+            "foo:bar",
+            "foo:bar:",
+            "foo:bar:/",
+            "foo:bar:/baz",
+            "foo:bar:/baz!",
+            "foo:bar:/baz/",
+            "foo:bar:/baz!//",
+            "foo:bar:/baz!/#",
+            "foo:bar:/baz!/#bang",
+            "foo:bar:/baz!/.",
+            "foo:bar:/baz!/./",
+            "foo:bar:/baz!/..",
+            "foo:bar:/baz!/../",
+            "foo:bar:/baz!/bang/.",
+            "foo:bar:/baz!/bang/./",
+            "foo:bar:/baz!/bang/..",
+            "foo:bar:/baz!/bang/../",
+            "foo:bar:baz:/bang",
+            "foo:bar:baz:/bang!",
+            "foo:bar:baz:/bang/",
+            "foo:bar:baz:/bang!/",
+            "foo:bar:baz:/bang!/boom",
+            "foo:bar:/baz/.!/",
+            "foo:bar:/baz/./!/",
+            "foo:bar:/baz/..!/",
+            "foo:bar:/baz/../!/",
         }) {
-            final URI uri = new URI(param);
-            final Path path = new Path(uri);
-            assertThat(path.getUri(), sameInstance(uri));
-            assertThat(path.getMountPoint(), nullValue());
-            assertThat(path.getEntryName(), nullValue());
-            assertThat(path.toString(), equalTo(path.getUri().toString()));
-            assertThat(path, equalTo(path));
-            assertThat(path.hashCode(), equalTo(path.hashCode()));
+            final URI uri = URI.create(param);
+
+            try {
+                Path.create(uri);
+                fail(param);
+            } catch (IllegalArgumentException expected) {
+            }
+
+            try {
+                new Path(uri);
+                fail(param);
+            } catch (URISyntaxException expected) {
+            }
         }
 
         for (final String[] params : new String[][] {
-            { "foo:bar:baz:/bang!/boom!/plonk/#boo", "foo:bar:baz:/bang!/boom!/", "plonk/#boo" },
-            { "foo:bar:baz:/bang!/boom!/plonk/#", "foo:bar:baz:/bang!/boom!/", "plonk/#" },
+            //{ "foo:/bar/", "baz" },
+        }) {
+            final MountPoint mountPoint = null == params[0] ? null : new MountPoint(URI.create(params[0]));
+            final EntryName entryName = new EntryName(URI.create(params[1]));
+            new Path(mountPoint, entryName);
+            fail(params[0] + params[1]);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructorWithValidUri() throws URISyntaxException {
+        for (final String[] params : new String[][] {
             { "foo:bar:baz:/bang!/boom!/plonk/", "foo:bar:baz:/bang!/boom!/", "plonk/" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", "" },
@@ -152,8 +153,6 @@ public class PathTest {
             { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
 
-            { "foo:bar:/baz!/../bang/", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/baz!/./bang/", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz/../!/bang/", "foo:bar:/!/", "bang/" },
             { "foo:bar:/baz/..!/bang/", "foo:bar:/!/", "bang/" },
             { "foo:bar:/baz/./!/bang/", "foo:bar:/baz/!/", "bang/" },
@@ -165,8 +164,6 @@ public class PathTest {
             { "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/!/bang/", "foo:bar:/!/", "bang/" },
 
-            { "foo:bar:/baz!/../bang", "foo:bar:/baz!/", "bang" },
-            { "foo:bar:/baz!/./bang", "foo:bar:/baz!/", "bang" },
             { "foo:bar:/baz/../!/bang", "foo:bar:/!/", "bang" },
             { "foo:bar:/baz/..!/bang", "foo:bar:/!/", "bang" },
             { "foo:bar:/baz/./!/bang", "foo:bar:/baz/!/", "bang" },
@@ -178,11 +175,8 @@ public class PathTest {
             { "foo:bar:/baz!/bang", "foo:bar:/baz!/", "bang" },
             { "foo:bar:/!/bang", "foo:bar:/!/", "bang" },
 
-            { "foo:bar:/baz!/../", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/..", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/./", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/.", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!//", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
 
             { "foo:bar:/baz/!/", "foo:bar:/baz/!/", "" },
@@ -195,50 +189,52 @@ public class PathTest {
             { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/..", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
+
+            { "foo", null, "foo" },
+            { "foo/", null, "foo/" },
+            { "foo//", null, "foo/" },
+            { "foo/.", null, "foo/" },
+            { "foo/./", null, "foo/" },
+            { "foo/..", null, "" },
+            { "foo/../", null, "" },
+            { "foo/bar", null, "foo/bar" },
+            { "foo/bar/", null, "foo/bar/" },
+            { "foo:/", "foo:/", "" },
+            { "foo:/bar", "foo:/", "bar" },
+            { "foo:/bar/", "foo:/bar/", "" },
+            { "foo:/bar//", "foo:/bar/", "" },
+            { "foo:/bar/.", "foo:/bar/", "" },
+            { "foo:/bar/./", "foo:/bar/", "" },
+            { "foo:/bar/..", "foo:/", "" },
+            { "foo:/bar/../", "foo:/", "" },
+            { "foo:/bar/baz", "foo:/bar/", "baz" },
+            { "foo:/bar/baz/", "foo:/bar/baz/", "" },
         }) {
-            final URI uri = new URI(params[0]);
-            final URI mountPointUri = new URI(params[1]);
-            final URI entryNameUri = new URI(params[2]);
-            final Path path = new Path(uri, true);
-            assertThat(path.getUri(),
-                    equalTo(new URI(    mountPointUri.toString()
-                                        + entryNameUri.toString())));
-            assertThat(path.getMountPoint().getUri(), equalTo(mountPointUri));
-            assertThat(path.getEntryName().getUri(), equalTo(entryNameUri));
-            assertThat(path.toString(), equalTo(path.getUri().toString()));
-            assertThat(path, equalTo(path));
-            assertThat(path.hashCode(), equalTo(path.hashCode()));
+            Path path = new Path(URI.create(params[0]), true);
+            final MountPoint mountPoint = null == params[1] ? null : new MountPoint(URI.create(params[1]));
+            final EntryName entryName = new EntryName(URI.create(params[2]));
+            testPath(path, mountPoint, entryName);
+
+            path = new Path(mountPoint, entryName);
+            testPath(path, mountPoint, entryName);
         }
     }
 
-    @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithMountPointAndEntryName()
-    throws URISyntaxException {
-        try {
-            new Path(null, null);
-            fail();
-        } catch (NullPointerException expected) {
+    private void testPath(final Path path,
+                          final MountPoint mountPoint,
+                          final EntryName entryName) {
+        if (null != mountPoint) {
+            assertThat(path.getUri(), equalTo(URI.create(
+                    mountPoint.getUri().toString()
+                    + entryName.getUri().toString())));
+            assertThat(path.getMountPoint().getUri(), equalTo(mountPoint.getUri()));
+        } else {
+            assertThat(path.getUri(), equalTo(entryName.getUri()));
+            assertThat(path.getMountPoint(), nullValue());
         }
-
-        for (final String[] params : new String[][] {
-            { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/a", "foo:bar:/baz!/", "a" },
-            { "foo:bar:/baz!/a/", "foo:bar:/baz!/", "a/" },
-        }) {
-            final URI uri = new URI(params[0]);
-            final URI mountPointUri = new URI(params[1]);
-            final URI entryNameUri = new URI(params[2]);
-            final MountPoint mountPoint = new MountPoint(mountPointUri);
-            final EntryName entryName = new EntryName(entryNameUri);
-            final Path path = new Path(mountPoint, entryName);
-
-            assertThat(path.getUri(), equalTo(uri));
-            assertThat(path.getMountPoint(), sameInstance(mountPoint));
-            assertThat(path.getEntryName(), sameInstance(entryName));
-            assertThat(path.toString(), equalTo(path.getUri().toString()));
-            assertThat(path, equalTo(path));
-            assertThat(path.hashCode(), equalTo(path.hashCode()));
-        }
+        assertThat(path.getEntryName().getUri(), equalTo(entryName.getUri()));
+        assertThat(path.toString(), equalTo(path.getUri().toString()));
+        assertThat(path, equalTo(Path.create(URI.create(path.getUri().toString()))));
+        assertThat(path.hashCode(), equalTo(Path.create(URI.create(path.getUri().toString())).hashCode()));
     }
 }
