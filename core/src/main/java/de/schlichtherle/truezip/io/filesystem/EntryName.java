@@ -29,6 +29,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * <ol>
  * <li>The URI must be relative, i.e. it must not have a scheme.
  * <li>The URI must not have an authority.
+ * <li>The URI must not have a fragment.
  * <li>The URI's path must be in normal form.
  * <li>The URI's path must not equal {@code ".."}.
  * <li>The URI's path must not start with {@code "/"}.
@@ -53,6 +54,8 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * @version $Id$
  */
 public final class EntryName implements Serializable, Comparable<EntryName> {
+
+    private static final long serialVersionUID = 2212342253466752478L;
 
     static EntryName NULL = EntryName.create(URI.create(""));
 
@@ -108,37 +111,22 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
     public EntryName(URI uri, final boolean normalize)
     throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new URISyntaxException(uri.toString(),
-                    "Scheme not allowed");
+            throw new URISyntaxException(uri.toString(), "Scheme not allowed");
         if (uri.getRawAuthority() != null)
-            throw new URISyntaxException(uri.toString(),
-                    "Authority not allowed");
-        if (normalize) {
+            throw new URISyntaxException(uri.toString(), "Authority not allowed");
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
+        if (normalize)
             uri = uri.normalize();
-            String p = uri.getPath();
-            while (true)
-                if (p.equals(".."))
-                    p = p.substring(2);
-                else if (p.startsWith(SEPARATOR))
-                    p = p.substring(1);
-                else if (p.startsWith("." + SEPARATOR))
-                    p = p.substring(3);
-                else if (p.startsWith(".." + SEPARATOR))
-                    p = p.substring(3);
-                else
-                    break;
-            uri = new URI(null, null, p, uri.getQuery(), uri.getFragment());
-        } else {
-            if (uri.normalize() != uri)
-                throw new URISyntaxException(uri.toString(),
-                        "Path not in normal form");
-            final String p = uri.getRawPath();
-            if (    "..".equals(p) || p.startsWith(SEPARATOR)
-                    || p.startsWith("." + SEPARATOR)
-                    || p.startsWith(".." + SEPARATOR))
-                throw new URISyntaxException(uri.toString(),
-                        "Illegal start of path");
-        }
+        else if (uri.normalize() != uri)
+            throw new URISyntaxException(uri.toString(), "Path not in normal form");
+        final String p = uri.getRawPath();
+        if (    "..".equals(p)
+                || p.startsWith(SEPARATOR)
+                || p.startsWith("." + SEPARATOR)
+                || p.startsWith(".." + SEPARATOR))
+            throw new URISyntaxException(uri.toString(),
+                    "Illegal start of path");
         this.uri = uri;
 
         assert invariants();
@@ -162,10 +150,12 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
         assert null != uri;
         assert !uri.isAbsolute();
         assert null == uri.getRawAuthority();
+        assert null == uri.getRawFragment();
         assert uri.normalize() == uri;
         String p = uri.getRawPath();
         assert !"..".equals(p);
         assert !p.startsWith(SEPARATOR);
+        assert !p.startsWith("." + SEPARATOR);
         assert !p.startsWith(".." + SEPARATOR);
         return true;
     }

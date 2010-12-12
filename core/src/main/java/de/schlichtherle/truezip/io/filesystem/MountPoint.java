@@ -33,11 +33,10 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * <li>If the URI is opaque, its scheme specific part must end with the bang
  *     slash separator {@code "!/"}.
  *     The scheme specific part <em>before</em> this bang slash separator is
- *     parsed according the syntax constraints for the {@link #getPath() path}
- *     with the following additional syntax constraints:
- *     The path must be absolute and cannot have a fragment.
+ *     parsed according the syntax constraints for a {@link Path} and the
+ *     following additional syntax constraints:
+ *     The path must be absolute.
  *     If its opaque, it's entry name must not be empty.
- *     If its hierarchical, it's path must be in normal form.
  * <li>If the URI is hierarchical, its path must be in normal form.
  * </ol>
  * <p>
@@ -52,6 +51,7 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * <li>{@code foo} (not absolute)
  * <li>{@code foo:/bar#baz} (fragment)
  * <li>{@code foo:bar:/baz!/bang} (doesn't end with bang slash separator)
+ * <li>{@code foo:bar:baz:/bang!/!/} (empty entry name in bar:baz:/bang!/)
  * </ul>
  * <p>
  * Note that this class is immutable and final, hence thread-safe, too.
@@ -129,7 +129,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(pathUri.toString(), "Not absolute");
             if (pathUri.isOpaque()
-                    && 0 >= path.getEntryName().toString().length())
+                    && 0 == path.getEntryName().toString().length())
                 throw new URISyntaxException(pathUri.toString(), "Empty entry name");
             if (normalize) {
                 final URI nuri = new URI(
@@ -190,10 +190,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
             throw new URISyntaxException(pathUri.toString(), "Not absolute");
-        if (null != pathUri.getRawFragment())
-            throw new URISyntaxException(pathUri.toString(), "Fragment not allowed");
         final EntryName entryName = path.getEntryName();
-        if (null != entryName && 0 == entryName.toString().length())
+        if (pathUri.isOpaque() && 0 == entryName.toString().length())
             throw new URISyntaxException(pathUri.toString(), "Empty entry name in opaque path");
         this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
         this.path = path;
@@ -251,7 +249,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         public String toString() {
             return scheme;
         }
-    }
+    } // class Scheme
 
     private boolean invariants() {
         assert null != uri;
@@ -261,10 +259,9 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             assert uri.getRawSchemeSpecificPart().endsWith(BANG_SLASH);
             assert null != path;
             assert path.getUri().isAbsolute();
-            assert path.getUri().normalize() == path.getUri();
             assert null == path.getUri().getRawFragment();
             assert !path.getUri().isOpaque()
-                    || 0 < path.getEntryName().toString().length();
+                    || 0 != path.getEntryName().toString().length();
         } else {
             assert uri.normalize() == uri;
             assert null == path;

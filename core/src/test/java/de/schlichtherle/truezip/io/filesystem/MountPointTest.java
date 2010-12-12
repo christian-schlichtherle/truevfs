@@ -30,7 +30,55 @@ public class MountPointTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithUri() throws URISyntaxException {
+    public void testConstructorWithInvalidUri() throws URISyntaxException {
+        try {
+            MountPoint.create(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create(null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint(null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create(null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint(null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create(null, null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint(null, null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
         for (final String param : new String[] {
             "foo:bar:baz:/!/!/",
             "foo",
@@ -41,12 +89,12 @@ public class MountPointTest {
             "/foo/bar/",
             "//foo",
             "/../foo",
+            "foo:/bar#baz",
             "foo:/bar//",
             "foo:/bar/.",
             "foo:/bar/./",
             "foo:/bar/..",
             "foo:/bar/../",
-            "foo:/bar#baz",
             "foo:bar:/baz!//",
             "foo:bar:/baz!/.",
             "foo:bar:/baz!/./",
@@ -54,15 +102,40 @@ public class MountPointTest {
             "foo:bar:/baz!/../",
             "foo:bar:/baz!/bang",
             "foo:bar:/baz!/#bang",
+            "foo:bar:baz:/bang!/!/",
         }) {
             final URI uri = URI.create(param);
+
             try {
                 MountPoint.create(uri);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
+
+            try {
+                new MountPoint(uri);
+                fail(param);
+            } catch (URISyntaxException expected) {
+            }
         }
 
+        for (final String[] params : new String[][] {
+            { "foo:/bar/", "foo:/baz/" },
+            { "foo", "bar:baz:/!/" },
+        }) {
+            final String scheme = params[0];
+            final Path path = new Path(URI.create(params[1]));
+            try {
+                new MountPoint(scheme, path);
+                fail(params[0] + ":" + params[1] + "!/");
+            } catch (URISyntaxException expected) {
+            }
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testConstructorWithValidUri() throws URISyntaxException {
         for (final String param : new String[] {
             "foo:/bar/baz/",
             "foo:/bar/baz",
@@ -75,13 +148,13 @@ public class MountPointTest {
             "foo:/bar?bang",
             "foo:/?bang",
         }) {
-            final URI uri = new URI(param);
+            final URI uri = URI.create(param);
             final MountPoint mountPoint = new MountPoint(uri);
             assertThat(mountPoint.getUri(), sameInstance(uri));
             assertThat(mountPoint.getPath(), nullValue());
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(mountPoint));
-            assertThat(mountPoint.hashCode(), equalTo(mountPoint.hashCode()));
+            assertThat(mountPoint, equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString()))));
+            assertThat(mountPoint.hashCode(), equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode()));
         }
 
         for (final String[] params : new String[][] {
@@ -97,50 +170,24 @@ public class MountPointTest {
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
         }) {
-            final URI uri = new URI(params[0]);
+            MountPoint mountPoint = new MountPoint(URI.create(params[0]), true);
             final String scheme = params[1];
-            final URI pathUri = new URI(params[2]);
-            final MountPoint mountPoint = new MountPoint(uri, true);
-            assertThat(mountPoint.getUri(), equalTo(new URI(scheme + ":" + pathUri + "!/")));
-            assertThat(mountPoint.getPath().getUri(), equalTo(pathUri));
-            assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(mountPoint));
-            assertThat(mountPoint.hashCode(), equalTo(mountPoint.hashCode()));
+            final Path path = new Path(URI.create(params[2]));
+            testMountPoint(mountPoint, scheme, path);
+
+            mountPoint = new MountPoint(scheme, path);
+            testMountPoint(mountPoint, scheme, path);
         }
     }
 
-    @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithSchemeAndPath() throws URISyntaxException {
-        for (final String[] params : new String[][] {
-            { "foo:/bar/", "foo:/baz/" },
-            { "foo", "bar:baz:/!/" },
-        }) {
-            final String scheme = params[0];
-            final URI pathUri = new URI(params[1]);
-            final Path path = new Path(pathUri);
-            try {
-                new MountPoint(scheme, path);
-                fail(params[0] + ":" + params[1] + "!/");
-            } catch (URISyntaxException expected) {
-            }
-        }
-
-        for (final String[] params : new String[][] {
-            { "foo:bar:/baz!/", "foo", "bar:/baz" },
-            { "foo:bar:/baz/!/", "foo", "bar:/baz/" },
-        }) {
-            final URI uri = new URI(params[0]);
-            final String scheme = params[1];
-            final URI pathUri = new URI(params[2]);
-            final Path path = new Path(pathUri);
-            final MountPoint mountPoint = new MountPoint(scheme, path);
-            assertThat(mountPoint.getUri(), equalTo(uri));
-            assertThat(mountPoint.getPath(), sameInstance(path));
-            assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(mountPoint));
-            assertThat(mountPoint.hashCode(), equalTo(mountPoint.hashCode()));
-        }
+    private void testMountPoint(final MountPoint mountPoint,
+                                final String scheme,
+                                final Path path) {
+        assertThat(mountPoint.getUri(), equalTo(URI.create(scheme + ":" + path + "!/")));
+        assertThat(mountPoint.getPath().getUri(), equalTo(path.getUri()));
+        assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
+        assertThat(mountPoint, equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString()))));
+        assertThat(mountPoint.hashCode(), equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode()));
     }
 
     /*@Test

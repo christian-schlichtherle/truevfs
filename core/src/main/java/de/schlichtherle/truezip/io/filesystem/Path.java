@@ -26,17 +26,32 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * A path is usually constructed from a {@link URI Uniform Resource Identifier}
  * in order to assert the following additional syntax constraints:
  * <p>
- * If the URI is opaque, its scheme specific part must contain at least one
- * bang slash separator {@code "!/"}.
- * The part <em>up to</em> the last bang slash separator is parsed according
- * to the syntax constraints for the {@link #getMountPoint() mount point}.
- * The part <em>after</em> the last bang slash separator is parsed according
- * to the syntax constraints for the {@link #getEntryName() entry name}.
+ * <ol>
+ * <li>The URI must not have a fragment.
+ * <li>If the URI is opaque, its scheme specific part must contain at least
+ *     one bang slash separator {@code "!/"}.
+ *     The part <em>up to</em> the last bang slash separator is parsed
+ *     according to the syntax constraints for a {@link MountPoint} and set as
+ *     the value of the property {@link #getMountPoint() mount point}.
+ *     The part <em>after</em> the last bang slash separator is parsed
+ *     according to the syntax constraints for an {@link EntryName} and set as
+ *     the value of the property {@link #getEntryName() entry name}.
+ * <li>If the URI is absolute, it's resolved with ".", parsed according to
+ *     the syntax constraints for a {@link MountPoint} and set as the value of
+ *     the property {@link #getMountPoint() mount point}.
+ *     The value of the property {@link #getEntryName() entry name} is then set
+ *     to the URI relativized to this {@link #getMountPoint() mount point}.
+ * <li>Otherwise, the value of the property
+ *     {@link #getMountPoint() mount point} is set to {@code null} and the URI
+ *     is parsed according to the syntax constraints for an {@link EntryName}
+ *     and set as the value of the property {@link #getEntryName() entry name}.
+ * </ol>
  * <p>
  * Examples for valid path URIs are:
  * <ul>
  * <li>{@code foo:bar:/baz!/bang} (mountPoint="foo:bar:/baz!/", entryName="bang")
- * <li>{@code foo:/bar/} (there are no constraints for hierarchical URIs)
+ * <li>{@code foo:/bar} (mountPoint="foo:/", entryName="bar")
+ * <li>{@code foo:/bar/} (mountPoint="foo:/bar/", entryName="")
  * </ul>
  * Examples for invalid path URIs are:
  * <ul>
@@ -109,6 +124,8 @@ public final class Path implements Serializable, Comparable<Path> {
      */
     public Path(URI uri, final boolean normalize)
     throws URISyntaxException {
+        if (null != uri.getRawFragment())
+            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getSchemeSpecificPart();
             final int i = ssp.lastIndexOf(BANG_SLASH);
@@ -124,13 +141,22 @@ public final class Path implements Serializable, Comparable<Path> {
             if (normalize) {
                 final URI nuri = new URI(
                         mountPoint.toString() + entryName.toString());
-                uri = uri.equals(nuri) ? uri : nuri;
+                if (!uri.equals(nuri))
+                    uri = nuri;
             }
-        } else {
-            mountPoint = null;
-            entryName = null;
+        } else if (uri.isAbsolute()) {
             if (normalize)
                 uri = uri.normalize();
+            else if (uri.normalize() != uri)
+                throw new URISyntaxException(uri.toString(),
+                        "Path not in normal form");
+            mountPoint = new MountPoint(uri.resolve("."));
+            entryName = new EntryName(mountPoint.getUri().relativize(uri));
+        } else {
+            mountPoint = null;
+            entryName = new EntryName(uri, normalize);
+            if (normalize)
+                uri = entryName.getUri();
         }
         this.uri = uri;
 
@@ -138,18 +164,26 @@ public final class Path implements Serializable, Comparable<Path> {
     }
 
     /**
-     * Constructs a new entry name by synthesizing its URI from the given
+     * Constructs a new path by synthesizing its URI from the given
      * mount point and entry name.
      *
-     * @param  mountPoint the non-{@code null} {@link #getMountPoint() mount point}.
+     * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
      * @param  entryName the non-{@code null} {@link #getEntryName() entry name}.
+     * @throws URISyntaxException if the synthesized path URI
+     *         would not conform to the syntax constraints for paths.
      */
     public Path(final MountPoint mountPoint, final EntryName entryName) {
-        try {
-            this.uri = new URI(mountPoint.toString() + entryName.toString());
-        } catch (URISyntaxException ex) {
-            throw (AssertionError) new AssertionError("Check specification of syntax constraints!")
-                    .initCause(ex);
+        if (null == mountPoint) {
+            this.uri = entryName.getUri();
+        } else if (mountPoint.getUri().isOpaque()) {
+            try {
+                this.uri = new URI(mountPoint.toString() + entryName.toString());
+            } catch (URISyntaxException ex) {
+                throw (AssertionError) new AssertionError("Check specification of syntax constraints!")
+                        .initCause(ex);
+            }
+        } else {
+            this.uri = mountPoint.getUri().resolve(entryName.getUri());
         }
         this.mountPoint = mountPoint;
         this.entryName = entryName;
@@ -159,15 +193,19 @@ public final class Path implements Serializable, Comparable<Path> {
 
     private boolean invariants() {
         assert null != uri;
+        assert null == uri.getRawFragment();
+        assert (null != mountPoint) == uri.isAbsolute();
+        assert null != entryName;
         if (uri.isOpaque()) {
-            assert uri.toString().contains(BANG_SLASH);
-            assert null != mountPoint;
-        }
-        if (null != entryName) {
-            assert null != mountPoint;
-            assert uri.isOpaque() || 0 != entryName.toString().length();
+            assert uri.getRawSchemeSpecificPart().contains(BANG_SLASH);
+            assert uri.equals(URI.create(   mountPoint.getUri().toString()
+                                            + entryName.getUri().toString()));
+        } else if (uri.isAbsolute()) {
+            assert uri.normalize() == uri;
+            assert uri.equals(mountPoint.getUri().resolve(entryName.getUri()));
         } else {
-            assert null == mountPoint;
+            assert uri.normalize() == uri;
+            assert entryName.getUri() == uri;
         }
         return true;
     }
