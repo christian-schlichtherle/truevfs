@@ -57,7 +57,7 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2212342253466752478L;
 
-    static EntryName NULL = EntryName.create(URI.create(""));
+    static EntryName ROOT = EntryName.create(URI.create(FileSystemEntry.ROOT));
 
     private final URI uri;
 
@@ -119,14 +119,14 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
         if (normalize)
             uri = uri.normalize();
         else if (uri.normalize() != uri)
-            throw new URISyntaxException(uri.toString(), "Path not in normal form");
+            throw new URISyntaxException(uri.toString(), "URI path not in normal form");
         final String p = uri.getRawPath();
         if (    "..".equals(p)
                 || p.startsWith(SEPARATOR)
                 || p.startsWith("." + SEPARATOR)
                 || p.startsWith(".." + SEPARATOR))
             throw new URISyntaxException(uri.toString(),
-                    "Illegal start of path");
+                    "Illegal start of URI path");
         this.uri = uri;
 
         assert invariants();
