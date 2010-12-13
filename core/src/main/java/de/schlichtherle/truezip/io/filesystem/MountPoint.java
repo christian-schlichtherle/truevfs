@@ -298,11 +298,14 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @param  entryName a non-{@code null} entry name relative to this mount
      *         point.
+     * @throws NullPointerException iff this mount point does not name a parent
+     *         mount point.
      * @return a non-{@code null} entry name relative to the parent mount
      *         point.
+     * @see    #getParent
      */
     public EntryName resolve(EntryName entryName) {
-        return null == path ? entryName : new EntryName(path.getEntryName(), entryName);
+        return new EntryName(path.getEntryName(), entryName);
     }
 
     /**
