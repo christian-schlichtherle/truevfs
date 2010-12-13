@@ -55,6 +55,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * </ul>
  * Examples for invalid path URIs are:
  * <ul>
+ * <li>{@code /foo} (leading slash separator not allowed)
  * <li>{@code foo:bar} (opaque URI w/o bang slash separator)
  * <li>{@code foo:bar:baz:/bang!/boom} (dito)
  * </ul>
