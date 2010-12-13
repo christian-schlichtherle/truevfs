@@ -58,7 +58,8 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
     private static final long serialVersionUID = 2212342253466752478L;
 
     /** Represents an entry name with an empty URI. */
-    static EntryName ROOT = EntryName.create(URI.create(FileSystemEntry.ROOT));
+    public static final EntryName ROOT
+            = EntryName.create(URI.create(FileSystemEntry.ROOT));
 
     private final URI uri;
 
