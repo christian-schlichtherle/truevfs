@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 public class EntryNameTest {
 
     @Test
-    public void testConstructorWithValidUri() throws URISyntaxException {
+    public void testConstructorWithValidUri() {
         // This is by no means a complete test, but all the other constructors
         // are already tested by MountPointTest and PathTest.
         for (final String[] params : new String[][] {
@@ -42,8 +42,8 @@ public class EntryNameTest {
             { "foo/", "bar", "foo/bar" },
             { "foo/", "bar/", "foo/bar/" },
         }) {
-            final EntryName parent = new EntryName(URI.create(params[0]));
-            final EntryName member = new EntryName(URI.create(params[1]));
+            final EntryName parent = EntryName.create(URI.create(params[0]));
+            final EntryName member = EntryName.create(URI.create(params[1]));
             final EntryName result = new EntryName(parent, member);
             assertThat(result.getUri(), equalTo(URI.create(params[2])));
         }

@@ -79,7 +79,7 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
      * @param  normalize whether or not the given URI shall get normalized
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
-     * @throws URISyntaxException if {@code uri} does not conform to the
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      * @return A non-{@code null} entry name.
      */

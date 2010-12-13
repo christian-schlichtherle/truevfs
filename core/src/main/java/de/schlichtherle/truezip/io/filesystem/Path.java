@@ -93,7 +93,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * @param  normalize whether or not the given URI shall get normalized
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
-     * @throws URISyntaxException if {@code uri} does not conform to the
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      * @return A non-{@code null} path.
      */
