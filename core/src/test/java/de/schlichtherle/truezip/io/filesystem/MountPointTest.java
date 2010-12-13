@@ -123,12 +123,11 @@ public class MountPointTest {
         }
 
         for (final String[] params : new String[][] {
-            { "foo:/bar/", "foo:/baz/" },
             { "foo", "bar:baz:/bang!/boom/" },
             { "foo", "bar:baz:/bang!/" },
             { "foo", "bar:/baz/" },
         }) {
-            final String scheme = params[0];
+            final Scheme scheme = Scheme.create(params[0]);
             final Path path = Path.create(URI.create(params[1]));
             try {
                 new MountPoint(scheme, path);
@@ -173,9 +172,11 @@ public class MountPointTest {
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
             assertThat(MountPoint.create(URI.create(mountPoint.toString())), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/")), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.getUri().getScheme(), mountPoint.getPath()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode(), equalTo(mountPoint.hashCode()));
+            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(EntryName.ROOT))), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolvePath(EntryName.ROOT).getUri()), equalTo(mountPoint));
         }
     }
 

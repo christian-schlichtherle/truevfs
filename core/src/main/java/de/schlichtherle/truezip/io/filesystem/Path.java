@@ -149,7 +149,7 @@ public final class Path implements Serializable, Comparable<Path> {
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
                 throw new URISyntaxException(uri.toString(),
-                        "Path not in normal form");
+                        "URI path not in normal form");
             mountPoint = new MountPoint(uri.resolve("."));
             entryName = new EntryName(mountPoint.getUri().relativize(uri));
         } else {
@@ -179,8 +179,7 @@ public final class Path implements Serializable, Comparable<Path> {
             try {
                 this.uri = new URI(mountPoint.toString() + entryName.toString());
             } catch (URISyntaxException ex) {
-                throw (AssertionError) new AssertionError("Check specification of syntax constraints!")
-                        .initCause(ex);
+                throw new AssertionError(ex);
             }
         } else {
             this.uri = mountPoint.getUri().resolve(entryName.getUri());

@@ -68,6 +68,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private final URI uri;
     private final Path path;
+    private volatile transient Scheme scheme;
 
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
@@ -141,18 +142,18 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
                 uri = uri.equals(nuri) ? uri : nuri;
             } else if (pathUri.normalize() != pathUri)
                 throw new URISyntaxException(uri.toString(),
-                        "Path not in normal form");
+                        "URI path not in normal form");
         } else {
             if (!uri.isAbsolute())
                 throw new URISyntaxException(uri.toString(), "Not absolute");
             if (!uri.getRawPath().endsWith(SEPARATOR))
                 throw new URISyntaxException(uri.toString(),
-                        "Path doesn't end with separator \"" + SEPARATOR + '"');
+                        "URI path doesn't end with separator \"" + SEPARATOR + '"');
             if (normalize)
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
                 throw new URISyntaxException(uri.toString(),
-                        "Path not in normal form");
+                        "URI path not in normal form");
             path = null;
         }
         this.uri = uri;
@@ -164,13 +165,13 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Constructs a new mount point by synthesizing its URI from the given
      * scheme and path.
      *
-     * @param  scheme the non-{@code null} {@link #getUri() URI} scheme.
+     * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
      * @param  path the non-{@code null} {@link #getPath() path}.
      * @throws IllegalArgumentException if the synthesized mount point URI
      *         would not conform to the syntax constraints for mount points.
      * @return A non-{@code null} mount point.
      */
-    public static MountPoint create(String scheme, Path path) {
+    public static MountPoint create(Scheme scheme, Path path) {
         try {
             return new MountPoint(scheme, path);
         } catch (URISyntaxException ex) {
@@ -182,17 +183,12 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Constructs a new mount point by synthesizing its URI from the given
      * scheme and path.
      *
-     * @param  scheme the non-{@code null} {@link #getUri() URI} scheme.
+     * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
      * @param  path the non-{@code null} {@link #getPath() path}.
      * @throws URISyntaxException if the synthesized mount point URI
      *         would not conform to the syntax constraints for mount points.
      */
-    public MountPoint(final String scheme, final Path path)
-    throws URISyntaxException {
-        this(new Scheme(scheme), path);
-    }
-
-    private MountPoint(final Scheme scheme, final Path path)
+    public MountPoint(final Scheme scheme, final Path path)
     throws URISyntaxException {
         final URI pathUri = path.getUri();
         if (!pathUri.isAbsolute())
@@ -203,61 +199,10 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             throw new URISyntaxException(pathUri.toString(), "Illegal entry name");
         this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
         this.path = path;
+        this.scheme = scheme;
 
         assert invariants();
     }
-
-    /**
-     * Represents a scheme according to the syntax constraints defined in RFC
-     * 2396.
-     */
-    private static final class Scheme
-    implements Serializable, Comparable<Scheme> {
-
-        private static final long serialVersionUID = 2765230379628276648L;
-
-        private final String scheme;
-
-        Scheme(final String scheme) throws URISyntaxException {
-            int i = scheme.length();
-            if (0 >= i)
-                throw new URISyntaxException(scheme, "Empty scheme");
-            char c;
-            c = scheme.charAt(0);
-            // TODO: Character class is no help here - consider table lookup!
-            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c))
-                throw new URISyntaxException(scheme, "Illegal character in scheme", 0);
-            while (--i >= 1) {
-                c = scheme.charAt(i);
-                if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
-                        && c != '+' && c != '-' && c != '.')
-                    throw new URISyntaxException(scheme, "Illegal character in scheme", i);
-            }
-            this.scheme = scheme;
-        }
-
-        @Override
-        public boolean equals(Object that) {
-            return this == that
-                    || that instanceof Scheme
-                        && this.scheme.equalsIgnoreCase(((Scheme) that).scheme);
-        }
-
-        @Override
-        public int compareTo(Scheme that) {
-            return this.scheme.compareTo(that.scheme);
-        }
-
-        @Override
-        public int hashCode() {
-            return scheme.toLowerCase(Locale.ENGLISH).hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return scheme;
-        }
-    } // class Scheme
 
     private boolean invariants() {
         assert null != getUri();
@@ -268,8 +213,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             assert null != getPath();
             assert getPath().getUri().isAbsolute();
             assert null == getPath().getUri().getRawFragment();
-            assert 0 != path.getEntryName().getUri().getPath().length();
-            assert !path.getEntryName().getUri().getPath().endsWith(SEPARATOR);
+            assert 0 != getPath().getEntryName().getUri().getPath().length();
+            assert !getPath().getEntryName().getUri().getPath().endsWith(SEPARATOR);
             assert 0 != getPath().getEntryName().toString().length();
         } else {
             assert getUri().normalize() == getUri();
@@ -280,12 +225,23 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
+     * Returns the non-{@code null} URI scheme.
+     *
+     * @return The non-{@code null} URI scheme.
+     */
+    public Scheme getScheme() {
+        return null != scheme
+                ? scheme
+                : (scheme = Scheme.create(uri.getScheme()));
+    }
+
+    /**
      * Returns the path or {@code null} iff the {@link #getUri() URI}
      * is hierarchical.
      *
      * @return The nullable path.
      */
-    Path getPath() {
+    public Path getPath() {
         return path;
     }
 
