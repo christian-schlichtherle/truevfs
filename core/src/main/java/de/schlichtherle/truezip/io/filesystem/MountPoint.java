@@ -262,9 +262,9 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @param  entryName a non-{@code null} entry name relative to this mount
      *         point.
-     * @throws RuntimeException iff this mount point does not name a parent
-     *         mount point.
-     * @return a non-{@code null} entry name relative to the parent mount
+     * @throws NullPointerException if {@code entryName} is {@code null} or if
+     *         this mount point does not name a parent mount point.
+     * @return A non-{@code null} entry name relative to the parent mount
      *         point.
      * @see    #getParent
      */
@@ -277,9 +277,10 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @param  entryName a non-{@code null} entry name relative to this mount
      *         point.
-     * @return a non-{@code null} path.
+     * @throws NullPointerException if {@code entryName} is {@code null}.
+     * @return A non-{@code null} path with an absolute URI.
      */
-    public Path resolvePath(EntryName entryName) {
+    public Path resolveAbsolute(EntryName entryName) {
         return new Path(this, entryName);
     }
 

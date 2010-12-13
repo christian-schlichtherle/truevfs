@@ -176,7 +176,7 @@ public class MountPointTest {
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode(), equalTo(mountPoint.hashCode()));
             assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(EntryName.ROOT))), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.resolvePath(EntryName.ROOT).getUri()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolveAbsolute(EntryName.ROOT).getUri()), equalTo(mountPoint));
         }
     }
 
@@ -196,7 +196,8 @@ public class MountPointTest {
             final Path path = Path.create(URI.create(params[3]));
             if (null != parentEntryName)
                 assertThat(mountPoint.resolveParent(entryName), equalTo(parentEntryName));
-            assertThat(mountPoint.resolvePath(entryName), equalTo(path));
+            assertThat(mountPoint.resolveAbsolute(entryName), equalTo(path));
+            assertThat(mountPoint.resolveAbsolute(entryName).getUri().isAbsolute(), is(true));
         }
     }
 }
