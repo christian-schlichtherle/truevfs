@@ -158,20 +158,11 @@ public class PathTest {
             } catch (URISyntaxException expected) {
             }
         }
-
-        for (final String[] params : new String[][] {
-            //{ "foo:/bar/", "baz" },
-        }) {
-            final MountPoint mountPoint = null == params[0] ? null : new MountPoint(URI.create(params[0]));
-            final EntryName entryName = new EntryName(URI.create(params[1]));
-            new Path(mountPoint, entryName);
-            fail(params[0] + params[1]);
-        }
     }
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testConstructorWithValidUri() throws URISyntaxException {
+    public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
             { "foo:bar:baz:/bang!/boom!/plonk/", "foo:bar:baz:/bang!/boom!/", "plonk/" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
@@ -219,9 +210,9 @@ public class PathTest {
             { "foo:/bar/baz/", "foo:/bar/baz/", "" },
             { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
         }) {
-            Path path = new Path(URI.create(params[0]), true);
-            final MountPoint mountPoint = null == params[1] ? null : new MountPoint(URI.create(params[1]));
-            final EntryName entryName = new EntryName(URI.create(params[2]));
+            Path path = Path.create(URI.create(params[0]), true);
+            final MountPoint mountPoint = null == params[1] ? null : MountPoint.create(URI.create(params[1]));
+            final EntryName entryName = EntryName.create(URI.create(params[2]));
             testPath(path, mountPoint, entryName);
 
             path = new Path(mountPoint, entryName);
@@ -234,16 +225,15 @@ public class PathTest {
                           final EntryName entryName) {
         if (null != mountPoint) {
             assertThat(path.getUri(), equalTo(URI.create(
-                    mountPoint.getUri().toString()
-                    + entryName.getUri().toString())));
-            assertThat(path.getMountPoint().getUri(), equalTo(mountPoint.getUri()));
+                    mountPoint.toString() + entryName)));
+            assertThat(path.getMountPoint(), equalTo(mountPoint));
         } else {
             assertThat(path.getUri(), equalTo(entryName.getUri()));
             assertThat(path.getMountPoint(), nullValue());
         }
         assertThat(path.getEntryName().getUri(), equalTo(entryName.getUri()));
         assertThat(path.toString(), equalTo(path.getUri().toString()));
-        assertThat(path, equalTo(Path.create(URI.create(path.getUri().toString()))));
-        assertThat(path.hashCode(), equalTo(Path.create(URI.create(path.getUri().toString())).hashCode()));
+        assertThat(Path.create(URI.create(path.getUri().toString())), equalTo(path));
+        assertThat(Path.create(URI.create(path.getUri().toString())).hashCode(), equalTo(path.hashCode()));
     }
 }
