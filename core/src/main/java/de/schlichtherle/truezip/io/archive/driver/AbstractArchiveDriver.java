@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import java.net.URI;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ConcurrentArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
@@ -24,7 +24,6 @@ import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import java.io.CharConversionException;
@@ -232,18 +231,14 @@ implements ArchiveDriver<AE>, Serializable {
     }
 
     @Override
-    public ArchiveModel newModel(URI mountPoint, FileSystemModel parent) {
-        return new ArchiveModel(mountPoint, parent);
-    }
-
-    @Override
     public ArchiveController<AE> newController(
-            ArchiveModel model,
+            MountPoint mountPoint,
             FederatedFileSystemController<?> parent) {
         return new ConcurrentArchiveController<AE>(
                     new CachingArchiveController<AE>(
                         new UpdatingArchiveController<AE>( // TODO: Support append strategy.
-                            this, model, parent)));
+                            new ArchiveModel(mountPoint, parent.getModel()),
+                            this, parent)));
     }
 
     /**

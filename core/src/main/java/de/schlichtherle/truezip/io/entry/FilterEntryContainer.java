@@ -33,7 +33,7 @@ public abstract class FilterEntryContainer<
 implements EntryContainer<E> {
 
     /** The decorated entry container. */
-    protected C target;
+    protected final C target; // FIXME: Encapsulate this!
 
     protected FilterEntryContainer(final C target) {
         this.target = target;

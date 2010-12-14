@@ -158,16 +158,19 @@ public class MountPointTest {
         }
 
         for (final String[] params : new String[][] {
+            { "foo:bar:baz:/./bang!/./boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
+            { "foo:bar:baz:/./bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
+            { "foo:bar:baz:/bang!/./boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo", "bar:baz:/bang!/boom" },
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
             final MountPoint mountPoint = MountPoint.create(URI.create(params[0]), true);
-            final String scheme = params[1];
+            final Scheme scheme = Scheme.create(params[1]);
             final Path path = Path.create(URI.create(params[2]));
 
-            assertThat(mountPoint.getUri().getScheme(), equalTo(scheme));
+            assertThat(mountPoint.getScheme(), equalTo(scheme));
             assertThat(mountPoint.getPath(), equalTo(path));
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
             assertThat(MountPoint.create(URI.create(mountPoint.toString())), equalTo(mountPoint));

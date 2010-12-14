@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
+import de.schlichtherle.truezip.io.filesystem.Path;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Indicates that an <i>archive entry</i>
@@ -32,7 +37,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 
     private static final long serialVersionUID = 2972350932856838564L;
 
-    private final URI path;
+    private final Path path;
 
     ArchiveEntryNotFoundException(
             final ArchiveModel model,
@@ -41,7 +46,11 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(msg);
         assert path != null;
         assert msg != null;
-        this.path = model.resolveURI(path);
+        try {
+            this.path = model.resolveAbsolute(EntryName.create(new URI(null, null, path, null, null)));
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     ArchiveEntryNotFoundException(
@@ -51,7 +60,11 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(cause == null ? null : cause.toString());
         assert path != null;
         super.initCause(cause);
-        this.path = model.resolveURI(path);
+        try {
+            this.path = model.resolveAbsolute(EntryName.create(new URI(null, null, path, null, null)));
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Override

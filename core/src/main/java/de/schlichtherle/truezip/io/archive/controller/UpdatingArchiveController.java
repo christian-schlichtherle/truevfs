@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.net.URISyntaxException;
+import java.net.URI;
+import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -184,8 +187,8 @@ extends FileSystemArchiveController<E> {
             = new TouchListener();
 
     public UpdatingArchiveController(
-            final ArchiveDriver<E> driver,
             final ArchiveModel model,
+            final ArchiveDriver<E> driver,
             final FederatedFileSystemController<?> parent) {
         super(model);
         if (null == driver)
@@ -213,8 +216,15 @@ extends FileSystemArchiveController<E> {
         return parent;
     }
 
-    private String parentPath(String path) {
-        return getModel().parentPath(path);
+    private String resolveParent(String path) {
+        try {
+            return getModel()
+                    .resolveParent(EntryName.create(new URI(null, null, path, null, null)))
+                    .getUri()
+                    .getPath();
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Override
@@ -254,7 +264,7 @@ extends FileSystemArchiveController<E> {
             if (!isRoot(path))
                 return null;
             final FileSystemEntry<?> entry = getParent()
-                    .getEntry(parentPath(path));
+                    .getEntry(resolveParent(path));
             if (null == entry)
                 return null;
             try {
@@ -294,7 +304,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         try {
             final FederatedFileSystemController<?> parent = getParent();
-            final String parentPath = parentPath(ROOT);
+            final String parentPath = resolveParent(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
@@ -339,7 +349,7 @@ extends FileSystemArchiveController<E> {
         if (null != output)
             return;
         final FederatedFileSystemController<?> parent = getParent();
-        final String parentPath = parentPath(ROOT);
+        final String parentPath = resolveParent(ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
@@ -638,6 +648,6 @@ extends FileSystemArchiveController<E> {
     public void unlink(String path) throws IOException {
         super.unlink(path);
         if (isRoot(path))
-            getParent().unlink(parentPath(path));
+            getParent().unlink(resolveParent(path));
     }
 }

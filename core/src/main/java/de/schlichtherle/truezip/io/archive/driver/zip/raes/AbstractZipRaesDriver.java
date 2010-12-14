@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
@@ -94,10 +95,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
 
     @Override
     public ArchiveController<ZipEntry> newController(
-            ArchiveModel model,
+            MountPoint mountPoint,
             FederatedFileSystemController<?> parent) {
         return new KeyManagerArchiveController(
-                super.newController(model, parent));
+                super.newController(mountPoint, parent));
     }
 
     /**
@@ -230,6 +231,6 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      *         prospective RAES encrypted ZIP file.
      */
     protected RaesParameters getRaesParameters(ArchiveModel model) {
-        return new KeyManagerRaesParameters(model.getMountPoint());
+        return new KeyManagerRaesParameters(model.getMountPoint().getUri());
     }
 }

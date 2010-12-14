@@ -41,9 +41,11 @@ implements ArchiveController<E> {
         super(controller);
     }
 
+    private volatile ArchiveModel model;
+
     @Override
-    public ArchiveModel getModel() {
-        return controller.getModel();
+    public final ArchiveModel getModel() {
+        return null != model ? model : (model = controller.getModel());
     }
 
     @Override

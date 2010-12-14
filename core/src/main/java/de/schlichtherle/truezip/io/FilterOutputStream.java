@@ -31,7 +31,7 @@ import java.io.OutputStream;
 public abstract class FilterOutputStream extends OutputStream {
 
     /** The decorated output stream. */
-    protected OutputStream out;
+    protected OutputStream out; // FIXME: Encapsulate this!
 
     /**
      * Constructs a new synchronized output stream.

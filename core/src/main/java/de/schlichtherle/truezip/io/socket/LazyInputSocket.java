@@ -31,7 +31,7 @@ import java.io.InputStream;
 public final class LazyInputSocket<LT extends Entry>
 extends FilterInputSocket<LT> {
 
-    public LazyInputSocket( final InputSocket<? extends LT> input) {
+    public LazyInputSocket(final InputSocket<? extends LT> input) {
         super(input);
     }
 

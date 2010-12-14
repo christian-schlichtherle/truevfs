@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import java.net.URI;
-
 /**
  * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
@@ -24,8 +22,6 @@ import java.net.URI;
  */
 public interface FileSystemDriver<M extends FileSystemModel> {
 
-    M newModel(URI mountPoint, FileSystemModel parent);
-
-    FileSystemController<?> newController(
-            M model, FederatedFileSystemController<?> parent);
+    FileSystemController<?> newController(  MountPoint mountPoint,
+                                            FederatedFileSystemController<?> parent);
 }

@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemModel.BANG_SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
@@ -54,11 +52,25 @@ public class FederatedFileSystemManager {
     private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
         @Override
-		public int compare( FileSystemController<?> l,
+        public int compare( FileSystemController<?> l,
                             FileSystemController<?> r) {
-            return r.getModel().getMountPoint().compareTo(l.getModel().getMountPoint());
+            return hierarchicalize(r.getModel().getMountPoint())
+                    .compareTo(hierarchicalize(l.getModel().getMountPoint()));
         }
     };
+
+    private static URI hierarchicalize(final MountPoint mountPoint) {
+        return hierarchicalize(mountPoint, EntryName.ROOT);
+    }
+
+    private static URI hierarchicalize(final MountPoint mountPoint, final EntryName entryName) {
+        final MountPoint parent = mountPoint.getParent();
+        if (null == parent) {
+            return mountPoint.resolveAbsolute(entryName).getUri();
+        } else {
+            return hierarchicalize(parent, mountPoint.resolveParent(entryName));
+        }
+    }
 
     private static volatile FederatedFileSystemManager instance; // volatile required for DCL in JSE 5!
 
@@ -141,14 +153,17 @@ public class FederatedFileSystemManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<URI, Link<Scheduler>> schedulers
-            = new WeakHashMap<URI, Link<Scheduler>>();
+    private final Map<MountPoint, Link<Scheduler>> schedulers
+            = new WeakHashMap<MountPoint, Link<Scheduler>>();
 
-    public <M extends FileSystemModel>
+    /**
+     * Equivalent to {@link #getController(MountPoint, FileSystemDriver, FederatedFileSystemController) getController(mountPoint, driver, null)}.
+     */
+    public final <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
-            final FileSystemDriver<M> driver,
-            URI mountPoint) {
-        return getController0(driver, mountPoint, null);
+            MountPoint mountPoint,
+            FileSystemDriver<M> driver) {
+        return getController(mountPoint, driver, null);
     }
 
     /**
@@ -171,41 +186,11 @@ public class FederatedFileSystemManager {
      */
     public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
-            FileSystemDriver<M> driver,
-            URI mountPoint,
-            FederatedFileSystemController<?> parent) {
-        if (mountPoint.isOpaque())
-            throw new IllegalArgumentException();
-        return getController0(driver, mountPoint, parent);
-    }
-
-    private <M extends FileSystemModel>
-    FederatedFileSystemController<?> getController0(
+            final MountPoint mountPoint,
             final FileSystemDriver<M> driver,
-            URI mountPoint,
             FederatedFileSystemController<?> parent) {
-        assert !mountPoint.isOpaque() || null == parent;
-        if (null == parent && mountPoint.isOpaque()) {
-            try {
-                String ssp = mountPoint.getSchemeSpecificPart();
-                if (!ssp.endsWith(BANG_SEPARATOR))
-                    throw new URISyntaxException(   mountPoint.toString(),
-                                                    "Doesn't end with the bang separator \""
-                                                    + BANG_SEPARATOR + '"');
-                final int split = ssp.lastIndexOf(SEPARATOR_CHAR, ssp.length() - 2);
-                if (0 > split)
-                    throw new URISyntaxException(   mountPoint.toString(),
-                                                    "Missing separator '"
-                                                    + SEPARATOR_CHAR + "'");
-                parent = getController0(
-                        driver, new URI(ssp.substring(0, split + 1)), null);
-            } catch (URISyntaxException ex) {
-                throw new IllegalArgumentException(ex);
-            }
-        }
-        final M model = driver.newModel(mountPoint,
-                null == parent ? null : parent.getModel());
-        mountPoint = model.getMountPoint(); // mind URI normalization!
+        if (null != mountPoint.getParent() && null == parent)
+            parent = getController(mountPoint.getParent(), driver, null);
         FederatedFileSystemController<?> controller;
         synchronized (schedulers) {
             Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
@@ -213,15 +198,14 @@ public class FederatedFileSystemManager {
                 controller = scheduler.controller;
             } else {
                 final FileSystemController<?> c
-                        = driver.newController(model, parent);
+                        = driver.newController(mountPoint, parent);
                 if (null == c.getParent()) {
                     controller = (FederatedFileSystemController<?>) c;
                 } else {
                     scheduler = new Scheduler(c);
                     controller = scheduler.controller;
-                    model.addFileSystemTouchedListener(scheduler);
+                    controller.getModel().addFileSystemTouchedListener(scheduler);
                 }
-                assert model == controller.getModel();
             }
         }
         assert (null != controller.getModel().getParent())
@@ -262,8 +246,8 @@ public class FederatedFileSystemManager {
      *
      * @param  prefix the prefix of the canonical path name of the file systems
      *         which shall get synchronized with their parent file system.
-     *         This may be {@code null} or empty in order to select all
-     *         accessed files systems.
+     *         This may be {@code null} in order to select all federated file
+     *         systems.
      * @throws SyncWarningException if the configuration uses the
      *         {@link SyncExceptionBuilder} and <em>only</em>
      *         warning conditions occured throughout the course of this method.
@@ -283,9 +267,9 @@ public class FederatedFileSystemManager {
      *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
      */
     public <E extends IOException>
-    void sync(  final URI prefix,
+    void sync(  final MountPoint prefix,
                 final ExceptionBuilder<? super IOException, E> builder,
-                BitField<SyncOption> options)
+                final BitField<SyncOption> options)
     throws E {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
@@ -316,12 +300,8 @@ public class FederatedFileSystemManager {
     }
 
     final Set<FederatedFileSystemController<?>> getControllers(
-            URI prefix,
+            final MountPoint prefix,
             final Comparator<? super FederatedFileSystemController<?>> comparator) {
-        if (null == prefix)
-            prefix = URI.create(""); // catch all
-        else
-            prefix = URI.create(prefix.toString() + SEPARATOR_CHAR).normalize();
         final Set<FederatedFileSystemController<?>> snapshot;
         synchronized (schedulers) {
             snapshot = null != comparator
@@ -331,12 +311,12 @@ public class FederatedFileSystemManager {
                 final Scheduler scheduler = Links.getTarget(link);
                 final ManagedFileSystemController controller
                         = null == scheduler ? null : scheduler.controller;
-                if (null != controller && controller
-                        .getModel()
-                        .getMountPoint()
-                        .getPath()
-                        .startsWith(prefix.getPath()))
-                    snapshot.add(controller);
+                if (null != controller)
+                    if (null == prefix
+                            || hierarchicalize(controller.getModel().getMountPoint())
+                                .toString()
+                                .startsWith(hierarchicalize(prefix).toString()))
+                        snapshot.add(controller);
             }
         }
         return snapshot;
@@ -426,7 +406,7 @@ public class FederatedFileSystemManager {
          * directly called except for unit testing.
          */
         @Override
-        @SuppressWarnings("NestedSynchronizedStatement")
+        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
         public synchronized void run() {
             synchronized (PromptingKeyManager.class) {
                 try {

@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.Scheme;
+import de.schlichtherle.truezip.io.filesystem.Path;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -25,7 +29,6 @@ import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
@@ -51,13 +54,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
@@ -726,20 +730,25 @@ public class File extends java.io.File {
         final java.io.File target = getRealFile(delegate);
         final ArchiveDriver<?> driver
                 = detector.getArchiveDriver(target.getPath());
-        final URI mountPoint
-                = URI.create(target.toURI().toString() + SEPARATOR_CHAR);
-        FederatedFileSystemController<?> parentController;
+        final MountPoint mountPoint;
+        final FederatedFileSystemController<?> parentController;
         if (null != enclArchive) {
             parentController = enclArchive.getController();
+            mountPoint = MountPoint.create(Scheme.FILE,
+                    new Path(   parentController.getModel().getMountPoint(),
+                                EntryName.create(URI.create(enclEntryName)))); // FIXME: Introduce driver.getScheme()!
         } else {
-            final FileDriver parentDriver = new FileDriver();
-            final FileSystemModel parentModel
-                    = parentDriver.newModel(mountPoint.resolve(".."));
-            parentController = parentDriver.newController(parentModel);
+            URI uri = target.toURI();
+            while (uri.getRawPath().endsWith(SEPARATOR)) {
+                final String s = uri.toString();
+                uri = URI.create(s.substring(0, s.length() - 1));
+            }
+            mountPoint = MountPoint.create(Scheme.FILE, Path.create(uri)); // FIXME: Introduce driver.getScheme()!
+            parentController = new FileDriver().newController(mountPoint.getParent());
         }
         this.controller = FederatedFileSystemManager
                 .getInstance()
-                .getController(driver, mountPoint, parentController);
+                .getController(mountPoint, driver, parentController);
     }
 
     /**
@@ -1135,7 +1144,9 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveException {
-        FederatedFileSystemManager.getInstance().sync(null, new ArchiveExceptionBuilder(), options);
+        FederatedFileSystemManager
+                .getInstance()
+                .sync(null, new ArchiveExceptionBuilder(), options);
     }
 
     /**
@@ -1217,10 +1228,11 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FederatedFileSystemManager.getInstance().sync(
-                URI.create(archive.getCanOrAbsFile().toURI().toString() + SEPARATOR_CHAR),
-                new ArchiveExceptionBuilder(),
-                options);
+        FederatedFileSystemManager
+                .getInstance()
+                .sync(  archive.getController().getModel().getMountPoint(),
+                        new ArchiveExceptionBuilder(),
+                        options);
     }
 
     /**

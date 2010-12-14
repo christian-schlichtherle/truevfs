@@ -38,7 +38,7 @@ extends AbstractFileSystemController<E>
 implements FileSystemController<E> {
 
     /** The decorated file system controller. */
-    protected C controller;
+    protected final C controller; // FIXME: Encapsulate this!
 
     protected FilterFileSystemController(final C controller) {
         this.controller = controller;
