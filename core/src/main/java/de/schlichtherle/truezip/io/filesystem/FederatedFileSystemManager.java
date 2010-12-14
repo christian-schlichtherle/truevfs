@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -33,14 +32,13 @@ import java.util.WeakHashMap;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
  * A container which manages the lifecycle of federated file system controllers.
  * <p>
- * Note that this class is thread-safe.
+ * This class is thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -57,82 +55,6 @@ public class FederatedFileSystemManager {
         }
     };
 
-    private static volatile FederatedFileSystemManager instance; // volatile required for DCL in JSE 5!
-
-    /**
-     * Returns the non-{@code null} federated file system manager class
-     * property instance.
-     * <p>
-     * If the class property has been explicitly set using
-     * {@link #setInstance}, then this instance is returned.
-     * <p>
-     * Otherwise, the value of the system property
-     * {@code de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager}
-     * is considered:
-     * <p>
-     * If this system property is set, it must denote the fully qualified
-     * class name of a subclass of this class. The class is loaded and
-     * instantiated using its public, no-arguments constructor.
-     * <p>
-     * Otherwise, this class is instantiated.
-     * <p>
-     * In order to support this plug-in architecture, you should <em>not</em>
-     * cache the instance returned by this method!
-     *
-     * @throws ClassCastException If the class name in the system property
-     *         does not denote a subclass of this class.
-     * @throws UndeclaredThrowableException If any other precondition on the
-     *         value of the system property does not hold.
-     * @return The non-{@code null} federated file system manager class
-     *         property instance.
-     */
-    public static FederatedFileSystemManager getInstance() {
-        FederatedFileSystemManager manager = instance;
-        if (null == manager) {
-            synchronized (FederatedFileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
-                manager = instance;
-                if (null == manager) {
-                    final String n = System.getProperty(
-                            FederatedFileSystemManager.class.getName(),
-                            FederatedFileSystemManager.class.getName());
-                    try {
-                        Class<?> c = loadClass(n, FederatedFileSystemManager.class);
-                        instance = manager = (FederatedFileSystemManager) c.newInstance();
-                    } catch (RuntimeException ex) {
-                        throw ex;
-                    } catch (Exception ex) {
-                        throw new UndeclaredThrowableException(ex);
-                    }
-                }
-            }
-        }
-        return manager;
-    }
-
-    /**
-     * Sets the federated file system manager class property instance.
-     * If the current federated file system manager has any managed federated
-     * file systems, an {@link IllegalStateException} is thrown.
-     * Call {@link #sync} and make sure to purge all references to the
-     * federated file system controllers which have been returned by
-     * {@link #getController} to prevent this.
-     *
-     * @param  manager The file system manager instance to use as the class
-     *         property.
-     *         If this is {@code null}, a new instance will be created on the
-     *         next call to {@link #getInstance}.
-     * @throws IllegalStateException if the current file system manager has any
-     *         managed file systems.
-     */
-    public static synchronized void setInstance(final FederatedFileSystemManager manager) {
-        final int count = null == instance ? 0 : instance.schedulers.size();
-        if (0 < count)
-            throw new IllegalStateException("There are " + count + " managed federated file systems!");
-        if (null == manager)
-            throw new NullPointerException();
-        instance = manager;
-    }
-
     /**
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
@@ -140,15 +62,6 @@ public class FederatedFileSystemManager {
      */
     private final Map<MountPoint, Link<Scheduler>> schedulers
             = new WeakHashMap<MountPoint, Link<Scheduler>>();
-
-    /**
-     * Equivalent to {@link #getController(MountPoint, FileSystemDriver, FederatedFileSystemController) getController(mountPoint, driver, null)}.
-     */
-    public final FederatedFileSystemController<?> getController(
-            MountPoint mountPoint,
-            FileSystemDriver driver) {
-        return getController(mountPoint, driver, null);
-    }
 
     /**
      * Returns a federated file system controller for the given mount point.
@@ -227,8 +140,9 @@ public class FederatedFileSystemManager {
      * This will reset the state of the respective file system controllers.
      * This method is thread-safe.
      *
-     * @param  prefix the prefix of the canonical path name of the file systems
-     *         which shall get synchronized with their parent file system.
+     * @param  prefix the prefix of the mount point of the federated file
+     *         systems which shall get synchronized with their parent file
+     *         system.
      *         This may be {@code null} in order to select all federated file
      *         systems.
      * @throws SyncWarningException if the configuration uses the
