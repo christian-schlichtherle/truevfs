@@ -43,12 +43,6 @@ public class FileSystemManagerTest {
     @Test
     public void testGetControllerWithNull() {
         try {
-            manager.getController(null, null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        try {
             manager.getController(null, null, null);
             fail();
         } catch (NullPointerException expected) {
@@ -76,7 +70,7 @@ public class FileSystemManagerTest {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
                 final FederatedFileSystemController<?> controller
-                        = manager.getController(mountPoint, driver);
+                        = manager.getController(mountPoint, driver, null);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
@@ -105,7 +99,7 @@ public class FileSystemManagerTest {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
                 final FederatedFileSystemController<?> controller
-                        = manager.getController(mountPoint, driver);
+                        = manager.getController(mountPoint, driver, null);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;

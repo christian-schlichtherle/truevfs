@@ -15,12 +15,11 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.Path;
-import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -32,11 +31,8 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.entry.Entry.ROOT;
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.Files.contains;
 
@@ -251,8 +247,9 @@ class Files {
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
         final Path path = Path.create(src.toURI(), true);
-        return FederatedFileSystemManager.getInstance()
-                .getController( path.getMountPoint(), new FileDriver())
+        return FileSystemManagers
+                .getInstance()
+                .getController( path.getMountPoint(), new FileDriver(), null)
                 .getInputSocket(path.getEntryName().toString(), options);
     }
 
@@ -270,8 +267,9 @@ class Files {
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
         final Path path = Path.create(dst.toURI(), true);
-        return FederatedFileSystemManager.getInstance()
-                .getController(     path.getMountPoint(), new FileDriver())
+        return FileSystemManagers
+                .getInstance()
+                .getController(     path.getMountPoint(), new FileDriver(), null)
                 .getOutputSocket(   path.getEntryName().toString(),
                                     options, template);
     }

@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.sample;
 
 import de.schlichtherle.truezip.io.file.File;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
+import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.ManagedFileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.StatisticsFileSystemManager;
 import java.io.IOException;
@@ -161,7 +161,7 @@ abstract class CommandLineUtility {
             final StatisticsFileSystemManager manager
                     = new StatisticsFileSystemManager();
             this.stats = manager.getStatistics();
-            FederatedFileSystemManager.setInstance(manager);
+            FileSystemManagers.setInstance(manager);
         }
 
         @Override

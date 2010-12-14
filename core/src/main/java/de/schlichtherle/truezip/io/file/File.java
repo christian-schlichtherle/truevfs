@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.Path;
@@ -27,7 +28,6 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -766,7 +766,7 @@ public class File extends java.io.File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        this.controller = FederatedFileSystemManager
+        this.controller = FileSystemManagers
                 .getInstance()
                 .getController(mountPoint, driver, parentController);
     }
@@ -1164,7 +1164,7 @@ public class File extends java.io.File {
      */
     public static void sync(BitField<SyncOption> options)
     throws ArchiveException {
-        FederatedFileSystemManager
+        FileSystemManagers
                 .getInstance()
                 .sync(null, new ArchiveExceptionBuilder(), options);
     }
@@ -1248,7 +1248,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
         if (archive.getEnclArchive() != null)
             throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FederatedFileSystemManager
+        FileSystemManagers
                 .getInstance()
                 .sync(  archive.getController().getModel().getMountPoint(),
                         new ArchiveExceptionBuilder(),
@@ -2792,7 +2792,7 @@ public class File extends java.io.File {
                 }
             }
         }
-        FederatedFileSystemManager.getInstance().addShutdownHook(new DeleteOnExit());
+        FileSystemManagers.getInstance().addShutdownHook(new DeleteOnExit());
     }
 
     /**
