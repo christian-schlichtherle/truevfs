@@ -59,7 +59,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 public interface ArchiveDriver<AE extends ArchiveEntry>
-extends FileSystemDriver<ArchiveModel>, EntryFactory<AE> {
+extends FileSystemDriver, EntryFactory<AE> {
 
     /**
      * Creates a new archive controller for the given archive file system's

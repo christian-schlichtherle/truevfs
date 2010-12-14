@@ -18,9 +18,9 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Locale;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
 
 /**
@@ -69,6 +69,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     private final URI uri;
     private final Path path;
     private volatile transient Scheme scheme;
+    private volatile transient URI hierarchical;
 
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
@@ -282,6 +283,22 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      */
     public Path resolveAbsolute(EntryName entryName) {
         return new Path(this, entryName);
+    }
+
+    URI hierarchicalize() {
+        if (null == path)
+            return uri;
+        if (null != hierarchical)
+            return hierarchical;
+        URI entry = path.getEntryName().getUri();
+        if (!entry.getRawPath().endsWith(SEPARATOR)) {
+            try {
+                entry = new URI(null, null, entry.getPath() + SEPARATOR_CHAR, entry.getQuery(), null);
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+        return hierarchical = path.getMountPoint().hierarchicalize().resolve(entry);
     }
 
     /**

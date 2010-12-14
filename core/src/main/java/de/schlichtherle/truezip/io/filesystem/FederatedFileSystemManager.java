@@ -22,7 +22,6 @@ import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -34,7 +33,6 @@ import java.util.WeakHashMap;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -49,28 +47,15 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class FederatedFileSystemManager {
 
-    private static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
+    static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
         @Override
         public int compare( FileSystemController<?> l,
                             FileSystemController<?> r) {
-            return hierarchicalize(r.getModel().getMountPoint())
-                    .compareTo(hierarchicalize(l.getModel().getMountPoint()));
+            return r.getModel().getMountPoint().hierarchicalize()
+                    .compareTo(l.getModel().getMountPoint().hierarchicalize());
         }
     };
-
-    private static URI hierarchicalize(final MountPoint mountPoint) {
-        return hierarchicalize(mountPoint, EntryName.ROOT);
-    }
-
-    private static URI hierarchicalize(final MountPoint mountPoint, final EntryName entryName) {
-        final MountPoint parent = mountPoint.getParent();
-        if (null == parent) {
-            return mountPoint.resolveAbsolute(entryName).getUri();
-        } else {
-            return hierarchicalize(parent, mountPoint.resolveParent(entryName));
-        }
-    }
 
     private static volatile FederatedFileSystemManager instance; // volatile required for DCL in JSE 5!
 
@@ -159,10 +144,9 @@ public class FederatedFileSystemManager {
     /**
      * Equivalent to {@link #getController(MountPoint, FileSystemDriver, FederatedFileSystemController) getController(mountPoint, driver, null)}.
      */
-    public final <M extends FileSystemModel>
-    FederatedFileSystemController<?> getController(
+    public final FederatedFileSystemController<?> getController(
             MountPoint mountPoint,
-            FileSystemDriver<M> driver) {
+            FileSystemDriver driver) {
         return getController(mountPoint, driver, null);
     }
 
@@ -184,10 +168,9 @@ public class FederatedFileSystemManager {
      *         system.
      * @return A non-{@code null} federated file system controller.
      */
-    public <M extends FileSystemModel>
-    FederatedFileSystemController<?> getController(
+    public FederatedFileSystemController<?> getController(
             final MountPoint mountPoint,
-            final FileSystemDriver<M> driver,
+            final FileSystemDriver driver,
             FederatedFileSystemController<?> parent) {
         if (null != mountPoint.getParent() && null == parent)
             parent = getController(mountPoint.getParent(), driver, null);
@@ -313,9 +296,8 @@ public class FederatedFileSystemManager {
                         = null == scheduler ? null : scheduler.controller;
                 if (null != controller)
                     if (null == prefix
-                            || hierarchicalize(controller.getModel().getMountPoint())
-                                .toString()
-                                .startsWith(hierarchicalize(prefix).toString()))
+                            || controller.getModel().getMountPoint().hierarchicalize().toString()
+                                .startsWith(prefix.hierarchicalize().toString()))
                         snapshot.add(controller);
             }
         }

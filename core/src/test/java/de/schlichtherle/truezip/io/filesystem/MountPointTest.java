@@ -141,12 +141,12 @@ public class MountPointTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String param : new String[] {
-            "foo:/bar/baz/",
-            "foo:/bar/",
+            "foo:/bär/bäz/",
+            "foo:/bär/",
             "foo:/",
-            "foo:/bar/baz/?bang",
-            "foo:/bar/?bang",
-            "foo:/?bang",
+            "foo:/bär/bäz/?bäng",
+            "foo:/bär/?bäng",
+            "foo:/?bäng",
         }) {
             final URI uri = URI.create(param);
             final MountPoint mountPoint = MountPoint.create(uri);
@@ -158,7 +158,7 @@ public class MountPointTest {
         }
 
         for (final String[] params : new String[][] {
-            { "foo:bar:baz:/./bang!/./boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
+            { "foo:bar:baz:/./bäng!/./bööm?plönk!/", "foo", "bar:baz:/bäng!/bööm?plönk" },
             { "foo:bar:baz:/./bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/./boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
@@ -186,7 +186,7 @@ public class MountPointTest {
     @Test
     public void testResolve() {
         for (final String[] params : new String[][] {
-            { "foo:bar:/baz?boom!/", "bang/?plonk", "baz/bang/?plonk", "foo:bar:/baz?boom!/bang/?plonk" },
+            { "foo:bar:/bäz?bööm!/", "bäng/?plönk", "bäz/bäng/?plönk", "foo:bar:/bäz?bööm!/bäng/?plönk" },
             { "foo:bar:/baz!/", "bang/?boom", "baz/bang/?boom", "foo:bar:/baz!/bang/?boom" },
             { "foo:bar:/baz!/", "bang/", "baz/bang/", "foo:bar:/baz!/bang/" },
             { "foo:bar:/baz!/", "bang", "baz/bang", "foo:bar:/baz!/bang" },
@@ -201,6 +201,23 @@ public class MountPointTest {
                 assertThat(mountPoint.resolveParent(entryName), equalTo(parentEntryName));
             assertThat(mountPoint.resolveAbsolute(entryName), equalTo(path));
             assertThat(mountPoint.resolveAbsolute(entryName).getUri().isAbsolute(), is(true));
+        }
+    }
+
+    @Test
+    public void testHierarchicalize() {
+        for (final String[] params : new String[][] {
+            { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng/?zönk" },
+            { "foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang/?zonk" },
+            { "foo:bar:baz:/boom!/bang!/", "baz:/boom/bang/" },
+            { "foo:bar:/baz?boom!/", "bar:/baz/?boom" },
+            { "foo:bar:/baz!/", "bar:/baz/" },
+            { "foo:/bar/?boom", "foo:/bar/?boom" },
+            { "foo:/bar/", "foo:/bar/" },
+        }) {
+            final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
+            final URI flat = URI.create(params[1]);
+            assertThat(mountPoint.hierarchicalize(), equalTo(flat));
         }
     }
 }

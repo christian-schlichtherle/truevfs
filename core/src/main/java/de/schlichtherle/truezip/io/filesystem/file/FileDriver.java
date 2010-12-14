@@ -26,10 +26,7 @@ import java.net.URI;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriver implements FileSystemDriver<FileSystemModel> {
-
-    public FileDriver() {
-    }
+public final class FileDriver implements FileSystemDriver {
 
     public FederatedFileSystemController<FileEntry> newController(
             MountPoint mountPoint) {
@@ -37,7 +34,7 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
     }
 
     @Override
-    public FileSystemController<FileEntry> newController(
+    public FederatedFileSystemController<FileEntry> newController(
             MountPoint mountPoint,
             FederatedFileSystemController<?> parent) {
         if (null != parent)
