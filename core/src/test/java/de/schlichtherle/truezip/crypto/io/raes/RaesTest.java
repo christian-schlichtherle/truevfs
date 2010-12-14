@@ -91,6 +91,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
     }
 
     @Override
+    @SuppressWarnings("ThrowableInitCause")
     protected void setUp()
     throws IOException {
         super.setUp();
@@ -127,7 +128,8 @@ public class RaesTest extends ReadOnlyFileTestCase {
             trof = RaesReadOnlyFile.getInstance(cipherFile, newRaesParameters());
         } catch (IOException ex) {
             if (!cipherFile.delete())
-                cipherFile.deleteOnExit();
+                throw (IOException) new IOException(cipherFile + " (could not delete)")
+                        .initCause(ex);
             throw ex;
         }
     }
@@ -139,10 +141,8 @@ public class RaesTest extends ReadOnlyFileTestCase {
             super.tearDown();
         } finally {
             try {
-                if (!cipherFile.delete() && cipherFile.exists()) {
-                    cipherFile.deleteOnExit();
-                    throw new IOException(cipherFile + ": could not delete");
-                }
+                if (!cipherFile.delete() && cipherFile.exists())
+                    throw new IOException(cipherFile + " (could not delete)");
             } finally {
                 cipherFile = null;
             }

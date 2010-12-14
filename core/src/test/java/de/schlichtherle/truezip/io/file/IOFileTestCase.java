@@ -438,7 +438,7 @@ public abstract class IOFileTestCase extends TestCase {
             }
         } finally {
             if (!tmp.delete())
-                tmp.deleteOnExit();
+                throw new IOException(tmp + " (could not delete)");
         }
     }
 
