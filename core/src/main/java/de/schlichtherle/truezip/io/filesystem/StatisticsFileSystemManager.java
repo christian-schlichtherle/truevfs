@@ -34,9 +34,9 @@ public final class StatisticsFileSystemManager
 extends FederatedFileSystemManager {
 
     @Override
-    public <M extends FileSystemModel>
-    FederatedFileSystemController<?> getController(
-            final MountPoint mountPoint, final FileSystemDriver<M> driver,
+    public FederatedFileSystemController<?> getController(
+            final MountPoint mountPoint,
+            final FileSystemDriver driver,
             final FederatedFileSystemController<?> parent) {
         final FederatedFileSystemController<?> controller
                 = super.getController(mountPoint, driver, parent);

@@ -164,7 +164,7 @@ public class PathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
-            { "foo:bar:baz:/bang!/boom!/plonk/", "foo:bar:baz:/bang!/boom!/", "plonk/" },
+            { "foo:bar:baz:/bäng!/bööm!/plönk/", "foo:bar:baz:/bäng!/bööm!/", "plönk/" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", "" },
 

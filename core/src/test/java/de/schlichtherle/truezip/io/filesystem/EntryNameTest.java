@@ -33,14 +33,14 @@ public class EntryNameTest {
         // This is by no means a complete test, but all the other constructors
         // are already tested by MountPointTest and PathTest.
         for (final String[] params : new String[][] {
-            { "foo", "", "foo" },
-            { "foo/", "", "foo/" },
-            { "", "foo", "foo" },
-            { "", "foo/", "foo/" },
-            { "foo", "bar", "foo/bar" },
-            { "foo", "bar/", "foo/bar/" },
-            { "foo/", "bar", "foo/bar" },
-            { "foo/", "bar/", "foo/bar/" },
+            { "föö", "", "föö" },
+            { "föö/", "", "föö/" },
+            { "", "föö", "föö" },
+            { "", "föö/", "föö/" },
+            { "föö", "bär", "föö/bär" },
+            { "föö", "bär/", "föö/bär/" },
+            { "föö/", "bär", "föö/bär" },
+            { "föö/", "bär/", "föö/bär/" },
         }) {
             final EntryName parent = EntryName.create(URI.create(params[0]));
             final EntryName member = EntryName.create(URI.create(params[1]));

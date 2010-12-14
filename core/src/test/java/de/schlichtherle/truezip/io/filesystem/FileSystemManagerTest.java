@@ -15,12 +15,14 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -30,7 +32,7 @@ import static org.junit.Assert.*;
 public class FileSystemManagerTest {
 
     private FederatedFileSystemManager manager;
-    private FileSystemDriver<FileSystemModel> driver;
+    private FileSystemDriver driver;
 
     @Before
     public void setUp() {
@@ -41,6 +43,12 @@ public class FileSystemManagerTest {
     @Test
     public void testGetControllerWithNull() {
         try {
+            manager.getController(null, null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
             manager.getController(null, null, null);
             fail();
         } catch (NullPointerException expected) {
@@ -48,43 +56,82 @@ public class FileSystemManagerTest {
     }
 
     @Test
-    public void testGetControllerWithOpaqueMountPoint() {
+    public void testGetControllerForward() {
         for (final String[] params : new String[][] {
-            { "file:/" },
-            { "zip:file:/outer.zip!/" },
-            { "zip:zip:file:/outer.zip!/inner.zip!/" },
-            { "zip:zip:zip:file:/outer.zip!/inner.zip!/nuts.zip!/" },
+            {
+                //"file:/", // does NOT get mapped!
+                "zip:file:/öuter.zip!/",
+                "zip:zip:file:/öuter.zip!/inner.zip!/",
+                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
+            },
+            {
+                //"file:/", // does NOT get mapped!
+                "zip:file:/föo.zip!/",
+                "zip:zip:file:/föo.zip!/bär.zip!/",
+                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
+            },
         }) {
-            final FederatedFileSystemController<?> controller
-                    = manager.getController(MountPoint.create(URI.create(params[0])), driver);
-        }
-    }
-
-    @Test
-    public void testGetControllerWithHierarchicalMountPoint() {
-        final FileSystemDriver<?> file = new FileDriver();
-        final FileSystemDriver<?> zip = new ZipDriver();
-        for (final Object[] params : new Object[][] {
-            { zip, "zip:zip:zip:file:/outer.zip!/inner.zip!/nuts.zip!/", zip, "zip:zip:file:/outer.zip!/inner.zip!/", zip, "zip:file:/outer.zip!/", file, "file:/" },
-        }) {
-            FederatedFileSystemController<?> controller = null;
-            for (int i = params.length; 0 <= --i; ) {
-                final MountPoint mountPoint = MountPoint.create(URI.create((String) params[i--]));
-                final FileSystemDriver<?> driver = (FileSystemDriver<?>) params[i];
-                controller = manager.getController(mountPoint, driver, controller);
+            FederatedFileSystemController<?> parent = null;
+            for (final String param : params) {
+                final MountPoint mountPoint
+                        = MountPoint.create(URI.create(param));
+                final FederatedFileSystemController<?> controller
+                        = manager.getController(mountPoint, driver);
+                if (null != parent && null != parent.getParent())
+                    assertThat(controller.getParent(), sameInstance((Object) parent));
+                parent = controller;
             }
         }
     }
 
-    private static class Driver implements FileSystemDriver<FileSystemModel> {
+    @Test
+    public void testGetControllerBackward() {
+        for (final String[] params : new String[][] {
+            {
+                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
+                "zip:zip:file:/öuter.zip!/inner.zip!/",
+                "zip:file:/öuter.zip!/",
+                //"file:/", // does NOT get mapped!
+            },
+            {
+                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
+                "zip:zip:file:/föo.zip!/bär.zip!/",
+                "zip:file:/föo.zip!/",
+                //"file:/", // does NOT get mapped!
+            },
+        }) {
+            FederatedFileSystemController<?> member = null;
+            for (final String param : params) {
+                final MountPoint mountPoint
+                        = MountPoint.create(URI.create(param));
+                final FederatedFileSystemController<?> controller
+                        = manager.getController(mountPoint, driver);
+                if (null != member && null != controller.getParent())
+                    assertThat(controller, sameInstance((Object) member.getParent()));
+                member = controller;
+            }
 
+            final Iterator<FederatedFileSystemController<?>> i
+                    = manager.getControllers(
+                        MountPoint.create(URI.create(params[params.length - 1])),
+                        FederatedFileSystemManager.REVERSE_CONTROLLERS).iterator();
+            for (final String param : params) {
+                final MountPoint mountPoint
+                        = MountPoint.create(URI.create(param));
+                assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
+            }
+            assertThat(i.hasNext(), is(false));
+        }
+    }
+
+    private static class Driver implements FileSystemDriver {
         @Override
         public FileSystemController<?> newController(
                 final MountPoint mountPoint,
                 final FederatedFileSystemController<?> parent) {
             assert null == mountPoint.getParent()
                     ? null == parent
-                    : mountPoint.getParent() == parent.getModel().getMountPoint();
+                    : mountPoint.getParent().equals(parent.getModel().getMountPoint());
             final Scheme scheme = mountPoint.getScheme();
             if (Scheme.FILE.equals(scheme)) {
                 // FIXME: Replace FileDriver.INSTANCE with a service locator!

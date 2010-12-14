@@ -16,12 +16,10 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 /**
- * @param   <M> The type of the file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemDriver<M extends FileSystemModel> {
-
+public interface FileSystemDriver {
     FileSystemController<?> newController(  MountPoint mountPoint,
                                             FederatedFileSystemController<?> parent);
 }
