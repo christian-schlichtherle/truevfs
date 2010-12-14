@@ -25,7 +25,6 @@ import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -728,8 +727,6 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        final ArchiveDriver<?> driver
-                = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
         final FederatedFileSystemController<?> parentController;
         try {
@@ -768,7 +765,9 @@ public class File extends java.io.File {
         }
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController(mountPoint, driver, parentController);
+                .getController( mountPoint,
+                                detector.getArchiveDriver(target.getPath()),
+                                parentController);
     }
 
     /**
@@ -2774,25 +2773,11 @@ public class File extends java.io.File {
             return;
         }
 
-        /** FIXME: Remove this! */
-
-        if (isArchive()) {
-            // We cannot prompt the user for a password in the shutdown hook
-            // in case this is a RAES encrypted ZIP file.
-            // So we do this now instead.
-            isDirectory();
-        }
-
-        class DeleteOnExit implements Runnable {
-            @Override
-			public void run() {
-                if (exists() && !delete()) {
-                    // Logging may not work in a shutdown hook!
-                    System.err.println(getPath() + ": failed to deleteOnExit()!");
-                }
-            }
-        }
-        FileSystemManagers.getInstance().addShutdownHook(new DeleteOnExit());
+        // Support for this operation for archive files and entries has been
+        // removed in TrueZIP 7 because using a shutdown hook uncautiously
+        // can easily introduce a memory leak when using multiple class loaders
+        // to load TrueZIP.
+        throw new UnsupportedOperationException();
     }
 
     /**

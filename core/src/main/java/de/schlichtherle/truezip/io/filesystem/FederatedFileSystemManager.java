@@ -218,11 +218,6 @@ public class FederatedFileSystemManager {
         return snapshot;
     }
 
-    /** FIXME: Remove this! */
-    public void addShutdownHook(final Runnable runnable) {
-        getShutdownHook().add(runnable);
-    }
-
     private ShutdownThread shutdownThread; // lazily initialized
 
     private synchronized ShutdownThread getShutdownHook() {

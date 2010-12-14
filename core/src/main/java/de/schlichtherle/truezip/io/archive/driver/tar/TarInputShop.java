@@ -260,7 +260,7 @@ implements InputShop<TarEntry> {
             if (!file.delete()) {
                 // Windoze: The temp file is still open for reading by one
                 // or more entry input streams.
-                file.deleteOnExit();
+                throw new IOException(file + " (could not delete)");
             }
         }
     }

@@ -220,8 +220,10 @@ implements OutputShop<TarEntry> {
                     in.close();
                 }
             } finally {
-                if (!temp.delete()) // may fail on Windoze if in.close() failed!
-                    temp.deleteOnExit(); // we're bullish never to leavy any temps!
+                if (!temp.delete()) {
+                    // Windoze: Most probably in.close() failed.
+                    throw new IOException(temp + " (could not delete)");
+                }
             }
         }
     } // class TempEntryOutputStream
