@@ -16,14 +16,9 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.Set;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * Defines the common properties of a file system.
@@ -38,118 +33,81 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public class FileSystemModel {
     static final String BANG_SEPARATOR = "!" + SEPARATOR;
 
-    private final URI mountPoint;
+    private final MountPoint mountPoint;
     private final FileSystemModel parent;
-    private final String parentPath;
     private boolean touched;
     private LinkedHashSet<FileSystemTouchedListener> touchedListeners
             = new LinkedHashSet<FileSystemTouchedListener>();
 
-    public FileSystemModel( URI mountPoint,
-                            final FileSystemModel parent) {
-        if (!mountPoint.isAbsolute())
-            throw new IllegalArgumentException();
-        if (!mountPoint.getRawSchemeSpecificPart().endsWith(SEPARATOR))
-            throw new IllegalArgumentException();
-        if (null != mountPoint.getRawFragment())
-            throw new IllegalArgumentException();
-        try {
-            if (mountPoint.isOpaque()) {
-                if (null == parent)
-                    throw new NullPointerException("Missing parent!");
-                final String ssp = mountPoint.getSchemeSpecificPart();
-                if (!ssp.endsWith(BANG_SEPARATOR))
-                    throw new URISyntaxException(   mountPoint.toString(),
-                                                    "Doesn't end with the bang separator \""
-                                                    + BANG_SEPARATOR + '"');
-                final String pmp = parent.getMountPoint().toString();
-                if (!ssp.startsWith(pmp))
-                    throw new URISyntaxException(   mountPoint.toString(),
-                                                    "Parent/member mismatch");
-                this.parentPath = ssp.substring(pmp.length(), ssp.length() - 2)
-                        + SEPARATOR_CHAR;
-            } else {
-                if (null != mountPoint.getRawQuery())
-                    throw new IllegalArgumentException();
-                mountPoint = mountPoint.normalize();
-                if (null != parent) {
-                    final URI pp = parent.getMountPoint().relativize(mountPoint);
-                    if (pp.equals(mountPoint))
-                        throw new URISyntaxException(   mountPoint.toString(),
-                                                        "Parent/member mismatch");
-                    assert null == pp.getScheme();
-                    this.parentPath = pp.getPath();
-                } else {
-                    this.parentPath = null;
-                }
-            }
-            if (null != this.parentPath
-                    && (this.parentPath.startsWith(".." + SEPARATOR)
-                        || this.parentPath.equals("..")))
-                throw new URISyntaxException(   mountPoint.toString(),
-                                                "Illegal parent path");
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        this.parent = parent;
-        this.mountPoint = mountPoint;
+    public FileSystemModel( MountPoint mountPoint) {
+        this(mountPoint, null);
+    }
 
-        assert this.mountPoint.getSchemeSpecificPart().endsWith(SEPARATOR);
-        assert (null == this.parent && null == this.parentPath)
-                ^ (null != this.parent && this.parentPath.endsWith(SEPARATOR));
-        assert null == this.parentPath
-                || !this.parentPath.startsWith(".." + SEPARATOR);
+    public FileSystemModel( final MountPoint mountPoint,
+                            final FileSystemModel parent) {
+        if (!equals(mountPoint.getParent(),
+                    (null == parent ? null : parent.getMountPoint())))
+            throw new IllegalArgumentException("Parent/Member mismatch!");
+        this.mountPoint = mountPoint;
+        this.parent = parent;
+    }
+
+    private static boolean equals(Object o1, Object o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
     /**
-     * Returns an absolute, hierarchical and normalized Unique Resource
-     * Identifier (URI) of the file system's <i>mount point</i> in the
-     * federated file system.
-     * The path of this URI ends with a {@code '/'} character so that
-     * relative URIs can be resolved against it.
+     * Returns the non-{@code null} mount point of this file system model.
      * <p>
      * The mount point may be used to construct error messages or to locate
      * and access file system metadata which is stored outside the federated
      * file system, e.g. in-memory stored passwords for RAES encrypted ZIP
      * files.
-     * <p>
-     * Implementation note: If the returned URI uses the <i>file scheme</i>,
-     * its path needs to be {@link java.io.File#getCanonicalPath() canonical}
-     * in order to be really unique.
      *
-     * @return A non-{@code null} URI for the mount point of the file system.
+     * @return The non-{@code null} mount point of this file system model.
      */
-    public final URI getMountPoint() {
+    public final MountPoint getMountPoint() {
         return mountPoint;
-    }
-
-    public final URI resolveURI(String path) {
-        return mountPoint.isOpaque()
-                ? URI.create(mountPoint + path)
-                : mountPoint.resolve(path);
     }
 
     /**
      * Returns the model of the parent file system or {@code null} if and
      * only if the file system is not federated, i.e. if it's not a member of
      * another file system.
+     *
+     * @return The nullable parent file system model.
      */
     public final FileSystemModel getParent() {
         return parent;
     }
 
     /**
-     * Resolves the given relative {@code path} against the relative path of
-     * the file system within its parent file system.
+     * Resolves the given entry name against the entry name of the file system
+     * in its parent file system.
      *
-     * @param  path a non-{@code null} entry name.
-     * @throws RuntimeException if this file system model does not specify a
-     *         {@link #getParent() parent file system model}.
+     * @param  entryName a non-{@code null} entry name relative to the file
+     *         system's mount point.
+     * @throws NullPointerException if {@code entryName} is {@code null} or if
+     *         the file system is not federated, i.e. if it's not a member of
+     *         another file system.
+     * @return a non-{@code null} entry name relative to the parent file
+     *         system's mount point.
+     * @see    #getParent
      */
-    public final String parentPath(String path) {
-        return isRoot(path)
-                ? cutTrailingSeparators(parentPath, SEPARATOR_CHAR)
-                : parentPath + path;
+    public final EntryName resolveParent(EntryName entryName) {
+        return mountPoint.resolveParent(entryName);
+    }
+
+    /**
+     * Resolves the given entry name against the file system's mount point.
+     *
+     * @param  entryName a non-{@code null} entry name relative to the file
+     *         system's mount point.
+     * @throws NullPointerException if {@code entryName} is {@code null}.
+     * @return A non-{@code null} path with an absolute URI.
+     */
+    public final Path resolveAbsolute(EntryName entryName) {
+        return mountPoint.resolveAbsolute(entryName);
     }
 
     /**

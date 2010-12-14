@@ -65,7 +65,7 @@ import java.io.IOException;
 public class FilterReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The read only file to be filtered. */
-    protected ReadOnlyFile rof;
+    protected ReadOnlyFile rof; // FIXME: Encapsulate this!
 
     /**
      * Creates a new instance of {@code FilterReadOnlyFile},

@@ -30,15 +30,17 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.Icon;
 
 /**
- * Implements a chain of responsibility in order to resolve
+ * Implements a chain of responsibility in order to resolveAbsolute
  * {@link FalsePositiveException}s thrown by the prospective file system
  * provided to its {@link #ManagedFileSystemController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
- * controller for its parent file system in order to resolve the requested
+ * controller for its parent file system in order to resolveAbsolute the requested
  * operation.
  * As a desired side effect, it also adapts the controller for the prospective
  * file system to a controller for a component file system.
@@ -55,8 +57,15 @@ implements FederatedFileSystemController<Entry> {
         assert null != getParent();
     }
 
-    private String parentPath(String path) {
-        return getModel().parentPath(path);
+    private String resolveParent(String path) {
+        try {
+            return getModel()
+                    .resolveParent(EntryName.create(new URI(null, null, path, null, null)))
+                    .getUri()
+                    .getPath();
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     @Override
@@ -97,7 +106,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             return controller.getEntry(path);
         } catch (FalsePositiveException ex) {
-            return getParent().getEntry(parentPath(path));
+            return getParent().getEntry(resolveParent(path));
         } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
@@ -108,7 +117,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             return controller.isReadable(path);
         } catch (FalsePositiveException ex) {
-            return getParent().isReadable(parentPath(path));
+            return getParent().isReadable(resolveParent(path));
         } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
@@ -119,7 +128,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             return controller.isWritable(path);
         } catch (FalsePositiveException ex) {
-            return getParent().isWritable(parentPath(path));
+            return getParent().isWritable(resolveParent(path));
         } catch (FileSystemException ex) {
             throw new UndeclaredThrowableException(ex);
         }
@@ -130,7 +139,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             controller.setReadOnly(path);
         } catch (FalsePositiveException ex) {
-            getParent().setReadOnly(parentPath(path));
+            getParent().setReadOnly(resolveParent(path));
         }
     }
 
@@ -140,7 +149,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             return controller.setTime(path, types, value);
         } catch (FalsePositiveException ex) {
-            return getParent().setTime(parentPath(path), types, value);
+            return getParent().setTime(resolveParent(path), types, value);
         }
     }
 
@@ -167,7 +176,7 @@ implements FederatedFileSystemController<Entry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentPath(path), options)
+                        .getInputSocket(resolveParent(path), options)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -179,7 +188,7 @@ implements FederatedFileSystemController<Entry> {
                 return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentPath(path), options)
+                        .getInputSocket(resolveParent(path), options)
                         .bind(this)
                         .newReadOnlyFile();
             }
@@ -191,7 +200,7 @@ implements FederatedFileSystemController<Entry> {
                 return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(parentPath(path), options)
+                        .getInputSocket(resolveParent(path), options)
                         .bind(this)
                         .newInputStream();
             }
@@ -226,7 +235,7 @@ implements FederatedFileSystemController<Entry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(parentPath(path), options, template)
+                        .getOutputSocket(resolveParent(path), options, template)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -238,7 +247,7 @@ implements FederatedFileSystemController<Entry> {
                 return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(parentPath(path), options, template)
+                        .getOutputSocket(resolveParent(path), options, template)
                         .bind(this)
                         .newOutputStream();
             }
@@ -254,7 +263,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             return controller.mknod(path, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getParent().mknod(parentPath(path), type, options, template);
+            return getParent().mknod(resolveParent(path), type, options, template);
         }
     }
 
@@ -263,7 +272,7 @@ implements FederatedFileSystemController<Entry> {
         try {
             controller.unlink(path);
         } catch (FalsePositiveException ex) {
-            getParent().unlink(parentPath(path));
+            getParent().unlink(resolveParent(path));
         }
     }
 

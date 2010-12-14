@@ -28,10 +28,12 @@ import java.io.OutputStream;
 public abstract class FilterOutputSocket<LT extends Entry>
 extends OutputSocket<LT> {
 
-    private OutputSocket<? extends LT> output;
+    private final OutputSocket<? extends LT> output;
 
     protected FilterOutputSocket(final OutputSocket<? extends LT> output) {
-        setOutputSocket(output);
+        if (null == output)
+            throw new NullPointerException();
+        this.output = output;
     }
 
     /**
@@ -44,12 +46,6 @@ extends OutputSocket<LT> {
      */
     protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
         return output.bind(this);
-    }
-
-    protected final void setOutputSocket(final OutputSocket<? extends LT> output) {
-        if (null == output)
-            throw new NullPointerException();
-        this.output = output;
     }
 
     @Override

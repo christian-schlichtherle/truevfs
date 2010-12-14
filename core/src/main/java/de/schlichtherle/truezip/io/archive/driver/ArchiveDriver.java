@@ -26,6 +26,7 @@ import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.archive.driver.registry.ArchiveDriverRegistry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.FileNotFoundException;
@@ -61,8 +62,8 @@ public interface ArchiveDriver<AE extends ArchiveEntry>
 extends FileSystemDriver<ArchiveModel>, EntryFactory<AE> {
 
     /**
-     * Creates a new archive controller for the given archive model and
-     * parent file system controller.
+     * Creates a new archive controller for the given archive file system's
+     * mount point and parent file system controller.
      * <p>
      * This method is primarily provided to serve two purposes:
      * <ol>
@@ -79,15 +80,15 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<AE> {
      *     predefined size threshold such as 128 MB for example.
      * </ol>
      *
-     * @param  model the non-{@code null} archive model.
-     * @param  parent the non-{@code null} parent file system
-     *         controller.
+     * @param  mountPoint the non-{@code null} mount point of the archive file
+     *         system.
+     * @param  parent the non-{@code null} parent file system controller.
      * @return A new archive controller for the given archive model and
      *         parent file system controller.
      */
     @Override
     ArchiveController<AE> newController(
-            ArchiveModel model,
+            MountPoint mountPoint,
             FederatedFileSystemController<?> parent);
 
     /**

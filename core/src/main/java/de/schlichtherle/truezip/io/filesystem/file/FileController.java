@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -51,13 +52,14 @@ implements FederatedFileSystemController<FileEntry> {
     private final File target;
 
     FileController(final FileSystemModel model) {
-        final URI mountPoint = model.getMountPoint();
-        if (!"file".equalsIgnoreCase(mountPoint.getScheme()))
+        final MountPoint mountPoint = model.getMountPoint();
+        final URI mountPointUri = mountPoint.getUri();
+        if (!"file".equalsIgnoreCase(mountPointUri.getScheme()))
             throw new IllegalArgumentException();
         if (null != model.getParent())
             throw new IllegalArgumentException();
         this.model = model;
-        this.target = new File(model.getMountPoint());
+        this.target = new File(mountPointUri);
     }
 
     @Override

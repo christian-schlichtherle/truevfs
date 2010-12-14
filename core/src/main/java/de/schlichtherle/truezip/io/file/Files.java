@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.Path;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
@@ -248,11 +250,10 @@ class Files {
                         .getInputSocket(file.getInnerEntryName(), options);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        final Path path = Path.create(src.toURI(), true);
         return FederatedFileSystemManager.getInstance()
-                .getController( new FileDriver(),
-                                URI.create( src.toURI().toString()
-                                            + SEPARATOR_CHAR))
-                .getInputSocket(ROOT, options);
+                .getController( path.getMountPoint(), new FileDriver())
+                .getInputSocket(path.getEntryName().toString(), options);
     }
 
     static OutputSocket<?> getOutputSocket(
@@ -268,11 +269,11 @@ class Files {
                                             options, template);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        final Path path = Path.create(dst.toURI(), true);
         return FederatedFileSystemManager.getInstance()
-                .getController( new FileDriver(),
-                                URI.create( dst.toURI().toString()
-                                            + SEPARATOR_CHAR))
-                .getOutputSocket(ROOT, options, template);
+                .getController(     path.getMountPoint(), new FileDriver())
+                .getOutputSocket(   path.getEntryName().toString(),
+                                    options, template);
     }
 
     /**

@@ -146,14 +146,14 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         } else {
             if (!uri.isAbsolute())
                 throw new URISyntaxException(uri.toString(), "Not absolute");
-            if (!uri.getRawPath().endsWith(SEPARATOR))
-                throw new URISyntaxException(uri.toString(),
-                        "URI path doesn't end with separator \"" + SEPARATOR + '"');
             if (normalize)
                 uri = uri.normalize();
             else if (uri.normalize() != uri)
                 throw new URISyntaxException(uri.toString(),
                         "URI path not in normal form");
+            if (!uri.getRawPath().endsWith(SEPARATOR))
+                throw new URISyntaxException(uri.toString(),
+                        "URI path doesn't end with separator \"" + SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;

@@ -29,10 +29,12 @@ import java.io.InputStream;
 public abstract class FilterInputSocket<LT extends Entry>
 extends InputSocket<LT> {
 
-    private InputSocket<? extends LT> input;
+    private final InputSocket<? extends LT> input;
 
     protected FilterInputSocket(final InputSocket<? extends LT> input) {
-        setInputSocket(input);
+        if (null == input)
+            throw new NullPointerException();
+        this.input = input;
     }
 
     /**
@@ -45,12 +47,6 @@ extends InputSocket<LT> {
      */
     protected InputSocket<? extends LT> getBoundSocket() throws IOException {
         return input.bind(this);
-    }
-
-    protected final void setInputSocket(final InputSocket<? extends LT> input) {
-        if (null == input)
-            throw new NullPointerException();
-        this.input = input;
     }
 
     @Override

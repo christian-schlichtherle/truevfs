@@ -1205,7 +1205,7 @@ public abstract class IOFileTestCase extends TestCase {
         return new java.io.File(file.getPath());
     }
     
-    private static final String[] members = {
+    private static final String[] MEMBERS = {
         "A directory member",
         "Another directory member",
         "Yet another directory member",
@@ -1219,8 +1219,8 @@ public abstract class IOFileTestCase extends TestCase {
 
         // Create regular directory for testing.
         assertTrue(dir.mkdir());
-        for (int i = members.length; --i >= 0; )
-            assertTrue(new java.io.File(dir, members[i]).createNewFile());
+        for (int i = MEMBERS.length; --i >= 0; )
+            assertTrue(new java.io.File(dir, MEMBERS[i]).createNewFile());
         java.io.File[] files = dir.listFiles();
         Arrays.sort(files);
         testList(files, dir2);
@@ -1228,8 +1228,8 @@ public abstract class IOFileTestCase extends TestCase {
 
         // Repeat test with regular archive file.
         assertTrue(dir2.mkdir());
-        for (int i = members.length; --i >= 0; )
-            assertTrue(new File(dir2, members[i]).createNewFile());
+        for (int i = MEMBERS.length; --i >= 0; )
+            assertTrue(new File(dir2, MEMBERS[i]).createNewFile());
         testList(files, dir2);
         assertTrue(dir2.deleteAll());
     }

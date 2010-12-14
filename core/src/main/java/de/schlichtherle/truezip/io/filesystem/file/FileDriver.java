@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
+import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import java.net.URI;
 
 /**
@@ -30,28 +31,17 @@ public final class FileDriver implements FileSystemDriver<FileSystemModel> {
     public FileDriver() {
     }
 
-    public FileSystemModel newModel(URI mountPoint) {
-        return new FileSystemModel(mountPoint, null);
-    }
-
     public FederatedFileSystemController<FileEntry> newController(
-            FileSystemModel model) {
-        return new FileController(model);
-    }
-
-    @Override
-    public FileSystemModel newModel(URI mountPoint, FileSystemModel parent) {
-        if (null != parent)
-            throw new IllegalArgumentException();
-        return new FileSystemModel(mountPoint, null);
+            MountPoint mountPoint) {
+        return new FileController(new FileSystemModel(mountPoint));
     }
 
     @Override
     public FileSystemController<FileEntry> newController(
-            FileSystemModel model,
+            MountPoint mountPoint,
             FederatedFileSystemController<?> parent) {
         if (null != parent)
             throw new IllegalArgumentException();
-        return new FileController(model);
+        return new FileController(new FileSystemModel(mountPoint));
     }
 }

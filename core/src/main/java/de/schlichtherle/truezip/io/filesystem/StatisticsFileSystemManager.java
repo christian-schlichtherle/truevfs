@@ -36,24 +36,10 @@ extends FederatedFileSystemManager {
     @Override
     public <M extends FileSystemModel>
     FederatedFileSystemController<?> getController(
-            final FileSystemDriver<M> driver,
-            final URI mountPoint) {
-        final FederatedFileSystemController<?> controller
-                = super.getController(driver, mountPoint);
-        return controller instanceof ManagedFileSystemController
-                && !(controller.getParent() instanceof ManagedFileSystemController)
-                ? new StatisticsFileSystemController(controller, this)
-                : controller;
-    }
-
-    @Override
-    public <M extends FileSystemModel>
-    FederatedFileSystemController<?> getController(
-            final FileSystemDriver<M> driver,
-            final URI mountPoint,
+            final MountPoint mountPoint, final FileSystemDriver<M> driver,
             final FederatedFileSystemController<?> parent) {
         final FederatedFileSystemController<?> controller
-                = super.getController(driver, mountPoint, parent);
+                = super.getController(mountPoint, driver, parent);
         return controller instanceof ManagedFileSystemController
                 && !(controller.getParent() instanceof ManagedFileSystemController)
                 ? new StatisticsFileSystemController(controller, this)
@@ -82,7 +68,7 @@ extends FederatedFileSystemManager {
 
     @Override
     public synchronized <E extends IOException>
-    void sync(  URI prefix,
+    void sync(  MountPoint prefix,
                 ExceptionBuilder<? super IOException, E> builder,
                 BitField<SyncOption> options)
     throws E {

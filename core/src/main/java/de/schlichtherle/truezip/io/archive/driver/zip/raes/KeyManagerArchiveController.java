@@ -47,6 +47,6 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
     public void unlink(String path) throws IOException {
         controller.unlink(path);
         if (isRoot(path))
-            KeyManager.resetKeyProvider(getModel().getMountPoint());
+            KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());
     }
 }

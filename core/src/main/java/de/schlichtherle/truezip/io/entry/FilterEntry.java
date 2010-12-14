@@ -26,7 +26,7 @@ public abstract class FilterEntry<E extends Entry>
 implements Entry {
 
     /** The decorated file system entry. */
-    protected E entry;
+    protected E entry; // FIXME: Encapsulate this!
 
     protected FilterEntry(final E target) {
         this.entry = target;
