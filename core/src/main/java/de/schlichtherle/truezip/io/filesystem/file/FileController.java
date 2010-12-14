@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -35,10 +34,13 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static java.io.File.separatorChar;
 
 /**
  * @author Christian Schlichtherle
@@ -52,14 +54,21 @@ implements FederatedFileSystemController<FileEntry> {
     private final File target;
 
     FileController(final FileSystemModel model) {
-        final MountPoint mountPoint = model.getMountPoint();
-        final URI mountPointUri = mountPoint.getUri();
-        if (!"file".equalsIgnoreCase(mountPointUri.getScheme()))
-            throw new IllegalArgumentException();
         if (null != model.getParent())
             throw new IllegalArgumentException();
+        URI uri = model.getMountPoint().getUri();
+        // Postfix: Move Windows UNC host from authority to path.
+        if ('\\' == separatorChar && null != uri.getRawAuthority()) {
+            try {
+                uri = new URI(  uri.getScheme(), "",
+                                SEPARATOR + SEPARATOR + uri.getAuthority() + uri.getPath(),
+                                uri.getQuery(), uri.getFragment());
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        }
         this.model = model;
-        this.target = new File(mountPointUri);
+        this.target = new File(uri);
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.file;
 
+import java.util.Locale;
 import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectOutputStream;
@@ -430,31 +431,31 @@ public class NonIOFileTest extends TestCase {
                 new File(win ? "C:\\ANY.TXT" : "/ANY.TXT"));
         testEqualsAndHashCode(
                 new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:\\ANY" + suffix.toUpperCase() + "\\test.txt" : "/ANY" + suffix.toUpperCase() + "/test.txt"));
+                new File(win ? "C:\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
         testEqualsAndHashCode(
                 new File(win ? "c:/any" + suffix + "/test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:\\ANY" + suffix.toUpperCase() + "\\test.txt" : "/ANY" + suffix.toUpperCase() + "/test.txt"));
+                new File(win ? "C:\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
         testEqualsAndHashCode(
                 new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:/ANY" + suffix.toUpperCase() + "/test.txt" : "/ANY" + suffix.toUpperCase() + "/test.txt"));
+                new File(win ? "C:/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
         testEqualsAndHashCode(
                 new File(win ? "c:/any" + suffix + "/test.txt" : "/any" + suffix + "/test.txt"),
-                new File(win ? "C:/ANY" + suffix.toUpperCase() + "/test.txt" : "/ANY" + suffix.toUpperCase() + "/test.txt"));
+                new File(win ? "C:/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt" : "/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
         if (win) {
             // These tests may take very long, depending on the network
             // configuration of the local system.
             testEqualsAndHashCode(
                     new File("\\\\localhost\\any" + suffix + "\\test.txt"),
-                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase() + "\\test.txt"));
+                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt"));
             testEqualsAndHashCode(
                     new File("//localhost/any" + suffix + "/test.txt"),
-                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase() + "\\test.txt"));
+                    new File("\\\\LOCALHOST\\ANY" + suffix.toUpperCase(Locale.ENGLISH) + "\\test.txt"));
             testEqualsAndHashCode(
                     new File("\\\\localhost\\any" + suffix + "\\test.txt"),
-                    new File("//LOCALHOST/ANY" + suffix.toUpperCase() + "/test.txt"));
+                    new File("//LOCALHOST/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
             testEqualsAndHashCode(
                     new File("//localhost/any" + suffix + "/test.txt"),
-                    new File("//LOCALHOST/ANY" + suffix.toUpperCase() + "/test.txt"));
+                    new File("//LOCALHOST/ANY" + suffix.toUpperCase(Locale.ENGLISH) + "/test.txt"));
         }
         final File l = new File(win ? "c:\\any" + suffix + "\\test.txt" : "/any" + suffix + "/test.txt");
         final File u = new File(win ? "c:\\any" + suffix + "\\TEST.TXT" : "/any" + suffix + "/TEST.TXT");

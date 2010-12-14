@@ -594,7 +594,7 @@ public class File extends java.io.File {
      * {@link java.io.File#File(URI) new java.io.File(uri)} with the following
      * amendment:
      * If the URI matches the pattern
-     * {@code (jar:)*file:(<i>path</i>!/)*<i>entry</i>}, then the
+     * {@code (jar:)*file:(path!/)*entry}, then the
      * constructed file object treats the URI like a (possibly ZIPped) file.
      * <p>
      * For example, in a Java application which is running from a JAR in the
@@ -605,8 +605,8 @@ public class File extends java.io.File {
      * public File getResourceAsFile(String resource) {
      *   URL url = getClass().getResource(resource);
      *   try {
-     *     return new File(new URI(url.toExternalForm()));
-     *   } catch (Exception notAJaredFileURI) {
+     *     return new File(url.toURI());
+     *   } catch (URISyntaxException notAJaredFileURI) {
      *     return null;
      *   }
      * }
@@ -614,12 +614,12 @@ public class File extends java.io.File {
      * The newly created {@code File} instance uses
      * {@link ArchiveDetector#ALL} as its {@code ArchiveDetector}.
      *
-     * @param uri an absolute, hierarchical URI with a scheme equal to
-     *        {@code file} or {@code jar}, a non-empty path component,
-     *        and undefined authority, query, and fragment components.
+     * @param  uri an absolute, hierarchical URI with a scheme equal to
+     *         {@code file} or {@code jar}, a non-empty path component,
+     *         and undefined authority, query, and fragment components.
      * @throws NullPointerException if {@code uri} is {@code null}.
-     * @throws IllegalArgumentException if the preconditions on the
-     *         parameter {@code uri} do not hold.
+     * @throws IllegalArgumentException if any precondition for the
+     *         parameter {@code uri} does not hold.
      */
     public File(URI uri) {
         this(uri, ArchiveDetector.ALL);
@@ -692,7 +692,7 @@ public class File extends java.io.File {
      */
     @Deprecated
     @SuppressWarnings("LeakingThisInConstructor")
-	public File(
+    public File(
             final java.io.File delegate,
             final File innerArchive,
             final ArchiveDetector detector) {
@@ -732,19 +732,39 @@ public class File extends java.io.File {
                 = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
         final FederatedFileSystemController<?> parentController;
-        if (null != enclArchive) {
-            parentController = enclArchive.getController();
-            mountPoint = MountPoint.create(Scheme.FILE,
-                    new Path(   parentController.getModel().getMountPoint(),
-                                EntryName.create(URI.create(enclEntryName)))); // FIXME: Introduce driver.getScheme()!
-        } else {
-            URI uri = target.toURI();
-            while (uri.getRawPath().endsWith(SEPARATOR)) {
-                final String s = uri.toString();
-                uri = URI.create(s.substring(0, s.length() - 1));
+        try {
+            if (null != enclArchive) {
+                parentController = enclArchive.getController();
+                mountPoint = MountPoint.create(Scheme.FILE,
+                        new Path(   parentController.getModel().getMountPoint(),
+                                    EntryName.create(
+                                        new URI(    null, null,
+                                                    enclEntryName,
+                                                    null, null)))); // FIXME: Introduce driver.getScheme()!
+            } else {
+                URI uri = target.toURI();
+                // Postfix: Move Windows UNC host from path to authority.
+                if ('\\' == separatorChar && uri.getRawPath().startsWith(SEPARATOR + SEPARATOR)) {
+                    final String s = uri.getPath();
+                    final int i = s.indexOf(SEPARATOR_CHAR, 2);
+                    if (0 <= i) {
+                        uri = new URI(  uri.getScheme(), s.substring(2, i),
+                                        s.substring(i),
+                                        uri.getQuery(), uri.getFragment());
+                    }
+                }
+                // Postfix: Delete trailing slash separator from directory URI.
+                while (uri.getRawPath().endsWith(SEPARATOR)) {
+                    final String s = uri.getPath();
+                    uri = new URI(  uri.getScheme(), uri.getAuthority(),
+                                    s.substring(0, s.length() - 1),
+                                    uri.getQuery(), uri.getFragment());
+                }
+                mountPoint = MountPoint.create(Scheme.FILE, Path.create(uri)); // FIXME: Introduce driver.getScheme()!
+                parentController = new FileDriver().newController(mountPoint.getParent());
             }
-            mountPoint = MountPoint.create(Scheme.FILE, Path.create(uri)); // FIXME: Introduce driver.getScheme()!
-            parentController = new FileDriver().newController(mountPoint.getParent());
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
         }
         this.controller = FederatedFileSystemManager
                 .getInstance()
