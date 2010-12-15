@@ -146,6 +146,8 @@ public class PathTest {
             "foo:bar:/baz/./!/",
             "foo:bar:/baz/..!/",
             "foo:bar:/baz/../!/",
+
+            "//authority/defined",
         }) {
             final URI uri = URI.create(param);
 
