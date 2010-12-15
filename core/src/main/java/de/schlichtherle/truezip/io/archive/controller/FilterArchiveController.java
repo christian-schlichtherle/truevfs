@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
+import java.io.IOException;
 
 /**
  * @param   <E> The type of the archive entries.
@@ -50,7 +50,7 @@ implements ArchiveController<E> {
 
     @Override
     public ArchiveFileSystemEntry<? extends E> getEntry(String path)
-    throws FileSystemException {
+    throws IOException {
         return controller.getEntry(path);
     }
 }

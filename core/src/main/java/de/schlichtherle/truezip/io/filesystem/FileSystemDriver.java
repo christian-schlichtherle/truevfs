@@ -21,5 +21,5 @@ package de.schlichtherle.truezip.io.filesystem;
  */
 public interface FileSystemDriver {
     FileSystemController<?> newController(  MountPoint mountPoint,
-                                            FederatedFileSystemController<?> parent);
+                                            FileSystemController<?> parent);
 }

@@ -15,12 +15,13 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -48,7 +49,7 @@ import static java.io.File.separatorChar;
  */
 final class FileController
 extends AbstractFileSystemController<FileEntry>
-implements FederatedFileSystemController<FileEntry> {
+implements FileSystemController<FileEntry> {
 
     private final FileSystemModel model;
     private final File target;
@@ -77,39 +78,39 @@ implements FederatedFileSystemController<FileEntry> {
     }
 
     @Override
-    public FederatedFileSystemController<?> getParent() {
+    public FileSystemController<?> getParent() {
         return null;
     }
 
     @Override
-    public Icon getOpenIcon() {
+    public Icon getOpenIcon() throws IOException {
         return null;
     }
 
     @Override
-    public Icon getClosedIcon() {
+    public Icon getClosedIcon() throws IOException {
         return null;
     }
 
     @Override
-    public boolean isReadOnly() {
+    public boolean isReadOnly() throws IOException {
         return false;
     }
 
     @Override
-    public FileEntry getEntry(String path) {
+    public FileEntry getEntry(String path) throws IOException {
         final FileEntry entry = FileEntry.get(target, path);
         return entry.getFile().exists() ? entry : null;
     }
 
     @Override
-    public boolean isReadable(String path) {
+    public boolean isReadable(String path) throws IOException {
         final File file = new File(target, path);
         return file.canRead();
     }
 
     @Override
-    public boolean isWritable(String path) {
+    public boolean isWritable(String path) throws IOException {
         final File file = new File(target, path);
         return isCreatableOrWritable(file);
     }
@@ -177,6 +178,7 @@ implements FederatedFileSystemController<FileEntry> {
     @Override
     public <X extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options) {
+                final BitField<SyncOption> options)
+    throws X, FileSystemException {
     }
 }

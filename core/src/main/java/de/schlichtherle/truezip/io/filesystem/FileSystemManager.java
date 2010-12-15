@@ -43,7 +43,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FederatedFileSystemManager {
+public class FileSystemManager {
 
     static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
@@ -81,13 +81,13 @@ public class FederatedFileSystemManager {
      *         system.
      * @return A non-{@code null} federated file system controller.
      */
-    public FederatedFileSystemController<?> getController(
+    public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            FederatedFileSystemController<?> parent) {
+            FileSystemController<?> parent) {
         if (null != mountPoint.getParent() && null == parent)
             parent = getController(mountPoint.getParent(), driver, null);
-        FederatedFileSystemController<?> controller;
+        FileSystemController<?> controller;
         synchronized (schedulers) {
             Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
             if (null != scheduler) {
@@ -96,7 +96,7 @@ public class FederatedFileSystemManager {
                 final FileSystemController<?> c
                         = driver.newController(mountPoint, parent);
                 if (null == c.getParent()) {
-                    controller = (FederatedFileSystemController<?>) c;
+                    controller = (FileSystemController<?>) c;
                 } else {
                     scheduler = new Scheduler(c);
                     controller = scheduler.controller;
@@ -177,7 +177,7 @@ public class FederatedFileSystemManager {
         // controller.
         // This ensures that an archive file system will always be synced
         // before its parent archive file system.
-        for (final FederatedFileSystemController<?> controller
+        for (final FileSystemController<?> controller
                 : getControllers(prefix, REVERSE_CONTROLLERS)) {
             try {
                 // Upon return, some new ArchiveWarningException's may
@@ -196,14 +196,14 @@ public class FederatedFileSystemManager {
         builder.check();
     }
 
-    final Set<FederatedFileSystemController<?>> getControllers(
+    final Set<FileSystemController<?>> getControllers(
             final MountPoint prefix,
-            final Comparator<? super FederatedFileSystemController<?>> comparator) {
-        final Set<FederatedFileSystemController<?>> snapshot;
+            final Comparator<? super FileSystemController<?>> comparator) {
+        final Set<FileSystemController<?>> snapshot;
         synchronized (schedulers) {
             snapshot = null != comparator
-                    ? new TreeSet<FederatedFileSystemController<?>>(comparator)
-                    : new HashSet<FederatedFileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
+                    ? new TreeSet<FileSystemController<?>>(comparator)
+                    : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
             for (final Link<Scheduler> link : schedulers.values()) {
                 final Scheduler scheduler = Links.getTarget(link);
                 final ManagedFileSystemController controller
@@ -231,8 +231,6 @@ public class FederatedFileSystemManager {
     /**
      * This shutdown thread class runs the runnable provided to its constructor
      * when it starts execution.
-     *
-     * @see FederatedFileSystemManager#addShutdownHook(java.lang.Runnable)
      */
     private static final class ShutdownThread extends Thread {
 
@@ -304,7 +302,7 @@ public class FederatedFileSystemManager {
                     // paranoid, but safe.
                     PromptingKeyManager.setPrompting(false);
                     // Logging doesn't work in a shutdown hook!
-                    //FederatedFileSystemManager.logger.setLevel(Level.OFF);
+                    //FileSystemManager.logger.setLevel(Level.OFF);
                     for (Runnable runnable : runnables)
                         runnable.run();
                 } finally {

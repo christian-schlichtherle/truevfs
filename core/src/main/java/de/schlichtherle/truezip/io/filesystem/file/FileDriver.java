@@ -15,12 +15,10 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import java.net.URI;
 
 /**
  * @author  Christian Schlichtherle
@@ -28,15 +26,15 @@ import java.net.URI;
  */
 public final class FileDriver implements FileSystemDriver {
 
-    public FederatedFileSystemController<FileEntry> newController(
+    public FileSystemController<FileEntry> newController(
             MountPoint mountPoint) {
         return new FileController(new FileSystemModel(mountPoint));
     }
 
     @Override
-    public FederatedFileSystemController<FileEntry> newController(
+    public FileSystemController<FileEntry> newController(
             MountPoint mountPoint,
-            FederatedFileSystemController<?> parent) {
+            FileSystemController<?> parent) {
         if (null != parent)
             throw new IllegalArgumentException();
         return new FileController(new FileSystemModel(mountPoint));

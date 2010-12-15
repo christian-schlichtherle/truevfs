@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -96,7 +95,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     @Override
     public ArchiveController<ZipEntry> newController(
             MountPoint mountPoint,
-            FederatedFileSystemController<?> parent) {
+            FileSystemController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent));
     }

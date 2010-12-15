@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.filesystem;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 /**
@@ -31,14 +30,14 @@ import java.util.Set;
  * @version $Id$
  */
 public final class StatisticsFileSystemManager
-extends FederatedFileSystemManager {
+extends FileSystemManager {
 
     @Override
-    public FederatedFileSystemController<?> getController(
+    public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            final FederatedFileSystemController<?> parent) {
-        final FederatedFileSystemController<?> controller
+            final FileSystemController<?> parent) {
+        final FileSystemController<?> controller
                 = super.getController(mountPoint, driver, parent);
         return controller instanceof ManagedFileSystemController
                 && !(controller.getParent() instanceof ManagedFileSystemController)
@@ -80,7 +79,7 @@ extends FederatedFileSystemManager {
         }
     }
 
-    Set<FederatedFileSystemController<?>> getControllers() {
+    Set<FileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 }

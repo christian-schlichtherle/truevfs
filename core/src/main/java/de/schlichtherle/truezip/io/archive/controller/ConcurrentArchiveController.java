@@ -65,8 +65,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public Icon getOpenIcon()
-    throws FileSystemException {
+    public Icon getOpenIcon() throws IOException {
         try {
             readLock().lock();
             try {
@@ -86,8 +85,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public Icon getClosedIcon()
-    throws FileSystemException {
+    public Icon getClosedIcon() throws IOException {
         try {
             readLock().lock();
             try {
@@ -107,8 +105,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean isReadOnly()
-    throws FileSystemException {
+    public boolean isReadOnly() throws IOException {
         try {
             readLock().lock();
             try {
@@ -129,70 +126,67 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
     @Override
     public ArchiveFileSystemEntry<? extends E> getEntry(String path)
-    throws FileSystemException {
-        try {
-            readLock().lock();
-            try {
-                return controller.getEntry(path);
-            } finally {
-                readLock().unlock();
-            }
-        } catch (NotWriteLockedException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
-            try {
-                return controller.getEntry(path);
-            } finally {
-                writeLock().unlock();
-            }
-        }
-    }
-
-    @Override
-    public boolean isReadable(String path)
-    throws FileSystemException {
-        try {
-            readLock().lock();
-            try {
-                return controller.isReadable(path);
-            } finally {
-                readLock().unlock();
-            }
-        } catch (NotWriteLockedException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
-            try {
-                return controller.isReadable(path);
-            } finally {
-                writeLock().unlock();
-            }
-        }
-    }
-
-    @Override
-    public boolean isWritable(String path)
-    throws FileSystemException {
-        try {
-            readLock().lock();
-            try {
-                return controller.isWritable(path);
-            } finally {
-                readLock().unlock();
-            }
-        } catch (NotWriteLockedException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
-            try {
-                return controller.isWritable(path);
-            } finally {
-                writeLock().unlock();
-            }
-        }
-    }
-
-    @Override
-    public void setReadOnly(String path)
     throws IOException {
+        try {
+            readLock().lock();
+            try {
+                return controller.getEntry(path);
+            } finally {
+                readLock().unlock();
+            }
+        } catch (NotWriteLockedException ex) {
+            assertNotReadLockedByCurrentThread(ex);
+            writeLock().lock();
+            try {
+                return controller.getEntry(path);
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    }
+
+    @Override
+    public boolean isReadable(String path) throws IOException {
+        try {
+            readLock().lock();
+            try {
+                return controller.isReadable(path);
+            } finally {
+                readLock().unlock();
+            }
+        } catch (NotWriteLockedException ex) {
+            assertNotReadLockedByCurrentThread(ex);
+            writeLock().lock();
+            try {
+                return controller.isReadable(path);
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    }
+
+    @Override
+    public boolean isWritable(String path) throws IOException {
+        try {
+            readLock().lock();
+            try {
+                return controller.isWritable(path);
+            } finally {
+                readLock().unlock();
+            }
+        } catch (NotWriteLockedException ex) {
+            assertNotReadLockedByCurrentThread(ex);
+            writeLock().lock();
+            try {
+                return controller.isWritable(path);
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    }
+
+    @Override
+    public void setReadOnly(String path) throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
