@@ -13,81 +13,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.entry;
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
 
 /**
- * Addresses an entry in a file system relative to its mount point.
- * A file system entry name is usually constructed from a
+ * Addresses an entry in an entry container.
+ * An entry name is usually constructed from a
  * {@link URI Uniform Resource Identifier} in order to assert the following
  * additional syntax constraints:
  * <ol>
  * <li>The URI must be relative, i.e. it must not have a scheme.
  * <li>The URI must not have an authority.
  * <li>The URI must not have a fragment.
- * <li>The URI's path must be in normal form, i.e. it must not contain
- *     redundant {@code "."} and {@code ".."} segments.
- * <li>The URI's path must not equal {@code "."}.
- * <li>The URI's path must not equal {@code ".."}.
- * <li>The URI's path must not start with {@code "/"}.
- * <li>The URI's path must not start with {@code "./"}.
- * <li>The URI's path must not start with {@code "../"}.
- * <li>The URI's path must not end with {@code "/"}.
  * </ol>
  * <p>
- * Examples for valid file system entry name URIs are:
+ * Examples for valid entry name URIs are:
  * <ul>
- * <li>{@code foo}
+ * <li>{@code /foo}
  * <li>{@code foo/bar}
+ * <li>{@code foo}
+ * <li>{@code foo/}
+ * <li>{@code foo/.}
+ * <li>{@code foo/..}
+ * <li>{@code ../foo}
  * </ul>
- * Examples for invalid file system entry name URIs are:
+ * Examples for invalid entry name URIs are:
  * <ul>
- * <li>{@code /foo} (leading slash separator not allowed)
- * <li>{@code foo/} (trailing slash separator not allowed)
- * <li>{@code foo/.} (not normalized)
- * <li>{@code foo/..} (not normalized)
+ * <li>{@code foo:/bar} (not relative)
+ * <li>{@code //foo/bar} (authority defined)
+ * <li>{@code foo#bar} (fragment defined)
  * </ul>
  * <p>
  * Note that this class is immutable and final, hence thread-safe, too.
  *
- * @see     FileSystemEntry#getName()
+ * @see     Entry#getName()
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileSystemEntryName implements Serializable, Comparable<FileSystemEntryName> {
+public class EntryName implements Serializable, Comparable<EntryName> {
 
-    private static final long serialVersionUID = 2212342253466752478L;
+    private static final long serialVersionUID = 2927354934726235478L;
 
-    /** Represents a file system entry name with an empty URI. */
-    public static final FileSystemEntryName ROOT
-            = FileSystemEntryName.create(URI.create(FileSystemEntry.ROOT));
+    /** Represents an entry name with an empty URI. */
+    public static final EntryName ROOT
+            = EntryName.create(URI.create(Entry.ROOT));
 
     private final URI uri;
 
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, null, false)}.
      */
-    public static FileSystemEntryName create(String path) {
+    public static EntryName create(String path) {
         return create(path, null, false);
     }
 
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, null, normalize)}.
      */
-    public static FileSystemEntryName create(String path, boolean normalize) {
+    public static EntryName create(String path, boolean normalize) {
         return create(path, null, normalize);
     }
 
     /**
-     * Constructs a new file system entry name by constructing a new URI from
+     * Constructs a new entry name by constructing a new URI from
      * the given path and query elements and parsing the result.
      * This static factory method calls
-     * {@link #FileSystemEntryName(URI, boolean) new FileSystemEntryName(new URI(null, null, path, query, null), normalize)}
+     * {@link #EntryName(URI, boolean) new EntryName(new URI(null, null, path, query, null), normalize)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
@@ -96,26 +92,26 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
-     * @return A non-{@code null} file system entry name.
+     *         syntax constraints for entry names.
+     * @return A non-{@code null} entry name.
      */
-    public static FileSystemEntryName create(String path, String query, boolean normalize) {
+    public static EntryName create(String path, String query, boolean normalize) {
         try {
-            return new FileSystemEntryName(new URI(null, null, path, query, null), normalize);
+            return new EntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
-    public static FileSystemEntryName create(URI uri) {
+    public static EntryName create(URI uri) {
         return create(uri, false);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new entry name by parsing the given URI.
      * This static factory method calls
-     * {@link #FileSystemEntryName(URI, boolean) new FileSystemEntryName(uri, normalize)}
+     * {@link #EntryName(URI, boolean) new EntryName(uri, normalize)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
@@ -124,35 +120,35 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
-     * @return A non-{@code null} file system entry name.
+     *         syntax constraints for entry names.
+     * @return A non-{@code null} entry name.
      */
-    public static FileSystemEntryName create(URI uri, boolean normalize) {
+    public static EntryName create(URI uri, boolean normalize) {
         try {
-            return new FileSystemEntryName(uri, normalize);
+            return new EntryName(uri, normalize);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /**
-     * Equivalent to {@link #FileSystemEntryName(URI, boolean) new FileSystemEntryName(uri, false)}.
+     * Equivalent to {@link #EntryName(URI, boolean) new EntryName(uri, false)}.
      */
-    public FileSystemEntryName(URI uri) throws URISyntaxException {
+    public EntryName(URI uri) throws URISyntaxException {
         this(uri, false);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new entry name by parsing the given URI.
      *
      * @param  uri the non-{@code null} {@link #getUri() URI}.
      * @param  normalize whether or not the given URI shall get normalized
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
+     *         syntax constraints for entry names.
      */
-    public FileSystemEntryName(URI uri, final boolean normalize)
+    public EntryName(URI uri, final boolean normalize)
     throws URISyntaxException {
         if (uri.isAbsolute())
             throw new URISyntaxException(uri.toString(), "Scheme not allowed");
@@ -160,40 +156,26 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
             throw new URISyntaxException(uri.toString(), "Authority not allowed");
         if (null != uri.getRawFragment())
             throw new URISyntaxException(uri.toString(), "Fragment not allowed");
-        if (normalize)
-            uri = uri.normalize();
-        else if (uri.normalize() != uri)
-            throw new URISyntaxException(uri.toString(), "URI path not in normal form");
-        final String p = uri.getRawPath();
-        if (    "..".equals(p)
-                || p.startsWith(SEPARATOR)
-                || p.startsWith("." + SEPARATOR)
-                || p.startsWith(".." + SEPARATOR))
-            throw new URISyntaxException(uri.toString(),
-                    "Illegal start of URI path");
-        if (p.endsWith(SEPARATOR))
-            throw new URISyntaxException(uri.toString(),
-                    "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
         this.uri = uri;
 
         assert invariants();
     }
 
     /**
-     * Constructs a new file system entry name by resolving the given member
-     * file system entry name against the given parent file system entry name.
-     * Note that the URI of the parent file system entry name is considered to
+     * Constructs a new entry name by resolving the given member
+     * entry name against the given parent entry name.
+     * Note that the URI of the parent entry name is considered to
      * name a directory even if it's not ending with a
-     * {@link FileSystemEntry#SEPARATOR}, so calling this constructor with
+     * {@link Entry#SEPARATOR}, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
-     * file system entry names respectively will result in the URI
-     * {@code "foo/bar"} for the resulting file system entry name.
+     * entry names respectively will result in the URI
+     * {@code "foo/bar"} for the resulting entry name.
      *
-     * @param  parent a non-{@code null} file system entry name.
-     * @param  member a non-{@code null} file system entry name.
+     * @param  parent a non-{@code null} entry name.
+     * @param  member a non-{@code null} entry name.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    FileSystemEntryName(final FileSystemEntryName parent, final FileSystemEntryName member) {
+    EntryName(final EntryName parent, final EntryName member) {
         final URI parentUri = parent.uri;
         final URI memberUri = member.uri;
         try {
@@ -215,45 +197,37 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
         assert !getUri().isAbsolute();
         assert null == getUri().getRawAuthority();
         assert null == getUri().getRawFragment();
-        assert getUri().normalize() == getUri();
-        String p = getUri().getRawPath();
-        assert !"..".equals(p);
-        assert !p.startsWith(SEPARATOR);
-        assert !p.startsWith("." + SEPARATOR);
-        assert !p.startsWith(".." + SEPARATOR);
-        assert !p.endsWith(SEPARATOR);
         return true;
     }
 
     /** Equivalent to {@link #getUri()}{@code .getPath()}. */
-    public String getPath() {
+    public final String getPath() {
         return uri.getPath();
     }
 
     /** Equivalent to {@link #getUri()}{@code .getQuery()}. */
-    public String getQuery() {
+    public final String getQuery() {
         return uri.getQuery();
     }
 
     /**
-     * Returns the non-{@code null} URI of this file system entry name.
+     * Returns the non-{@code null} URI of this entry name.
      *
-     * @return The non-{@code null} URI of this file system entry name.
+     * @return The non-{@code null} URI of this entry name.
      */
-    public URI getUri() {
+    public final URI getUri() {
         return uri;
     }
 
     /**
-     * Returns {@code true} iff the given object is a file system entry name
-     * and its URI {@link URI#equals(Object) equals} the URI of this file
-     * system entry name.
+     * Returns {@code true} iff the given object is a entry name
+     * and its URI {@link URI#equals(Object) equals} the URI of this entry name.
      */
     @Override
-    public boolean equals(Object that) {
+    public final boolean equals(Object that) {
         return this == that
-                || that instanceof FileSystemEntryName
-                    && this.uri.equals(((FileSystemEntryName) that).uri);
+                || that instanceof EntryName
+                    && this.uri.equals(((EntryName) that).uri);
     }
 
     /**
@@ -261,7 +235,7 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(FileSystemEntryName that) {
+    public final int compareTo(EntryName that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -269,7 +243,7 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return uri.hashCode();
     }
 
@@ -277,7 +251,7 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public String toString() {
+    public final String toString() {
         return uri.toString();
     }
 }

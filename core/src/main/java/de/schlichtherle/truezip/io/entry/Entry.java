@@ -154,6 +154,7 @@ public interface Entry {
      * constraints for an entry name to meet their particular requirements.
      *
      * @return The non-{@code null} <i>entry name</i>.
+     * @see    EntryName
      */
     String getName();
 

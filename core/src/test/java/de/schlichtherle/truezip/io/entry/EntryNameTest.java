@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.entry;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystemEntryNameTest {
+public class EntryNameTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
@@ -34,21 +34,8 @@ public class FileSystemEntryNameTest {
         for (final String param : new String[] {
             "/../foo#boo",
             "/../foo#",
-            "/../foo",
-            "/./foo",
-            "//foo",
-            "/foo",
-            "/foo/bar",
-            "/foo/bar/",
-            "/",
             "foo#bar",
             "#foo",
-            "foo/",
-            "foo//",
-            "foo/.",
-            "foo/./",
-            "foo/..",
-            "foo/../",
             "foo:bar",
             "foo:bar:",
             "foo:bar:/",
@@ -110,13 +97,13 @@ public class FileSystemEntryNameTest {
             final URI uri = URI.create(param);
 
             try {
-                FileSystemEntryName.create(uri);
+                EntryName.create(uri);
                 fail(param);
             } catch (IllegalArgumentException ex) {
             }
 
             try {
-                new FileSystemEntryName(uri);
+                new EntryName(uri);
                 fail(param);
             } catch (URISyntaxException ex) {
             }
@@ -130,9 +117,9 @@ public class FileSystemEntryNameTest {
             { "", "föö", "föö" },
             { "föö", "bär", "föö/bär" },
         }) {
-            final FileSystemEntryName parent = FileSystemEntryName.create(URI.create(params[0]));
-            final FileSystemEntryName member = FileSystemEntryName.create(URI.create(params[1]));
-            final FileSystemEntryName result = new FileSystemEntryName(parent, member);
+            final EntryName parent = EntryName.create(URI.create(params[0]));
+            final EntryName member = EntryName.create(URI.create(params[1]));
+            final EntryName result = new EntryName(parent, member);
             assertThat(result.getUri(), equalTo(URI.create(params[2])));
         }
     }
