@@ -169,6 +169,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P findParameters(
             final Class<P> type,
             final RaesParameters parameters)
