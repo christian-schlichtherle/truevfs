@@ -83,6 +83,9 @@ public class PathTest {
             "/foo/bar",
             "/foo/bar/",
             "/",
+            "foo#bar",
+            "#foo",
+            "foo/",
             "foo//",
             "foo/.",
             "foo/./",
@@ -164,16 +167,16 @@ public class PathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
-            { "foo:bar:baz:/bäng!/bööm!/plönk/", "foo:bar:baz:/bäng!/bööm!/", "plönk/" },
+            { "foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", "" },
 
             { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/bang/..", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
 
-            { "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
 
             { "foo:bar:/baz!/bang", "foo:bar:/baz!/", "bang" },
 
@@ -182,21 +185,21 @@ public class PathTest {
             { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk" },
 
-            { "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
+            //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
             { "foo:bar:/baz!/bang/..", "foo:bar:/baz!/", "" },
             { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
 
             { "foo", null, "foo" },
-            { "foo/", null, "foo/" },
-            { "foo//", null, "foo/" },
-            { "foo/.", null, "foo/" },
-            { "foo/./", null, "foo/" },
+            //{ "foo/", null, "foo/" },
+            //{ "foo//", null, "foo/" },
+            //{ "foo/.", null, "foo/" },
+            //{ "foo/./", null, "foo/" },
             { "foo/..", null, "" },
             { "foo/../", null, "" },
             { "foo/bar", null, "foo/bar" },
-            { "foo/bar/", null, "foo/bar/" },
+            //{ "foo/bar/", null, "foo/bar/" },
             { "foo:/", "foo:/", "" },
             { "foo:/bar", "foo:/", "bar" },
             { "foo:/bar/", "foo:/bar/", "" },

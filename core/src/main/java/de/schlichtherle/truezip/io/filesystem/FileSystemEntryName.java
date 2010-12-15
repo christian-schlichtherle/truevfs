@@ -37,6 +37,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * <li>The URI's path must not start with {@code "/"}.
  * <li>The URI's path must not start with {@code "./"}.
  * <li>The URI's path must not start with {@code "../"}.
+ * <li>The URI's path must not end with {@code "/"}.
  * </ol>
  * <p>
  * Examples for valid file system entry name URIs are:
@@ -52,6 +53,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * <p>
  * Note that this class is immutable and final, hence thread-safe, too.
  *
+ * @see     FileSystemEntry#getName()
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -167,6 +169,9 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
                 || p.startsWith(".." + SEPARATOR))
             throw new URISyntaxException(uri.toString(),
                     "Illegal start of URI path");
+        if (p.endsWith(SEPARATOR))
+            throw new URISyntaxException(uri.toString(),
+                    "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
         this.uri = uri;
 
         assert invariants();
@@ -214,6 +219,7 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
         assert !p.startsWith(SEPARATOR);
         assert !p.startsWith("." + SEPARATOR);
         assert !p.startsWith(".." + SEPARATOR);
+        assert !p.endsWith(SEPARATOR);
         return true;
     }
 

@@ -48,6 +48,7 @@ extends Entry, Link<E> {
      * </ol>
      *
      * @return The non-{@code null} <i>file system entry name</i>.
+     * @see    FileSystemEntryName
      */
     @Override
     String getName();
