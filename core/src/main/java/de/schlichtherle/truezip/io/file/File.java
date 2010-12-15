@@ -620,6 +620,7 @@ public class File extends java.io.File {
      * @throws IllegalArgumentException if any precondition for the
      *         parameter {@code uri} does not hold.
      */
+    // FIXME: Use Path!
     public File(URI uri) {
         this(uri, ArchiveDetector.ALL);
     }
@@ -627,6 +628,7 @@ public class File extends java.io.File {
     // Unfortunately, this constructor has a significant overhead as the jar:
     // schemes need to be processed twice, first before initializing the super
     // class and second when initializing this sub class.
+    // FIXME: Use Path!
     File(   final URI uri,
             final ArchiveDetector detector) {
         super(unjarFileURI(uri));
@@ -2205,6 +2207,7 @@ public class File extends java.io.File {
         return delegate.toString();
     }
 
+    // FIXME: Use Path!
     @Override
     public java.net.URI toURI() {
         return delegate.toURI();
@@ -2214,6 +2217,7 @@ public class File extends java.io.File {
      * @deprecated This method has been deprecated in JSE 6.
      * @see java.io.File#toURL
      */
+    // FIXME: Use Path!
     @Deprecated
     @Override
     public URL toURL() throws MalformedURLException {

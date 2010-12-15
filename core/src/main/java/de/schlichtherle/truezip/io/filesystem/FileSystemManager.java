@@ -36,7 +36,7 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * A container which manages the lifecycle of federated file system controllers.
+ * A container which manages the lifecycle of file system controllers.
  * <p>
  * This class is thread-safe.
  *
@@ -173,21 +173,17 @@ public class FileSystemManager {
             throw new IllegalArgumentException();
         // The general algorithm is to sort the mount points in descending
         // order of their pathnames and then traverse the array in reverse
-        // order to call the sync() method on each respective archive
+        // order to call the sync() method on each respective file system
         // controller.
-        // This ensures that an archive file system will always be synced
-        // before its parent archive file system.
+        // This ensures that a member file system will always be synced
+        // before its parent file system.
         for (final FileSystemController<?> controller
                 : getControllers(prefix, REVERSE_CONTROLLERS)) {
             try {
-                // Upon return, some new ArchiveWarningException's may
-                // have been generated. We need to remember them for
-                // later throwing.
                 controller.sync(builder, options);
             } catch (IOException ex) {
-                // Updating the archive file or wrapping it back into
-                // one of it's parent archive files resulted in an
-                // I/O exception for some reason.
+                // Syncing the file system resulted in an I/O exception for
+                // some reason.
                 // We are bullheaded and store the exception for later
                 // throwing and continue updating the rest.
                 builder.warn(ex);
@@ -233,38 +229,13 @@ public class FileSystemManager {
      * when it starts execution.
      */
     private static final class ShutdownThread extends Thread {
-
-        final ShutdownRunnable runnables;
-
-        ShutdownThread(final ShutdownRunnable runnables) {
-            super("TrueZIP FileSystemProvider Shutdown Hook");
+        ShutdownThread(final ShutdownRunnable runnable) {
+            super(runnable, "TrueZIP FileSystemManager Shutdown Hook");
             super.setPriority(Thread.MAX_PRIORITY);
-            this.runnables = runnables;
-        }
-
-        /**
-         * Adds the given {@code runnable} to the set of runnables to run
-         * when this thread starts execution.
-         */
-        void add(final Runnable runnable) {
-            runnables.add(runnable);
-        }
-
-        @Override
-        public void run() {
-            runnables.run();
         }
     } // class ShutdownThread
 
-    /**
-     * This singleton shutdown hook runnable class runs a set of user-provided
-     * runnables which may perform cleanup tasks when it's {@link #run()}
-     * method is invoked.
-     * This is typically used to delete archive files or entries.
-     */
     private final class ShutdownRunnable implements Runnable {
-
-        final Collection<Runnable> runnables = new HashSet<Runnable>();
 
         ShutdownRunnable() {
             // Force loading the key manager now in order to prevent class
@@ -273,15 +244,6 @@ public class FileSystemManager {
             // hook in an app server environment where class loading is
             // disabled.
             PromptingKeyManager.getInstance();
-        }
-
-        /**
-         * Adds the given {@code runnable} to the set of runnables to run by
-         * this shutdown hook.
-         */
-        synchronized void add(final Runnable runnable) {
-            if (runnable != null)
-                runnables.add(runnable);
         }
 
         /**
@@ -303,8 +265,6 @@ public class FileSystemManager {
                     PromptingKeyManager.setPrompting(false);
                     // Logging doesn't work in a shutdown hook!
                     //FileSystemManager.logger.setLevel(Level.OFF);
-                    for (Runnable runnable : runnables)
-                        runnable.run();
                 } finally {
                     try {
                         sync(   null,
