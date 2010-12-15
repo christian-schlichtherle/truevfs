@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.entry.EntryName;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,15 +60,13 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileSystemEntryName implements Serializable, Comparable<FileSystemEntryName> {
+public final class FileSystemEntryName extends EntryName {
 
     private static final long serialVersionUID = 2212342253466752478L;
 
     /** Represents a file system entry name with an empty URI. */
     public static final FileSystemEntryName ROOT
             = FileSystemEntryName.create(URI.create(FileSystemEntry.ROOT));
-
-    private final URI uri;
 
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, null, false)}.
@@ -91,7 +90,8 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
+     * @param  path the non-{@code null} {@link #getPath() path}.
+     * @param  query the nullable {@link #getQuery() query}.
      * @param  normalize whether or not the given URI shall get normalized
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
@@ -154,16 +154,10 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      */
     public FileSystemEntryName(URI uri, final boolean normalize)
     throws URISyntaxException {
-        if (uri.isAbsolute())
-            throw new URISyntaxException(uri.toString(), "Scheme not allowed");
-        if (uri.getRawAuthority() != null)
-            throw new URISyntaxException(uri.toString(), "Authority not allowed");
-        if (null != uri.getRawFragment())
-            throw new URISyntaxException(uri.toString(), "Fragment not allowed");
-        if (normalize)
-            uri = uri.normalize();
-        else if (uri.normalize() != uri)
+        super(uri, normalize);
+        if (!normalize && uri.normalize() != uri)
             throw new URISyntaxException(uri.toString(), "URI path not in normal form");
+        uri = getUri();
         final String p = uri.getRawPath();
         if (    "..".equals(p)
                 || p.startsWith(SEPARATOR)
@@ -174,7 +168,6 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
         if (p.endsWith(SEPARATOR))
             throw new URISyntaxException(uri.toString(),
                     "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
-        this.uri = uri;
 
         assert invariants();
     }
@@ -194,27 +187,16 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
      * @throws NullPointerException if any parameter is {@code null}.
      */
     FileSystemEntryName(final FileSystemEntryName parent, final FileSystemEntryName member) {
-        final URI parentUri = parent.uri;
-        final URI memberUri = member.uri;
-        try {
-            uri = 0 == parentUri.getPath().length()
-                    ? memberUri
-                    : 0 == memberUri.getPath().length()
-                        ? parentUri
-                        : new URI(null, null, parentUri.getPath() + SEPARATOR, parentUri.getQuery(), null)
-                            .resolve(memberUri);
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+        super(parent, member);
 
         assert invariants();
     }
 
     private boolean invariants() {
         assert null != getUri();
-        assert !getUri().isAbsolute();
-        assert null == getUri().getRawAuthority();
-        assert null == getUri().getRawFragment();
+        //assert !getUri().isAbsolute();
+        //assert null == getUri().getRawAuthority();
+        //assert null == getUri().getRawFragment();
         assert getUri().normalize() == getUri();
         String p = getUri().getRawPath();
         assert !"..".equals(p);
@@ -223,61 +205,5 @@ public final class FileSystemEntryName implements Serializable, Comparable<FileS
         assert !p.startsWith(".." + SEPARATOR);
         assert !p.endsWith(SEPARATOR);
         return true;
-    }
-
-    /** Equivalent to {@link #getUri()}{@code .getPath()}. */
-    public String getPath() {
-        return uri.getPath();
-    }
-
-    /** Equivalent to {@link #getUri()}{@code .getQuery()}. */
-    public String getQuery() {
-        return uri.getQuery();
-    }
-
-    /**
-     * Returns the non-{@code null} URI of this file system entry name.
-     *
-     * @return The non-{@code null} URI of this file system entry name.
-     */
-    public URI getUri() {
-        return uri;
-    }
-
-    /**
-     * Returns {@code true} iff the given object is a file system entry name
-     * and its URI {@link URI#equals(Object) equals} the URI of this file
-     * system entry name.
-     */
-    @Override
-    public boolean equals(Object that) {
-        return this == that
-                || that instanceof FileSystemEntryName
-                    && this.uri.equals(((FileSystemEntryName) that).uri);
-    }
-
-    /**
-     * Implements a natural ordering which is consistent with
-     * {@link #equals(Object)}.
-     */
-    @Override
-    public int compareTo(FileSystemEntryName that) {
-        return this.uri.compareTo(that.uri);
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals(Object)}.
-     */
-    @Override
-    public int hashCode() {
-        return uri.hashCode();
-    }
-
-    /**
-     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
-     */
-    @Override
-    public String toString() {
-        return uri.toString();
     }
 }

@@ -60,8 +60,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     private static final long serialVersionUID = 2927354934726235478L;
 
     /** Represents an entry name with an empty URI. */
-    public static final EntryName ROOT
-            = EntryName.create(URI.create(Entry.ROOT));
+    //public static final EntryName ROOT = EntryName.create(URI.create(Entry.ROOT));
 
     private final URI uri;
 
@@ -87,7 +86,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
+     * @param  path the non-{@code null} {@link #getPath() path}.
+     * @param  query the nullable {@link #getQuery() query}.
      * @param  normalize whether or not the given URI shall get normalized
      *         before parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
@@ -156,7 +156,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
             throw new URISyntaxException(uri.toString(), "Authority not allowed");
         if (null != uri.getRawFragment())
             throw new URISyntaxException(uri.toString(), "Fragment not allowed");
-        this.uri = uri;
+        this.uri = normalize ? uri.normalize() : uri;
 
         assert invariants();
     }
@@ -175,7 +175,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @param  member a non-{@code null} entry name.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    EntryName(final EntryName parent, final EntryName member) {
+    public EntryName(final EntryName parent, final EntryName member) {
         final URI parentUri = parent.uri;
         final URI memberUri = member.uri;
         try {
@@ -200,12 +200,22 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         return true;
     }
 
-    /** Equivalent to {@link #getUri()}{@code .getPath()}. */
+    /**
+     * Returns the non-{@code null} path of this entry name.
+     * Equivalent to {@link #getUri()}{@code .getPath()}.
+     *
+     * @return The non-{@code null} path of this entry name.
+     */
     public final String getPath() {
         return uri.getPath();
     }
 
-    /** Equivalent to {@link #getUri()}{@code .getQuery()}. */
+    /**
+     * Returns the nullable query of this entry name.
+     * Equivalent to {@link #getUri()}{@code .getQuery()}.
+     *
+     * @return The nullable query of this entry name.
+     */
     public final String getQuery() {
         return uri.getQuery();
     }
