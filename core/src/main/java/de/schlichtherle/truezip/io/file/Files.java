@@ -239,13 +239,14 @@ class Files {
             final java.io.File src,
             final BitField<InputOption> options) {
         if (src instanceof File) {
+            // TODO: Get rid of this and use the more general pattern below!
             final File file = (File) src;
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
                         .getInputSocket(file.getInnerEntryName0(), options);
         }
-        // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        // TODO: Replace new FileDriver() with an adapter for an ArchiveDetector!
         final Path path = Path.create(src.toURI(), true);
         return FileSystemManagers
                 .getInstance()
@@ -258,19 +259,19 @@ class Files {
             final BitField<OutputOption> options,
             final Entry template) {
         if (dst instanceof File) {
+            // TODO: Get rid of this and use the more general pattern below!
             final File file = (File) dst;
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
                         .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
-        // FIXME: Replace FileDriver.INSTANCE with a service locator!
+        // TODO: Replace new FileDriver() with an adapter for an ArchiveDetector!
         final Path path = Path.create(dst.toURI(), true);
         return FileSystemManagers
                 .getInstance()
-                .getController(     path.getMountPoint(), new FileDriver(), null)
-                .getOutputSocket(   path.getEntryName(),
-                                    options, template);
+                .getController(  path.getMountPoint(), new FileDriver(), null)
+                .getOutputSocket(path.getEntryName(), options, template);
     }
 
     /**

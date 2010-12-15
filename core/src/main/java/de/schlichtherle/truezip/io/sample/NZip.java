@@ -278,7 +278,7 @@ public class NZip extends CommandLineUtility {
             final java.io.File file,
             final String path,
             final boolean detailed) {
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         if (detailed) {
             align(buf, file.length(), 11);
             buf.append(' ');
