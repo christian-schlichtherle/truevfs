@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util;
 
 import java.lang.ref.SoftReference;
@@ -94,8 +93,12 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                final T target = getTarget();
-                return "strongLink:" + (null == target ? "(null)" : target);
+                return new StringBuilder()
+                        .append(getClass().getName())
+                        .append("[target=")
+                        .append(getTarget())
+                        .append(']')
+                        .toString();
             }
         }
 
@@ -112,8 +115,12 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                final T target = getTarget();
-                return "softLink:" + (null == target ? "(null)" : target);
+                return new StringBuilder()
+                        .append(getClass().getName())
+                        .append("[target=")
+                        .append(getTarget())
+                        .append(']')
+                        .toString();
             }
         }
 
@@ -130,8 +137,12 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                final T target = getTarget();
-                return "weakLink:" + (null == target ? "(null)" : target);
+                return new StringBuilder()
+                        .append(getClass().getName())
+                        .append("[target=")
+                        .append(getTarget())
+                        .append(']')
+                        .toString();
             }
         }
     }
