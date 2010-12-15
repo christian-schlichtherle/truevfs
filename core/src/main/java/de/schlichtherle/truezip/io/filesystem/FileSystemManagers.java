@@ -15,9 +15,13 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.key.PromptingKeyManager;
+import de.schlichtherle.truezip.util.BitField;
+import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
  * Provides static utility methods to access file system managers.
@@ -32,7 +36,12 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  */
 public class FileSystemManagers {
 
+    /** You cannot instantiate this class. */
+    private FileSystemManagers() {
+    }
+
     private static volatile FileSystemManager instance; // volatile required for DCL in JSE 5!
+    private static ShutdownThread shutdownThread; // lazily initialized
 
     /**
      * Returns the non-{@code null} federated file system manager class
@@ -67,17 +76,18 @@ public class FileSystemManagers {
             synchronized (FileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    final String n = System.getProperty(
+                    final String name = System.getProperty(
                             FileSystemManager.class.getName(),
                             FileSystemManager.class.getName());
                     try {
-                        Class<?> c = loadClass(n, FileSystemManager.class);
-                        instance = manager = (FileSystemManager) c.newInstance();
+                        manager = (FileSystemManager) loadClass(name, FileSystemManager.class)
+                                .newInstance();
                     } catch (RuntimeException ex) {
                         throw ex;
                     } catch (Exception ex) {
                         throw new UndeclaredThrowableException(ex);
                     }
+                    setInstance(manager);
                 }
             }
         }
@@ -109,4 +119,73 @@ public class FileSystemManagers {
             throw new NullPointerException();
         instance = manager;
     }
+
+    private static synchronized ShutdownThread getShutdownThread(
+            final FileSystemManager manager) {
+        if (null == shutdownThread) {
+            shutdownThread = new ShutdownThread(manager);
+            Runtime.getRuntime().addShutdownHook(shutdownThread);
+        }
+        return shutdownThread;
+    }
+
+    /**
+     * This shutdown thread class runs the runnable provided to its constructor
+     * when it starts execution.
+     */
+    private static final class ShutdownThread extends Thread {
+        ShutdownThread(final FileSystemManager manager) {
+            super(  new ShutdownRunnable(manager),
+                    "TrueZIP FileSystemManager Shutdown Hook");
+            super.setPriority(Thread.MAX_PRIORITY);
+        }
+    } // class ShutdownThread
+
+    private static final class ShutdownRunnable implements Runnable {
+
+        final FileSystemManager manager;
+
+        ShutdownRunnable(final FileSystemManager manager) {
+            // Force loading the key manager now in order to prevent class
+            // loading when running the shutdown hook.
+            // This may help if this shutdown hook is run as a JVM shutdown
+            // hook in an app server environment where class loading is
+            // disabled.
+            PromptingKeyManager.getInstance();
+            this.manager = manager;
+        }
+
+        /**
+         * Runs all runnables added to the set.
+         * <p>
+         * Password prompting will be disabled in order to avoid
+         * {@link RuntimeException}s or even {@link Error}s in this shutdown
+         * hook.
+         * <p>
+         * Note that this method is <em>not</em> re-entrant and should not be
+         * directly called except for unit testing.
+         */
+        @Override
+        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
+        public synchronized void run() {
+            synchronized (PromptingKeyManager.class) {
+                try {
+                    // paranoid, but safe.
+                    PromptingKeyManager.setPrompting(false);
+                    // Logging doesn't work in a shutdown hook!
+                    //FileSystemManager.logger.setLevel(Level.OFF);
+                } finally {
+                    try {
+                        manager.sync(   null,
+                                        new SyncExceptionBuilder(),
+                                        BitField.of(FORCE_CLOSE_INPUT,
+                                                    FORCE_CLOSE_OUTPUT));
+                    } catch (IOException ouch) {
+                        // Logging doesn't work in a shutdown hook!
+                        ouch.printStackTrace();
+                    }
+                }
+            }
+        }
+    } // class ShutdownRunnable
 }

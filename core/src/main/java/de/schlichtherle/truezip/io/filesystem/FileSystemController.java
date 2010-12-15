@@ -103,7 +103,7 @@ public interface FileSystemController<E extends Entry> {
      * @param  name a non-{@code null} relative path name.
      * @return A non-{@code null} {@code OutputSocket}.
      */
-    // FIXME: Erase template parameter and add OutputOption.PRESERVE!
+    // FIXME: Consider erasing template parameter and add OutputOption.PRESERVE?!
     OutputSocket<? extends E> getOutputSocket(
             FileSystemEntryName name, BitField<OutputOption> options, Entry template);
 

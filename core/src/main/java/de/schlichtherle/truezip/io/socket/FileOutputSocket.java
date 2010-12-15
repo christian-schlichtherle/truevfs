@@ -118,6 +118,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                         }
                     }
                     if (null != template) {
+                        // TODO: Use getPeerTarget() instead of template!
                         final long time = template.getTime(WRITE);
                         if (UNKNOWN != time)
                             if (!fileTarget.setLastModified(time))

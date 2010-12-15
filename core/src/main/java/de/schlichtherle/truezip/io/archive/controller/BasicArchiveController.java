@@ -191,7 +191,7 @@ implements ArchiveController<E> {
 
             @Override
             public E getLocalTarget() throws IOException {
-                if (!autoSync(name, READ) && !recursion) {
+                if (!recursion && !autoSync(name, READ)) {
                     autoMount(); // detect false positives!
                     recursion = true;
                     try {
@@ -246,6 +246,7 @@ implements ArchiveController<E> {
                 if (null == link) {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
+                    // TODO: Use getPeerTarget() instead of template!
                     link = autoMount(   !isRoot(path)
                                         && options.get(CREATE_PARENTS), options)
                             .mknod( path, FILE, options.get(CREATE_PARENTS),

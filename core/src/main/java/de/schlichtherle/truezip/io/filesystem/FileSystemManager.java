@@ -15,13 +15,11 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,7 +43,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class FileSystemManager {
 
-    static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
+    public static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
             = new Comparator<FileSystemController<?>>() {
         @Override
         public int compare( FileSystemController<?> l,
@@ -213,70 +211,4 @@ public class FileSystemManager {
         }
         return snapshot;
     }
-
-    private ShutdownThread shutdownThread; // lazily initialized
-
-    private synchronized ShutdownThread getShutdownHook() {
-        if (null == shutdownThread) {
-            shutdownThread = new ShutdownThread(new ShutdownRunnable());
-            Runtime.getRuntime().addShutdownHook(shutdownThread);
-        }
-        return shutdownThread;
-    }
-
-    /**
-     * This shutdown thread class runs the runnable provided to its constructor
-     * when it starts execution.
-     */
-    private static final class ShutdownThread extends Thread {
-        ShutdownThread(final ShutdownRunnable runnable) {
-            super(runnable, "TrueZIP FileSystemManager Shutdown Hook");
-            super.setPriority(Thread.MAX_PRIORITY);
-        }
-    } // class ShutdownThread
-
-    private final class ShutdownRunnable implements Runnable {
-
-        ShutdownRunnable() {
-            // Force loading the key manager now in order to prevent class
-            // loading when running the shutdown hook.
-            // This may help if this shutdown hook is run as a JVM shutdown
-            // hook in an app server environment where class loading is
-            // disabled.
-            PromptingKeyManager.getInstance();
-        }
-
-        /**
-         * Runs all runnables added to the set.
-         * <p>
-         * Password prompting will be disabled in order to avoid
-         * {@link RuntimeException}s or even {@link Error}s in this shutdown
-         * hook.
-         * <p>
-         * Note that this method is <em>not</em> re-entrant and should not be
-         * directly called except for unit testing.
-         */
-        @Override
-        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
-        public synchronized void run() {
-            synchronized (PromptingKeyManager.class) {
-                try {
-                    // paranoid, but safe.
-                    PromptingKeyManager.setPrompting(false);
-                    // Logging doesn't work in a shutdown hook!
-                    //FileSystemManager.logger.setLevel(Level.OFF);
-                } finally {
-                    try {
-                        sync(   null,
-                                new SyncExceptionBuilder(),
-                                BitField.of(    FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT));
-                    } catch (IOException ouch) {
-                        // Logging doesn't work in a shutdown hook!
-                        ouch.printStackTrace();
-                    }
-                }
-            }
-        }
-    } // class ShutdownRunnable
 }
