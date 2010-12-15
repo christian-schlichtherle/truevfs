@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import static de.schlichtherle.truezip.util.BitFieldTest.Dummy.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BitFieldTest extends TestCase {
+public class BitFieldTest {
 
-    public BitFieldTest(String testName) {
-        super(testName);
-    }
-
+    @Test
     public void testSetOne() {
         BitField<Dummy> bits = BitField.noneOf(Dummy.class).set(ONE);
         assertFalse(bits.isEmpty());
@@ -38,6 +35,7 @@ public class BitFieldTest extends TestCase {
         assertTrue(bits.is(ONE));
     }
 
+    @Test
     public void testClearOne() {
         BitField<Dummy> bits = BitField.of(ONE).clear(ONE);
         assertTrue(bits.isEmpty());
@@ -46,6 +44,7 @@ public class BitFieldTest extends TestCase {
         assertFalse(bits.is(ONE));
     }
 
+    @Test
     public void testSetTwo() {
         BitField<Dummy> bits = BitField.of(ONE, TWO);
         assertFalse(bits.isEmpty());
@@ -56,6 +55,7 @@ public class BitFieldTest extends TestCase {
         assertTrue(bits.is(TWO));
     }
 
+    @Test
     public void testClearTwo() {
         BitField<Dummy> bits = BitField.of(ONE, TWO).clear(ONE).clear(TWO);
         assertTrue(bits.isEmpty());
