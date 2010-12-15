@@ -50,7 +50,8 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * </ul>
  * Examples for invalid mount point URIs are:
  * <ul>
- * <li>{@code foo} (not absolute)
+ * <li>{@code /foo} (not absolute)
+ * <li>{@code foo} (dito)
  * <li>{@code foo:/bar/#baz} (fragment)
  * <li>{@code foo:bar:/baz!/bang} (doesn't end with bang slash separator)
  * <li>{@code foo:bar:baz:/bang!/!/} (empty entry name in bar:baz:/bang!/)
