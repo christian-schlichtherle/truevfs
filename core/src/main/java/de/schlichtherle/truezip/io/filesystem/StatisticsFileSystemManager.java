@@ -36,11 +36,11 @@ extends FileSystemManager {
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            final FileSystemController<?> parent) {
+            FileSystemController<?> parent) {
         final FileSystemController<?> controller
                 = super.getController(mountPoint, driver, parent);
-        return controller instanceof ManagedFileSystemController
-                && !(controller.getParent() instanceof ManagedFileSystemController)
+        parent = controller.getParent();
+        return null != parent && null == parent.getParent() // controller is top level federated file system?
                 ? new StatisticsFileSystemController(controller, this)
                 : controller;
     }

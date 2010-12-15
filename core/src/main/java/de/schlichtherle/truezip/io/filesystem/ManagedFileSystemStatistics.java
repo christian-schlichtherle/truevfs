@@ -67,26 +67,26 @@ public final class ManagedFileSystemStatistics {
     }
 
     /**
-     * Returns the total number of <em>top level</em> managed federated file
+     * Returns the total number of managed <em>top level</em> federated file
      * systems.
      */
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
         for (FileSystemController<?> controller : manager.getControllers())
-            if (!(controller.getParent() instanceof ManagedFileSystemController))
+            if (null == controller.getParent().getParent())
                 result++;
         return result;
     }
 
     /**
-     * Returns the number of <em>top level</em> managed federated file systems
+     * Returns the number of managed <em>top level</em> federated file systems
      * which have been touched and need synchronization by calling
      * {@link StatisticsFileSystemManager#sync}.
      */
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
         for (FileSystemController<?> controller : manager.getControllers()) {
-            if (!(controller.getParent() instanceof ManagedFileSystemController))
+            if (null == controller.getParent().getParent())
                 if (controller.getModel().isTouched())
                     result++;
         }
@@ -146,9 +146,10 @@ public final class ManagedFileSystemStatistics {
     } // CountingInputStream
 
     /**
-     * Returns the total number of bytes read from all <em>top level</em>
-     * managed federated file systems, i.e. all file systems which are not a
-     * member of another federated file system.
+     * Returns the total number of bytes read from all managed
+     * <em>top level</em> federated file systems, i.e. all managed federated
+     * file systems which have a parent file system which is not a member of
+     * another parent file system.
      * <p>
      * This method is intended to be used to monitor the progress of the
      * method {@link StatisticsFileSystemManager#sync}.
@@ -180,9 +181,10 @@ public final class ManagedFileSystemStatistics {
     } // class CountingOutputStream
 
     /**
-     * Returns the total number of bytes written to all <em>top level</em>
-     * managed federated file systems, i.e. all file systems which are not a
-     * member of another federated file system.
+     * Returns the total number of bytes written to all managed
+     * <em>top level</em> federated file systems, i.e. all managed federated
+     * file systems which have a parent file system which is not a member of
+     * another parent file system.
      * <p>
      * This method is intended to be used to monitor the progress of the
      * method {@link StatisticsFileSystemManager#sync}.
