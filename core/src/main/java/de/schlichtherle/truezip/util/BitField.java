@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.util;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Iterator;
 
@@ -35,7 +36,9 @@ import java.util.Iterator;
  * @version $Id$
  */
 public final class BitField<E extends Enum<E>>
-implements Iterable<E>, Cloneable {
+implements Iterable<E>, Cloneable, Serializable {
+
+    private static final long serialVersionUID = 3203876204846746524L;
 
     /**
      * Returns a bit field which can contain the given element type and is
@@ -229,12 +232,10 @@ implements Iterable<E>, Cloneable {
      * {@code BitField} and contains the same bits.
      */
     @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof BitField<?>))
-            return false;
-        return bits.equals(((BitField<?>) o).bits);
+    public boolean equals(Object that) {
+        return this == that
+                || that instanceof BitField<?>
+                    && bits.equals(((BitField<?>) that).bits);
     }
 
     /** Returns a hash code which is consistent with {@link #equals}. */
