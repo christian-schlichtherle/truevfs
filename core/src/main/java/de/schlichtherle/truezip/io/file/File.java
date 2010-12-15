@@ -21,8 +21,6 @@ import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -33,7 +31,6 @@ import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
@@ -412,7 +407,7 @@ public class File extends java.io.File {
      *
      * @see #getEnclEntryName
      */
-    private String enclEntryName;
+    private EntryName enclEntryName;
 
     /**
      * This refers to the archive controller if and only if this file refers
@@ -715,15 +710,23 @@ public class File extends java.io.File {
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
-                this.enclEntryName
-                        = path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                        .replace(separatorChar, SEPARATOR_CHAR);
+                this.enclEntryName = toEntryName(
+                        path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
+                        .replace(separatorChar, SEPARATOR_CHAR));
             }
         } else {
             this.detector = detector;
         }
 
         assert invariants();
+    }
+
+    private static EntryName toEntryName(String path) {
+        try {
+            return EntryName.create(new URI(null, null, path, null, null));
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private void initController() {
@@ -735,10 +738,7 @@ public class File extends java.io.File {
                 parentController = enclArchive.getController();
                 mountPoint = MountPoint.create(Scheme.FILE,
                         new Path(   parentController.getModel().getMountPoint(),
-                                    EntryName.create(
-                                        new URI(    null, null,
-                                                    enclEntryName,
-                                                    null, null)))); // FIXME: Introduce driver.getScheme()!
+                                    enclEntryName)); // FIXME: Introduce driver.getScheme()!
             } else {
                 URI uri = target.toURI();
                 // Postfix: Move Windows UNC host from path to authority.
@@ -876,11 +876,13 @@ public class File extends java.io.File {
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
-        enclEntryName = enclEntryNameBuf.length() > 0 ? enclEntryNameBuf.toString() : null;
+        enclEntryName = enclEntryNameBuf.length() > 0
+                ? toEntryName(enclEntryNameBuf.toString())
+                : null;
 
         if (innerArchive == this) {
             // controller initialization has been deferred until now in
-            // order to provide the FederatedFileSystemController with an otherwise fully
+            // order to provide the FileSystemController with an otherwise fully
             // initialized object.
             initController();
         }
@@ -992,7 +994,7 @@ public class File extends java.io.File {
 
         if (innerArchive == this) {
             // controller init has been deferred until now in
-            // order to provide the FederatedFileSystemController with a fully
+            // order to provide the FileSystemController with a fully
             // initialized object.
             initController();
         }
@@ -1033,7 +1035,7 @@ public class File extends java.io.File {
                     }
                     return;
                 }
-                enclEntryName = base + "/" + enclEntryName;
+                enclEntryName = toEntryName(base + "/" + enclEntryName);
             } else {
                 if (isArchive) {
                     innerArchive = this;
@@ -1044,10 +1046,10 @@ public class File extends java.io.File {
                     if (i == parent.length() - 1) // scheme only?
                         return;
                     uri = newURI(parent.substring(0, i), parent.substring(i + 1));
-                    enclEntryName = base.substring(0, baseEnd); // cut off trailing '!'!
+                    enclEntryName = toEntryName(base.substring(0, baseEnd)); // cut off trailing '!'!
                     parent = uri.getSchemeSpecificPart();
                 } else {
-                    enclEntryName = base;
+                    enclEntryName = toEntryName(base);
                 }
             }
         }
@@ -1127,9 +1129,7 @@ public class File extends java.io.File {
             throw new AssertionError();
         if (!(enclArchive == null
                 || contains(enclArchive.getPath(), delegate.getParentFile().getPath())
-                    && enclEntryName.length() > 0
-                    && (separatorChar == '/'
-                        || enclEntryName.indexOf(separatorChar) == -1)))
+                    && enclEntryName.toString().length() > 0))
             throw new AssertionError();
 
         return true;
@@ -1784,7 +1784,15 @@ public class File extends java.io.File {
      * their meaning wherever possible.
      */
     public final String getInnerEntryName() {
-        return this == innerArchive ? ROOT : enclEntryName;
+        return this == innerArchive
+                ? ROOT
+                : null == enclEntryName
+                    ? null
+                    : enclEntryName.getPath();
+    }
+
+    final EntryName getInnerEntryName0() {
+        return this == innerArchive ? EntryName.ROOT : enclEntryName;
     }
 
     /**
@@ -1817,6 +1825,10 @@ public class File extends java.io.File {
      * meaning wherever possible.
      */
     public final String getEnclEntryName() {
+        return null == enclEntryName ? null : enclEntryName.getPath();
+    }
+
+    final EntryName getEnclEntryName0() {
         return enclEntryName;
     }
 
@@ -2218,7 +2230,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             try {
                 return innerArchive.getController()
-                        .getEntry(getInnerEntryName()) != null;
+                        .getEntry(getInnerEntryName0()) != null;
             } catch (IOException ex) {
                 return false;
             }
@@ -2238,7 +2250,7 @@ public class File extends java.io.File {
     public boolean isFile() {
         if (innerArchive != null) {
             try {
-                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName());
+                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == FILE;
             } catch (IOException ex) {
                 return false;
@@ -2267,7 +2279,7 @@ public class File extends java.io.File {
     public boolean isDirectory() {
         if (innerArchive != null) {
             try {
-                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName());
+                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == DIRECTORY;
             } catch (IOException ex) {
                 return false;
@@ -2313,7 +2325,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             try {
                 return innerArchive.getController()
-                        .isReadable(getInnerEntryName());
+                        .isReadable(getInnerEntryName0());
             } catch (IOException ex) {
                 return false;
             }
@@ -2326,7 +2338,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             try {
                 return innerArchive.getController()
-                        .isWritable(getInnerEntryName());
+                        .isWritable(getInnerEntryName0());
             } catch (IOException ex) {
                 return false;
             }
@@ -2347,7 +2359,7 @@ public class File extends java.io.File {
     public boolean setReadOnly() {
         if (innerArchive != null) {
             try {
-                innerArchive.getController().setReadOnly(getInnerEntryName());
+                innerArchive.getController().setReadOnly(getInnerEntryName0());
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -2378,7 +2390,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return 0;
             }
@@ -2416,7 +2428,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return 0;
             }
@@ -2458,7 +2470,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             try {
                 innerArchive.getController()
-                        .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
+                        .setTime(getInnerEntryName0(), BitField.of(Access.WRITE), time);
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -2483,7 +2495,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return null;
             }
@@ -2513,7 +2525,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return null;
             }
@@ -2599,7 +2611,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return null;
             }
@@ -2663,7 +2675,7 @@ public class File extends java.io.File {
         if (innerArchive != null) {
             final FileSystemEntry<?> entry;
             try {
-                entry = innerArchive.getController().getEntry(getInnerEntryName());
+                entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
                 return null;
             }
@@ -2725,7 +2737,7 @@ public class File extends java.io.File {
     public boolean createNewFile() throws IOException {
         if (innerArchive != null) {
             return innerArchive.getController()
-                    .mknod(getInnerEntryName(), FILE,
+                    .mknod(getInnerEntryName0(), FILE,
                         BitField.noneOf(OutputOption.class)
                             .set(CREATE_PARENTS, isLenient()),
                         null);
@@ -2771,7 +2783,7 @@ public class File extends java.io.File {
         try {
             if (innerArchive != null) {
                 return innerArchive.getController()
-                        .mknod(getInnerEntryName(), DIRECTORY,
+                        .mknod(getInnerEntryName0(), DIRECTORY,
                             BitField.noneOf(OutputOption.class)
                                 .set(CREATE_PARENTS, isLenient()), null);
             }
@@ -2794,7 +2806,7 @@ public class File extends java.io.File {
     public boolean delete() {
         try {
             if (innerArchive != null) {
-                innerArchive.getController().unlink(getInnerEntryName());
+                innerArchive.getController().unlink(getInnerEntryName0());
                 return true;
             }
         } catch (IOException ex) {

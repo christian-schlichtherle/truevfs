@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URI;
@@ -98,34 +99,34 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public FileEntry getEntry(String path) throws IOException {
-        final FileEntry entry = FileEntry.get(target, path);
+    public FileEntry getEntry(EntryName path) throws IOException {
+        final FileEntry entry = FileEntry.get(target, path.getPath());
         return entry.getFile().exists() ? entry : null;
     }
 
     @Override
-    public boolean isReadable(String path) throws IOException {
-        final File file = new File(target, path);
+    public boolean isReadable(EntryName path) throws IOException {
+        final File file = new File(target, path.getPath());
         return file.canRead();
     }
 
     @Override
-    public boolean isWritable(String path) throws IOException {
-        final File file = new File(target, path);
+    public boolean isWritable(EntryName path) throws IOException {
+        final File file = new File(target, path.getPath());
         return isCreatableOrWritable(file);
     }
 
     @Override
-    public void setReadOnly(String path) throws IOException {
-        final File file = new File(target, path);
+    public void setReadOnly(EntryName path) throws IOException {
+        final File file = new File(target, path.getPath());
         if (!file.setReadOnly())
             throw new IOException();
     }
 
     @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
+    public boolean setTime(EntryName path, BitField<Access> types, long value)
     throws IOException {
-        final File file = new File(target, path);
+        final File file = new File(target, path.getPath());
         boolean ok = true;
         for (final Access type : types)
             ok &= WRITE == type ? file.setLastModified(value) : false;
@@ -134,27 +135,27 @@ implements FileSystemController<FileEntry> {
 
     @Override
     public InputSocket<FileEntry> getInputSocket(
-            String path,
+            EntryName path,
             BitField<InputOption> options) {
-        return FileInputSocket.get( FileEntry.get(target, path),
+        return FileInputSocket.get( FileEntry.get(target, path.getPath()),
                                     options.clear(InputOption.CACHE));
     }
 
     @Override
     public OutputSocket<FileEntry> getOutputSocket(
-            String path,
+            EntryName path,
             BitField<OutputOption> options,
             Entry template) {
-        return FileOutputSocket.get(FileEntry.get(target, path), options, template);
+        return FileOutputSocket.get(FileEntry.get(target, path.getPath()), options, template);
     }
 
     @Override
-    public boolean mknod(   String path,
+    public boolean mknod(   EntryName path,
                             Type type,
                             BitField<OutputOption> options,
                             Entry template)
     throws IOException {
-        final File file = new File(target, path);
+        final File file = new File(target, path.getPath());
         switch (type) {
             case FILE:
                 return file.createNewFile();
@@ -168,9 +169,9 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public void unlink(String path)
+    public void unlink(EntryName path)
     throws IOException {
-        final File file = new File(target, path);
+        final File file = new File(target, path.getPath());
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
     }

@@ -216,15 +216,8 @@ extends FileSystemArchiveController<E> {
         return parent;
     }
 
-    private String resolveParent(String path) {
-        try {
-            return getModel()
-                    .resolveParent(EntryName.create(new URI(null, null, path, null, null)))
-                    .getUri()
-                    .getPath();
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+    private EntryName resolveParent(EntryName path) {
+        return getModel().resolveParent(path);
     }
 
     @Override
@@ -240,15 +233,16 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public final ArchiveFileSystemEntry<E> getEntry(final String path)
+    public final ArchiveFileSystemEntry<E> getEntry(final EntryName path)
     throws IOException {
+        final String name = path.getPath();
         try {
-            return autoMount().getEntry(path);
+            return autoMount().getEntry(name);
         } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             // FIXME: Check if this is required anymore.
-            if (!isRoot(path))
+            if (!isRoot(name))
                 return null;
             final FileSystemEntry<?> entry = getParent()
                     .getEntry(resolveParent(path));
@@ -291,7 +285,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         try {
             final FileSystemController<?> parent = getParent();
-            final String parentPath = resolveParent(ROOT);
+            final EntryName parentPath = resolveParent(EntryName.ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
@@ -336,7 +330,7 @@ extends FileSystemArchiveController<E> {
         if (null != output)
             return;
         final FileSystemController<?> parent = getParent();
-        final String parentPath = resolveParent(ROOT);
+        final EntryName parentPath = resolveParent(EntryName.ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
@@ -632,9 +626,9 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public void unlink(String path) throws IOException {
+    public void unlink(EntryName path) throws IOException {
         super.unlink(path);
-        if (isRoot(path))
+        if (isRoot(path.getPath()))
             getParent().unlink(resolveParent(path));
     }
 }

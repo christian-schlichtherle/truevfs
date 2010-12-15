@@ -243,14 +243,14 @@ class Files {
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .getInputSocket(file.getInnerEntryName(), options);
+                        .getInputSocket(file.getInnerEntryName0(), options);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
         final Path path = Path.create(src.toURI(), true);
         return FileSystemManagers
                 .getInstance()
                 .getController( path.getMountPoint(), new FileDriver(), null)
-                .getInputSocket(path.getEntryName().toString(), options);
+                .getInputSocket(path.getEntryName(), options);
     }
 
     static OutputSocket<?> getOutputSocket(
@@ -262,15 +262,14 @@ class Files {
             final File archive = file.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .getOutputSocket(   file.getInnerEntryName(),
-                                            options, template);
+                        .getOutputSocket(file.getInnerEntryName0(), options, template);
         }
         // FIXME: Replace FileDriver.INSTANCE with a service locator!
         final Path path = Path.create(dst.toURI(), true);
         return FileSystemManagers
                 .getInstance()
                 .getController(     path.getMountPoint(), new FileDriver(), null)
-                .getOutputSocket(   path.getEntryName().toString(),
+                .getOutputSocket(   path.getEntryName(),
                                     options, template);
     }
 

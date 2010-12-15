@@ -25,6 +25,7 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -125,7 +126,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public ArchiveFileSystemEntry<? extends E> getEntry(String path)
+    public ArchiveFileSystemEntry<? extends E> getEntry(EntryName path)
     throws IOException {
         try {
             readLock().lock();
@@ -146,7 +147,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean isReadable(String path) throws IOException {
+    public boolean isReadable(EntryName path) throws IOException {
         try {
             readLock().lock();
             try {
@@ -166,7 +167,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean isWritable(String path) throws IOException {
+    public boolean isWritable(EntryName path) throws IOException {
         try {
             readLock().lock();
             try {
@@ -186,7 +187,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public void setReadOnly(String path) throws IOException {
+    public void setReadOnly(EntryName path) throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
@@ -197,7 +198,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean setTime( String path, BitField<Access> types, long value)
+    public boolean setTime(EntryName path, BitField<Access> types, long value)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
@@ -209,7 +210,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public InputSocket<E> getInputSocket(  String path,
+    public InputSocket<E> getInputSocket(   EntryName path,
                                             BitField<InputOption> options) {
         return new Input(controller.getInputSocket(path, options));
     }
@@ -281,7 +282,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Input
 
     @Override
-    public OutputSocket<E> getOutputSocket(String path,
+    public OutputSocket<E> getOutputSocket( EntryName path,
                                             BitField<OutputOption> options,
                                             Entry template) {
         return new Output(controller.getOutputSocket(path, options, template));
@@ -316,7 +317,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Output
 
     @Override
-    public boolean mknod(   String path,
+    public boolean mknod(   EntryName path,
                             Type type,
                             BitField<OutputOption> options,
                             Entry template)
@@ -331,7 +332,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public void unlink(String path)
+    public void unlink(EntryName path)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();

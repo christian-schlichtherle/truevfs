@@ -70,49 +70,49 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public FileSystemEntry<? extends E> getEntry(String path)
+    public FileSystemEntry<? extends E> getEntry(EntryName path)
     throws IOException {
         return controller.getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws IOException {
+    public boolean isReadable(EntryName path) throws IOException {
         return controller.isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws IOException {
+    public boolean isWritable(EntryName path) throws IOException {
         return controller.isWritable(path);
     }
 
     @Override
-    public void setReadOnly(String path) throws IOException {
+    public void setReadOnly(EntryName path) throws IOException {
         controller.setReadOnly(path);
     }
 
     @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
+    public boolean setTime(EntryName path, BitField<Access> types, long value)
     throws IOException {
         return controller.setTime(path, types, value);
     }
 
     @Override
     public InputSocket<? extends E> getInputSocket(
-            String path,
+            EntryName path,
             BitField<InputOption> options) {
         return controller.getInputSocket(path, options);
     }
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(
-            String path,
+            EntryName path,
             BitField<OutputOption> options,
             Entry template) {
         return controller.getOutputSocket(path, options, template);
     }
 
     @Override
-    public boolean mknod(   String path,
+    public boolean mknod(   EntryName path,
                             Entry.Type type,
                             BitField<OutputOption> options,
                             Entry template)
@@ -121,7 +121,7 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public void unlink(String path) throws IOException {
+    public void unlink(EntryName path) throws IOException {
         controller.unlink(path);
     }
 
