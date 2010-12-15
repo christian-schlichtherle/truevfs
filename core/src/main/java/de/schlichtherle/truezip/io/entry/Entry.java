@@ -126,7 +126,7 @@ public interface Entry {
 
     enum Access {
         WRITE,
-        READ, // FIXME: This is not yet fully supported!
+        READ, // TODO: This is not yet fully supported!
     }
 
     /**
