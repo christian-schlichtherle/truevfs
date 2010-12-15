@@ -123,7 +123,7 @@ public class MountPointTest {
         }
 
         for (final String[] params : new String[][] {
-            { "foo", "bar:baz:/bang!/boom/" },
+            //{ "foo", "bar:baz:/bang!/boom" },
             { "foo", "bar:baz:/bang!/" },
             { "foo", "bar:/baz/" },
         }) {
@@ -186,9 +186,8 @@ public class MountPointTest {
     @Test
     public void testResolve() {
         for (final String[] params : new String[][] {
-            { "foo:bar:/bäz?bööm!/", "bäng/?plönk", "bäz/bäng/?plönk", "foo:bar:/bäz?bööm!/bäng/?plönk" },
-            { "foo:bar:/baz!/", "bang/?boom", "baz/bang/?boom", "foo:bar:/baz!/bang/?boom" },
-            { "foo:bar:/baz!/", "bang/", "baz/bang/", "foo:bar:/baz!/bang/" },
+            { "foo:bar:/bäz?bööm!/", "bäng?plönk", "bäz/bäng?plönk", "foo:bar:/bäz?bööm!/bäng?plönk" },
+            { "foo:bar:/baz!/", "bang?boom", "baz/bang?boom", "foo:bar:/baz!/bang?boom" },
             { "foo:bar:/baz!/", "bang", "baz/bang", "foo:bar:/baz!/bang" },
             { "foo:/bar/?boom", "baz?plonk", null, "foo:/bar/baz?plonk" },
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },

@@ -134,9 +134,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
                 throw new URISyntaxException(uri.toString(), "Path not absolute");
             final String pathEntryNameUriPath
                     = path.getEntryName().getUri().getPath();
-            if (0 == pathEntryNameUriPath.length()
-                    || pathEntryNameUriPath.endsWith(SEPARATOR))
-                throw new URISyntaxException(uri.toString(), "Illegal entry name");
+            if (0 == pathEntryNameUriPath.length())
+                throw new URISyntaxException(uri.toString(), "Empty entry name");
             if (normalize) {
                 final URI nuri = new URI(
                         uri.getScheme(), pathUri.toString() + BANG_SLASH, null);
@@ -195,9 +194,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         if (!pathUri.isAbsolute())
             throw new URISyntaxException(pathUri.toString(), "Path not absolute");
         final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
-        if (0 == pathEntryNameUriPath.length()
-                || pathEntryNameUriPath.endsWith(SEPARATOR))
-            throw new URISyntaxException(pathUri.toString(), "Illegal entry name");
+        if (0 == pathEntryNameUriPath.length())
+            throw new URISyntaxException(pathUri.toString(), "Empty entry name");
         this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
         this.path = path;
         this.scheme = scheme;
@@ -215,8 +213,6 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
             assert getPath().getUri().isAbsolute();
             assert null == getPath().getUri().getRawFragment();
             assert 0 != getPath().getEntryName().getUri().getPath().length();
-            assert !getPath().getEntryName().getUri().getPath().endsWith(SEPARATOR);
-            assert 0 != getPath().getEntryName().toString().length();
         } else {
             assert getUri().normalize() == getUri();
             assert getUri().getRawPath().endsWith(SEPARATOR);
