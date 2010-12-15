@@ -22,8 +22,9 @@ import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.IOException;
 
 /**
- * Defines the available options for file system synchronization operations,
- * i.e. {@link FileSystemController#sync} and {@link FileSystemManager#sync}.
+ * Defines the available options for the synchronization of federated file
+ * systems via the methods {@link FileSystemController#sync} and
+ * {@link FileSystemManager#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -32,12 +33,12 @@ public enum SyncOption {
 
     /**
      * Suppose there are any open input streams or read only files for any
-     * archive entries of an archive controller's target archive file.
-     * Then if this option is set, the archive controller waits until all
-     * <em>other</em> threads have closed their archive entry input streams
-     * and read only files before proceeding with the update of the target
-     * archive file.
-     * Archive input streams and read only files opened by the
+     * file system entries.
+     * Then if this option is set, the file system controller waits until all
+     * <em>other</em> threads have closed their entry input streams
+     * and read only files before proceeding with the update of the federated
+     * file system.
+     * Input streams and read only files opened by the
      * <em>current</em> thread are always ignored.
      * If the current thread gets interrupted while waiting, it will
      * stop waiting and proceed normally as if this options wasn't set.
@@ -45,22 +46,22 @@ public enum SyncOption {
      * Beware: If a stream has not been closed because the client
      * application does not always properly close its streams, even on an
      * {@link IOException} (which is a typical bug in many Java
-     * applications), then the respective archive controller will not
+     * applications), then the respective file system controller will not
      * return from the update until the current thread gets interrupted!
      */
     WAIT_CLOSE_INPUT,
 
     /**
      * Suppose there are any open input streams or read only files for any
-     * archive entries of an archive controller's target archive file.
-     * Then if this option is set, the archive controller will proceed to
-     * update the target archive file anyway and finally throw a
+     * file system entries.
+     * Then if this option is set, the file system controller will proceed to
+     * update the federated file system anyway and finally throw a
      * {@link SyncWarningException} with a {@link InputBusyException} as its
      * cause to indicate that any subsequent operations on these streams will
      * fail with an {@link InputClosedException} because they have been forced
      * to close.
      * <p>
-     * If this option is not set, the target archive file is <em>not</em>
+     * If this option is not set, the federated file system is <em>not</em>
      * updated and an {@link InputBusyException} is thrown to indicate
      * that the application must close all entry input streams and read
      * only files first.
@@ -69,13 +70,13 @@ public enum SyncOption {
 
     /**
      * Similar to {@link #WAIT_CLOSE_INPUT},
-     * but applies to archive entry output streams instead.
+     * but applies to file system entry output streams instead.
      */
     WAIT_CLOSE_OUTPUT,
 
     /**
      * Similar to {@link #FORCE_CLOSE_INPUT},
-     * but applies to archive entry output streams and may throw a
+     * but applies to file system entry output streams and may throw a
      * {@link OutputClosedException} / {@link OutputBusyException} instead.
      * <p>
      * If this option is set, then
@@ -86,15 +87,15 @@ public enum SyncOption {
 
     /**
      * If this option is set, all pending changes are aborted.
-     * This option will leave a corrupted target archive file and is only
-     * meaningful immediately before the target archive file gets deleted.
+     * This option may leave the federated file system corrupted and is only
+     * meaningful immediately before the federated file system gets deleted.
      */
     ABORT_CHANGES,
 
     /**
-     * Suppose an archive controller has cached data for archive entries.
+     * Suppose a federated file system controller has cached data for entries.
      * Then if this option is set, the cache contents get cleared after
-     * flushing them to the target archive file when it gets synchronized.
+     * flushing them to the federated file system when it gets synchronized.
      */
     CLEAR_CACHE,
 }
