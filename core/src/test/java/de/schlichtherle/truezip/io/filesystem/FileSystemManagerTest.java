@@ -31,12 +31,12 @@ import static org.junit.Assert.*;
  */
 public class FileSystemManagerTest {
 
-    private FederatedFileSystemManager manager;
+    private FileSystemManager manager;
     private FileSystemDriver driver;
 
     @Before
     public void setUp() {
-        manager = new FederatedFileSystemManager();
+        manager = new FileSystemManager();
         driver = new Driver();
     }
 
@@ -65,11 +65,11 @@ public class FileSystemManagerTest {
                 "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
             },
         }) {
-            FederatedFileSystemController<?> parent = null;
+            FileSystemController<?> parent = null;
             for (final String param : params) {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
-                final FederatedFileSystemController<?> controller
+                final FileSystemController<?> controller
                         = manager.getController(mountPoint, driver, null);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
@@ -94,21 +94,21 @@ public class FileSystemManagerTest {
                 //"file:/", // does NOT get mapped!
             },
         }) {
-            FederatedFileSystemController<?> member = null;
+            FileSystemController<?> member = null;
             for (final String param : params) {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
-                final FederatedFileSystemController<?> controller
+                final FileSystemController<?> controller
                         = manager.getController(mountPoint, driver, null);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
             }
 
-            final Iterator<FederatedFileSystemController<?>> i
+            final Iterator<FileSystemController<?>> i
                     = manager.getControllers(
                         MountPoint.create(URI.create(params[params.length - 1])),
-                        FederatedFileSystemManager.REVERSE_CONTROLLERS).iterator();
+                        FileSystemManager.REVERSE_CONTROLLERS).iterator();
             for (final String param : params) {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
@@ -122,7 +122,7 @@ public class FileSystemManagerTest {
         @Override
         public FileSystemController<?> newController(
                 final MountPoint mountPoint,
-                final FederatedFileSystemController<?> parent) {
+                final FileSystemController<?> parent) {
             assert null == mountPoint.getParent()
                     ? null == parent
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint());

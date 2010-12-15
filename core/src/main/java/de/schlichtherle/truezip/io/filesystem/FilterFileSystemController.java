@@ -50,38 +50,38 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public FederatedFileSystemController<?> getParent() {
+    public FileSystemController<?> getParent() {
         return controller.getParent();
     }
 
     @Override
-    public Icon getOpenIcon() throws FileSystemException {
+    public Icon getOpenIcon() throws IOException {
         return controller.getOpenIcon();
     }
 
     @Override
-    public Icon getClosedIcon() throws FileSystemException {
+    public Icon getClosedIcon() throws IOException {
         return controller.getClosedIcon();
     }
 
     @Override
-    public boolean isReadOnly() throws FileSystemException {
+    public boolean isReadOnly() throws IOException {
         return controller.isReadOnly();
     }
 
     @Override
     public FileSystemEntry<? extends E> getEntry(String path)
-    throws FileSystemException {
+    throws IOException {
         return controller.getEntry(path);
     }
 
     @Override
-    public boolean isReadable(String path) throws FileSystemException {
+    public boolean isReadable(String path) throws IOException {
         return controller.isReadable(path);
     }
 
     @Override
-    public boolean isWritable(String path) throws FileSystemException {
+    public boolean isWritable(String path) throws IOException {
         return controller.isWritable(path);
     }
 

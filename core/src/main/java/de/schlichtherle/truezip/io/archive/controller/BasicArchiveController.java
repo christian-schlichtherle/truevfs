@@ -124,8 +124,7 @@ implements ArchiveController<E> {
         return model;
     }
 
-    final ArchiveFileSystem<E> autoMount()
-    throws IOException {
+    final ArchiveFileSystem<E> autoMount() throws IOException {
         return autoMount(false, BitField.noneOf(OutputOption.class));
     }
 
@@ -152,44 +151,22 @@ implements ArchiveController<E> {
     throws IOException;
 
     @Override
-    public final boolean isReadOnly()
-    throws FileSystemException {
-        try {
-            return autoMount().isReadOnly();
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
+    public final boolean isReadOnly() throws IOException {
+        return autoMount().isReadOnly();
     }
 
     @Override
-    public final boolean isReadable(final String path)
-    throws FileSystemException {
-        try {
-            return autoMount().getEntry(path) != null;
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
+    public final boolean isReadable(final String path) throws IOException {
+        return autoMount().getEntry(path) != null;
     }
 
     @Override
-    public final boolean isWritable(final String path)
-    throws FileSystemException {
-        try {
-            return autoMount().isWritable(path);
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return false;
-        }
+    public final boolean isWritable(final String path) throws IOException {
+        return autoMount().isWritable(path);
     }
 
     @Override
-    public final void setReadOnly(final String path)
-    throws IOException {
+    public final void setReadOnly(final String path) throws IOException {
         autoMount().setReadOnly(path);
     }
 

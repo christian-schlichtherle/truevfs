@@ -280,5 +280,5 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
                 return out;
             }
         } // class RegisteringOutputSocket
-    }
+    } // class EntryCache
 }

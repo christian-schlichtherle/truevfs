@@ -23,8 +23,7 @@ import java.io.IOException;
 
 /**
  * Defines the available options for file system synchronization operations,
- * i.e. {@link FileSystemController#sync} and
- * {@link FederatedFileSystemManager#sync}.
+ * i.e. {@link FileSystemController#sync} and {@link FileSystemManager#sync}.
  *
  * @author Christian Schlichtherle
  * @version $Id$

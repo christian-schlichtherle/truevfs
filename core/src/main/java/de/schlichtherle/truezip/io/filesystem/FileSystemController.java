@@ -28,10 +28,11 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * Provides read/write access to a file system.
- * The file system is addressed by the
- * {@link FileSystemModel#getMountPoint() mount point} of its
- * {@link #getModel() file system model}.
+ * Provides read/write access to one or more file systems which are organized
+ * in a chain of responsibility for file system federation.
+ * The {@link FileSystemModel#getMountPoint() mount point} of the
+ * {@link #getModel() file system model} addresses the file system at the head
+ * of this chain of federated file systems.
  * <p>
  * Where the methods of this interface accept a
  * {@link FileSystemEntry#getName path name} string as a parameter, this will
@@ -62,24 +63,23 @@ public interface FileSystemController<E extends Entry> {
     FileSystemModel getModel();
 
     /**
-     * Returns the controller for the parent federated file system or
-     * {@code null} if and only if this file system is not a member of another
+     * Returns the controller for the parent file system or {@code null} if
+     * and only if this file system is not federated, i.e. a member of another
      * file system.
      */
-    FederatedFileSystemController<?> getParent();
+    FileSystemController<?> getParent();
 
-    Icon getOpenIcon() throws FileSystemException;
+    Icon getOpenIcon() throws IOException;
 
-    Icon getClosedIcon() throws FileSystemException;
+    Icon getClosedIcon() throws IOException;
 
-    boolean isReadOnly() throws FileSystemException;
+    boolean isReadOnly() throws IOException;
 
-    FileSystemEntry<? extends E> getEntry(String path)
-    throws FileSystemException;
+    FileSystemEntry<? extends E> getEntry(String path) throws IOException;
 
-    boolean isReadable(String path) throws FileSystemException;
+    boolean isReadable(String path) throws IOException;
 
-    boolean isWritable(String path) throws FileSystemException;
+    boolean isWritable(String path) throws IOException;
 
     void setReadOnly(String path) throws IOException;
 

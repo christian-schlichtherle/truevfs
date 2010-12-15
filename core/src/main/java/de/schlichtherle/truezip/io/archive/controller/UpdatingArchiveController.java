@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URISyntaxException;
 import java.net.URI;
 import de.schlichtherle.truezip.io.filesystem.EntryName;
@@ -32,7 +33,6 @@ import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.FilterEntry;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
@@ -169,7 +169,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private final ArchiveDriver<E> driver;
-    private final FederatedFileSystemController<?> parent;
+    private final FileSystemController<?> parent;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -189,7 +189,7 @@ extends FileSystemArchiveController<E> {
     public UpdatingArchiveController(
             final ArchiveModel model,
             final ArchiveDriver<E> driver,
-            final FederatedFileSystemController<?> parent) {
+            final FileSystemController<?> parent) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
@@ -212,7 +212,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public FederatedFileSystemController<?> getParent() {
+    public FileSystemController<?> getParent() {
         return parent;
     }
 
@@ -228,39 +228,26 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public Icon getOpenIcon()
-    throws FileSystemException {
-        try {
-            autoMount(); // detect false positives!
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
+    public Icon getOpenIcon() throws IOException {
+        autoMount(); // detect false positives!
         return getDriver().getOpenIcon(getModel());
     }
 
     @Override
-    public Icon getClosedIcon()
-    throws FileSystemException {
-        try {
-            autoMount(); // detect false positives!
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            return null;
-        }
+    public Icon getClosedIcon() throws IOException {
+        autoMount(); // detect false positives!
         return getDriver().getClosedIcon(getModel());
     }
 
     @Override
     public final ArchiveFileSystemEntry<E> getEntry(final String path)
-    throws FileSystemException {
+    throws IOException {
         try {
             return autoMount().getEntry(path);
         } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
+            // FIXME: Check if this is required anymore.
             if (!isRoot(path))
                 return null;
             final FileSystemEntry<?> entry = getParent()
@@ -303,7 +290,7 @@ extends FileSystemArchiveController<E> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final FederatedFileSystemController<?> parent = getParent();
+            final FileSystemController<?> parent = getParent();
             final String parentPath = resolveParent(ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
@@ -348,7 +335,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FederatedFileSystemController<?> parent = getParent();
+        final FileSystemController<?> parent = getParent();
         final String parentPath = resolveParent(ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentPath, options.set(OutputOption.CACHE), null);

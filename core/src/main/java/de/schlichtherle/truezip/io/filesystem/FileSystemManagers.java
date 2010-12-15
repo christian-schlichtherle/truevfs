@@ -32,7 +32,7 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
  */
 public class FileSystemManagers {
 
-    private static volatile FederatedFileSystemManager instance; // volatile required for DCL in JSE 5!
+    private static volatile FileSystemManager instance; // volatile required for DCL in JSE 5!
 
     /**
      * Returns the non-{@code null} federated file system manager class
@@ -42,7 +42,7 @@ public class FileSystemManagers {
      * {@link #setInstance}, then this instance is returned.
      * <p>
      * Otherwise, the value of the system property
-     * {@code de.schlichtherle.truezip.io.filesystem.FederatedFileSystemManager}
+     * {@code de.schlichtherle.truezip.io.filesystem.FileSystemManager}
      * is considered:
      * <p>
      * If this system property is set, it must denote the fully qualified
@@ -61,18 +61,18 @@ public class FileSystemManagers {
      * @return The non-{@code null} federated file system manager class
      *         property instance.
      */
-    public static FederatedFileSystemManager getInstance() {
-        FederatedFileSystemManager manager = instance;
+    public static FileSystemManager getInstance() {
+        FileSystemManager manager = instance;
         if (null == manager) {
-            synchronized (FederatedFileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
+            synchronized (FileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
                     final String n = System.getProperty(
-                            FederatedFileSystemManager.class.getName(),
-                            FederatedFileSystemManager.class.getName());
+                            FileSystemManager.class.getName(),
+                            FileSystemManager.class.getName());
                     try {
-                        Class<?> c = loadClass(n, FederatedFileSystemManager.class);
-                        instance = manager = (FederatedFileSystemManager) c.newInstance();
+                        Class<?> c = loadClass(n, FileSystemManager.class);
+                        instance = manager = (FileSystemManager) c.newInstance();
                     } catch (RuntimeException ex) {
                         throw ex;
                     } catch (Exception ex) {
@@ -88,9 +88,9 @@ public class FileSystemManagers {
      * Sets the federated file system manager class property instance.
      * If the current federated file system manager has any managed federated
      * file systems, an {@link IllegalStateException} is thrown.
-     * Call {@link #sync} and make sure to purge all references to the
-     * federated file system controllers which have been returned by
-     * {@link #getController} to prevent this.
+     * Call {@link FileSystemManager#sync} and make sure to purge all
+     * references to the federated file system controllers which are returned
+     * by {@link FileSystemManager#getController} to prevent this.
      *
      * @param  manager The file system manager instance to use as the class
      *         property.
@@ -99,7 +99,7 @@ public class FileSystemManagers {
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
-    public static synchronized void setInstance(final FederatedFileSystemManager manager) {
+    public static synchronized void setInstance(final FileSystemManager manager) {
         final int count = null == instance
                 ? 0
                 : instance.getControllers(null, null).size();

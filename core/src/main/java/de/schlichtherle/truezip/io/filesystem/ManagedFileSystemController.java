@@ -50,7 +50,7 @@ import javax.swing.Icon;
  */
 final class ManagedFileSystemController
 extends FilterFileSystemController<Entry, FileSystemController<?>>
-implements FederatedFileSystemController<Entry> {
+implements FileSystemController<Entry> {
 
     ManagedFileSystemController(final FileSystemController<?> controller) {
         super(controller);
@@ -69,68 +69,56 @@ implements FederatedFileSystemController<Entry> {
     }
 
     @Override
-    public Icon getOpenIcon() {
+    public Icon getOpenIcon() throws IOException {
         try {
             return controller.getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
-    public Icon getClosedIcon() {
+    public Icon getClosedIcon() throws IOException {
         try {
             return controller.getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
-    public boolean isReadOnly() {
+    public boolean isReadOnly() throws IOException {
         try {
             return controller.isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
-    public FileSystemEntry<?> getEntry(String path) {
+    public FileSystemEntry<?> getEntry(String path) throws IOException {
         try {
             return controller.getEntry(path);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(resolveParent(path));
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
-    public boolean isReadable(String path) {
+    public boolean isReadable(String path) throws IOException {
         try {
             return controller.isReadable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(resolveParent(path));
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
     @Override
-    public boolean isWritable(String path) {
+    public boolean isWritable(String path) throws IOException {
         try {
             return controller.isWritable(path);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(resolveParent(path));
-        } catch (FileSystemException ex) {
-            throw new UndeclaredThrowableException(ex);
         }
     }
 
@@ -280,10 +268,10 @@ implements FederatedFileSystemController<Entry> {
     public <X extends IOException>
     void sync(  final ExceptionBuilder<? super SyncException, X> builder,
                 final BitField<SyncOption> options)
-    throws X {
+    throws X, FileSystemException {
         try {
             controller.sync(builder, options);
-        } catch (FileSystemException ex) {
+        } catch (FalsePositiveException ex) {
             throw new UndeclaredThrowableException(ex);
         }
     }

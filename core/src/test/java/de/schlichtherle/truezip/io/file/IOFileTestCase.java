@@ -15,8 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputClosedException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -157,7 +157,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<FederatedFileSystemController<?>> ref = new WeakReference<FederatedFileSystemController<?>>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -177,7 +177,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<FederatedFileSystemController<?>> ref = new WeakReference<FederatedFileSystemController<?>>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();

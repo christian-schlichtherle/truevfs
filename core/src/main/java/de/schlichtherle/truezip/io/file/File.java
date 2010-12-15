@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
@@ -26,7 +26,6 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.FederatedFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -51,6 +50,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
@@ -420,7 +421,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient FederatedFileSystemController<?> controller;
+    private transient FileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -728,7 +729,7 @@ public class File extends java.io.File {
     private void initController() {
         final java.io.File target = getRealFile(delegate);
         final MountPoint mountPoint;
-        final FederatedFileSystemController<?> parentController;
+        final FileSystemController<?> parentController;
         try {
             if (null != enclArchive) {
                 parentController = enclArchive.getController();
@@ -1860,7 +1861,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FederatedFileSystemController<?> getController() {
+    final FileSystemController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }
@@ -2202,7 +2203,7 @@ public class File extends java.io.File {
      * @see java.io.File#toURL
      */
     @Deprecated
-	@Override
+    @Override
     public URL toURL() throws MalformedURLException {
         return delegate.toURL();
     }
@@ -2214,9 +2215,14 @@ public class File extends java.io.File {
      */
     @Override
     public boolean exists() {
-        if (innerArchive != null)
-            return innerArchive.getController()
-                    .getEntry(getInnerEntryName()) != null;
+        if (innerArchive != null) {
+            try {
+                return innerArchive.getController()
+                        .getEntry(getInnerEntryName()) != null;
+            } catch (IOException ex) {
+                return false;
+            }
+        }
         return delegate.exists();
     }
 
@@ -2231,9 +2237,12 @@ public class File extends java.io.File {
     @Override
     public boolean isFile() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive
-                    .getController().getEntry(getInnerEntryName());
-            return null != entry && entry.getType() == FILE;
+            try {
+                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName());
+                return null != entry && entry.getType() == FILE;
+            } catch (IOException ex) {
+                return false;
+            }
         }
         return delegate.isFile();
     }
@@ -2257,9 +2266,12 @@ public class File extends java.io.File {
     @Override
     public boolean isDirectory() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive
-                    .getController().getEntry(getInnerEntryName());
-            return null != entry && entry.getType() == DIRECTORY;
+            try {
+                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName());
+                return null != entry && entry.getType() == DIRECTORY;
+            } catch (IOException ex) {
+                return false;
+            }
         }
         return delegate.isDirectory();
     }
@@ -2271,8 +2283,12 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getOpenIcon() {
-        if (innerArchive == this)
-            return getController().getOpenIcon();
+        if (innerArchive == this) {
+            try {
+                return getController().getOpenIcon();
+            } catch (IOException ex) {
+            }
+        }
         return null;
     }
 
@@ -2283,24 +2299,38 @@ public class File extends java.io.File {
      * Otherwise, null is returned.
      */
     public Icon getClosedIcon() {
-        if (innerArchive == this)
-            return getController().getClosedIcon();
+        if (innerArchive == this) {
+            try {
+                return getController().getClosedIcon();
+            } catch (IOException ex) {
+            }
+        }
         return null;
     }
 
     @Override
     public boolean canRead() {
-        if (innerArchive != null)
-            return innerArchive.getController()
-                    .isReadable(getInnerEntryName());
+        if (innerArchive != null) {
+            try {
+                return innerArchive.getController()
+                        .isReadable(getInnerEntryName());
+            } catch (IOException ex) {
+                return false;
+            }
+        }
         return delegate.canRead();
     }
 
     @Override
     public boolean canWrite() {
-        if (innerArchive != null)
-            return innerArchive.getController()
-                    .isWritable(getInnerEntryName());
+        if (innerArchive != null) {
+            try {
+                return innerArchive.getController()
+                        .isWritable(getInnerEntryName());
+            } catch (IOException ex) {
+                return false;
+            }
+        }
         return delegate.canWrite();
     }
 
@@ -2315,14 +2345,13 @@ public class File extends java.io.File {
      */
     @Override
     public boolean setReadOnly() {
-        try {
-            if (innerArchive != null) {
-                innerArchive.getController()
-                        .setReadOnly(getInnerEntryName());
+        if (innerArchive != null) {
+            try {
+                innerArchive.getController().setReadOnly(getInnerEntryName());
                 return true;
+            } catch (IOException ex) {
+                return false;
             }
-        } catch (IOException ex) {
-            return false;
         }
         return delegate.setReadOnly();
     }
@@ -2347,8 +2376,12 @@ public class File extends java.io.File {
     @Override
     public long length() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive
-                    .getController().getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return 0;
+            }
             if (null == entry || DIRECTORY == entry.getType())
                 return 0;
 
@@ -2381,8 +2414,12 @@ public class File extends java.io.File {
     @Override
     public long lastModified() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive
-                    .getController().getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return 0;
+            }
             if (null == entry)
                 return 0;
             // Depending on the driver type, target.getTime() could return
@@ -2418,14 +2455,14 @@ public class File extends java.io.File {
      */
     @Override
     public boolean setLastModified(final long time) {
-        try {
-            if (innerArchive != null) {
+        if (innerArchive != null) {
+            try {
                 innerArchive.getController()
                         .setTime(getInnerEntryName(), BitField.of(Access.WRITE), time);
                 return true;
+            } catch (IOException ex) {
+                return false;
             }
-        } catch (IOException ex) {
-            return false;
         }
         return delegate.setLastModified(time);
     }
@@ -2444,8 +2481,12 @@ public class File extends java.io.File {
     @Override
     public String[] list() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive.getController()
-                    .getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return null;
+            }
             if (null == entry)
                 return null;
             final Set<String> members = entry.getMembers();
@@ -2470,8 +2511,12 @@ public class File extends java.io.File {
     @Override
     public String[] list(final FilenameFilter filter) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive.getController()
-                    .getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return null;
+            }
             if (null == entry)
                 return null;
             final Set<String> members = entry.getMembers();
@@ -2552,8 +2597,12 @@ public class File extends java.io.File {
             final FilenameFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive.getController()
-                    .getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return null;
+            }
             if (null == entry)
                 return null;
             final Set<String> members = entry.getMembers();
@@ -2612,8 +2661,12 @@ public class File extends java.io.File {
             final FileFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry = innerArchive.getController()
-                    .getEntry(getInnerEntryName());
+            final FileSystemEntry<?> entry;
+            try {
+                entry = innerArchive.getController().getEntry(getInnerEntryName());
+            } catch (IOException ex) {
+                return null;
+            }
             if (null == entry)
                 return null;
             final Set<String> members = entry.getMembers();
