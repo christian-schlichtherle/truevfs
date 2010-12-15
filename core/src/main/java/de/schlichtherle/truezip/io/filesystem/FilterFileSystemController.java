@@ -70,59 +70,59 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public FileSystemEntry<? extends E> getEntry(EntryName path)
+    public FileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
     throws IOException {
-        return controller.getEntry(path);
+        return controller.getEntry(name);
     }
 
     @Override
-    public boolean isReadable(EntryName path) throws IOException {
-        return controller.isReadable(path);
+    public boolean isReadable(FileSystemEntryName name) throws IOException {
+        return controller.isReadable(name);
     }
 
     @Override
-    public boolean isWritable(EntryName path) throws IOException {
-        return controller.isWritable(path);
+    public boolean isWritable(FileSystemEntryName name) throws IOException {
+        return controller.isWritable(name);
     }
 
     @Override
-    public void setReadOnly(EntryName path) throws IOException {
-        controller.setReadOnly(path);
+    public void setReadOnly(FileSystemEntryName name) throws IOException {
+        controller.setReadOnly(name);
     }
 
     @Override
-    public boolean setTime(EntryName path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
-        return controller.setTime(path, types, value);
+        return controller.setTime(name, types, value);
     }
 
     @Override
     public InputSocket<? extends E> getInputSocket(
-            EntryName path,
+            FileSystemEntryName name,
             BitField<InputOption> options) {
-        return controller.getInputSocket(path, options);
+        return controller.getInputSocket(name, options);
     }
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(
-            EntryName path,
+            FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return controller.getOutputSocket(path, options, template);
+        return controller.getOutputSocket(name, options, template);
     }
 
     @Override
-    public boolean mknod(   EntryName path,
+    public boolean mknod(   FileSystemEntryName name,
                             Entry.Type type,
                             BitField<OutputOption> options,
                             Entry template)
     throws IOException {
-        return controller.mknod(path, type, options, template);
+        return controller.mknod(name, type, options, template);
     }
 
     @Override
-    public void unlink(EntryName path) throws IOException {
-        controller.unlink(path);
+    public void unlink(FileSystemEntryName name) throws IOException {
+        controller.unlink(name);
     }
 
     @Override

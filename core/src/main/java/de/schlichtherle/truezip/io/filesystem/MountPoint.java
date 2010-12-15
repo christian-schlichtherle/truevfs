@@ -269,8 +269,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *         point.
      * @see    #getParent
      */
-    public EntryName resolveParent(EntryName entryName) {
-        return new EntryName(path.getEntryName(), entryName);
+    public FileSystemEntryName resolveParent(FileSystemEntryName entryName) {
+        return new FileSystemEntryName(path.getEntryName(), entryName);
     }
 
     /**
@@ -281,7 +281,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * @throws NullPointerException if {@code entryName} is {@code null}.
      * @return A non-{@code null} path with an absolute URI.
      */
-    public Path resolveAbsolute(EntryName entryName) {
+    public Path resolveAbsolute(FileSystemEntryName entryName) {
         return new Path(this, entryName);
     }
 

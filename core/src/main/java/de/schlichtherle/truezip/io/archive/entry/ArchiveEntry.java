@@ -37,23 +37,6 @@ import de.schlichtherle.truezip.io.entry.Entry;
 public interface ArchiveEntry extends Entry {
 
     /**
-     * Returns the non-{@code null} <i>archive entry name</i>.
-     * An archive entry name is an {@link Entry#getName() entry name} which
-     * meets the following additional requirement:
-     * <ol>
-     * <li>An archive entry name may end with one or more separator
-     *     characters (e.g. to identify a directory entry).</li>
-     * </ol>
-     * For example, {@code "foo/bar/"} and
-     * {@code "./abc/../foo/./def/./../bar/."} are both valid path names
-     * which refer to the same entity in the archive file.
-     *
-     * @return The non-{@code null} <i>archive entry name</i>.
-     */
-    @Override
-    String getName();
-
-    /**
      * Sets the size of this archive entry.
      *
      * @param  type the size type.

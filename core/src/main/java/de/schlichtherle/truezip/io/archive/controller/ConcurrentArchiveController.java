@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -126,12 +126,12 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public ArchiveFileSystemEntry<? extends E> getEntry(EntryName path)
+    public ArchiveFileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
     throws IOException {
         try {
             readLock().lock();
             try {
-                return controller.getEntry(path);
+                return controller.getEntry(name);
             } finally {
                 readLock().unlock();
             }
@@ -139,7 +139,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getEntry(path);
+                return controller.getEntry(name);
             } finally {
                 writeLock().unlock();
             }
@@ -147,11 +147,11 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean isReadable(EntryName path) throws IOException {
+    public boolean isReadable(FileSystemEntryName name) throws IOException {
         try {
             readLock().lock();
             try {
-                return controller.isReadable(path);
+                return controller.isReadable(name);
             } finally {
                 readLock().unlock();
             }
@@ -159,7 +159,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isReadable(path);
+                return controller.isReadable(name);
             } finally {
                 writeLock().unlock();
             }
@@ -167,11 +167,11 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public boolean isWritable(EntryName path) throws IOException {
+    public boolean isWritable(FileSystemEntryName name) throws IOException {
         try {
             readLock().lock();
             try {
-                return controller.isWritable(path);
+                return controller.isWritable(name);
             } finally {
                 readLock().unlock();
             }
@@ -179,7 +179,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isWritable(path);
+                return controller.isWritable(name);
             } finally {
                 writeLock().unlock();
             }
@@ -187,32 +187,32 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public void setReadOnly(EntryName path) throws IOException {
+    public void setReadOnly(FileSystemEntryName name) throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.setReadOnly(path);
+            controller.setReadOnly(name);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public boolean setTime(EntryName path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.setTime(path, types, value);
+            return controller.setTime(name, types, value);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public InputSocket<E> getInputSocket(   EntryName path,
+    public InputSocket<E> getInputSocket(   FileSystemEntryName name,
                                             BitField<InputOption> options) {
-        return new Input(controller.getInputSocket(path, options));
+        return new Input(controller.getInputSocket(name, options));
     }
 
     private class Input extends FilterInputSocket<E> {
@@ -282,10 +282,10 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Input
 
     @Override
-    public OutputSocket<E> getOutputSocket( EntryName path,
+    public OutputSocket<E> getOutputSocket( FileSystemEntryName name,
                                             BitField<OutputOption> options,
                                             Entry template) {
-        return new Output(controller.getOutputSocket(path, options, template));
+        return new Output(controller.getOutputSocket(name, options, template));
     }
 
     private class Output extends FilterOutputSocket<E> {
@@ -317,7 +317,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Output
 
     @Override
-    public boolean mknod(   EntryName path,
+    public boolean mknod(   FileSystemEntryName name,
                             Type type,
                             BitField<OutputOption> options,
                             Entry template)
@@ -325,19 +325,19 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.mknod(path, type, options, template);
+            return controller.mknod(name, type, options, template);
         } finally {
             writeLock().unlock();
         }
     }
 
     @Override
-    public void unlink(EntryName path)
+    public void unlink(FileSystemEntryName name)
     throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.unlink(path);
+            controller.unlink(name);
         } finally {
             writeLock().unlock();
         }

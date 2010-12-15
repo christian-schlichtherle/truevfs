@@ -231,11 +231,10 @@ public class Paths {
             return result[0];
         }
 
-        public String getBaseName() {
+        public String getMemberName() {
             return result[1];
         }
     }
-
 
     @SuppressWarnings("empty-statement")
     private static int lastIndexNot(String path, char separatorChar, int last) {

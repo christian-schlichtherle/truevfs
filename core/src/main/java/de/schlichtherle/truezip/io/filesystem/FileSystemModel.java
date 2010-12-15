@@ -94,7 +94,7 @@ public class FileSystemModel {
      *         system's mount point.
      * @see    #getParent
      */
-    public final EntryName resolveParent(EntryName entryName) {
+    public final FileSystemEntryName resolveParent(FileSystemEntryName entryName) {
         return mountPoint.resolveParent(entryName);
     }
 
@@ -106,7 +106,7 @@ public class FileSystemModel {
      * @throws NullPointerException if {@code entryName} is {@code null}.
      * @return A non-{@code null} path with an absolute URI.
      */
-    public final Path resolveAbsolute(EntryName entryName) {
+    public final Path resolveAbsolute(FileSystemEntryName entryName) {
         return mountPoint.resolveAbsolute(entryName);
     }
 

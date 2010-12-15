@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.io.IOException;
 
@@ -34,6 +34,6 @@ extends FileSystemController<E> {
     ArchiveModel getModel();
 
     @Override
-    ArchiveFileSystemEntry<? extends E> getEntry(EntryName path)
+    ArchiveFileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
     throws IOException;
 }

@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import java.util.Locale;
-import java.io.ObjectInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ByteArrayOutputStream;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
-import junit.framework.TestCase;
+import java.util.Locale;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Tests archive type independent features of the {@link File} class.
@@ -35,27 +38,24 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class NonIOFileTest extends TestCase {
+public class NonIOFileTest {
 
     private File archive;
     private String suffix;
 
-    public NonIOFileTest(String testName) {
-        super(testName);
+    @Before
+    public void setUp() {
         File.setDefaultArchiveDetector(ArchiveDetector.DEFAULT);
-    }
-
-    @Override
-    protected void setUp() {
         suffix = ".zip";
         archive = new File("archive.zip");
     }
 
-    @Override
-    protected void tearDown() {
+    @After
+    public void tearDown() {
         assertFalse(new java.io.File("archive.zip").exists());
     }
 
+    @Test
     public void testURIConstructor() throws Exception {
         File file;
         final String fs = File.separator;
@@ -109,55 +109,55 @@ public class NonIOFileTest extends TestCase {
 
         // One ZIP file in path with one redundant jar: scheme.
 
-        file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!/", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:file:/a " + suffix + "/b " + suffix + "!", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "/", null));
-        assertSame(file.getInnerArchive(), file.getEnclArchive());
-        assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "", null));
-        assertSame(file.getInnerArchive(), file.getEnclArchive());
-        assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:file:/a " + suffix + "!/b " + suffix + "", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
         // One ZIP file in path with two redundant jar: schemes.
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!/", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "/b " + suffix + "!", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "/", null));
-        assertSame(file.getInnerArchive(), file.getEnclArchive());
-        assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "", null));
-        assertSame(file.getInnerArchive(), file.getEnclArchive());
-        assertSame(file.getInnerEntryName(), file.getEnclEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("b " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
         // Two ZIP files in path.
 
@@ -204,33 +204,34 @@ public class NonIOFileTest extends TestCase {
         // Three ZIP files in path with one ZIP file removed by normalization
         // and hence one redundant jar: scheme.
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("c " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
-        assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerEntryName());
-        assertEquals(fs + "a " + suffix + "", file.getEnclArchive().getPath());
-        assertEquals("c " + suffix + "", file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "jar:jar:file:/a " + suffix + "!/b " + suffix + "!/../c " + suffix + "!", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
         // One ZIP file in path which is removed by normalization.
 
-        file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "/", null));
-        assertNull(file.getInnerArchive());
-        assertNull(file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "/", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
 
-        file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "", null));
-        assertNull(file.getInnerArchive());
-        assertNull(file.getInnerEntryName());
-        assertNull(file.getEnclArchive());
-        assertNull(file.getEnclEntryName());
+        try {
+            file = new File(new URI("jar", "file:/a " + suffix + "!/../b " + suffix + "", null));
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
     }
 
+    @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testParentConstructor() throws Exception {
         // Test normalization and parent+child constructors.
@@ -344,6 +345,7 @@ public class NonIOFileTest extends TestCase {
                 c.getInnerArchive().getEnclEntryName());
     }
     
+    @Test
     public void testGetParentFile() {
         File abcdefgh = new File("a/b" + suffix + "/c/d/e" + suffix + "/f" + suffix + "/g/h" + suffix + "");
         File abcdefg  = abcdefgh.getParentFile();
@@ -373,6 +375,7 @@ public class NonIOFileTest extends TestCase {
         assertNull(n);
     }
 
+    @Test
     public void testNormalizedAbsoluteFile() throws IOException {
         testNormalizedAbsoluteFile("",   "");
         testNormalizedAbsoluteFile(".",  ".");
@@ -419,6 +422,7 @@ public class NonIOFileTest extends TestCase {
     /**
      * Test of equals method, of class de.schlichtherle.truezip.io.File.
      */
+    @Test
     public void testEqualsAndHashCode() {
         final boolean win = File.separatorChar == '\\'; // Windoze?
         
@@ -476,6 +480,7 @@ public class NonIOFileTest extends TestCase {
         assertEquals(b.hashCode(), b.hashCode());
     }
 
+    @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         // Preamble.
         final File inner = new File(archive, "inner" + suffix);
@@ -528,7 +533,8 @@ public class NonIOFileTest extends TestCase {
         assertSame(innerController, inner2Controller);
     }
 
-    public void testGetOutermostArchive() {
+    @Test
+    public void testGetTopLevelArchive() {
         File file = new File("abc/def" + suffix + "/efg" + suffix + "/hij" + suffix + "/test.txt");
         assertEquals(new java.io.File("abc/def" + suffix), file.getTopLevelArchive());
     }

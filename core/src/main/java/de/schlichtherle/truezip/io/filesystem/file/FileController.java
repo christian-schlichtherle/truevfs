@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import java.net.URI;
@@ -99,32 +99,32 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public FileEntry getEntry(EntryName path) throws IOException {
+    public FileEntry getEntry(FileSystemEntryName path) throws IOException {
         final FileEntry entry = FileEntry.get(target, path.getPath());
         return entry.getFile().exists() ? entry : null;
     }
 
     @Override
-    public boolean isReadable(EntryName path) throws IOException {
+    public boolean isReadable(FileSystemEntryName path) throws IOException {
         final File file = new File(target, path.getPath());
         return file.canRead();
     }
 
     @Override
-    public boolean isWritable(EntryName path) throws IOException {
+    public boolean isWritable(FileSystemEntryName path) throws IOException {
         final File file = new File(target, path.getPath());
         return isCreatableOrWritable(file);
     }
 
     @Override
-    public void setReadOnly(EntryName path) throws IOException {
+    public void setReadOnly(FileSystemEntryName path) throws IOException {
         final File file = new File(target, path.getPath());
         if (!file.setReadOnly())
             throw new IOException();
     }
 
     @Override
-    public boolean setTime(EntryName path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName path, BitField<Access> types, long value)
     throws IOException {
         final File file = new File(target, path.getPath());
         boolean ok = true;
@@ -135,7 +135,7 @@ implements FileSystemController<FileEntry> {
 
     @Override
     public InputSocket<FileEntry> getInputSocket(
-            EntryName path,
+            FileSystemEntryName path,
             BitField<InputOption> options) {
         return FileInputSocket.get( FileEntry.get(target, path.getPath()),
                                     options.clear(InputOption.CACHE));
@@ -143,14 +143,14 @@ implements FileSystemController<FileEntry> {
 
     @Override
     public OutputSocket<FileEntry> getOutputSocket(
-            EntryName path,
+            FileSystemEntryName path,
             BitField<OutputOption> options,
             Entry template) {
         return FileOutputSocket.get(FileEntry.get(target, path.getPath()), options, template);
     }
 
     @Override
-    public boolean mknod(   EntryName path,
+    public boolean mknod(   FileSystemEntryName path,
                             Type type,
                             BitField<OutputOption> options,
                             Entry template)
@@ -169,7 +169,7 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public void unlink(EntryName path)
+    public void unlink(FileSystemEntryName path)
     throws IOException {
         final File file = new File(target, path.getPath());
         if (!file.delete())

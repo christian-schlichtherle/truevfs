@@ -16,9 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import java.net.URISyntaxException;
-import java.net.URI;
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -216,8 +214,8 @@ extends FileSystemArchiveController<E> {
         return parent;
     }
 
-    private EntryName resolveParent(EntryName path) {
-        return getModel().resolveParent(path);
+    private FileSystemEntryName resolveParent(FileSystemEntryName name) {
+        return getModel().resolveParent(name);
     }
 
     @Override
@@ -233,19 +231,19 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public final ArchiveFileSystemEntry<E> getEntry(final EntryName path)
+    public final ArchiveFileSystemEntry<E> getEntry(final FileSystemEntryName name)
     throws IOException {
-        final String name = path.getPath();
+        final String path = name.getPath();
         try {
-            return autoMount().getEntry(name);
+            return autoMount().getEntry(path);
         } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
             // FIXME: Check if this is required anymore.
-            if (!isRoot(name))
+            if (!isRoot(path))
                 return null;
             final FileSystemEntry<?> entry = getParent()
-                    .getEntry(resolveParent(path));
+                    .getEntry(resolveParent(name));
             if (null == entry)
                 return null;
             try {
@@ -285,14 +283,14 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         try {
             final FileSystemController<?> parent = getParent();
-            final EntryName parentPath = resolveParent(EntryName.ROOT);
+            final FileSystemEntryName parentName = resolveParent(FileSystemEntryName.ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
             // reading!
-            final boolean readOnly = !parent.isWritable(parentPath);
+            final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = parent.getInputSocket(
-                    parentPath, BitField.of(InputOption.CACHE));
+                    parentName, BitField.of(InputOption.CACHE));
             input = new Input(getDriver().newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(
                     input.getDriverProduct(), getDriver(),
@@ -330,9 +328,9 @@ extends FileSystemArchiveController<E> {
         if (null != output)
             return;
         final FileSystemController<?> parent = getParent();
-        final EntryName parentPath = resolveParent(EntryName.ROOT);
+        final FileSystemEntryName parentName = resolveParent(FileSystemEntryName.ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
-                parentPath, options.set(OutputOption.CACHE), null);
+                parentName, options.set(OutputOption.CACHE), null);
         output = new Output(getDriver().newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));
     }
@@ -351,12 +349,12 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-	boolean autoSync(final String path, final Access intention)
+	boolean autoSync(final FileSystemEntryName name, final Access intention)
     throws SyncException, FileSystemException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
-                || null == (entry = fileSystem.getEntry(path)))
+                || null == (entry = fileSystem.getEntry(name.getPath())))
             return false;
         String n = null;
         if (null != output && null != output.getEntry(
@@ -626,9 +624,9 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public void unlink(EntryName path) throws IOException {
-        super.unlink(path);
-        if (isRoot(path.getPath()))
-            getParent().unlink(resolveParent(path));
+    public void unlink(FileSystemEntryName name) throws IOException {
+        super.unlink(name);
+        if (isRoot(name.getPath()))
+            getParent().unlink(resolveParent(name));
     }
 }

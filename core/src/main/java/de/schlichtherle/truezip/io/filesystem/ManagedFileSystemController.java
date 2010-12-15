@@ -55,8 +55,8 @@ implements FileSystemController<Entry> {
         assert null != getParent();
     }
 
-    private EntryName resolveParent(EntryName path) {
-        return getModel().resolveParent(path);
+    private FileSystemEntryName resolveParent(FileSystemEntryName name) {
+        return getModel().resolveParent(name);
     }
 
     @Override
@@ -87,65 +87,65 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public FileSystemEntry<?> getEntry(EntryName path) throws IOException {
+    public FileSystemEntry<?> getEntry(FileSystemEntryName name) throws IOException {
         try {
-            return controller.getEntry(path);
+            return controller.getEntry(name);
         } catch (FalsePositiveException ex) {
-            return getParent().getEntry(resolveParent(path));
+            return getParent().getEntry(resolveParent(name));
         }
     }
 
     @Override
-    public boolean isReadable(EntryName path) throws IOException {
+    public boolean isReadable(FileSystemEntryName name) throws IOException {
         try {
-            return controller.isReadable(path);
+            return controller.isReadable(name);
         } catch (FalsePositiveException ex) {
-            return getParent().isReadable(resolveParent(path));
+            return getParent().isReadable(resolveParent(name));
         }
     }
 
     @Override
-    public boolean isWritable(EntryName path) throws IOException {
+    public boolean isWritable(FileSystemEntryName name) throws IOException {
         try {
-            return controller.isWritable(path);
+            return controller.isWritable(name);
         } catch (FalsePositiveException ex) {
-            return getParent().isWritable(resolveParent(path));
+            return getParent().isWritable(resolveParent(name));
         }
     }
 
     @Override
-    public void setReadOnly(EntryName path) throws IOException {
+    public void setReadOnly(FileSystemEntryName name) throws IOException {
         try {
-            controller.setReadOnly(path);
+            controller.setReadOnly(name);
         } catch (FalsePositiveException ex) {
-            getParent().setReadOnly(resolveParent(path));
+            getParent().setReadOnly(resolveParent(name));
         }
     }
 
     @Override
-    public boolean setTime(EntryName path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
         try {
-            return controller.setTime(path, types, value);
+            return controller.setTime(name, types, value);
         } catch (FalsePositiveException ex) {
-            return getParent().setTime(resolveParent(path), types, value);
+            return getParent().setTime(resolveParent(name), types, value);
         }
     }
 
     @Override
     public InputSocket<?> getInputSocket(
-            final EntryName path,
+            final FileSystemEntryName name,
             final BitField<InputOption> options) {
-        return new Input(path, options);
+        return new Input(name, options);
     }
 
     private class Input extends FilterInputSocket<Entry> {
-        final EntryName path;
+        final FileSystemEntryName name;
         final BitField<InputOption> options;
 
-        Input(final EntryName path, final BitField<InputOption> options) {
-            super(controller.getInputSocket(path, options));
-            this.path = path;
+        Input(final FileSystemEntryName name, final BitField<InputOption> options) {
+            super(controller.getInputSocket(name, options));
+            this.name = name;
             this.options = options;
         }
 
@@ -155,7 +155,7 @@ implements FileSystemController<Entry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(resolveParent(path), options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -167,7 +167,7 @@ implements FileSystemController<Entry> {
                 return getBoundSocket().newReadOnlyFile();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(resolveParent(path), options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .newReadOnlyFile();
             }
@@ -179,7 +179,7 @@ implements FileSystemController<Entry> {
                 return getBoundSocket().newInputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getInputSocket(resolveParent(path), options)
+                        .getInputSocket(resolveParent(name), options)
                         .bind(this)
                         .newInputStream();
             }
@@ -188,22 +188,22 @@ implements FileSystemController<Entry> {
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            EntryName path,
+            FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return new Output(path, options, template);
+        return new Output(name, options, template);
     }
 
     private class Output extends FilterOutputSocket<Entry> {
-        final EntryName path;
+        final FileSystemEntryName name;
         final BitField<OutputOption> options;
         final Entry template;
 
-        Output( final EntryName path,
+        Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
                 final Entry template) {
-            super(controller.getOutputSocket(path, options, template));
-            this.path = path;
+            super(controller.getOutputSocket(name, options, template));
+            this.name = name;
             this.options = options;
             this.template = template;
         }
@@ -214,7 +214,7 @@ implements FileSystemController<Entry> {
                 return getBoundSocket().getLocalTarget();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(resolveParent(path), options, template)
+                        .getOutputSocket(resolveParent(name), options, template)
                         .bind(this)
                         .getLocalTarget();
             }
@@ -226,7 +226,7 @@ implements FileSystemController<Entry> {
                 return getBoundSocket().newOutputStream();
             } catch (FalsePositiveException ex) {
                 return getParent()
-                        .getOutputSocket(resolveParent(path), options, template)
+                        .getOutputSocket(resolveParent(name), options, template)
                         .bind(this)
                         .newOutputStream();
             }
@@ -234,24 +234,24 @@ implements FileSystemController<Entry> {
     } // class Output
 
     @Override
-    public boolean mknod(   EntryName path,
+    public boolean mknod(   FileSystemEntryName name,
                             Entry.Type type,
                             BitField<OutputOption> options,
                             Entry template)
     throws IOException {
         try {
-            return controller.mknod(path, type, options, template);
+            return controller.mknod(name, type, options, template);
         } catch (FalsePositiveException ex) {
-            return getParent().mknod(resolveParent(path), type, options, template);
+            return getParent().mknod(resolveParent(name), type, options, template);
         }
     }
 
     @Override
-    public void unlink(EntryName path) throws IOException {
+    public void unlink(FileSystemEntryName name) throws IOException {
         try {
-            controller.unlink(path);
+            controller.unlink(name);
         } catch (FalsePositiveException ex) {
-            getParent().unlink(resolveParent(path));
+            getParent().unlink(resolveParent(name));
         }
     }
 

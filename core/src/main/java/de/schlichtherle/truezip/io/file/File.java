@@ -15,15 +15,19 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.InputException;
+import java.io.FileNotFoundException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -407,7 +411,7 @@ public class File extends java.io.File {
      *
      * @see #getEnclEntryName
      */
-    private EntryName enclEntryName;
+    private FileSystemEntryName enclEntryName;
 
     /**
      * This refers to the archive controller if and only if this file refers
@@ -710,7 +714,7 @@ public class File extends java.io.File {
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
-                this.enclEntryName = toEntryName(
+                this.enclEntryName = FileSystemEntryName.create(
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
                         .replace(separatorChar, SEPARATOR_CHAR));
             }
@@ -721,24 +725,20 @@ public class File extends java.io.File {
         assert invariants();
     }
 
-    private static EntryName toEntryName(String path) {
-        try {
-            return EntryName.create(new URI(null, null, path, null, null));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
-    }
+    private static final Scheme UNKNOWN = Scheme.create("unknown");
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
+        final FileSystemDriver driver
+                = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
         final FileSystemController<?> parentController;
         try {
             if (null != enclArchive) {
                 parentController = enclArchive.getController();
-                mountPoint = MountPoint.create(Scheme.FILE,
+                mountPoint = MountPoint.create(UNKNOWN, // FIXME: Introduce detector.getScheme(target.getPath())!
                         new Path(   parentController.getModel().getMountPoint(),
-                                    enclEntryName)); // FIXME: Introduce driver.getScheme()!
+                                    enclEntryName));
             } else {
                 URI uri = target.toURI();
                 // Postfix: Move Windows UNC host from path to authority.
@@ -758,7 +758,7 @@ public class File extends java.io.File {
                                     s.substring(0, s.length() - 1),
                                     uri.getQuery(), uri.getFragment());
                 }
-                mountPoint = MountPoint.create(Scheme.FILE, Path.create(uri)); // FIXME: Introduce driver.getScheme()!
+                mountPoint = MountPoint.create(UNKNOWN, Path.create(uri)); // FIXME: Introduce detector.getScheme(target.getPath())!
                 parentController = new FileDriver().newController(mountPoint.getParent());
             }
         } catch (URISyntaxException ex) {
@@ -766,9 +766,7 @@ public class File extends java.io.File {
         }
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController( mountPoint,
-                                detector.getArchiveDriver(target.getPath()),
-                                parentController);
+                .getController(mountPoint, driver, parentController);
     }
 
     /**
@@ -877,7 +875,7 @@ public class File extends java.io.File {
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
         enclEntryName = enclEntryNameBuf.length() > 0
-                ? toEntryName(enclEntryNameBuf.toString())
+                ? FileSystemEntryName.create(enclEntryNameBuf.toString())
                 : null;
 
         if (innerArchive == this) {
@@ -903,11 +901,11 @@ public class File extends java.io.File {
 
         splitter.split(path);
         final String parent = splitter.getParentPath();
-        final String base = splitter.getBaseName();
+        final String member = splitter.getMemberName();
 
-        if (base.length() == 0 || ".".equals(base)) {
+        if (member.length() == 0 || ".".equals(member)) {
             // Fall through.
-        } else if ("..".equals(base)) {
+        } else if ("..".equals(member)) {
             skip++;
         } else if (skip > 0) {
             skip--;
@@ -927,12 +925,12 @@ public class File extends java.io.File {
                         if (ancestor.isEntry()) {
                             if (enclEntryNameBuf.length() > 0) {
                                 enclEntryNameBuf.insert(0, '/');
-                                enclEntryNameBuf.insert(0, ancestor.enclEntryName);
+                                enclEntryNameBuf.insert(0, ancestor.enclEntryName.getPath());
                             } else { // TODO: Simplify this!
                                 // Example: new File(new File(new File("archive.zip"), "entry"), ".")
                                 // with ArchiveDetector.DEFAULT.
                                 assert enclArchive == ancestor.enclArchive;
-                                enclEntryNameBuf.append(ancestor.enclEntryName);
+                                enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
                             }
                         } else {
                             assert enclArchive == null;
@@ -945,7 +943,7 @@ public class File extends java.io.File {
                         innerArchive = this;
                         enclArchive = ancestor.enclArchive;
                         if (ancestor.enclEntryName != null)
-                            enclEntryNameBuf.append(ancestor.enclEntryName);
+                            enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
                     }
                     if (innerArchive != this)
                         innerArchive = enclArchive;
@@ -965,11 +963,11 @@ public class File extends java.io.File {
                     return;
                 }
                 enclEntryNameBuf.insert(0, '/');
-                enclEntryNameBuf.insert(0, base);
+                enclEntryNameBuf.insert(0, member);
             } else {
                 if (isArchive)
                     innerArchive = this;
-                enclEntryNameBuf.append(base);
+                enclEntryNameBuf.append(member);
             }
         }
 
@@ -1017,17 +1015,17 @@ public class File extends java.io.File {
         }
         splitter.split(path);
         String parent = splitter.getParentPath();
-        final String base = splitter.getBaseName();
-        if (base.length() == 0 || ".".equals(base)) {
+        final String member = splitter.getMemberName();
+        if (member.length() == 0 || ".".equals(member)) {
             // Fall through.
-        } else if ("..".equals(base)) {
+        } else if ("..".equals(member)) {
             skip++;
         } else if (skip > 0) {
             skip--;
         } else {
-            final int baseEnd = base.length() - 1;
-            final boolean isArchive = base.charAt(baseEnd) == '!';
-            if (enclEntryName != null) {
+            final int baseEnd = member.length() - 1;
+            final boolean isArchive = member.charAt(baseEnd) == '!';
+            if (null != enclEntryName) {
                 if (isArchive) {
                     enclArchive = detector.newFile(newURI(scheme, path)); // use the same detector for the parent directory
                     if (innerArchive != this) {
@@ -1035,7 +1033,8 @@ public class File extends java.io.File {
                     }
                     return;
                 }
-                enclEntryName = toEntryName(base + "/" + enclEntryName);
+                enclEntryName = FileSystemEntryName.create(
+                        member + "/" + enclEntryName.getPath());
             } else {
                 if (isArchive) {
                     innerArchive = this;
@@ -1046,10 +1045,11 @@ public class File extends java.io.File {
                     if (i == parent.length() - 1) // scheme only?
                         return;
                     uri = newURI(parent.substring(0, i), parent.substring(i + 1));
-                    enclEntryName = toEntryName(base.substring(0, baseEnd)); // cut off trailing '!'!
+                    enclEntryName = FileSystemEntryName.create(
+                            member.substring(0, baseEnd)); // cut off trailing '!'!
                     parent = uri.getSchemeSpecificPart();
                 } else {
-                    enclEntryName = toEntryName(base);
+                    enclEntryName = FileSystemEntryName.create(member);
                 }
             }
         }
@@ -1791,8 +1791,8 @@ public class File extends java.io.File {
                     : enclEntryName.getPath();
     }
 
-    final EntryName getInnerEntryName0() {
-        return this == innerArchive ? EntryName.ROOT : enclEntryName;
+    final FileSystemEntryName getInnerEntryName0() {
+        return this == innerArchive ? FileSystemEntryName.ROOT : enclEntryName;
     }
 
     /**
@@ -1828,7 +1828,7 @@ public class File extends java.io.File {
         return null == enclEntryName ? null : enclEntryName.getPath();
     }
 
-    final EntryName getEnclEntryName0() {
+    final FileSystemEntryName getEnclEntryName0() {
         return enclEntryName;
     }
 

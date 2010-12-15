@@ -178,8 +178,8 @@ public class MountPointTest {
             assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode(), equalTo(mountPoint.hashCode()));
-            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(EntryName.ROOT))), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.resolveAbsolute(EntryName.ROOT).getUri()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(FileSystemEntryName.ROOT))), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolveAbsolute(FileSystemEntryName.ROOT).getUri()), equalTo(mountPoint));
         }
     }
 
@@ -194,8 +194,8 @@ public class MountPointTest {
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },
         }) {
             final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
-            final EntryName entryName = EntryName.create(URI.create(params[1]));
-            final EntryName parentEntryName = null == params[2] ? null : EntryName.create(URI.create(params[2]));
+            final FileSystemEntryName entryName = FileSystemEntryName.create(URI.create(params[1]));
+            final FileSystemEntryName parentEntryName = null == params[2] ? null : FileSystemEntryName.create(URI.create(params[2]));
             final Path path = Path.create(URI.create(params[3]));
             if (null != parentEntryName)
                 assertThat(mountPoint.resolveParent(entryName), equalTo(parentEntryName));
