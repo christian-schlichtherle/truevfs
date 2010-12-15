@@ -75,15 +75,15 @@ public interface FileSystemController<E extends Entry> {
 
     boolean isReadOnly() throws IOException;
 
-    FileSystemEntry<? extends E> getEntry(String path) throws IOException;
+    FileSystemEntry<? extends E> getEntry(EntryName path) throws IOException;
 
-    boolean isReadable(String path) throws IOException;
+    boolean isReadable(EntryName path) throws IOException;
 
-    boolean isWritable(String path) throws IOException;
+    boolean isWritable(EntryName path) throws IOException;
 
-    void setReadOnly(String path) throws IOException;
+    void setReadOnly(EntryName path) throws IOException;
 
-    boolean setTime(String path, BitField<Access> types, long value)
+    boolean setTime(EntryName path, BitField<Access> types, long value)
     throws IOException;
 
     /**
@@ -94,7 +94,7 @@ public interface FileSystemController<E extends Entry> {
      * @return A non-{@code null} {@code InputSocket}.
      */
     InputSocket<? extends E> getInputSocket(
-            String path, BitField<InputOption> options);
+            EntryName path, BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
@@ -105,7 +105,7 @@ public interface FileSystemController<E extends Entry> {
      */
     // FIXME: Erase template parameter and add OutputOption.PRESERVE!
     OutputSocket<? extends E> getOutputSocket(
-            String path, BitField<OutputOption> options, Entry template);
+            EntryName path, BitField<OutputOption> options, Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -136,11 +136,11 @@ public interface FileSystemController<E extends Entry> {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  String path, Type type, BitField<OutputOption> options,
+    boolean mknod(  EntryName path, Type type, BitField<OutputOption> options,
                     Entry template)
     throws IOException;
 
-    void unlink(String path) throws IOException;
+    void unlink(EntryName path) throws IOException;
 
     /**
      * Writes all changes to the contents of this file system to its

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -70,8 +71,8 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 public final class CachingArchiveController<E extends ArchiveEntry>
 extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
-    private final Map<String, EntryCache> caches
-            = new HashMap<String, EntryCache>();
+    private final Map<EntryName, EntryCache> caches
+            = new HashMap<EntryName, EntryCache>();
 
     public CachingArchiveController(ArchiveController<? extends E> controller) {
         super(controller);
@@ -79,16 +80,16 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
     @Override
     public InputSocket<E> getInputSocket(
-            final String path,
+            final EntryName path,
             final BitField<InputOption> options) {
         return new Input(path, options);
     }
 
     private class Input extends FilterInputSocket<E> {
-        final String path;
+        final EntryName path;
         final BitField<InputOption> options;
 
-        Input(final String path, final BitField<InputOption> options) {
+        Input(final EntryName path, final BitField<InputOption> options) {
             super(controller.getInputSocket(path, options));
             this.path = path;
             this.options = options;
@@ -108,18 +109,18 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
     @Override
     public OutputSocket<E> getOutputSocket(
-            final String path,
+            final EntryName path,
             final BitField<OutputOption> options,
             final Entry template) {
         return new Output(path, options, template);
     }
 
     private class Output extends FilterOutputSocket<E> {
-        final String path;
+        final EntryName path;
         final BitField<OutputOption> options;
         final Entry template;
 
-        Output( final String path,
+        Output( final EntryName path,
                 final BitField<OutputOption> options,
                 final Entry template) {
             super(controller.getOutputSocket(path, options, template));
@@ -159,7 +160,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Output
 
     @Override
-    public void unlink(final String path) throws IOException {
+    public void unlink(final EntryName path) throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         controller.unlink(path);
@@ -200,14 +201,14 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     private final class EntryCache implements IOCache<E> {
-        final String path;
+        final EntryName path;
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
         final IOCache<E> cache;
         final InputSocket <E> input;
         final OutputSocket<E> output;
 
-        EntryCache( final String path,
+        EntryCache( final EntryName path,
                     final BitField<InputOption > inputOptions,
                     final BitField<OutputOption> outputOptions) {
             this.path = path;

@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.EntryName;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
@@ -156,40 +157,42 @@ implements ArchiveController<E> {
     }
 
     @Override
-    public final boolean isReadable(final String path) throws IOException {
-        return autoMount().getEntry(path) != null;
+    public final boolean isReadable(EntryName path) throws IOException {
+        return autoMount().getEntry(path.getPath()) != null;
     }
 
     @Override
-    public final boolean isWritable(final String path) throws IOException {
-        return autoMount().isWritable(path);
+    public final boolean isWritable(EntryName path) throws IOException {
+        return autoMount().isWritable(path.getPath());
     }
 
     @Override
-    public final void setReadOnly(final String path) throws IOException {
-        autoMount().setReadOnly(path);
+    public final void setReadOnly(EntryName path) throws IOException {
+        autoMount().setReadOnly(path.getPath());
     }
 
     @Override
     public final boolean setTime(
-            final String path,
+            final EntryName path,
             final BitField<Access> types,
             final long value)
     throws IOException {
-        autoSync(path, null);
-        return autoMount().setTime(path, types, value);
+        final String name = path.getPath();
+        autoSync(name, null);
+        return autoMount().setTime(name, types, value);
     }
 
     @Override
     public final InputSocket<E> getInputSocket(
-            final String path,
+            final EntryName path,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
+            final String name = path.getPath();
             boolean recursion;
 
             @Override
             public E getLocalTarget() throws IOException {
-                if (!autoSync(path, READ) && !recursion) {
+                if (!autoSync(name, READ) && !recursion) {
                     autoMount(); // detect false positives!
                     recursion = true;
                     try {
@@ -198,10 +201,10 @@ implements ArchiveController<E> {
                         recursion = false;
                     }
                 }
-                final E entry = Links.getTarget(autoMount().getEntry(path));
+                final E entry = Links.getTarget(autoMount().getEntry(name));
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
-                            path, "no such file or directory");
+                            name, "no such file or directory");
                 return entry;
             }
 
@@ -209,7 +212,7 @@ implements ArchiveController<E> {
                 final E entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(),
-                            path, "cannot read directories");
+                            name, "cannot read directories");
                 return BasicArchiveController.this.getInputSocket(entry.getName()).bind(this);
             }
 
@@ -231,21 +234,22 @@ implements ArchiveController<E> {
 
     @Override
     public final OutputSocket<E> getOutputSocket(
-            final String path,
+            final EntryName path,
             final BitField<OutputOption> options,
             final Entry template) {
         class Output extends OutputSocket<E> {
+            final String name = path.getPath();
             ArchiveFileSystemOperation<E> link;
 
             E getEntry() throws IOException {
-                if (autoSync(path, WRITE))
+                if (autoSync(name, WRITE))
                     link = null;
                 if (null == link) {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
-                    link = autoMount(   !isRoot(path)
+                    link = autoMount(   !isRoot(name)
                                         && options.get(CREATE_PARENTS), options)
-                            .mknod( path, FILE, options.get(CREATE_PARENTS),
+                            .mknod( name, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }
                 return link.getTarget().getTarget();
@@ -302,15 +306,16 @@ implements ArchiveController<E> {
 
     @Override
     public final boolean mknod(
-            final String path,
+            final EntryName path,
             final Type type,
             final BitField<OutputOption> options,
             final Entry template)
     throws IOException {
+        final String name = path.getPath();
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(),
-                    path, "not yet supported: mknod " + type);
-        if (isRoot(path)) {
+                    name, "not yet supported: mknod " + type);
+        if (isRoot(name)) {
             try {
                 autoMount(); // detect false positives!
             } catch (FalsePositiveException ex) {
@@ -320,13 +325,13 @@ implements ArchiveController<E> {
                 return true;
             }
             throw new ArchiveEntryNotFoundException(getModel(),
-                    path, "directory exists already");
+                    name, "directory exists already");
         } else { // !isRoot(entryName)
             final ArchiveFileSystem<E> fileSystem
                     = autoMount(options.get(CREATE_PARENTS), options);
-            final boolean created = null == fileSystem.getEntry(path);
+            final boolean created = null == fileSystem.getEntry(name);
             final ArchiveFileSystemOperation<E> link = fileSystem.mknod(
-                    path, type, options.get(CREATE_PARENTS), template);
+                    name, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             if (created)
                 link.run();
@@ -335,9 +340,10 @@ implements ArchiveController<E> {
     }
 
     @Override
-    public void unlink(final String path) throws IOException {
-        autoSync(path, null);
-        if (isRoot(path)) {
+    public void unlink(final EntryName path) throws IOException {
+        final String name = path.getPath();
+        autoSync(name, null);
+        if (isRoot(name)) {
             final ArchiveFileSystem<E> fileSystem;
             try {
                 fileSystem = autoMount();
@@ -352,12 +358,12 @@ implements ArchiveController<E> {
                 }
                 throw ex; // continue with unlinking our target archive file.
             }
-            if (!fileSystem.getEntry(path).getMembers().isEmpty())
+            if (!fileSystem.getEntry(name).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
             sync(   new SyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
         } else { // !isRoot(path)
-            autoMount().unlink(path);
+            autoMount().unlink(name);
         }
     }
 

@@ -179,6 +179,16 @@ public final class EntryName implements Serializable, Comparable<EntryName> {
         return true;
     }
 
+    /** Equivalent to {@link #getUri()}{@code .getPath()}. */
+    public String getPath() {
+        return uri.getPath();
+    }
+
+    /** Equivalent to {@link #getUri()}{@code .getQuery()}. */
+    public String getQuery() {
+        return uri.getQuery();
+    }
+
     /**
      * Returns the non-{@code null} URI of this entry name.
      *

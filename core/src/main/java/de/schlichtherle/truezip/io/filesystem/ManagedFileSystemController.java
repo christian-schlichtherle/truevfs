@@ -30,8 +30,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import javax.swing.Icon;
 
 /**
@@ -57,15 +55,8 @@ implements FileSystemController<Entry> {
         assert null != getParent();
     }
 
-    private String resolveParent(String path) {
-        try {
-            return getModel()
-                    .resolveParent(EntryName.create(new URI(null, null, path, null, null)))
-                    .getUri()
-                    .getPath();
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+    private EntryName resolveParent(EntryName path) {
+        return getModel().resolveParent(path);
     }
 
     @Override
@@ -96,7 +87,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public FileSystemEntry<?> getEntry(String path) throws IOException {
+    public FileSystemEntry<?> getEntry(EntryName path) throws IOException {
         try {
             return controller.getEntry(path);
         } catch (FalsePositiveException ex) {
@@ -105,7 +96,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public boolean isReadable(String path) throws IOException {
+    public boolean isReadable(EntryName path) throws IOException {
         try {
             return controller.isReadable(path);
         } catch (FalsePositiveException ex) {
@@ -114,7 +105,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public boolean isWritable(String path) throws IOException {
+    public boolean isWritable(EntryName path) throws IOException {
         try {
             return controller.isWritable(path);
         } catch (FalsePositiveException ex) {
@@ -123,7 +114,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public void setReadOnly(String path) throws IOException {
+    public void setReadOnly(EntryName path) throws IOException {
         try {
             controller.setReadOnly(path);
         } catch (FalsePositiveException ex) {
@@ -132,7 +123,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
+    public boolean setTime(EntryName path, BitField<Access> types, long value)
     throws IOException {
         try {
             return controller.setTime(path, types, value);
@@ -143,16 +134,16 @@ implements FileSystemController<Entry> {
 
     @Override
     public InputSocket<?> getInputSocket(
-            final String path,
+            final EntryName path,
             final BitField<InputOption> options) {
         return new Input(path, options);
     }
 
     private class Input extends FilterInputSocket<Entry> {
-        final String path;
+        final EntryName path;
         final BitField<InputOption> options;
 
-        Input(final String path, final BitField<InputOption> options) {
+        Input(final EntryName path, final BitField<InputOption> options) {
             super(controller.getInputSocket(path, options));
             this.path = path;
             this.options = options;
@@ -197,18 +188,18 @@ implements FileSystemController<Entry> {
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            String path,
+            EntryName path,
             BitField<OutputOption> options,
             Entry template) {
         return new Output(path, options, template);
     }
 
     private class Output extends FilterOutputSocket<Entry> {
-        final String path;
+        final EntryName path;
         final BitField<OutputOption> options;
         final Entry template;
 
-        Output( final String path,
+        Output( final EntryName path,
                 final BitField<OutputOption> options,
                 final Entry template) {
             super(controller.getOutputSocket(path, options, template));
@@ -243,7 +234,7 @@ implements FileSystemController<Entry> {
     } // class Output
 
     @Override
-    public boolean mknod(   String path,
+    public boolean mknod(   EntryName path,
                             Entry.Type type,
                             BitField<OutputOption> options,
                             Entry template)
@@ -256,7 +247,7 @@ implements FileSystemController<Entry> {
     }
 
     @Override
-    public void unlink(String path) throws IOException {
+    public void unlink(EntryName path) throws IOException {
         try {
             controller.unlink(path);
         } catch (FalsePositiveException ex) {
