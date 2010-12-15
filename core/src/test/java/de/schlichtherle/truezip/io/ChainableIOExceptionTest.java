@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import java.io.File;
@@ -38,7 +37,7 @@ public class ChainableIOExceptionTest extends TestCase {
         final ChainableIOException[] appearance = new ChainableIOException[max];
         final ChainableIOException[] priority = new ChainableIOException[max];
         for (int i = 0; i < max; i++) {
-            final File dummy = (File) new File("" + (i + 1)).getAbsoluteFile();
+            final File dummy = new File("" + (i + 1)).getAbsoluteFile();
             exc = new TestException(dummy.getPath(), i % 3).initPredecessor(exc);
             appearance[max - 1 - i]
                     = priority[max - 1 - (i % 3) * (max / 3) - (i / 3)]
