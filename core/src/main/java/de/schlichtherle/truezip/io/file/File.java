@@ -620,7 +620,7 @@ public class File extends java.io.File {
      * @throws IllegalArgumentException if any precondition for the
      *         parameter {@code uri} does not hold.
      */
-    // FIXME: Use Path!
+    // TODO: Use Path!
     public File(URI uri) {
         this(uri, ArchiveDetector.ALL);
     }
@@ -628,7 +628,7 @@ public class File extends java.io.File {
     // Unfortunately, this constructor has a significant overhead as the jar:
     // schemes need to be processed twice, first before initializing the super
     // class and second when initializing this sub class.
-    // FIXME: Use Path!
+    // TODO: Use Path!
     File(   final URI uri,
             final ArchiveDetector detector) {
         super(unjarFileURI(uri));
