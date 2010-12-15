@@ -234,7 +234,7 @@ public class PromptingKeyManager extends KeyManager {
         if (forType == null)
             throw new NullPointerException();
         try {
-            useType.getConstructor((Class[]) null);
+            useType.getConstructor((Class<?>[]) null);
         } catch (NoSuchMethodException noPublicNullaryConstructor) {
             throw new IllegalArgumentException(useType.getName()
             + " (no public nullary constructor)",
