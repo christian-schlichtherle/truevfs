@@ -33,7 +33,7 @@ implements FileSystemController<E> {
                 .append(getClass().getName())
                 .append("[model=")
                 .append(getModel())
-                .append("]")
+                .append(']')
                 .toString();
     }
 }
