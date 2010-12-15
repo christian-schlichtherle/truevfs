@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -22,8 +21,8 @@ import java.io.CharConversionException;
 /**
  * An immutable, thread-safe factory for entries.
  *
- * @param <E> The type of the entries.
- * @author Christian Schlichtherle
+ * @param   <E> The type of the entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface EntryFactory<E extends Entry> {
