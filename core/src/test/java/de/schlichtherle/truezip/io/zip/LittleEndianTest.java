@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import junit.framework.TestCase;
@@ -42,7 +41,7 @@ public class LittleEndianTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        read = (byte[]) DATA.clone();
+        read = DATA.clone();
         write = new byte[read.length];
     }
 
