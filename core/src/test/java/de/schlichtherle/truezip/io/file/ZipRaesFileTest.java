@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.key.AesKeyProvider;
@@ -126,7 +125,7 @@ public class ZipRaesFileTest extends IOFileTestCase {
 
     public static class CustomKeyManager extends KeyManager {
         //@SuppressWarnings("unchecked")
-		public CustomKeyManager() {
+        public CustomKeyManager() {
             mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
         }
     }
