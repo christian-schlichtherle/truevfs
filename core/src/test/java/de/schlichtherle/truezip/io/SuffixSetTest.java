@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import java.util.Iterator;
@@ -99,14 +98,10 @@ public class SuffixSetTest extends TestCase {
     public void testOriginalIteratorAndContains() {
         assertFalse(empty.originalIterator().hasNext());
 
-        for (int i = 0; i < sets.length; i++) {
-            for (int j = 0; j < sets.length ; j++) {
-                for (final Iterator<String> it = sets[i].originalIterator(); it.hasNext();) {
-                    final String s = (String) it.next();
-                    assertTrue(sets[j].contains(s));
-                }
-            }
-        }
+        for (int i = 0; i < sets.length; i++)
+            for (int j = 0; j < sets.length ; j++)
+                for (final Iterator<String> it = sets[i].originalIterator(); it.hasNext();)
+                    assertTrue(sets[j].contains(it.next()));
     }
 
     public void testAddAll() {
