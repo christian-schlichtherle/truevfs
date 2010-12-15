@@ -44,8 +44,7 @@ public class FileSystemManagers {
     private static ShutdownThread shutdownThread; // lazily initialized
 
     /**
-     * Returns the non-{@code null} federated file system manager class
-     * property instance.
+     * Returns the non-{@code null} file system manager class property instance.
      * <p>
      * If the class property has been explicitly set using
      * {@link #setInstance}, then this instance is returned.
@@ -67,8 +66,7 @@ public class FileSystemManagers {
      *         does not denote a subclass of this class.
      * @throws UndeclaredThrowableException If any other precondition on the
      *         value of the system property does not hold.
-     * @return The non-{@code null} federated file system manager class
-     *         property instance.
+     * @return The non-{@code null} file system manager class property instance.
      */
     public static FileSystemManager getInstance() {
         FileSystemManager manager = instance;
@@ -95,11 +93,11 @@ public class FileSystemManagers {
     }
 
     /**
-     * Sets the federated file system manager class property instance.
-     * If the current federated file system manager has any managed federated
-     * file systems, an {@link IllegalStateException} is thrown.
+     * Sets the file system manager class property instance.
+     * If the current file system manager manages any federated file systems,
+     * an {@link IllegalStateException} is thrown.
      * Call {@link FileSystemManager#sync} and make sure to purge all
-     * references to the federated file system controllers which are returned
+     * references to the file system controllers which are returned
      * by {@link FileSystemManager#getController} to prevent this.
      *
      * @param  manager The file system manager instance to use as the class

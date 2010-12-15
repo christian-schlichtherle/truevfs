@@ -60,9 +60,8 @@ public class FileSystemModel {
      * Returns the non-{@code null} mount point of this file system model.
      * <p>
      * The mount point may be used to construct error messages or to locate
-     * and access file system metadata which is stored outside the federated
-     * file system, e.g. in-memory stored passwords for RAES encrypted ZIP
-     * files.
+     * and access file system metadata which is stored outside the file system,
+     * e.g. in-memory stored passwords for RAES encrypted ZIP files.
      *
      * @return The non-{@code null} mount point of this file system model.
      */
@@ -73,7 +72,7 @@ public class FileSystemModel {
     /**
      * Returns the model of the parent file system or {@code null} if and
      * only if the file system is not federated, i.e. if it's not a member of
-     * another file system.
+     * a parent file system.
      *
      * @return The nullable parent file system model.
      */
@@ -89,7 +88,7 @@ public class FileSystemModel {
      *         system's mount point.
      * @throws NullPointerException if {@code entryName} is {@code null} or if
      *         the file system is not federated, i.e. if it's not a member of
-     *         another file system.
+     *         a parent file system.
      * @return a non-{@code null} entry name relative to the parent file
      *         system's mount point.
      * @see    #getParent

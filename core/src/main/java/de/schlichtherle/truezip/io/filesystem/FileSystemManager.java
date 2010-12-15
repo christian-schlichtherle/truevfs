@@ -34,7 +34,9 @@ import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * A container which manages the lifecycle of file system controllers.
+ * A container which manages the lifecycle of controllers for federated file
+ * systems. A file system is federated if and only if it's a member of a parent
+ * file system.
  * <p>
  * This class is thread-safe.
  *
@@ -62,49 +64,45 @@ public class FileSystemManager {
             = new WeakHashMap<MountPoint, Link<Scheduler>>();
 
     /**
-     * Returns a federated file system controller for the given mount point.
-     * The returned file system controller will use the given parent federated
-     * file system controller to mount its file system when required.
-     * Mind that the given mount point gets normalized and is not necessarily
-     * {@link Object#equals equal} to the mount point of the file system model
-     * of the returned federated file system controller.
+     * Returns a file system controller for the given mount point.
+     * If and only if the given mount point addresses a federated file system,
+     * the returned file system controller is remembered for life cycle
+     * management, i.e. future lookup and {@link #sync synchronization}
+     * operations.
      *
+     * @param  mountPoint the non-{@code null} mount point of the file system.
      * @param  driver the non-{@code null} file system driver which will be
-     *         used to create a file system model and optionally a file system
-     *         controller.
-     * @param  mountPoint the non-{@code null}
-     *         {@link FileSystemModel#getMountPoint() mount point}
-     *         of the federated file system.
-     * @param  parent the nullable controller for the parent federated file
-     *         system.
-     * @return A non-{@code null} federated file system controller.
+     *         used to create a new file system controller if required.
+     * @param  parent the nullable controller for the parent file system.
+     * @return A non-{@code null} file system controller.
+     * @throws NullPointerException if {@code mountPoint} is {@code null}
      */
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
             FileSystemController<?> parent) {
-        if (null != mountPoint.getParent() && null == parent)
-            parent = getController(mountPoint.getParent(), driver, null);
-        FileSystemController<?> controller;
-        synchronized (schedulers) {
-            Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
-            if (null != scheduler) {
-                controller = scheduler.controller;
-            } else {
-                final FileSystemController<?> c
-                        = driver.newController(mountPoint, parent);
-                if (null == c.getParent()) {
-                    controller = (FileSystemController<?>) c;
-                } else {
-                    scheduler = new Scheduler(c);
-                    controller = scheduler.controller;
-                    controller.getModel().addFileSystemTouchedListener(scheduler);
-                }
-            }
+        if (null == mountPoint.getParent()) {
+            if (null != parent)
+                throw new IllegalArgumentException("Parent/member mismatch!");
+            return driver.newController(mountPoint, null);
         }
-        assert (null != controller.getModel().getParent())
-                == (null != controller.getParent());
-        return controller;
+        // This is faster than calling a synchronized method, why?
+        synchronized (this) {
+            return getController0(mountPoint, driver, parent);
+        }
+    }
+
+    private /*synchronized*/ FileSystemController<?> getController0(
+            final MountPoint mountPoint,
+            final FileSystemDriver driver,
+            FileSystemController<?> parent) {
+        Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
+        if (null == scheduler) {
+            if (null == parent)
+                parent = getController(mountPoint.getParent(), driver, null);
+            scheduler = new Scheduler(driver.newController(mountPoint, parent));
+        }
+        return scheduler.controller;
     }
 
     private final class Scheduler implements FileSystemTouchedListener {
@@ -113,6 +111,7 @@ public class FileSystemManager {
 
         Scheduler(final FileSystemController<?> prospect) {
             controller = new ManagedFileSystemController(prospect);
+            controller.getModel().addFileSystemTouchedListener(this);
             touchedChanged(null); // setup schedule
         }
 
@@ -122,9 +121,9 @@ public class FileSystemManager {
          */
         @Override
         public void touchedChanged(final FileSystemEvent event) {
-            synchronized (schedulers) {
-                final FileSystemModel model = controller.getModel();
-                assert null == event || event.getSource() == model;
+            final FileSystemModel model = controller.getModel();
+            assert null == event || event.getSource() == model;
+            synchronized (FileSystemManager.this) {
                 schedulers.put(model.getMountPoint(),
                         (model.isTouched() ? STRONG : WEAK).newLink(this));
             }
@@ -132,15 +131,15 @@ public class FileSystemManager {
     } // class Scheduler
 
     /**
-     * Writes all changes to the contents of the file systems who's canonical
-     * path name (mount point) starts with the given {@code prefix} to their
+     * Writes all changes to the contents of the federated file systems who's
+     * mount point starts with the given {@code prefix} to their respective
      * parent file system.
      * This will reset the state of the respective file system controllers.
      * This method is thread-safe.
      *
      * @param  prefix the prefix of the mount point of the federated file
-     *         systems which shall get synchronized with their parent file
-     *         system.
+     *         systems which shall get synchronized to their respective parent
+     *         file system.
      *         This may be {@code null} in order to select all federated file
      *         systems.
      * @throws SyncWarningException if the configuration uses the
@@ -190,24 +189,21 @@ public class FileSystemManager {
         builder.check();
     }
 
-    final Set<FileSystemController<?>> getControllers(
+    final synchronized Set<FileSystemController<?>> getControllers(
             final MountPoint prefix,
             final Comparator<? super FileSystemController<?>> comparator) {
-        final Set<FileSystemController<?>> snapshot;
-        synchronized (schedulers) {
-            snapshot = null != comparator
-                    ? new TreeSet<FileSystemController<?>>(comparator)
-                    : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
-            for (final Link<Scheduler> link : schedulers.values()) {
-                final Scheduler scheduler = Links.getTarget(link);
-                final ManagedFileSystemController controller
-                        = null == scheduler ? null : scheduler.controller;
-                if (null != controller)
-                    if (null == prefix
-                            || controller.getModel().getMountPoint().hierarchicalize().toString()
-                                .startsWith(prefix.hierarchicalize().toString()))
-                        snapshot.add(controller);
-            }
+        final Set<FileSystemController<?>> snapshot = null != comparator
+                ? new TreeSet<FileSystemController<?>>(comparator)
+                : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
+        for (final Link<Scheduler> link : schedulers.values()) {
+            final Scheduler scheduler = Links.getTarget(link);
+            final ManagedFileSystemController controller
+                    = null == scheduler ? null : scheduler.controller;
+            if (null != controller)
+                if (null == prefix
+                        || controller.getModel().getMountPoint().hierarchicalize().toString()
+                            .startsWith(prefix.hierarchicalize().toString()))
+                    snapshot.add(controller);
         }
         return snapshot;
     }

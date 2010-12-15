@@ -93,7 +93,8 @@ public enum SyncOption {
     ABORT_CHANGES,
 
     /**
-     * Suppose a federated file system controller has cached data for entries.
+     * Suppose a controller of a federated file system has cached data for its
+     * entries.
      * Then if this option is set, the cache contents get cleared after
      * flushing them to the federated file system when it gets synchronized.
      */
