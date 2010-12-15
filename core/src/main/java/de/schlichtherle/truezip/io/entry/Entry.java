@@ -131,25 +131,27 @@ public interface Entry {
 
     /**
      * Returns the non-{@code null} <i>entry name</i>.
-     * An entry name must meet the following requirements:
+     * An entry name must conform to the following constraints:
      * <ol>
      * <li>An entry name is a sequence of <i>segments</i> which are
      *     separated by one or more <i>separator characters</i>
      *     ({@link #SEPARATOR_CHAR}).
-     *     This implies that a segment cannot contain separator characters.</li>
+     *     This implies that a segment cannot contain separator characters.
      * <li>An entry name may contain one or more dot ({@code "."}) or
      *     dot-dot ({@code ".."}) segments which represent the current or
-     *     parent directory respectively.</li>
-     * <li>If an entry name starts with one or more separator characters
-     *     its said to be <i>absolute</i>.
-     *     Otherwise, its said to be <i>relative</i>.</li>
+     *     parent segment respectively.
+     * <li>An entry name may start with one or more separator characters.
+     *     In this case, its said to be <i>absolute</i>.
+     *     Otherwise, its said to be <i>relative</i>.
+     * <li>An entry name may end with one or more separator
+     *     characters (e.g. to identify a directory entry).
      * </ol>
-     * For example, {@code "foo/bar"} and
+     * For example, {@code "foo/bar/"} and
      * {@code "./abc/../foo/./def/./../bar/."} are both valid entry names which
-     * refer to the same entity.
+     * refer to the same entry.
      * <p>
-     * Note that implementations may impose additional terms for an entry name
-     * to meet their particular requirements.
+     * Note that subinterfaces and implementations may impose additional
+     * constraints for an entry name to meet their particular requirements.
      *
      * @return The non-{@code null} <i>entry name</i>.
      */

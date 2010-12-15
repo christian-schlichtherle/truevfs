@@ -42,9 +42,9 @@ public class EntryNameTest {
             { "föö/", "bär", "föö/bär" },
             { "föö/", "bär/", "föö/bär/" },
         }) {
-            final EntryName parent = EntryName.create(URI.create(params[0]));
-            final EntryName member = EntryName.create(URI.create(params[1]));
-            final EntryName result = new EntryName(parent, member);
+            final FileSystemEntryName parent = FileSystemEntryName.create(URI.create(params[0]));
+            final FileSystemEntryName member = FileSystemEntryName.create(URI.create(params[1]));
+            final FileSystemEntryName result = new FileSystemEntryName(parent, member);
             assertThat(result.getUri(), equalTo(URI.create(params[2])));
         }
     }

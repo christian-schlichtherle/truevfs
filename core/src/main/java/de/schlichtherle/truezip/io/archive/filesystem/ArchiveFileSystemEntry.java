@@ -20,10 +20,10 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 
 /**
- * A marker interface which distinguishes entries created by an archive file
+ * An empty interface which distinguishes entries created by an archive file
  * system from any other entries, in particular those created by the
  * {@link ArchiveDriver#newEntry factory method} of an archive driver.
- * With the help of this marker interface, an archive file system ensures that
+ * With the help of this empty interface, an archive file system ensures that
  * when a new archive entry is created, the {@code template} parameter is
  * <em>not</em> an instance of this interface, but possibly a product of the
  * archive entry factory in the archive driver.

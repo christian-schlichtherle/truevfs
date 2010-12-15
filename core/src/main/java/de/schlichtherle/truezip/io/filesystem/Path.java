@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  *     according to the syntax constraints for a {@link MountPoint} and set as
  *     the value of the property {@link #getMountPoint() mount point}.
  *     The part <em>after</em> the last bang slash separator is parsed
- *     according to the syntax constraints for an {@link EntryName} and set as
+ *     according to the syntax constraints for an {@link FileSystemEntryName} and set as
  *     the value of the property {@link #getEntryName() entry name}.
  * <li>If the URI is absolute, it's resolved with ".", parsed according to
  *     the syntax constraints for a {@link MountPoint} and set as the value of
@@ -43,7 +43,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  *     to the URI relativized to this {@link #getMountPoint() mount point}.
  * <li>Otherwise, the value of the property
  *     {@link #getMountPoint() mount point} is set to {@code null} and the URI
- *     is parsed according to the syntax constraints for an {@link EntryName}
+ *     is parsed according to the syntax constraints for an {@link FileSystemEntryName}
  *     and set as the value of the property {@link #getEntryName() entry name}.
  * </ol>
  * <p>
@@ -74,7 +74,7 @@ public final class Path implements Serializable, Comparable<Path> {
 
     private final URI uri;
     private final MountPoint mountPoint;
-    private final EntryName entryName;
+    private final FileSystemEntryName entryName;
 
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
@@ -136,7 +136,7 @@ public final class Path implements Serializable, Comparable<Path> {
             mountPoint = new MountPoint(
                     new URI(uri.getScheme(), ssp.substring(0, i + 2), null),
                     normalize);
-            entryName = new EntryName(
+            entryName = new FileSystemEntryName(
                     new URI(null, ssp.substring(i + 2), uri.getFragment()),
                     normalize);
             if (normalize) {
@@ -152,10 +152,10 @@ public final class Path implements Serializable, Comparable<Path> {
                 throw new URISyntaxException(uri.toString(),
                         "URI path not in normal form");
             mountPoint = new MountPoint(uri.resolve("."));
-            entryName = new EntryName(mountPoint.getUri().relativize(uri));
+            entryName = new FileSystemEntryName(mountPoint.getUri().relativize(uri));
         } else {
             mountPoint = null;
-            entryName = new EntryName(uri, normalize);
+            entryName = new FileSystemEntryName(uri, normalize);
             if (normalize)
                 uri = entryName.getUri();
         }
@@ -173,7 +173,7 @@ public final class Path implements Serializable, Comparable<Path> {
      * @throws URISyntaxException if the synthesized path URI
      *         would not conform to the syntax constraints for paths.
      */
-    public Path(final MountPoint mountPoint, final EntryName entryName) {
+    public Path(final MountPoint mountPoint, final FileSystemEntryName entryName) {
         if (null == mountPoint) {
             this.uri = entryName.getUri();
         } else if (mountPoint.getUri().isOpaque()) {
@@ -226,7 +226,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The nullable entry name.
      */
-    public EntryName getEntryName() {
+    public FileSystemEntryName getEntryName() {
         return entryName;
     }
 

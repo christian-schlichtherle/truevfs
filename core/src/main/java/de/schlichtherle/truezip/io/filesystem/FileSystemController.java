@@ -75,43 +75,43 @@ public interface FileSystemController<E extends Entry> {
 
     boolean isReadOnly() throws IOException;
 
-    FileSystemEntry<? extends E> getEntry(EntryName path) throws IOException;
+    FileSystemEntry<? extends E> getEntry(FileSystemEntryName name) throws IOException;
 
-    boolean isReadable(EntryName path) throws IOException;
+    boolean isReadable(FileSystemEntryName name) throws IOException;
 
-    boolean isWritable(EntryName path) throws IOException;
+    boolean isWritable(FileSystemEntryName name) throws IOException;
 
-    void setReadOnly(EntryName path) throws IOException;
+    void setReadOnly(FileSystemEntryName name) throws IOException;
 
-    boolean setTime(EntryName path, BitField<Access> types, long value)
+    boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException;
 
     /**
      * Returns an input socket for reading the given entry from the file
      * system.
      *
-     * @param  path a non-{@code null} relative path name.
+     * @param  name a non-{@code null} relative path name.
      * @return A non-{@code null} {@code InputSocket}.
      */
     InputSocket<? extends E> getInputSocket(
-            EntryName path, BitField<InputOption> options);
+            FileSystemEntryName name, BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
      * system.
      *
-     * @param  path a non-{@code null} relative path name.
+     * @param  name a non-{@code null} relative path name.
      * @return A non-{@code null} {@code OutputSocket}.
      */
     // FIXME: Erase template parameter and add OutputOption.PRESERVE!
     OutputSocket<? extends E> getOutputSocket(
-            EntryName path, BitField<OutputOption> options, Entry template);
+            FileSystemEntryName name, BitField<OutputOption> options, Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
      * for the given {@code path} into the file system.
      *
-     * @param  path a non-{@code null} relative path name.
+     * @param  name a non-{@code null} relative path name.
      * @param  type a non-{@code null} entry type.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
@@ -136,11 +136,11 @@ public interface FileSystemController<E extends Entry> {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  EntryName path, Type type, BitField<OutputOption> options,
+    boolean mknod(  FileSystemEntryName name, Type type, BitField<OutputOption> options,
                     Entry template)
     throws IOException;
 
-    void unlink(EntryName path) throws IOException;
+    void unlink(FileSystemEntryName name) throws IOException;
 
     /**
      * Writes all changes to the contents of this file system to its

@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
@@ -45,7 +45,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
     }
 
     @Override
-    public void unlink(EntryName path) throws IOException {
+    public void unlink(FileSystemEntryName path) throws IOException {
         controller.unlink(path);
         if (isRoot(path.getPath()))
             KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());

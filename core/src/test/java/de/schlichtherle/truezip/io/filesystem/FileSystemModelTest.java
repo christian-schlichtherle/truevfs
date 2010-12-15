@@ -49,7 +49,7 @@ public class FileSystemModelTest {
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), nullValue());
             try {
-                model.resolveParent(EntryName.create(URI.create(ROOT)));
+                model.resolveParent(FileSystemEntryName.create(URI.create(ROOT)));
                 fail();
             } catch (RuntimeException expected) {
             }
@@ -82,8 +82,8 @@ public class FileSystemModelTest {
         }) {
             final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
             final MountPoint parentMountPoint = MountPoint.create(URI.create(params[1]));
-            final EntryName entryName = EntryName.create(URI.create(params[2]));
-            final EntryName parentEntryName = EntryName.create(URI.create(params[3]));
+            final FileSystemEntryName entryName = FileSystemEntryName.create(URI.create(params[2]));
+            final FileSystemEntryName parentEntryName = FileSystemEntryName.create(URI.create(params[3]));
             final Path path = Path.create(URI.create(params[4]));
             FileSystemModel parent = newModel(parentMountPoint);
             FileSystemModel model = new FileSystemModel(mountPoint, parent);

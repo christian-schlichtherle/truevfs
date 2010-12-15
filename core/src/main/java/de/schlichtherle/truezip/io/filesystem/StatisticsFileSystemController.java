@@ -46,14 +46,14 @@ extends FilterFileSystemController<Entry, FileSystemController<?>> {
 
     @Override
     public InputSocket<?> getInputSocket(
-            final EntryName path,
+            final FileSystemEntryName name,
             final BitField<InputOption> options) {
-        return new Input(path, options);
+        return new Input(name, options);
     }
 
     private class Input extends FilterInputSocket<Entry> {
-        Input(EntryName path, BitField<InputOption> options) {
-            super(controller.getInputSocket(path, options));
+        Input(FileSystemEntryName name, BitField<InputOption> options) {
+            super(controller.getInputSocket(name, options));
         }
 
         @Override
@@ -71,15 +71,15 @@ extends FilterFileSystemController<Entry, FileSystemController<?>> {
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            EntryName path,
+            FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return new Output(path, options, template);
+        return new Output(name, options, template);
     }
 
     private class Output extends FilterOutputSocket<Entry> {
-        Output(EntryName path, BitField<OutputOption> options, Entry template) {
-            super(controller.getOutputSocket(path, options, template));
+        Output(FileSystemEntryName name, BitField<OutputOption> options, Entry template) {
+            super(controller.getOutputSocket(name, options, template));
         }
 
         @Override

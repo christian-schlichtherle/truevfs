@@ -308,13 +308,13 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
 
             split(path);
             final String parentPath = getParentPath();
-            final String baseName = getBaseName();
+            final String memberName = getMemberName();
             BaseEntry<AE> parent = master.get(parentPath);
             if (parent == null) {
                 parent = newEntryUnchecked(parentPath, DIRECTORY, null);
                 master.put(parentPath, parent);
             }
-            parent.add(baseName);
+            parent.add(memberName);
             fix(parentPath);
         }
     }
@@ -876,7 +876,7 @@ implements EntryContainer<ArchiveFileSystemEntry<AE>> {
         final BaseEntry<AE> parent = master.get(parentPath);
         assert parent != null : "The parent directory of \"" + path
                     + "\" is missing - archive file system is corrupted!";
-        final boolean ok = parent.remove(splitter.getBaseName());
+        final boolean ok = parent.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + path
                     + "\" does not contain this entry - archive file system is corrupted!";
         touch();

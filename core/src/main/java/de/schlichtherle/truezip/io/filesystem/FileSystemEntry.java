@@ -32,14 +32,22 @@ public interface FileSystemEntry<E extends Entry>
 extends Entry, Link<E> {
 
     /**
-     * Returns the non-{@code null} <i>path name</i>.
-     * A path name is an {@link Entry#getName() entry name}
-     * which meets the following additional requirement:
+     * Returns the non-{@code null} <i>file system entry name</i>.
+     * A file system entry name is an {@link Entry#getName() entry name}
+     * which must conform to the following additional constraints:
      * <ol>
-     * <li>A path name <em>must not</em> end with a separator character.</li>
+     * <li>A file system entry name must be in normal form,
+     *     i.e. it must not contain redundant {@code "."} and {@code ".."}
+     *     segments.
+     * <li>A file system entry name must not equal {@code "."}.
+     * <li>A file system entry name must not equal {@code ".."}.
+     * <li>A file system entry name must not start with {@code "/"}.
+     * <li>A file system entry name must not start with {@code "./"}.
+     * <li>A file system entry name must not start with {@code "../"}.
+     * <li>A file system entry name must not end with {@code "/"}.
      * </ol>
      *
-     * @return The non-{@code null} <i>path name</i>.
+     * @return The non-{@code null} <i>file system entry name</i>.
      */
     @Override
     String getName();

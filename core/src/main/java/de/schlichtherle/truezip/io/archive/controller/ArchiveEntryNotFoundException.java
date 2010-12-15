@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import java.io.FileNotFoundException;
@@ -41,30 +41,22 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 
     ArchiveEntryNotFoundException(
             final ArchiveModel model,
-            final String path,
+            final FileSystemEntryName name,
             final String msg) {
         super(msg);
-        assert path != null;
+        assert name != null;
         assert msg != null;
-        try {
-            this.path = model.resolveAbsolute(EntryName.create(new URI(null, null, path, null, null)));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+        this.path = model.resolveAbsolute(name);
     }
 
     ArchiveEntryNotFoundException(
             final ArchiveModel model,
-            final String path,
+            final FileSystemEntryName name,
             final IOException cause) {
         super(cause == null ? null : cause.toString());
-        assert path != null;
+        assert name != null;
         super.initCause(cause);
-        try {
-            this.path = model.resolveAbsolute(EntryName.create(new URI(null, null, path, null, null)));
-        } catch (URISyntaxException ex) {
-            throw new AssertionError(ex);
-        }
+        this.path = model.resolveAbsolute(name);
     }
 
     @Override

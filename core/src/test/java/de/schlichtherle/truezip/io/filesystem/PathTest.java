@@ -212,7 +212,7 @@ public class PathTest {
         }) {
             Path path = Path.create(URI.create(params[0]), true);
             final MountPoint mountPoint = null == params[1] ? null : MountPoint.create(URI.create(params[1]));
-            final EntryName entryName = EntryName.create(URI.create(params[2]));
+            final FileSystemEntryName entryName = FileSystemEntryName.create(URI.create(params[2]));
             testPath(path, mountPoint, entryName);
 
             path = new Path(mountPoint, entryName);
@@ -222,7 +222,7 @@ public class PathTest {
 
     private void testPath(final Path path,
                           final MountPoint mountPoint,
-                          final EntryName entryName) {
+                          final FileSystemEntryName entryName) {
         if (null != mountPoint) {
             assertThat(path.getUri(), equalTo(URI.create(
                     mountPoint.toString() + entryName)));
