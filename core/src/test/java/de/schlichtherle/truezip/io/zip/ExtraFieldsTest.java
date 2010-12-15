@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import java.util.Arrays;
@@ -55,7 +54,7 @@ public class ExtraFieldsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         fields = new ExtraFields();
-        serialized = (byte[]) SERIALIZED.clone();
+        serialized = SERIALIZED.clone();
     }
 
     public void testGetSet() {
