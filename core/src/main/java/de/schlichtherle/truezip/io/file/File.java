@@ -17,16 +17,14 @@ package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
-import java.io.FileNotFoundException;
+import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.Scheme;
 import de.schlichtherle.truezip.io.filesystem.Path;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
@@ -35,6 +33,7 @@ import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,21 +52,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemController.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.socket.OutputOption.*;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -1142,9 +1135,8 @@ public class File extends java.io.File {
     //
 
     /**
-     * Writes all changes to the contents of all target archive files to the
-     * underlying file system.
-     * This will reset the state of the respective archive controllers.
+     * Writes all changes to the contents of all federated file systems to
+     * their respective parent file system.
      * This method is thread-safe.
      *
      * @throws ArchiveWarningException If the configuration uses the
@@ -1158,10 +1150,9 @@ public class File extends java.io.File {
      *         {@link SyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
-     * @throws NullPointerException If {@code config} is {@code null}.
-     * @throws IllegalArgumentException If the configuration property
-     *         {@code closeInputStreams} is {@code false} and
-     *         {@code closeOutputStreams} is {@code true}.
+     * @throws NullPointerException If {@code options} is {@code null}.
+     * @throws IllegalArgumentException If the combination of options is
+     *         illegal.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
     public static void sync(BitField<SyncOption> options)
@@ -1172,22 +1163,58 @@ public class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@code
-        sync(BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
-     * }.
+     * Similar to {@link #sync(BitField) sync(options)},
+     * but will only update the given {@code archive} and all its member
+     * federated file systems.
+     * <p>
+     * If a client application needs to unmount an individual federated file
+     * system, the following idiom can be used:
+     * <pre>{@code
+     * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
+     *   if (file.isDirectory()) // ignore false positives
+     *     File.umount(File); // update federated file system and all its members
+     * }</pre>
+     * Again, this will also unmount all federated file systems which are
+     * located within the federated file system referred to by the {@code file}
+     * instance.
+     *
+     * @param  archive a top level federated file system.
+     * @throws NullPointerException If {@code archive} or {@code options} are
+     *         {@code null}.
+     * @throws IllegalArgumentException If {@code archive} is not a top level
+     *         federated file system.
+     * @see    #sync(BitField)
+     */
+    public static void sync(
+            final File archive,
+            final BitField<SyncOption> options)
+    throws ArchiveException {
+        if (!archive.isArchive())
+            throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
+        if (null != archive.getEnclArchive())
+            throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
+        FileSystemManagers
+                .getInstance()
+                .sync(  archive.getController().getModel().getMountPoint(),
+                        new ArchiveExceptionBuilder(),
+                        options);
+    }
+
+    /**
+     * Equivalent to {@code sync(FileSystemController.UMOUNT)}.
      *
      * @see #sync(BitField)
      */
     public static void umount()
     throws ArchiveException {
-        sync(BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(UMOUNT);
     }
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(CLEAR_CACHE)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+        sync(   BitField.of(SyncOption.CLEAR_CACHE)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1201,11 +1228,11 @@ public class File extends java.io.File {
 
     /**
      * Equivalent to {@code
-        sync(   BitField.of(CLEAR_CACHE)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+        sync(   BitField.of(SyncOption.CLEAR_CACHE)
+                .set(SyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(SyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1222,61 +1249,23 @@ public class File extends java.io.File {
     }
 
     /**
-     * Similar to {@link #sync(BitField) sync(options)},
-     * but will only update the given {@code archive} and all its enclosed
-     * (nested) archives.
-     * <p>
-     * If a client application needs to unmount an individual archive file,
-     * the following idiom can be used:
-     * <pre>{@code
-     * if (file.isArchive() && file.getEnclArchive() == null) // filter top level archive
-     *   if (file.isDirectory()) // ignore false positives
-     *     File.umount(File); // update archive and all enclosed archives
-     * }</pre>
-     * Again, this will also unmount all archive files which are located
-     * within the archive file referred to by the {@code file} instance.
-     *
-     * @param archive A top level archive file.
-     * @throws NullPointerException If {@code archive} is {@code null}.
-     * @throws IllegalArgumentException If {@code archive} is not an
-     *         archive or is enclosed in another archive (is not top level).
-     * @see #sync(BitField)
-     */
-    public static void sync(
-            final File archive,
-            final BitField<SyncOption> options)
-    throws ArchiveException {
-        if (!archive.isArchive())
-            throw new IllegalArgumentException(archive.getPath() + " (not an archive)");
-        if (archive.getEnclArchive() != null)
-            throw new IllegalArgumentException(archive.getPath() + " (not a top level archive)");
-        FileSystemManagers
-                .getInstance()
-                .sync(  archive.getController().getModel().getMountPoint(),
-                        new ArchiveExceptionBuilder(),
-                        options);
-    }
-
-    /**
      * Equivalent to {@code
-        sync(   archive,
-                BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(archive, BitField.of(FileSystemController.UMOUNT))
      * }.
      *
      * @see #sync(File, BitField)
      */
     public static void umount(File archive)
     throws ArchiveException {
-        sync(   archive,
-                BitField.of(CLEAR_CACHE, FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(archive, UMOUNT);
     }
 
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(CLEAR_CACHE)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                BitField.of(SyncOption.CLEAR_CACHE)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1292,11 +1281,11 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(CLEAR_CACHE)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                BitField.of(SyncOption.CLEAR_CACHE)
+                .set(SyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(SyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1314,22 +1303,20 @@ public class File extends java.io.File {
     }
 
     /**
-     * Equivalent to {@code
-        sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
-     * }.
+     * Equivalent to {@code sync(FileSystemController.UPDATE)}.
      *
      * @see #sync(BitField)
      */
     public static void update()
     throws ArchiveException {
-        sync(BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+        sync(UPDATE);
     }
 
     /**
      * Equivalent to {@code
         sync(   BitField.noneOf(SyncOption.class)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1344,10 +1331,10 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   BitField.noneOf(SyncOption.class)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                .set(SyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(SyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(BitField)
@@ -1366,7 +1353,8 @@ public class File extends java.io.File {
     /**
      * Equivalent to {@code
         sync(   archive,
-                BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
+                BitField.of(SyncOption.FORCE_CLOSE_INPUT,
+     *                      SyncOption.FORCE_CLOSE_OUTPUT))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1381,8 +1369,8 @@ public class File extends java.io.File {
      * Equivalent to {@code
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
-                .set(FORCE_CLOSE_INPUT, closeStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeStreams));
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeStreams))
      * }.
      *
      * @see #sync(File, BitField)
@@ -1399,10 +1387,10 @@ public class File extends java.io.File {
      * Equivalent to {@code
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
-                .set(WAIT_CLOSE_INPUT, waitForInputStreams)
-                .set(FORCE_CLOSE_INPUT, closeInputStreams)
-                .set(WAIT_CLOSE_OUTPUT, waitForOutputStreams)
-                .set(FORCE_CLOSE_OUTPUT, closeOutputStreams));
+                .set(SyncOption.WAIT_CLOSE_INPUT, waitForInputStreams)
+                .set(SyncOption.FORCE_CLOSE_INPUT, closeInputStreams)
+                .set(SyncOption.WAIT_CLOSE_OUTPUT, waitForOutputStreams)
+                .set(SyncOption.FORCE_CLOSE_OUTPUT, closeOutputStreams))
      * }.
      *
      * @see #sync(File, BitField)
