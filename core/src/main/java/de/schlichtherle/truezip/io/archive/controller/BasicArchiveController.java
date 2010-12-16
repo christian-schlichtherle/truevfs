@@ -43,12 +43,15 @@ import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
@@ -107,6 +110,11 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
 abstract class BasicArchiveController<E extends ArchiveEntry>
 extends AbstractFileSystemController<E>
 implements ArchiveController<E> {
+
+    private static final String CLASS_NAME
+            = BasicArchiveController.class.getName();
+    private static final Logger LOGGER
+            = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private final ArchiveModel model;
 
@@ -358,6 +366,11 @@ implements ArchiveController<E> {
                 try {
                     // The parent archive controller will unlink our target
                     // archive file next, so we need to reset anyway.
+                    // The only effect of calling sync for a false positive
+                    // archive file is that it will reset the mount state so
+                    // that the file system can be successfully mounted again
+                    // if the target archive file is subsequently modified to
+                    // be a regular archive file.
                     sync(   new SyncExceptionBuilder(),
                             BitField.of(ABORT_CHANGES));
                 } catch (IOException cannotHappen) {
@@ -365,8 +378,14 @@ implements ArchiveController<E> {
                 }
                 throw ex; // continue with unlinking our target archive file.
             }
-            if (!fileSystem.getEntry(path).getMembers().isEmpty())
+            if (!fileSystem.getEntry(ROOT).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
+            // Check for any archive entries with absolute entry names.
+            // Subtract one for the ROOT entry.
+            if (1 != fileSystem.size())
+                LOGGER.log(Level.WARNING, "unlink.absolute",
+                        new Object[] {  fileSystem.size() - 1,
+                                        getModel().getMountPoint() });
             sync(   new SyncExceptionBuilder(),
                     BitField.of(ABORT_CHANGES));
         } else { // !isRoot(path)
