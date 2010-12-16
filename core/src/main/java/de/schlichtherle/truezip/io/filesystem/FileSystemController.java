@@ -27,6 +27,8 @@ import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import javax.swing.Icon;
 
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+
 /**
  * Provides read/write access to one or more file systems which are organized
  * in a chain of responsibility for file system federation.
@@ -154,9 +156,23 @@ public interface FileSystemController<E extends Entry> {
      * @throws IOException if any exceptional condition occurs throughout the
      *         synchronization of this file system.
      * @see    FileSystemModel#isTouched
+     * @see    #UPDATE
+     * @see    #UMOUNT
      */
     <X extends IOException>
     void sync(  ExceptionBuilder<? super SyncException, X> builder,
                 BitField<SyncOption> options)
     throws X, FileSystemException;
+
+    /**
+     * Equivalent to
+     * {@code BitField.of(SyncOption.FORCE_CLOSE_INPUT, SyncOption.FORCE_CLOSE_OUTPUT)}.
+     */
+    BitField<SyncOption> UPDATE = BitField.of(  FORCE_CLOSE_INPUT,
+                                                FORCE_CLOSE_OUTPUT);
+
+    /**
+     * Equivalent to {@code UPDATE.set(SyncOption.CLEAR_CACHE)}.
+     */
+    BitField<SyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
 }

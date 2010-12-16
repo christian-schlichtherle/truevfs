@@ -96,12 +96,13 @@ public class FileSystemManagers {
      * Sets the file system manager class property instance.
      * If the current file system manager manages any federated file systems,
      * an {@link IllegalStateException} is thrown.
-     * Call {@link FileSystemManager#sync} and make sure to purge all
-     * references to the file system controllers which are returned
-     * by {@link FileSystemManager#getController} to prevent this.
+     * To avoid this, call its {@link FileSystemManager#sync} method and make
+     * sure to purge all references to the file system controllers which are
+     * returned by its {@link FileSystemManager#getController} method prior to
+     * calling this method.
      *
-     * @param  manager The file system manager instance to use as the class
-     *         property.
+     * @param  manager the nullable file system manager instance to use as the
+     *         class property.
      *         If this is {@code null}, a new instance will be created on the
      *         next call to {@link #getInstance}.
      * @throws IllegalStateException if the current file system manager has any
@@ -112,9 +113,7 @@ public class FileSystemManagers {
                 ? 0
                 : instance.getControllers(null, null).size();
         if (0 < count)
-            throw new IllegalStateException("There are " + count + " managed federated file systems!");
-        if (null == manager)
-            throw new NullPointerException();
+            throw new IllegalStateException("There are still " + count + " managed federated file systems!");
         instance = manager;
     }
 
