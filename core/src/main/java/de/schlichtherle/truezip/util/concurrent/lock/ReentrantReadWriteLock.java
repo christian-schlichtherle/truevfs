@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util.concurrent.lock;
 
 import de.schlichtherle.truezip.util.Operation;
@@ -48,7 +47,7 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
 
     private static final String CLASS_NAME
             = "de.schlichtherle.truezip.util.concurrent.locks.ReentrantReadWriteLock";
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private int  readCount; // shared
@@ -137,8 +136,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
                 try {
                     wait();
                 } catch (InterruptedException ex) {
-                    logger.log(Level.FINE, "interrupted", ex);
-                    logger.log(Level.FINE, "continuing");
+                    LOGGER.log(Level.FINE, "interrupted", ex);
+                    LOGGER.log(Level.FINE, "continuing");
                 }
             }
             assert writeCount == writeHoldCount : "write lock/hold mismatch!";
@@ -190,8 +189,8 @@ public final class ReentrantReadWriteLock implements ReadWriteLock {
                     try {
                         wait();
                     } catch (InterruptedException ex) {
-                        logger.log(Level.FINE, "interrupted", ex);
-                        logger.log(Level.FINE, "continuing");
+                        LOGGER.log(Level.FINE, "interrupted", ex);
+                        LOGGER.log(Level.FINE, "continuing");
                     }
                 }
                 assert readCount == readHoldCount : "read lock/hold mismatch!";

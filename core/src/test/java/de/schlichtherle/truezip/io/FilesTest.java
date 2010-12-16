@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io;
 
 import java.net.URI;
@@ -36,7 +35,7 @@ import static de.schlichtherle.truezip.io.Files.split;
  */
 public class FilesTest extends TestCase {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             FilesTest.class.getName());
 
     public FilesTest(String testName) {
@@ -496,7 +495,7 @@ public class FilesTest extends TestCase {
             fin.close();
         }
         if (!result)
-            logger.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
+            LOGGER.finer("Overwriting a file which has an open FileInputStream is not tolerated!");
 
         final String[] modes = { "r", "rw", "rws", "rwd" };
         for (int i = 0, l = modes.length; i < l; i++) {
@@ -509,11 +508,11 @@ public class FilesTest extends TestCase {
                 raf.close();
             }
             if (!result)
-                logger.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
+                LOGGER.log(Level.FINER, "Overwriting a file which has an open RandomAccessFile in \"{0}\" mode is not tolerated!", mode);
         }
 
         if (!total)
-            logger.finer(
+            LOGGER.finer(
                     "Applications should ALWAYS close their streams or you may face strange 'errors'.\n"
                     + "Note that this issue is NOT AT ALL specific to TrueZIP, but rather imposed by this platform!");
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -70,7 +69,7 @@ implements Serializable {
     private static final long serialVersionUID = 1579600190374703884L;
     private static final String CLASS_NAME
             = GlobalArchiveDriverRegistry.class.getName();
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
     private static final String PACKAGE_NAME
             = GlobalArchiveDriverRegistry.class.getPackage().getName();
@@ -98,7 +97,7 @@ implements Serializable {
     public final String ALL_SUFFIXES;
 
     static {
-        logger.config("banner"); // NOI18N
+        LOGGER.config("banner"); // NOI18N
     }
 
     /**
@@ -167,7 +166,7 @@ implements Serializable {
         try {
             urls = getResources(service, GlobalArchiveDriverRegistry.class);
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "lookup.ex", ex); // NOI18N
+            LOGGER.log(Level.WARNING, "lookup.ex", ex); // NOI18N
             return;
         }
 
@@ -190,7 +189,7 @@ implements Serializable {
         assert clientRegistry != null;
 
         // Load the configuration map from the properties file.
-        logger.log(Level.CONFIG, "loading", url); // NOI18N
+        LOGGER.log(Level.CONFIG, "loading", url); // NOI18N
         final Properties config = new Properties();
         try {
             final InputStream in = url.openStream();
@@ -201,7 +200,7 @@ implements Serializable {
                 in.close();
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "loading.ex", ex); // NOI18N
+            LOGGER.log(Level.WARNING, "loading.ex", ex); // NOI18N
             // Continue normally.
         }
     }
@@ -266,7 +265,7 @@ implements Serializable {
                 addAll = true;
             } else if (!all.contains(suffix)) {
                 i.remove();
-                logger.log(Level.WARNING, "unknownSuffix", suffix); // NOI18N
+                LOGGER.log(Level.WARNING, "unknownSuffix", suffix); // NOI18N
             }
         }
         if (clear)
@@ -281,17 +280,17 @@ implements Serializable {
         if (i.hasNext()) {
             do {
                 final Map.Entry<String, Object> entry = i.next();
-                logger.log(Level.CONFIG, "driverRegistered", // NOI18N
+                LOGGER.log(Level.CONFIG, "driverRegistered", // NOI18N
                         new Object[] { entry.getKey(), entry.getValue() });
             } while (i.hasNext());
 
-            logger.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
+            LOGGER.log(Level.CONFIG, "allSuffixList", ALL_SUFFIXES); // NOI18N
             if (DEFAULT_SUFFIXES.length() > 0)
-                logger.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
+                LOGGER.log(Level.CONFIG, "defaultSuffixList", DEFAULT_SUFFIXES); // NOI18N
             else
-                logger.config("noDefaultSuffixes"); // NOI18N
+                LOGGER.config("noDefaultSuffixes"); // NOI18N
         } else {
-            logger.warning("noDriversRegistered"); // NOI18N
+            LOGGER.warning("noDriversRegistered"); // NOI18N
         }
     }
 }

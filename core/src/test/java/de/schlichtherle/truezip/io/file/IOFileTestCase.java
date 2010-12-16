@@ -987,7 +987,7 @@ public abstract class IOFileTestCase extends TestCase {
     // This test needs to be redesigned: It primarily lacks a clear intention.
     /*public void testGarbageCollection()
     throws Throwable {
-        logger.fine("testGarbageCollection");
+        LOGGER.fine("testGarbageCollection");
      
         // Preamble:
         {

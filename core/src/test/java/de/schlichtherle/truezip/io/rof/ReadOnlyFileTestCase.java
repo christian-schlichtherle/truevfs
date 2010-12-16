@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.rof;
 
 import java.io.File;
@@ -36,7 +35,7 @@ import junit.framework.TestCase;
  */
 public abstract class ReadOnlyFileTestCase extends TestCase {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             BufferedReadOnlyFileTest.class.getName());
 
     private static final Random rnd = new SecureRandom();
@@ -44,9 +43,9 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
+        LOGGER.log(Level.CONFIG, "Java assertions {0}", (ea ? "enabled." : "disabled!"));
         if (!ea)
-            logger.warning("Please enable assertions for additional white box testing.");
+            LOGGER.warning("Please enable assertions for additional white box testing.");
     }
 
     /** The test data. */

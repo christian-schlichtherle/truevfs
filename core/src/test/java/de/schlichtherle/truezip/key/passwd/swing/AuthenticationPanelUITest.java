@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package de.schlichtherle.truezip.key.passwd.swing;
-
 import java.awt.EventQueue;
 import java.io.File;
 import java.lang.ref.PhantomReference;
@@ -47,7 +46,7 @@ public class AuthenticationPanelUITest extends TestCase {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             AuthenticationPanelUITest.class.getName());
 
     static final File rootDir;
@@ -99,7 +98,7 @@ public class AuthenticationPanelUITest extends TestCase {
             System.gc();
         }
         assert null == queue.poll(); // previous poll() has removed the reference
-        logger.log(Level.FINE, "Successfully allocated {0} megabytes before JFileChooser was discarded.", i);
+        LOGGER.log(Level.FINE, "Successfully allocated {0} megabytes before JFileChooser was discarded.", i);
 
         // Now ask for a file chooser again.
         JFileChooser fc = AuthenticationPanel.getFileChooser();

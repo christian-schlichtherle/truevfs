@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.AesKeyProvider;
@@ -28,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(AesKeyMgmtLifeCycle.class.getName());
 
     private int keyStrength;
@@ -82,6 +81,6 @@ public class AesKeyMgmtLifeCycle extends KeyMgmtLifeCycle {
                 throw new AssertionError("Illegal key strength!");
         }
         msg += " bits.";
-        logger.fine(msg);
+        LOGGER.fine(msg);
     }
 }
