@@ -47,8 +47,7 @@ import javax.swing.Icon;
  * @version $Id$
  */
 final class ManagedFileSystemController
-extends FilterFileSystemController<Entry, FileSystemController<?>>
-implements FileSystemController<Entry> {
+extends FilterFileSystemController<Entry, FileSystemController<?>> {
 
     ManagedFileSystemController(final FileSystemController<?> controller) {
         super(controller);
