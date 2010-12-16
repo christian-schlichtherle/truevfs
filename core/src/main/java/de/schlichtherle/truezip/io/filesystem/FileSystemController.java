@@ -84,6 +84,7 @@ public interface FileSystemController {
 
     void setReadOnly(FileSystemEntryName name) throws IOException;
 
+    // FIXME: Put this into FileSystemEntry and let getEntry() return a proxy!
     boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException;
 
@@ -138,7 +139,9 @@ public interface FileSystemController {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  FileSystemEntryName name, Type type, BitField<OutputOption> options,
+    boolean mknod(  FileSystemEntryName name,
+                    Type type,
+                    BitField<OutputOption> options,
                     Entry template)
     throws IOException;
 

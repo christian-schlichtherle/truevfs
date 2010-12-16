@@ -27,8 +27,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry
-extends Entry {
+public interface FileSystemEntry extends Entry {
 
     /**
      * Returns the non-{@code null} <i>file system entry name</i>.

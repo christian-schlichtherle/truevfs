@@ -43,10 +43,11 @@ public interface ArchiveEntry extends Entry {
      * @param  value the size of the given size type for this archive entry in
      *         bytes or
      *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
-     * @throws IllegalArgumentException if {@code size} is negative and not
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         type is unsupported.
+     * @throws NullPointerException if {@code type} is {@code null}.
+     * @throws IllegalArgumentException if {@code value} is negative and not
+     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      */
     boolean setSize(Size type, long value);
 
@@ -57,10 +58,11 @@ public interface ArchiveEntry extends Entry {
      * @param  value the last time of the given access type for this archive
      *         entry in milliseconds since the epoch or
      *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
-     * @throws IllegalArgumentException if {@code time} is negative and not
-     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      * @return {@code true} on success, {@code false} otherwise, e.g. if the
      *         given type is unsupported.
+     * @throws NullPointerException if {@code type} is {@code null}.
+     * @throws IllegalArgumentException if {@code value} is negative and not
+     *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      */
     boolean setTime(Access type, long value);
 }
