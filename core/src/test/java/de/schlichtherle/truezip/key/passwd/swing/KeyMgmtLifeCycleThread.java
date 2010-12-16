@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import java.net.URI;
@@ -29,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class KeyMgmtLifeCycleThread extends Thread {
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(KeyMgmtLifeCycleThread.class.getName());
 
     private final KeyMgmtLifeCycle rlc;
@@ -59,7 +58,7 @@ public class KeyMgmtLifeCycleThread extends Thread {
 
     @Override
     public void start() {
-        logger.log(Level.FINE, "{0}: Starting Key Management Life Cycle Thread...", rlc.id);
+        LOGGER.log(Level.FINE, "{0}: Starting Key Management Life Cycle Thread...", rlc.id);
         super.start();
     }
 

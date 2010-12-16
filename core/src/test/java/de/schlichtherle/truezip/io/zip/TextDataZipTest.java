@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import java.util.logging.Level;
@@ -26,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class TextDataZipTest extends PlainZipTestCase {
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(TextDataZipTest.class.getName());
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
@@ -34,7 +33,7 @@ public class TextDataZipTest extends PlainZipTestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
+        LOGGER.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         final String text = "This is a truly compressible text!\n";
         final int count = 1024 / text.length();
@@ -44,7 +43,7 @@ public class TextDataZipTest extends PlainZipTestCase {
             buf.append(text);
         }
         data = buf.toString().getBytes();
-        logger.log(Level.CONFIG, "Created {0} bytes of highly compressible text as the data.", data.length);
+        LOGGER.log(Level.CONFIG, "Created {0} bytes of highly compressible text as the data.", data.length);
     }
     
     /** Creates a new instance of RandomMessageZipTest */

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.swing;
 
 import de.schlichtherle.truezip.swing.event.PanelEvent;
@@ -49,7 +48,7 @@ public class EnhancedPanel extends JPanel  {
 
     private static final long serialVersionUID = 6984576810262891640L;
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(EnhancedPanel.class.getName());
     
     /**
@@ -173,7 +172,7 @@ public class EnhancedPanel extends JPanel  {
      * {@code event}.
      */
     protected void processPanelEvent(final PanelEvent event) {
-        logger.log(Level.FINE, "Processing {0}", event);
+        LOGGER.log(Level.FINE, "Processing {0}", event);
         switch (event.getID()) {
             case PanelEvent.ANCESTOR_WINDOW_SHOWN:
                 fireAncestorWindowShown(event);

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.key.passwd.swing;
 
 import de.schlichtherle.truezip.key.KeyManager;
@@ -36,7 +35,7 @@ import java.util.logging.Logger;
  */
 public class KeyMgmtLifeCycle implements Runnable {
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(KeyMgmtLifeCycle.class.getName());
 
     /** The identifier of the protected resource. */
@@ -94,7 +93,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         // key manager when opening the resource.
         refKey = provider.getCreateKey();
         String msg = id + ": getCreateKey() returned " + toString(refKey) + ".";
-        logger.fine(msg);
+        LOGGER.fine(msg);
 
         createResourceHook(provider);
     }
@@ -125,11 +124,11 @@ public class KeyMgmtLifeCycle implements Runnable {
         nullify(providedKey);
         if (correct) {
             msg += "That's correct.";
-            logger.fine(msg);
+            LOGGER.fine(msg);
         }  else {
             provider.invalidOpenKey();
             msg += "That's wrong!";
-            logger.fine(msg);
+            LOGGER.fine(msg);
             try {
                 Thread.sleep(3000);
             }  catch (InterruptedException ex) {

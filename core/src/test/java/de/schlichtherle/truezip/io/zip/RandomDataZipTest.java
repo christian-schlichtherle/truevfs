@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.zip;
 
 import java.util.logging.Level;
@@ -26,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class RandomDataZipTest extends PlainZipTestCase {
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(RandomDataZipTest.class.getName());
 
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
@@ -34,10 +33,10 @@ public class RandomDataZipTest extends PlainZipTestCase {
     static {
         boolean ea = false;
         assert ea = true; // NOT ea == true !
-        logger.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
+        LOGGER.log(Level.CONFIG, "Java assertions enabled: {0}", ea);
 
         rnd.nextBytes(data);
-        logger.log(Level.CONFIG, "Created {0} bytes of random data.", data.length);
+        LOGGER.log(Level.CONFIG, "Created {0} bytes of random data.", data.length);
     }
     
     /**

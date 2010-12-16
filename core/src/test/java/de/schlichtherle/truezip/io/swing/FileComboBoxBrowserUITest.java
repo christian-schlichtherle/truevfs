@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.swing;
 
 import de.schlichtherle.truezip.io.file.File;
@@ -43,7 +42,7 @@ public class FileComboBoxBrowserUITest extends TestCase {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
     }
 
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(FileComboBoxBrowserUITest.class.getName());
 
     public FileComboBoxBrowserUITest(String testName) {
@@ -99,7 +98,7 @@ public class FileComboBoxBrowserUITest extends TestCase {
     public void testAutoCompletion(final java.io.File dir) {
         final String[] entries = dir.list();
         if (entries == null || entries.length == 0) {
-            logger.warning("Current directory does not contain any files - skipping test!");
+            LOGGER.warning("Current directory does not contain any files - skipping test!");
             return;
         }
 

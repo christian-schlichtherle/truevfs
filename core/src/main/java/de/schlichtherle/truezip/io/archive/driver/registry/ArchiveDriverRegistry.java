@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.driver.registry;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
@@ -52,9 +51,9 @@ public class ArchiveDriverRegistry implements Serializable {
 
     private static final String CLASS_NAME
             = ArchiveDriverRegistry.class.getName();
-    private static final ResourceBundle resources
+    private static final ResourceBundle RESOURCES
             = ResourceBundle.getBundle(CLASS_NAME);
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     static final String KWD_DRIVER = "DRIVER";      // NOI18N
@@ -171,7 +170,7 @@ public class ArchiveDriverRegistry implements Serializable {
             if (eager)
                 throw new IllegalArgumentException(getString("noSuffixes")); // NOI18N
             else
-                logger.log(Level.WARNING, "noSuffixes"); // NOI18N
+                LOGGER.log(Level.WARNING, "noSuffixes"); // NOI18N
         } else {
             driver = eager ? newArchiveDriver(driver) : (String) driver; // force cast
             for (String suffix : set)
@@ -222,7 +221,7 @@ public class ArchiveDriverRegistry implements Serializable {
                 // an ArchiveDriver, so we probably need to load its class
                 // first and instantiate it.
                 driver = newArchiveDriver(driver);
-                logger.log(Level.FINE, "installed", // NOI18N
+                LOGGER.log(Level.FINE, "installed", // NOI18N
                         new Object[] { suffix, driver });
             }
             // Cache the driver in the local registry.
@@ -286,11 +285,11 @@ public class ArchiveDriverRegistry implements Serializable {
     }
 
     private static String getString(String key) {
-        return resources.getString(key);
+        return RESOURCES.getString(key);
     }
 
     private static String getString(String key, String arg) {
-        return MessageFormat.format(resources.getString(key),
+        return MessageFormat.format(RESOURCES.getString(key),
                                     (Object[]) new String[] { arg });
     }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.generator.DigestRandom;
@@ -32,7 +31,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
  */
 public class RaesTest extends ReadOnlyFileTestCase {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger LOGGER = Logger.getLogger(
             RaesTest.class.getName());
 
     private static final String PASSWD = "secret";
@@ -52,7 +51,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
             @Override
 			public char[] getOpenPasswd() {
                 if (secondTry) {
-                    logger.finer("First returned password was wrong, providing the right one now!");
+                    LOGGER.finer("First returned password was wrong, providing the right one now!");
                     return PASSWD.toCharArray();
                 } else {
                     secondTry = true;
@@ -64,7 +63,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
 
             @Override
 			public void invalidOpenPasswd() {
-                logger.finer("Password wrong!");
+                LOGGER.finer("Password wrong!");
             }
 
             @Override
@@ -79,7 +78,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
 
             @Override
 			public void setKeyStrength(int keyStrength) {
-                logger.log(Level.FINER, "Key strength: {0}", keyStrength);
+                LOGGER.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };
     }
@@ -121,7 +120,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
             } finally {
                 out.close();
             }
-            logger.log(Level.FINE,
+            LOGGER.log(Level.FINE,
                     "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
                     new Object[]{ data.length, out.getKeySizeBits() });
             // Open cipherFile for random access decryption.

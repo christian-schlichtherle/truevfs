@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
@@ -44,7 +43,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     /**
@@ -108,7 +107,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
                 wait(toWait);
             }
         } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "wait.interrupted", ex);
+            LOGGER.log(Level.WARNING, "wait.interrupted", ex);
         }
         return threads.size();
     }
