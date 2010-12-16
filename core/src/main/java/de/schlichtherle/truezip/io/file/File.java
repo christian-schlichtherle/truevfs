@@ -2242,7 +2242,7 @@ public class File extends java.io.File {
     public boolean isFile() {
         if (innerArchive != null) {
             try {
-                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FileSystemEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == FILE;
             } catch (IOException ex) {
                 return false;
@@ -2271,7 +2271,7 @@ public class File extends java.io.File {
     public boolean isDirectory() {
         if (innerArchive != null) {
             try {
-                final FileSystemEntry<?> entry = innerArchive.getController().getEntry(getInnerEntryName0());
+                final FileSystemEntry entry = innerArchive.getController().getEntry(getInnerEntryName0());
                 return null != entry && entry.getType() == DIRECTORY;
             } catch (IOException ex) {
                 return false;
@@ -2380,7 +2380,7 @@ public class File extends java.io.File {
     @Override
     public long length() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2418,7 +2418,7 @@ public class File extends java.io.File {
     @Override
     public long lastModified() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2485,7 +2485,7 @@ public class File extends java.io.File {
     @Override
     public String[] list() {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2515,7 +2515,7 @@ public class File extends java.io.File {
     @Override
     public String[] list(final FilenameFilter filter) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2601,7 +2601,7 @@ public class File extends java.io.File {
             final FilenameFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {
@@ -2665,7 +2665,7 @@ public class File extends java.io.File {
             final FileFilter filter,
             final FileFactory factory) {
         if (innerArchive != null) {
-            final FileSystemEntry<?> entry;
+            final FileSystemEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerEntryName0());
             } catch (IOException ex) {

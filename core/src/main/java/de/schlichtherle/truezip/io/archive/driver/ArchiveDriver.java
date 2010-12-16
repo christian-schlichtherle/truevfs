@@ -54,12 +54,12 @@ import javax.swing.Icon;
  *     it can be serialized.
  * </ul>
  *
- * @param <AE> The type of the archive entries.
+ * @param <E> The type of the archive entries.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveDriver<AE extends ArchiveEntry>
-extends FileSystemDriver, EntryFactory<AE> {
+public interface ArchiveDriver<E extends ArchiveEntry>
+extends FileSystemDriver, EntryFactory<E> {
 
     /**
      * Creates a new archive controller for the given archive file system's
@@ -87,7 +87,7 @@ extends FileSystemDriver, EntryFactory<AE> {
      *         parent file system controller.
      */
     @Override
-    ArchiveController<AE> newController(
+    ArchiveController<E> newController(
             MountPoint mountPoint,
             FileSystemController<?> parent);
 
@@ -118,7 +118,7 @@ extends FileSystemDriver, EntryFactory<AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} input shop.
      */
-    InputShop<AE> newInputShop(ArchiveModel model, InputSocket<?> input)
+    InputShop<E> newInputShop(ArchiveModel model, InputSocket<?> input)
     throws IOException;
 
     /**
@@ -156,9 +156,9 @@ extends FileSystemDriver, EntryFactory<AE> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} output shop.
      */
-    OutputShop<AE> newOutputShop(   ArchiveModel model,
+    OutputShop<E> newOutputShop(   ArchiveModel model,
                                     OutputSocket<?> output,
-                                    InputShop<AE> source)
+                                    InputShop<E> source)
     throws IOException;
 
     /**

@@ -77,7 +77,7 @@ public interface FileSystemController<E extends Entry> {
 
     boolean isReadOnly() throws IOException;
 
-    FileSystemEntry<? extends E> getEntry(FileSystemEntryName name) throws IOException;
+    FileSystemEntry getEntry(FileSystemEntryName name) throws IOException;
 
     boolean isReadable(FileSystemEntryName name) throws IOException;
 

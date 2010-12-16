@@ -70,7 +70,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
         } catch (IOException ex) {
             if (!isRoot(name.getPath()))
                 return null;
-            final FileSystemEntry<?> entry = getParent()
+            final FileSystemEntry entry = getParent()
                     .getEntry(getModel().resolveParent(name));
             if (null == entry)
                 return null;
@@ -79,7 +79,10 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
             // Now mask the entry as a special file.
             try {
                 return new SpecialFileEntry<ZipEntry>(
-                        driver.newEntry(ROOT, SPECIAL, entry.getTarget()));
+                        driver.newEntry(ROOT, SPECIAL,
+                            entry instanceof ArchiveFileSystemEntry<?>
+                                ? ((ArchiveFileSystemEntry<?>) entry).getTarget()
+                                : entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }

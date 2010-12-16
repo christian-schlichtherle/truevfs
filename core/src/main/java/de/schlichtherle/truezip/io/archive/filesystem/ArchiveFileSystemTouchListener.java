@@ -22,10 +22,11 @@ import java.util.EventListener;
 /**
  * Used to notify implementations of an event in an {@link ArchiveFileSystem}.
  *
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemTouchListener<AE extends ArchiveEntry>
+public interface ArchiveFileSystemTouchListener<E extends ArchiveEntry>
 extends EventListener {
 
     /**
@@ -36,12 +37,12 @@ extends EventListener {
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void beforeTouch(ArchiveFileSystemEvent<? extends AE> event)
+    void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
     throws IOException;
 
     /**
      * Called immediately after the source archive file system has been
      * modified (touched) for the first time.
      */
-    void afterTouch(ArchiveFileSystemEvent<? extends AE> event);
+    void afterTouch(ArchiveFileSystemEvent<? extends E> event);
 }

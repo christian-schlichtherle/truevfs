@@ -86,7 +86,7 @@ extends FilterFileSystemController<Entry, FileSystemController<?>> {
     }
 
     @Override
-    public FileSystemEntry<?> getEntry(FileSystemEntryName name) throws IOException {
+    public FileSystemEntry getEntry(FileSystemEntryName name) throws IOException {
         try {
             return controller.getEntry(name);
         } catch (FalsePositiveException ex) {

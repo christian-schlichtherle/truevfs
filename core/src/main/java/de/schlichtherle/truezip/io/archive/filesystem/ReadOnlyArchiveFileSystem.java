@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
@@ -29,16 +28,16 @@ import de.schlichtherle.truezip.util.BitField;
  * <p>
  * All modifying methods throw a {@link ReadOnlyArchiveFileSystemException}.
  *
- * @param   <AE> The type of the archive entries.
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class ReadOnlyArchiveFileSystem<AE extends ArchiveEntry>
-extends ArchiveFileSystem<AE> {
+final class ReadOnlyArchiveFileSystem<E extends ArchiveEntry>
+extends ArchiveFileSystem<E> {
 
     ReadOnlyArchiveFileSystem(
-        final EntryContainer<AE> container,
-        final EntryFactory<AE> factory,
+        final EntryContainer<E> container,
+        final EntryFactory<E> factory,
         final Entry rootTemplate) {
         super(container, factory, rootTemplate);
     }
@@ -56,7 +55,7 @@ extends ArchiveFileSystem<AE> {
     }
 
     @Override
-    public ArchiveFileSystemOperation<AE> mknod( String path, Type type,
+    public ArchiveFileSystemOperation<E> mknod( String path, Type type,
                                 boolean createParents, Entry template)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
