@@ -45,11 +45,11 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  */
 public class FileSystemManager {
 
-    public static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
-            = new Comparator<FileSystemController<?>>() {
+    public static final Comparator<FileSystemController> REVERSE_CONTROLLERS
+            = new Comparator<FileSystemController>() {
         @Override
-        public int compare( FileSystemController<?> l,
-                            FileSystemController<?> r) {
+        public int compare( FileSystemController l,
+                            FileSystemController r) {
             return r.getModel().getMountPoint().hierarchicalize()
                     .compareTo(l.getModel().getMountPoint().hierarchicalize());
         }
@@ -77,10 +77,10 @@ public class FileSystemManager {
      * @return A non-{@code null} file system controller.
      * @throws NullPointerException if {@code mountPoint} is {@code null}
      */
-    public FileSystemController<?> getController(
+    public FileSystemController getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            FileSystemController<?> parent) {
+            FileSystemController parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -92,10 +92,10 @@ public class FileSystemManager {
         }
     }
 
-    private /*synchronized*/ FileSystemController<?> getController0(
+    private /*synchronized*/ FileSystemController getController0(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            FileSystemController<?> parent) {
+            FileSystemController parent) {
         Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
         if (null == scheduler) {
             if (null == parent)
@@ -109,7 +109,7 @@ public class FileSystemManager {
 
         final ManagedFileSystemController controller;
 
-        Scheduler(final FileSystemController<?> prospect) {
+        Scheduler(final FileSystemController prospect) {
             controller = new ManagedFileSystemController(prospect);
             controller.getModel().addFileSystemTouchedListener(this);
             touchedChanged(null); // setup schedule
@@ -174,7 +174,7 @@ public class FileSystemManager {
         // controller.
         // This ensures that a member file system will always be synced
         // before its parent file system.
-        for (final FileSystemController<?> controller
+        for (final FileSystemController controller
                 : getControllers(prefix, REVERSE_CONTROLLERS)) {
             try {
                 controller.sync(builder, options);
@@ -189,12 +189,12 @@ public class FileSystemManager {
         builder.check();
     }
 
-    final synchronized Set<FileSystemController<?>> getControllers(
+    final synchronized Set<FileSystemController> getControllers(
             final MountPoint prefix,
-            final Comparator<? super FileSystemController<?>> comparator) {
-        final Set<FileSystemController<?>> snapshot = null != comparator
-                ? new TreeSet<FileSystemController<?>>(comparator)
-                : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
+            final Comparator<? super FileSystemController> comparator) {
+        final Set<FileSystemController> snapshot = null != comparator
+                ? new TreeSet<FileSystemController>(comparator)
+                : new HashSet<FileSystemController>((int) (schedulers.size() / .75f) + 1);
         for (final Link<Scheduler> link : schedulers.values()) {
             final Scheduler scheduler = Links.getTarget(link);
             final ManagedFileSystemController controller

@@ -54,12 +54,11 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * this interface without breaking binary compatibility to your existing
  * application!
  *
- * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 // FIXME: Make this an abstract class again to allow future extensions.
-public interface FileSystemController<E extends Entry> {
+public interface FileSystemController {
 
     /** Returns the non-{@code null} file system model. */
     FileSystemModel getModel();
@@ -69,7 +68,7 @@ public interface FileSystemController<E extends Entry> {
      * and only if this file system is not federated, i.e. a member of another
      * file system.
      */
-    FileSystemController<?> getParent();
+    FileSystemController getParent();
 
     Icon getOpenIcon() throws IOException;
 
@@ -95,8 +94,8 @@ public interface FileSystemController<E extends Entry> {
      * @param  name a non-{@code null} relative path name.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<? extends E> getInputSocket(
-            FileSystemEntryName name, BitField<InputOption> options);
+    InputSocket<?> getInputSocket(  FileSystemEntryName name,
+                                    BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
@@ -106,8 +105,9 @@ public interface FileSystemController<E extends Entry> {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     // FIXME: Consider erasing template parameter and add OutputOption.PRESERVE?!
-    OutputSocket<? extends E> getOutputSocket(
-            FileSystemEntryName name, BitField<OutputOption> options, Entry template);
+    OutputSocket<?> getOutputSocket(FileSystemEntryName name,
+                                    BitField<OutputOption> options,
+                                    Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries

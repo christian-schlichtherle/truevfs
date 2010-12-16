@@ -413,7 +413,7 @@ public class File extends java.io.File {
      *
      * @see #readObject
      */
-    private transient FileSystemController<?> controller;
+    private transient FileSystemController controller;
 
     //
     // Constructor and helper methods:
@@ -727,12 +727,12 @@ public class File extends java.io.File {
         final FileSystemDriver driver
                 = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
-        final FileSystemController<?> parentController;
+        final FileSystemController parent;
         try {
             if (null != enclArchive) {
-                parentController = enclArchive.getController();
+                parent = enclArchive.getController();
                 mountPoint = MountPoint.create(UNKNOWN, // FIXME: Introduce detector.getScheme(target.getPath())!
-                        new Path(   parentController.getModel().getMountPoint(),
+                        new Path(   parent.getModel().getMountPoint(),
                                     enclEntryName));
             } else {
                 URI uri = target.toURI();
@@ -754,14 +754,14 @@ public class File extends java.io.File {
                                     uri.getQuery(), uri.getFragment());
                 }
                 mountPoint = MountPoint.create(UNKNOWN, Path.create(uri)); // FIXME: Introduce detector.getScheme(target.getPath())!
-                parentController = new FileDriver().newController(mountPoint.getParent());
+                parent = new FileDriver().newController(mountPoint.getParent());
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController(mountPoint, driver, parentController);
+                .getController(mountPoint, driver, parent);
     }
 
     /**
@@ -1863,7 +1863,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FileSystemController<?> getController() {
+    final FileSystemController getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

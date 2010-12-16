@@ -48,9 +48,7 @@ import static java.io.File.separatorChar;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FileController
-extends AbstractFileSystemController<FileEntry>
-implements FileSystemController<FileEntry> {
+final class FileController extends AbstractFileSystemController  {
 
     private final FileSystemModel model;
     private final File target;
@@ -79,7 +77,7 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public FileSystemController<?> getParent() {
+    public FileSystemController getParent() {
         return null;
     }
 
@@ -134,7 +132,7 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public InputSocket<FileEntry> getInputSocket(
+    public InputSocket<?> getInputSocket(
             FileSystemEntryName path,
             BitField<InputOption> options) {
         return FileInputSocket.get( FileEntry.get(target, path.getPath()),
@@ -142,7 +140,7 @@ implements FileSystemController<FileEntry> {
     }
 
     @Override
-    public OutputSocket<FileEntry> getOutputSocket(
+    public OutputSocket<?> getOutputSocket(
             FileSystemEntryName path,
             BitField<OutputOption> options,
             Entry template) {

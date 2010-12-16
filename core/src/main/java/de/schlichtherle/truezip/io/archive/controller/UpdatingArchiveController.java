@@ -161,7 +161,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private final ArchiveDriver<E> driver;
-    private final FileSystemController<?> parent;
+    private final FileSystemController parent;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -181,7 +181,7 @@ extends FileSystemArchiveController<E> {
     public UpdatingArchiveController(
             final ArchiveModel model,
             final ArchiveDriver<E> driver,
-            final FileSystemController<?> parent) {
+            final FileSystemController parent) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
@@ -192,7 +192,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public FileSystemController<?> getParent() {
+    public FileSystemController getParent() {
         return parent;
     }
 
@@ -212,7 +212,7 @@ extends FileSystemArchiveController<E> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final FileSystemController<?> parent = getParent();
+            final FileSystemController parent = getParent();
             final FileSystemEntryName parentName = getModel()
                     .resolveParent(FileSystemEntryName.ROOT);
             // readOnly must be set first because the parent archive controller
@@ -258,7 +258,7 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemController<?> parent = getParent();
+        final FileSystemController parent = getParent();
         final FileSystemEntryName parentName = getModel()
                 .resolveParent(FileSystemEntryName.ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(

@@ -89,7 +89,7 @@ extends FileSystemDriver, EntryFactory<E> {
     @Override
     ArchiveController<E> newController(
             MountPoint mountPoint,
-            FileSystemController<?> parent);
+            FileSystemController parent);
 
     /**
      * Creates a new input shop for reading the archive entries of the the

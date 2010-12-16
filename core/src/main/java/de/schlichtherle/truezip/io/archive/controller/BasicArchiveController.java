@@ -107,7 +107,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @version $Id$
  */
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends AbstractFileSystemController<E>
+extends AbstractFileSystemController
 implements ArchiveController<E> {
 
     private static final String CLASS_NAME

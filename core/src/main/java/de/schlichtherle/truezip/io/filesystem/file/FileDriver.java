@@ -26,15 +26,15 @@ import de.schlichtherle.truezip.io.filesystem.MountPoint;
  */
 public final class FileDriver implements FileSystemDriver {
 
-    public FileSystemController<FileEntry> newController(
+    public FileSystemController newController(
             MountPoint mountPoint) {
         return new FileController(new FileSystemModel(mountPoint));
     }
 
     @Override
-    public FileSystemController<FileEntry> newController(
+    public FileSystemController newController(
             MountPoint mountPoint,
-            FileSystemController<?> parent) {
+            FileSystemController parent) {
         if (null != parent)
             throw new IllegalArgumentException();
         return new FileController(new FileSystemModel(mountPoint));
