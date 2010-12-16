@@ -30,7 +30,6 @@ import org.junit.Test;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Tests archive type independent features of the {@link File} class.
@@ -525,11 +524,11 @@ public class NonIOFileTest {
         assertNotSame(innerDriver, inner2Driver);
 
         // Assert that the controllers haven't been persistet.
-        final FileSystemController<?> archiveController = archive.getController();
-        final FileSystemController<?> archive2Controller = archive2.getController();
+        final FileSystemController archiveController = archive.getController();
+        final FileSystemController archive2Controller = archive2.getController();
         assertSame(archiveController, archive2Controller);
-        final FileSystemController<?> innerController = inner.getController();
-        final FileSystemController<?> inner2Controller = inner2.getController();
+        final FileSystemController innerController = inner.getController();
+        final FileSystemController inner2Controller = inner2.getController();
         assertSame(innerController, inner2Controller);
     }
 

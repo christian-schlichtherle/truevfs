@@ -27,15 +27,11 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
- * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterFileSystemController<
-        E extends Entry,
-        C extends FileSystemController<? extends E>>
-extends AbstractFileSystemController<E>
-implements FileSystemController<E> {
+public abstract class FilterFileSystemController<C extends FileSystemController>
+extends AbstractFileSystemController {
 
     /** The decorated file system controller. */
     protected final C controller; // FIXME: Encapsulate this!
@@ -50,7 +46,7 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public FileSystemController<?> getParent() {
+    public FileSystemController getParent() {
         return controller.getParent();
     }
 
@@ -97,14 +93,14 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(
+    public InputSocket<?> getInputSocket(
             FileSystemEntryName name,
             BitField<InputOption> options) {
         return controller.getInputSocket(name, options);
     }
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(
+    public OutputSocket<?> getOutputSocket(
             FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {

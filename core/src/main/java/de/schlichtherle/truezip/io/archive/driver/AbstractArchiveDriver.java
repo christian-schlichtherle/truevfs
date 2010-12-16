@@ -53,8 +53,8 @@ import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractArchiveDriver<AE extends ArchiveEntry>
-implements ArchiveDriver<AE>, Serializable {
+public abstract class AbstractArchiveDriver<E extends ArchiveEntry>
+implements ArchiveDriver<E>, Serializable {
 
     private static final long serialVersionUID = 6546816446546846516L;
 
@@ -231,12 +231,12 @@ implements ArchiveDriver<AE>, Serializable {
     }
 
     @Override
-    public ArchiveController<AE> newController(
+    public ArchiveController<E> newController(
             MountPoint mountPoint,
-            FileSystemController<?> parent) {
-        return new ConcurrentArchiveController<AE>(
-                    new CachingArchiveController<AE>(
-                        new UpdatingArchiveController<AE>( // TODO: Support append strategy.
+            FileSystemController parent) {
+        return new ConcurrentArchiveController<E>(
+                    new CachingArchiveController<E>(
+                        new UpdatingArchiveController<E>( // TODO: Support append strategy.
                             new ArchiveModel(mountPoint, parent.getModel()),
                             this, parent)));
     }

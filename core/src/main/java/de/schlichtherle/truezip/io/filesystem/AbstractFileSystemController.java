@@ -15,17 +15,14 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.entry.Entry;
-
 /**
  * Provides an implementation for the method {@link #toString}.
  *
- * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractFileSystemController<E extends Entry>
-implements FileSystemController<E> {
+public abstract class AbstractFileSystemController
+implements FileSystemController {
 
     @Override
     public final String toString() {
