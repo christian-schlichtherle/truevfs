@@ -55,11 +55,12 @@ import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
  */
 public abstract class AbstractArchiveDriver<AE extends ArchiveEntry>
 implements ArchiveDriver<AE>, Serializable {
+
     private static final long serialVersionUID = 6546816446546846516L;
 
     private static final String CLASS_NAME
             = AbstractArchiveDriver.class.getName();
-    private static final Logger logger
+    private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
 
     private final String charset;
@@ -118,7 +119,7 @@ implements ArchiveDriver<AE>, Serializable {
             final String charset) {
         try {
             final Charset impl = Charset.forName(charset);
-            logger.log(Level.CONFIG, "charset.class", new Object[] { // NOI18N
+            LOGGER.log(Level.CONFIG, "charset.class", new Object[] { // NOI18N
                 charset,
                 impl.name(),
                 impl.getClass().getName(),

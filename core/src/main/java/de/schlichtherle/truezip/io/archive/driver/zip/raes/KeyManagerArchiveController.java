@@ -76,9 +76,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
                 return null;
             // The entry exists, but we can't access it for some reason.
             // This may be because the cipher key is not available.
-            // In order to prevent any other access to this file, in particular
-            // in order to prevent deleting it, mask the entry as a special
-            // file.
+            // Now mask the entry as a special file.
             try {
                 return new SpecialFileEntry<ZipEntry>(
                         driver.newEntry(ROOT, SPECIAL, entry.getTarget()));
