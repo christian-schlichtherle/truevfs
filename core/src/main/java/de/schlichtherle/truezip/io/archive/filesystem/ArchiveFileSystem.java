@@ -442,11 +442,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     /**
-     * Like {@link #newEntryChecked(String, Entry.Type, Entry)
-     * newEntry(path, type, null)}, but throws an
-     * {@link AssertionError} instead of a {@link CharConversionException}.
+     * Like {@link #newEntryChecked newEntryChecked(path, type, null)},
+     * but wraps any {@link CharConversionException} in an
+     * {@link AssertionError}.
      *
-     * @throws IllegalArgumentException if a {@link CharConversionException}
+     * @throws AssertionError if a {@link CharConversionException}
      *         occurs. The original exception is wrapped as its cause.
      */
     private BaseEntry<E> newEntryUnchecked(
@@ -461,7 +461,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         try {
             return newEntry(path, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
-            throw new IllegalArgumentException(path, ex);
+            throw new AssertionError(ex);
         }
     }
 
@@ -471,7 +471,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * not yet linked into this (virtual) archive file system.
      *
      * @see    #mknod
-     * @param  path the non-{@code null} path name of the archive file system entry.
+     * @param  path the non-{@code null} path name of the archive file system
+     *         entry.
      *         This is always a {@link #isValidPath(String) valid path name}.
      */
     private BaseEntry<E> newEntryChecked(
@@ -508,7 +509,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     : new      NamedFileEntry<E>(path, entry);
     }
 
-    private E clone(final E entry) {
+    private E copy(final Entry entry) {
         try {
             return factory.newEntry(entry.getName(), entry.getType(), entry);
         } catch (CharConversionException ex) {
@@ -531,7 +532,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         BaseEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
-            return newEntry(getName(), fileSystem.clone(entry));
+            return newEntry(getName(), fileSystem.copy(entry));
         }
 
         /**

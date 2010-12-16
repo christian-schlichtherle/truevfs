@@ -75,7 +75,7 @@ import java.util.regex.Matcher;
  * @see ArchiveDetector#DEFAULT
  * @see ArchiveDetector#ALL
  */
-// TODO: Remove support for serialization in this class.
+// TODO: Consider removing support for serialization in this class.
 public class DefaultArchiveDetector
 extends AbstractArchiveDetector
 implements Serializable {
