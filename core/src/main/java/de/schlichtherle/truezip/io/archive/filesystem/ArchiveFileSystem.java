@@ -104,7 +104,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         // Setup root.
         root = newEntryUnchecked(ROOT, DIRECTORY, null);
         for (Access access : BitField.allOf(Access.class))
-            root.getTarget().setTime(access, System.currentTimeMillis());
+            root.getArchiveEntry().setTime(access, System.currentTimeMillis());
         master.put(ROOT, root);
         try {
             touch();
@@ -513,24 +513,24 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * It decorates an {@link ArchiveEntry} in order to add the methods
      * required to implement the concept of a directory.
      */
-    private static abstract class BaseEntry<AE extends ArchiveEntry>
-    extends FilterEntry<AE>
-    implements ArchiveFileSystemEntry<AE>, Cloneable {
+    private static abstract class BaseEntry<E extends ArchiveEntry>
+    extends FilterEntry<E>
+    implements ArchiveFileSystemEntry<E>, Cloneable {
         /** Constructs a new instance of {@code Entry}. */
-        BaseEntry(final AE entry) {
+        BaseEntry(final E entry) {
             super(entry);
             assert entry != null;
         }
 
         @SuppressWarnings("unchecked")
-        BaseEntry<AE> clone(final EntryFactory<AE> factory) {
-            final BaseEntry<AE> clone;
+        BaseEntry<E> clone(final EntryFactory<E> factory) {
+            final BaseEntry<E> clone;
             try {
-                clone = (BaseEntry<AE>) clone();
+                clone = (BaseEntry<E>) clone();
             } catch (CloneNotSupportedException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
-            final AE entry = clone.entry;
+            final E entry = clone.entry;
             try {
                 clone.entry = factory.newEntry(entry.getName(), entry.getType(), entry);
             } catch (CharConversionException cannotHappen) {
@@ -571,16 +571,16 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         /** Returns the decorated archive entry. */
         @Override
-        public final AE getTarget() {
+        public final E getArchiveEntry() {
             return entry;
         }
     } // class Entry
 
     /** A file entry. */
-    private static class FileEntry<AE extends ArchiveEntry>
-    extends BaseEntry<AE> {
+    private static class FileEntry<E extends ArchiveEntry>
+    extends BaseEntry<E> {
         /** Decorates the given archive entry. */
-        FileEntry(final AE entry) {
+        FileEntry(final E entry) {
             super(entry);
             assert entry.getType() != DIRECTORY;
         }
@@ -592,12 +592,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     } // class FileEntry
 
     /** A named file entry. */
-    private static class NamedFileEntry<AE extends ArchiveEntry>
-    extends FileEntry<AE> {
+    private static class NamedFileEntry<E extends ArchiveEntry>
+    extends FileEntry<E> {
         final String path;
 
         /** Decorates the given archive entry. */
-        NamedFileEntry(final String path, final AE entry) {
+        NamedFileEntry(final String path, final E entry) {
             super(entry);
             assert entry.getType() != DIRECTORY;
             this.path = path;
@@ -610,19 +610,19 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     } // class NamedFileEntry
 
     /** A directory entry. */
-    private static class DirectoryEntry<AE extends ArchiveEntry>
-    extends BaseEntry<AE> {
+    private static class DirectoryEntry<E extends ArchiveEntry>
+    extends BaseEntry<E> {
         Set<String> members = new LinkedHashSet<String>();
 
         /** Decorates the given archive entry. */
-        DirectoryEntry(final AE entry) {
+        DirectoryEntry(final E entry) {
             super(entry);
             assert DIRECTORY == entry.getType();
         }
 
         @Override
-        BaseEntry<AE> clone(final EntryFactory<AE> factory) {
-            final DirectoryEntry<AE> clone = (DirectoryEntry<AE>) super.clone(factory);
+        BaseEntry<E> clone(final EntryFactory<E> factory) {
+            final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(factory);
             clone.members = Collections.unmodifiableSet(clone.members);
             return clone;
         }
@@ -644,12 +644,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     } // class DirectoryEntry
 
     /** A named file entry. */
-    private static class NamedDirectoryEntry<AE extends ArchiveEntry>
-    extends DirectoryEntry<AE> {
+    private static class NamedDirectoryEntry<E extends ArchiveEntry>
+    extends DirectoryEntry<E> {
         final String path;
 
         /** Decorates the given archive entry. */
-        NamedDirectoryEntry(final String path, final AE entry) {
+        NamedDirectoryEntry(final String path, final E entry) {
             super(entry);
             assert DIRECTORY == entry.getType();
             this.path = path;
@@ -719,7 +719,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             throw new ArchiveFileSystemException(path,
                     "only FILE and DIRECTORY entries are currently supported");
         while (template instanceof ArchiveFileSystemEntry<?>)
-            template = ((ArchiveFileSystemEntry<?>) template).getTarget();
+            template = ((ArchiveFileSystemEntry<?>) template).getArchiveEntry();
         return new PathLink(path, type, template, createParents);
     }
 
@@ -800,10 +800,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 assert DIRECTORY == parent.getType();
                 master.put(entry.getName(), entry);
                 if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never beforeTouch ghosts!
-                    parent.getTarget().setTime(Access.WRITE, time);
+                    parent.getArchiveEntry().setTime(Access.WRITE, time);
                 parent = entry;
             }
-            final E entry = getTarget().getTarget();
+            final E entry = getTarget().getArchiveEntry();
             if (UNKNOWN == entry.getTime(WRITE))
                 entry.setTime(WRITE, time);
         }
@@ -818,9 +818,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * A data class which represents a segment for use by
      * {@link PathLink}.
      */
-    private static final class SegmentLink<AE extends ArchiveEntry>
-    implements Link<ArchiveFileSystemEntry<AE>> {
-        final BaseEntry<AE> entry;
+    private static final class SegmentLink<E extends ArchiveEntry>
+    implements Link<ArchiveFileSystemEntry<E>> {
+        final BaseEntry<E> entry;
         final String base;
 
         /**
@@ -831,7 +831,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
          * @param base The nullable base (segment) path of the path name.
          */
         SegmentLink(
-                final BaseEntry<AE> entry,
+                final BaseEntry<E> entry,
                 final String base) {
             assert entry != null;
             this.entry = entry;
@@ -839,7 +839,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         @Override
-        public ArchiveFileSystemEntry<AE> getTarget() {
+        public ArchiveFileSystemEntry<E> getTarget() {
             return entry;
         }
     } // class SegmentLink
@@ -881,7 +881,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     + "\" does not contain this entry - archive file system is corrupted!";
         touch();
         if (parent.getTime(Access.WRITE) != UNKNOWN) // never beforeTouch ghosts!
-            parent.getTarget().setTime(Access.WRITE, System.currentTimeMillis());
+            parent.getArchiveEntry().setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     public boolean setTime(
@@ -900,7 +900,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         touch();
         boolean ok = true;
         for (Access type : types)
-            ok &= entry.getTarget().setTime(type, value);
+            ok &= entry.getArchiveEntry().setTime(type, value);
         return ok;
     }
 

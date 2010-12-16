@@ -81,7 +81,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
                 return new SpecialFileEntry<ZipEntry>(
                         driver.newEntry(ROOT, SPECIAL,
                             entry instanceof ArchiveFileSystemEntry<?>
-                                ? ((ArchiveFileSystemEntry<?>) entry).getTarget()
+                                ? ((ArchiveFileSystemEntry<?>) entry).getArchiveEntry()
                                 : entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
@@ -107,7 +107,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
         }
 
         @Override
-        public E getTarget() {
+        public E getArchiveEntry() {
             return entry;
         }
     }

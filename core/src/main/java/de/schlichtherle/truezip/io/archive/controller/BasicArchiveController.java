@@ -215,7 +215,11 @@ implements ArchiveController<E> {
                         recursion = false;
                     }
                 }
-                final E entry = Links.getTarget(autoMount().getEntry(path));
+                final ArchiveFileSystemEntry<E> fileSystemEntry
+                        = autoMount().getEntry(path);
+                final E entry = null == fileSystemEntry
+                        ? null
+                        : fileSystemEntry.getArchiveEntry();
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
                             name, "no such file or directory");
@@ -267,7 +271,7 @@ implements ArchiveController<E> {
                             .mknod( path, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }
-                return link.getTarget().getTarget();
+                return link.getTarget().getArchiveEntry();
             }
 
             @Override

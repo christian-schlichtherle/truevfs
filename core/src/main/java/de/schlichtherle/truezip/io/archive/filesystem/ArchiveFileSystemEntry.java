@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.util.Link;
 
 /**
  * Adapts an {@link ArchiveEntry} to a {@link FileSystemEntry}.
@@ -33,15 +32,14 @@ import de.schlichtherle.truezip.util.Link;
  * @version $Id$
  */
 public interface ArchiveFileSystemEntry<E extends ArchiveEntry>
-extends FileSystemEntry, Link<E> {
+extends FileSystemEntry {
 
     /**
-     * Returns the non-{@code null} archive entry which is wrapped by this
+     * Returns the non-{@code null} archive entry which is adapted by this
      * archive file system entry.
      *
-     * @return The non-{@code null} archive entry which is wrapped by this
+     * @return The non-{@code null} archive entry which is adapted by this
      *         archive file system entry.
      */
-    @Override
-    E getTarget();
+    E getArchiveEntry();
 }
