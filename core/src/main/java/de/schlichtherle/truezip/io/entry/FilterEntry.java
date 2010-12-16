@@ -25,10 +25,12 @@ package de.schlichtherle.truezip.io.entry;
 public abstract class FilterEntry<E extends Entry>
 implements Entry {
 
-    /** The decorated file system entry. */
-    protected final E entry; // FIXME: Encapsulate this!
+    /** The decorated entry. */
+    protected final E entry;
 
     protected FilterEntry(final E entry) {
+        if (null == entry)
+            throw new NullPointerException();
         this.entry = entry;
     }
 

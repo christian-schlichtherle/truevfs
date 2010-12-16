@@ -69,8 +69,6 @@ extends FilterOutputShop<E, OutputShop<E>> {
      */
     public ConcurrentOutputShop(final OutputShop<E> output) {
         super(output);
-        if (null == output)
-            throw new NullPointerException();
     }
 
     /**
@@ -164,7 +162,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
         if (closed)
             return;
         closed = true;
-        target.close();
+        container.close();
     }
 
     /** Needs to be externally synchronized! */
@@ -261,7 +259,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
 
         /**
          * The finalizer in this class forces this output stream to close.
-         * This ensures that an output target can be updated although the
+         * This ensures that an output container can be updated although the
          * client application may have "forgot" to close this instance before.
          */
         @Override

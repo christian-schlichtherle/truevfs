@@ -33,24 +33,32 @@ public abstract class FilterEntryContainer<
 implements EntryContainer<E> {
 
     /** The decorated entry container. */
-    protected final C target; // FIXME: Encapsulate this!
+    protected final C container;
 
-    protected FilterEntryContainer(final C target) {
-        this.target = target;
+    /**
+     * Constructs a new filter entry container.
+     *
+     * @param  container the non-{@code null} container to be decorated.
+     * @throws NullPointerException iff {@code container} is {@code null}.
+     */
+    protected FilterEntryContainer(final C container) {
+        if (null == container)
+            throw new NullPointerException();
+        this.container = container;
     }
 
     @Override
     public int size() {
-        return target.size();
+        return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        return target.iterator();
+        return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
-        return target.getEntry(name);
+        return container.getEntry(name);
     }
 }
