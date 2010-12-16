@@ -47,17 +47,10 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * However, there is no requirement for an implementation to be thread-safe.
  * Therefore, all implementations should clearly state their level of
  * thread-safety.
- * <p>
- * <b>Warning:</b> You should <em>not</em> implement this interface directly,
- * but rather extend one of the provided implementation classes instead.
- * This is required so that future versions of TrueZIP can add more methods to
- * this interface without breaking binary compatibility to your existing
- * application!
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-// FIXME: Make this an abstract class again to allow future extensions.
 public interface FileSystemController {
 
     /** Returns the non-{@code null} file system model. */
@@ -84,7 +77,8 @@ public interface FileSystemController {
 
     void setReadOnly(FileSystemEntryName name) throws IOException;
 
-    // FIXME: Put this into FileSystemEntry and let getEntry() return a proxy!
+    // TODO: Consider putting this into FileSystemEntry and let getEntry()
+    // return a proxy instead - mind the IOException however!
     boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException;
 

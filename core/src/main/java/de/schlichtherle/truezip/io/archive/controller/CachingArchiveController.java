@@ -79,7 +79,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public InputSocket<E> getInputSocket(
+    public InputSocket<? extends E> getInputSocket(
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         return new Input(name, options);
@@ -108,7 +108,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Input
 
     @Override
-    public OutputSocket<E> getOutputSocket(
+    public OutputSocket<? extends E> getOutputSocket(
             final FileSystemEntryName name,
             final BitField<OutputOption> options,
             final Entry template) {
