@@ -15,6 +15,15 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import java.io.CharConversionException;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import java.util.Set;
+import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.entry.FilterEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
@@ -23,6 +32,8 @@ import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
 import java.io.IOException;
 
 import static de.schlichtherle.truezip.io.Paths.isRoot;
+import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the
@@ -34,14 +45,70 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 final class KeyManagerArchiveController
 extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
 
+    private final ArchiveDriver<ZipEntry> driver;
+
     /**
      * Constructs a new key manager archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(
-            ArchiveController<? extends ZipEntry> controller) {
+            ArchiveController<? extends ZipEntry> controller,
+            final ArchiveDriver<ZipEntry> driver) {
         super(controller);
+        this.driver = driver;
+    }
+
+    @Override
+    public final ArchiveFileSystemEntry<? extends ZipEntry> getEntry(
+            final FileSystemEntryName name)
+    throws IOException {
+        try {
+            return controller.getEntry(name);
+        } catch (FileSystemException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            if (!isRoot(name.getPath()))
+                return null;
+            final FileSystemEntry<?> entry = getParent()
+                    .getEntry(getModel().resolveParent(name));
+            if (null == entry)
+                return null;
+            // The entry exists, but we can't access it for some reason.
+            // This may be because the cipher key is not available.
+            // In order to prevent any other access to this file, in particular
+            // in order to prevent deleting it, mask the entry as a special
+            // file.
+            try {
+                return new SpecialFileEntry<ZipEntry>(
+                        driver.newEntry(ROOT, SPECIAL, entry.getTarget()));
+            } catch (CharConversionException cannotHappen) {
+                throw new AssertionError(cannotHappen);
+            }
+        }
+    }
+
+    private static final class SpecialFileEntry<E extends ArchiveEntry>
+    extends FilterEntry<E>
+    implements ArchiveFileSystemEntry<E> {
+        SpecialFileEntry(E entry) {
+            super(entry);
+        }
+
+        @Override
+        public Entry.Type getType() {
+            return SPECIAL; // drivers could ignore this type, so we must ignore them!
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return null;
+        }
+
+        @Override
+        public E getTarget() {
+            return entry;
+        }
     }
 
     @Override

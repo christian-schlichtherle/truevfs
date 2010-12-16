@@ -30,9 +30,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemTouchList
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.entry.FilterEntry;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -52,18 +50,14 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
@@ -197,85 +191,21 @@ extends FileSystemArchiveController<E> {
         this.parent = parent;
     }
 
-    /**
-     * Returns the driver instance which is used for the target archive.
-     * All access to this method must be externally synchronized on this
-     * controller's read lock!
-     *
-     * @return A valid reference to an {@link ArchiveDriver} object
-     *         - never {@code null}.
-     */
-    private ArchiveDriver<E> getDriver() {
-        return driver;
-    }
-
     @Override
     public FileSystemController<?> getParent() {
         return parent;
     }
 
-    private FileSystemEntryName resolveParent(FileSystemEntryName name) {
-        return getModel().resolveParent(name);
-    }
-
     @Override
     public Icon getOpenIcon() throws IOException {
         autoMount(); // detect false positives!
-        return getDriver().getOpenIcon(getModel());
+        return driver.getOpenIcon(getModel());
     }
 
     @Override
     public Icon getClosedIcon() throws IOException {
         autoMount(); // detect false positives!
-        return getDriver().getClosedIcon(getModel());
-    }
-
-    @Override
-    public final ArchiveFileSystemEntry<E> getEntry(final FileSystemEntryName name)
-    throws IOException {
-        final String path = name.getPath();
-        try {
-            return autoMount().getEntry(path);
-        } catch (FileSystemException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            // FIXME: Check if this is required anymore.
-            if (!isRoot(path))
-                return null;
-            final FileSystemEntry<?> entry = getParent()
-                    .getEntry(resolveParent(name));
-            if (null == entry)
-                return null;
-            try {
-                return new SpecialFileEntry<E>(
-                        getDriver().newEntry(ROOT, SPECIAL, entry.getTarget()));
-            } catch (CharConversionException cannotHappen) {
-                throw new AssertionError(cannotHappen);
-            }
-        }
-    }
-
-    private static final class SpecialFileEntry<AE extends ArchiveEntry>
-    extends FilterEntry<AE>
-    implements ArchiveFileSystemEntry<AE> {
-        SpecialFileEntry(AE entry) {
-            super(entry);
-        }
-
-        @Override
-        public Entry.Type getType() {
-            return SPECIAL; // drivers could ignore this type, so we must ignore them!
-        }
-
-        @Override
-        public Set<String> getMembers() {
-            return null;
-        }
-
-        @Override
-        public AE getTarget() {
-            return entry;
-        }
+        return driver.getClosedIcon(getModel());
     }
 
     @Override
@@ -283,7 +213,8 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         try {
             final FileSystemController<?> parent = getParent();
-            final FileSystemEntryName parentName = resolveParent(FileSystemEntryName.ROOT);
+            final FileSystemEntryName parentName = getModel()
+                    .resolveParent(FileSystemEntryName.ROOT);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
@@ -291,9 +222,9 @@ extends FileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = parent.getInputSocket(
                     parentName, BitField.of(InputOption.CACHE));
-            input = new Input(getDriver().newInputShop(getModel(), socket));
+            input = new Input(driver.newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(
-                    input.getDriverProduct(), getDriver(),
+                    input.getDriverProduct(), driver,
                     socket.getLocalTarget(), readOnly));
         } catch (FileSystemException ex) {
             throw ex;
@@ -317,7 +248,7 @@ extends FileSystemArchiveController<E> {
                 throw new FalsePositiveException(getModel(), ex2);
             }
             touchListener.beforeTouch(null);
-            setFileSystem(newArchiveFileSystem(getDriver()));
+            setFileSystem(newArchiveFileSystem(driver));
             touchListener.afterTouch(null);
         }
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
@@ -328,10 +259,11 @@ extends FileSystemArchiveController<E> {
         if (null != output)
             return;
         final FileSystemController<?> parent = getParent();
-        final FileSystemEntryName parentName = resolveParent(FileSystemEntryName.ROOT);
+        final FileSystemEntryName parentName = getModel()
+                .resolveParent(FileSystemEntryName.ROOT);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(OutputOption.CACHE), null);
-        output = new Output(getDriver().newOutputShop(getModel(), socket,
+        output = new Output(driver.newOutputShop(getModel(), socket,
                     null == input ? null : input.getDriverProduct()));
     }
 
@@ -627,6 +559,6 @@ extends FileSystemArchiveController<E> {
     public void unlink(FileSystemEntryName name) throws IOException {
         super.unlink(name);
         if (isRoot(name.getPath()))
-            getParent().unlink(resolveParent(name));
+            getParent().unlink(getModel().resolveParent(name));
     }
 }

@@ -15,13 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemOperation;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
@@ -154,6 +155,12 @@ implements ArchiveController<E> {
     @Override
     public final boolean isReadOnly() throws IOException {
         return autoMount().isReadOnly();
+    }
+
+    @Override
+    public final ArchiveFileSystemEntry<E> getEntry(FileSystemEntryName name)
+    throws IOException {
+        return autoMount().getEntry(name.getPath());
     }
 
     @Override
