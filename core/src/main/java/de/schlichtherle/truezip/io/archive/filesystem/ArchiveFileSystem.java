@@ -509,7 +509,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     : new      NamedFileEntry<E>(path, entry);
     }
 
-    private E copy(final Entry entry) {
+    private E copy(final E entry) {
         try {
             return factory.newEntry(entry.getName(), entry.getType(), entry);
         } catch (CharConversionException ex) {
