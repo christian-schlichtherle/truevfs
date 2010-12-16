@@ -515,28 +515,19 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     private static abstract class BaseEntry<E extends ArchiveEntry>
     extends FilterEntry<E>
-    implements ArchiveFileSystemEntry<E>, Cloneable {
+    implements ArchiveFileSystemEntry<E> {
         /** Constructs a new instance of {@code Entry}. */
         BaseEntry(final E entry) {
             super(entry);
             assert entry != null;
         }
 
-        @SuppressWarnings("unchecked")
         BaseEntry<E> clone(final EntryFactory<E> factory) {
-            final BaseEntry<E> clone;
             try {
-                clone = (BaseEntry<E>) clone();
-            } catch (CloneNotSupportedException cannotHappen) {
-                throw new AssertionError(cannotHappen);
+                return newEntry(getName(), factory.newEntry(entry.getName(), entry.getType(), entry));
+            } catch (CharConversionException ex) {
+                throw new AssertionError(ex);
             }
-            final E entry = clone.entry;
-            try {
-                clone.entry = factory.newEntry(entry.getName(), entry.getType(), entry);
-            } catch (CharConversionException cannotHappen) {
-                throw new AssertionError(cannotHappen);
-            }
-            return clone;
         }
 
         /**

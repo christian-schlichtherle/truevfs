@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileSystemModelTest {
+public class ArchiveFileSystemTest {
 
     @Test
     public void testAddRemoveArchiveFileSystemListeners() {
