@@ -426,7 +426,7 @@ public class ZipEntry implements Cloneable {
      */
     byte[] getExtra(final boolean zip64) {
         final ExtraFields fields = getFields(zip64);
-        return fields != null ? fields.getExtra() : EMPTY;
+        return null == fields ? EMPTY : fields.getExtra();
     }
 
     private ExtraFields getFields(final boolean zip64) {
