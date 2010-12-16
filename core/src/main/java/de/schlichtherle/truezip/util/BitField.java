@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.util;
 
 import java.io.Serializable;
@@ -31,8 +30,8 @@ import java.util.Iterator;
  * <p>
  * <b>TODO:</b> Add more modifying methods.
  *
- * @param <E> The type of {@link Enum} objects contained in this set.
- * @author Christian Schlichtherle
+ * @param   <E> The type of {@link Enum} objects contained in this set.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class BitField<E extends Enum<E>>
@@ -97,6 +96,21 @@ implements Iterable<E>, Cloneable, Serializable {
         return new BitField<E>(bit, bits);
     }
 
+    /**
+     * Returns a bit field which contains the same bits as the given set of
+     * enums.
+     * <p>
+     * This could be used like this:
+     * <pre>{@code
+     *  BitField<Option> field = BitField.of(bits);
+     * }</pre>
+     * where {@code bits} is an {@code EnumSet<Option>}.
+     */
+    public static <E extends Enum<E>>
+    BitField<E> of(EnumSet<E> bits) {
+        return new BitField<E>(bits);
+    }
+
     private EnumSet<E> bits;
 
     /**
@@ -116,6 +130,15 @@ implements Iterable<E>, Cloneable, Serializable {
     /** Constructs a new bit field which contains the given bits. */
     private BitField(final E bit, final E... bits) {
         this.bits = EnumSet.of(bit, bits);
+    }
+
+    /**
+     * Constructs a new bit field by cloning the given set of enums.
+     *
+     * @param bits the non-{@code null} set of enums.
+     */
+    private BitField(final EnumSet<E> bits) {
+        this.bits = bits.clone();
     }
 
     /** Returns a clone of this bit field. */
@@ -210,6 +233,18 @@ implements Iterable<E>, Cloneable, Serializable {
     @Override
     public Iterator<E> iterator() {
         return new BitFieldIterator();
+    }
+
+    /**
+     * Returns a new set of enums containing the same bits as this instance.
+     * The following boolean expression is always true for any
+     * non-{@code null} bit field {@code bits}:
+     * {@code bits.equals(BitField.of(bits.toEnumSet()))}.
+     *
+     * @return a new set of enums containing the same bits as this instance.
+     */
+    public EnumSet<E> toEnumSet() {
+        return bits.clone();
     }
 
     /**
