@@ -64,8 +64,8 @@ import java.io.IOException;
  */
 public class FilterReadOnlyFile extends AbstractReadOnlyFile {
 
-    /** The decorated read only file. */
-    protected ReadOnlyFile rof; // FIXME: Encapsulate this!
+    /** The nullable decorated read only file. */
+    protected ReadOnlyFile rof;
 
     /**
      * Creates a new instance of {@code FilterReadOnlyFile},
