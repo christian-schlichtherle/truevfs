@@ -30,8 +30,8 @@ import java.io.InputStream;
  */
 public abstract class FilterInputStream extends InputStream {
 
-    /** The decorated input stream. */
-    protected InputStream in; // FIXME: Encapsulate this!
+    /** The nullable decorated input stream. */
+    protected InputStream in;
 
     /**
      * Constructs a new filter input stream.
