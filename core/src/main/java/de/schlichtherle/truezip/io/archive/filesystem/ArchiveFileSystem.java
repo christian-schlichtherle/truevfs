@@ -497,15 +497,15 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      *
      * @throws NullPointerException If {@code entry} is {@code null}.
      */
-    private static <AE extends ArchiveEntry>
-    BaseEntry<AE> newEntry(final String path, final AE entry) {
+    private static <E extends ArchiveEntry>
+    BaseEntry<E> newEntry(final String path, final E entry) {
         return DIRECTORY == entry.getType()
                 ? path.equals(entry.getName())
-                    ? new      DirectoryEntry<AE>(      entry)
-                    : new NamedDirectoryEntry<AE>(path, entry)
+                    ? new      DirectoryEntry<E>(      entry)
+                    : new NamedDirectoryEntry<E>(path, entry)
                 : path.equals(entry.getName())
-                    ? new           FileEntry<AE>(      entry)
-                    : new      NamedFileEntry<AE>(path, entry);
+                    ? new           FileEntry<E>(      entry)
+                    : new      NamedFileEntry<E>(path, entry);
     }
 
     /**
