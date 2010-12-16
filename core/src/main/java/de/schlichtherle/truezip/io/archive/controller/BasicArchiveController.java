@@ -39,7 +39,6 @@ import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Links;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -215,15 +214,12 @@ implements ArchiveController<E> {
                         recursion = false;
                     }
                 }
-                final ArchiveFileSystemEntry<E> fileSystemEntry
+                final ArchiveFileSystemEntry<E> entry
                         = autoMount().getEntry(path);
-                final E entry = null == fileSystemEntry
-                        ? null
-                        : fileSystemEntry.getArchiveEntry();
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
                             name, "no such file or directory");
-                return entry;
+                return entry.getArchiveEntry();
             }
 
             final InputSocket<? extends E> getBoundSocket() throws IOException {

@@ -67,8 +67,8 @@ public class ManySmallEntriesTest extends TestCase {
     public void testManySmallEntries() throws IOException {
         LOGGER.fine("testManySmallEntries");
         
-        final int n = 70000; // 0xffff;
-        LOGGER.log(Level.FINER, "Compressing {0} ZIP file entries to: {1}", new Object[]{n, zip.getPath()});
+        final int n = 70000; // > 0xffff;
+        LOGGER.log(Level.FINER, "Compressing {0} ZIP file entries to: {1}", new Object[]{ n, zip.getPath() });
         LOGGER.finer("Note that the max. number of entries supported by the ZIP File Format Spec. is 65535!");
 
         final HashSet<String> set = new HashSet<String>();
@@ -90,7 +90,7 @@ public class ManySmallEntriesTest extends TestCase {
             assertTrue(set.add(name));
         }
         zipOut.close();
-        LOGGER.log(Level.FINER, "Compressed {0} ZIP file entries into {1} KB ZIP file length.", new Object[]{n, zip.length() / 1024});
+        LOGGER.log(Level.FINER, "Compressed {0} ZIP file entries into {1} KB ZIP file length.", new Object[]{ n, zip.length() / 1024 });
 
         final ZipFile zipIn = new ZipFile(zip);
         try {
