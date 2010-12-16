@@ -910,12 +910,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     public boolean isWritable(final String path) {
-        return !isReadOnly() && getType(path) == FILE;
+        return !isReadOnly();
     }
 
     public void setReadOnly(final String path)
     throws ArchiveFileSystemException {
-        if (!isReadOnly() || getType(path) != FILE)
+        if (!isReadOnly())
             throw new ArchiveFileSystemException(path,
                 "cannot set read-only state");
     }

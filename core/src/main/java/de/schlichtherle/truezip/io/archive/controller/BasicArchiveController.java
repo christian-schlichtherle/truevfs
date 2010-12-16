@@ -196,7 +196,7 @@ implements ArchiveController<E> {
     }
 
     @Override
-    public final InputSocket<E> getInputSocket(
+    public final InputSocket<? extends E> getInputSocket(
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
@@ -247,7 +247,7 @@ implements ArchiveController<E> {
     abstract InputSocket<? extends E> getInputSocket(String name) throws IOException;
 
     @Override
-    public final OutputSocket<E> getOutputSocket(
+    public final OutputSocket<? extends E> getOutputSocket(
             final FileSystemEntryName name,
             final BitField<OutputOption> options,
             final Entry template) {
