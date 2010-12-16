@@ -83,18 +83,16 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
      */
     public MultiplexedArchiveOutputShop(final OutputShop<AE> output) {
         super(output);
-        if (output == null)
-            throw new NullPointerException();
     }
 
     @Override
     public int size() {
-        return target.size() + temps.size();
+        return container.size() + temps.size();
     }
 
     @Override
     public Iterator<AE> iterator() {
-        return new JointIterator<AE>(target.iterator(), new TempEntriesIterator());
+        return new JointIterator<AE>(container.iterator(), new TempEntriesIterator());
     }
 
     private class TempEntriesIterator implements Iterator<AE> {
@@ -119,7 +117,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
 
     @Override
     public AE getEntry(String name) {
-        final AE entry = target.getEntry(name);
+        final AE entry = container.getEntry(name);
         if (null != entry)
             return entry;
         final TempEntryOutputStream out = temps.get(name);
@@ -165,7 +163,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     /**
-     * Returns whether the target output archive is busy writing an archive
+     * Returns whether the container output archive is busy writing an archive
      * entry or not.
      */
     public boolean isBusy() {

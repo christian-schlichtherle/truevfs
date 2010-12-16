@@ -40,11 +40,11 @@ implements InputShop<E> {
 
     @Override
     public InputSocket<? extends E> getInputSocket(String name) {
-        return target.getInputSocket(name);
+        return container.getInputSocket(name);
     }
 
     @Override
     public void close() throws IOException {
-        target.close();
+        container.close();
     }
 }

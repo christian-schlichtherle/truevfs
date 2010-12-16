@@ -48,16 +48,19 @@ import javax.swing.Icon;
 public final class ConcurrentArchiveController<E extends ArchiveEntry>
 extends FilterArchiveController<E, ArchiveController<? extends E>> {
 
+    private volatile ReentrantLock readLock;
+    private volatile ReentrantLock writeLock;
+
     public ConcurrentArchiveController(ArchiveController<? extends E> controller) {
         super(controller);
     }
 
     private ReentrantLock readLock() {
-        return getModel().readLock();
+        return null != readLock ? readLock : (readLock = getModel().readLock());
     }
 
     private ReentrantLock writeLock() {
-        return getModel().writeLock();
+        return null != writeLock ? writeLock : (writeLock = getModel().writeLock());
     }
 
     private void assertNotReadLockedByCurrentThread(NotWriteLockedException ex)

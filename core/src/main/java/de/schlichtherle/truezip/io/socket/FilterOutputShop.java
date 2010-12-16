@@ -41,11 +41,11 @@ implements OutputShop<E> {
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(E entry) {
-        return target.getOutputSocket(entry);
+        return container.getOutputSocket(entry);
     }
 
     @Override
     public void close() throws IOException {
-        target.close();
+        container.close();
     }
 }

@@ -64,7 +64,7 @@ import java.io.IOException;
  */
 public class FilterReadOnlyFile extends AbstractReadOnlyFile {
 
-    /** The read only file to be filtered. */
+    /** The decorated read only file. */
     protected ReadOnlyFile rof; // FIXME: Encapsulate this!
 
     /**

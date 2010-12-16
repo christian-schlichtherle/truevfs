@@ -68,7 +68,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
- * by performing a full update of the target archive file.
+ * by performing a full update of the container archive file.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -122,7 +122,7 @@ extends FileSystemArchiveController<E> {
 
         /** Returns the product of the archive driver this input is wrapping. */
         InputShop<E> getDriverProduct() {
-            return target;
+            return container;
         }
     }
 
@@ -140,7 +140,7 @@ extends FileSystemArchiveController<E> {
 
         /** Returns the product of the archive driver this output is wrapping. */
         OutputShop<E> getDriverProduct() {
-            return target;
+            return container;
         }
     }
 
@@ -235,7 +235,7 @@ extends FileSystemArchiveController<E> {
                 throw new FalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
-            // This may fail if e.g. the target file is an RAES
+            // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
             try {
@@ -378,7 +378,7 @@ extends FileSystemArchiveController<E> {
      *
      * @param handler An exception handler - {@code null} is not permitted.
      * @throws SyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
+     *         throughout the processing of the container archive file.
      */
     private <X extends IOException>
     void commenceSync(final ExceptionHandler<? super SyncException, X> handler)
@@ -411,7 +411,7 @@ extends FileSystemArchiveController<E> {
      *
      * @param  handler An exception handler - {@code null} is not permitted.
      * @throws IOException If any exceptional condition occurs throughout the
-     *         processing of the target archive file.
+     *         processing of the container archive file.
      */
     private <X extends IOException>
     void performSync(final ExceptionHandler<? super SyncException, X> handler)
@@ -499,7 +499,7 @@ extends FileSystemArchiveController<E> {
                     // entry which hasn't received any content yet.
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
-                    // system gets remounted from the target archive file.
+                    // system gets remounted from the container archive file.
                     output.getOutputSocket(ae).newOutputStream().close();
                 }
             } catch (IOException ex) {
@@ -513,7 +513,7 @@ extends FileSystemArchiveController<E> {
      * 
      * @param handler An exception handler - {@code null} is not permitted.
      * @throws SyncException If any exceptional condition occurs
-     *         throughout the processing of the target archive file.
+     *         throughout the processing of the container archive file.
      */
     private <X extends IOException>
     void commitSync(final ExceptionHandler<? super SyncException, X> handler)

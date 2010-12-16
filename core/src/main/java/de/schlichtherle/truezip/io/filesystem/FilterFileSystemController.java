@@ -34,9 +34,11 @@ public abstract class FilterFileSystemController<C extends FileSystemController>
 extends AbstractFileSystemController {
 
     /** The decorated file system controller. */
-    protected final C controller; // FIXME: Encapsulate this!
+    protected final C controller;
 
     protected FilterFileSystemController(final C controller) {
+        if (null == controller)
+            throw new NullPointerException();
         this.controller = controller;
     }
 

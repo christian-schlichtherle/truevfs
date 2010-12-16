@@ -73,8 +73,6 @@ extends FilterInputShop<E, InputShop<E>> {
      */
     public ConcurrentInputShop(final InputShop<E> input) {
         super(input);
-        if (null == input)
-            throw new NullPointerException();
     }
 
     /**
