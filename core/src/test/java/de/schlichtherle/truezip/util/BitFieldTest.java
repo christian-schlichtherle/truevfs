@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.util;
 import org.junit.Test;
 
 import static de.schlichtherle.truezip.util.BitFieldTest.Dummy.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -33,6 +34,7 @@ public class BitFieldTest {
         assertEquals(1, bits.cardinality());
         assertTrue(bits.get(ONE));
         assertTrue(bits.is(ONE));
+        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -42,6 +44,7 @@ public class BitFieldTest {
         assertEquals(0, bits.cardinality());
         assertFalse(bits.get(ONE));
         assertFalse(bits.is(ONE));
+        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -53,6 +56,7 @@ public class BitFieldTest {
         assertTrue(bits.is(ONE));
         assertTrue(bits.get(TWO));
         assertTrue(bits.is(TWO));
+        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
     }
 
     @Test
@@ -64,6 +68,7 @@ public class BitFieldTest {
         assertFalse(bits.is(ONE));
         assertFalse(bits.get(TWO));
         assertFalse(bits.is(TWO));
+        assertThat(BitField.of(bits.toEnumSet()), equalTo(bits));
     }
 
     enum Dummy { ONE, TWO, THREE }
