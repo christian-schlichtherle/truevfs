@@ -15,24 +15,33 @@
  */
 package de.schlichtherle.truezip.io.archive.filesystem;
 
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.util.Link;
 
 /**
- * An empty interface which distinguishes entries created by an archive file
- * system from any other entries, in particular those created by the
- * {@link ArchiveDriver#newEntry factory method} of an archive driver.
- * With the help of this empty interface, an archive file system ensures that
+ * Adapts an {@link ArchiveEntry} to a {@link FileSystemEntry}.
+ * With the help of this interface, an archive file system can ensure that
  * when a new archive entry is created, the {@code template} parameter is
  * <em>not</em> an instance of this interface, but possibly a product of the
  * archive entry factory in the archive driver.
  * This enables an archive driver to copy properties specific to its type of
  * archive entries, e.g. the compressed size of ZIP entries.
  * 
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemEntry<AE extends ArchiveEntry>
-extends FileSystemEntry<AE> {
+public interface ArchiveFileSystemEntry<E extends ArchiveEntry>
+extends FileSystemEntry, Link<E> {
+
+    /**
+     * Returns the non-{@code null} archive entry which is wrapped by this
+     * archive file system entry.
+     *
+     * @return The non-{@code null} archive entry which is wrapped by this
+     *         archive file system entry.
+     */
+    @Override
+    E getTarget();
 }

@@ -70,7 +70,7 @@ implements FileSystemController<E> {
     }
 
     @Override
-    public FileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
+    public FileSystemEntry getEntry(FileSystemEntryName name)
     throws IOException {
         return controller.getEntry(name);
     }

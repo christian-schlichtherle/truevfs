@@ -35,7 +35,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry implements FileSystemEntry<FileEntry> {
+public class FileEntry implements FileSystemEntry {
 
     /**
      * Returns a file entry for the given parameter.
@@ -156,10 +156,5 @@ public class FileEntry implements FileSystemEntry<FileEntry> {
         for (String member : list)
             set.add(member);
         return Collections.unmodifiableSet(set);
-    }
-
-    @Override
-    public FileEntry getTarget() {
-        return this;
     }
 }

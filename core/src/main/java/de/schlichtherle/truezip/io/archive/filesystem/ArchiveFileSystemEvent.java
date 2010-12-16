@@ -19,10 +19,11 @@ import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import java.util.EventObject;
 
 /**
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ArchiveFileSystemEvent<AE extends ArchiveEntry>
+public class ArchiveFileSystemEvent<E extends ArchiveEntry>
 extends EventObject {
 
     private static final long serialVersionUID = 7205624082374036401L;
@@ -33,7 +34,7 @@ extends EventObject {
      * @param source the non-{@code null} archive file system source which
      *        caused this event.
      */
-    public ArchiveFileSystemEvent(ArchiveFileSystem<AE> source) {
+    public ArchiveFileSystemEvent(ArchiveFileSystem<E> source) {
         super(source);
     }
 
@@ -46,7 +47,7 @@ extends EventObject {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public ArchiveFileSystem<AE> getSource() {
-        return (ArchiveFileSystem<AE>) source;
+    public ArchiveFileSystem<E> getSource() {
+        return (ArchiveFileSystem<E>) source;
     }
 }

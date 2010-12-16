@@ -24,12 +24,11 @@ import java.util.Set;
  * Optionally, it may also provide access to another entry which is decorated
  * by it.
  *
- * @param   <E> The type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry<E extends Entry>
-extends Entry, Link<E> {
+public interface FileSystemEntry
+extends Entry {
 
     /**
      * Returns the non-{@code null} <i>file system entry name</i>.
@@ -59,15 +58,4 @@ extends Entry, Link<E> {
      * represent the base names of the members of this directory entry.
      */
     Set<String> getMembers();
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return The decorated entry or {@code this} if this file system entry
-     *         does not decorate an entry or does not want to provide access
-     *         to it.
-     *         {@code null} is an illegal return value!
-     */
-    @Override
-    E getTarget();
 }

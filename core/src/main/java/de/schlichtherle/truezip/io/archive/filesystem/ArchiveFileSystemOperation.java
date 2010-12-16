@@ -28,13 +28,14 @@ import de.schlichtherle.truezip.util.Operation;
  * Note that the state of the archive file system will not change until
  * the {@link #run} method is called!
  *
+ * @param   <E> The type of the archive entries.
  * @see ArchiveFileSystem#mknod
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemOperation<AE extends ArchiveEntry>
+public interface ArchiveFileSystemOperation<E extends ArchiveEntry>
 extends Operation<ArchiveFileSystemException>,
-        Link<ArchiveFileSystemEntry<AE>> {
+        Link<ArchiveFileSystemEntry<E>> {
 
     /** Executes this archive file system operation. */
     @Override
