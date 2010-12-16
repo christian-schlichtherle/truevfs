@@ -28,8 +28,8 @@ implements Entry {
     /** The decorated file system entry. */
     protected final E entry; // FIXME: Encapsulate this!
 
-    protected FilterEntry(final E target) {
-        this.entry = target;
+    protected FilterEntry(final E entry) {
+        this.entry = entry;
     }
 
     @Override

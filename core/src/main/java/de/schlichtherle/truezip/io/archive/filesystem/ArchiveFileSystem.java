@@ -438,7 +438,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         if (path == null)
             throw new NullPointerException();
         final BaseEntry<E> entry = master.get(path);
-        return null == entry ? null : entry.clone(factory);
+        return null == entry ? null : entry.clone(this);
     }
 
     /**
@@ -508,6 +508,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     : new      NamedFileEntry<E>(path, entry);
     }
 
+    private E clone(final E entry) {
+        try {
+            return factory.newEntry(entry.getName(), entry.getType(), entry);
+        } catch (CharConversionException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
     /**
      * Defines the common features of all entries in this archive file system.
      * It decorates an {@link ArchiveEntry} in order to add the methods
@@ -519,15 +527,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         /** Constructs a new instance of {@code Entry}. */
         BaseEntry(final E entry) {
             super(entry);
-            assert entry != null;
+            assert null != entry;
         }
 
-        BaseEntry<E> clone(final EntryFactory<E> factory) {
-            try {
-                return newEntry(getName(), factory.newEntry(entry.getName(), entry.getType(), entry));
-            } catch (CharConversionException ex) {
-                throw new AssertionError(ex);
-            }
+        BaseEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
+            return newEntry(getName(), fileSystem.clone(entry));
         }
 
         /**
@@ -573,7 +577,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         /** Decorates the given archive entry. */
         FileEntry(final E entry) {
             super(entry);
-            assert entry.getType() != DIRECTORY;
+            assert DIRECTORY != entry.getType();
         }
 
         @Override
@@ -590,7 +594,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         /** Decorates the given archive entry. */
         NamedFileEntry(final String path, final E entry) {
             super(entry);
-            assert entry.getType() != DIRECTORY;
+            assert DIRECTORY != entry.getType();
             this.path = path;
         }
 
@@ -612,9 +616,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         @Override
-        BaseEntry<E> clone(final EntryFactory<E> factory) {
-            final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(factory);
-            clone.members = Collections.unmodifiableSet(clone.members);
+        BaseEntry<E> clone(final ArchiveFileSystem<E> fileSystem) {
+            final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
+            clone.members = Collections.unmodifiableSet(members);
             return clone;
         }
 
