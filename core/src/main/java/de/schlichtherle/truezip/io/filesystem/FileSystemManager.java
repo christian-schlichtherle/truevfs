@@ -50,7 +50,11 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 @ThreadSafe
 public class FileSystemManager {
 
-    public static final Comparator<FileSystemController<?>> REVERSE_CONTROLLERS
+    /**
+     * Orders file system controllers so that all file systems appear before
+     * any of their parent file systems.
+     */
+    private static final Comparator<FileSystemController<?>> BOTTOM_UP_COMPARATOR
             = new Comparator<FileSystemController<?>>() {
         @Override
         public int compare( FileSystemController<?> l,
@@ -137,51 +141,42 @@ public class FileSystemManager {
     } // class Scheduler
 
     /**
-     * Writes all changes to the contents of the federated file systems who's
-     * mount point starts with the given {@code prefix} to their respective
-     * parent file system.
+     * Writes all changes to the contents of the federated file systems managed
+     * by this instance which have a mount point which starts with the given
+     * {@code prefix} to their respective parent file system.
      * This will reset the state of the respective file system controllers.
-     * This method is thread-safe.
      *
-     * @param  prefix the prefix of the mount point of the federated file
+     * @param  <X> the type of the assembled {@code IOException} to throw.
+     * @param  builder the non-{@code null} exception builder to use for the
+     *         assembly of an {@code IOException} from one or more
+     *         {@code IOException}s.
+     * @param  options the non-{@code null} synchronization options.
+     * @param  prefix the prefix of the mount point of all federated file
      *         systems which shall get synchronized to their respective parent
      *         file system.
      *         This may be {@code null} in order to select all federated file
      *         systems.
-     * @throws SyncWarningException if the configuration uses the
-     *         {@link SyncExceptionBuilder} and <em>only</em>
-     *         warning conditions occured throughout the course of this method.
-     *         This implies that the respective file system has been
-     *         synchronized with constraints, e.g. a failure to set the last
-     *         modification time of the parent file system entry to the last
-     *         modification time of the (virtual) root directory of its file
-     *         system.
-     * @throws SyncException if the configuration uses the
-     *         {@link SyncExceptionBuilder} and any error
-     *         condition occured throughout the course of this method.
-     *         This implies loss of data!
-     * @throws NullPointerException if {@code builder} or {@code options} is
-     *         {@code null}.
+     * @throws IOException at the discretion of the exception {@code builder}.
      * @throws IllegalArgumentException if the configuration property
      *         {@code FORCE_CLOSE_INPUT} is {@code false} and
      *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
      */
-    public <E extends IOException>
-    void sync(  @Nullable final MountPoint prefix,
-                @NonNull final ExceptionBuilder<? super IOException, E> builder,
-                @NonNull final BitField<SyncOption> options)
-    throws E {
+    public <X extends IOException>
+    void sync(  @NonNull final ExceptionBuilder<? super IOException, X> builder,
+                @NonNull final BitField<SyncOption> options,
+                @Nullable final MountPoint prefix)
+    throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
         // The general algorithm is to sort the mount points in descending
-        // order of their pathnames and then traverse the array in reverse
+        // order of their pathnames and then traverse the set in reverse
         // order to call the sync() method on each respective file system
         // controller.
         // This ensures that a member file system will always be synced
         // before its parent file system.
         for (final FileSystemController<?> controller
-                : getControllers(prefix, REVERSE_CONTROLLERS)) {
+                : getControllers(prefix, BOTTOM_UP_COMPARATOR)) {
             try {
                 controller.sync(builder, options);
             } catch (IOException ex) {
@@ -195,7 +190,18 @@ public class FileSystemManager {
         builder.check();
     }
 
-    final synchronized Set<FileSystemController<?>> getControllers(
+    /**
+     * Returns a new set with all federated file systems managed by this
+     * instance in no particular order.
+     *
+     * @return A new set with all federated file systems managed by this
+     *         instance in no particular order.
+     */
+    public final Set<FileSystemController<?>> getControllers() {
+        return getControllers(null, null);
+    }
+
+    private synchronized Set<FileSystemController<?>> getControllers(
             final MountPoint prefix,
             final Comparator<? super FileSystemController<?>> comparator) {
         final Set<FileSystemController<?>> snapshot = null != comparator

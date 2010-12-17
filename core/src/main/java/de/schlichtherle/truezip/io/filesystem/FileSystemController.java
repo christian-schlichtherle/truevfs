@@ -162,11 +162,10 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      *
      * @param  <X> the type of the assembled {@code IOException} to throw.
      * @param  builder the non-{@code null} exception builder to use for the
-     *         assembly of an {@code IOException} from the given
+     *         assembly of an {@code IOException} from one or more
      *         {@code SyncException}s.
      * @param  options the non-{@code null} synchronization options.
-     * @throws IOException if any exceptional condition occurs throughout the
-     *         synchronization of this file system.
+     * @throws IOException at the discretion of the exception {@code builder}.
      * @see    FileSystemModel#isTouched
      * @see    #UPDATE
      * @see    #UMOUNT
@@ -180,8 +179,8 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Equivalent to
      * {@code BitField.of(SyncOption.FORCE_CLOSE_INPUT, SyncOption.FORCE_CLOSE_OUTPUT)}.
      */
-    public static final BitField<SyncOption> UPDATE = BitField.of(  FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT);
+    public static final BitField<SyncOption> UPDATE
+            = BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT);
 
     /**
      * Equivalent to {@code UPDATE.set(SyncOption.CLEAR_CACHE)}.

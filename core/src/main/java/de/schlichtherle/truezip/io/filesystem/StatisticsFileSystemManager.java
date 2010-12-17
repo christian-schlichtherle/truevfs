@@ -67,19 +67,14 @@ extends FileSystemManager {
 
     @Override
     public synchronized <E extends IOException>
-    void sync(  MountPoint prefix,
-                ExceptionBuilder<? super IOException, E> builder,
-                BitField<SyncOption> options)
+    void sync(  ExceptionBuilder<? super IOException, E> builder,
+                BitField<SyncOption> options, MountPoint prefix)
     throws E {
         try {
-            super.sync(prefix, builder, options);
+            super.sync(builder, options, prefix);
         } finally {
             statistics.close();
             statistics = new ManagedFileSystemStatistics(this);
         }
-    }
-
-    Set<FileSystemController<?>> getControllers() {
-        return getControllers(null, null);
     }
 }
