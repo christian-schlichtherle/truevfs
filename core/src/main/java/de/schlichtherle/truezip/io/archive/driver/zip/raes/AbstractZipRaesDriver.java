@@ -93,7 +93,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    public ArchiveController<ZipEntry> newController(
+    public ArchiveController newController(
             MountPoint mountPoint,
             FileSystemController parent) {
         return new KeyManagerArchiveController(

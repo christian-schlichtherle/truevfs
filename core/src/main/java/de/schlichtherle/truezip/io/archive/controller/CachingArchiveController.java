@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
@@ -64,28 +63,27 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * {@link InputOption#CACHE} set or an {@link #getOutputSocket output socket}
  * with the output option {@link OutputOption#CACHE} set.
  *
- * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class CachingArchiveController<E extends ArchiveEntry>
-extends FilterArchiveController<E, ArchiveController<? extends E>> {
+public final class CachingArchiveController
+extends FilterArchiveController {
 
     private final Map<FileSystemEntryName, EntryCache> caches
             = new HashMap<FileSystemEntryName, EntryCache>();
 
-    public CachingArchiveController(ArchiveController<? extends E> controller) {
+    public CachingArchiveController(ArchiveController controller) {
         super(controller);
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(
+    public InputSocket<?> getInputSocket(
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         return new Input(name, options);
     }
 
-    private class Input extends FilterInputSocket<E> {
+    private class Input extends FilterInputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> options;
 
@@ -96,8 +94,8 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         }
 
         @Override
-        public InputSocket<? extends E> getBoundSocket() throws IOException {
-            final IOCache<E> cache = caches.get(name);
+        public InputSocket<?> getBoundSocket() throws IOException {
+            final IOCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
             return (null != cache ? cache : new EntryCache(name,
@@ -108,14 +106,14 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Input
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(
+    public OutputSocket<?> getOutputSocket(
             final FileSystemEntryName name,
             final BitField<OutputOption> options,
             final Entry template) {
         return new Output(name, options, template);
     }
 
-    private class Output extends FilterOutputSocket<E> {
+    private class Output extends FilterOutputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
         final Entry template;
@@ -130,10 +128,10 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         }
 
         @Override
-        public OutputSocket<? extends E> getBoundSocket() throws IOException {
+        public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final IOCache<E> cache = caches.get(name);
+            final IOCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(OutputOption.CACHE)
                     || options.get(OutputOption.APPEND)
                     || null != template) {
@@ -142,7 +140,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
                     try {
                         cache.flush();
                     } finally {
-                        final IOCache<E> cache2 = caches.remove(name);
+                        final IOCache<Entry> cache2 = caches.remove(name);
                         assert cache2 == cache;
                         cache.clear();
                     }
@@ -164,7 +162,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         controller.unlink(name);
-        final IOCache<E> cache = caches.remove(name);
+        final IOCache<Entry> cache = caches.remove(name);
         if (null != cache)
             cache.clear();
     }
@@ -200,13 +198,13 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         controller.sync(builder, options.clear(CLEAR_CACHE));
     }
 
-    private final class EntryCache implements IOCache<E> {
+    private final class EntryCache implements IOCache<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
-        final IOCache<E> cache;
-        final InputSocket <E> input;
-        final OutputSocket<E> output;
+        final IOCache<Entry> cache;
+        final InputSocket <Entry> input;
+        final OutputSocket<Entry> output;
 
         EntryCache( final FileSystemEntryName name,
                     final BitField<InputOption > inputOptions,
@@ -223,12 +221,12 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
         }
 
         @Override
-        public InputSocket<E> getInputSocket() {
+        public InputSocket<Entry> getInputSocket() {
             return input;
         }
 
         @Override
-        public OutputSocket<E> getOutputSocket() {
+        public OutputSocket<Entry> getOutputSocket() {
             return output;
         }
 
@@ -242,8 +240,8 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             cache.clear();
         }
 
-        class RegisteringInputSocket extends FilterInputSocket<E> {
-            RegisteringInputSocket(final InputSocket <? extends E> input) {
+        class RegisteringInputSocket extends FilterInputSocket<Entry> {
+            RegisteringInputSocket(final InputSocket <?> input) {
                 super(input);
             }
 
@@ -264,8 +262,8 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
             }
         } // class RegisteringInputSocket
 
-        class RegisteringOutputSocket extends FilterOutputSocket<E> {
-            RegisteringOutputSocket(OutputSocket <? extends E> output) {
+        class RegisteringOutputSocket extends FilterOutputSocket<Entry> {
+            RegisteringOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 

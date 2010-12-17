@@ -45,7 +45,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
+extends FilterArchiveController {
 
     private final ArchiveDriver<ZipEntry> driver;
 
@@ -55,15 +55,14 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(
-            final ArchiveController<? extends ZipEntry> controller,
+            final ArchiveController controller,
             final ArchiveDriver<ZipEntry> driver) {
         super(controller);
         this.driver = driver;
     }
 
     @Override
-    public final ArchiveFileSystemEntry<? extends ZipEntry> getEntry(
-            final FileSystemEntryName name)
+    public final FileSystemEntry getEntry(final FileSystemEntryName name)
     throws IOException {
         try {
             return controller.getEntry(name);

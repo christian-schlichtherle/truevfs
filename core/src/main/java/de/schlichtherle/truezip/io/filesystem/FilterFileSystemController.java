@@ -27,6 +27,7 @@ import java.io.IOException;
 import javax.swing.Icon;
 
 /**
+ * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
