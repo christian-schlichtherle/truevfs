@@ -18,7 +18,6 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
@@ -91,9 +90,9 @@ extends FileSystemDriver, EntryFactory<E> {
      *         parent file system controller.
      */
     @Override
-    FileSystemController newController(
+    FileSystemController<? extends ArchiveModel> newController(
             MountPoint mountPoint,
-            FileSystemController parent);
+            FileSystemController<?> parent);
 
     /**
      * Creates a new input shop for reading the archive entries of the the

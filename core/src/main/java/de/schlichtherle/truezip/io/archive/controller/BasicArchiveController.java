@@ -108,8 +108,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @version $Id$
  */
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends AbstractFileSystemController
-implements ArchiveController {
+extends AbstractFileSystemController<ArchiveModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -405,7 +404,7 @@ implements ArchiveController {
      * @param  name the non-{@code null} entry name.
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
-     * @see    ArchiveController#sync(ExceptionBuilder, BitField)
+     * @see    FileSystemController#sync(ExceptionBuilder, BitField)
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws NotWriteLockedException

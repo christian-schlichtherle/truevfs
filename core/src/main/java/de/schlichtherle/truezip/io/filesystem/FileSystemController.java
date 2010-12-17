@@ -57,18 +57,18 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  */
 @ExtendOneOf(AbstractFileSystemController.class)
 @ThreadSafe
-public interface FileSystemController {
+public interface FileSystemController<M extends FileSystemModel> {
 
     /** Returns the non-{@code null} file system model. */
     @NonNull
-    FileSystemModel getModel();
+    M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. a member of another
      * file system.
      */
-    FileSystemController getParent();
+    FileSystemController<?> getParent();
 
     Icon getOpenIcon() throws IOException;
 

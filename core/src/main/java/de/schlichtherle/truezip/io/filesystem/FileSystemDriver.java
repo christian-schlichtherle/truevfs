@@ -20,6 +20,6 @@ package de.schlichtherle.truezip.io.filesystem;
  * @version $Id$
  */
 public interface FileSystemDriver {
-    FileSystemController newController( MountPoint mountPoint,
-                                        FileSystemController parent);
+    FileSystemController<?> newController( MountPoint mountPoint,
+                                        FileSystemController<?> parent);
 }

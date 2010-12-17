@@ -21,8 +21,8 @@ package de.schlichtherle.truezip.io.filesystem;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class AbstractFileSystemController
-implements FileSystemController {
+public abstract class AbstractFileSystemController<M extends FileSystemModel>
+implements FileSystemController<M> {
 
     @Override
     public final String toString() {

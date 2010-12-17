@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -67,12 +70,14 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @version $Id$
  */
 public final class CachingArchiveController
-extends FilterArchiveController {
+extends FilterFileSystemController<
+        ArchiveModel,
+        FileSystemController<? extends ArchiveModel>> {
 
     private final Map<FileSystemEntryName, EntryCache> caches
             = new HashMap<FileSystemEntryName, EntryCache>();
 
-    public CachingArchiveController(ArchiveController controller) {
+    public CachingArchiveController(FileSystemController<? extends ArchiveModel> controller) {
         super(controller);
     }
 
