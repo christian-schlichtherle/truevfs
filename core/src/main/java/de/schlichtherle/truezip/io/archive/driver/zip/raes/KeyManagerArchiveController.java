@@ -30,6 +30,7 @@ import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
@@ -42,6 +43,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 final class KeyManagerArchiveController
 extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>> {
 
@@ -53,7 +55,7 @@ extends FilterArchiveController<ZipEntry, ArchiveController<? extends ZipEntry>>
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(
-            ArchiveController<? extends ZipEntry> controller,
+            final ArchiveController<? extends ZipEntry> controller,
             final ArchiveDriver<ZipEntry> driver) {
         super(controller);
         this.driver = driver;

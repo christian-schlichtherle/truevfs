@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
@@ -27,12 +28,15 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ExtendOneOf(FilterArchiveController.class)
+@NotThreadSafe
 public interface ArchiveController<E extends ArchiveEntry>
 extends FileSystemController {
 
@@ -44,11 +48,11 @@ extends FileSystemController {
     throws IOException;
 
     @Override
-    InputSocket<? extends E> getInputSocket(  FileSystemEntryName name,
-                                    BitField<InputOption> options);
+    InputSocket<? extends E> getInputSocket(FileSystemEntryName name,
+                                            BitField<InputOption> options);
 
     @Override
-    OutputSocket<? extends E> getOutputSocket(FileSystemEntryName name,
-                                    BitField<OutputOption> options,
-                                    Entry template);
+    OutputSocket<? extends E> getOutputSocket(  FileSystemEntryName name,
+                                                BitField<OutputOption> options,
+                                                Entry template);
 }

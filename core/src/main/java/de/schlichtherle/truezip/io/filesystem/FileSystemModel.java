@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.Set;
 import java.util.LinkedHashSet;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
 
@@ -30,13 +31,14 @@ import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class FileSystemModel {
     static final String BANG_SEPARATOR = "!" + SEPARATOR;
 
     private final MountPoint mountPoint;
     private final FileSystemModel parent;
-    private boolean touched;
-    private LinkedHashSet<FileSystemTouchedListener> touchedListeners
+    private volatile boolean touched;
+    private Set<FileSystemTouchedListener> touchedListeners
             = new LinkedHashSet<FileSystemTouchedListener>();
 
     public FileSystemModel( MountPoint mountPoint) {
@@ -140,7 +142,7 @@ public class FileSystemModel {
      */
     @SuppressWarnings("unchecked")
     final Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
-        return (Set<FileSystemTouchedListener>) touchedListeners.clone();
+        return new LinkedHashSet<FileSystemTouchedListener>(touchedListeners);
     }
 
     /**
@@ -149,7 +151,7 @@ public class FileSystemModel {
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void addFileSystemTouchedListener(
+    synchronized public final void addFileSystemTouchedListener(
             final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
@@ -162,7 +164,7 @@ public class FileSystemModel {
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    public final void removeFileSystemTouchedListener(
+    synchronized public final void removeFileSystemTouchedListener(
             final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();

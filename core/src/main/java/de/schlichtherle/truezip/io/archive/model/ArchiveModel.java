@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
 import java.net.URI;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Defines the common properties of any archive file system.
@@ -27,6 +28,7 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class ArchiveModel extends FileSystemModel {
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;

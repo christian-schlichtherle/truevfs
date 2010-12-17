@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.TabuFileException;
 import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
@@ -58,11 +59,12 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ExtendOneOf(AbstractArchiveDriver.class)
 public interface ArchiveDriver<E extends ArchiveEntry>
 extends FileSystemDriver, EntryFactory<E> {
 
     /**
-     * Creates a new archive controller for the given archive file system's
+     * Creates a new file system controller for the given archive file's
      * mount point and parent file system controller.
      * <p>
      * This method is primarily provided to serve two purposes:
@@ -79,6 +81,7 @@ extends FileSystemDriver, EntryFactory<E> {
      *     full-update-strategy if the target archive file exceeds a
      *     predefined size threshold such as 128 MB for example.
      * </ol>
+     * Note that the returned archive controller must be thread-safe!
      *
      * @param  mountPoint the non-{@code null} mount point of the archive file
      *         system.
@@ -87,7 +90,7 @@ extends FileSystemDriver, EntryFactory<E> {
      *         parent file system controller.
      */
     @Override
-    ArchiveController<E> newController(
+    FileSystemController newController(
             MountPoint mountPoint,
             FileSystemController parent);
 
