@@ -15,11 +15,22 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
+ * A factory for file system controllers.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemDriver {
-    FileSystemController<?> newController( MountPoint mountPoint,
-                                        FileSystemController<?> parent);
+public interface FileSystemDriver<M extends FileSystemModel> {
+
+    /**
+     * Constructs a new file system controller for the given mount point
+     * and nullable parent file system controller.
+     */
+    @NonNull FileSystemController<? extends M> newController(
+            @NonNull MountPoint mountPoint,
+            @Nullable FileSystemController<?> parent);
 }

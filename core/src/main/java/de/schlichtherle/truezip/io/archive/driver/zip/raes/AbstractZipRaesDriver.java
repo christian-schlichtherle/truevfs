@@ -38,6 +38,8 @@ import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -92,9 +94,10 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
+    @NonNull
     public FileSystemController<? extends ArchiveModel> newController(
-            MountPoint mountPoint,
-            FileSystemController<?> parent) {
+            @NonNull MountPoint mountPoint,
+            @NonNull FileSystemController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }

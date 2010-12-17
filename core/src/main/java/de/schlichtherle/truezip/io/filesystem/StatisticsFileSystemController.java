@@ -27,11 +27,13 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class StatisticsFileSystemController
 extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
 

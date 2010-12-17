@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
@@ -69,6 +70,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class CachingArchiveController
 extends FilterFileSystemController<
         ArchiveModel,

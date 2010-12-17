@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
 
@@ -35,6 +36,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 abstract class FileSystemArchiveController<E extends ArchiveEntry>
 extends BasicArchiveController<E> {
 

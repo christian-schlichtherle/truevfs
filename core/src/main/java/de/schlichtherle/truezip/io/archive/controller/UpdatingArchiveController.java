@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.Icon;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.newArchiveFileSystem;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
@@ -74,6 +75,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class UpdatingArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 

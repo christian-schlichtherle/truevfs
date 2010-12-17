@@ -17,6 +17,8 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import net.jcip.annotations.ThreadSafe;
@@ -70,6 +72,7 @@ public class FileSystemManagers {
      *         value of the system property does not hold.
      * @return The non-{@code null} file system manager class property instance.
      */
+    @NonNull
     public static FileSystemManager getInstance() {
         FileSystemManager manager = instance;
         if (null == manager) {
@@ -110,7 +113,7 @@ public class FileSystemManagers {
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
-    public static synchronized void setInstance(final FileSystemManager manager) {
+    public static synchronized void setInstance(@Nullable final FileSystemManager manager) {
         final int count = null == instance
                 ? 0
                 : instance.getControllers(null, null).size();

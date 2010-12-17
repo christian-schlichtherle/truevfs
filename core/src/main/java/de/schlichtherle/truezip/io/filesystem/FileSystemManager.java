@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -80,10 +82,11 @@ public class FileSystemManager {
      * @return A non-{@code null} file system controller.
      * @throws NullPointerException if {@code mountPoint} is {@code null}
      */
+    @NonNull
     public FileSystemController<?> getController(
-            final MountPoint mountPoint,
-            final FileSystemDriver driver,
-            FileSystemController<?> parent) {
+            @NonNull final MountPoint mountPoint,
+            @NonNull final FileSystemDriver<?> driver,
+            @Nullable FileSystemController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -97,7 +100,7 @@ public class FileSystemManager {
 
     private /*synchronized*/ FileSystemController<?> getController0(
             final MountPoint mountPoint,
-            final FileSystemDriver driver,
+            final FileSystemDriver<?> driver,
             FileSystemController<?> parent) {
         Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
         if (null == scheduler) {
@@ -164,9 +167,9 @@ public class FileSystemManager {
      *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
      */
     public <E extends IOException>
-    void sync(  final MountPoint prefix,
-                final ExceptionBuilder<? super IOException, E> builder,
-                final BitField<SyncOption> options)
+    void sync(  @Nullable final MountPoint prefix,
+                @NonNull final ExceptionBuilder<? super IOException, E> builder,
+                @NonNull final BitField<SyncOption> options)
     throws E {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
                 || options.get(ABORT_CHANGES))

@@ -29,10 +29,13 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.swing.Icon;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * This "driver" interface is used as an abstract factory which reads and
@@ -60,8 +63,9 @@ import javax.swing.Icon;
  */
 // TODO: Consider making this an abstract class.
 @ExtendOneOf(AbstractArchiveDriver.class)
+@ThreadSafe
 public interface ArchiveDriver<E extends ArchiveEntry>
-extends FileSystemDriver, EntryFactory<E> {
+extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
 
     /**
      * Creates a new file system controller for the given archive file's
@@ -90,9 +94,10 @@ extends FileSystemDriver, EntryFactory<E> {
      *         parent file system controller.
      */
     @Override
+    @NonNull
     FileSystemController<? extends ArchiveModel> newController(
-            MountPoint mountPoint,
-            FileSystemController<?> parent);
+            @NonNull MountPoint mountPoint,
+            @NonNull FileSystemController<?> parent);
 
     /**
      * Creates a new input shop for reading the archive entries of the the

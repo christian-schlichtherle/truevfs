@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 public class FileSystemManagerTest {
 
     private FileSystemManager manager;
-    private FileSystemDriver driver;
+    private FileSystemDriver<?> driver;
 
     @Before
     public void setUp() {
@@ -118,7 +118,7 @@ public class FileSystemManagerTest {
         }
     }
 
-    private static class Driver implements FileSystemDriver {
+    private static class Driver implements FileSystemDriver<FileSystemModel> {
         @Override
         public FileSystemController<?> newController(
                 final MountPoint mountPoint,

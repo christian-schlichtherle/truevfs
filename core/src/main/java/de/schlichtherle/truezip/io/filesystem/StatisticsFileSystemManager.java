@@ -35,7 +35,7 @@ extends FileSystemManager {
     @Override
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
-            final FileSystemDriver driver,
+            final FileSystemDriver<?> driver,
             FileSystemController<?> parent) {
         final FileSystemController<?> controller
                 = super.getController(mountPoint, driver, parent);

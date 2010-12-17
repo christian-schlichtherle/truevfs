@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
@@ -108,6 +109,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
 extends AbstractFileSystemController<ArchiveModel> {
 
