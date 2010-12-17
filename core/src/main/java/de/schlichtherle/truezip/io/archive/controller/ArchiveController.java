@@ -31,28 +31,13 @@ import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ExtendOneOf(FilterArchiveController.class)
 @NotThreadSafe
-public interface ArchiveController<E extends ArchiveEntry>
-extends FileSystemController {
+public interface ArchiveController extends FileSystemController {
 
     @Override
     ArchiveModel getModel();
-
-    @Override
-    ArchiveFileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
-    throws IOException;
-
-    @Override
-    InputSocket<? extends E> getInputSocket(FileSystemEntryName name,
-                                            BitField<InputOption> options);
-
-    @Override
-    OutputSocket<? extends E> getOutputSocket(  FileSystemEntryName name,
-                                                BitField<OutputOption> options,
-                                                Entry template);
 }

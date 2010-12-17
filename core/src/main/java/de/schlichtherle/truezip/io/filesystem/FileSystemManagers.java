@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
@@ -34,6 +35,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class FileSystemManagers {
 
     /** You cannot instantiate this class. */
@@ -117,6 +119,7 @@ public class FileSystemManagers {
         instance = manager;
     }
 
+    // FIXME: There is no shutdown hook currently!
     private static synchronized ShutdownThread getShutdownThread(
             final FileSystemManager manager) {
         if (null == shutdownThread) {

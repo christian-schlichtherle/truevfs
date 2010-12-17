@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
@@ -108,7 +109,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  */
 abstract class BasicArchiveController<E extends ArchiveEntry>
 extends AbstractFileSystemController
-implements ArchiveController<E> {
+implements ArchiveController {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -165,7 +166,7 @@ implements ArchiveController<E> {
     }
 
     @Override
-    public final ArchiveFileSystemEntry<E> getEntry(FileSystemEntryName name)
+    public final FileSystemEntry getEntry(FileSystemEntryName name)
     throws IOException {
         return autoMount().getEntry(name.getPath());
     }
@@ -196,7 +197,7 @@ implements ArchiveController<E> {
     }
 
     @Override
-    public final InputSocket<? extends E> getInputSocket(
+    public final InputSocket<?> getInputSocket(
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
@@ -247,7 +248,7 @@ implements ArchiveController<E> {
     abstract InputSocket<? extends E> getInputSocket(String name) throws IOException;
 
     @Override
-    public final OutputSocket<? extends E> getOutputSocket(
+    public final OutputSocket<?> getOutputSocket(
             final FileSystemEntryName name,
             final BitField<OutputOption> options,
             final Entry template) {

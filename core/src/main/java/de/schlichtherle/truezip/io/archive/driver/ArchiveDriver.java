@@ -59,6 +59,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Consider making this an abstract class.
 @ExtendOneOf(AbstractArchiveDriver.class)
 public interface ArchiveDriver<E extends ArchiveEntry>
 extends FileSystemDriver, EntryFactory<E> {

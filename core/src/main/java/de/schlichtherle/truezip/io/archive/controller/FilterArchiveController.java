@@ -15,36 +15,23 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
-import de.schlichtherle.truezip.io.socket.InputOption;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputOption;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
-import java.io.IOException;
 
 /**
- * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterArchiveController<
-        E extends ArchiveEntry,
-        C extends ArchiveController<? extends E>>
-extends FilterFileSystemController<C>
-implements ArchiveController<E> {
+public abstract class FilterArchiveController
+extends FilterFileSystemController<ArchiveController>
+implements ArchiveController {
 
     /**
      * Constructs a new filter archive controller.
      *
      * @param controller the non-{@code null} archive controller.
      */
-    protected FilterArchiveController(final C controller) {
+    protected FilterArchiveController(final ArchiveController controller) {
         super(controller);
     }
 
@@ -53,26 +40,5 @@ implements ArchiveController<E> {
     @Override
     public final ArchiveModel getModel() {
         return null != model ? model : (model = controller.getModel());
-    }
-
-    @Override
-    public ArchiveFileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
-    throws IOException {
-        return controller.getEntry(name);
-    }
-
-    @Override
-    public InputSocket<? extends E> getInputSocket(
-            FileSystemEntryName name,
-            BitField<InputOption> options) {
-        return controller.getInputSocket(name, options);
-    }
-
-    @Override
-    public OutputSocket<? extends E> getOutputSocket(
-            FileSystemEntryName name,
-            BitField<OutputOption> options,
-            Entry template) {
-        return controller.getOutputSocket(name, options, template);
     }
 }

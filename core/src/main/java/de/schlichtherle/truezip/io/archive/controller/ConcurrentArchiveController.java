@@ -19,12 +19,12 @@ import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -42,18 +42,17 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class ConcurrentArchiveController<E extends ArchiveEntry>
-extends FilterArchiveController<E, ArchiveController<? extends E>> {
+public final class ConcurrentArchiveController
+extends FilterArchiveController {
 
     private volatile ReentrantLock readLock;
     private volatile ReentrantLock writeLock;
 
-    public ConcurrentArchiveController(ArchiveController<? extends E> controller) {
+    public ConcurrentArchiveController(ArchiveController controller) {
         super(controller);
     }
 
@@ -131,7 +130,7 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public ArchiveFileSystemEntry<? extends E> getEntry(FileSystemEntryName name)
+    public FileSystemEntry getEntry(FileSystemEntryName name)
     throws IOException {
         try {
             readLock().lock();
@@ -215,18 +214,18 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(   FileSystemEntryName name,
+    public InputSocket<?> getInputSocket(   FileSystemEntryName name,
                                             BitField<InputOption> options) {
         return new Input(controller.getInputSocket(name, options));
     }
 
-    private class Input extends FilterInputSocket<E> {
-        Input(InputSocket<? extends E> input) {
+    private class Input extends FilterInputSocket<Entry> {
+        Input(InputSocket<?> input) {
             super(input);
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -287,19 +286,19 @@ extends FilterArchiveController<E, ArchiveController<? extends E>> {
     } // class Input
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket( FileSystemEntryName name,
+    public OutputSocket<?> getOutputSocket( FileSystemEntryName name,
                                             BitField<OutputOption> options,
                                             Entry template) {
         return new Output(controller.getOutputSocket(name, options, template));
     }
 
-    private class Output extends FilterOutputSocket<E> {
-        Output(OutputSocket<? extends E> output) {
+    private class Output extends FilterOutputSocket<Entry> {
+        Output(OutputSocket<?> output) {
             super(output);
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        public Entry getLocalTarget() throws IOException {
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {

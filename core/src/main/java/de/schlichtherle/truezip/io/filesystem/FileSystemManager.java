@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
@@ -44,6 +45,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @version $Id$
  */
 // FIXME: Enable decorators by making this an interface or abstract class.
+@ThreadSafe
 public class FileSystemManager {
 
     public static final Comparator<FileSystemController> REVERSE_CONTROLLERS

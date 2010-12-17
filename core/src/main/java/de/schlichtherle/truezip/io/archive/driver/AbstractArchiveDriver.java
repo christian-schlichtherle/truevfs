@@ -231,11 +231,11 @@ implements ArchiveDriver<E>, Serializable {
     }
 
     @Override
-    public ArchiveController<E> newController(
+    public ArchiveController newController(
             MountPoint mountPoint,
             FileSystemController parent) {
-        return new ConcurrentArchiveController<E>(
-                    new CachingArchiveController<E>(
+        return new ConcurrentArchiveController(
+                    new CachingArchiveController(
                         new UpdatingArchiveController<E>( // TODO: Support append strategy.
                             new ArchiveModel(mountPoint, parent.getModel()),
                             this, parent)));
