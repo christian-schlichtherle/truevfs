@@ -165,13 +165,10 @@ public class ChainableIOException extends IOException implements Cloneable {
         }
     }
 
-    /**
-     * Equivalent to
-     * {@code return (ChainableIOException) super.initCause(cause);}.
-     */
     @Override
     public ChainableIOException initCause(final Throwable cause) {
-        return (ChainableIOException) super.initCause(cause);
+        super.initCause(cause);
+        return this;
     }
 
     /**

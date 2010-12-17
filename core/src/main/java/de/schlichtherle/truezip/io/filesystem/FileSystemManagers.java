@@ -27,7 +27,9 @@ import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
 /**
- * Provides static utility methods to access file system managers.
+ * A static service locator and container for a default file system manager
+ * instance.
+ * utility methods to access file system managers.
  * If you want to use this package with dependency injection, then you should
  * avoid using this class if possible because it uses static fields for
  * storing stateful objects.
@@ -130,10 +132,10 @@ public class FileSystemManagers {
             @Nullable final FileSystemManager manager) {
         final int count = null == instance
                 ? 0
-                : instance.getControllers(null, null).size();
+                : instance.getControllers().size();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");
-        if (!equal(manager, instance)) {
+        if (manager != instance) {
             if (null != instance) {
                 assert null != shutdownThread;
                 Runtime.getRuntime().removeShutdownHook(shutdownThread);
@@ -147,10 +149,6 @@ public class FileSystemManagers {
         instance = manager;
 
         assert invariants();
-    }
-
-    private static boolean equal(Object o1, Object o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
     private static boolean invariants() {
@@ -204,10 +202,9 @@ public class FileSystemManagers {
                 //FileSystemManager.logger.setLevel(Level.OFF);
             } finally {
                 try {
-                    manager.sync(   null,
-                                    new SyncExceptionBuilder(),
+                    manager.sync(   new SyncExceptionBuilder(),
                                     BitField.of(FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT));
+                                                FORCE_CLOSE_OUTPUT), null);
                 } catch (IOException ouch) {
                     // Logging doesn't work in a shutdown hook!
                     ouch.printStackTrace();

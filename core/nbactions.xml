@@ -94,4 +94,11 @@
                 <goal>site</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-findbugs:findbugs</actionName>
+            <displayName>findbugs:findbugs</displayName>
+            <goals>
+                <goal>findbugs:findbugs</goal>
+            </goals>
+        </action>
     </actions>

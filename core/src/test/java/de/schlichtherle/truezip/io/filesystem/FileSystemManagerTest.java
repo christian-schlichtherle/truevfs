@@ -104,17 +104,6 @@ public class FileSystemManagerTest {
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
             }
-
-            final Iterator<FileSystemController<?>> i
-                    = manager.getControllers(
-                        MountPoint.create(URI.create(params[params.length - 1])),
-                        FileSystemManager.REVERSE_CONTROLLERS).iterator();
-            for (final String param : params) {
-                final MountPoint mountPoint
-                        = MountPoint.create(URI.create(param));
-                assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
-            }
-            assertThat(i.hasNext(), is(false));
         }
     }
 

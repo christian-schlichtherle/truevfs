@@ -32,6 +32,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -1146,20 +1147,19 @@ public class File extends java.io.File {
      *         with constraints, such as a failure to map the last modification
      *         time of the archive file to the last modification time of its
      *         implicit root directory.
-     * @throws ArchiveWarningException If the configuration uses the
+     * @throws ArchiveException If the configuration uses the
      *         {@link SyncExceptionBuilder} and any error
      *         condition occured throughout the course of this method.
      *         This implies loss of data!
-     * @throws NullPointerException If {@code options} is {@code null}.
      * @throws IllegalArgumentException If the combination of options is
      *         illegal.
      * @see <a href="package-summary.html#state">Managing Archive File State</a>
      */
-    public static void sync(BitField<SyncOption> options)
+    public static void sync(@NonNull BitField<SyncOption> options)
     throws ArchiveException {
         FileSystemManagers
                 .getInstance()
-                .sync(null, new ArchiveExceptionBuilder(), options);
+                .sync(new ArchiveExceptionBuilder(), options, null);
     }
 
     /**
@@ -1179,15 +1179,13 @@ public class File extends java.io.File {
      * instance.
      *
      * @param  archive a top level federated file system.
-     * @throws NullPointerException If {@code archive} or {@code options} are
-     *         {@code null}.
      * @throws IllegalArgumentException If {@code archive} is not a top level
-     *         federated file system.
+     *         federated file system or the combination of options is illegal.
      * @see    #sync(BitField)
      */
     public static void sync(
-            final File archive,
-            final BitField<SyncOption> options)
+            @NonNull final File archive,
+            @NonNull final BitField<SyncOption> options)
     throws ArchiveException {
         if (!archive.isArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
@@ -1195,9 +1193,8 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         FileSystemManagers
                 .getInstance()
-                .sync(  archive.getController().getModel().getMountPoint(),
-                        new ArchiveExceptionBuilder(),
-                        options);
+                .sync(  new ArchiveExceptionBuilder(),
+                        options, archive.getController().getModel().getMountPoint());
     }
 
     /**
@@ -1255,7 +1252,7 @@ public class File extends java.io.File {
      *
      * @see #sync(File, BitField)
      */
-    public static void umount(File archive)
+    public static void umount(@NonNull File archive)
     throws ArchiveException {
         sync(archive, UMOUNT);
     }
@@ -1270,7 +1267,7 @@ public class File extends java.io.File {
      *
      * @see #sync(File, BitField)
      */
-    public static void umount(File archive, boolean closeStreams)
+    public static void umount(@NonNull File archive, boolean closeStreams)
     throws ArchiveException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
@@ -1290,7 +1287,7 @@ public class File extends java.io.File {
      *
      * @see #sync(File, BitField)
      */
-    public static void umount(File archive,
+    public static void umount(@NonNull File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
@@ -1359,7 +1356,7 @@ public class File extends java.io.File {
      *
      * @see #sync(File, BitField)
      */
-    public static void update(File archive)
+    public static void update(@NonNull File archive)
     throws ArchiveException {
         sync(   archive,
                 BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT));
@@ -1375,7 +1372,7 @@ public class File extends java.io.File {
      *
      * @see #sync(File, BitField)
      */
-    public static void update(File archive, boolean closeStreams)
+    public static void update(@NonNull File archive, boolean closeStreams)
     throws ArchiveException {
         sync(   archive,
                 BitField.noneOf(SyncOption.class)
@@ -1396,7 +1393,7 @@ public class File extends java.io.File {
      * @see #sync(File, BitField)
      */
     public static void update(
-            File archive,
+            @NonNull File archive,
             boolean waitForInputStreams, boolean closeInputStreams,
             boolean waitForOutputStreams, boolean closeOutputStreams)
     throws ArchiveException {
