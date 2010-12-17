@@ -22,7 +22,6 @@ import java.net.URI;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
@@ -50,8 +49,7 @@ import static java.io.File.separatorChar;
  * @version $Id$
  */
 @ThreadSafe
-final class FileController
-extends AbstractFileSystemController<FileSystemModel>  {
+final class FileController extends FileSystemController<FileSystemModel>  {
 
     private final FileSystemModel model;
     private final File target;
