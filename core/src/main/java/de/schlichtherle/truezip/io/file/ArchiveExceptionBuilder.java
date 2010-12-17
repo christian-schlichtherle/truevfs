@@ -35,14 +35,11 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
         if (cause instanceof ArchiveException)
             next = (ArchiveException) cause;
         else if (cause instanceof SyncWarningException)
-            next = (ArchiveException) new ArchiveWarningException(cause.getMessage())
-                    .initCause(cause.getCause()); // erase SyncWarningException
+            next = new ArchiveWarningException(cause.getMessage(), cause.getCause()); // erase SyncWarningException
         else if (cause instanceof SyncException)
-            next = (ArchiveException) new ArchiveWarningException(cause.getMessage())
-                    .initCause(cause.getCause()); // erase SyncException
+            next = new ArchiveException(cause.getMessage(), cause.getCause()); // erase SyncException
         else
-            next = (ArchiveException) new ArchiveException(cause.getMessage())
-                    .initCause(cause);
+            next = new ArchiveException(cause.getMessage(), cause);
         try {
             return (ArchiveException) next.initPredecessor(previous);
         } catch (IllegalStateException ex) {
@@ -61,7 +58,7 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
      * result.
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     protected final ArchiveException post(ArchiveException assembly) {
         return null == assembly ? null : (ArchiveException) assembly.sortPriority();
     }

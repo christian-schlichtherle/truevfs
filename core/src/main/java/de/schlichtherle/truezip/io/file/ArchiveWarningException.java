@@ -27,9 +27,9 @@ package de.schlichtherle.truezip.io.file;
  */
 public class ArchiveWarningException extends ArchiveException {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2495649276620654782L;
     
-    ArchiveWarningException(String message) {
-        super(message, -1);
+    ArchiveWarningException(String message, Throwable cause) {
+        super(message, cause, -1);
     }
 }
