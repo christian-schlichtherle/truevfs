@@ -39,12 +39,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import javax.swing.Icon;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class ConcurrentArchiveController<E extends ArchiveEntry>
 extends FilterArchiveController<E, ArchiveController<? extends E>> {
 

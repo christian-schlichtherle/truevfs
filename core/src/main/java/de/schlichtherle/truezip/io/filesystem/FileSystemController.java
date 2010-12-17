@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -28,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 
@@ -53,6 +55,8 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ExtendOneOf(AbstractFileSystemController.class)
+@ThreadSafe
 public interface FileSystemController {
 
     /** Returns the non-{@code null} file system model. */
