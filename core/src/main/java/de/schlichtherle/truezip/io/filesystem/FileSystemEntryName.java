@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.entry.EntryName;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 
@@ -60,6 +61,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public final class FileSystemEntryName extends EntryName {
 
     private static final long serialVersionUID = 2212342253466752478L;

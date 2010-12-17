@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
 import de.schlichtherle.truezip.io.FilterOutputStream;
@@ -100,7 +99,7 @@ implements OutputShop<ZipEntry> {
 
     @Override
     public int size() {
-        return size() + (tempEntry != null ? 1 : 0);
+        return super.size() + (tempEntry != null ? 1 : 0);
     }
 
     @Override

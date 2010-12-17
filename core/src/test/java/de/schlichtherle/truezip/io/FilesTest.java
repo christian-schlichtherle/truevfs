@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.io.Paths.Splitter;
 import java.net.URI;
 import java.io.File;
 import java.io.FileInputStream;
@@ -146,10 +147,9 @@ public class FilesTest extends TestCase {
         final String parent = file.getParent();
         final String base = file.getName();
 
-        final String[] split = split(path, File.separatorChar);
-        assertEquals(2, split.length);
-        assertEquals(parent, split[0]);
-        assertEquals(base, split[1]);
+        final Splitter splitter = split(path, File.separatorChar);
+        assertEquals(parent, splitter.getParentPath());
+        assertEquals(base, splitter.getMemberName());
     }
 
     public void testNormalize() {
@@ -320,7 +320,7 @@ public class FilesTest extends TestCase {
                 .replace('/', separatorChar), expected);
         final String result = normalize(path, separatorChar);
         assertEquals(expected, result);
-        assertTrue(!result.equals(path) || result == path);
+        assertTrue(!result.equals(path) || result == path); // mind contract!
     }
 
     public void testNormalize2() {

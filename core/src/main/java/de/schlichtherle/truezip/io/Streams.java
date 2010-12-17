@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,25 +63,26 @@ public class Streams {
      * This method <em>always</em> closes <em>both</em> streams - even if an
      * exception occurs.
      *
-     * @param  in the input stream.
-     * @param  out the output stream.
+     * @param  input the input stream.
+     * @param  output the output stream.
      * @throws InputException if copying the data fails because of an
      *         {@code IOException} in the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output</em> stream.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static void copy(final InputStream in, final OutputStream out)
+    public static void copy(@NonNull final InputStream input,
+                            @NonNull final OutputStream output)
     throws IOException {
         try {
-            Streams.cat(in, out);
+            Streams.cat(input, output);
         } finally {
             try {
-                in.close();
+                input.close();
             } catch (IOException ex) {
                 throw new InputException(ex);
             } finally {
-                out.close();
+                output.close();
             }
         }
     }

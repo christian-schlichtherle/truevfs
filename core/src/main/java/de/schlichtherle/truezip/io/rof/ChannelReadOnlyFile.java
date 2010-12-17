@@ -57,7 +57,7 @@ public class ChannelReadOnlyFile extends AbstractReadOnlyFile {
         try {
             channel.position(fp);
         } catch (IllegalArgumentException ex) {
-            throw (IOException) new IOException(ex.toString()).initCause(ex);
+            throw new IOException(ex);
         }
     }
 

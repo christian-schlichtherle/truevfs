@@ -194,8 +194,8 @@ abstract class CommandLineUtility {
          */
         private void showProgress() {
             // Round up to kilobytes.
-            args[0] = new Long((stats.getTopLevelRead() + 1023) / 1024);
-            args[1] = new Long((stats.getTopLevelWritten() + 1023) / 1024);
+            args[0] = (stats.getTopLevelRead() + 1023) / 1024;
+            args[1] = (stats.getTopLevelWritten() + 1023) / 1024;
             err.print(MessageFormat.format(
                     "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
             err.flush();

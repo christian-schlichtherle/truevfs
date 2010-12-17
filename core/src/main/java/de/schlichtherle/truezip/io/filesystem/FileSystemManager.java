@@ -43,6 +43,7 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+// FIXME: Enable decorators by making this an interface or abstract class.
 public class FileSystemManager {
 
     public static final Comparator<FileSystemController> REVERSE_CONTROLLERS

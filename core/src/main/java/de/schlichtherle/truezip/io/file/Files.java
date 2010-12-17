@@ -81,6 +81,7 @@ class Files {
         return !contains(src, dst) && move0(src, dst, detector);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private static boolean move0(
             final java.io.File src,
             final java.io.File dst,

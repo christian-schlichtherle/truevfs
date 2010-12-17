@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.swing;
 
 import de.schlichtherle.truezip.io.file.ArchiveDetector;
@@ -72,9 +71,8 @@ final class FileView extends FilterFileView {
 
     @Override
     public Boolean isTraversable(java.io.File file) {
-        Boolean traversable = traversable(file);
-        return traversable != null
-                ? traversable
+        return file instanceof File
+                ? Boolean.valueOf(((File) file).isDirectory())
                 : super.isTraversable(file);
     }
 
@@ -134,12 +132,5 @@ final class FileView extends FilterFileView {
         return parent.isDirectory()
                 && !ArchiveDetector.NULL.newFile(parent.getPath())
                     .isDirectory();
-    }
-
-    static Boolean traversable(java.io.File file) {
-        if (!(file instanceof File))
-            return null;
-        File smartFile = (File) file;
-        return smartFile.isDirectory() ? Boolean.TRUE : Boolean.FALSE;
     }
 }

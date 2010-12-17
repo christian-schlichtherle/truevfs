@@ -15,15 +15,15 @@
  */
 package de.schlichtherle.truezip.crypto.io.raes;
 
-import de.schlichtherle.truezip.crypto.generator.DigestRandom;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileTestCase;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.prng.DigestRandomGenerator;
+import org.bouncycastle.crypto.prng.RandomGenerator;
 
 /**
  * @author Christian Schlichtherle
@@ -36,7 +36,12 @@ public class RaesTest extends ReadOnlyFileTestCase {
 
     private static final String PASSWD = "secret";
 
-    private static final Random rnd = new DigestRandom(new SHA256Digest());
+    private static final RandomGenerator rng
+            = new DigestRandomGenerator(new SHA256Digest());
+
+    static {
+        rng.addSeedMaterial(System.currentTimeMillis());
+    }
 
     private static final int[] keyStrengths = {
         Type0RaesParameters.KEY_STRENGTH_128,
@@ -49,35 +54,39 @@ public class RaesTest extends ReadOnlyFileTestCase {
             boolean secondTry;
 
             @Override
-			public char[] getOpenPasswd() {
+            public char[] getOpenPasswd() {
                 if (secondTry) {
                     LOGGER.finer("First returned password was wrong, providing the right one now!");
                     return PASSWD.toCharArray();
                 } else {
                     secondTry = true;
-                    return rnd.nextBoolean()
+                    byte[] buf = new byte[1];
+                    rng.nextBytes(buf);
+                    return buf[0] >= 0
                             ? PASSWD.toCharArray()
                             : "wrong".toCharArray();
                 }
             }
 
             @Override
-			public void invalidOpenPasswd() {
+            public void invalidOpenPasswd() {
                 LOGGER.finer("Password wrong!");
             }
 
             @Override
-			public char[] getCreatePasswd() {
+            public char[] getCreatePasswd() {
                 return PASSWD.toCharArray();
             }
 
             @Override
-			public int getKeyStrength() {
-                return keyStrengths[rnd.nextInt(keyStrengths.length)];
+            public int getKeyStrength() {
+                byte[] buf = new byte[1];
+                rng.nextBytes(buf);
+                return keyStrengths[(buf[0] & 0xFF) % keyStrengths.length];
             }
 
             @Override
-			public void setKeyStrength(int keyStrength) {
+            public void setKeyStrength(int keyStrength) {
                 LOGGER.log(Level.FINER, "Key strength: {0}", keyStrength);
             }
         };
@@ -90,12 +99,11 @@ public class RaesTest extends ReadOnlyFileTestCase {
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
     protected void setUp()
     throws IOException {
         super.setUp();
 
-        cipherFile = File.createTempFile("tmp", null);
+        cipherFile = File.createTempFile("tzp-tmp", null);
         try {
             final RaesOutputStream out = RaesOutputStream.getInstance(
                     new FileOutputStream(cipherFile),
@@ -103,18 +111,22 @@ public class RaesTest extends ReadOnlyFileTestCase {
             try {
                 // Use Las Vegas algorithm to encrypt the data.
                 int n;
+                byte[] buf = new byte[2];
                 for (int off = 0; off < data.length; off += n) {
-                    if (rnd.nextBoolean()) {
+                    rng.nextBytes(buf);
+                    if (buf[0] >= 0) {
                         // Write a byte.
                         n = 1;
                         out.write(data[off]);
                     } else {
                         // Write a buffer (maybe zero length).
-                        n = rnd.nextInt(data.length / 100);
+                        rng.nextBytes(buf);
+                        n = ((buf[0] << 8 | buf[1]) & 0xFFFF) % (data.length / 100);
                         n = Math.min(n, data.length - off);
                         out.write(data, off, n);
                     }
-                    if (rnd.nextBoolean())
+                    rng.nextBytes(buf);
+                    if (buf[0] >= 0)
                         out.flush(); // maybe flush
                 }
             } finally {
@@ -127,8 +139,7 @@ public class RaesTest extends ReadOnlyFileTestCase {
             trof = RaesReadOnlyFile.getInstance(cipherFile, newRaesParameters());
         } catch (IOException ex) {
             if (!cipherFile.delete())
-                throw (IOException) new IOException(cipherFile + " (could not delete)")
-                        .initCause(ex);
+                throw new IOException(cipherFile + " (could not delete)", ex);
             throw ex;
         }
     }

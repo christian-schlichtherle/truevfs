@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +44,7 @@ extends IOSocket<LT, Entry> {
     private InputSocket<?> peer;
 
     @Override
+    @CheckForNull
     public Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
@@ -53,15 +56,14 @@ extends IOSocket<LT, Entry> {
      * the given output socket's peer input socket to this instance, i.e. this
      * output socket is not connected to the peer input socket.
      *
-     * @param  to the non-{@code null} output socket which has a remote
-     *         target to share.
-     * @throws NullPointerException if {@code with} is {@code null}.
-     * @return This output socket.
+     * @param  to the output socket which has a remote target to share.
+     * @return {@code this}
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final OutputSocket<LT> bind(final OutputSocket<?> to) {
-        final InputSocket<?> newPeer = to.peer;
+    @NonNull
+    public final OutputSocket<LT> bind(@CheckForNull final OutputSocket<?> to) {
+        final InputSocket<?> newPeer = null == to ? null : to.peer;
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
@@ -86,7 +88,8 @@ extends IOSocket<LT, Entry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    final OutputSocket<LT> connect(final InputSocket<?> newPeer) {
+    @NonNull
+    final OutputSocket<LT> connect(@CheckForNull final InputSocket<?> newPeer) {
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
@@ -135,5 +138,6 @@ extends IOSocket<LT, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new output stream.
      */
+    @NonNull
     public abstract OutputStream newOutputStream() throws IOException;
 }

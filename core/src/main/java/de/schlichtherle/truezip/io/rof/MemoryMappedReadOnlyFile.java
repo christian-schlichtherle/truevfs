@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.rof;
 
 import java.io.File;
@@ -153,8 +152,9 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
         return len;
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_GC")
     @Override
-	public void close() throws IOException {
+    public void close() throws IOException {
         // Check state.
         if (channel == null)
             return;
@@ -168,8 +168,9 @@ public class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
             // Workaround for garbage collection issue with memory mapped files.
             // Note that there's no guarantee that this works: Sometimes it
             // does, sometimes not!
+            // This may also happen during the integration tests.
             System.gc();
-            System.runFinalization();
+            //System.runFinalization();
             // Thread.interrupted(); // cancel pending interrupt
             try {
                 Thread.sleep(50);

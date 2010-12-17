@@ -223,10 +223,11 @@ public class Files extends Paths {
      *         Otherwise, an object which's runtime class is guaranteed to
      *         be {@code File}.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     public static File normalize(final File file) {
         final String path = file.getPath();
         final String newPath = normalize(path, separatorChar);
-        return newPath != path ? new File(newPath) : file; // mind contract!
+        return newPath == path ? file : new File(newPath); // mind contract!
     }
 
     /**
@@ -241,8 +242,7 @@ public class Files extends Paths {
      * Equivalent to {@link #split(String, char)
      * split(path, File.separatorChar)}.
      */
-    public static String[] split(
-            final String path) {
+    public static Splitter split(String path) {
         return split(path, separatorChar);
     }
 

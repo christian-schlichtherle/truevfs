@@ -18,6 +18,8 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFileInputStream;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +47,7 @@ extends IOSocket<LT, Entry> {
     private OutputSocket<?> peer;
 
     @Override
+    @CheckForNull
     public Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
@@ -56,15 +59,14 @@ extends IOSocket<LT, Entry> {
      * the given input socket's peer output socket to this instance, i.e. this
      * input socket is not connected to the peer output socket.
      *
-     * @param  to the non-{@code null} input socket which has a remote
-     *         target to share.
-     * @throws NullPointerException if {@code with} is {@code null}.
-     * @return This input socket.
+     * @param  to the input socket which has a remote target to share.
+     * @return {@code this}
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    public final InputSocket<LT> bind(final InputSocket<?> to) {
-        final OutputSocket<?> newPeer = to.peer;
+    @NonNull
+    public final InputSocket<LT> bind(@CheckForNull final InputSocket<?> to) {
+        final OutputSocket<?> newPeer = null == to ? null : to.peer;
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
@@ -89,7 +91,8 @@ extends IOSocket<LT, Entry> {
      * @see    #beforePeering
      * @see    #afterPeering
      */
-    final InputSocket<LT> connect(final OutputSocket<?> newPeer) {
+    @NonNull
+    final InputSocket<LT> connect(@CheckForNull final OutputSocket<?> newPeer) {
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
@@ -141,6 +144,7 @@ extends IOSocket<LT, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new read only file.
      */
+    @NonNull
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 
     /**
@@ -160,6 +164,7 @@ extends IOSocket<LT, Entry> {
      * @throws IOException on any other exceptional condition.
      * @return A new input stream.
      */
+    @NonNull
     public InputStream newInputStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }

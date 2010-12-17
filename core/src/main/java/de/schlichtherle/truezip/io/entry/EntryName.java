@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.entry;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
 
@@ -49,12 +50,18 @@ import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
  * <li>{@code foo#bar} (fragment defined)
  * </ul>
  * <p>
- * Note that this class is immutable and final, hence thread-safe, too.
+ * Note that this class is designed to be immutable and hence thread-safe.
+ * However, although all its visible state is set in the constructors and all
+ * methods are declared final, this class is not declared final itself solely
+ * in order to enable subclassing for the purpose of adding even more
+ * constraints while still being able to use this class as a polymorph base
+ * class.
  *
  * @see     Entry#getName()
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2927354934726235478L;
