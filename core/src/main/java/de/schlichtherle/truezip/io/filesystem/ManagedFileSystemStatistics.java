@@ -34,7 +34,7 @@ import java.io.OutputStream;
  */
 public final class ManagedFileSystemStatistics {
 
-    private final StatisticsFileSystemManager manager;
+    private final FileSystemManager manager;
     private volatile long read;
     private volatile long written;
     private boolean closed;
@@ -94,6 +94,7 @@ public final class ManagedFileSystemStatistics {
     }
 
     ReadOnlyFile countBytes(ReadOnlyFile rof) {
+        assert !isClosed();
         return new CountingReadOnlyFile(rof);
     }
 
@@ -120,6 +121,7 @@ public final class ManagedFileSystemStatistics {
     } // CountingReadOnlyFile
 
     InputStream countBytes(InputStream in) {
+        assert !isClosed();
         return new CountingInputStream(in);
     }
 
@@ -159,6 +161,7 @@ public final class ManagedFileSystemStatistics {
     }
 
     OutputStream countBytes(OutputStream out) {
+        assert !isClosed();
         return new CountingOutputStream(out);
     }
 

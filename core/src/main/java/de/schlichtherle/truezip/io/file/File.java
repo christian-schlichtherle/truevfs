@@ -408,13 +408,13 @@ public class File extends java.io.File {
     private FileSystemEntryName enclEntryName;
 
     /**
-     * This refers to the archive controller if and only if this file refers
-     * to an archive file, otherwise it's {@code null}.
+     * This refers to the file system controller if and only if this file
+     * is located within a federated file system, otherwise it's {@code null}.
      * This field should be considered to be {@code final}!
      *
      * @see #readObject
      */
-    private transient FileSystemController controller;
+    private transient FileSystemController<?> controller;
 
     //
     // Constructor and helper methods:
@@ -725,10 +725,10 @@ public class File extends java.io.File {
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
-        final FileSystemDriver driver
+        final FileSystemDriver<?> driver
                 = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
-        final FileSystemController parent;
+        final FileSystemController<?> parent;
         try {
             if (null != enclArchive) {
                 parent = enclArchive.getController();
@@ -1194,7 +1194,8 @@ public class File extends java.io.File {
         FileSystemManagers
                 .getInstance()
                 .sync(  new ArchiveExceptionBuilder(),
-                        options, archive.getController().getModel().getMountPoint());
+                        options,
+                        archive.getController().getModel().getMountPoint());
     }
 
     /**
@@ -1860,7 +1861,7 @@ public class File extends java.io.File {
      * Returns an archive controller if and only if the path denotes an
      * archive file, or {@code null} otherwise.
      */
-    final FileSystemController getController() {
+    final FileSystemController<?> getController() {
         assert (null != controller) == isArchive();
         return controller;
     }

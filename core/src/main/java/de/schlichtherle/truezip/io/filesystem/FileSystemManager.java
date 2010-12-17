@@ -192,13 +192,26 @@ public class FileSystemManager {
 
     /**
      * Returns a new set with all federated file systems managed by this
-     * instance in no particular order.
+     * instance.
      *
      * @return A new set with all federated file systems managed by this
-     *         instance in no particular order.
+     *         instance.
      */
     public final Set<FileSystemController<?>> getControllers() {
         return getControllers(null, null);
+    }
+
+    /**
+     * Returns a new set with all federated file systems managed by this
+     * instance which have a mount point which starts with the given
+     * {@code prefix}.
+     *
+     * @return A new set with all federated file systems managed by this
+     *         instance which have a mount point which starts with the given
+     *         {@code prefix}.
+     */
+    public Set<FileSystemController<?>> getControllers(MountPoint prefix) {
+        return getControllers(prefix, null);
     }
 
     private synchronized Set<FileSystemController<?>> getControllers(
