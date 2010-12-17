@@ -51,13 +51,13 @@ import de.schlichtherle.truezip.io.ChainableIOException;
  */
 public class ArchiveException extends ChainableIOException {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6846372003204673485L;
 
-    ArchiveException(String message) {
+    ArchiveException(String message, Throwable cause) {
         super(message);
     }
 
-    ArchiveException(String message, int priority) {
-        super(message, priority);
+    ArchiveException(String message, Throwable cause, int priority) {
+        super(message, cause, priority);
     }
 }
