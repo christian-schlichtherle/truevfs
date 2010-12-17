@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
+import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
@@ -48,7 +49,9 @@ import static java.io.File.separatorChar;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-final class FileController extends AbstractFileSystemController  {
+@ThreadSafe
+final class FileController
+extends AbstractFileSystemController<FileSystemModel>  {
 
     private final FileSystemModel model;
     private final File target;
@@ -77,7 +80,7 @@ final class FileController extends AbstractFileSystemController  {
     }
 
     @Override
-    public FileSystemController getParent() {
+    public FileSystemController<?> getParent() {
         return null;
     }
 

@@ -17,7 +17,6 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
@@ -93,9 +92,9 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
     }
 
     @Override
-    public ArchiveController newController(
+    public FileSystemController<? extends ArchiveModel> newController(
             MountPoint mountPoint,
-            FileSystemController parent) {
+            FileSystemController<?> parent) {
         return new KeyManagerArchiveController(
                 super.newController(mountPoint, parent), this);
     }

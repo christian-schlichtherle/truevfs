@@ -31,8 +31,10 @@ import javax.swing.Icon;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterFileSystemController<C extends FileSystemController>
-extends AbstractFileSystemController {
+public abstract class FilterFileSystemController<
+        M extends FileSystemModel,
+        C extends FileSystemController<? extends M>>
+extends AbstractFileSystemController<M> {
 
     /** The decorated file system controller. */
     protected final C controller;
@@ -43,13 +45,15 @@ extends AbstractFileSystemController {
         this.controller = controller;
     }
 
+    private volatile M model;
+
     @Override
-    public FileSystemModel getModel() {
-        return controller.getModel();
+    public final M getModel() {
+        return null != model ? model : (model = controller.getModel());
     }
 
     @Override
-    public FileSystemController getParent() {
+    public FileSystemController<?> getParent() {
         return controller.getParent();
     }
 

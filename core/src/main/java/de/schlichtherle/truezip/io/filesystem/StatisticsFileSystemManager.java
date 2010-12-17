@@ -33,11 +33,11 @@ public final class StatisticsFileSystemManager
 extends FileSystemManager {
 
     @Override
-    public FileSystemController getController(
+    public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver driver,
-            FileSystemController parent) {
-        final FileSystemController controller
+            FileSystemController<?> parent) {
+        final FileSystemController<?> controller
                 = super.getController(mountPoint, driver, parent);
         parent = controller.getParent();
         return null != parent && null == parent.getParent() // controller is top level federated file system?
@@ -79,7 +79,7 @@ extends FileSystemManager {
         }
     }
 
-    Set<FileSystemController> getControllers() {
+    Set<FileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 }

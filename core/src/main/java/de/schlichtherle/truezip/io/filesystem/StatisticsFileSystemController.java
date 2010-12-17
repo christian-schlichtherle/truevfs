@@ -33,12 +33,12 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class StatisticsFileSystemController
-extends FilterFileSystemController<FileSystemController> {
+extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
 
     private final StatisticsFileSystemManager manager;
 
     StatisticsFileSystemController(
-            FileSystemController controller,
+            FileSystemController<?> controller,
             StatisticsFileSystemManager manager) {
         super(controller);
         this.manager = manager;

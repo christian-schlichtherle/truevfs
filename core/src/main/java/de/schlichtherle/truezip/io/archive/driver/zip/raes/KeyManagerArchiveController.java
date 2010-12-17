@@ -15,6 +15,9 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
 import java.io.CharConversionException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.util.Set;
@@ -27,8 +30,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
-import de.schlichtherle.truezip.io.archive.controller.ArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.FilterArchiveController;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -45,7 +46,9 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FilterArchiveController {
+extends FilterFileSystemController<
+        ArchiveModel,
+        FileSystemController<? extends ArchiveModel>> {
 
     private final ArchiveDriver<ZipEntry> driver;
 
@@ -55,7 +58,7 @@ extends FilterArchiveController {
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(
-            final ArchiveController controller,
+            final FileSystemController<? extends ArchiveModel> controller,
             final ArchiveDriver<ZipEntry> driver) {
         super(controller);
         this.driver = driver;

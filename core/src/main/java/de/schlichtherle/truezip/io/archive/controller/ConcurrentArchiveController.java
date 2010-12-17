@@ -18,15 +18,17 @@ package de.schlichtherle.truezip.io.archive.controller;
 import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -47,12 +49,14 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class ConcurrentArchiveController
-extends FilterArchiveController {
+extends FilterFileSystemController<
+        ArchiveModel,
+        FileSystemController<? extends ArchiveModel>> {
 
     private volatile ReentrantLock readLock;
     private volatile ReentrantLock writeLock;
 
-    public ConcurrentArchiveController(ArchiveController controller) {
+    public ConcurrentArchiveController(FileSystemController<? extends ArchiveModel> controller) {
         super(controller);
     }
 

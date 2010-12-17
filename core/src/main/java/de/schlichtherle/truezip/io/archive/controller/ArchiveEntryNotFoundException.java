@@ -27,11 +27,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Indicates that an <i>archive entry</i>
- * does not exist or is not accessible.
- * <p>
- * May be thrown by {@link ArchiveController#getInputSocket} or
- * {@link ArchiveController#getOutputSocket}.
+ * Indicates that an <i>archive entry</i> does not exist or is not accessible.
+ * 
+ * @author Christian Schlichtherle
+ * @version $Id$
  */
 public final class ArchiveEntryNotFoundException extends FileNotFoundException {
 
