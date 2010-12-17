@@ -25,12 +25,14 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import java.io.IOException;
 import javax.swing.Icon;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public abstract class FilterFileSystemController<
         M extends FileSystemModel,
         C extends FileSystemController<? extends M>>
@@ -39,13 +41,13 @@ extends AbstractFileSystemController<M> {
     /** The decorated file system controller. */
     protected final C controller;
 
+    private volatile M model;
+
     protected FilterFileSystemController(final C controller) {
         if (null == controller)
             throw new NullPointerException();
         this.controller = controller;
     }
-
-    private volatile M model;
 
     @Override
     public final M getModel() {

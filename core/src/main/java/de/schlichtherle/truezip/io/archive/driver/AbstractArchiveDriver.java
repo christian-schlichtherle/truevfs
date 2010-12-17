@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -231,8 +232,8 @@ implements ArchiveDriver<E>, Serializable {
 
     @Override
     public FileSystemController<? extends ArchiveModel> newController(
-            MountPoint mountPoint,
-            FileSystemController<?> parent) {
+            @NonNull MountPoint mountPoint,
+            @NonNull FileSystemController<?> parent) {
         return new ConcurrentArchiveController(
                     new CachingArchiveController(
                         new UpdatingArchiveController<E>( // TODO: Support append strategy.

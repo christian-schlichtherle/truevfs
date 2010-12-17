@@ -16,12 +16,14 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import java.util.EventObject;
+import net.jcip.annotations.Immutable;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystemEvent extends EventObject {
+@Immutable
+public final class FileSystemEvent extends EventObject {
 
     private static final long serialVersionUID = 7656343146323435361L;
 

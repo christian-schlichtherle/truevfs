@@ -19,12 +19,14 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileDriver implements FileSystemDriver {
+public final class FileDriver implements FileSystemDriver<FileSystemModel> {
 
     public FileSystemController<?> newController(
             MountPoint mountPoint) {
@@ -32,9 +34,10 @@ public final class FileDriver implements FileSystemDriver {
     }
 
     @Override
+    @NonNull
     public FileSystemController<?> newController(
-            MountPoint mountPoint,
-            FileSystemController<?> parent) {
+            @NonNull MountPoint mountPoint,
+            @CheckForNull FileSystemController<?> parent) {
         if (null != parent)
             throw new IllegalArgumentException();
         return new FileController(new FileSystemModel(mountPoint));

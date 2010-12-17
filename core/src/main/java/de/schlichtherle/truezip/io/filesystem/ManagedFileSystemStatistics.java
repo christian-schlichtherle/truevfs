@@ -60,7 +60,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController controller : manager.getControllers())
+        for (FileSystemController<?> controller : manager.getControllers())
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -72,7 +72,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (FileSystemController controller : manager.getControllers())
+        for (FileSystemController<?> controller : manager.getControllers())
             if (null == controller.getParent().getParent())
                 result++;
         return result;
@@ -85,7 +85,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController controller : manager.getControllers()) {
+        for (FileSystemController<?> controller : manager.getControllers()) {
             if (null == controller.getParent().getParent())
                 if (controller.getModel().isTouched())
                     result++;
