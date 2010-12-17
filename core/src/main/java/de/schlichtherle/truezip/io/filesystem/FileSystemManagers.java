@@ -48,20 +48,23 @@ public class FileSystemManagers {
     private static ShutdownThread shutdownThread; // lazily initialized
 
     /**
-     * Returns the non-{@code null} file system manager class property instance.
+     * Returns the file system manager value of this class property.
      * <p>
      * If the class property has been explicitly set using
      * {@link #setInstance}, then this instance is returned.
-     * <p>
      * Otherwise, the value of the system property
      * {@code de.schlichtherle.truezip.io.filesystem.FileSystemManager}
      * is considered:
      * <p>
      * If this system property is set, it must denote the fully qualified
-     * class name of a subclass of this class. The class is loaded and
-     * instantiated using its public, no-arguments constructor.
+     * class name of a subclass of the class {@link FileSystemManager}.
+     * The class is loaded and instantiated using its public, no-arguments
+     * constructor.
+     * Otherwise, the class {@link FileSystemManager} is instantiated.
      * <p>
-     * Otherwise, this class is instantiated.
+     * In any case, the returned file system manager is instrumented to run its
+     * {@link FileSystemManager#sync} method when the JVM terminates by means
+     * of a shutdown hook.
      * <p>
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
@@ -70,7 +73,8 @@ public class FileSystemManagers {
      *         does not denote a subclass of this class.
      * @throws UndeclaredThrowableException If any other precondition on the
      *         value of the system property does not hold.
-     * @return The non-{@code null} file system manager class property instance.
+     * @return The non-{@code null} file system manager value of this class
+     *         property.
      */
     @NonNull
     public static FileSystemManager getInstance() {
@@ -79,6 +83,7 @@ public class FileSystemManagers {
             synchronized (FileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
+                    // FIXME: Use ServiceLoader instead!
                     final String name = System.getProperty(
                             FileSystemManager.class.getName(),
                             FileSystemManager.class.getName());
@@ -94,48 +99,64 @@ public class FileSystemManagers {
                 }
             }
         }
+
+        assert invariants();
+
         return manager;
     }
 
     /**
-     * Sets the file system manager class property instance.
+     * Sets the file system manager value of this class property.
+     * <p>
      * If the current file system manager manages any federated file systems,
      * an {@link IllegalStateException} is thrown.
      * To avoid this, call its {@link FileSystemManager#sync} method and make
      * sure to purge all references to the file system controllers which are
      * returned by its {@link FileSystemManager#getController} method prior to
      * calling this method.
+     * <p>
+     * If not {@code null}, the file system manager instance is instrumented
+     * to run its {@link FileSystemManager#sync} method when the JVM terminates
+     * by means of a shutdown hook.
      *
-     * @param  manager the nullable file system manager instance to use as the
-     *         class property.
+     * @param  manager the nullable file system manager value of this class
+     *         property.
      *         If this is {@code null}, a new instance will be created on the
      *         next call to {@link #getInstance}.
      * @throws IllegalStateException if the current file system manager has any
      *         managed file systems.
      */
-    public static synchronized void setInstance(@Nullable final FileSystemManager manager) {
+    public static synchronized void setInstance(
+            @Nullable final FileSystemManager manager) {
         final int count = null == instance
                 ? 0
                 : instance.getControllers(null, null).size();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");
-        instance = manager;
-    }
-
-    // FIXME: There is no shutdown hook currently!
-    private static synchronized ShutdownThread getShutdownThread(
-            final FileSystemManager manager) {
-        if (null == shutdownThread) {
-            shutdownThread = new ShutdownThread(manager);
-            Runtime.getRuntime().addShutdownHook(shutdownThread);
+        if (!equal(manager, instance)) {
+            if (null != instance) {
+                assert null != shutdownThread;
+                Runtime.getRuntime().removeShutdownHook(shutdownThread);
+                shutdownThread = null;
+            }
+            if (null != manager) {
+                shutdownThread = new ShutdownThread(manager);
+                Runtime.getRuntime().addShutdownHook(shutdownThread);
+            }
         }
-        return shutdownThread;
+        instance = manager;
+
+        assert invariants();
     }
 
-    /**
-     * This shutdown thread class runs the runnable provided to its constructor
-     * when it starts execution.
-     */
+    private static boolean equal(Object o1, Object o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
+    }
+
+    private static boolean invariants() {
+        return (null != instance) == (null != shutdownThread);
+    }
+
     private static final class ShutdownThread extends Thread {
         ShutdownThread(final FileSystemManager manager) {
             super(  new ShutdownRunnable(manager),
@@ -149,13 +170,16 @@ public class FileSystemManagers {
         final FileSystemManager manager;
 
         ShutdownRunnable(final FileSystemManager manager) {
+            assert null != manager;
+            this.manager = manager;
             // Force loading the key manager now in order to prevent class
             // loading when running the shutdown hook.
             // This may help if this shutdown hook is run as a JVM shutdown
             // hook in an app server environment where class loading is
             // disabled.
+            // FIXME: This adds a dependency on the key manager,
+            // which is not acceptible!
             PromptingKeyManager.getInstance();
-            this.manager = manager;
         }
 
         /**
@@ -169,24 +193,24 @@ public class FileSystemManagers {
          * directly called except for unit testing.
          */
         @Override
-        @SuppressWarnings({"NestedSynchronizedStatement", "CallToThreadDumpStack"})
-        public synchronized void run() {
-            synchronized (PromptingKeyManager.class) {
+        @SuppressWarnings("CallToThreadDumpStack")
+        public void run() {
+            try {
+                // Paranoid, but safe.
+                // FIXME: This adds a dependency on the key manager,
+                // which is not acceptible!
+                PromptingKeyManager.setPrompting(false);
+                // Logging doesn't work in a shutdown hook!
+                //FileSystemManager.logger.setLevel(Level.OFF);
+            } finally {
                 try {
-                    // paranoid, but safe.
-                    PromptingKeyManager.setPrompting(false);
+                    manager.sync(   null,
+                                    new SyncExceptionBuilder(),
+                                    BitField.of(FORCE_CLOSE_INPUT,
+                                                FORCE_CLOSE_OUTPUT));
+                } catch (IOException ouch) {
                     // Logging doesn't work in a shutdown hook!
-                    //FileSystemManager.logger.setLevel(Level.OFF);
-                } finally {
-                    try {
-                        manager.sync(   null,
-                                        new SyncExceptionBuilder(),
-                                        BitField.of(FORCE_CLOSE_INPUT,
-                                                    FORCE_CLOSE_OUTPUT));
-                    } catch (IOException ouch) {
-                        // Logging doesn't work in a shutdown hook!
-                        ouch.printStackTrace();
-                    }
+                    ouch.printStackTrace();
                 }
             }
         }

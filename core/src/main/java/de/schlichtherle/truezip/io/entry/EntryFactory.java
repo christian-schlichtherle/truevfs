@@ -21,7 +21,7 @@ import java.io.CharConversionException;
 /**
  * An immutable, thread-safe factory for entries.
  *
- * @param   <E> The type of the entries.
+ * @param   <E> The type of the created entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */

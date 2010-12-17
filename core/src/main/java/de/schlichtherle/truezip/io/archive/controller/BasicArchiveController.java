@@ -28,7 +28,6 @@ import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
-import de.schlichtherle.truezip.io.filesystem.AbstractFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
@@ -111,7 +110,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends AbstractFileSystemController<ArchiveModel> {
+extends FileSystemController<ArchiveModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();

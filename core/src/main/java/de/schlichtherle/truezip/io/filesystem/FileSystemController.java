@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -40,59 +39,55 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
  * {@link #getModel() file system model} addresses the file system at the head
  * of this chain of federated file systems.
  * <p>
- * Where the methods of this interface accept a
+ * Where the methods of this abstract class accept a
  * {@link FileSystemEntry#getName path name} string as a parameter, this will
  * be resolved against the
  * {@link FileSystemModel#getMountPoint() mount point} URI of this
  * controller's file system.
  * <p>
- * All method implementations of this interface must be reentrant on
+ * All method implementations of this abstract class must be reentrant on
  * exceptions - so client applications may repeatedly call them.
- * However, there is no requirement for an implementation to be thread-safe.
- * Therefore, all implementations should clearly state their level of
- * thread-safety.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ExtendOneOf(AbstractFileSystemController.class)
 @ThreadSafe
-public interface FileSystemController<M extends FileSystemModel> {
+public abstract class FileSystemController<M extends FileSystemModel> {
 
     /** Returns the non-{@code null} file system model. */
     @NonNull
-    M getModel();
+    public abstract M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. a member of another
      * file system.
      */
-    FileSystemController<?> getParent();
+    public abstract FileSystemController<?> getParent();
 
-    Icon getOpenIcon() throws IOException;
+    public abstract Icon getOpenIcon() throws IOException;
 
-    Icon getClosedIcon() throws IOException;
+    public abstract Icon getClosedIcon() throws IOException;
 
-    boolean isReadOnly() throws IOException;
+    public abstract boolean isReadOnly() throws IOException;
 
-    FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
+    public abstract FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    boolean isReadable(@NonNull FileSystemEntryName name)
+    public abstract boolean isReadable(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    boolean isWritable(@NonNull FileSystemEntryName name)
+    public abstract boolean isWritable(@NonNull FileSystemEntryName name)
     throws IOException;
 
-    void setReadOnly(@NonNull FileSystemEntryName name)
+    public abstract void setReadOnly(@NonNull FileSystemEntryName name)
     throws IOException;
 
     // TODO: Consider putting this into FileSystemEntry and let getEntry()
     // return a proxy instead - mind the IOException however!
-    boolean setTime(@NonNull FileSystemEntryName name,
-                    @NonNull BitField<Access> types,
-                    long value)
+    public abstract boolean setTime(@NonNull FileSystemEntryName name,
+                                    @NonNull BitField<Access> types,
+                                    long value)
     throws IOException;
 
     /**
@@ -103,8 +98,9 @@ public interface FileSystemController<M extends FileSystemModel> {
      * @return A non-{@code null} {@code InputSocket}.
      */
     @NonNull
-    InputSocket<?> getInputSocket(  @NonNull FileSystemEntryName name,
-                                    @NonNull BitField<InputOption> options);
+    public abstract InputSocket<?> getInputSocket(
+            @NonNull FileSystemEntryName name,
+            @NonNull BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
@@ -115,9 +111,10 @@ public interface FileSystemController<M extends FileSystemModel> {
      */
     // FIXME: Consider erasing template parameter and add OutputOption.PRESERVE?!
     @NonNull
-    OutputSocket<?> getOutputSocket(@NonNull FileSystemEntryName name,
-                                    @NonNull BitField<OutputOption> options,
-                                    @Nullable Entry template);
+    public abstract OutputSocket<?> getOutputSocket(
+            @NonNull FileSystemEntryName name,
+            @NonNull BitField<OutputOption> options,
+            @Nullable Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -148,13 +145,16 @@ public interface FileSystemController<M extends FileSystemModel> {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  @NonNull FileSystemEntryName name,
-                    @NonNull Type type,
-                    @NonNull BitField<OutputOption> options,
-                    @Nullable Entry template)
+    public abstract boolean mknod(
+            @NonNull FileSystemEntryName name,
+            @NonNull Type type,
+            @NonNull BitField<OutputOption> options,
+            @Nullable Entry template)
     throws IOException;
 
-    void unlink(@NonNull FileSystemEntryName name) throws IOException;
+    public abstract void unlink(
+            @NonNull FileSystemEntryName name)
+    throws IOException;
 
     /**
      * Writes all changes to the contents of this file system to its
@@ -171,20 +171,50 @@ public interface FileSystemController<M extends FileSystemModel> {
      * @see    #UPDATE
      * @see    #UMOUNT
      */
-    <X extends IOException>
-    void sync(  @NonNull ExceptionBuilder<? super SyncException, X> builder,
-                @NonNull BitField<SyncOption> options)
+    public abstract <X extends IOException> void sync(
+            @NonNull ExceptionBuilder<? super SyncException, X> builder,
+            @NonNull BitField<SyncOption> options)
     throws X, FileSystemException;
 
     /**
      * Equivalent to
      * {@code BitField.of(SyncOption.FORCE_CLOSE_INPUT, SyncOption.FORCE_CLOSE_OUTPUT)}.
      */
-    BitField<SyncOption> UPDATE = BitField.of(  FORCE_CLOSE_INPUT,
+    public static final BitField<SyncOption> UPDATE = BitField.of(  FORCE_CLOSE_INPUT,
                                                 FORCE_CLOSE_OUTPUT);
 
     /**
      * Equivalent to {@code UPDATE.set(SyncOption.CLEAR_CACHE)}.
      */
-    BitField<SyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
+    public static final BitField<SyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
+
+    /**
+     * Two file system controllers are considered equal if and only if they
+     * are identical.
+     * This can't get overriden.
+     */
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) {
+        return this == that;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public final String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[model=")
+                .append(getModel())
+                .append(']')
+                .toString();
+    }
 }

@@ -140,8 +140,7 @@ public class FileSystemModel {
      * 
      * @return A clone of the set of file system listeners.
      */
-    @SuppressWarnings("unchecked")
-    final Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
+    final synchronized Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
         return new LinkedHashSet<FileSystemTouchedListener>(touchedListeners);
     }
 
@@ -151,7 +150,7 @@ public class FileSystemModel {
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    synchronized public final void addFileSystemTouchedListener(
+    public final synchronized void addFileSystemTouchedListener(
             final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
@@ -164,11 +163,32 @@ public class FileSystemModel {
      * @param  listener the non-{@code null} listener for file system events.
      * @throws NullPointerException if {@code listener} is {@code null}.
      */
-    synchronized public final void removeFileSystemTouchedListener(
+    public final synchronized void removeFileSystemTouchedListener(
             final FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
         touchedListeners.remove(listener);
+    }
+
+    /**
+     * Two file system models are considered equal if and only if their mount
+     * points are equal.
+     * This can't get overriden.
+     */
+    @Override
+    public final boolean equals(Object that) {
+        return this == that
+                || that instanceof FileSystemModel
+                    && this.mountPoint.equals(((FileSystemModel) that).mountPoint);
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return mountPoint.hashCode();
     }
 
     @Override

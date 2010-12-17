@@ -213,4 +213,24 @@ public class FileSystemManager {
         }
         return snapshot;
     }
+
+    /**
+     * Two file system managers are considered equal if and only if they are
+     * identical.
+     * This can't get overriden.
+     */
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) {
+        return this == that;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
 }

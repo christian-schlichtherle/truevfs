@@ -36,7 +36,7 @@ import net.jcip.annotations.ThreadSafe;
 public abstract class FilterFileSystemController<
         M extends FileSystemModel,
         C extends FileSystemController<? extends M>>
-extends AbstractFileSystemController<M> {
+extends FileSystemController<M> {
 
     /** The decorated file system controller. */
     protected final C controller;
