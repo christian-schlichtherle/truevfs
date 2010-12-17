@@ -270,20 +270,13 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         /**
-         * Splits the given path name into a parent path name and a base path.
-         * Iff the given path name does not path a parent directory, then
-         * {@link ArchiveEntry#ROOT} is set at index zero of the returned array.
-         *
-         * @param  path The path name which's parent path name and base path
-         *         are to be returned.
-         * @throws NullPointerException If {@code path} is {@code null}.
+         * Like its super class implementation, but substitutes {@code ROOT}
+         * for {@code null}.
          */
         @Override
-        public String[] split(String path) {
-            final String split[] = super.split(path);
-            if (split[0] == null)
-                split[0] = ROOT; // postfix
-            return split;
+        public String getParentPath() {
+            final String parentPath = super.getParentPath();
+            return null != parentPath ? parentPath : ROOT;
         }
     }
 
@@ -724,26 +717,24 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         final boolean createParents;
         final SegmentLink<E>[] links;
 
-        PathLink(
-                final String entryPath,
-                final Entry.Type entryType,
-                final Entry template,
-                final boolean createParents)
+        PathLink(   final String entryPath,
+                    final Entry.Type entryType,
+                    final Entry template,
+                    final boolean createParents)
         throws ArchiveFileSystemException {
             this.createParents = createParents;
             links = newSegmentLinks(entryPath, entryType, template, 1);
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
-		private SegmentLink<E>[] newSegmentLinks(
-                final String entryPath,
-                final Entry.Type entryType,
-                final Entry template,
-                final int level)
+        private SegmentLink<E>[] newSegmentLinks(   final String entryPath,
+                                                    final Entry.Type entryType,
+                                                    final Entry template,
+                                                    final int level)
         throws ArchiveFileSystemException {
-            final String split[] = splitter.split(entryPath);
-            final String parentPath = split[0]; // could equal ROOT
-            final String baseName = split[1];
+            splitter.split(entryPath);
+            final String parentPath = splitter.getParentPath(); // could equal ROOT
+            final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
             // Lookup parent entry, creating it where necessary and allowed.
@@ -767,13 +758,13 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(parentEntry, null);
                 newEntry = newEntryChecked(entryPath, entryType, template);
-                elements[1] = new SegmentLink<E>(newEntry, baseName);
+                elements[1] = new SegmentLink<E>(newEntry, memberName);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         parentPath, DIRECTORY, null, level + 1);
                 newEntry = newEntryChecked(entryPath, entryType, template);
                 elements[elements.length - level]
-                        = new SegmentLink<E>(newEntry, baseName);
+                        = new SegmentLink<E>(newEntry, memberName);
             } else {
                 throw new ArchiveFileSystemException(entryPath,
                         "missing parent directory entry");

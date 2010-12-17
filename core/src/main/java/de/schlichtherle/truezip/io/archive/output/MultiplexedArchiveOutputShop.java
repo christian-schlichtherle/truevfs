@@ -208,7 +208,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         private final InputSocket<?> input;
         private boolean closed;
 
-        @SuppressWarnings({"LeakingThisInConstructor", "ThrowableInitCause"})
+        @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(  final OutputSocket<? extends AE> output,
                                 final FileEntry temp)
         throws IOException {
@@ -262,7 +262,6 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             }
         }
 
-        @SuppressWarnings("ThrowableInitCause")
         private boolean store(boolean discard) throws IOException {
             if (discard)
                 assert closed : "broken archive controller!";

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.swing;
 
 import java.io.File;
@@ -86,6 +85,6 @@ abstract class FilterFileView extends FileView {
 
     @Override
     public Boolean isTraversable(File f) {
-        return delegate != null ? delegate.isTraversable(f) : null;
+        return delegate != null ? delegate.isTraversable(f) : Boolean.FALSE;
     }
 }

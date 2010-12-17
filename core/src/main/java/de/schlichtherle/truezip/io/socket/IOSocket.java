@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -75,16 +76,16 @@ public abstract class IOSocket<LT, RT> {
      * {@link OutputSocket#newOutputStream created} by the given output socket
      * {@code output}.
      *
-     * @param  input a non-{@code null} input socket for the input target.
-     * @param  output a non-{@code null} output socket for the output target.
+     * @param  input an input socket for the input target.
+     * @param  output an output socket for the output target.
      * @throws InputException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>input</em> stream.
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>output</em> stream.
      * @throws NullPointerException if any parameter is {@code null}.
      */
-    public static void copy(final InputSocket <?> input,
-                            final OutputSocket<?> output)
+    public static void copy(@NonNull final InputSocket <?> input,
+                            @NonNull final OutputSocket<?> output)
     throws IOException {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
@@ -130,7 +131,7 @@ public abstract class IOSocket<LT, RT> {
 
     /** Provided for the comfort of subclasses in this package. */
     static boolean equal(IOSocket<?, ?> o1, IOSocket<?, ?> o2) {
-        assert (o1 == o2) == (o1 == o2 || null != o1 && o1.equals(o2));
+        assert o1 == o2 || null == o1 || !o1.equals(o2);
         return o1 == o2;
     }
 
@@ -140,8 +141,8 @@ public abstract class IOSocket<LT, RT> {
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object o) {
-        return this == o;
+    public final boolean equals(Object that) {
+        return this == that;
     }
 
     /**

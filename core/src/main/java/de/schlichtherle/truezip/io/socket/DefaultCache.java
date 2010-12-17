@@ -327,7 +327,6 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         }
 
         @Override
-        @SuppressWarnings("ThrowableInitCause")
         public OutputStream newOutputStream() throws IOException {
             if (null != getPeerTarget()) {
                 // Dito, but this time we must clear the cache.

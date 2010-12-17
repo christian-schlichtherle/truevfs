@@ -75,7 +75,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @Override
-    @SuppressWarnings("ThrowableInitCause")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     public OutputStream newOutputStream() throws IOException {
         final File fileTarget = file.getFile();
         if (options.get(CREATE_PARENTS))

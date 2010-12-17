@@ -241,8 +241,8 @@ public class ArchiveDriverRegistry implements Serializable {
      * @throws IllegalArgumentException If an archive driver cannot get
      *         returned. Its cause provides more detail.
      */
-    @SuppressWarnings({"unchecked", "ThrowableInitCause"})
-	private static ArchiveDriver<?> newArchiveDriver(Object driver) {
+    @SuppressWarnings("unchecked")
+    private static ArchiveDriver<?> newArchiveDriver(Object driver) {
         try {
             if (driver instanceof String)
                 driver = loadClass((String) driver, ArchiveDriverRegistry.class);
@@ -250,8 +250,7 @@ public class ArchiveDriverRegistry implements Serializable {
                 driver = ((Class<? extends ArchiveDriver<?>>) driver).newInstance();
             return (ArchiveDriver<?>) driver; // may throw ClassCastException
         } catch (Exception ex) {
-            throw (IllegalArgumentException) new IllegalArgumentException(getString("cannotCreate"))
-                    .initCause(ex); // NOI18N
+            throw new IllegalArgumentException(getString("cannotCreate"), ex); // NOI18N
         }
     }
 

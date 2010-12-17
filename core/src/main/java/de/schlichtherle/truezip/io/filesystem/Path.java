@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 
@@ -66,6 +67,7 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public final class Path implements Serializable, Comparable<Path> {
 
     private static final long serialVersionUID = 5798435461242930648L;

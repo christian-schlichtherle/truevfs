@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
@@ -63,12 +64,15 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({ "JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS", "SE_TRANSIENT_FIELD_NOT_RESTORED" })
 public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
 
     private final URI uri;
     private final Path path;
+
     private volatile transient Scheme scheme;
     private volatile transient URI hierarchical;
 
@@ -228,9 +232,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * @return The non-{@code null} URI scheme.
      */
     public Scheme getScheme() {
-        return null != scheme
-                ? scheme
-                : (scheme = Scheme.create(uri.getScheme()));
+        return null != scheme ? scheme : (scheme = Scheme.create(uri.getScheme()));
     }
 
     /**

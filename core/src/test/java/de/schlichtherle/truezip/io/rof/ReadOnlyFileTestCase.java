@@ -74,7 +74,7 @@ public abstract class ReadOnlyFileTestCase extends TestCase {
     throws IOException {
         data = new byte[1024];
         rnd.nextBytes(data);
-        file = File.createTempFile("tmp", null);
+        file = File.createTempFile("tzp-tmp", null);
         try {
             final OutputStream out = new FileOutputStream(file);
             try {

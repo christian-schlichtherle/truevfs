@@ -24,6 +24,8 @@ import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import javax.swing.Icon;
 
@@ -54,6 +56,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 public interface FileSystemController {
 
     /** Returns the non-{@code null} file system model. */
+    @NonNull
     FileSystemModel getModel();
 
     /**
@@ -69,17 +72,23 @@ public interface FileSystemController {
 
     boolean isReadOnly() throws IOException;
 
-    FileSystemEntry getEntry(FileSystemEntryName name) throws IOException;
+    FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
+    throws IOException;
 
-    boolean isReadable(FileSystemEntryName name) throws IOException;
+    boolean isReadable(@NonNull FileSystemEntryName name)
+    throws IOException;
 
-    boolean isWritable(FileSystemEntryName name) throws IOException;
+    boolean isWritable(@NonNull FileSystemEntryName name)
+    throws IOException;
 
-    void setReadOnly(FileSystemEntryName name) throws IOException;
+    void setReadOnly(@NonNull FileSystemEntryName name)
+    throws IOException;
 
     // TODO: Consider putting this into FileSystemEntry and let getEntry()
     // return a proxy instead - mind the IOException however!
-    boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
+    boolean setTime(@NonNull FileSystemEntryName name,
+                    @NonNull BitField<Access> types,
+                    long value)
     throws IOException;
 
     /**
@@ -89,8 +98,9 @@ public interface FileSystemController {
      * @param  name a non-{@code null} relative path name.
      * @return A non-{@code null} {@code InputSocket}.
      */
-    InputSocket<?> getInputSocket(  FileSystemEntryName name,
-                                    BitField<InputOption> options);
+    @NonNull
+    InputSocket<?> getInputSocket(  @NonNull FileSystemEntryName name,
+                                    @NonNull BitField<InputOption> options);
 
     /**
      * Returns an output socket for writing the given entry to the file
@@ -100,9 +110,10 @@ public interface FileSystemController {
      * @return A non-{@code null} {@code OutputSocket}.
      */
     // FIXME: Consider erasing template parameter and add OutputOption.PRESERVE?!
-    OutputSocket<?> getOutputSocket(FileSystemEntryName name,
-                                    BitField<OutputOption> options,
-                                    Entry template);
+    @NonNull
+    OutputSocket<?> getOutputSocket(@NonNull FileSystemEntryName name,
+                                    @NonNull BitField<OutputOption> options,
+                                    @Nullable Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
@@ -133,13 +144,13 @@ public interface FileSystemController {
      *             {@code false}.</li>
      *         </ul>
      */
-    boolean mknod(  FileSystemEntryName name,
-                    Type type,
-                    BitField<OutputOption> options,
-                    Entry template)
+    boolean mknod(  @NonNull FileSystemEntryName name,
+                    @NonNull Type type,
+                    @NonNull BitField<OutputOption> options,
+                    @Nullable Entry template)
     throws IOException;
 
-    void unlink(FileSystemEntryName name) throws IOException;
+    void unlink(@NonNull FileSystemEntryName name) throws IOException;
 
     /**
      * Writes all changes to the contents of this file system to its
@@ -157,8 +168,8 @@ public interface FileSystemController {
      * @see    #UMOUNT
      */
     <X extends IOException>
-    void sync(  ExceptionBuilder<? super SyncException, X> builder,
-                BitField<SyncOption> options)
+    void sync(  @NonNull ExceptionBuilder<? super SyncException, X> builder,
+                @NonNull BitField<SyncOption> options)
     throws X, FileSystemException;
 
     /**

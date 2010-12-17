@@ -899,8 +899,8 @@ implements Iterable<E>, Closeable {
         @Override
         public void close() throws IOException {
             try {
-                while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
-                    ;
+                while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF - this version makes FindBugs happy!
+                }
             } finally {
                 super.close();
             }
@@ -965,13 +965,12 @@ implements Iterable<E>, Closeable {
         public int read()
         throws IOException {
             int read;
-            while ((read = read(singleByteBuf, 0, 1)) == 0) // reading nothing is not acceptible!
-                ;
+            while ((read = read(singleByteBuf, 0, 1)) == 0) { // reading nothing is not acceptible!
+            }
             return read > 0 ? singleByteBuf[0] & 0xff : -1;
         }
 
         @Override
-        @SuppressWarnings("ThrowableInitCause")
         public int read(final byte[] buf, final int off, final int len)
         throws IOException {
             if (len == 0)
@@ -1004,7 +1003,7 @@ implements Iterable<E>, Closeable {
                 while ((inflated = inf.inflate(infBuf, 0, infBuf.length)) > 0)
                     crc.update(infBuf, 0, inflated);
             } catch (DataFormatException ex) {
-                throw (IOException) new IOException(ex.toString()).initCause(ex);
+                throw new IOException(ex);
             }
 
             // Check inflater invariants.
@@ -1027,8 +1026,8 @@ implements Iterable<E>, Closeable {
 
             // Order is important!
             try {
-                while (skip(Long.MAX_VALUE) > 0) // process CRC-32 until EOF - this version makes FindBugs happy!
-                    ;
+                while (skip(Long.MAX_VALUE) > 0) { // process CRC-32 until EOF - this version makes FindBugs happy!
+                }
             } finally {
                 closed = true;
                 InflaterPool.release(inf);

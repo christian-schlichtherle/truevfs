@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Provides static utility methods for path names.
  * This class cannot get instantiated outside its package.
@@ -31,7 +33,8 @@ public class Paths {
      * Equivalent to
      * {@code new Normalizer(separatorChar).}{@link Normalizer#normalize(String)}.
      */
-    public static String normalize(String path, char separatorChar) {
+    @NonNull
+    public static String normalize(@NonNull String path, char separatorChar) {
         return new Normalizer(separatorChar).normalize(path);
     }
 
@@ -61,11 +64,11 @@ public class Paths {
          *
          * @param  path the non-{@code null} path name to normalize.
          * @return {@code path} if it was already in normalized form.
-         *         Otherwise, a new String with the normalized form of the
+         *         Otherwise, a new string with the normalized form of the
          *         given path name.
-         * @throws NullPointerException if {@code path} is {@code null}.
          */
-        public String normalize(final String path) {
+        @NonNull
+        public String normalize(@NonNull final String path) {
             final int prefixLen = prefixLength(path, separatorChar);
             final int pathLen = path.length();
             this.path = path.substring(prefixLen, pathLen);
@@ -148,23 +151,22 @@ public class Paths {
      * case a single separator character is retained to denote the root
      * directory.
      *
-     * @param path The path name to chop.
-     * @param separatorChar The file name separator character.
+     * @param  path The path name to chop.
+     * @param  separatorChar The file name separator character.
      * @return {@code path} if it's a path name without trailing separators
      *         or contains the separator character only.
      *         Otherwise, the substring until the first of at least one
      *         separating characters is returned.
-     * @throws NullPointerException If {@code path} is {@code null}.
      */
-    @SuppressWarnings("empty-statement")
+    @NonNull
     public static String cutTrailingSeparators(
-            final String path,
+            @NonNull final String path,
             final char separatorChar) {
         int i = path.length();
-        if (0 >= i || path.charAt(--i) != separatorChar)
+        if (0 >= i || separatorChar != path.charAt(--i))
             return path;
-        while (0 < i && path.charAt(--i) == separatorChar)
-            ;
+        while (0 < i && separatorChar == path.charAt(--i)) {
+        }
         return path.substring(0, ++i);
     }
 
@@ -172,13 +174,14 @@ public class Paths {
      * Equivalent to
      * {@code return new Splitter(separatorChar).{@link Splitter#split(String) split(path)};}.
      */
-    public static String[] split(String path, char separatorChar) {
+    @NonNull
+    public static Splitter split(@NonNull String path, char separatorChar) {
         return new Splitter(separatorChar).split(path);
     }
 
     public static class Splitter {
         private final char separatorChar;
-        private final String[] result = new String[2];
+        private String parentPath, memberName;
 
         public Splitter(final char separatorChar) {
             this.separatorChar = separatorChar;
@@ -196,13 +199,12 @@ public class Paths {
          *     This compares equal with {@link java.io.File#getName()}.</li>
          * </ol>
          *
-         * @param path The name of the path which's parent path name and base name
-         *        are to be returned.
-         * @return An array of at least two string elements to hold the resul
-         *         of the operation.
-         * @throws NullPointerException If {@code path} is {@code null}.
+         * @param  path The name of the path which's parent path name and base
+         *         name are to be returned.
+         * @return {@code this}
          */
-        public String[] split(final String path) {
+        @NonNull
+        public Splitter split(@NonNull final String path) {
             final int prefixLength = prefixLength(path, separatorChar);
             // Skip any trailing separators and look for the previous separator.
             int baseBegin = -1;
@@ -215,29 +217,28 @@ public class Paths {
             // Finally split according to our findings.
             if (baseBegin >= prefixLength) { // found separator after the prefix?
                 final int parentEnd = lastIndexNot(path, separatorChar, baseBegin) + 1;
-                result[0] = path.substring(0, parentEnd > prefixLength ? parentEnd : prefixLength);        // include separator, may produce separator only!
-                result[1] = path.substring(baseBegin + 1, baseEnd);  // between separator and trailing separator
+                parentPath = path.substring(0, parentEnd > prefixLength ? parentEnd : prefixLength);    // include separator, may produce separator only!
+                memberName = path.substring(baseBegin + 1, baseEnd);    // between separator and trailing separator
             } else { // no separator after prefix
-                if (0 < prefixLength && prefixLength < baseEnd)       // prefix exists and we have more?
-                    result[0] = path.substring(0, prefixLength);    // prefix is parent
-                else
-                    result[0] = null;                            // no parent
-                result[1] = path.substring(prefixLength, baseEnd);
+                parentPath = 0 < prefixLength && prefixLength < baseEnd // prefix exists and we have more?
+                    ? path.substring(0, prefixLength)                   // prefix is parent
+                    : null;                                             // no parent
+                memberName = path.substring(prefixLength, baseEnd);
             }
-            return result;
+            return this;
         }
 
         public String getParentPath() {
-            return result[0];
+            return parentPath;
         }
 
         public String getMemberName() {
-            return result[1];
+            return memberName;
         }
     }
 
     @SuppressWarnings("empty-statement")
-    private static int lastIndexNot(String path, char separatorChar, int last) {
+    private static int lastIndexNot(@NonNull String path, char separatorChar, int last) {
         while (path.charAt(last) == separatorChar && --last >= 0)
             ;
         return last;
@@ -247,7 +248,7 @@ public class Paths {
      * Returns {@code true} iff the given path name refers to the root
      * directory, i.e. if it's empty.
      */
-    public static boolean isRoot(String path) {
+    public static boolean isRoot(@NonNull String path) {
         return 0 == path.length();
     }
 
@@ -262,7 +263,7 @@ public class Paths {
      *         separator character.
      * @throws NullPointerException If {@code path} is {@code null}.
      */
-    public static boolean isAbsolute(String path, char separatorChar) {
+    public static boolean isAbsolute(@NonNull String path, char separatorChar) {
         final int prefixLen = prefixLength(path, separatorChar);
         return prefixLen > 0 && path.charAt(prefixLen - 1) == separatorChar;
     }
@@ -287,7 +288,7 @@ public class Paths {
      * @return The number of characters in the prefix.
      * @throws NullPointerException If {@code path} is {@code null}.
      */
-    private static int prefixLength(final String path, final char separatorChar) {
+    private static int prefixLength(@NonNull final String path, final char separatorChar) {
         final int pathLength = path.length();
         int len = 0; // default prefix length
         if (pathLength > 0 && path.charAt(0) == separatorChar) {
@@ -314,7 +315,7 @@ public class Paths {
      * @param separatorChar The file name separator character.
      * @throws NullPointerException If any parameter is {@code null}.
      */
-    public static boolean contains(String a, String b, char separatorChar) {
+    public static boolean contains(@NonNull String a, @NonNull String b, char separatorChar) {
         // Windows is just case preserving, all others are case sensitive.
         if (separatorChar == '\\') {
             a = a.toLowerCase();

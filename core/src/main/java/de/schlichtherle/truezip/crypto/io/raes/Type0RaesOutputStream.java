@@ -15,7 +15,8 @@
  */
 package de.schlichtherle.truezip.crypto.io.raes;
 
-import de.schlichtherle.truezip.crypto.generator.DigestRandom;
+import java.security.SecureRandom;
+import java.util.Random;
 import de.schlichtherle.truezip.crypto.mode.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
@@ -32,6 +33,8 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.prng.DigestRandomGenerator;
+import org.bouncycastle.crypto.prng.RandomGenerator;
 
 import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
 
@@ -42,6 +45,8 @@ import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
  * @version $Id$
  */
 class Type0RaesOutputStream extends RaesOutputStream {
+
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     /**
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
@@ -102,7 +107,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
         keyStrengthBits = keyStrengthBytes * 8; // key strength in bits
         assert digest.getDigestSize() >= keyStrengthBytes;
         final byte[] salt = new byte[keyStrengthBytes];
-        new DigestRandom(digest).nextBytes(salt);
+        generateSalt(digest, salt);
 
         // Init PBE parameters.
         final PBEParametersGenerator paramGen
@@ -156,6 +161,12 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Now that everything went OK, finally init the super class cipher.
         this.cipher = cipher;
+    }
+
+    private static void generateSalt(final Digest digest, final byte[] salt) {
+        final RandomGenerator randomGenerator = new DigestRandomGenerator(digest);
+        randomGenerator.addSeedMaterial(secureRandom.generateSeed(salt.length));
+        randomGenerator.nextBytes(salt);
     }
 
     @Override
