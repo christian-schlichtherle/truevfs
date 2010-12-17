@@ -204,7 +204,8 @@ public class FileSystemManagers {
                 try {
                     manager.sync(   new SyncExceptionBuilder(),
                                     BitField.of(FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT), null);
+                                                FORCE_CLOSE_OUTPUT),
+                                    null);
                 } catch (IOException ouch) {
                     // Logging doesn't work in a shutdown hook!
                     ouch.printStackTrace();
