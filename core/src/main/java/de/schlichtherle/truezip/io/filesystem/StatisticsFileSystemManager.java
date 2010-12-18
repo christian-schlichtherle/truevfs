@@ -32,8 +32,8 @@ import net.jcip.annotations.ThreadSafe;
 public final class StatisticsFileSystemManager
 extends DecoratingFileSystemManager<FileSystemManager> {
 
-    private volatile ManagedFileSystemStatistics statistics
-            = new ManagedFileSystemStatistics(this);
+    private volatile FileSystemStatistics statistics
+            = new FileSystemStatistics(this);
 
     public StatisticsFileSystemManager(
             @NonNull final FileSystemManager manager) {
@@ -73,10 +73,10 @@ extends DecoratingFileSystemManager<FileSystemManager> {
      * This delay increases if the system is under heavy load.
      *
      * @see #sync
-     * @see ManagedFileSystemStatistics#isClosed
+     * @see FileSystemStatistics#isClosed
      */
     @NonNull
-    public ManagedFileSystemStatistics getStatistics() {
+    public FileSystemStatistics getStatistics() {
         return statistics;
     }
 
@@ -94,7 +94,7 @@ extends DecoratingFileSystemManager<FileSystemManager> {
         try {
             super.sync(options, builder);
         } finally {
-            statistics = new ManagedFileSystemStatistics(this);
+            statistics = new FileSystemStatistics(this);
         }
     }
 }

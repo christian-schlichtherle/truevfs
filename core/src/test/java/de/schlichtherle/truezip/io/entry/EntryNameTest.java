@@ -15,8 +15,19 @@
  */
 package de.schlichtherle.truezip.io.entry;
 
+import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -28,10 +39,83 @@ import static org.junit.Assert.*;
  */
 public class EntryNameTest {
 
+    private static final Logger LOGGER
+            = Logger.getLogger(EntryNameTest.class.getName());
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        final ExceptionListener listener = new ExceptionListener() {
+            @Override
+            public void exceptionThrown(Exception ex) {
+                throw new UndeclaredThrowableException(ex);
+            }
+        };
+
+        for (final String[] params : new String[][] {
+            { "föö bär", null },
+            { "föö/bär/", },
+            { "föö/bär", },
+            { "föö/", },
+            { "föö", },
+            { "föö?bär", },
+            { "", },
+            { "/", },
+            { "/föö", },
+            { ".", },
+            { "./", },
+            { "..", },
+            { "../", },
+            { "/.", },
+            { "/./", },
+            { "/..", },
+            { "/../", },
+        }) {
+            final EntryName original = 1 < params.length
+                    ? EntryName.create(params[0], params[1])
+                    : EntryName.create(params[0]);
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(original);
+                oos.close();
+
+                LOGGER.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final ObjectInputStream ois = new ObjectInputStream(bis);
+                final Object clone = ois.readObject();
+                ois.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+            }
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final XMLEncoder enc = new XMLEncoder(bos);
+                enc.setExceptionListener(listener);
+                enc.writeObject(original);
+                enc.close();
+
+                LOGGER.log(Level.FINE, bos.toString("UTF-8"));
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final XMLDecoder dec = new XMLDecoder(bis);
+                final Object clone = dec.readObject();
+                dec.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+            }
+        }
+    }
+
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() {
         for (final String param : new String[] {
+            "foo bar",
             "/../foo#boo",
             "/../foo#",
             "foo#bar",
@@ -94,16 +178,14 @@ public class EntryNameTest {
 
             "//authority/defined",
         }) {
-            final URI uri = URI.create(param);
-
             try {
-                EntryName.create(uri);
+                EntryName.create(param);
                 fail(param);
             } catch (IllegalArgumentException ex) {
             }
 
             try {
-                new EntryName(uri);
+                new EntryName(param);
                 fail(param);
             } catch (URISyntaxException ex) {
             }
@@ -121,6 +203,7 @@ public class EntryNameTest {
             final EntryName member = EntryName.create(URI.create(params[1]));
             final EntryName result = new EntryName(parent, member);
             assertThat(result.getUri(), equalTo(URI.create(params[2])));
+            assertThat(EntryName.create(result.getUri()), equalTo(result));
         }
     }
 }

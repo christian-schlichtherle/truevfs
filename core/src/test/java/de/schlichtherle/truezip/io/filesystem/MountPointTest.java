@@ -15,6 +15,17 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
@@ -29,41 +40,136 @@ import static org.junit.Assert.*;
  */
 public class MountPointTest {
 
+    private static final Logger LOGGER
+            = Logger.getLogger(MountPoint.class.getName());
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        final ExceptionListener listener = new ExceptionListener() {
+            @Override
+            public void exceptionThrown(Exception ex) {
+                throw new UndeclaredThrowableException(ex);
+            }
+        };
+
+        for (final String[] params : new String[][] {
+            { "zip:zip:file:/föö%20bär!/föö%20bär!/", },
+            { "zip:file:/föö%20bär!/", },
+            { "file:/föö%20bär/", },
+        }) {
+            final MountPoint original = MountPoint.create(params[0]);
+            assertThat(original.toString(), equalTo(params[0]));
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(original);
+                oos.close();
+
+                LOGGER.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final ObjectInputStream ois = new ObjectInputStream(bis);
+                final Object clone = ois.readObject();
+                ois.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+                assertThat(clone.toString(), equalTo(params[0]));
+            }
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final XMLEncoder enc = new XMLEncoder(bos);
+                enc.setExceptionListener(listener);
+                enc.writeObject(original);
+                enc.close();
+
+                LOGGER.log(Level.FINE, bos.toString("UTF-8"));
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final XMLDecoder dec = new XMLDecoder(bis);
+                final Object clone = dec.readObject();
+                dec.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+                assertThat(clone.toString(), equalTo(params[0]));
+            }
+        }
+    }
+
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            MountPoint.create(null);
+            MountPoint.create((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new MountPoint(null);
+            new MountPoint((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            MountPoint.create(null, false);
+            MountPoint.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new MountPoint(null, false);
+            new MountPoint((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            MountPoint.create(null, true);
+            MountPoint.create((String) null, false);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new MountPoint(null, true);
+            new MountPoint((String) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create((URI) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint((URI) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create((String) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint((String) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            MountPoint.create((URI) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new MountPoint((URI) null, true);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -129,7 +235,7 @@ public class MountPointTest {
             { "foo", "bar:/baz/" },
         }) {
             final Scheme scheme = Scheme.create(params[0]);
-            final Path path = Path.create(URI.create(params[1]));
+            final Path path = Path.create(params[1]);
             try {
                 new MountPoint(scheme, path);
                 fail(params[0] + ":" + params[1] + "!/");
@@ -154,11 +260,13 @@ public class MountPointTest {
             assertThat(mountPoint.getUri(), sameInstance(uri));
             assertThat(mountPoint.getPath(), nullValue());
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(mountPoint, equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString()))));
-            assertThat(mountPoint.hashCode(), equalTo(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode()));
+            assertThat(mountPoint, equalTo(MountPoint.create(mountPoint.getUri().toString())));
+            assertThat(mountPoint.hashCode(), equalTo(MountPoint.create(mountPoint.getUri().toString()).hashCode()));
         }
 
         for (final String[] params : new String[][] {
+            { "bar:baz:/ba%20ng!/", "bar", "baz:/ba%20ng" },
+            { "foo:bar:baz:/ba%20ng!/bo%20om?plo%20nk!/", "foo", "bar:baz:/ba%20ng!/bo%20om?plo%20nk" },
             { "foo:bar:baz:/./bäng!/./bööm?plönk!/", "foo", "bar:baz:/bäng!/bööm?plönk" },
             { "foo:bar:baz:/./bang!/boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
             { "foo:bar:baz:/bang!/./boom?plonk!/", "foo", "bar:baz:/bang!/boom?plonk" },
@@ -167,20 +275,20 @@ public class MountPointTest {
             { "foo:bar:/baz?bang!/", "foo", "bar:/baz?bang" },
             { "foo:bar:/baz!/", "foo", "bar:/baz" },
         }) {
-            final MountPoint mountPoint = MountPoint.create(URI.create(params[0]), true);
+            final MountPoint mountPoint = MountPoint.create(params[0], true);
             final Scheme scheme = Scheme.create(params[1]);
-            final Path path = Path.create(URI.create(params[2]));
+            final Path path = Path.create(params[2]);
 
             assertThat(mountPoint.getScheme(), equalTo(scheme));
             assertThat(mountPoint.getPath(), equalTo(path));
             assertThat(mountPoint.toString(), equalTo(mountPoint.getUri().toString()));
-            assertThat(MountPoint.create(URI.create(mountPoint.toString())), equalTo(mountPoint));
-            assertThat(MountPoint.create(URI.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/")), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.toString()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.getUri().getScheme() + ":" + mountPoint.getPath() + "!/"), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
-            assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())), equalTo(mountPoint));
-            assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode(), equalTo(mountPoint.hashCode()));
+            assertThat(MountPoint.create(mountPoint.getUri().toString()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
             assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(ROOT_ENTRY_NAME))), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.resolveAbsolute(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolvePath(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
         }
     }
 
@@ -193,14 +301,14 @@ public class MountPointTest {
             { "foo:/bar/?boom", "baz?plonk", null, "foo:/bar/baz?plonk" },
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },
         }) {
-            final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
-            final FileSystemEntryName entryName = FileSystemEntryName.create(URI.create(params[1]));
-            final FileSystemEntryName parentEntryName = null == params[2] ? null : FileSystemEntryName.create(URI.create(params[2]));
-            final Path path = Path.create(URI.create(params[3]));
+            final MountPoint mountPoint = MountPoint.create(params[0]);
+            final FileSystemEntryName entryName = FileSystemEntryName.create(params[1]);
+            final FileSystemEntryName parentEntryName = null == params[2] ? null : FileSystemEntryName.create(params[2]);
+            final Path path = Path.create(params[3]);
             if (null != parentEntryName)
                 assertThat(mountPoint.resolveParent(entryName), equalTo(parentEntryName));
-            assertThat(mountPoint.resolveAbsolute(entryName), equalTo(path));
-            assertThat(mountPoint.resolveAbsolute(entryName).getUri().isAbsolute(), is(true));
+            assertThat(mountPoint.resolvePath(entryName), equalTo(path));
+            assertThat(mountPoint.resolvePath(entryName).getUri().isAbsolute(), is(true));
         }
     }
 
@@ -215,9 +323,8 @@ public class MountPointTest {
             { "foo:/bar/?boom", "foo:/bar/?boom" },
             { "foo:/bar/", "foo:/bar/" },
         }) {
-            final MountPoint mountPoint = MountPoint.create(URI.create(params[0]));
-            final URI flat = URI.create(params[1]);
-            assertThat(mountPoint.hierarchicalize(), equalTo(flat));
+            final MountPoint mountPoint = MountPoint.create(params[0]);
+            assertThat(mountPoint.hierarchicalize(), equalTo(URI.create(params[1])));
         }
     }
 }

@@ -15,6 +15,18 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.entry.EntryNameTest;
+import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
@@ -28,41 +40,144 @@ import static org.junit.Assert.*;
  */
 public class PathTest {
 
+    private static final Logger LOGGER
+            = Logger.getLogger(PathTest.class.getName());
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        final ExceptionListener listener = new ExceptionListener() {
+            @Override
+            public void exceptionThrown(Exception ex) {
+                throw new UndeclaredThrowableException(ex);
+            }
+        };
+
+        for (final String[] params : new String[][] {
+            { "zip:zip:file:/föö%20bär!/föö%20bär!/föö%20bär", },
+            { "zip:file:/föö%20bär!/föö%20bär", },
+            { "file:/föö%20bär/föö%20bär", },
+            { "zip:file:/foo!/bar", },
+            { "file:/foo/bar", },
+            { "file:/foo/bar", },
+            { "föö%20bär", },
+            { "föö/bär", },
+            { "föö", },
+            { "föö?bär", },
+            { "", },
+        }) {
+            final Path original = Path.create(params[0]);
+            assertThat(original.toString(), equalTo(params[0]));
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(original);
+                oos.close();
+
+                LOGGER.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final ObjectInputStream ois = new ObjectInputStream(bis);
+                final Object clone = ois.readObject();
+                ois.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+                assertThat(clone.toString(), equalTo(params[0]));
+            }
+
+            {
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                final XMLEncoder enc = new XMLEncoder(bos);
+                enc.setExceptionListener(listener);
+                enc.writeObject(original);
+                enc.close();
+
+                LOGGER.log(Level.FINE, bos.toString("UTF-8"));
+
+                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+                final XMLDecoder dec = new XMLDecoder(bis);
+                final Object clone = dec.readObject();
+                dec.close();
+
+                assertThat(clone, not(sameInstance((Object) original)));
+                assertThat(clone, equalTo((Object) original));
+                assertThat(clone.toString(), equalTo(params[0]));
+            }
+        }
+    }
+
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            Path.create(null);
+            Path.create((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new Path(null);
+            new Path((String) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            Path.create(null, false);
+            Path.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new Path(null, false);
+            new Path((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            Path.create(null, true);
+            Path.create((String) null, false);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new Path(null, true);
+            new Path((String) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            Path.create((URI) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new Path((URI) null, false);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            Path.create((String) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new Path((String) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            Path.create((URI) null, true);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            new Path((URI) null, true);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -169,6 +284,7 @@ public class PathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            { "foo:bar:baz:/bä%20ng!/bö%20öm!/plö%20nk", "foo:bar:baz:/bä%20ng!/bö%20öm!/", "plö%20nk" },
             { "foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
             { "foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", "" },
@@ -215,9 +331,9 @@ public class PathTest {
             { "foo:/bar/baz/", "foo:/bar/baz/", "" },
             { "foo:/bar/baz/?bang", "foo:/bar/baz/", "?bang" },
         }) {
-            Path path = Path.create(URI.create(params[0]), true);
-            final MountPoint mountPoint = null == params[1] ? null : MountPoint.create(URI.create(params[1]));
-            final FileSystemEntryName entryName = FileSystemEntryName.create(URI.create(params[2]));
+            Path path = Path.create(params[0], true);
+            final MountPoint mountPoint = null == params[1] ? null : MountPoint.create(params[1]);
+            final FileSystemEntryName entryName = FileSystemEntryName.create(params[2]);
             testPath(path, mountPoint, entryName);
 
             path = new Path(mountPoint, entryName);
@@ -238,7 +354,21 @@ public class PathTest {
         }
         assertThat(path.getEntryName().getUri(), equalTo(entryName.getUri()));
         assertThat(path.toString(), equalTo(path.getUri().toString()));
-        assertThat(Path.create(URI.create(path.getUri().toString())), equalTo(path));
-        assertThat(Path.create(URI.create(path.getUri().toString())).hashCode(), equalTo(path.hashCode()));
+        assertThat(Path.create(path.getUri().toString()), equalTo(path));
+        assertThat(Path.create(path.getUri().toString()).hashCode(), equalTo(path.hashCode()));
+    }
+
+    @Test
+    public void testSpaces() {
+        for (final String[] params : new String[][] {
+            { "foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ", },
+            { "foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ", },
+        }) {
+            Path path = Path.create(params[0]);
+            for (int i = params.length; 0 < --i; ) {
+                assertThat(path.getEntryName().getPath(), equalTo(params[i]));
+                path = path.getMountPoint().getPath();
+            }
+        }
     }
 }

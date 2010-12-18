@@ -715,7 +715,8 @@ public class File extends java.io.File {
                 this.innerArchive = this.enclArchive = innerArchive;
                 this.enclEntryName = FileSystemEntryName.create(
                         path.substring(innerArchivePathLength + 1) // cut off leading separatorChar
-                        .replace(separatorChar, SEPARATOR_CHAR));
+                            .replace(separatorChar, SEPARATOR_CHAR),
+                        null);
             }
         } else {
             this.detector = detector;
@@ -886,8 +887,8 @@ public class File extends java.io.File {
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
         init(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar));
-        enclEntryName = enclEntryNameBuf.length() > 0
-                ? FileSystemEntryName.create(enclEntryNameBuf.toString())
+        enclEntryName = 0 < enclEntryNameBuf.length()
+                ? FileSystemEntryName.create(enclEntryNameBuf.toString(), null)
                 : null;
 
         if (innerArchive == this) {
@@ -1046,7 +1047,8 @@ public class File extends java.io.File {
                     return;
                 }
                 enclEntryName = FileSystemEntryName.create(
-                        member + "/" + enclEntryName.getPath());
+                        member + "/" + enclEntryName.getPath(),
+                        null);
             } else {
                 if (isArchive) {
                     innerArchive = this;
@@ -1058,10 +1060,11 @@ public class File extends java.io.File {
                         return;
                     uri = newURI(parent.substring(0, i), parent.substring(i + 1));
                     enclEntryName = FileSystemEntryName.create(
-                            member.substring(0, baseEnd)); // cut off trailing '!'!
+                            member.substring(0, baseEnd), // cut off trailing '!'!
+                            null);
                     parent = uri.getSchemeSpecificPart();
                 } else {
-                    enclEntryName = FileSystemEntryName.create(member);
+                    enclEntryName = FileSystemEntryName.create(member, null);
                 }
             }
         }

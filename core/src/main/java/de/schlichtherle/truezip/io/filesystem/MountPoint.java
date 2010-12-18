@@ -15,13 +15,18 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
-import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
+import static de.schlichtherle.truezip.io.filesystem.Path.MOUNT_POINT_SEPARATOR;
 
 /**
  * Addresses the mount point of a file system.
@@ -31,9 +36,9 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * <ol>
  * <li>The URI must be absolute.
  * <li>The URI must not have a fragment.
- * <li>If the URI is opaque, its scheme specific part must end with the bang
- *     slash separator {@code "!/"}.
- *     The scheme specific part <em>before</em> this bang slash separator is
+ * <li>If the URI is opaque, its scheme specific part must end with the mount
+ *     point separator {@code "!/"}.
+ *     The scheme specific part <em>before</em> this mount point separator is
  *     parsed according the syntax constraints for a {@link Path} and the
  *     following additional syntax constraints:
  *     The path must be absolute.
@@ -53,11 +58,12 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  * <li>{@code /foo} (not absolute)
  * <li>{@code foo} (dito)
  * <li>{@code foo:/bar/#baz} (fragment)
- * <li>{@code foo:bar:/baz!/bang} (doesn't end with bang slash separator)
+ * <li>{@code foo:bar:/baz!/bang} (doesn't end with mount point separator)
  * <li>{@code foo:bar:baz:/bang!/!/} (empty entry name in bar:baz:/bang!/)
  * </ul>
  * <p>
- * Note that this class is immutable and final, hence thread-safe, too.
+ * This class supports serialization with both
+ * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
  * @see     Path
  * @author  Christian Schlichtherle
@@ -69,8 +75,11 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
 
-    private final URI uri;
-    private final Path path;
+    @NonNull
+    private URI uri; // not final for serialization only!
+
+    @CheckForNull
+    private transient Path path;
 
     private volatile transient Scheme scheme;
     private volatile transient URI hierarchical;
@@ -78,7 +87,40 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
-    public static MountPoint create(URI uri) {
+    @NonNull
+    public static MountPoint create(@NonNull String uri) {
+        return create(uri, false);
+    }
+
+    /**
+     * Constructs a new mount point by constructing a new URI from
+     * the given string representation and parsing the result.
+     * This static factory method calls
+     * {@link #MountPoint(String, boolean) new MountPoint(uri, normalize)}
+     * and wraps any thrown {@link URISyntaxException} in an
+     * {@link IllegalArgumentException}.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
+     *         syntax constraints for mount points.
+     * @return A new mount point.
+     */
+    @NonNull
+    public static MountPoint create(@NonNull String uri, boolean normalize) {
+        try {
+            return new MountPoint(uri, normalize);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    /**
+     * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
+     */
+    @NonNull
+    public static MountPoint create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -89,15 +131,15 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
-     * @return A non-{@code null} mount point.
+     * @return A new mount point.
      */
-    public static MountPoint create(URI uri, boolean normalize) {
+    @NonNull
+    public static MountPoint create(@NonNull URI uri, boolean normalize) {
         try {
             return new MountPoint(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -106,44 +148,142 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
+     * Constructs a new mount point by synthesizing its URI from the given
+     * scheme and path.
+     * This static factory method calls
+     * {@link #MountPoint(Scheme, Path) new MountPoint(scheme, path)}
+     * and wraps any thrown {@link URISyntaxException} in an
+     * {@link IllegalArgumentException}.
+     *
+     * @param  scheme the {@link #getScheme() scheme}.
+     * @param  path the {@link #getPath() path}.
+     * @throws IllegalArgumentException if the synthesized mount point URI
+     *         would not conform to the syntax constraints for mount points.
+     * @return A new mount point.
+     */
+    @NonNull
+    public static MountPoint create(@NonNull Scheme scheme, @NonNull Path path) {
+        try {
+            return new MountPoint(scheme, path);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    /**
+     * Equivalent to {@link #MountPoint(String, boolean) new MountPoint(uri, false)}.
+     */
+    public MountPoint(@NonNull String uri) throws URISyntaxException {
+        this(uri, false);
+    }
+
+    /**
+     * Constructs a new path by calling
+     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws URISyntaxException if {@code uri} does not conform to the
+     *         syntax constraints for mount points.
+     */
+    public MountPoint(@NonNull String uri, boolean normalize)
+    throws URISyntaxException {
+        parse(uri, normalize);
+    }
+
+    /**
      * Equivalent to {@link #MountPoint(URI, boolean) new MountPoint(uri, false)}.
      */
-    public MountPoint(URI uri) throws URISyntaxException {
+    public MountPoint(@NonNull URI uri) throws URISyntaxException {
         this(uri, false);
     }
 
     /**
      * Constructs a new mount point by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
      */
-    public MountPoint(URI uri, final boolean normalize)
+    public MountPoint(@NonNull URI uri, boolean normalize)
+    throws URISyntaxException {
+        parse(uri, normalize);
+    }
+
+    /**
+     * Constructs a new mount point by synthesizing its URI from the given
+     * scheme and path.
+     *
+     * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
+     * @param  path the non-{@code null} {@link #getPath() path}.
+     * @throws URISyntaxException if the synthesized mount point URI
+     *         would not conform to the syntax constraints for mount points.
+     */
+    public MountPoint(@NonNull final Scheme scheme, @NonNull final Path path)
+    throws URISyntaxException {
+        final URI pathUri = path.getUri();
+        if (!pathUri.isAbsolute())
+            throw new URISyntaxException(pathUri.toString(), "Path not absolute");
+        final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
+        if (0 == pathEntryNameUriPath.length())
+            throw new URISyntaxException(pathUri.toString(), "Empty entry name");
+        this.uri = new URI(new StringBuilder(scheme.toString())
+                .append(':')
+                .append(path.toString())
+                .append(MOUNT_POINT_SEPARATOR)
+                .toString());
+        this.path = path;
+        this.scheme = scheme;
+
+        assert invariants();
+    }
+
+    private void writeObject(@NonNull ObjectOutputStream out)
+    throws IOException {
+        out.writeObject(uri.toString());
+    }
+
+    private void readObject(@NonNull ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        try {
+            parse(in.readObject().toString(), false);
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
+    }
+
+    private void parse(@NonNull String uri, final boolean normalize)
+    throws URISyntaxException {
+        parse(new URI(uri), normalize);
+    }
+
+    private void parse(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         if (null != uri.getRawFragment())
             throw new URISyntaxException(uri.toString(), "Fragment not allowed");
         if (uri.isOpaque()) {
-            final String ssp = uri.getSchemeSpecificPart();
-            final int i = ssp.lastIndexOf(BANG_SLASH);
+            final String ssp = uri.getRawSchemeSpecificPart();
+            final int i = ssp.lastIndexOf(MOUNT_POINT_SEPARATOR);
             if (ssp.length() - 2 != i)
                 throw new URISyntaxException(uri.toString(),
-                        "Doesn't end with separator \"" + BANG_SLASH + '"');
-            path = new Path(new URI(ssp.substring(0, i)), normalize);
+                        "Doesn't end with mount point separator \"" + MOUNT_POINT_SEPARATOR + '"');
+            path = new Path(ssp.substring(0, i), normalize);
             final URI pathUri = path.getUri();
             if (!pathUri.isAbsolute())
                 throw new URISyntaxException(uri.toString(), "Path not absolute");
-            final String pathEntryNameUriPath
-                    = path.getEntryName().getUri().getPath();
-            if (0 == pathEntryNameUriPath.length())
+            if (0 == path.getEntryName().getPath().length())
                 throw new URISyntaxException(uri.toString(), "Empty entry name");
             if (normalize) {
-                final URI nuri = new URI(
-                        uri.getScheme(), pathUri.toString() + BANG_SLASH, null);
-                uri = uri.equals(nuri) ? uri : nuri;
+                final URI nuri = new URI(new StringBuilder(uri.getScheme())
+                        .append(':')
+                        .append(pathUri.toString())
+                        .append(MOUNT_POINT_SEPARATOR)
+                        .toString());
+                if (!uri.equals(nuri))
+                    uri = nuri;
             } else if (pathUri.normalize() != pathUri)
                 throw new URISyntaxException(uri.toString(),
                         "URI path not in normal form");
@@ -165,58 +305,16 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
         assert invariants();
     }
 
-    /**
-     * Constructs a new mount point by synthesizing its URI from the given
-     * scheme and path.
-     *
-     * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
-     * @param  path the non-{@code null} {@link #getPath() path}.
-     * @throws IllegalArgumentException if the synthesized mount point URI
-     *         would not conform to the syntax constraints for mount points.
-     * @return A non-{@code null} mount point.
-     */
-    public static MountPoint create(Scheme scheme, Path path) {
-        try {
-            return new MountPoint(scheme, path);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    /**
-     * Constructs a new mount point by synthesizing its URI from the given
-     * scheme and path.
-     *
-     * @param  scheme the non-{@code null} {@link #getScheme() scheme}.
-     * @param  path the non-{@code null} {@link #getPath() path}.
-     * @throws URISyntaxException if the synthesized mount point URI
-     *         would not conform to the syntax constraints for mount points.
-     */
-    public MountPoint(final Scheme scheme, final Path path)
-    throws URISyntaxException {
-        final URI pathUri = path.getUri();
-        if (!pathUri.isAbsolute())
-            throw new URISyntaxException(pathUri.toString(), "Path not absolute");
-        final String pathEntryNameUriPath = path.getEntryName().getUri().getPath();
-        if (0 == pathEntryNameUriPath.length())
-            throw new URISyntaxException(pathUri.toString(), "Empty entry name");
-        this.uri = new URI(scheme.toString(), path.toString() + BANG_SLASH, null);
-        this.path = path;
-        this.scheme = scheme;
-
-        assert invariants();
-    }
-
     private boolean invariants() {
         assert null != getUri();
         assert getUri().isAbsolute();
         assert null == getUri().getRawFragment();
         if (getUri().isOpaque()) {
-            assert getUri().getRawSchemeSpecificPart().endsWith(BANG_SLASH);
+            assert getUri().getRawSchemeSpecificPart().endsWith(MOUNT_POINT_SEPARATOR);
             assert null != getPath();
             assert getPath().getUri().isAbsolute();
             assert null == getPath().getUri().getRawFragment();
-            assert 0 != getPath().getEntryName().getUri().getPath().length();
+            assert 0 != getPath().getEntryName().getUri().getRawPath().length();
         } else {
             assert getUri().normalize() == getUri();
             assert getUri().getRawPath().endsWith(SEPARATOR);
@@ -230,6 +328,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The non-{@code null} URI scheme.
      */
+    @NonNull
     public Scheme getScheme() {
         return null != scheme ? scheme : (scheme = Scheme.create(uri.getScheme()));
     }
@@ -240,6 +339,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The nullable path.
      */
+    @CheckForNull
     public Path getPath() {
         return path;
     }
@@ -251,6 +351,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * 
      * @return The nullable parent mount point.
      */
+    @CheckForNull
     public MountPoint getParent() {
         return null == path ? null : path.getMountPoint();
     }
@@ -259,30 +360,29 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Resolves the given entry name against the entry name of this mount
      * point in its parent file system.
      *
-     * @param  entryName a non-{@code null} entry name relative to this mount
-     *         point.
+     * @param  entryName an entry name relative to this mount point.
      * @throws NullPointerException if {@code entryName} is {@code null} or if
      *         this mount point does not name a parent mount point.
-     * @return A non-{@code null} entry name relative to the parent mount
-     *         point.
+     * @return A new entry name relative to the parent mount point.
      * @see    #getParent
      */
-    public FileSystemEntryName resolveParent(FileSystemEntryName entryName) {
+    @NonNull
+    public FileSystemEntryName resolveParent(@NonNull FileSystemEntryName entryName) {
         return new FileSystemEntryName(path.getEntryName(), entryName);
     }
 
     /**
      * Resolves the given entry name against the path of this mount point.
      *
-     * @param  entryName a non-{@code null} entry name relative to this mount
-     *         point.
-     * @throws NullPointerException if {@code entryName} is {@code null}.
-     * @return A non-{@code null} path with an absolute URI.
+     * @param  entryName an entry name relative to this mount point.
+     * @return A new path with an absolute URI.
      */
-    public Path resolveAbsolute(FileSystemEntryName entryName) {
+    @NonNull
+    public Path resolvePath(@NonNull FileSystemEntryName entryName) {
         return new Path(this, entryName);
     }
 
+    @NonNull
     URI hierarchicalize() {
         if (null == path)
             return uri;
@@ -304,6 +404,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The non-{@code null} URI.
      */
+    @NonNull
     public URI getUri() {
         return uri;
     }
@@ -314,7 +415,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Note that this ignores the scheme and path.
      */
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@CheckForNull Object that) {
         return this == that
                 || that instanceof MountPoint
                     && this.uri.equals(((MountPoint) that).uri);
@@ -325,7 +426,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(MountPoint that) {
+    public int compareTo(@NonNull MountPoint that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -341,6 +442,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
+    @NonNull
     public String toString() {
         return uri.toString();
     }
