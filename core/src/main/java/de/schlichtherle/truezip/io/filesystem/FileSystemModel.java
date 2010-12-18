@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
 
 /**
  * Defines the common properties of a file system.

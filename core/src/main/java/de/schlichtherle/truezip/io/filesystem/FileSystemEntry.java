@@ -16,7 +16,6 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.util.Link;
 import java.util.Set;
 
 /**

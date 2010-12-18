@@ -56,7 +56,6 @@ public class KeyManagerTest {
         KeyManager.setInstance(inst3);
         final KeyManager inst4 = KeyManager.getInstance();
         assertNotNull(inst4);
-
         assertSame(inst3, inst4);
     }
 
