@@ -126,7 +126,7 @@ public abstract class FileSystemManagerTestCase {
         }
     }
 
-    private static void gc() {
+    static void gc() {
         System.gc();
         try {
             Thread.sleep(50);

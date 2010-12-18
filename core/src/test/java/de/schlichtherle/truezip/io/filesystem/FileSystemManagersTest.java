@@ -17,6 +17,7 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -27,8 +28,10 @@ public class FileSystemManagersTest {
 
     @Test
     public void testInstance() {
+        FileSystemManagerTestCase.gc();
         final FileSystemManager inst1 = FileSystemManagers.getInstance();
         assertNotNull(inst1);
+        assertThat(inst1.size(), is(0));
 
         FileSystemManagers.setInstance(null);
         final FileSystemManager inst2 = FileSystemManagers.getInstance();
