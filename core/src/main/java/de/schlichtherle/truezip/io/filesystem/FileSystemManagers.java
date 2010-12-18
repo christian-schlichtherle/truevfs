@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ServiceLoader;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
@@ -52,22 +53,15 @@ public class FileSystemManagers {
      * <p>
      * If the class property has been explicitly set using
      * {@link #setInstance}, then this instance is returned.
-     * Otherwise, the value of the system property
-     * {@code de.schlichtherle.truezip.io.filesystem.FileSystemManager}
-     * is considered:
+     * Otherwise, the service is located by loading the class name from the
+     * resource file {@code /META-INF/services/de.schlichtherle.truezip.io.filesystem.FileSystemManager}.
      * <p>
-     * If this system property is set, it must denote the fully qualified
-     * class name of a subclass of the class {@link FileSystemManager}.
-     * The class is loaded and instantiated using its public, no-arguments
-     * constructor.
-     * Otherwise, the class {@link FileSystemManager} is instantiated.
+     * In order to support this plug-in architecture, you should <em>not</em>
+     * cache the instance returned by this method!
      * <p>
      * In any case, the returned file system manager is instrumented to run its
      * {@link FileSystemManager#sync} method when the JVM terminates by means
      * of a shutdown hook.
-     * <p>
-     * In order to support this plug-in architecture, you should <em>not</em>
-     * cache the instance returned by this method!
      *
      * @throws ClassCastException If the class name in the system property
      *         does not denote a subclass of this class.
@@ -83,25 +77,13 @@ public class FileSystemManagers {
             synchronized (FileSystemManagers.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    // FIXME: Use ServiceLoader instead!
-                    final String name = System.getProperty(
-                            FileSystemManager.class.getName(),
-                            FederatedFileSystemManager.class.getName());
-                    try {
-                        manager = (FileSystemManager) loadClass(name, FileSystemManager.class)
-                                .newInstance();
-                    } catch (RuntimeException ex) {
-                        throw ex;
-                    } catch (Exception ex) {
-                        throw new UndeclaredThrowableException(ex);
-                    }
+                    // TODO: Check compatibility with OSGi.
+                    manager = ServiceLoader.load(FileSystemManager.class).iterator().next();
                     setInstance(manager);
                 }
             }
         }
-
         assert invariants();
-
         return manager;
     }
 

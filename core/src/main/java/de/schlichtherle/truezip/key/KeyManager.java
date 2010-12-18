@@ -15,14 +15,13 @@
  */
 package de.schlichtherle.truezip.key;
 
+import java.util.ServiceLoader;
 import java.net.URI;
-import java.awt.GraphicsEnvironment;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.Set;
 
-import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
 
 /**
  * An abstract class which maintains a map of {@link KeyProvider} instances for
@@ -73,30 +72,13 @@ public abstract class KeyManager {
      * <p>
      * If the class property has been explicitly set using
      * {@link #setInstance}, then this instance is returned.
-     * <p>
-     * Otherwise, the value of the system property
-     * {@code de.schlichtherle.truezip.key.KeyManager} is considered:
-     * <p>
-     * If this system property is set, it must denote the fully qualified
-     * class name of a subclass of this class. The class is loaded and
-     * instantiated using its public, no-arguments constructor.
-     * <p>
-     * Otherwise, if the JVM is running in headless mode and the API conforms
-     * to JSE 6 (where the class {@code java.io.Console} is available),
-     * then the console I/O based implementation in the class
-     * {@link de.schlichtherle.truezip.key.passwd.console.PromptingKeyManager}
-     * is loaded and instantiated using its public, no-arguments constructor.
-     * <p>
-     * Otherwise, the Swing based implementation in the class
-     * {@link de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager}
-     * is loaded and instantiated using its public, no-arguments constructor.
+     * Otherwise, the service is located by loading the class name from the
+     * resource file {@code /META-INF/services/de.schlichtherle.truezip.key.KeyManager}.
      * <p>
      * In order to support this plug-in architecture, you should <em>not</em>
      * cache the instance returned by this method!
      *
-     * @throws ClassCastException If the class name in the system property
-     *         does not denote a subclass of this class.
-     * @throws UndeclaredThrowableException If any other precondition on the
+     * @throws ServiceConfigurationError If any other precondition on the
      *         value of the system property does not hold.
      * @return The non-{@code null} key manager class property instance.
      */
@@ -106,34 +88,12 @@ public abstract class KeyManager {
             synchronized (KeyManager.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
-                    // FIXME: Use ServiceLoader instead!
-                    final String n = System.getProperty(
-                            KeyManager.class.getName(),
-                            getKeyManagerClassName());
-                    try {
-                        Class<?> c = loadClass(n, KeyManager.class);
-                        instance = manager = (KeyManager) c.newInstance();
-                    } catch (RuntimeException ex) {
-                        throw ex;
-                    } catch (Exception ex) {
-                        throw new UndeclaredThrowableException(ex);
-                    }
+                    // TODO: Check compatibility with OSGi.
+                    instance = manager = ServiceLoader.load(KeyManager.class).iterator().next();
                 }
             }
         }
         return manager;
-    }
-
-    private static String getKeyManagerClassName() {
-        if (GraphicsEnvironment.isHeadless()) {
-            try {
-                Class.forName("java.io.Console");
-                return de.schlichtherle.truezip.key.passwd.console.PromptingKeyManager.class.getName();
-            } catch (ClassNotFoundException noJSE6ConsoleAvailable) {
-                // Ignore and fall through - prompting will be disabled.
-            }
-        }
-        return de.schlichtherle.truezip.key.passwd.swing.PromptingKeyManager.class.getName();
     }
 
     /**
