@@ -27,13 +27,13 @@ import java.util.Iterator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterEntryContainer<
+public abstract class DecoratingEntryContainer<
         E extends Entry,
         C extends EntryContainer<E>>
 implements EntryContainer<E> {
 
     /** The decorated entry container. */
-    protected final C container;
+    protected final C delegate;
 
     /**
      * Constructs a new filter entry container.
@@ -41,24 +41,24 @@ implements EntryContainer<E> {
      * @param  container the non-{@code null} container to be decorated.
      * @throws NullPointerException iff {@code container} is {@code null}.
      */
-    protected FilterEntryContainer(final C container) {
+    protected DecoratingEntryContainer(final C container) {
         if (null == container)
             throw new NullPointerException();
-        this.container = container;
+        this.delegate = container;
     }
 
     @Override
-    public int size() {
-        return container.size();
+    public int getSize() {
+        return delegate.getSize();
     }
 
     @Override
     public Iterator<E> iterator() {
-        return container.iterator();
+        return delegate.iterator();
     }
 
     @Override
     public E getEntry(String name) {
-        return container.getEntry(name);
+        return delegate.getEntry(name);
     }
 }

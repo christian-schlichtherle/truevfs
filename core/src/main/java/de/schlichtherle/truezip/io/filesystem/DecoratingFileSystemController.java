@@ -33,79 +33,79 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public abstract class FilterFileSystemController<
+public abstract class DecoratingFileSystemController<
         M extends FileSystemModel,
         C extends FileSystemController<? extends M>>
 extends FileSystemController<M> {
 
     /** The decorated file system controller. */
-    protected final C controller;
+    protected final C delegate;
 
     private volatile M model;
 
-    protected FilterFileSystemController(final C controller) {
+    protected DecoratingFileSystemController(final C controller) {
         if (null == controller)
             throw new NullPointerException();
-        this.controller = controller;
+        this.delegate = controller;
     }
 
     @Override
     public final M getModel() {
-        return null != model ? model : (model = controller.getModel());
+        return null != model ? model : (model = delegate.getModel());
     }
 
     @Override
     public FileSystemController<?> getParent() {
-        return controller.getParent();
+        return delegate.getParent();
     }
 
     @Override
     public Icon getOpenIcon() throws IOException {
-        return controller.getOpenIcon();
+        return delegate.getOpenIcon();
     }
 
     @Override
     public Icon getClosedIcon() throws IOException {
-        return controller.getClosedIcon();
+        return delegate.getClosedIcon();
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        return controller.isReadOnly();
+        return delegate.isReadOnly();
     }
 
     @Override
     public FileSystemEntry getEntry(FileSystemEntryName name)
     throws IOException {
-        return controller.getEntry(name);
+        return delegate.getEntry(name);
     }
 
     @Override
     public boolean isReadable(FileSystemEntryName name) throws IOException {
-        return controller.isReadable(name);
+        return delegate.isReadable(name);
     }
 
     @Override
     public boolean isWritable(FileSystemEntryName name) throws IOException {
-        return controller.isWritable(name);
+        return delegate.isWritable(name);
     }
 
     @Override
     public void setReadOnly(FileSystemEntryName name) throws IOException {
-        controller.setReadOnly(name);
+        delegate.setReadOnly(name);
     }
 
     @Override
     public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
-        return controller.setTime(name, types, value);
+        return delegate.setTime(name, types, value);
     }
 
     @Override
     public InputSocket<?> getInputSocket(
             FileSystemEntryName name,
             BitField<InputOption> options) {
-        return controller.getInputSocket(name, options);
+        return delegate.getInputSocket(name, options);
     }
 
     @Override
@@ -113,7 +113,7 @@ extends FileSystemController<M> {
             FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return controller.getOutputSocket(name, options, template);
+        return delegate.getOutputSocket(name, options, template);
     }
 
     @Override
@@ -122,18 +122,18 @@ extends FileSystemController<M> {
                             BitField<OutputOption> options,
                             Entry template)
     throws IOException {
-        return controller.mknod(name, type, options, template);
+        return delegate.mknod(name, type, options, template);
     }
 
     @Override
     public void unlink(FileSystemEntryName name) throws IOException {
-        controller.unlink(name);
+        delegate.unlink(name);
     }
 
     @Override
     public <X extends IOException>
     void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
-        controller.sync(options, builder);
+        delegate.sync(options, builder);
     }
 }

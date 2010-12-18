@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
@@ -98,7 +98,7 @@ implements OutputShop<ZipEntry> {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return super.size() + (tempEntry != null ? 1 : 0);
     }
 
@@ -204,7 +204,7 @@ implements OutputShop<ZipEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(ZipEntry) t}.
      */
-    private class EntryOutputStream extends FilterOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         EntryOutputStream(ZipEntry entry) throws IOException {
             this(entry, true);
         }
@@ -217,7 +217,7 @@ implements OutputShop<ZipEntry> {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
+            delegate.write(b, off, len);
         }
 
         @Override

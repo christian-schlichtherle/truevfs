@@ -17,13 +17,13 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
-import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import java.io.CharConversionException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.util.Set;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.FilterEntry;
+import de.schlichtherle.truezip.io.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.io.Paths.*;
  */
 @ThreadSafe
 final class KeyManagerArchiveController
-extends FilterFileSystemController<
+extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
 
@@ -68,7 +68,7 @@ extends FilterFileSystemController<
     public final FileSystemEntry getEntry(final FileSystemEntryName name)
     throws IOException {
         try {
-            return controller.getEntry(name);
+            return delegate.getEntry(name);
         } catch (FileSystemException ex) {
             throw ex;
         } catch (IOException ex) {
@@ -94,7 +94,7 @@ extends FilterFileSystemController<
     }
 
     private static final class SpecialFileEntry<E extends ArchiveEntry>
-    extends FilterEntry<E>
+    extends DecoratingEntry<E>
     implements ArchiveFileSystemEntry<E> {
         SpecialFileEntry(E entry) {
             super(entry);
@@ -112,13 +112,13 @@ extends FilterFileSystemController<
 
         @Override
         public E getArchiveEntry() {
-            return entry;
+            return delegate;
         }
     }
 
     @Override
     public void unlink(FileSystemEntryName path) throws IOException {
-        controller.unlink(path);
+        delegate.unlink(path);
         if (isRoot(path.getPath()))
             KeyManager.resetKeyProvider(getModel().getMountPoint().getUri());
     }

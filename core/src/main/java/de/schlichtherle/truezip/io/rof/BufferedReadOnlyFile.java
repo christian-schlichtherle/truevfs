@@ -28,14 +28,14 @@ import java.io.IOException;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in {@link FilterReadOnlyFile}.
+ * in {@link DecoratingReadOnlyFile}.
  * <p>
  * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class BufferedReadOnlyFile extends FilterReadOnlyFile {
+public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = 4096;
@@ -155,7 +155,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
         if (windowLen <= 0)
             throw new IllegalArgumentException();
 
-        super.rof = rof;
+        super.delegate = rof;
         length = rof.length();
         fp = rof.getFilePointer();
         window = new byte[windowLen];
@@ -167,7 +167,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     @Override
     public long length()
     throws IOException {
-        final long newLength = rof.length();
+        final long newLength = delegate.length();
         if (newLength != length) {
             length = newLength;
             invalidateWindow();
@@ -277,7 +277,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
     /**
      * Closes this read only file.
      * As a side effect, this will set the reference to the underlying read
-     * only file ({@link #rof} to {@code null}.
+     * only file ({@link #delegate} to {@code null}.
      */
     @Override
     public void close()
@@ -287,7 +287,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
 
         // Order is important here!
         closed = true;
-        rof.close();
+        delegate.close();
     }
 
     /**
@@ -324,7 +324,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
             // Move window in the buffered file.
             windowOff = (fp / windowLen) * windowLen; // round down to multiple of window size
             if (windowOff != nextWindowOff)
-                rof.seek(windowOff);
+                delegate.seek(windowOff);
 
             // Fill window until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -332,7 +332,7 @@ public class BufferedReadOnlyFile extends FilterReadOnlyFile {
             // contract.
             int n = 0;
             do {
-                int read = rof.read(window, n, windowLen - n);
+                int read = delegate.read(window, n, windowLen - n);
                 if (read < 0)
                     break;
                 n += read;

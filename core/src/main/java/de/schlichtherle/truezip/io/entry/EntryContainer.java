@@ -32,7 +32,7 @@ public interface EntryContainer<E extends Entry>
 extends Iterable<E> {
 
     /** Returns the number of entries in this container. */
-    int size();
+    int getSize();
 
     /**
      * Returns a new iterator over all entries in this container.

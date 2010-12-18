@@ -98,7 +98,7 @@ public final class FederatedFileSystemManager extends FileSystemManager {
     } // class Scheduler
 
     @Override
-    public synchronized int size() {
+    public synchronized int getSize() {
         return schedulers.size();
     }
 

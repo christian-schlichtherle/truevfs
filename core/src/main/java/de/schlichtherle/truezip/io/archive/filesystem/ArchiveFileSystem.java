@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.io.entry.FilterEntry;
+import de.schlichtherle.truezip.io.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
@@ -159,7 +159,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         this.factory = factory;
         master = new LinkedHashMap<String, BaseEntry<E>>(
-                (int) (container.size() / .75f) + 1);
+                (int) (container.getSize() / .75f) + 1);
 
         // Load entries from input archive.
         final Normalizer normalizer = new Normalizer();
@@ -393,7 +393,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return master.size();
     }
 
@@ -510,7 +510,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * required to implement the concept of a directory.
      */
     private static abstract class BaseEntry<E extends ArchiveEntry>
-    extends FilterEntry<E>
+    extends DecoratingEntry<E>
     implements ArchiveFileSystemEntry<E> {
         /** Constructs a new instance of {@code Entry}. */
         BaseEntry(final E entry) {
@@ -519,7 +519,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
 
         BaseEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
-            return newEntry(getName(), fileSystem.copy(entry));
+            return newEntry(getName(), fileSystem.copy(delegate));
         }
 
         /**
@@ -555,7 +555,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         /** Returns the decorated archive entry. */
         @Override
         public final E getArchiveEntry() {
-            return entry;
+            return delegate;
         }
     } // class Entry
 

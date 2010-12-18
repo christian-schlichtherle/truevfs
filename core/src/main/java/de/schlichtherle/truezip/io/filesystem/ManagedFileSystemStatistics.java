@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.FilterInputStream;
-import de.schlichtherle.truezip.io.FilterOutputStream;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +46,7 @@ public final class ManagedFileSystemStatistics {
      * Returns the total number of managed federated file systems.
      */
     public int getFileSystemsTotal() {
-        return manager.size();
+        return manager.getSize();
     }
 
     /**
@@ -97,14 +97,14 @@ public final class ManagedFileSystemStatistics {
         return new CountingReadOnlyFile(rof);
     }
 
-    private final class CountingReadOnlyFile extends FilterReadOnlyFile {
+    private final class CountingReadOnlyFile extends DecoratingReadOnlyFile {
         CountingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
 
         @Override
         public int read() throws IOException {
-            int ret = rof.read();
+            int ret = delegate.read();
             if (0 < ret)
                 read++;
             return ret;
@@ -112,7 +112,7 @@ public final class ManagedFileSystemStatistics {
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            int ret = rof.read(b, off, len);
+            int ret = delegate.read(b, off, len);
             if (0 < ret)
                 read += ret;
             return ret;
@@ -124,14 +124,14 @@ public final class ManagedFileSystemStatistics {
         return new CountingInputStream(in);
     }
 
-    private final class CountingInputStream extends FilterInputStream {
+    private final class CountingInputStream extends DecoratingInputStream {
         CountingInputStream(InputStream in) {
             super(in);
         }
 
         @Override
         public int read() throws IOException {
-            int ret = in.read();
+            int ret = delegate.read();
             if (0 < ret)
                 read++;
             return ret;
@@ -139,7 +139,7 @@ public final class ManagedFileSystemStatistics {
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            int ret = in.read(b, off, len);
+            int ret = delegate.read(b, off, len);
             if (0 < ret)
                 read += ret;
             return ret;
@@ -164,20 +164,20 @@ public final class ManagedFileSystemStatistics {
         return new CountingOutputStream(out);
     }
 
-    private final class CountingOutputStream extends FilterOutputStream {
+    private final class CountingOutputStream extends DecoratingOutputStream {
         CountingOutputStream(OutputStream out) {
             super(out);
         }
 
         @Override
         public void write(int b) throws IOException {
-            out.write(b);
+            delegate.write(b);
             written++;
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
+            delegate.write(b, off, len);
             written += len;
         }
     } // class CountingOutputStream

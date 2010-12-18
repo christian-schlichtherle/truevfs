@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.rof;
 
 import java.io.EOFException;
 import java.io.IOException;
 
 /**
- * A base class for {@code ReadOnlyFile} implementations which
- * implements the common boilerplate.
+ * A base class for {@code ReadOnlyFile} implementations which implements the
+ * common boilerplate.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -29,17 +28,17 @@ import java.io.IOException;
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
 
     @Override
-	public final int read(byte[] b) throws IOException {
+    public final int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
     @Override
-	public final void readFully(byte[] b) throws IOException {
+    public final void readFully(byte[] b) throws IOException {
         readFully(b, 0, b.length);
     }
 
     @Override
-	public void readFully(final byte[] buf, final int off, final int len)
+    public void readFully(final byte[] buf, final int off, final int len)
     throws IOException {
         int total = 0, read;
         do {

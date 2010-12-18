@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -82,7 +82,7 @@ import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileOutputStream extends FilterOutputStream {
+public class FileOutputStream extends DecoratingOutputStream {
 
     /**
      * Creates a new {@code FileOutputStream} for accessing regular files or

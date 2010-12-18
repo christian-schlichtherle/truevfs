@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.FilterEntryContainer;
+import de.schlichtherle.truezip.io.entry.DecoratingEntryContainer;
 import java.io.IOException;
 
 /**
@@ -26,25 +26,25 @@ import java.io.IOException;
  * Multithreading needs to be addressed by client applications.
  *
  * @param   <E> The type of the entries.
- * @see     FilterOutputShop
+ * @see     DecoratingOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterInputShop<E extends Entry, I extends InputShop<E>>
-extends FilterEntryContainer<E, I>
+public abstract class DecoratingInputShop<E extends Entry, I extends InputShop<E>>
+extends DecoratingEntryContainer<E, I>
 implements InputShop<E> {
 
-    protected FilterInputShop(final I input) {
+    protected DecoratingInputShop(final I input) {
         super(input);
     }
 
     @Override
     public InputSocket<? extends E> getInputSocket(String name) {
-        return container.getInputSocket(name);
+        return delegate.getInputSocket(name);
     }
 
     @Override
     public void close() throws IOException {
-        container.close();
+        delegate.close();
     }
 }

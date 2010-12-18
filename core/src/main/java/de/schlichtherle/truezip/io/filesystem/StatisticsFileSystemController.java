@@ -17,8 +17,8 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -35,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 class StatisticsFileSystemController
-extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
+extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 
     private final StatisticsFileSystemManager manager;
 
@@ -53,9 +53,9 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
         return new Input(name, options);
     }
 
-    private class Input extends FilterInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(FileSystemEntryName name, BitField<InputOption> options) {
-            super(controller.getInputSocket(name, options));
+            super(delegate.getInputSocket(name, options));
         }
 
         @Override
@@ -79,9 +79,9 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
         return new Output(name, options, template);
     }
 
-    private class Output extends FilterOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output(FileSystemEntryName name, BitField<OutputOption> options, Entry template) {
-            super(controller.getOutputSocket(name, options, template));
+            super(delegate.getOutputSocket(name, options, template));
         }
 
         @Override

@@ -18,8 +18,8 @@ package de.schlichtherle.truezip.io.filesystem;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -49,7 +49,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 final class ManagedFileSystemController
-extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
+extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 
     ManagedFileSystemController(final FileSystemController<?> controller) {
         super(controller);
@@ -63,7 +63,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public Icon getOpenIcon() throws IOException {
         try {
-            return controller.getOpenIcon();
+            return delegate.getOpenIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getOpenIcon();
         }
@@ -72,7 +72,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public Icon getClosedIcon() throws IOException {
         try {
-            return controller.getClosedIcon();
+            return delegate.getClosedIcon();
         } catch (FalsePositiveException ex) {
             return getParent().getClosedIcon();
         }
@@ -81,7 +81,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public boolean isReadOnly() throws IOException {
         try {
-            return controller.isReadOnly();
+            return delegate.isReadOnly();
         } catch (FalsePositiveException ex) {
             return getParent().isReadOnly();
         }
@@ -90,7 +90,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public FileSystemEntry getEntry(FileSystemEntryName name) throws IOException {
         try {
-            return controller.getEntry(name);
+            return delegate.getEntry(name);
         } catch (FalsePositiveException ex) {
             return getParent().getEntry(resolveParent(name));
         }
@@ -99,7 +99,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public boolean isReadable(FileSystemEntryName name) throws IOException {
         try {
-            return controller.isReadable(name);
+            return delegate.isReadable(name);
         } catch (FalsePositiveException ex) {
             return getParent().isReadable(resolveParent(name));
         }
@@ -108,7 +108,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public boolean isWritable(FileSystemEntryName name) throws IOException {
         try {
-            return controller.isWritable(name);
+            return delegate.isWritable(name);
         } catch (FalsePositiveException ex) {
             return getParent().isWritable(resolveParent(name));
         }
@@ -117,7 +117,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public void setReadOnly(FileSystemEntryName name) throws IOException {
         try {
-            controller.setReadOnly(name);
+            delegate.setReadOnly(name);
         } catch (FalsePositiveException ex) {
             getParent().setReadOnly(resolveParent(name));
         }
@@ -127,7 +127,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
         try {
-            return controller.setTime(name, types, value);
+            return delegate.setTime(name, types, value);
         } catch (FalsePositiveException ex) {
             return getParent().setTime(resolveParent(name), types, value);
         }
@@ -140,12 +140,12 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
         return new Input(name, options);
     }
 
-    private class Input extends FilterInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> options;
 
         Input(final FileSystemEntryName name, final BitField<InputOption> options) {
-            super(controller.getInputSocket(name, options));
+            super(delegate.getInputSocket(name, options));
             this.name = name;
             this.options = options;
         }
@@ -195,7 +195,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
         return new Output(name, options, template);
     }
 
-    private class Output extends FilterOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
         final Entry template;
@@ -203,7 +203,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
         Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
                 final Entry template) {
-            super(controller.getOutputSocket(name, options, template));
+            super(delegate.getOutputSocket(name, options, template));
             this.name = name;
             this.options = options;
             this.template = template;
@@ -241,7 +241,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
                             Entry template)
     throws IOException {
         try {
-            return controller.mknod(name, type, options, template);
+            return delegate.mknod(name, type, options, template);
         } catch (FalsePositiveException ex) {
             return getParent().mknod(resolveParent(name), type, options, template);
         }
@@ -250,7 +250,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     @Override
     public void unlink(FileSystemEntryName name) throws IOException {
         try {
-            controller.unlink(name);
+            delegate.unlink(name);
         } catch (FalsePositiveException ex) {
             getParent().unlink(resolveParent(name));
         }
@@ -261,7 +261,7 @@ extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
     void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
         try {
-            controller.sync(options, builder);
+            delegate.sync(options, builder);
         } catch (FalsePositiveException ex) {
             throw new UndeclaredThrowableException(ex);
         }

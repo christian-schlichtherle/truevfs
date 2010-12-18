@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.filechooser.FileSystemView;
@@ -31,41 +32,20 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class FilterFileSystemView extends FileSystemView {
+abstract class DecoratingFileSystemView extends FileSystemView {
 
-    /** The file system view to be decorated - never {@code null}. */
-    private FileSystemView delegate;
+    /** The decorated file system view. */
+    @NonNull
+    protected final FileSystemView delegate;
 
     /**
      * Creates a new decorating file system view.
      *
      * @param delegate The file view to be decorated - may be {@code null}.
      */
-    protected FilterFileSystemView(final FileSystemView delegate) {
+    protected DecoratingFileSystemView(final FileSystemView delegate) {
         if (delegate == null)
             throw new NullPointerException();
-        this.delegate = delegate;
-    }
-
-    /**
-     * Returns the file system view to be decorated - never {@code null}.
-     */
-    public FileSystemView getDelegate() {
-        return delegate;
-    }
-
-    /**
-     * Sets the file system view to be decorated.
-     *
-     * @throws NullPointerException If {@code delegate} is {@code null}.
-     * @throws IllegalArgumentException If {@code delegate} is this
-     *         instance.
-     */
-    public void setDelegate(final FileSystemView delegate) {
-        if (delegate == null)
-            throw new NullPointerException();
-        if (delegate == this)
-            throw new IllegalArgumentException();
         this.delegate = delegate;
     }
 
@@ -194,8 +174,8 @@ abstract class FilterFileSystemView extends FileSystemView {
      * is called.
      */
     public File createFileSystemRootImpl(File f) {
-        return (delegate instanceof FilterFileSystemView)
-                ? ((FilterFileSystemView) delegate).createFileSystemRootImpl(f)
+        return (delegate instanceof DecoratingFileSystemView)
+                ? ((DecoratingFileSystemView) delegate).createFileSystemRootImpl(f)
                 : super.createFileSystemRoot(f);
     }
 }

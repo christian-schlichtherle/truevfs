@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,7 +85,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                 : file;
         final File tempTarget = temp.getFile();
 
-        class OutputStream extends FilterOutputStream {
+        class OutputStream extends DecoratingOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {

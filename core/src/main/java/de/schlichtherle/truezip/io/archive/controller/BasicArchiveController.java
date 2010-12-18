@@ -380,9 +380,9 @@ extends FileSystemController<ArchiveModel> {
                 throw new IOException("root directory not empty");
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
-            if (1 != fileSystem.size())
+            if (1 != fileSystem.getSize())
                 LOGGER.log(Level.WARNING, "unlink.absolute",
-                        new Object[] {  fileSystem.size() - 1,
+                        new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
             sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
         } else { // !isRoot(path)

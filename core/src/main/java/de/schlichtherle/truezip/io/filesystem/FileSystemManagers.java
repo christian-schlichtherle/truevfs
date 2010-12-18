@@ -110,7 +110,7 @@ public class FileSystemManagers {
      */
     public static synchronized void setInstance(
             @Nullable final FileSystemManager manager) {
-        final int count = null == instance ? 0 : instance.size();
+        final int count = null == instance ? 0 : instance.getSize();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");
         if (manager != instance) {

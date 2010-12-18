@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.io.file;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import de.schlichtherle.truezip.io.FilterInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -79,7 +79,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FileInputStream extends FilterInputStream {
+public class FileInputStream extends DecoratingInputStream {
 
     /**
      * Creates a new {@code FileInputStream} for accessing regular files or

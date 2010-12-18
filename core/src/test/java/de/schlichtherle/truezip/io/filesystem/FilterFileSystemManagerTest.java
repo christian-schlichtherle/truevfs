@@ -21,11 +21,11 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class PrefixFilterFileSystemManagerTest extends FileSystemManagerTestCase {
+public class FilterFileSystemManagerTest extends FileSystemManagerTestCase {
 
     @Override
     public void setUp() {
-        manager = new PrefixFilterFileSystemManager(
+        manager = new FilterFileSystemManager(
                 new FederatedFileSystemManager(),
                 MountPoint.create(URI.create("file:/")));
     }

@@ -16,39 +16,63 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * Filters the list of federated file systems managed by the decorated file
+ * system manager so that their mount point starts with the prefix provided
+ * to the {@link #FilterFileSystemManager constructor}.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public abstract class FilterFileSystemManager<M extends FileSystemManager>
-extends FileSystemManager {
+public final class FilterFileSystemManager
+extends DecoratingFileSystemManager<FileSystemManager> {
 
-    protected final M manager;
-    
-    protected FilterFileSystemManager(@NonNull final M manager) {
-        if (null == manager)
-            throw new NullPointerException();
-        this.manager = manager;
+    private final String prefix;
+
+    /**
+     * Constructs a new prefix filter file system manager from the given file
+     * system manager and mount point prefix.
+     *
+     * @param manager the decorated file system manager.
+     * @param prefix the prefix of the mount point used to filter all federated
+     *        file systems of the decorated file system manager.
+     */
+    public FilterFileSystemManager(
+            @NonNull final FileSystemManager manager,
+            @NonNull final MountPoint prefix) {
+        super(manager);
+        this.prefix = prefix.hierarchicalize().toString();
     }
 
     @Override
-    public FileSystemController<?> getController(
-            MountPoint mountPoint,
-            FileSystemDriver<?> driver) {
-        return manager.getController(mountPoint, driver);
-    }
-
-    @Override
-    public int size() {
-        return manager.size();
+    public int getSize() {
+        return getControllers().size();
     }
 
     @Override
     public Iterator<FileSystemController<?>> iterator() {
-        return manager.iterator();
+        return getControllers().iterator();
+    }
+
+    private Collection<FileSystemController<?>> getControllers() {
+        final List<FileSystemController<?>> snapshot
+                = new ArrayList<FileSystemController<?>>(
+                    (int) (delegate.getSize() / .75f) + 1);
+        for (FileSystemController<?> controller : delegate)
+            if (controller
+                    .getModel()
+                    .getMountPoint()
+                    .hierarchicalize()
+                    .toString()
+                    .startsWith(prefix))
+                snapshot.add(controller);
+        return snapshot;
     }
 }

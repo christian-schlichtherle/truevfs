@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 public class ConcurrentOutputShop<E extends Entry>
-extends FilterOutputShop<E, OutputShop<E>> {
+extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentOutputShop.class.getName();
@@ -162,7 +162,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
         if (closed)
             return;
         closed = true;
-        container.close();
+        delegate.close();
     }
 
     /** Needs to be externally synchronized! */
@@ -176,7 +176,7 @@ extends FilterOutputShop<E, OutputShop<E>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends FilterOutputSocket<E> {
+        class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(ConcurrentOutputShop.super.getOutputSocket(entry));
             }
@@ -213,17 +213,17 @@ extends FilterOutputShop<E, OutputShop<E>> {
                     try {
                         flush();
                     } finally {
-                        out.close();
+                        delegate.close();
                     }
                 } finally {
-                    threads.remove(out);
+                    threads.remove(delegate);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }
         }
     } // class SynchronizedConcurrentOutputStream
 
-    private final class ConcurrentOutputStream extends FilterOutputStream {
+    private final class ConcurrentOutputStream extends DecoratingOutputStream {
         private ConcurrentOutputStream(OutputStream out) {
             super(out);
         }
@@ -231,28 +231,28 @@ extends FilterOutputShop<E, OutputShop<E>> {
         @Override
         public void write(int b) throws IOException {
             assertNotShopClosed();
-            out.write(b);
+            delegate.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             assertNotShopClosed();
-            out.write(b, off, len);
+            delegate.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
             if (!closed)
-                out.flush();
+                delegate.flush();
         }
 
         @Override
         public final void close() throws IOException {
             if (!closed) {
                 try {
-                    out.flush();
+                    delegate.flush();
                 } finally {
-                    out.close();
+                    delegate.close();
                 }
             }
         }

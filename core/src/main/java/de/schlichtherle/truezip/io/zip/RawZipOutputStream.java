@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.zip;
 
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.Charset;
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import static de.schlichtherle.truezip.io.zip.ZipEntry.STORED;
  * @version $Id$
  */
 public abstract class RawZipOutputStream<E extends ZipEntry>
-extends FilterOutputStream
+extends DecoratingOutputStream
 implements Iterable<E> {
 
     /**
@@ -275,7 +275,7 @@ implements Iterable<E> {
      * to the underlying stream.
      */
     public long length() {
-        return ((LEDataOutputStream) out).size();
+        return ((LEDataOutputStream) delegate).size();
     }
 
     /**
@@ -386,7 +386,7 @@ implements Iterable<E> {
         assert entry != null;
 
         final ZipEntry entry = this.entry;
-        final LEDataOutputStream dos = (LEDataOutputStream) out;
+        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
         final long csize = entry.getCompressedSize();
         final long size = entry.getSize();
@@ -488,19 +488,19 @@ implements Iterable<E> {
                     deflate();
                 crc.update(b, off, len);
             } else {
-                out.write(b, off, len);
+                delegate.write(b, off, len);
                 if (entry.getMethod() != DEFLATED)
                     crc.update(b, off, len);
             }
         } else {
-            out.write(b, off, len);
+            delegate.write(b, off, len);
         }
     }
 
     private void deflate() throws IOException {
         final int dlen = def.deflate(dbuf, 0, dbuf.length);
         if (dlen > 0)
-            out.write(dbuf, 0, dlen);
+            delegate.write(dbuf, 0, dlen);
     }
 
     /**
@@ -526,7 +526,7 @@ implements Iterable<E> {
                     + Long.toHexString(expectedCrc)
                     + ")");
                 }
-                final long written = ((LEDataOutputStream) out).size();
+                final long written = ((LEDataOutputStream) delegate).size();
                 final long entrySize = written - dataStart;
                 if (entry.getSize() != entrySize) {
                     throw new ZipException(entry.getName()
@@ -580,7 +580,7 @@ implements Iterable<E> {
         if (!entry.getGeneralBit(3))
             return;
 
-        final LEDataOutputStream dos = (LEDataOutputStream) out;
+        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long crc = entry.getCrc();
         final long csize = entry.getCompressedSize();
         final long size = entry.getSize();
@@ -635,7 +635,7 @@ implements Iterable<E> {
         // Order is important here!
         finished = true;
         closeEntry();
-        final LEDataOutputStream dos = (LEDataOutputStream) out;
+        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         cdOffset = dos.size();
         for (ZipEntry entry : entries.values())
             writeCentralFileHeader(entry);
@@ -650,7 +650,7 @@ implements Iterable<E> {
     private void writeCentralFileHeader(final ZipEntry entry) throws IOException {
         assert entry != null;
 
-        final LEDataOutputStream dos = (LEDataOutputStream) out;
+        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long csize32 = entry.getCompressedSize32();
         final long size32 = entry.getSize32();
         final long offset32 = entry.getOffset32();
@@ -730,7 +730,7 @@ implements Iterable<E> {
      * @throws IOException On any I/O related issue.
      */
     private void writeEndOfCentralDirectory() throws IOException {
-        final LEDataOutputStream dos = (LEDataOutputStream) out;
+        final LEDataOutputStream dos = (LEDataOutputStream) delegate;
         final long cdEntries = entries.size();
         final long cdSize = dos.size() - cdOffset;
         final long cdOffset = this.cdOffset;

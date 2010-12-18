@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.PrefixFilterFileSystemManager;
+import de.schlichtherle.truezip.io.filesystem.FilterFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -1207,7 +1207,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
-        new PrefixFilterFileSystemManager(
+        new FilterFileSystemManager(
                 FileSystemManagers.getInstance(),
                 archive.getController().getModel().getMountPoint())
                     .sync(options, new ArchiveExceptionBuilder());

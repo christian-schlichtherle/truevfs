@@ -28,12 +28,12 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
@@ -49,7 +49,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class ConcurrentArchiveController
-extends FilterFileSystemController<
+extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
 
@@ -78,7 +78,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.getOpenIcon();
+                return delegate.getOpenIcon();
             } finally {
                 readLock().unlock();
             }
@@ -86,7 +86,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getOpenIcon();
+                return delegate.getOpenIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -98,7 +98,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.getClosedIcon();
+                return delegate.getClosedIcon();
             } finally {
                 readLock().unlock();
             }
@@ -106,7 +106,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getClosedIcon();
+                return delegate.getClosedIcon();
             } finally {
                 writeLock().unlock();
             }
@@ -118,7 +118,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.isReadOnly();
+                return delegate.isReadOnly();
             } finally {
                 readLock().unlock();
             }
@@ -126,7 +126,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isReadOnly();
+                return delegate.isReadOnly();
             } finally {
                 writeLock().unlock();
             }
@@ -139,7 +139,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.getEntry(name);
+                return delegate.getEntry(name);
             } finally {
                 readLock().unlock();
             }
@@ -147,7 +147,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.getEntry(name);
+                return delegate.getEntry(name);
             } finally {
                 writeLock().unlock();
             }
@@ -159,7 +159,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.isReadable(name);
+                return delegate.isReadable(name);
             } finally {
                 readLock().unlock();
             }
@@ -167,7 +167,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isReadable(name);
+                return delegate.isReadable(name);
             } finally {
                 writeLock().unlock();
             }
@@ -179,7 +179,7 @@ extends FilterFileSystemController<
         try {
             readLock().lock();
             try {
-                return controller.isWritable(name);
+                return delegate.isWritable(name);
             } finally {
                 readLock().unlock();
             }
@@ -187,7 +187,7 @@ extends FilterFileSystemController<
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
-                return controller.isWritable(name);
+                return delegate.isWritable(name);
             } finally {
                 writeLock().unlock();
             }
@@ -199,7 +199,7 @@ extends FilterFileSystemController<
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.setReadOnly(name);
+            delegate.setReadOnly(name);
         } finally {
             writeLock().unlock();
         }
@@ -211,7 +211,7 @@ extends FilterFileSystemController<
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.setTime(name, types, value);
+            return delegate.setTime(name, types, value);
         } finally {
             writeLock().unlock();
         }
@@ -220,10 +220,10 @@ extends FilterFileSystemController<
     @Override
     public InputSocket<?> getInputSocket(   FileSystemEntryName name,
                                             BitField<InputOption> options) {
-        return new Input(controller.getInputSocket(name, options));
+        return new Input(delegate.getInputSocket(name, options));
     }
 
-    private class Input extends FilterInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
         }
@@ -293,10 +293,10 @@ extends FilterFileSystemController<
     public OutputSocket<?> getOutputSocket( FileSystemEntryName name,
                                             BitField<OutputOption> options,
                                             Entry template) {
-        return new Output(controller.getOutputSocket(name, options, template));
+        return new Output(delegate.getOutputSocket(name, options, template));
     }
 
-    private class Output extends FilterOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
         }
@@ -333,7 +333,7 @@ extends FilterFileSystemController<
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            return controller.mknod(name, type, options, template);
+            return delegate.mknod(name, type, options, template);
         } finally {
             writeLock().unlock();
         }
@@ -345,7 +345,7 @@ extends FilterFileSystemController<
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.unlink(name);
+            delegate.unlink(name);
         } finally {
             writeLock().unlock();
         }
@@ -358,7 +358,7 @@ extends FilterFileSystemController<
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.sync(options, builder);
+            delegate.sync(options, builder);
         } finally {
             writeLock().unlock();
         }

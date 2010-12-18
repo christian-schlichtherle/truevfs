@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.io.archive.controller;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.FilterFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.IOCache;
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -72,7 +72,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  */
 @NotThreadSafe
 public final class CachingArchiveController
-extends FilterFileSystemController<
+extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
 
@@ -90,12 +90,12 @@ extends FilterFileSystemController<
         return new Input(name, options);
     }
 
-    private class Input extends FilterInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> options;
 
         Input(final FileSystemEntryName name, final BitField<InputOption> options) {
-            super(controller.getInputSocket(name, options));
+            super(delegate.getInputSocket(name, options));
             this.name = name;
             this.options = options;
         }
@@ -120,7 +120,7 @@ extends FilterFileSystemController<
         return new Output(name, options, template);
     }
 
-    private class Output extends FilterOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
         final Entry template;
@@ -128,7 +128,7 @@ extends FilterFileSystemController<
         Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
                 final Entry template) {
-            super(controller.getOutputSocket(name, options, template));
+            super(delegate.getOutputSocket(name, options, template));
             this.name = name;
             this.options = options;
             this.template = template;
@@ -155,7 +155,7 @@ extends FilterFileSystemController<
                 return super.getBoundSocket(); // bypass the cache
             }
             // Create marker entry and mind CREATE_PARENTS!
-            controller.mknod(name, FILE, options, null);
+            delegate.mknod(name, FILE, options, null);
             getModel().setTouched(true);
             return (null != cache ? cache : new EntryCache(name,
                         BitField.noneOf(InputOption.class), options))
@@ -168,7 +168,7 @@ extends FilterFileSystemController<
     public void unlink(final FileSystemEntryName name) throws IOException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        controller.unlink(name);
+        delegate.unlink(name);
         final IOCache<Entry> cache = caches.remove(name);
         if (null != cache)
             cache.clear();
@@ -201,7 +201,7 @@ extends FilterFileSystemController<
             if (clear)
                 caches.clear();
         }
-        controller.sync(options.clear(CLEAR_CACHE), builder);
+        delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
     private final class EntryCache implements IOCache<Entry> {
@@ -220,8 +220,8 @@ extends FilterFileSystemController<
             this.outputOptions = outputOptions.clear(OutputOption.CACHE);
             this.cache = IOCache.Strategy.WRITE_BACK.newCache(
                     new RegisteringInputSocket(
-                        controller.getInputSocket(name, this.inputOptions)),
-                    controller.getOutputSocket(name, this.outputOptions, null));
+                        delegate.getInputSocket(name, this.inputOptions)),
+                    delegate.getOutputSocket(name, this.outputOptions, null));
             this.input = cache.getInputSocket();
             this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }
@@ -246,7 +246,7 @@ extends FilterFileSystemController<
             cache.clear();
         }
 
-        class RegisteringInputSocket extends FilterInputSocket<Entry> {
+        class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
             RegisteringInputSocket(final InputSocket <?> input) {
                 super(input);
             }
@@ -268,7 +268,7 @@ extends FilterFileSystemController<
             }
         } // class RegisteringInputSocket
 
-        class RegisteringOutputSocket extends FilterOutputSocket<Entry> {
+        class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
             RegisteringOutputSocket(OutputSocket <?> output) {
                 super(output);
             }

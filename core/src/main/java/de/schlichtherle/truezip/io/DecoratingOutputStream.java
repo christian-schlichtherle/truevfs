@@ -15,23 +15,24 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Clean room implementation of its {@link java.io.FilterOutputStream cousin }
+ * Clean room implementation of its cousin {@link java.io.FilterOutputStream}
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     FilterInputStream
- * @see     SynchronizedOutputStream for a thread-safe filter output stream.
+ * @see     DecoratingInputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterOutputStream extends OutputStream {
+public abstract class DecoratingOutputStream extends OutputStream {
 
     /** The nullable decorated output stream. */
-    protected OutputStream out;
+    @Nullable
+    protected OutputStream delegate;
 
     /**
      * Constructs a new synchronized output stream.
@@ -39,13 +40,13 @@ public abstract class FilterOutputStream extends OutputStream {
      *
      * @param out the output stream to wrap in this decorator.
      */
-    protected FilterOutputStream(final OutputStream out) {
-        this.out = out;
+    protected DecoratingOutputStream(final OutputStream out) {
+        this.delegate = out;
     }
 
     @Override
-	public void write(int b) throws IOException {
-        out.write(b);
+    public void write(int b) throws IOException {
+        delegate.write(b);
     }
 
     @Override
@@ -55,12 +56,12 @@ public abstract class FilterOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        out.write(b, off, len);
+        delegate.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
-        out.flush();
+        delegate.flush();
     }
 
     @Override
@@ -68,7 +69,7 @@ public abstract class FilterOutputStream extends OutputStream {
         try {
             flush();
         } finally {
-            out.close();
+            delegate.close();
         }
     }
 }
