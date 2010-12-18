@@ -34,12 +34,12 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Implements a chain of responsibility in order to resolveAbsolute
+ * Implements a chain of responsibility in order to resolve
  * {@link FalsePositiveException}s thrown by the prospective file system
  * provided to its {@link #ManagedFileSystemController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
- * controller for its parent file system in order to resolveAbsolute the requested
+ * controller for its parent file system in order to resolve the requested
  * operation.
  * As a desired side effect, it also adapts the controller for the prospective
  * file system to a controller for a component file system.

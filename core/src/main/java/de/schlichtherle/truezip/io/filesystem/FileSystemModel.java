@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import net.jcip.annotations.ThreadSafe;
@@ -99,13 +100,13 @@ public class FileSystemModel {
     /**
      * Resolves the given entry name against the file system's mount point.
      *
-     * @param  entryName a non-{@code null} entry name relative to the file
-     *         system's mount point.
-     * @throws NullPointerException if {@code entryName} is {@code null}.
-     * @return A non-{@code null} path with an absolute URI.
+     * @param  entryName an entry name relative to the file system's mount
+     *         point.
+     * @return A new path with an absolute URI.
      */
-    public final Path resolveAbsolute(FileSystemEntryName entryName) {
-        return mountPoint.resolveAbsolute(entryName);
+    @NonNull
+    public final Path resolvePath(@NonNull FileSystemEntryName entryName) {
+        return mountPoint.resolvePath(entryName);
     }
 
     /**

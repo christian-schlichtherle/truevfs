@@ -91,7 +91,7 @@ public class FileSystemModelTest {
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
             assertThat(model.resolveParent(entryName), equalTo(parentEntryName));
-            assertThat(model.resolveAbsolute(entryName), equalTo(path));
+            assertThat(model.resolvePath(entryName), equalTo(path));
             assertThat(model.isTouched(), is(false));
         }
     }

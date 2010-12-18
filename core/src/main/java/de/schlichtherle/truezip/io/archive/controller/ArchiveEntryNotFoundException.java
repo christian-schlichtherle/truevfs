@@ -45,7 +45,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(msg);
         assert name != null;
         assert msg != null;
-        this.path = model.resolveAbsolute(name);
+        this.path = model.resolvePath(name);
     }
 
     ArchiveEntryNotFoundException(
@@ -55,7 +55,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
         super(cause == null ? null : cause.toString());
         assert name != null;
         super.initCause(cause);
-        this.path = model.resolveAbsolute(name);
+        this.path = model.resolvePath(name);
     }
 
     @Override

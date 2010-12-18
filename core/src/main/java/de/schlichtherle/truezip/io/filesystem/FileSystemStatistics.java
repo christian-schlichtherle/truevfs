@@ -32,13 +32,13 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class ManagedFileSystemStatistics {
+public final class FileSystemStatistics {
 
     private final StatisticsFileSystemManager manager;
     private volatile long read;
     private volatile long written;
 
-    ManagedFileSystemStatistics(final StatisticsFileSystemManager manager) {
+    FileSystemStatistics(final StatisticsFileSystemManager manager) {
         this.manager = manager;
     }
 

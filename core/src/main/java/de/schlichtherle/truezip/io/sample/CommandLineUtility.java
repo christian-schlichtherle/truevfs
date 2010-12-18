@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.sample;
 
 import de.schlichtherle.truezip.io.file.File;
 import de.schlichtherle.truezip.io.filesystem.FileSystemManagers;
-import de.schlichtherle.truezip.io.filesystem.ManagedFileSystemStatistics;
+import de.schlichtherle.truezip.io.filesystem.FileSystemStatistics;
 import de.schlichtherle.truezip.io.filesystem.StatisticsFileSystemManager;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -152,7 +152,7 @@ abstract class CommandLineUtility {
     protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final ManagedFileSystemStatistics statistics;
+        private final FileSystemStatistics stats;
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
@@ -161,7 +161,7 @@ abstract class CommandLineUtility {
             final StatisticsFileSystemManager manager
                     = new StatisticsFileSystemManager(
                         FileSystemManagers.getInstance());
-            this.statistics = manager.getStatistics();
+            this.stats = manager.getStatistics();
             FileSystemManagers.setInstance(manager);
         }
 
@@ -195,8 +195,8 @@ abstract class CommandLineUtility {
          */
         private void showProgress() {
             // Round up to kilobytes.
-            args[0] = (statistics.getTopLevelRead() + 1023) / 1024;
-            args[1] = (statistics.getTopLevelWritten() + 1023) / 1024;
+            args[0] = (stats.getTopLevelRead() + 1023) / 1024;
+            args[1] = (stats.getTopLevelWritten() + 1023) / 1024;
             err.print(MessageFormat.format(
                     "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
             err.flush();

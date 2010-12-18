@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.EntryName;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
@@ -54,7 +56,8 @@ import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.SEPARAT
  * <li>{@code foo/..} (not normalized)
  * </ul>
  * <p>
- * Note that this class is immutable and final, hence thread-safe, too.
+ * This class supports serialization with both
+ * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
  * @see     FileSystemEntry#getName()
  * @author  Christian Schlichtherle
@@ -80,17 +83,43 @@ public final class FileSystemEntryName extends EntryName {
             = FileSystemEntryName.create(URI.create(ROOT));
 
     /**
-     * Equivalent to {@link #create(String, String, boolean) create(path, null, false)}.
+     * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
-    public static FileSystemEntryName create(String path) {
-        return create(path, null, false);
+    @NonNull
+    public static FileSystemEntryName create(@NonNull String uri) {
+        return create(uri, false);
     }
 
     /**
-     * Equivalent to {@link #create(String, String, boolean) create(path, null, normalize)}.
+     * Constructs a new file system entry name by constructing a new URI from
+     * the given string representation and parsing the result.
+     * This static factory method calls
+     * {@link #FileSystemEntryName(String, boolean) new FileSystemEntryName(uri, normalize)}
+     * and wraps any thrown {@link URISyntaxException} in an
+     * {@link IllegalArgumentException}.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
+     *         syntax constraints for entry names.
+     * @return A new file system entry name.
      */
-    public static FileSystemEntryName create(String path, boolean normalize) {
-        return create(path, null, normalize);
+    @NonNull
+    public static FileSystemEntryName create(@NonNull String uri, boolean normalize) {
+        try {
+            return new FileSystemEntryName(uri, normalize);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    /**
+     * Equivalent to {@link #create(String, String, boolean) create(path, query, false)}.
+     */
+    @NonNull
+    public static FileSystemEntryName create(@NonNull String path, @CheckForNull String query) {
+        return create(path, query, false);
     }
 
     /**
@@ -101,16 +130,16 @@ public final class FileSystemEntryName extends EntryName {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  path the non-{@code null} {@link #getPath() path}.
-     * @param  query the nullable {@link #getQuery() query}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  path the {@link #getPath() path}.
+     * @param  query the {@link #getQuery() query}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
-     * @return A non-{@code null} file system entry name.
+     *         syntax constraints for entry names.
+     * @return A new file system entry name.
      */
-    public static FileSystemEntryName create(String path, String query, boolean normalize) {
+    @NonNull
+    public static FileSystemEntryName create(@NonNull String path, @CheckForNull String query, boolean normalize) {
         try {
             return new FileSystemEntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
@@ -119,7 +148,8 @@ public final class FileSystemEntryName extends EntryName {
     }
 
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
-    public static FileSystemEntryName create(URI uri) {
+    @NonNull
+    public static FileSystemEntryName create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -130,15 +160,15 @@ public final class FileSystemEntryName extends EntryName {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
-     * @return A non-{@code null} file system entry name.
+     *         syntax constraints for entry names.
+     * @return A new file system entry name.
      */
-    public static FileSystemEntryName create(URI uri, boolean normalize) {
+    @NonNull
+    public static FileSystemEntryName create(@NonNull URI uri, boolean normalize) {
         try {
             return new FileSystemEntryName(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -147,23 +177,44 @@ public final class FileSystemEntryName extends EntryName {
     }
 
     /**
+     * Equivalent to {@link #FileSystemEntryName(String, boolean) new FileSystemEntryName(uri, false)}.
+     */
+    public FileSystemEntryName(@NonNull String uri) throws URISyntaxException {
+        this(uri, false);
+    }
+
+    /**
+     * Constructs a new file system entry name by calling
+     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws URISyntaxException if {@code uri} does not conform to the
+     *         syntax constraints for entry names.
+     */
+    public FileSystemEntryName(@NonNull String uri, boolean normalize) throws URISyntaxException {
+        this(new URI(uri), false);
+    }
+
+    /**
      * Equivalent to {@link #FileSystemEntryName(URI, boolean) new FileSystemEntryName(uri, false)}.
      */
-    public FileSystemEntryName(URI uri) throws URISyntaxException {
+    public FileSystemEntryName(@NonNull URI uri) throws URISyntaxException {
         this(uri, false);
     }
 
     /**
      * Constructs a new file system entry name by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for file system entry names.
      */
-    public FileSystemEntryName(URI uri, final boolean normalize)
+    public FileSystemEntryName(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         super(uri, normalize);
         if (!normalize && uri.normalize() != uri)
@@ -193,11 +244,11 @@ public final class FileSystemEntryName extends EntryName {
      * file system entry names respectively will result in the URI
      * {@code "foo/bar"} for the resulting file system entry name.
      *
-     * @param  parent a non-{@code null} file system entry name.
-     * @param  member a non-{@code null} file system entry name.
-     * @throws NullPointerException if any parameter is {@code null}.
+     * @param  parent an entry name for the parent.
+     * @param  member an entry name for the member.
      */
-    FileSystemEntryName(final FileSystemEntryName parent, final FileSystemEntryName member) {
+    FileSystemEntryName(@NonNull final FileSystemEntryName parent,
+                        @NonNull final FileSystemEntryName member) {
         super(parent, member);
 
         assert invariants();

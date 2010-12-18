@@ -15,15 +15,27 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
+import net.jcip.annotations.Immutable;
 
 /**
  * Represents a {@link java.net.URI} scheme according to the syntax constraints
  * defined in <a href="http://www.ietf.org/rfc/rfc2396.txt""><i>RFC&nbsp;2396:
  * Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
+ * <p>
+ * This class supports serialization with both
+ * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
+ *
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
+@Immutable
 public final class Scheme implements Serializable, Comparable<Scheme> {
 
     private static final long serialVersionUID = 2765230379628276648L;
@@ -75,7 +87,8 @@ public final class Scheme implements Serializable, Comparable<Scheme> {
         }
         while (--i >= 1) {
             c = scheme.charAt(i);
-            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c) && c != '+' && c != '-' && c != '.') {
+            if ((c < 'a' || 'z' < c) && (c < 'A' || 'Z' < c)
+                    && c != '+' && c != '-' && c != '.') {
                 throw new URISyntaxException(scheme, "Illegal character in URI scheme", i);
             }
         }

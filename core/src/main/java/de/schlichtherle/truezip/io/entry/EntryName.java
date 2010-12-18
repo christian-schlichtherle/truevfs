@@ -15,6 +15,11 @@
  */
 package de.schlichtherle.truezip.io.entry;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,18 +53,20 @@ import net.jcip.annotations.Immutable;
  * <li>{@code foo#bar} (fragment defined)
  * </ul>
  * <p>
- * Note that this class is designed to be immutable and hence thread-safe.
- * However, although all its visible state is set in the constructors and all
- * methods are declared final, this class is not declared final itself solely
- * in order to enable subclassing for the purpose of adding even more
- * constraints while still being able to use this class as a polymorph base
- * class.
+ * Although this class is declared to be immutable, it's not declared to be
+ * final solely in order to enable subclassing for the purpose of adding even
+ * more constraints in the sub class constructor while still being able to use
+ * references to this base class polymorphically.
+ * <p>
+ * This class supports serialization with both
+ * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
  * @see     Entry#getName()
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2927354934726235478L;
@@ -80,23 +87,47 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      */
     public static final char SEPARATOR_CHAR = '/';
 
-    /** Represents an entry name with an empty URI. */
-    //public static final EntryName ROOT = EntryName.create(URI.create(Entry.ROOT));
-
-    private final URI uri;
+    @NonNull
+    private URI uri; // not final for serialization only!
 
     /**
-     * Equivalent to {@link #create(String, String, boolean) create(path, null, false)}.
+     * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
-    public static EntryName create(String path) {
-        return create(path, null, false);
+    @NonNull
+    public static EntryName create(@NonNull String uri) {
+        return create(uri, false);
     }
 
     /**
-     * Equivalent to {@link #create(String, String, boolean) create(path, null, normalize)}.
+     * Constructs a new entry name by constructing a new URI from
+     * the given string representation and parsing the result.
+     * This static factory method calls
+     * {@link #EntryName(String, boolean) new EntryName(uri, normalize)}
+     * and wraps any thrown {@link URISyntaxException} in an
+     * {@link IllegalArgumentException}.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
+     *         syntax constraints for entry names.
+     * @return A new entry name.
      */
-    public static EntryName create(String path, boolean normalize) {
-        return create(path, null, normalize);
+    @NonNull
+    public static EntryName create(@NonNull String uri, boolean normalize) {
+        try {
+            return new EntryName(uri, normalize);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    /**
+     * Equivalent to {@link #create(String, String, boolean) create(path, query, false)}.
+     */
+    @NonNull
+    public static EntryName create(@NonNull String path, @CheckForNull String query) {
+        return create(path, query, false);
     }
 
     /**
@@ -107,16 +138,16 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  path the non-{@code null} {@link #getPath() path}.
-     * @param  query the nullable {@link #getQuery() query}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  path the {@link #getPath() path}.
+     * @param  query the {@link #getQuery() query}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
-     * @return A non-{@code null} entry name.
+     * @return A new entry name.
      */
-    public static EntryName create(String path, String query, boolean normalize) {
+    @NonNull
+    public static EntryName create(@NonNull String path, @CheckForNull String query, boolean normalize) {
         try {
             return new EntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
@@ -125,7 +156,8 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /** Equivalent to {@link #create(URI, boolean) create(uri, false)}. */
-    public static EntryName create(URI uri) {
+    @NonNull
+    public static EntryName create(@NonNull URI uri) {
         return create(uri, false);
     }
 
@@ -136,15 +168,15 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
-     * @return A non-{@code null} entry name.
+     * @return A new entry name.
      */
-    public static EntryName create(URI uri, boolean normalize) {
+    @NonNull
+    public static EntryName create(@NonNull URI uri, boolean normalize) {
         try {
             return new EntryName(uri, normalize);
         } catch (URISyntaxException ex) {
@@ -153,23 +185,43 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /**
+     * Equivalent to {@link #EntryName(String, boolean) new EntryName(uri, false)}.
+     */
+    public EntryName(@NonNull String uri) throws URISyntaxException {
+        this(uri, false);
+    }
+
+    /**
+     * Constructs a new entry name by calling
+     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
+     *
+     * @param  uri the URI string representation.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
+     * @throws URISyntaxException if {@code uri} does not conform to the
+     *         syntax constraints for entry names.
+     */
+    public EntryName(@NonNull String uri, boolean normalize) throws URISyntaxException {
+        this(new URI(uri), false);
+    }
+
+    /**
      * Equivalent to {@link #EntryName(URI, boolean) new EntryName(uri, false)}.
      */
-    public EntryName(URI uri) throws URISyntaxException {
+    public EntryName(@NonNull URI uri) throws URISyntaxException {
         this(uri, false);
     }
 
     /**
      * Constructs a new entry name by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  normalize whether or not the given URI shall get normalized
-     *         before parsing it.
-     * @throws NullPointerException if {@code uri} is {@code null}.
+     * @param  uri the {@link #getUri() URI}.
+     * @param  normalize whether or not the URI shall get normalized before
+     *         parsing it.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      */
-    public EntryName(URI uri, final boolean normalize)
+    public EntryName(@NonNull URI uri, final boolean normalize)
     throws URISyntaxException {
         if (uri.isAbsolute())
             throw new URISyntaxException(uri.toString(), "Scheme not allowed");
@@ -192,11 +244,11 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * entry names respectively will result in the URI
      * {@code "foo/bar"} for the resulting entry name.
      *
-     * @param  parent a non-{@code null} entry name.
-     * @param  member a non-{@code null} entry name.
-     * @throws NullPointerException if any parameter is {@code null}.
+     * @param  parent an entry name for the parent.
+     * @param  member an entry name for the member.
      */
-    public EntryName(final EntryName parent, final EntryName member) {
+    public EntryName(   @NonNull final EntryName parent,
+                        @NonNull final EntryName member) {
         final URI parentUri = parent.uri;
         final URI memberUri = member.uri;
         try {
@@ -213,6 +265,22 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         assert invariants();
     }
 
+    private void writeObject(@NonNull ObjectOutputStream out)
+    throws IOException {
+        out.writeObject(uri.toString());
+    }
+
+    private void readObject(@NonNull ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        try {
+            uri = new URI(in.readObject().toString());
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
+
+        assert invariants();
+    }
+
     private boolean invariants() {
         assert null != getUri();
         assert !getUri().isAbsolute();
@@ -222,30 +290,33 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     }
 
     /**
-     * Returns the non-{@code null} path of this entry name.
-     * Equivalent to {@link #getUri()}{@code .getPath()}.
+     * Returns the path of this entry name.
+     * Equivalent to {@link #getUri() getUri()}{@code .getPath()}.
      *
-     * @return The non-{@code null} path of this entry name.
+     * @return The path of this entry name.
      */
+    @NonNull
     public final String getPath() {
         return uri.getPath();
     }
 
     /**
-     * Returns the nullable query of this entry name.
-     * Equivalent to {@link #getUri()}{@code .getQuery()}.
+     * Returns the query of this entry name.
+     * Equivalent to {@link #getUri() getUri()}{@code .getQuery()}.
      *
-     * @return The nullable query of this entry name.
+     * @return The query of this entry name.
      */
+    @CheckForNull
     public final String getQuery() {
         return uri.getQuery();
     }
 
     /**
-     * Returns the non-{@code null} URI of this entry name.
+     * Returns the URI of this entry name.
      *
-     * @return The non-{@code null} URI of this entry name.
+     * @return The URI of this entry name.
      */
+    @NonNull
     public final URI getUri() {
         return uri;
     }
@@ -255,7 +326,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * and its URI {@link URI#equals(Object) equals} the URI of this entry name.
      */
     @Override
-    public final boolean equals(Object that) {
+    public final boolean equals(@CheckForNull Object that) {
         return this == that
                 || that instanceof EntryName
                     && this.uri.equals(((EntryName) that).uri);
@@ -266,7 +337,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * {@link #equals(Object)}.
      */
     @Override
-    public final int compareTo(EntryName that) {
+    public final int compareTo(@NonNull EntryName that) {
         return this.uri.compareTo(that.uri);
     }
 
@@ -282,6 +353,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
+    @NonNull
     public final String toString() {
         return uri.toString();
     }
