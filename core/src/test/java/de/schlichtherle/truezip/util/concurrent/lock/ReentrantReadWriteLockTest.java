@@ -17,6 +17,8 @@
 package de.schlichtherle.truezip.util.concurrent.lock;
 
 import de.schlichtherle.truezip.util.Operation;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 /**
@@ -93,7 +95,7 @@ public class ReentrantReadWriteLockTest extends TestCase {
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Logger.getLogger(ReentrantReadWriteLockTest.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
                 }
                 target.interrupt();
             }

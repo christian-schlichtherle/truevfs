@@ -62,7 +62,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FilterReadOnlyFile extends AbstractReadOnlyFile {
+public abstract class FilterReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
     protected ReadOnlyFile rof;
@@ -71,7 +71,7 @@ public class FilterReadOnlyFile extends AbstractReadOnlyFile {
      * Creates a new instance of {@code FilterReadOnlyFile},
      * which filters the given read only file.
      */
-    public FilterReadOnlyFile(ReadOnlyFile rof) {
+    protected FilterReadOnlyFile(ReadOnlyFile rof) {
         this.rof = rof;
     }
 

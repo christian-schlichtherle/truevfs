@@ -29,12 +29,12 @@ import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.PrefixFilterFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -763,7 +763,7 @@ public class File extends java.io.File {
             throw new AssertionError(ex);
         }
 
-        class Adapter implements FileSystemDriver<FileSystemModel> {
+        class Driver implements FileSystemDriver<FileSystemModel> {
             @Override
             public FileSystemController<?> newController(
                     MountPoint prospect,
@@ -773,11 +773,11 @@ public class File extends java.io.File {
                         ? driver.newController(mountPoint, parent)
                         : new FileDriver().newController(prospect);
             }
-        } // class Adapter
+        } // class Driver
 
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController(mountPoint, new Adapter());
+                .getController(mountPoint, new Driver());
     }
 
     /**
@@ -1174,7 +1174,7 @@ public class File extends java.io.File {
     throws ArchiveException {
         FileSystemManagers
                 .getInstance()
-                .sync(options, new ArchiveExceptionBuilder(), null);
+                .sync(options, new ArchiveExceptionBuilder());
     }
 
     /**
@@ -1206,10 +1206,10 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a federated file system)");
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
-        FileSystemManagers
-                .getInstance()
-                .sync(  options, new ArchiveExceptionBuilder(),
-                        archive.getController().getModel().getMountPoint());
+        new PrefixFilterFileSystemManager(
+                FileSystemManagers.getInstance(),
+                archive.getController().getModel().getMountPoint())
+                    .sync(options, new ArchiveExceptionBuilder());
     }
 
     /**

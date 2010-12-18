@@ -18,124 +18,92 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.util.Iterator;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
-import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.Links;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
-import static de.schlichtherle.truezip.util.Link.Type.STRONG;
-import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
+ * A container which manages the lifecycle of controllers for federated file
+ * systems. A file system is federated if and only if it's a member of a parent
+ * file system.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class FileSystemManager extends NewClass {
+public abstract class FileSystemManager
+implements Iterable<FileSystemController<?>> {
 
     /**
-     * Orders file system controllers so that all file systems appear before
-     * any of their parent file systems.
+     * Returns a file system controller for the given mount point.
+     * If and only if the given mount point addresses a federated file system,
+     * the returned file system controller is remembered for life cycle
+     * management, i.e. future lookup and {@link #sync synchronization}
+     * operations.
+     *
+     * @param  mountPoint the mount point of the file system.
+     * @param  driver the file system driver which will be used to create a
+     *         new file system controller if required.
+     * @return A non-{@code null} file system controller.
+     * @throws NullPointerException if {@code mountPoint} is {@code null}
      */
-    private static final Comparator<FileSystemController<?>> BOTTOM_UP_COMPARATOR
-            = new Comparator<FileSystemController<?>>() {
-        @Override
-        public int compare( FileSystemController<?> l,
-                            FileSystemController<?> r) {
-            return r.getModel().getMountPoint().hierarchicalize()
-                    .compareTo(l.getModel().getMountPoint().hierarchicalize());
-        }
-    };
+    @NonNull
+    public abstract FileSystemController<?> getController(
+            @NonNull MountPoint mountPoint,
+            @NonNull FileSystemDriver<?> driver);
 
     /**
-     * The map of all schedulers for composite file system controllers,
-     * keyed by the mount point of their respective file system model.
-     * All access to this map must be externally synchronized!
+     * Returns the number of federated file systems managed by this instance.
+     *
+     * @return The number of federated file systems managed by this instance.
      */
-    private final Map<MountPoint, Link<Scheduler>> schedulers
-            = new WeakHashMap<MountPoint, Link<Scheduler>>();
+    public abstract int size();
 
+    /**
+     * Returns an iterator for the controller of all federated file systems
+     * managed by this instance.
+     * <p>
+     * <strong>Important:</strong> The iterated file system controllers must be
+     * ordered so that all file systems appear before any of their parent file
+     * systems.
+     *
+     * @return An iterator for the controller of all federated file systems
+     *         managed by this instance.
+     */
     @Override
     @NonNull
-    public synchronized FileSystemController<?> getController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemDriver<?> driver) {
-        return getController(mountPoint, driver, null);
+    public abstract Iterator<FileSystemController<?>> iterator();
+
+    /**
+     * A visitor for file system controllers.
+     *
+     * @see #visit(Visitor, ExceptionBuilder)
+     */
+    public interface Visitor {
+        void visit(FileSystemController<?> controller) throws IOException;
     }
 
-    private FileSystemController<?> getController(
-            final MountPoint mountPoint,
-            final FileSystemDriver<?> driver,
-            FileSystemController<?> parent) {
-        if (null == mountPoint.getParent()) {
-            if (null != parent)
-                throw new IllegalArgumentException("Parent/member mismatch!");
-            return driver.newController(mountPoint, null);
-        }
-        Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
-        if (null == scheduler) {
-            if (null == parent)
-                parent = getController(mountPoint.getParent(), driver, null);
-            scheduler = new Scheduler(driver.newController(mountPoint, parent));
-        }
-        return scheduler.controller;
-    }
-
-    private final class Scheduler implements FileSystemTouchedListener {
-
-        final ManagedFileSystemController controller;
-
-        Scheduler(final FileSystemController<?> prospect) {
-            controller = new ManagedFileSystemController(prospect);
-            controller.getModel().addFileSystemTouchedListener(this);
-            touchedChanged(null); // setup schedule
-        }
-
-        /**
-         * Schedules the file system controller for synchronization according
-         * to the given touch status.
-         */
-        @Override
-        public void touchedChanged(final FileSystemEvent event) {
-            final FileSystemModel model = controller.getModel();
-            assert null == event || event.getSource() == model;
-            synchronized (FileSystemManager.this) {
-                schedulers.put(model.getMountPoint(),
-                        (model.isTouched() ? STRONG : WEAK).newLink(this));
-            }
-        }
-    } // class Scheduler
-
+    /**
+     * Visits the controller of all federated file systems managed by this
+     * instance.
+     *
+     * @param  <X> the type of the assembled {@code IOException} to throw.
+     * @param  builder the exception builder to use for the assembly of an
+     *         {@code IOException} from one or more input {@code IOException}s.
+     * @throws IOException at the discretion of the exception {@code builder}.
+     */
     public <X extends IOException>
-    void sync(  @NonNull final BitField<SyncOption> options,
-                @NonNull final ExceptionBuilder<? super IOException, X> builder,
-                @Nullable final MountPoint prefix)
+    void visit( @NonNull Visitor visitor,
+                @NonNull ExceptionBuilder<? super IOException, X> builder)
     throws X {
-        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
-                || options.get(ABORT_CHANGES))
-            throw new IllegalArgumentException();
-        // The general algorithm is to sort the mount points in descending
-        // order of their pathnames and then traverse the set in reverse
-        // order to call the sync() method on each respective file system
-        // controller.
-        // This ensures that a member file system will always be synced
-        // before its parent file system.
-        for (final FileSystemController<?> controller
-                : getControllers(BOTTOM_UP_COMPARATOR, prefix)) {
+        for (FileSystemController<?> controller : this) {
             try {
-                controller.sync(options, builder);
+                visitor.visit(controller);
             } catch (IOException ex) {
-                // Syncing the file system resulted in an I/O exception for
-                // some reason.
+                // Visiting the file system controller resulted in an I/O
+                // exception for some reason.
                 // We are bullheaded and store the exception for later
                 // throwing and continue updating the rest.
                 builder.warn(ex);
@@ -144,56 +112,54 @@ public class FileSystemManager extends NewClass {
         builder.check();
     }
 
-    @Override
-    public int size() {
-        return schedulers.size();
-    }
-
-    @Override
-    public Iterator<FileSystemController<?>> iterator() {
-        return getControllers(BOTTOM_UP_COMPARATOR, null).iterator();
-    }
-
     /**
-     * Returns a new set with all federated file systems managed by this
-     * instance.
+     * Writes all changes to the contents of the federated file systems managed
+     * by this instance to their respective parent file system.
+     * This will reset the state of the respective file system controllers.
      *
-     * @return A new set with all federated file systems managed by this
-     *         instance.
+     * @param  <X> the type of the assembled {@code IOException} to throw.
+     * @param  options the synchronization options.
+     * @param  builder the exception builder to use for the assembly of an
+     *         {@code IOException} from one or more input {@code IOException}s.
+     * @throws IOException at the discretion of the exception {@code builder}.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
+     *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
+     *         option {@code ABORT_CHANGES} is set.
      */
-    private Set<FileSystemController<?>> getControllers() {
-        return getControllers(null, null);
-    }
-
-    /**
-     * Returns a new set with all federated file systems managed by this
-     * instance which have a mount point which starts with the given
-     * {@code prefix}.
-     *
-     * @return A new set with all federated file systems managed by this
-     *         instance which have a mount point which starts with the given
-     *         {@code prefix}.
-     */
-    private Set<FileSystemController<?>> getControllers(@Nullable MountPoint prefix) {
-        return getControllers(null, prefix);
-    }
-
-    private synchronized Set<FileSystemController<?>> getControllers(
-            @NonNull final Comparator<? super FileSystemController<?>> comparator,
-            @Nullable final MountPoint prefix) {
-        final Set<FileSystemController<?>> snapshot = null != comparator
-                ? new TreeSet<FileSystemController<?>>(comparator)
-                : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
-        for (final Link<Scheduler> link : schedulers.values()) {
-            final Scheduler scheduler = Links.getTarget(link);
-            final ManagedFileSystemController controller
-                    = null == scheduler ? null : scheduler.controller;
-            if (null != controller)
-                if (null == prefix
-                        || controller.getModel().getMountPoint().hierarchicalize().toString()
-                            .startsWith(prefix.hierarchicalize().toString()))
-                    snapshot.add(controller);
+    public <X extends IOException>
+    void sync(  @NonNull final BitField<SyncOption> options,
+                @NonNull final ExceptionBuilder<? super IOException, X> builder)
+    throws X {
+        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
+                || options.get(ABORT_CHANGES))
+            throw new IllegalArgumentException();
+        class Sync implements Visitor {
+            @Override
+            public void visit(FileSystemController<?> controller)
+            throws IOException {
+                controller.sync(options, builder);
+            }
         }
-        return snapshot;
+        visit(new Sync(), builder);
+    }
+
+    /**
+     * Two file system managers are considered equal if and only if they are
+     * identical. This can't get overriden.
+     */
+    @Override
+    @SuppressWarnings(value = "EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) {
+        return this == that;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
     }
 }

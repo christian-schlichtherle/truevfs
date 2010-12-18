@@ -157,7 +157,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         InputStream in = new FileInputStream(path);
-        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         in.close();
@@ -177,7 +177,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertTrue(new File(path).createNewFile());
         File.umount();
         OutputStream out = new FileOutputStream(path);
-        Reference<FileSystemController> ref = new WeakReference<FileSystemController>(new File(path).getInnerArchive().getController());
+        Reference<FileSystemController<?>> ref = new WeakReference<FileSystemController<?>>(new File(path).getInnerArchive().getController());
         gc();
         assertNotNull(ref.get());
         out.close();
@@ -193,7 +193,7 @@ public abstract class IOFileTestCase extends TestCase {
     private static void gc() {
         System.gc();
         try {
-            Thread.sleep(100);
+            Thread.sleep(50);
         } catch (InterruptedException ex) {
             Logger.getLogger(IOFileTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }

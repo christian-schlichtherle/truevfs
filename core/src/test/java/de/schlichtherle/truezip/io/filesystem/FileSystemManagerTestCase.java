@@ -15,9 +15,12 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +31,13 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileSystemManagerTest {
+public abstract class FileSystemManagerTestCase {
 
-    private FileSystemManager manager;
-    private FileSystemDriver<?> driver;
+    protected FileSystemManager manager;
+    private final FileSystemDriver<?> driver = new Driver();
 
     @Before
     public void setUp() {
-        manager = new FileSystemManager();
-        driver = new Driver();
     }
 
     @Test
@@ -49,7 +50,7 @@ public class FileSystemManagerTest {
     }
 
     @Test
-    public void testGetControllerForward() {
+    public void testForward() {
         for (final String[] params : new String[][] {
             {
                 //"file:/", // does NOT get mapped!
@@ -74,11 +75,16 @@ public class FileSystemManagerTest {
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
             }
+
+            assertThat(manager.size(), is(params.length));
+            parent = null;
+            gc();
+            assertThat(manager.size(), is(0));
         }
     }
 
     @Test
-    public void testGetControllerBackward() {
+    public void testBackward() {
         for (final String[] params : new String[][] {
             {
                 "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
@@ -103,6 +109,29 @@ public class FileSystemManagerTest {
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
             }
+
+            Iterator<FileSystemController<?>> i = manager.iterator();
+            for (final String param : params) {
+                final MountPoint mountPoint
+                        = MountPoint.create(URI.create(param));
+                assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
+            }
+            assertThat(i.hasNext(), is(false));
+
+            assertThat(manager.size(), is(params.length));
+            member = null;
+            i = null;
+            gc();
+            assertThat(manager.size(), is(0));
+        }
+    }
+
+    private static void gc() {
+        System.gc();
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FileSystemManagerTestCase.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 

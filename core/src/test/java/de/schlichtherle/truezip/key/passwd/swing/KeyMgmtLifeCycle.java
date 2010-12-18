@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -87,7 +88,7 @@ public class KeyMgmtLifeCycle implements Runnable {
 
     private void createResource() throws UnknownKeyException {
         final KeyManager manager = KeyManager.getInstance();
-        final KeyProvider provider = getKeyProvider(manager, id);
+        final KeyProvider<?> provider = getKeyProvider(manager, id);
 
         // Store the key, so we can later check the key stored in the
         // key manager when opening the resource.
@@ -98,13 +99,14 @@ public class KeyMgmtLifeCycle implements Runnable {
         createResourceHook(provider);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected KeyProvider<?> getKeyProvider(KeyManager manager, URI id) {
         return manager.getKeyProvider(id, (Class) KeyProvider.class);
     }
 
     private void openResource() throws UnknownKeyException {
         final KeyManager manager = KeyManager.getInstance();
-        final KeyProvider provider = getKeyProvider(manager, id);
+        final KeyProvider<?> provider = getKeyProvider(manager, id);
 
         boolean correct = false;
         while (!correct) {
@@ -114,8 +116,7 @@ public class KeyMgmtLifeCycle implements Runnable {
         openResourceHook(provider);
     }
 
-    @SuppressWarnings("CallToThreadDumpStack")
-    private boolean authenticateKey(final KeyProvider provider) throws UnknownKeyException {
+    private boolean authenticateKey(final KeyProvider<?> provider) throws UnknownKeyException {
         final Object providedKey = provider.getOpenKey();
         final boolean correct = equals(refKey, providedKey);
         String msg = id + ": getOpenKey() returned " + toString(providedKey) + ". ";
@@ -132,7 +133,7 @@ public class KeyMgmtLifeCycle implements Runnable {
             try {
                 Thread.sleep(3000);
             }  catch (InterruptedException ex) {
-                ex.printStackTrace();
+                Logger.getLogger(KeyMgmtLifeCycle.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
             }
         }
 

@@ -49,7 +49,7 @@ import java.util.Map;
  */
 public class PromptingKeyManager extends KeyManager {
 
-    private static volatile boolean prompting = true;
+    private volatile boolean prompting = true;
 
     /**
      * The user interface classes or instances.
@@ -162,7 +162,7 @@ public class PromptingKeyManager extends KeyManager {
      * @see #getInstance
      */
     protected void setPromptingImpl(boolean prompting) {
-        PromptingKeyManager.prompting = prompting;
+        this.prompting = prompting;
     }
 
     static void assertPrompting()
