@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import java.util.Iterator;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.Link;
@@ -30,25 +31,16 @@ import java.util.TreeSet;
 import java.util.WeakHashMap;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 
 /**
- * A container which manages the lifecycle of controllers for federated file
- * systems. A file system is federated if and only if it's a member of a parent
- * file system.
- * <p>
- * This class is thread-safe.
- *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-// FIXME: Enable decorators by making this an interface or abstract class.
 @ThreadSafe
-public class FileSystemManager {
+public class FileSystemManager extends NewClass {
 
     /**
      * Orders file system controllers so that all file systems appear before
@@ -72,40 +64,23 @@ public class FileSystemManager {
     private final Map<MountPoint, Link<Scheduler>> schedulers
             = new WeakHashMap<MountPoint, Link<Scheduler>>();
 
-    /**
-     * Returns a file system controller for the given mount point.
-     * If and only if the given mount point addresses a federated file system,
-     * the returned file system controller is remembered for life cycle
-     * management, i.e. future lookup and {@link #sync synchronization}
-     * operations.
-     *
-     * @param  mountPoint the non-{@code null} mount point of the file system.
-     * @param  driver the non-{@code null} file system driver which will be
-     *         used to create a new file system controller if required.
-     * @param  parent the nullable controller for the parent file system.
-     * @return A non-{@code null} file system controller.
-     * @throws NullPointerException if {@code mountPoint} is {@code null}
-     */
+    @Override
     @NonNull
-    public FileSystemController<?> getController(
-            @NonNull final MountPoint mountPoint,
-            @NonNull final FileSystemDriver<?> driver,
-            @Nullable FileSystemController<?> parent) {
+    public synchronized FileSystemController<?> getController(
+            @NonNull MountPoint mountPoint,
+            @NonNull FileSystemDriver<?> driver) {
+        return getController(mountPoint, driver, null);
+    }
+
+    private FileSystemController<?> getController(
+            final MountPoint mountPoint,
+            final FileSystemDriver<?> driver,
+            FileSystemController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
             return driver.newController(mountPoint, null);
         }
-        // This is faster than calling a synchronized method, why?
-        synchronized (this) {
-            return getController0(mountPoint, driver, parent);
-        }
-    }
-
-    private /*synchronized*/ FileSystemController<?> getController0(
-            final MountPoint mountPoint,
-            final FileSystemDriver<?> driver,
-            FileSystemController<?> parent) {
         Scheduler scheduler = Links.getTarget(schedulers.get(mountPoint));
         if (null == scheduler) {
             if (null == parent)
@@ -140,30 +115,9 @@ public class FileSystemManager {
         }
     } // class Scheduler
 
-    /**
-     * Writes all changes to the contents of the federated file systems managed
-     * by this instance which have a mount point which starts with the given
-     * {@code prefix} to their respective parent file system.
-     * This will reset the state of the respective file system controllers.
-     *
-     * @param  <X> the type of the assembled {@code IOException} to throw.
-     * @param  builder the non-{@code null} exception builder to use for the
-     *         assembly of an {@code IOException} from one or more
-     *         {@code IOException}s.
-     * @param  options the non-{@code null} synchronization options.
-     * @param  prefix the prefix of the mount point of all federated file
-     *         systems which shall get synchronized to their respective parent
-     *         file system.
-     *         This may be {@code null} in order to select all federated file
-     *         systems.
-     * @throws IOException at the discretion of the exception {@code builder}.
-     * @throws IllegalArgumentException if the configuration property
-     *         {@code FORCE_CLOSE_INPUT} is {@code false} and
-     *         {@code FORCE_CLOSE_OUTPUT} is {@code true}.
-     */
     public <X extends IOException>
-    void sync(  @NonNull final ExceptionBuilder<? super IOException, X> builder,
-                @NonNull final BitField<SyncOption> options,
+    void sync(  @NonNull final BitField<SyncOption> options,
+                @NonNull final ExceptionBuilder<? super IOException, X> builder,
                 @Nullable final MountPoint prefix)
     throws X {
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
@@ -176,9 +130,9 @@ public class FileSystemManager {
         // This ensures that a member file system will always be synced
         // before its parent file system.
         for (final FileSystemController<?> controller
-                : getControllers(prefix, BOTTOM_UP_COMPARATOR)) {
+                : getControllers(BOTTOM_UP_COMPARATOR, prefix)) {
             try {
-                controller.sync(builder, options);
+                controller.sync(options, builder);
             } catch (IOException ex) {
                 // Syncing the file system resulted in an I/O exception for
                 // some reason.
@@ -190,6 +144,16 @@ public class FileSystemManager {
         builder.check();
     }
 
+    @Override
+    public int size() {
+        return schedulers.size();
+    }
+
+    @Override
+    public Iterator<FileSystemController<?>> iterator() {
+        return getControllers(BOTTOM_UP_COMPARATOR, null).iterator();
+    }
+
     /**
      * Returns a new set with all federated file systems managed by this
      * instance.
@@ -197,7 +161,7 @@ public class FileSystemManager {
      * @return A new set with all federated file systems managed by this
      *         instance.
      */
-    public final Set<FileSystemController<?>> getControllers() {
+    private Set<FileSystemController<?>> getControllers() {
         return getControllers(null, null);
     }
 
@@ -210,13 +174,13 @@ public class FileSystemManager {
      *         instance which have a mount point which starts with the given
      *         {@code prefix}.
      */
-    public Set<FileSystemController<?>> getControllers(MountPoint prefix) {
-        return getControllers(prefix, null);
+    private Set<FileSystemController<?>> getControllers(@Nullable MountPoint prefix) {
+        return getControllers(null, prefix);
     }
 
     private synchronized Set<FileSystemController<?>> getControllers(
-            final MountPoint prefix,
-            final Comparator<? super FileSystemController<?>> comparator) {
+            @NonNull final Comparator<? super FileSystemController<?>> comparator,
+            @Nullable final MountPoint prefix) {
         final Set<FileSystemController<?>> snapshot = null != comparator
                 ? new TreeSet<FileSystemController<?>>(comparator)
                 : new HashSet<FileSystemController<?>>((int) (schedulers.size() / .75f) + 1);
@@ -231,25 +195,5 @@ public class FileSystemManager {
                     snapshot.add(controller);
         }
         return snapshot;
-    }
-
-    /**
-     * Two file system managers are considered equal if and only if they are
-     * identical.
-     * This can't get overriden.
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
     }
 }

@@ -373,8 +373,7 @@ extends FileSystemController<ArchiveModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    sync(   new SyncExceptionBuilder(),
-                            BitField.of(ABORT_CHANGES));
+                    sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -388,8 +387,7 @@ extends FileSystemController<ArchiveModel> {
                 LOGGER.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.size() - 1,
                                         getModel().getMountPoint() });
-            sync(   new SyncExceptionBuilder(),
-                    BitField.of(ABORT_CHANGES));
+            sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
         } else { // !isRoot(path)
             autoMount().unlink(path);
         }

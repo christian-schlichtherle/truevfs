@@ -105,6 +105,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 // @Inherited // Useless for interfaces
+// TODO: Check if this is still required.
 public @interface ExtendOneOf {
 
     /**

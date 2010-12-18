@@ -35,11 +35,10 @@ extends FileSystemManager {
     @Override
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
-            final FileSystemDriver<?> driver,
-            FileSystemController<?> parent) {
+            final FileSystemDriver<?> driver) {
         final FileSystemController<?> controller
-                = super.getController(mountPoint, driver, parent);
-        parent = controller.getParent();
+                = super.getController(mountPoint, driver);
+        final FileSystemController<?> parent = controller.getParent();
         return null != parent && null == parent.getParent() // controller is top level federated file system?
                 ? new StatisticsFileSystemController(controller, this)
                 : controller;
@@ -67,13 +66,13 @@ extends FileSystemManager {
 
     @Override
     public synchronized <E extends IOException>
-    void sync(  ExceptionBuilder<? super IOException, E> builder,
-                BitField<SyncOption> options, MountPoint prefix)
+    void sync(  BitField<SyncOption> options,
+                ExceptionBuilder<? super IOException, E> builder,
+                MountPoint prefix)
     throws E {
         try {
-            super.sync(builder, options, prefix);
+            super.sync(options, builder, prefix);
         } finally {
-            statistics.close();
             statistics = new ManagedFileSystemStatistics(this);
         }
     }

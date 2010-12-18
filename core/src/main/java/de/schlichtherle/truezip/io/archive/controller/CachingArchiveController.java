@@ -176,8 +176,7 @@ extends FilterFileSystemController<
 
     @Override
     public <X extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options)
+    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
@@ -202,7 +201,7 @@ extends FilterFileSystemController<
             if (clear)
                 caches.clear();
         }
-        controller.sync(builder, options.clear(CLEAR_CACHE));
+        controller.sync(options.clear(CLEAR_CACHE), builder);
     }
 
     private final class EntryCache implements IOCache<Entry> {

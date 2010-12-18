@@ -353,13 +353,12 @@ extends FilterFileSystemController<
 
     @Override
     public <X extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options)
+    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
-            controller.sync(builder, options);
+            controller.sync(options, builder);
         } finally {
             writeLock().unlock();
         }

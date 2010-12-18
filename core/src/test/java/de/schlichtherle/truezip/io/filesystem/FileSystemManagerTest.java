@@ -15,7 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import java.util.Iterator;
 import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import java.net.URI;
@@ -43,7 +42,7 @@ public class FileSystemManagerTest {
     @Test
     public void testGetControllerWithNull() {
         try {
-            manager.getController(null, null, null);
+            manager.getController(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -70,7 +69,7 @@ public class FileSystemManagerTest {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
                 final FileSystemController<?> controller
-                        = manager.getController(mountPoint, driver, null);
+                        = manager.getController(mountPoint, driver);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
@@ -99,7 +98,7 @@ public class FileSystemManagerTest {
                 final MountPoint mountPoint
                         = MountPoint.create(URI.create(param));
                 final FileSystemController<?> controller
-                        = manager.getController(mountPoint, driver, null);
+                        = manager.getController(mountPoint, driver);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;

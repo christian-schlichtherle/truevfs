@@ -34,10 +34,9 @@ import java.io.OutputStream;
  */
 public final class ManagedFileSystemStatistics {
 
-    private final FileSystemManager manager;
+    private final StatisticsFileSystemManager manager;
     private volatile long read;
     private volatile long written;
-    private boolean closed;
 
     ManagedFileSystemStatistics(final StatisticsFileSystemManager manager) {
         this.manager = manager;
@@ -47,7 +46,7 @@ public final class ManagedFileSystemStatistics {
      * Returns the total number of managed federated file systems.
      */
     public int getFileSystemsTotal() {
-        return manager.getControllers().size();
+        return manager.size();
     }
 
     /**
@@ -60,7 +59,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController<?> controller : manager.getControllers())
+        for (FileSystemController<?> controller : manager)
             if (controller.getModel().isTouched())
                 result++;
         return result;
@@ -72,7 +71,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getTopLevelFileSystemsTotal() {
         int result = 0;
-        for (FileSystemController<?> controller : manager.getControllers())
+        for (FileSystemController<?> controller : manager)
             if (null == controller.getParent().getParent())
                 result++;
         return result;
@@ -85,7 +84,7 @@ public final class ManagedFileSystemStatistics {
      */
     public int getTopLevelFileSystemsTouched() {
         int result = 0;
-        for (FileSystemController<?> controller : manager.getControllers()) {
+        for (FileSystemController<?> controller : manager) {
             if (null == controller.getParent().getParent())
                 if (controller.getModel().isTouched())
                     result++;
@@ -196,10 +195,6 @@ public final class ManagedFileSystemStatistics {
         return written;
     }
 
-    void close() {
-        closed = true;
-    }
-
     /**
      * Returns {@code true} iff this statistics instance has been closed and
      * should not receive any more updates.
@@ -208,6 +203,6 @@ public final class ManagedFileSystemStatistics {
      *         should not receive any more updates.
      */
     public boolean isClosed() {
-        return closed;
+        return this != manager.getStatistics();
     }
 }

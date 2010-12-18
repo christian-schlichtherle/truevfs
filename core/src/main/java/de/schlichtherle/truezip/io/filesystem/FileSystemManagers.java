@@ -130,9 +130,7 @@ public class FileSystemManagers {
      */
     public static synchronized void setInstance(
             @Nullable final FileSystemManager manager) {
-        final int count = null == instance
-                ? 0
-                : instance.getControllers().size();
+        final int count = null == instance ? 0 : instance.size();
         if (0 < count)
             throw new IllegalStateException("There are still " + count + " managed federated file systems!");
         if (manager != instance) {
@@ -202,9 +200,8 @@ public class FileSystemManagers {
                 //FileSystemManager.logger.setLevel(Level.OFF);
             } finally {
                 try {
-                    manager.sync(   new SyncExceptionBuilder(),
-                                    BitField.of(FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT),
+                    manager.sync(   BitField.of(FORCE_CLOSE_INPUT,
+                                                FORCE_CLOSE_OUTPUT), new SyncExceptionBuilder(),
                                     null);
                 } catch (IOException ouch) {
                     // Logging doesn't work in a shutdown hook!
