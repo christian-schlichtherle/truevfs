@@ -57,6 +57,7 @@ import javax.swing.Icon;
 
 import static de.schlichtherle.truezip.io.filesystem.FileSystemController.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
@@ -1794,7 +1795,7 @@ public class File extends java.io.File {
     }
 
     final FileSystemEntryName getInnerEntryName0() {
-        return this == innerArchive ? FileSystemEntryName.ROOT : enclEntryName;
+        return this == innerArchive ? ROOT_ENTRY_NAME : enclEntryName;
     }
 
     /**

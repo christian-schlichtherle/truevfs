@@ -15,12 +15,13 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.entry.EntryName;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.SEPARATOR;
 
 /**
  * Addresses an entry in a file system.
@@ -72,7 +73,10 @@ public final class Path implements Serializable, Comparable<Path> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
-    /** The separator which is used to split opaque path names into segments. */
+    /**
+     * The separator which is used to split opaque path names into
+     * {@link MountPoint mount points} and {@link EntryName entry names}.
+     */
     public static final String BANG_SLASH = "!" + SEPARATOR;
 
     private final URI uri;

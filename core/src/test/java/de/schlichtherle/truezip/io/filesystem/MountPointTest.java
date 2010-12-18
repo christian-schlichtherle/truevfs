@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
 
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -178,8 +179,8 @@ public class MountPointTest {
             assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())), equalTo(mountPoint));
             assertThat(MountPoint.create(URI.create(mountPoint.getUri().toString())).hashCode(), equalTo(mountPoint.hashCode()));
-            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(FileSystemEntryName.ROOT))), equalTo(mountPoint));
-            assertThat(MountPoint.create(mountPoint.resolveAbsolute(FileSystemEntryName.ROOT).getUri()), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(ROOT_ENTRY_NAME))), equalTo(mountPoint));
+            assertThat(MountPoint.create(mountPoint.resolveAbsolute(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
         }
     }
 

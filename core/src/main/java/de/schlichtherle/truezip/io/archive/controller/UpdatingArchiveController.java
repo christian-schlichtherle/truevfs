@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemTouchListener;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
@@ -56,15 +55,12 @@ import java.util.Iterator;
 import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.newArchiveFileSystem;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.FORCE_CLOSE_OUTPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.WAIT_CLOSE_OUTPUT;
+import static de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.io.entry.Entry.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
@@ -163,7 +159,7 @@ extends FileSystemArchiveController<E> {
     }
 
     private final ArchiveDriver<E> driver;
-    private final FileSystemController parent;
+    private final FileSystemController<?> parent;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -183,7 +179,7 @@ extends FileSystemArchiveController<E> {
     public UpdatingArchiveController(
             final ArchiveModel model,
             final ArchiveDriver<E> driver,
-            final FileSystemController parent) {
+            final FileSystemController<?> parent) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
@@ -194,7 +190,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public FileSystemController getParent() {
+    public FileSystemController<?> getParent() {
         return parent;
     }
 
@@ -214,9 +210,9 @@ extends FileSystemArchiveController<E> {
     void mount(final boolean autoCreate, final BitField<OutputOption> options)
     throws IOException {
         try {
-            final FileSystemController parent = getParent();
+            final FileSystemController<?> parent = getParent();
             final FileSystemEntryName parentName = getModel()
-                    .resolveParent(FileSystemEntryName.ROOT);
+                    .resolveParent(ROOT_ENTRY_NAME);
             // readOnly must be set first because the parent archive controller
             // could be a FileFileSystemController and on stinky Windows
             // this property turns to TRUE once a file is opened for
@@ -260,9 +256,9 @@ extends FileSystemArchiveController<E> {
     throws IOException {
         if (null != output)
             return;
-        final FileSystemController parent = getParent();
+        final FileSystemController<?> parent = getParent();
         final FileSystemEntryName parentName = getModel()
-                .resolveParent(FileSystemEntryName.ROOT);
+                .resolveParent(ROOT_ENTRY_NAME);
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(OutputOption.CACHE), null);
         output = new Output(driver.newOutputShop(getModel(), socket,

@@ -20,8 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
 
 /**
@@ -40,7 +39,7 @@ import static de.schlichtherle.truezip.io.filesystem.Path.BANG_SLASH;
  *     The path must be absolute.
  *     If its opaque, it's entry name must not be empty.
  * <li>If the URI is hierarchical, its path must be in normal form and end with
- *     a {@link FileSystemEntry#SEPARATOR}.
+ *     a {@link FileSystemEntryName#SEPARATOR}.
  * </ol>
  * <p>
  * Examples for valid mount point URIs are:

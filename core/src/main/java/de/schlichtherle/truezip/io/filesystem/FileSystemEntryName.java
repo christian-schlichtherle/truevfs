@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.SEPARATOR;
 
 /**
  * Addresses an entry in a file system relative to its mount point.
@@ -65,9 +65,19 @@ public final class FileSystemEntryName extends EntryName {
 
     private static final long serialVersionUID = 2212342253466752478L;
 
+    /**
+     * The entry name of the root directory,
+     * which is {@value}.
+     * Note that this name is empty and hence does <em>not</em> contain a
+     * separator character.
+     *
+     * @see #SEPARATOR_CHAR
+     */
+    public static final String ROOT = "";
+
     /** Represents a file system entry name with an empty URI. */
-    public static final FileSystemEntryName ROOT
-            = FileSystemEntryName.create(URI.create(FileSystemEntry.ROOT));
+    public static final FileSystemEntryName ROOT_ENTRY_NAME
+            = FileSystemEntryName.create(URI.create(ROOT));
 
     /**
      * Equivalent to {@link #create(String, String, boolean) create(path, null, false)}.
@@ -178,7 +188,7 @@ public final class FileSystemEntryName extends EntryName {
      * file system entry name against the given parent file system entry name.
      * Note that the URI of the parent file system entry name is considered to
      * name a directory even if it's not ending with a
-     * {@link FileSystemEntry#SEPARATOR}, so calling this constructor with
+     * {@link FileSystemEntryName#SEPARATOR}, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
      * file system entry names respectively will result in the URI
      * {@code "foo/bar"} for the resulting file system entry name.

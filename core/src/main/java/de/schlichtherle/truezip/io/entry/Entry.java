@@ -40,48 +40,26 @@ public interface Entry {
      * property.
      */
     Entry NULL = new Entry() {
+        @Override
         public String getName() {
             return "/dev/null";
         }
 
+        @Override
         public Type getType() {
             return Type.SPECIAL;
         }
 
+        @Override
         public long getSize(Size type) {
             return UNKNOWN;
         }
 
+        @Override
         public long getTime(Access type) {
             return UNKNOWN;
         }
     };
-
-    /**
-     * The entry name of the root directory,
-     * which is {@value}.
-     * Note that this name is empty and hence does <em>not</em> contain a
-     * separator character.
-     *
-     * @see #SEPARATOR_CHAR
-     */
-    String ROOT = "";
-
-    /**
-     * The separator string for base names in an entry name,
-     * which is {@value}.
-     *
-     * @see #SEPARATOR_CHAR
-     */
-    String SEPARATOR = "/";
-
-    /**
-     * The separator character for base names in an entry name,
-     * which is {@value}.
-     *
-     * @see #SEPARATOR
-     */
-    char SEPARATOR_CHAR = '/';
 
     /**
      * The unknown value for numeric properties,
@@ -135,7 +113,7 @@ public interface Entry {
      * <ol>
      * <li>An entry name is a sequence of <i>segments</i> which are
      *     separated by one or more <i>separator characters</i>
-     *     ({@link #SEPARATOR_CHAR}).
+     *     ({@link EntryName#SEPARATOR_CHAR}).
      *     This implies that a segment cannot contain separator characters.
      * <li>An entry name may contain one or more dot ({@code "."}) or
      *     dot-dot ({@code ".."}) segments which represent the current or

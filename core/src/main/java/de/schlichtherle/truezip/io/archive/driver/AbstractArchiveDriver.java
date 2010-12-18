@@ -38,9 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * An abstract archive driver implementation to ease the task of developing

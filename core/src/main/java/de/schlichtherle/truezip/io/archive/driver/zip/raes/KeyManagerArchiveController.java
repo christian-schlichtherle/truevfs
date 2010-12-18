@@ -33,9 +33,9 @@ import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.Paths.isRoot;
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * This archive controller resets the key provider in the key manager if the

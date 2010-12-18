@@ -23,11 +23,10 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.SPECIAL;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 
 /**
  * Adapts a {@link File} instance to a {@link FileSystemEntry}.
