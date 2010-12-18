@@ -177,8 +177,7 @@ final class FileController extends FileSystemController<FileSystemModel>  {
 
     @Override
     public <X extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options)
+    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
     }
 }

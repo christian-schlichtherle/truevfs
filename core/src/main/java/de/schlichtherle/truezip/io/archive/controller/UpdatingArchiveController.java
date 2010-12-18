@@ -304,15 +304,13 @@ extends FileSystemArchiveController<E> {
 
     private boolean sync() throws SyncException, FileSystemException {
         getModel().assertWriteLockedByCurrentThread();
-        sync(   new SyncExceptionBuilder(),
-                BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT));
+        sync(   BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT), new SyncExceptionBuilder());
         return true;
     }
 
     @Override
 	public <X extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options)
+    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();

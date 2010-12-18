@@ -132,9 +132,8 @@ extends FileSystemController<M> {
 
     @Override
     public <X extends IOException>
-    void sync(  final ExceptionBuilder<? super SyncException, X> builder,
-                final BitField<SyncOption> options)
+    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
-        controller.sync(builder, options);
+        controller.sync(options, builder);
     }
 }

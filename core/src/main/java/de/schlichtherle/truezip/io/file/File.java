@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.file;
 
+import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -29,10 +31,10 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -728,12 +730,13 @@ public class File extends java.io.File {
         final FileSystemDriver<?> driver
                 = detector.getArchiveDriver(target.getPath());
         final MountPoint mountPoint;
-        final FileSystemController<?> parent;
         try {
             if (null != enclArchive) {
-                parent = enclArchive.getController();
                 mountPoint = MountPoint.create(UNKNOWN, // FIXME: Introduce detector.getScheme(target.getPath())!
-                        new Path(   parent.getModel().getMountPoint(),
+                        new Path(   enclArchive
+                                        .getController()
+                                        .getModel()
+                                        .getMountPoint(),
                                     enclEntryName));
             } else {
                 URI uri = target.toURI();
@@ -755,14 +758,26 @@ public class File extends java.io.File {
                                     uri.getQuery(), uri.getFragment());
                 }
                 mountPoint = MountPoint.create(UNKNOWN, Path.create(uri)); // FIXME: Introduce detector.getScheme(target.getPath())!
-                parent = new FileDriver().newController(mountPoint.getParent());
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
+
+        class Adapter implements FileSystemDriver<FileSystemModel> {
+            @Override
+            public FileSystemController<?> newController(
+                    MountPoint prospect,
+                    FileSystemController<?> parent) {
+                // FIXME: Replace new FileDriver() with ArchiveDetectorAdapter!
+                return prospect.equals(mountPoint)
+                        ? driver.newController(mountPoint, parent)
+                        : new FileDriver().newController(prospect);
+            }
+        } // class Adapter
+
         this.controller = FileSystemManagers
                 .getInstance()
-                .getController(mountPoint, driver, parent);
+                .getController(mountPoint, new Adapter());
     }
 
     /**
@@ -1159,7 +1174,7 @@ public class File extends java.io.File {
     throws ArchiveException {
         FileSystemManagers
                 .getInstance()
-                .sync(new ArchiveExceptionBuilder(), options, null);
+                .sync(options, new ArchiveExceptionBuilder(), null);
     }
 
     /**
@@ -1193,8 +1208,7 @@ public class File extends java.io.File {
             throw new IllegalArgumentException(archive.getPath() + " (not a top level federated file system)");
         FileSystemManagers
                 .getInstance()
-                .sync(  new ArchiveExceptionBuilder(),
-                        options,
+                .sync(  options, new ArchiveExceptionBuilder(),
                         archive.getController().getModel().getMountPoint());
     }
 

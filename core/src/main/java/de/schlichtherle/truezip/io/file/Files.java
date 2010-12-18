@@ -251,7 +251,7 @@ class Files {
         final Path path = Path.create(src.toURI(), true);
         return FileSystemManagers
                 .getInstance()
-                .getController( path.getMountPoint(), new FileDriver(), null)
+                .getController( path.getMountPoint(), new FileDriver())
                 .getInputSocket(path.getEntryName(), options);
     }
 
@@ -271,7 +271,7 @@ class Files {
         final Path path = Path.create(dst.toURI(), true);
         return FileSystemManagers
                 .getInstance()
-                .getController(  path.getMountPoint(), new FileDriver(), null)
+                .getController(  path.getMountPoint(), new FileDriver())
                 .getOutputSocket(path.getEntryName(), options, template);
     }
 

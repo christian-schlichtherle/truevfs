@@ -161,18 +161,20 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * parent file system.
      *
      * @param  <X> the type of the assembled {@code IOException} to throw.
-     * @param  builder the non-{@code null} exception builder to use for the
-     *         assembly of an {@code IOException} from one or more
-     *         {@code SyncException}s.
-     * @param  options the non-{@code null} synchronization options.
+     * @param  options the synchronization options.
+     * @param  builder the exception builder to use for the assembly of an
+     *         {@code IOException} from one or more input {@code SyncException}s.
      * @throws IOException at the discretion of the exception {@code builder}.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
+     *         and {@code FORCE_CLOSE_OUTPUT} is set.
      * @see    FileSystemModel#isTouched
      * @see    #UPDATE
      * @see    #UMOUNT
      */
-    public abstract <X extends IOException> void sync(
-            @NonNull ExceptionBuilder<? super SyncException, X> builder,
-            @NonNull BitField<SyncOption> options)
+    public abstract <X extends IOException>
+    void sync(  @NonNull BitField<SyncOption> options,
+                @NonNull ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException;
 
     /**
