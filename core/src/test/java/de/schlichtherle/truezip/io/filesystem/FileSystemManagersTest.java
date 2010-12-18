@@ -29,6 +29,7 @@ public class FileSystemManagersTest {
     @Test
     public void testInstance() {
         FileSystemManagerTestCase.gc();
+
         final FileSystemManager inst1 = FileSystemManagers.getInstance();
         assertNotNull(inst1);
         assertThat(inst1.size(), is(0));

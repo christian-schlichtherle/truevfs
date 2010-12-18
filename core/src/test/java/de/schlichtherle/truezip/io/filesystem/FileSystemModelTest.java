@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.filesystem;
 import java.net.URI;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.ROOT;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 

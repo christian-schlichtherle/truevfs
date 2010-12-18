@@ -47,15 +47,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.ROOT;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
-import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.Paths.*;
+import static de.schlichtherle.truezip.io.socket.OutputOption.*;
 
 /**
  * This is the base class for any archive controller, providing all the

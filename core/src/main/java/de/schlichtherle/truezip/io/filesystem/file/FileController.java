@@ -39,9 +39,9 @@ import java.net.URISyntaxException;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
-import static de.schlichtherle.truezip.io.Files.isCreatableOrWritable;
-import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntry.SEPARATOR;
+import static de.schlichtherle.truezip.io.Files.*;
+import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static java.io.File.separatorChar;
 
 /**

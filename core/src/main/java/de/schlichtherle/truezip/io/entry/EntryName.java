@@ -20,8 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
-
 /**
  * Addresses an entry in an entry container.
  * An entry name is usually constructed from a
@@ -65,6 +63,22 @@ import static de.schlichtherle.truezip.io.entry.Entry.SEPARATOR;
 public class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2927354934726235478L;
+
+    /**
+     * The separator string for base names in an entry name,
+     * which is {@value}.
+     *
+     * @see #SEPARATOR_CHAR
+     */
+    public static final String SEPARATOR = "/";
+
+    /**
+     * The separator character for base names in an entry name,
+     * which is {@value}.
+     *
+     * @see #SEPARATOR
+     */
+    public static final char SEPARATOR_CHAR = '/';
 
     /** Represents an entry name with an empty URI. */
     //public static final EntryName ROOT = EntryName.create(URI.create(Entry.ROOT));
@@ -173,7 +187,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * entry name against the given parent entry name.
      * Note that the URI of the parent entry name is considered to
      * name a directory even if it's not ending with a
-     * {@link Entry#SEPARATOR}, so calling this constructor with
+     * {@link #SEPARATOR}, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
      * entry names respectively will result in the URI
      * {@code "foo/bar"} for the resulting entry name.
