@@ -152,15 +152,16 @@ abstract class CommandLineUtility {
     protected static final class ProgressMonitor extends Thread {
         private final PrintStream err;
         private final Long[] args = new Long[2];
-        private final ManagedFileSystemStatistics stats;
+        private final ManagedFileSystemStatistics statistics;
 
         ProgressMonitor(final PrintStream err) {
             setDaemon(true);
             setPriority(Thread.MAX_PRIORITY);
             this.err = err;
             final StatisticsFileSystemManager manager
-                    = new StatisticsFileSystemManager();
-            this.stats = manager.getStatistics();
+                    = new StatisticsFileSystemManager(
+                        FileSystemManagers.getInstance());
+            this.statistics = manager.getStatistics();
             FileSystemManagers.setInstance(manager);
         }
 
@@ -194,8 +195,8 @@ abstract class CommandLineUtility {
          */
         private void showProgress() {
             // Round up to kilobytes.
-            args[0] = (stats.getTopLevelRead() + 1023) / 1024;
-            args[1] = (stats.getTopLevelWritten() + 1023) / 1024;
+            args[0] = (statistics.getTopLevelRead() + 1023) / 1024;
+            args[1] = (statistics.getTopLevelWritten() + 1023) / 1024;
             err.print(MessageFormat.format(
                     "Top level archive I/O: {0} / {1} KB        \r", (Object[]) args));
             err.flush();

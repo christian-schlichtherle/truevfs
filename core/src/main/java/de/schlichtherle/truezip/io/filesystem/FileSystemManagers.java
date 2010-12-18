@@ -15,8 +15,6 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -24,7 +22,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import net.jcip.annotations.ThreadSafe;
 
 import static de.schlichtherle.truezip.util.ClassLoaders.loadClass;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemController.*;
 
 /**
  * A static service locator and container for a default file system manager
@@ -82,13 +80,13 @@ public class FileSystemManagers {
     public static FileSystemManager getInstance() {
         FileSystemManager manager = instance;
         if (null == manager) {
-            synchronized (FileSystemManager.class) { // DCL does work in combination with volatile in JSE 5!
+            synchronized (FileSystemManagers.class) { // DCL does work in combination with volatile in JSE 5!
                 manager = instance;
                 if (null == manager) {
                     // FIXME: Use ServiceLoader instead!
                     final String name = System.getProperty(
                             FileSystemManager.class.getName(),
-                            FileSystemManager.class.getName());
+                            FederatedFileSystemManager.class.getName());
                     try {
                         manager = (FileSystemManager) loadClass(name, FileSystemManager.class)
                                 .newInstance();
@@ -168,45 +166,16 @@ public class FileSystemManagers {
         ShutdownRunnable(final FileSystemManager manager) {
             assert null != manager;
             this.manager = manager;
-            // Force loading the key manager now in order to prevent class
-            // loading when running the shutdown hook.
-            // This may help if this shutdown hook is run as a JVM shutdown
-            // hook in an app server environment where class loading is
-            // disabled.
-            // FIXME: This adds a dependency on the key manager,
-            // which is not acceptible!
-            PromptingKeyManager.getInstance();
         }
 
-        /**
-         * Runs all runnables added to the set.
-         * <p>
-         * Password prompting will be disabled in order to avoid
-         * {@link RuntimeException}s or even {@link Error}s in this shutdown
-         * hook.
-         * <p>
-         * Note that this method is <em>not</em> re-entrant and should not be
-         * directly called except for unit testing.
-         */
         @Override
         @SuppressWarnings("CallToThreadDumpStack")
         public void run() {
             try {
-                // Paranoid, but safe.
-                // FIXME: This adds a dependency on the key manager,
-                // which is not acceptible!
-                PromptingKeyManager.setPrompting(false);
+                manager.sync(UMOUNT, new SyncExceptionBuilder());
+            } catch (IOException ouch) {
                 // Logging doesn't work in a shutdown hook!
-                //FileSystemManager.logger.setLevel(Level.OFF);
-            } finally {
-                try {
-                    manager.sync(   BitField.of(FORCE_CLOSE_INPUT,
-                                                FORCE_CLOSE_OUTPUT), new SyncExceptionBuilder(),
-                                    null);
-                } catch (IOException ouch) {
-                    // Logging doesn't work in a shutdown hook!
-                    ouch.printStackTrace();
-                }
+                ouch.printStackTrace();
             }
         }
     } // class ShutdownRunnable

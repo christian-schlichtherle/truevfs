@@ -17,41 +17,56 @@ package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.util.Set;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Provides statistics for the federated file systems managed by the instances
- * of this class.
- * <p>
- * Note that this class is thread-safe.
+ * Provides statistics for the federated file systems managed by the decorated
+ * file system manager.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class StatisticsFileSystemManager
-extends FileSystemManager {
+extends FilterFileSystemManager<FileSystemManager> {
+
+    private volatile ManagedFileSystemStatistics statistics
+            = new ManagedFileSystemStatistics(this);
+
+    public StatisticsFileSystemManager(
+            @NonNull final FileSystemManager manager) {
+        super(manager);
+    }
 
     @Override
     public FileSystemController<?> getController(
             final MountPoint mountPoint,
             final FileSystemDriver<?> driver) {
-        final FileSystemController<?> controller
-                = super.getController(mountPoint, driver);
-        final FileSystemController<?> parent = controller.getParent();
-        return null != parent && null == parent.getParent() // controller is top level federated file system?
-                ? new StatisticsFileSystemController(controller, this)
-                : controller;
-    }
 
-    private ManagedFileSystemStatistics statistics
-            = new ManagedFileSystemStatistics(this);
+        class Driver implements FileSystemDriver<FileSystemModel> {
+            @Override
+            public FileSystemController<?> newController(
+                    MountPoint mountPoint,
+                    FileSystemController<?> parent) {
+                final FileSystemController<?> controller
+                        = driver.newController(mountPoint, parent);
+                return null != parent && null == parent.getParent() // controller is top level federated file system?
+                        ? new StatisticsFileSystemController(controller, StatisticsFileSystemManager.this)
+                        : controller;
+            }
+        } // class Driver
+
+        return manager.getController(mountPoint, new Driver());
+    }
 
     /**
      * Returns a non-{@code null} object which provides statistics about the
-     * set of federated file systems managed by this instance.
+     * set of federated file systems managed by the decorated file system
+     * manager.
      * The statistics provided by the returned object get asynchronously
-     * updated up to the next call to {@link #sync}. The
+     * updated up to the next call to {@link #sync}.
      * <p>
      * Note that there may be a slight delay until the values returned reflect
      * the actual state of this package.
@@ -60,18 +75,24 @@ extends FileSystemManager {
      * @see #sync
      * @see ManagedFileSystemStatistics#isClosed
      */
-    public synchronized ManagedFileSystemStatistics getStatistics() {
+    @NonNull
+    public ManagedFileSystemStatistics getStatistics() {
         return statistics;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * After the synchronization, this implementation creates a new statistics
+     * object to be returned by a subsequent call to {@link #getStatistics}.
+     */
     @Override
-    public synchronized <E extends IOException>
+    public <E extends IOException>
     void sync(  BitField<SyncOption> options,
-                ExceptionBuilder<? super IOException, E> builder,
-                MountPoint prefix)
+                ExceptionBuilder<? super IOException, E> builder)
     throws E {
         try {
-            super.sync(options, builder, prefix);
+            super.sync(options, builder);
         } finally {
             statistics = new ManagedFileSystemStatistics(this);
         }

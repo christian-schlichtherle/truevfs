@@ -22,16 +22,16 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Provides statistics for the federated file systems managed by a single file
  * system manager.
- * <p>
- * Note that this class is thread-safe.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class ManagedFileSystemStatistics {
 
     private final StatisticsFileSystemManager manager;

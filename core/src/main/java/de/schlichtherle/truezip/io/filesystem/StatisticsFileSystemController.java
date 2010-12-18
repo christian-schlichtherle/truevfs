@@ -34,7 +34,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class StatisticsFileSystemController
+class StatisticsFileSystemController
 extends FilterFileSystemController<FileSystemModel, FileSystemController<?>> {
 
     private final StatisticsFileSystemManager manager;

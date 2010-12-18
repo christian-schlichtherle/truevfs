@@ -20,6 +20,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.net.URI;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPasswordField;
 import junit.framework.Assert;
 import org.netbeans.jemmy.ComponentChooser;
@@ -260,13 +262,15 @@ public class RemoteControl extends Assert implements Runnable {
         return error;
     }
 
+    @SuppressWarnings("SleepWhileHoldingLock")
     private void pushDefaultButton(JDialogOperator dialog) {
         final JButtonOperator ok = new JButtonOperator(
                 dialog.getRootPane().getDefaultButton());
         while (!ok.isEnabled()) {
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException ex) {
+                Logger.getLogger(RemoteControl.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
             }
         }
         ok.push();

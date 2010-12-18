@@ -404,7 +404,7 @@ extends FileSystemController<ArchiveModel> {
      * @param  name the non-{@code null} entry name.
      * @param  intention the intended operation on the entry. If {@code null},
      *         a pure file system operation with no I/O is intended.
-     * @see    FileSystemController#sync(ExceptionBuilder, BitField)
+     * @see    FileSystemController#sync
      * @throws IOException if any exceptional condition occurs
      *         throughout the synchronization of the target archive file.
      * @throws NotWriteLockedException

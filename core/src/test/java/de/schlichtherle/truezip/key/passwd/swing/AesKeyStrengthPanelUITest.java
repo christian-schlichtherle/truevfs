@@ -19,6 +19,8 @@ package de.schlichtherle.truezip.key.passwd.swing;
 import de.schlichtherle.truezip.key.AesKeyProvider;
 import java.awt.EventQueue;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import junit.framework.TestCase;
 import org.netbeans.jemmy.JemmyProperties;
@@ -176,7 +178,7 @@ public class AesKeyStrengthPanelUITest extends TestCase {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
-            throw new UndeclaredThrowableException(ex);
+            Logger.getLogger(AesKeyStrengthPanelUITest.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 }
