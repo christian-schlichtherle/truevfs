@@ -113,7 +113,7 @@ class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final long end = fileLength - footer.length;
         rof.seek(end);
         rof.readFully(footer);
-        if (this.rof.read() != -1) {
+        if (this.delegate.read() != -1) {
             // This should never happen unless someone is writing to the
             // end of the file concurrently!
             throw new RaesException(

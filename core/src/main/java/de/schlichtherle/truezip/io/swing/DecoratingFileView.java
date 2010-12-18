@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import javax.swing.filechooser.FileView;
 import javax.swing.Icon;
@@ -32,34 +33,18 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-abstract class FilterFileView extends FileView {
+abstract class DecoratingFileView extends FileView {
 
-    /** The file view to be decorated - may be {@code null}. */
-    private FileView delegate;
+    /** The nullable decorated file view. */
+    @Nullable
+    protected final FileView delegate;
 
     /**
      * Constructs a new decorating file view.
      *
      * @param delegate The file view to be decorated - may be {@code null}.
      */
-    protected FilterFileView(final FileView delegate) {
-        this.delegate = delegate;
-    }
-
-    /** Returns the file view to be decorated - may be {@code null}. */
-    public FileView getDelegate() {
-        return delegate;
-    }
-
-    /**
-     * Sets the file view to be decorated - may be {@code null}.
-     *
-     * @throws IllegalArgumentException If {@code delegate} is this
-     *         instance.
-     */
-    public void setDelegate(final FileView delegate) {
-        if (delegate == this)
-            throw new IllegalArgumentException();
+    protected DecoratingFileView(final FileView delegate) {
         this.delegate = delegate;
     }
 

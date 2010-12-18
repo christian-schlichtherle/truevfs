@@ -76,10 +76,10 @@ public abstract class FileSystemManagerTestCase {
                 parent = controller;
             }
 
-            assertThat(manager.size(), is(params.length));
+            assertThat(manager.getSize(), is(params.length));
             parent = null;
             gc();
-            assertThat(manager.size(), is(0));
+            assertThat(manager.getSize(), is(0));
         }
     }
 
@@ -118,11 +118,11 @@ public abstract class FileSystemManagerTestCase {
             }
             assertThat(i.hasNext(), is(false));
 
-            assertThat(manager.size(), is(params.length));
+            assertThat(manager.getSize(), is(params.length));
             member = null;
             i = null;
             gc();
-            assertThat(manager.size(), is(0));
+            assertThat(manager.getSize(), is(0));
         }
     }
 

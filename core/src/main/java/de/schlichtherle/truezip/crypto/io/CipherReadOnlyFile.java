@@ -17,7 +17,7 @@
 package de.schlichtherle.truezip.crypto.io;
 
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import org.bouncycastle.crypto.Mac;
@@ -32,7 +32,7 @@ import org.bouncycastle.crypto.Mac;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in the base class {@link FilterReadOnlyFile}.
+ * in the base class {@link DecoratingReadOnlyFile}.
  *
  * @author Christian Schlichtherle
  * @version $Id$
@@ -56,7 +56,7 @@ import org.bouncycastle.crypto.Mac;
 // have to provide another buffer to copy the data into before we could
 // actually decrypt it, which is redundant.
 //
-public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
+public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
      * The maximum buffer length of the window to the encrypted file.
@@ -158,7 +158,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
      * @throws IllegalStateException If this object has already been
      *         initialized.
      *         This exception is <em>not</em> recoverable.
-     * @throws NullPointerException If {@link #rof} or {@code cipher} is
+     * @throws NullPointerException If {@link #delegate} or {@code cipher} is
      *         {@code null}.
      *         This exception <em>is</em> recoverable.
      */
@@ -174,7 +174,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             throw new IllegalStateException("file is already initialized");
 
         // Check state (recoverable).
-        if (rof == null)
+        if (delegate == null)
             throw new NullPointerException("rof");
 
         // Check parameters (fail fast).
@@ -345,7 +345,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
         // Order is important here!
         closed = true;
         cipher = null;
-        rof.close();
+        delegate.close();
     }
 
     /**
@@ -396,7 +396,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             final int blockLen = block.length;
             windowOff = fp / blockLen * blockLen; // round down to multiple of block size
             if (windowOff != nextWindowOff)
-                rof.seek(windowOff + start);
+                delegate.seek(windowOff + start);
 
             // Fill window until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -404,7 +404,7 @@ public abstract class CipherReadOnlyFile extends FilterReadOnlyFile {
             // contract.
             int n = 0;
             do {
-                int read = rof.read(window, n, windowLen - n);
+                int read = delegate.read(window, n, windowLen - n);
                 if (read < 0)
                     break;
                 n += read;

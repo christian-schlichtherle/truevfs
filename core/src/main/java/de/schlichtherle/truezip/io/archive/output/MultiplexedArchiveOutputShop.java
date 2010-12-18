@@ -15,15 +15,15 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.socket.OutputShop;
-import de.schlichtherle.truezip.io.socket.FilterOutputShop;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
@@ -63,7 +63,7 @@ import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
  * @version $Id$
  */
 public class MultiplexedArchiveOutputShop<AE extends ArchiveEntry>
-extends FilterOutputShop<AE, OutputShop<AE>> {
+extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -86,13 +86,13 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public int size() {
-        return container.size() + temps.size();
+    public int getSize() {
+        return delegate.getSize() + temps.size();
     }
 
     @Override
     public Iterator<AE> iterator() {
-        return new JointIterator<AE>(container.iterator(), new TempEntriesIterator());
+        return new JointIterator<AE>(delegate.iterator(), new TempEntriesIterator());
     }
 
     private class TempEntriesIterator implements Iterator<AE> {
@@ -117,7 +117,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
 
     @Override
     public AE getEntry(String name) {
-        final AE entry = container.getEntry(name);
+        final AE entry = delegate.getEntry(name);
         if (null != entry)
             return entry;
         final TempEntryOutputStream out = temps.get(name);
@@ -129,7 +129,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends FilterOutputSocket<AE> {
+        class Output extends DecoratingOutputSocket<AE> {
             Output() {
                 super(MultiplexedArchiveOutputShop.super.getOutputSocket(entry));
             }
@@ -171,7 +171,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
     }
 
     /** This entry output stream writes directly to the output archive. */
-    private class EntryOutputStream extends FilterOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
         EntryOutputStream(final OutputStream out) {
@@ -200,7 +200,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
      * archive is still busy.
      */
     private class TempEntryOutputStream
-    extends FilterOutputStream {
+    extends DecoratingOutputStream {
         private final FileEntry temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
@@ -216,7 +216,7 @@ extends FilterOutputShop<AE, OutputShop<AE>> {
             this.output = output;
             this.local = output.getLocalTarget();
             this.peer = output.getPeerTarget();
-            class ProxyInput extends FilterInputSocket<Entry> {
+            class ProxyInput extends DecoratingInputSocket<Entry> {
                 private final Entry target = null != peer ? peer : temp;
 
                 ProxyInput() {

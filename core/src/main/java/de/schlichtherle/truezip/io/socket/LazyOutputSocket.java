@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public final class LazyOutputSocket<LT extends Entry>
-extends FilterOutputSocket<LT> {
+extends DecoratingOutputSocket<LT> {
 
     public LazyOutputSocket(final OutputSocket<? extends LT> output) {
         super(output);
@@ -38,13 +38,13 @@ extends FilterOutputSocket<LT> {
         return new LazyOutputStream();
     }
 
-    private class LazyOutputStream extends FilterOutputStream {
+    private class LazyOutputStream extends DecoratingOutputStream {
         LazyOutputStream() {
             super(null);
         }
 
         OutputStream getOutputStream() throws IOException {
-            return null != out ? out : (out = getBoundSocket().newOutputStream());
+            return null != delegate ? delegate : (delegate = getBoundSocket().newOutputStream());
         }
 
         @Override
@@ -64,8 +64,8 @@ extends FilterOutputSocket<LT> {
 
         @Override
         public void close() throws IOException {
-            if (null != out)
-                out.close();
+            if (null != delegate)
+                delegate.close();
         }
     } // class LazyOutputStream
 }

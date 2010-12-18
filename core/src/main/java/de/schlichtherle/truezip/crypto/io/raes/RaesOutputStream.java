@@ -64,7 +64,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *        {@link RaesParametersAgent} interface.
      *        Instances of this interface are recursively used to find RAES
      *        parameters which match a known RAES type.
-     * @throws NullPointerException If {@link #out} is {@code null}
+     * @throws NullPointerException If {@link #delegate} is {@code null}
      *         or {@code parameters} is {@code null}.
      * @throws IllegalArgumentException If an illegal keyStrength is provided
      *         in the parameters.

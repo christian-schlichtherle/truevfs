@@ -83,7 +83,7 @@ extends FileSystemArchiveController<E> {
         }
 
         @Override
-        public int size() {
+        public int getSize() {
             return 0;
         }
 
@@ -120,7 +120,7 @@ extends FileSystemArchiveController<E> {
 
         /** Returns the product of the archive driver this input is wrapping. */
         InputShop<E> getDriverProduct() {
-            return container;
+            return delegate;
         }
     }
 
@@ -138,7 +138,7 @@ extends FileSystemArchiveController<E> {
 
         /** Returns the product of the archive driver this output is wrapping. */
         OutputShop<E> getDriverProduct() {
-            return container;
+            return delegate;
         }
     }
 

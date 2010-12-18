@@ -19,9 +19,9 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
-import de.schlichtherle.truezip.io.socket.FilterOutputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.FilterInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -124,7 +124,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final ArchiveModel model,
             final InputSocket<?> target)
     throws IOException {
-        class Input extends FilterInputSocket<Entry> {
+        class Input extends DecoratingInputSocket<Entry> {
             Input() {
                 super(target);
             }
@@ -191,7 +191,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
-        class Output extends FilterOutputSocket<Entry> {
+        class Output extends DecoratingOutputSocket<Entry> {
             Output() {
                 super(target);
             }

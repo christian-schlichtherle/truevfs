@@ -19,7 +19,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.ByteBuffer;
 import de.schlichtherle.truezip.util.Pool;
 import java.nio.charset.Charset;
-import de.schlichtherle.truezip.io.FilterInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import java.util.Iterator;
 import de.schlichtherle.truezip.io.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -936,7 +936,7 @@ implements Iterable<E>, Closeable {
      * checked in the method {@code close}.
      */
     private static final class RawCheckedInputStream
-    extends FilterInputStream {
+    extends DecoratingInputStream {
 
         private final Checksum crc = new CRC32();
         private final byte[] singleByteBuf = new byte[1];
@@ -987,7 +987,7 @@ implements Iterable<E>, Closeable {
                 throw new IndexOutOfBoundsException();
 
             // Read data.
-            final int read = in.read(buf, off, len);
+            final int read = delegate.read(buf, off, len);
 
             // Feed inflater.
             if (read >= 0) {

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.tar;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.Streams;
@@ -77,7 +77,7 @@ implements OutputShop<TarEntry> {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return entries.size();
     }
 
@@ -143,7 +143,7 @@ implements OutputShop<TarEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(TarEntry)}.
      */
-    private class EntryOutputStream extends FilterOutputStream {
+    private class EntryOutputStream extends DecoratingOutputStream {
         private boolean closed;
 
         EntryOutputStream(final TarEntry entry)
@@ -156,7 +156,7 @@ implements OutputShop<TarEntry> {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
+            delegate.write(b, off, len);
         }
 
         @Override
@@ -176,7 +176,7 @@ implements OutputShop<TarEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends FilterOutputStream {
+    private class TempEntryOutputStream extends DecoratingOutputStream {
         private final File temp;
         private final TarEntry entry;
         private boolean closed;

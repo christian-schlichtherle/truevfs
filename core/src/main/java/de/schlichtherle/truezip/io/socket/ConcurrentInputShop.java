@@ -15,11 +15,11 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.FilterInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SynchronizedReadOnlyFile;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 public class ConcurrentInputShop<E extends Entry>
-extends FilterInputShop<E, InputShop<E>> {
+extends DecoratingInputShop<E, InputShop<E>> {
 
     private static final String CLASS_NAME
             = ConcurrentInputShop.class.getName();
@@ -179,7 +179,7 @@ extends FilterInputShop<E, InputShop<E>> {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends FilterInputSocket<E> {
+        class Input extends DecoratingInputSocket<E> {
             Input() {
                 super(ConcurrentInputShop.super.getInputSocket(name));
             }
@@ -223,9 +223,9 @@ extends FilterInputShop<E, InputShop<E>> {
                 if (closed)
                     return;
                 try {
-                    in.close();
+                    delegate.close();
                 } finally {
-                    threads.remove(in);
+                    threads.remove(delegate);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }
@@ -247,16 +247,16 @@ extends FilterInputShop<E, InputShop<E>> {
                 if (closed)
                     return;
                 try {
-                    rof.close();
+                    delegate.close();
                 } finally {
-                    threads.remove(rof);
+                    threads.remove(delegate);
                     lock.notify(); // there can be only one waiting thread!
                 }
             }
         }
     } // class SynchronizedConcurrentReadOnlyFile
 
-    private final class ConcurrentInputStream extends FilterInputStream {
+    private final class ConcurrentInputStream extends DecoratingInputStream {
         ConcurrentInputStream(final InputStream in) {
             super(in);
         }
@@ -264,48 +264,48 @@ extends FilterInputShop<E, InputShop<E>> {
         @Override
         public int read() throws IOException {
             assertNotShopClosed();
-            return in.read();
+            return delegate.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             assertNotShopClosed();
-            return in.read(b, off, len);
+            return delegate.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
             assertNotShopClosed();
-            return in.skip(n);
+            return delegate.skip(n);
         }
 
         @Override
         public int available() throws IOException {
             assertNotShopClosed();
-            return in.available();
+            return delegate.available();
         }
 
         @Override
         public void mark(int readlimit) {
             if (!closed)
-                in.mark(readlimit);
+                delegate.mark(readlimit);
         }
 
         @Override
         public void reset() throws IOException {
             assertNotShopClosed();
-            in.reset();
+            delegate.reset();
         }
 
         @Override
         public boolean markSupported() {
-            return !closed && in.markSupported();
+            return !closed && delegate.markSupported();
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                in.close();
+                delegate.close();
         }
 
         /**
@@ -324,7 +324,7 @@ extends FilterInputShop<E, InputShop<E>> {
         }
     } // class ConcurrentInputStream
 
-    private final class ConcurrentReadOnlyFile extends FilterReadOnlyFile {
+    private final class ConcurrentReadOnlyFile extends DecoratingReadOnlyFile {
         ConcurrentReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
@@ -332,43 +332,43 @@ extends FilterInputShop<E, InputShop<E>> {
         @Override
         public long length() throws IOException {
             assertNotShopClosed();
-            return rof.length();
+            return delegate.length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
             assertNotShopClosed();
-            return rof.getFilePointer();
+            return delegate.getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
             assertNotShopClosed();
-            rof.seek(pos);
+            delegate.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
             assertNotShopClosed();
-            return rof.read();
+            return delegate.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             assertNotShopClosed();
-            return rof.read(b, off, len);
+            return delegate.read(b, off, len);
         }
 
         @Override
         public void readFully(byte[] b, int off, int len) throws IOException {
             assertNotShopClosed();
-            rof.readFully(b, off, len);
+            delegate.readFully(b, off, len);
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                rof.close();
+                delegate.close();
         }
 
         /**

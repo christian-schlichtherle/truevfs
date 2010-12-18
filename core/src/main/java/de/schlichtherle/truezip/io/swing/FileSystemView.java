@@ -60,7 +60,7 @@ import javax.swing.UIManager;
 // system (like TrueZIP provides) - the current JFileChooser is just not able
 // to do this right.
 //
-public class FileSystemView extends FilterFileSystemView {
+public class FileSystemView extends DecoratingFileSystemView {
 
     private static FileSystemView defaultView = new FileSystemView(
             javax.swing.filechooser.FileSystemView.getFileSystemView(),

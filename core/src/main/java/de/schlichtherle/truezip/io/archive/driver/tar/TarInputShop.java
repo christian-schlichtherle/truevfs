@@ -199,7 +199,7 @@ implements InputShop<TarEntry> {
     }
 
     @Override
-    public final int size() {
+    public final int getSize() {
         return entries.size();
     }
 

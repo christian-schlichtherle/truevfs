@@ -15,36 +15,37 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Clean room implementation of its {@link java.io.FilterInputStream cousin }
+ * Clean room implementation of its cousin {@link java.io.FilterInputStream}
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     FilterOutputStream
- * @see     SynchronizedInputStream for a thread-safe filter input stream.
+ * @see     DecoratingOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterInputStream extends InputStream {
+public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
-    protected InputStream in;
+    @Nullable
+    protected InputStream delegate;
 
     /**
      * Constructs a new filter input stream.
      *
      * @param in the input stream to wrap in this decorator.
      */
-    protected FilterInputStream(final InputStream in) {
-        this.in = in;
+    protected DecoratingInputStream(final InputStream in) {
+        this.delegate = in;
     }
 
     @Override
-	public int read() throws IOException {
-        return in.read();
+    public int read() throws IOException {
+        return delegate.read();
     }
 
     @Override
@@ -54,36 +55,36 @@ public abstract class FilterInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        return in.read(b, off, len);
+        return delegate.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
-        return in.skip(n);
+        return delegate.skip(n);
     }
 
     @Override
     public int available() throws IOException {
-        return in.available();
+        return delegate.available();
     }
 
     @Override
     public void close() throws IOException {
-        in.close();
+        delegate.close();
     }
 
     @Override
     public void mark(int readlimit) {
-        in.mark(readlimit);
+        delegate.mark(readlimit);
     }
 
     @Override
     public void reset() throws IOException {
-        in.reset();
+        delegate.reset();
     }
 
     @Override
     public boolean markSupported() {
-        return in.markSupported();
+        return delegate.markSupported();
     }
 }

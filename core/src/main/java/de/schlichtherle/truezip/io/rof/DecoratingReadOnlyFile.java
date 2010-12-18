@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.schlichtherle.truezip.io.rof;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 
 /**
@@ -54,54 +54,53 @@ import java.io.IOException;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in {@link FilterReadOnlyFile}.
+ * in {@link DecoratingReadOnlyFile}.
  * </blockquote>
- * <p>
- * This class is <em>not</em> thread-safe.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterReadOnlyFile extends AbstractReadOnlyFile {
+public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
-    protected ReadOnlyFile rof;
+    @Nullable
+    protected ReadOnlyFile delegate;
 
     /**
-     * Creates a new instance of {@code FilterReadOnlyFile},
+     * Creates a new instance of {@code DecoratingReadOnlyFile},
      * which filters the given read only file.
      */
-    protected FilterReadOnlyFile(ReadOnlyFile rof) {
-        this.rof = rof;
+    protected DecoratingReadOnlyFile(ReadOnlyFile rof) {
+        this.delegate = rof;
     }
 
     @Override
-	public long length() throws IOException {
-        return rof.length();
+    public long length() throws IOException {
+        return delegate.length();
     }
 
     @Override
-	public long getFilePointer() throws IOException {
-        return rof.getFilePointer();
+    public long getFilePointer() throws IOException {
+        return delegate.getFilePointer();
     }
 
     @Override
-	public void seek(long pos) throws IOException {
-        rof.seek(pos);
+    public void seek(long pos) throws IOException {
+        delegate.seek(pos);
     }
 
     @Override
-	public int read() throws IOException {
-        return rof.read();
+    public int read() throws IOException {
+        return delegate.read();
     }
 
     @Override
-	public int read(byte[] b, int off, int len) throws IOException {
-        return rof.read(b, off, len);
+    public int read(byte[] b, int off, int len) throws IOException {
+        return delegate.read(b, off, len);
     }
 
     @Override
-	public void close() throws IOException {
-        rof.close();
+    public void close() throws IOException {
+        delegate.close();
     }
 }

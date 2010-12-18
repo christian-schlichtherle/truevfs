@@ -26,7 +26,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class SynchronizedInputStream extends FilterInputStream {
+public class SynchronizedInputStream extends DecoratingInputStream {
 
     /** The object to synchronize on - never {@code null}. */
     protected final Object lock;

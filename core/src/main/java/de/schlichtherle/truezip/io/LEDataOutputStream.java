@@ -35,7 +35,7 @@ import java.io.OutputStream;
  * @version $Id$
  */
 public class LEDataOutputStream
-extends FilterOutputStream
+extends DecoratingOutputStream
 implements DataOutput {
 
     /** This buffer is used for writing data. */
@@ -80,7 +80,7 @@ implements DataOutput {
      */
     @Override
     public void write(int b) throws IOException {
-	out.write(b);
+	delegate.write(b);
         incCount(1);
     }
 
@@ -98,7 +98,7 @@ implements DataOutput {
     @Override
     public void write(byte b[], int off, int len)
     throws IOException {
-	out.write(b, off, len);
+	delegate.write(b, off, len);
 	incCount(len);
     }
 
@@ -115,7 +115,7 @@ implements DataOutput {
      */
     @Override
 	public final void writeBoolean(boolean b) throws IOException {
-	out.write(b ? 1 : 0);
+	delegate.write(b ? 1 : 0);
 	incCount(1);
     }
 
@@ -130,7 +130,7 @@ implements DataOutput {
      */
     @Override
 	public final void writeByte(int b) throws IOException {
-	out.write(b);
+	delegate.write(b);
         incCount(1);
     }
 
@@ -162,7 +162,7 @@ implements DataOutput {
         buf[0] = (byte) s;
         s >>= 8;
         buf[1] = (byte) s;
-        out.write(buf, 0, 2);
+        delegate.write(buf, 0, 2);
         incCount(2);
     }
 
@@ -184,7 +184,7 @@ implements DataOutput {
         buf[2] = (byte) i;
         i >>= 8;
         buf[3] = (byte) i;
-        out.write(buf, 0, 4);
+        delegate.write(buf, 0, 4);
         incCount(4);
     }
 
@@ -214,7 +214,7 @@ implements DataOutput {
         buf[6] = (byte) l;
         l >>= 8;
         buf[7] = (byte) l;
-        out.write(buf, 0, 8);
+        delegate.write(buf, 0, 8);
 	incCount(8);
     }
 

@@ -15,12 +15,12 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.FilterInputStream;
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
@@ -161,7 +161,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                 final OutputSocket<? extends LT> output
                         = outputProxy.getBoundSocket();
                 assert null == output.getPeerTarget();
-                class ProxyInput extends FilterInputSocket<Entry> {
+                class ProxyInput extends DecoratingInputSocket<Entry> {
                     ProxyInput() {
                         super(FileInputSocket.get(buffer.file));
                     }
@@ -227,7 +227,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
             this.file = file;
         }
 
-        final class BufferReadOnlyFile extends FilterReadOnlyFile {
+        final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
             boolean closed;
 
             BufferReadOnlyFile() throws IOException {
@@ -240,14 +240,14 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                     return;
                 closed = true;
                 try {
-                    rof.close();
+                    delegate.close();
                 } finally {
                     getInputStrategy().release(Buffer.this);
                 }
             }
         } // class BufferReadOnlyFile
 
-        final class BufferInputStream extends FilterInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class BufferInputStream extends DecoratingInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
             BufferInputStream() throws IOException {
@@ -260,14 +260,14 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                     return;
                 closed = true;
                 try {
-                    in.close();
+                    delegate.close();
                 } finally {
                     getInputStrategy().release(Buffer.this);
                 }
             }
         } // class BufferInputStream
 
-        final class BufferOutputStream extends FilterOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class BufferOutputStream extends DecoratingOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
             BufferOutputStream() throws IOException {
@@ -280,7 +280,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
                     return;
                 closed = true;
                 try {
-                    out.close();
+                    delegate.close();
                 } finally {
                     getOutputStrategy().release(Buffer.this);
                 }
@@ -288,7 +288,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         } // class BufferOutputStream
     } // class Buffer
 
-    private final class InputSocketProxy extends FilterInputSocket<LT> {
+    private final class InputSocketProxy extends DecoratingInputSocket<LT> {
         InputSocketProxy(final InputSocket <? extends LT> input) {
             super(input);
         }
@@ -321,7 +321,7 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         }
     } // class InputProxy
 
-    private final class OutputSocketProxy extends FilterOutputSocket<LT> {
+    private final class OutputSocketProxy extends DecoratingOutputSocket<LT> {
         OutputSocketProxy(final OutputSocket<? extends LT> output) {
             super(output);
         }

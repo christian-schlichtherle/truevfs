@@ -47,6 +47,11 @@ implements InputShop<ZipEntry> {
     }
 
     @Override
+    public int getSize() {
+        return super.size();
+    }
+
+    @Override
     public InputSocket<ZipEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();

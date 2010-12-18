@@ -16,24 +16,25 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
 /**
- * @see     FilterInputSocket
+ * @see     DecoratingOutputSocket
  * @param   <LT> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterOutputSocket<LT extends Entry>
-extends OutputSocket<LT> {
+public abstract class DecoratingInputSocket<LT extends Entry>
+extends InputSocket<LT> {
 
-    private final OutputSocket<? extends LT> output;
+    private final InputSocket<? extends LT> delegate;
 
-    protected FilterOutputSocket(final OutputSocket<? extends LT> output) {
-        if (null == output)
+    protected DecoratingInputSocket(final InputSocket<? extends LT> input) {
+        if (null == input)
             throw new NullPointerException();
-        this.output = output;
+        this.delegate = input;
     }
 
     /**
@@ -44,8 +45,8 @@ extends OutputSocket<LT> {
      * @throws IOException at the discretion of an overriding method.
      * @return The bound filtered socket.
      */
-    protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
-        return output.bind(this);
+    protected InputSocket<? extends LT> getBoundSocket() throws IOException {
+        return delegate.bind(this);
     }
 
     @Override
@@ -59,7 +60,12 @@ extends OutputSocket<LT> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
-        return getBoundSocket().newOutputStream();
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        return getBoundSocket().newReadOnlyFile();
+    }
+
+    @Override
+    public InputStream newInputStream() throws IOException {
+        return getBoundSocket().newInputStream();
     }
 }

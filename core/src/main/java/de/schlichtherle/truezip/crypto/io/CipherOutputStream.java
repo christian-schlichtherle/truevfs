@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.crypto.io;
 
-import de.schlichtherle.truezip.io.FilterOutputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  *
  * @author Christian Schlichtherle
  */
-public class CipherOutputStream extends FilterOutputStream {
+public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
     protected BufferedBlockCipher cipher;
@@ -101,7 +101,7 @@ public class CipherOutputStream extends FilterOutputStream {
             outBuf = new byte[outLen];
         outLen = cipher.processByte((byte) b, outBuf, 0);
         if (outLen > 0)
-            out.write(outBuf, 0, outLen);
+            delegate.write(outBuf, 0, outLen);
     }
 
     /**
@@ -124,7 +124,7 @@ public class CipherOutputStream extends FilterOutputStream {
         if (outLen > outBuf.length)
             outBuf = new byte[outLen];
         outLen = cipher.processBytes(buf, off, len, outBuf, 0);
-        out.write(outBuf, 0, outLen);
+        delegate.write(outBuf, 0, outLen);
     }
 
     /**
@@ -151,15 +151,16 @@ public class CipherOutputStream extends FilterOutputStream {
         } catch (InvalidCipherTextException icte) {
             throw new IOException(icte);
         }
-        out.write(outBuf, 0, outLen);
-        out.flush();
+        delegate.write(outBuf, 0, outLen);
+        delegate.flush();
         //outBuf = new byte[0];
     }
 
     /**
      * Closes this output stream and releases any resources associated with it.
      * This method calls {@link #finish()} and then closes and nullifies
-     * the underlying output stream {@link #out} and the cipher {@link #cipher}.
+     * the underlying output stream {@link #delegate} and the cipher
+     * {@link #cipher}.
      *
      * @throws IOException If an I/O error occurs.
      */

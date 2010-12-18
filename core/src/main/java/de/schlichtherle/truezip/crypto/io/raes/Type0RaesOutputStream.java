@@ -146,7 +146,7 @@ class Type0RaesOutputStream extends RaesOutputStream {
 
         // Init stream chain.
         dos = new LEDataOutputStream(out);
-        this.out = new MacOutputStream(dos, mac);
+        this.delegate = new MacOutputStream(dos, mac);
 
         // Write data envelope header.
         dos.writeInt(SIGNATURE);

@@ -32,7 +32,7 @@ public class FileSystemManagersTest {
 
         final FileSystemManager inst1 = FileSystemManagers.getInstance();
         assertNotNull(inst1);
-        assertThat(inst1.size(), is(0));
+        assertThat(inst1.getSize(), is(0));
 
         FileSystemManagers.setInstance(null);
         final FileSystemManager inst2 = FileSystemManagers.getInstance();

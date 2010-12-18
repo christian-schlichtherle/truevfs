@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public final class StatisticsFileSystemManager
-extends FilterFileSystemManager<FileSystemManager> {
+extends DecoratingFileSystemManager<FileSystemManager> {
 
     private volatile ManagedFileSystemStatistics statistics
             = new ManagedFileSystemStatistics(this);
@@ -58,7 +58,7 @@ extends FilterFileSystemManager<FileSystemManager> {
             }
         } // class Driver
 
-        return manager.getController(mountPoint, new Driver());
+        return delegate.getController(mountPoint, new Driver());
     }
 
     /**

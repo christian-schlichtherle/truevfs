@@ -86,7 +86,7 @@ public class TarBZip2Driver extends TarDriver {
     /**
      * Constructs a new TAR.BZ2 driver.
      *
-     * @param inBlockSize The compression block size to use when writing
+     * @param inBlockSize The compression block getSize to use when writing
      *        a BZIP2 output stream.
      * @throws IllegalArgumentException If {@code inBlockSize} is not
      *         in the range [1..9].

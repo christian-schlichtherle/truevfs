@@ -15,9 +15,9 @@
  */
 package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.FilterInputStream;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ import java.io.InputStream;
  * @version $Id$
  */
 public final class LazyInputSocket<LT extends Entry>
-extends FilterInputSocket<LT> {
+extends DecoratingInputSocket<LT> {
 
     public LazyInputSocket(final InputSocket<? extends LT> input) {
         super(input);
@@ -45,13 +45,13 @@ extends FilterInputSocket<LT> {
         return new LazyInputStream();
     }
 
-    private class LazyReadOnlyFile extends FilterReadOnlyFile {
+    private class LazyReadOnlyFile extends DecoratingReadOnlyFile {
         LazyReadOnlyFile() {
             super(null);
         }
 
         ReadOnlyFile getReadOnlyFile() throws IOException {
-            return null != rof ? rof : (rof = getBoundSocket().newReadOnlyFile());
+            return null != delegate ? delegate : (delegate = getBoundSocket().newReadOnlyFile());
         }
 
         @Override
@@ -81,18 +81,18 @@ extends FilterInputSocket<LT> {
 
         @Override
         public void close() throws IOException {
-            if (null != rof)
-                rof.close();
+            if (null != delegate)
+                delegate.close();
         }
     } // class LazyReadOnlyFile
 
-    private class LazyInputStream extends FilterInputStream {
+    private class LazyInputStream extends DecoratingInputStream {
         LazyInputStream() {
             super(null);
         }
 
         InputStream getInputStream() throws IOException {
-            return null != in ? in : (in = getBoundSocket().newInputStream());
+            return null != delegate ? delegate : (delegate = getBoundSocket().newInputStream());
         }
 
         @Override
@@ -117,8 +117,8 @@ extends FilterInputSocket<LT> {
 
         @Override
         public void close() throws IOException {
-            if (null != in)
-                in.close();
+            if (null != delegate)
+                delegate.close();
         }
 
         @Override

@@ -22,35 +22,35 @@ package de.schlichtherle.truezip.io.entry;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FilterEntry<E extends Entry>
+public abstract class DecoratingEntry<E extends Entry>
 implements Entry {
 
     /** The decorated entry. */
-    protected final E entry;
+    protected final E delegate;
 
-    protected FilterEntry(final E entry) {
+    protected DecoratingEntry(final E entry) {
         if (null == entry)
             throw new NullPointerException();
-        this.entry = entry;
+        this.delegate = entry;
     }
 
     @Override
     public String getName() {
-        return entry.getName();
+        return delegate.getName();
     }
 
     @Override
     public Type getType() {
-        return entry.getType();
+        return delegate.getType();
     }
 
     @Override
     public long getSize(Size type) {
-        return entry.getSize(type);
+        return delegate.getSize(type);
     }
 
     @Override
     public long getTime(Access type) {
-        return entry.getTime(type);
+        return delegate.getTime(type);
     }
 }

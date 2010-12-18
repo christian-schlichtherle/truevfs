@@ -16,7 +16,7 @@
 package de.schlichtherle.truezip.crypto.io.raes;
 
 import de.schlichtherle.truezip.crypto.io.CipherReadOnlyFile;
-import de.schlichtherle.truezip.io.rof.FilterReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import java.io.File;
@@ -58,7 +58,7 @@ import static de.schlichtherle.truezip.crypto.io.raes.RaesConstants.*;
  * Thus, if you would like to access the underlying {@code ReadOnlyFile}
  * again after you have finished working with an instance of this class,
  * you should synchronize their file pointers using the pattern as described
- * in the base class {@link FilterReadOnlyFile}.
+ * in the base class {@link DecoratingReadOnlyFile}.
  *
  * @see RaesOutputStream
  *
