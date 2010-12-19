@@ -850,7 +850,7 @@ implements Iterable<E>, Closeable {
         return (int) size;
     }
 
-    /** Asserts that this archive is still open. */
+    /** Asserts that this ZIP file is still open for reading its entries. */
     final void assertOpen() throws ZipException {
         if (null == archive)
             throw new ZipException("ZIP file has been closed!");

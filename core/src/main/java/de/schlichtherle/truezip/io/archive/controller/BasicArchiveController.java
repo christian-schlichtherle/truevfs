@@ -198,18 +198,22 @@ extends FileSystemController<ArchiveModel> {
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
-            boolean recursion;
+            /*@Override
+            protected void beforePeering() throws IOException {
+                if (!autoSync(name, READ))
+                    autoMount(); // detect false positives!
+            }*/
 
             @Override
             public E getLocalTarget() throws IOException {
-                if (!recursion && !autoSync(name, READ)) {
+                //autoSync(name, READ);
+                if (!autoSync(name, READ)) {
                     autoMount(); // detect false positives!
-                    recursion = true;
-                    try {
-                        getPeerTarget(); // force autoSync for peer target!
-                    } finally {
-                        recursion = false;
-                    }
+                    // Force autoSync for peer target.
+                    // FIXME: This might cause recursive loops if the output
+                    // socket is also calling getPeerTarget(), e.g. in order
+                    // to copy some properties!
+                    getPeerTarget();
                 }
                 final ArchiveFileSystemEntry<E> entry
                         = autoMount().getEntry(name);
@@ -249,8 +253,18 @@ extends FileSystemController<ArchiveModel> {
             final BitField<OutputOption> options,
             final Entry template) {
         class Output extends OutputSocket<E> {
-            final String path = name.getPath();
             ArchiveFileSystemOperation<E> link;
+
+            /*@Override
+            protected void beforePeering() throws IOException {
+                if (!autoSync(name, WRITE))
+                    autoMount(); // detect false positives!
+            }*/
+
+            @Override
+            protected void afterPeering() {
+                link = null; // reset local target reference
+            }
 
             E getEntry() throws IOException {
                 if (autoSync(name, WRITE))
@@ -259,17 +273,12 @@ extends FileSystemController<ArchiveModel> {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
                     // TODO: Use getPeerTarget() instead of template!
-                    link = autoMount(   !isRoot(path)
+                    link = autoMount(   !isRoot(name.getPath())
                                         && options.get(CREATE_PARENTS), options)
                             .mknod( name, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }
                 return link.getTarget().getArchiveEntry();
-            }
-
-            @Override
-            protected void afterPeering() {
-                link = null; // reset local target reference
             }
 
             @Override
