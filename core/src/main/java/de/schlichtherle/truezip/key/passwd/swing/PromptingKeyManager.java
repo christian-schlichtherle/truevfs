@@ -45,7 +45,7 @@ import java.awt.HeadlessException;
  * @version $Id$
  */
 public class PromptingKeyManager
-        extends de.schlichtherle.truezip.key.PromptingKeyManager {
+extends de.schlichtherle.truezip.key.PromptingKeyManager {
 
     /**
      * Constructs a new {@code PromptingKeyManager}.
@@ -67,7 +67,7 @@ public class PromptingKeyManager
      * </table>
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public PromptingKeyManager() {
+    public PromptingKeyManager() {
         mapPromptingKeyProviderUIType(
         		(Class) PromptingKeyProvider.class,
         		(Class) PromptingKeyProviderUI.class);

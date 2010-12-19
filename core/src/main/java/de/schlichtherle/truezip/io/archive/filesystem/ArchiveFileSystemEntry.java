@@ -34,12 +34,39 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
 extends FileSystemEntry {
 
+    /**
+     * Constructs a new archive file system entry which decorates the given
+     * archive entry.
+     */
+    @NonNull
+    public static <E extends ArchiveEntry>
+    ArchiveFileSystemEntry<E> create(   @NonNull final String path,
+                                        @NonNull final E entry) {
+        switch (entry.getType()) {
+            case FILE:
+                return path.equals(entry.getName())
+                        ? new      FileEntry<E>(      entry)
+                        : new NamedFileEntry<E>(path, entry);
+
+            case DIRECTORY:
+                return path.equals(entry.getName())
+                        ? new      DirectoryEntry<E>(      entry)
+                        : new NamedDirectoryEntry<E>(path, entry);
+
+            case SPECIAL:
+                return new SpecialFileEntry<E>(path, entry);
+
+            default:
+                throw new UnsupportedOperationException(entry + " (type not supported)");
+        }
+    }
+
     /** The decorated archive entry. */
     @NonNull
     protected final E entry;
 
     /** Constructs a new instance of {@code Entry}. */
-    protected ArchiveFileSystemEntry(@NonNull final E entry) {
+    private ArchiveFileSystemEntry(@NonNull final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.entry = entry;
@@ -110,22 +137,6 @@ extends FileSystemEntry {
      */
     boolean remove(@NonNull String member) {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Constructs a new archive file system entry which decorates the given
-     * archive entry.
-     */
-    @NonNull
-    static <E extends ArchiveEntry>
-    ArchiveFileSystemEntry<E> create(@NonNull String path, @NonNull E entry) {
-        return DIRECTORY == entry.getType()
-                ? path.equals(entry.getName())
-                    ? new      DirectoryEntry<E>(      entry)
-                    : new NamedDirectoryEntry<E>(path, entry)
-                : path.equals(entry.getName())
-                    ? new           FileEntry<E>(      entry)
-                    : new      NamedFileEntry<E>(path, entry);
     }
 
     /** A file entry. */
@@ -214,4 +225,31 @@ extends FileSystemEntry {
             return path;
         }
     } // class NamedDirectoryEntry
+
+    private static final class SpecialFileEntry<E extends ArchiveEntry>
+    extends ArchiveFileSystemEntry<E> {
+        final String path;
+
+        SpecialFileEntry(final String path, final E entry) {
+            super(entry);
+            assert SPECIAL == entry.getType();
+            final String name = entry.getName();
+            this.path = name.equals(path) ? name : path;
+        }
+
+        @Override
+        public String getName() {
+            return path;
+        }
+
+        @Override
+        public Type getType() {
+            return SPECIAL; // drivers could ignore this type, so we must ignore them!
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return null;
+        }
+    }
 }

@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.FileNotFoundException;

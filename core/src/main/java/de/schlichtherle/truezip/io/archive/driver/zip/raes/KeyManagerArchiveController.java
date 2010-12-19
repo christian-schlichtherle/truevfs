@@ -81,7 +81,7 @@ extends DecoratingFileSystemController<
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
             try {
-                return new SpecialFileEntry<ZipEntry>(
+                return ArchiveFileSystemEntry.create(ROOT,
                         driver.newEntry(ROOT, SPECIAL,
                             entry instanceof ArchiveFileSystemEntry<?>
                                 ? ((ArchiveFileSystemEntry<?>) entry).getArchiveEntry()
@@ -89,25 +89,6 @@ extends DecoratingFileSystemController<
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);
             }
-        }
-    }
-
-    private static final class SpecialFileEntry<E extends ArchiveEntry>
-    extends ArchiveFileSystemEntry<E> {
-
-        SpecialFileEntry(E entry) {
-            super(entry);
-        }
-
-        @Override
-        @NonNull
-        public Type getType() {
-            return SPECIAL; // drivers could ignore this type, so we must ignore them!
-        }
-
-        @Override
-        public Set<String> getMembers() {
-            return null;
         }
     }
 

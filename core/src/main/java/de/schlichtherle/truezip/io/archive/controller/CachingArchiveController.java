@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.IOCache;
+import de.schlichtherle.truezip.io.filesystem.file.FileCache;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputOption;
@@ -102,7 +102,7 @@ extends DecoratingFileSystemController<
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final IOCache<Entry> cache = caches.get(name);
+            final FileCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
             return (null != cache ? cache : new EntryCache(name,
@@ -138,7 +138,7 @@ extends DecoratingFileSystemController<
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final IOCache<Entry> cache = caches.get(name);
+            final FileCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(OutputOption.CACHE)
                     || options.get(OutputOption.APPEND)
                     || null != template) {
@@ -147,7 +147,7 @@ extends DecoratingFileSystemController<
                     try {
                         cache.flush();
                     } finally {
-                        final IOCache<Entry> cache2 = caches.remove(name);
+                        final FileCache<Entry> cache2 = caches.remove(name);
                         assert cache2 == cache;
                         cache.clear();
                     }
@@ -169,7 +169,7 @@ extends DecoratingFileSystemController<
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
-        final IOCache<Entry> cache = caches.remove(name);
+        final FileCache<Entry> cache = caches.remove(name);
         if (null != cache)
             cache.clear();
     }
@@ -204,11 +204,11 @@ extends DecoratingFileSystemController<
         delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
-    private final class EntryCache implements IOCache<Entry> {
+    private final class EntryCache implements FileCache<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
-        final IOCache<Entry> cache;
+        final FileCache<Entry> cache;
         final InputSocket <Entry> input;
         final OutputSocket<Entry> output;
 
@@ -218,7 +218,7 @@ extends DecoratingFileSystemController<
             this.name = name;
             this.inputOptions = inputOptions.clear(InputOption.CACHE);
             this.outputOptions = outputOptions.clear(OutputOption.CACHE);
-            this.cache = IOCache.Strategy.WRITE_BACK.newCache(
+            this.cache = FileCache.Strategy.WRITE_BACK.newCache(
                     new RegisteringInputSocket(
                         delegate.getInputSocket(name, this.inputOptions)),
                     delegate.getOutputSocket(name, this.outputOptions, null));

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (options.get(InputOption.CACHE))
-            input = IOCache.Strategy.READ_ONLY.newCache(input).getInputSocket();
+            input = FileCache.Strategy.READ_ONLY.newCache(input).getInputSocket();
         return input;
     }
 
