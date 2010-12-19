@@ -72,13 +72,8 @@ extends IOSocket<LT, Entry> {
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             beforePeering();
-            try {
-                peer = newPeer;
-                afterPeering();
-            } catch (RuntimeException ex) {
-                peer = oldPeer;
-                throw ex;
-            }
+            peer = newPeer;
+            afterPeering();
         }
         return this;
     }
@@ -98,15 +93,14 @@ extends IOSocket<LT, Entry> {
     throws IOException {
         final OutputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
+            peer = null;
             try {
-                peer = null;
                 if (null != oldPeer)
                     oldPeer.connect(null);
                 beforePeering();
                 peer = newPeer;
                 if (null != newPeer)
                     newPeer.connect(this);
-                afterPeering();
             } catch (IOException ex) {
                 peer = oldPeer;
                 if (null != oldPeer)
@@ -118,6 +112,7 @@ extends IOSocket<LT, Entry> {
                     oldPeer.connect(this);
                 throw ex;
             }
+            afterPeering();
         }
         return this;
     }

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem;
 
 import java.io.IOException;
 
 /**
- * Defines the potential options for data output operations.
+ * Defines the potential options for data input operations.
  * Not all options may be supported or available for all operations and
  * certain combinations may even be illegal.
  * It's up to the particular operation to define which options are
@@ -26,27 +26,15 @@ import java.io.IOException;
  * If an option is not supported, it must be silently ignored.
  * If an option is not available, an {@link IOException} must be thrown.
  *
- * @see     InputOption
+ * @see     OutputOption
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public enum OutputOption {
+public enum InputOption {
 
     /**
-     * Whether or not any missing parent directory entries shall get created
-     * automatically.
-     */
-    CREATE_PARENTS,
-
-    /**
-     * Whether or not the output socket data shall get cached in a temporary
+     * Whether or not the input socket data shall get cached in a temporary
      * file for future use.
      */
-    CACHE,
-
-    /**
-     * Whether or not the new data shall get appended to the existing data
-     * of the local target rather than replacing it entirely.
-     */
-    APPEND,
+    CACHE
 }
