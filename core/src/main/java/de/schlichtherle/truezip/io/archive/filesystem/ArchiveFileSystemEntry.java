@@ -148,7 +148,6 @@ extends FileSystemEntry {
         /** Decorates the given archive entry. */
         FileEntry(final E entry) {
             super(entry);
-            assert DIRECTORY != entry.getType();
         }
 
         @Override
@@ -171,7 +170,6 @@ extends FileSystemEntry {
         NamedFileEntry(final String path, final E entry) {
             super(entry);
             assert !path.equals(entry.getName());
-            assert DIRECTORY != entry.getType();
             this.path = path;
         }
 
@@ -189,7 +187,6 @@ extends FileSystemEntry {
         /** Decorates the given archive entry. */
         DirectoryEntry(final E entry) {
             super(entry);
-            assert DIRECTORY == entry.getType();
         }
 
         @Override
@@ -229,7 +226,6 @@ extends FileSystemEntry {
         NamedDirectoryEntry(final String path, final E entry) {
             super(entry);
             assert !path.equals(entry.getName());
-            assert DIRECTORY == entry.getType();
             this.path = path;
         }
 
@@ -239,7 +235,8 @@ extends FileSystemEntry {
         }
     } // class NamedDirectoryEntry
 
-    private static final class NamedSpecialFileEntry<E extends ArchiveEntry>
+    /** A named special file entry. */
+    private static class NamedSpecialFileEntry<E extends ArchiveEntry>
     extends ArchiveFileSystemEntry<E> {
         final String path;
 
@@ -264,5 +261,5 @@ extends FileSystemEntry {
         public Set<String> getMembers() {
             return null;
         }
-    }
+    } // class NamedSpecialFileEntry
 }
