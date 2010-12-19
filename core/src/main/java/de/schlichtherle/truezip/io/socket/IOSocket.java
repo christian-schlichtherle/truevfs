@@ -81,10 +81,11 @@ public abstract class IOSocket<LT, PT> {
      * A subclass implementation may throw an {@code IOException} to veto the
      * peering, e.g. if the socket is not yet ready to do I/O.
      *
-     * @see InputSocket#bind
-     * @see InputSocket#connect
-     * @see OutputSocket#bind
-     * @see OutputSocket#connect
+     * @throws IOException at the discretion of a subclass implementation.
+     * @see    InputSocket#bind
+     * @see    InputSocket#connect
+     * @see    OutputSocket#bind
+     * @see    OutputSocket#connect
      */
     protected void beforePeering() throws IOException {
     }
@@ -94,12 +95,13 @@ public abstract class IOSocket<LT, PT> {
      * socket has been successfully changed.
      * The implementation in this base class does nothing.
      *
-     * @see InputSocket#bind
-     * @see InputSocket#connect
-     * @see OutputSocket#bind
-     * @see OutputSocket#connect
+     * @throws IOException at the discretion of a subclass implementation.
+     * @see    InputSocket#bind
+     * @see    InputSocket#connect
+     * @see    OutputSocket#bind
+     * @see    OutputSocket#connect
      */
-    protected void afterPeering() {
+    protected void afterPeering() throws IOException {
     }
 
     /**

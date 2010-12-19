@@ -39,6 +39,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,8 +112,15 @@ extends FileSystemController<ArchiveModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
+
     private static final Logger LOGGER
             = Logger.getLogger(CLASS_NAME, CLASS_NAME);
+
+    private static final BitField<OutputOption> AUTO_MOUNT_OPTIONS
+            = BitField.noneOf(OutputOption.class);
+
+    private static final BitField<SyncOption> UNLINK_SYNC_OPTIONS
+            = BitField.of(ABORT_CHANGES);
 
     private final ArchiveModel model;
 
@@ -133,7 +141,7 @@ extends FileSystemController<ArchiveModel> {
     }
 
     final ArchiveFileSystem<E> autoMount() throws IOException {
-        return autoMount(false, BitField.noneOf(OutputOption.class));
+        return autoMount(false, AUTO_MOUNT_OPTIONS);
     }
 
     /**
@@ -154,8 +162,8 @@ extends FileSystemController<ArchiveModel> {
      * @return A valid archive file system - {@code null} is never returned.
      * @throws FalsePositiveException
      */
-    abstract ArchiveFileSystem<E> autoMount(   boolean autoCreate,
-                                                BitField<OutputOption> options)
+    abstract ArchiveFileSystem<E> autoMount(boolean autoCreate,
+                                            BitField<OutputOption> options)
     throws IOException;
 
     @Override
@@ -198,15 +206,14 @@ extends FileSystemController<ArchiveModel> {
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
+
             /*@Override
-            protected void beforePeering() throws IOException {
-                if (!autoSync(name, READ))
-                    autoMount(); // detect false positives!
+            protected void afterPeering() throws IOException {
+                getPeerTarget();
             }*/
 
             @Override
             public E getLocalTarget() throws IOException {
-                //autoSync(name, READ);
                 if (!autoSync(name, READ)) {
                     autoMount(); // detect false positives!
                     // Force autoSync for peer target.
@@ -220,7 +227,7 @@ extends FileSystemController<ArchiveModel> {
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
                             name, "no such file or directory");
-                return entry.getArchiveEntry();
+                return entry.getEntry();
             }
 
             InputSocket<?> getBoundSocket() throws IOException {
@@ -260,15 +267,12 @@ extends FileSystemController<ArchiveModel> {
 
             /*@Override
             protected void beforePeering() throws IOException {
-                if (!autoSync(name, WRITE))
-                    autoMount( // detect false positives!
-                            !isRoot(name.getPath())
-                            && options.get(CREATE_PARENTS), options);
             }*/
 
             @Override
-            protected void afterPeering() {
-                link = null; // reset local target reference
+            protected void afterPeering() throws IOException {
+                //getPeerTarget();
+                link = null;
             }
 
             E getEntry() throws IOException {
@@ -278,13 +282,12 @@ extends FileSystemController<ArchiveModel> {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
                     // TODO: Use getPeerTarget() instead of template!
-                    link = autoMount(
-                                !isRoot(name.getPath())
-                                && options.get(CREATE_PARENTS), options)
+                    link = autoMount(   !isRoot(name.getPath())
+                                        && options.get(CREATE_PARENTS), options)
                             .mknod( name, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }
-                return link.getTarget().getArchiveEntry();
+                return link.getTarget().getEntry();
             }
 
             @Override
@@ -384,7 +387,7 @@ extends FileSystemController<ArchiveModel> {
                     // that the file system can be successfully mounted again
                     // if the target archive file is subsequently modified to
                     // be a regular archive file.
-                    sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
+                    sync(UNLINK_SYNC_OPTIONS, new SyncExceptionBuilder());
                 } catch (IOException cannotHappen) {
                     throw new AssertionError(cannotHappen);
                 }
@@ -398,7 +401,7 @@ extends FileSystemController<ArchiveModel> {
                 LOGGER.log(Level.WARNING, "unlink.absolute",
                         new Object[] {  fileSystem.getSize() - 1,
                                         getModel().getMountPoint() });
-            sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
+            sync(UNLINK_SYNC_OPTIONS, new SyncExceptionBuilder());
         } else { // !isRoot(path)
             autoMount().unlink(name);
         }

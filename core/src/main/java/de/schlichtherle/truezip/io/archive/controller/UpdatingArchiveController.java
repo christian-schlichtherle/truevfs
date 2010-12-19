@@ -297,10 +297,10 @@ extends FileSystemArchiveController<E> {
             return false;
         String n = null;
         if (null != output && null != output.getEntry(
-                n = entry.getArchiveEntry().getName()))
+                n = entry.getEntry().getName()))
             return sync();
         if (null != input && null != input.getEntry(
-                null != n ? n : (n = entry.getArchiveEntry().getName())))
+                null != n ? n : (n = entry.getEntry().getName())))
             return false;
         if (READ == intention)
             return sync();
@@ -460,7 +460,7 @@ extends FileSystemArchiveController<E> {
                 final ExceptionHandler<IOException, X> handler)
     throws X {
         for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
-            final E ae = fse.getArchiveEntry();
+            final E ae = fse.getEntry();
             final String n = ae.getName();
             if (null != output.getEntry(n))
                 continue; // we have already written this entry
