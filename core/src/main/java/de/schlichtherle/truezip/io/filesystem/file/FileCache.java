@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.socket.InputCache;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputCache;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
@@ -40,7 +44,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface IOCache<LT extends Entry>
+public interface FileCache<LT extends Entry>
 extends InputCache<LT>, OutputCache<LT> {
 
     /** Provides different cache strategies. */
@@ -58,7 +62,7 @@ extends InputCache<LT>, OutputCache<LT> {
 
             @Override
             public <LT extends Entry>
-            IOCache<LT> newCache(   InputSocket<? extends LT> input,
+            FileCache<LT> newCache(   InputSocket<? extends LT> input,
                                     OutputSocket<? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
@@ -115,7 +119,7 @@ extends InputCache<LT>, OutputCache<LT> {
 
         /** Returns a new input / output cache. */
         public <LT extends Entry>
-        IOCache<LT> newCache(   InputSocket<? extends LT> input,
+        FileCache<LT> newCache(   InputSocket<? extends LT> input,
                                 OutputSocket<? extends LT> output) {
             if (null == input || null == output)
                 throw new NullPointerException();

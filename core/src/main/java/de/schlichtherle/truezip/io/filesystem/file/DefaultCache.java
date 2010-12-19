@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.socket;
+package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.io.socket.IOSocket;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +41,7 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class DefaultCache<LT extends Entry> implements IOCache<LT> {
+final class DefaultCache<LT extends Entry> implements FileCache<LT> {
     private final Pool<FileEntry, IOException> pool = TempFilePool.get();
     private final InputSocketProxy inputProxy;
     private final OutputSocketProxy outputProxy;
@@ -294,6 +297,11 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
         }
 
         @Override
+        protected InputSocket<? extends LT> getBoundSocket() throws IOException {
+            return super.getBoundSocket();
+        }
+
+        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
                 // The data for connected sockets cannot not get cached because
@@ -324,6 +332,11 @@ final class DefaultCache<LT extends Entry> implements IOCache<LT> {
     private final class OutputSocketProxy extends DecoratingOutputSocket<LT> {
         OutputSocketProxy(final OutputSocket<? extends LT> output) {
             super(output);
+        }
+
+        @Override
+        protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
+            return super.getBoundSocket();
         }
 
         @Override
