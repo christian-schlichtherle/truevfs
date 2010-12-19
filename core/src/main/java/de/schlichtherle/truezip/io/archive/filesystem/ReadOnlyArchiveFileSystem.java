@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.util.BitField;
 
 /**
@@ -55,19 +56,22 @@ extends ArchiveFileSystem<E> {
     }
 
     @Override
-    public ArchiveFileSystemOperation<E> mknod( String path, Type type,
-                                boolean createParents, Entry template)
+    public ArchiveFileSystemOperation<E> mknod( FileSystemEntryName path,
+                                                Type type,
+                                                boolean createParents,
+                                                Entry template)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public void unlink(String path) throws ArchiveFileSystemException {
+    public void unlink(FileSystemEntryName path)
+    throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public boolean setTime(String path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName path, BitField<Access> types, long value)
     throws ArchiveFileSystemException {
         throw new ReadOnlyArchiveFileSystemException();
     }

@@ -20,13 +20,16 @@ import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.EntryContainer;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
-import de.schlichtherle.truezip.io.Paths;
+import de.schlichtherle.truezip.io.entry.EntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.util.Link;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -161,10 +164,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 (int) (container.getSize() / .75f) + 1);
 
         // Load entries from input archive.
-        final Normalizer normalizer = new Normalizer();
         for (final E entry : container) {
-            final String path = normalizer.normalize(entry.getName());
-            master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
+            String name = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            name = EntryName.create(name, null, true).getPath();
+            master.put(name, ArchiveFileSystemEntry.create(name, entry.getType(), entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -178,81 +181,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         // entries = Collections.enumeration(master.values()); // concurrent modification!
         final Check fsck = new Check();
         for (final E entry : container) {
-            final String path = normalizer.normalize(entry.getName());
-            if (isValidPath(path))
-                fsck.fix(path);
-        }
-    }
-
-    private static class Normalizer
-    extends de.schlichtherle.truezip.io.Paths.Normalizer {
-        Normalizer() {
-            super(SEPARATOR_CHAR);
-        }
-
-        @Override
-        public String normalize(@NonNull String path) {
-            return cutTrailingSeparators(super.normalize(path), SEPARATOR_CHAR);
-        }
-    }
-
-    /**
-     * Checks whether the given path name is a <i>valid path name</i>.
-     * A valid path name is in
-     * {@link Paths#normalize(String, char) normal form},
-     * is relative, does not identify the dot directory ({@code "."}) or
-     * the dot-dot directory ({@code ".."}) or any of their descendants.
-     *
-     * @see    EntryFactory#create Common Requirements For Operation Names
-     * @param  name a non-{@code null} path name.
-     */
-    private static boolean isValidPath(@NonNull final String name) {
-        if (isRoot(name))
-            return true;
-
-        if (name != new Normalizer().normalize(name)) // mind contract!
-            return false;
-
-        final int length = name.length();
-        assert length > 0 || isRoot(name);
-        switch (name.charAt(0)) {
-        case SEPARATOR_CHAR:
-            return false; // not a relative path name
-
-        case '.':
-            if (length >= 2) {
-                switch (name.charAt(1)) {
-                case '.':
-                    if (length >= 3) {
-                        if (name.charAt(2) == SEPARATOR_CHAR) {
-                            assert name.startsWith(".." + SEPARATOR);
-                            return false;
-                        }
-                        // Fall through.
-                    } else {
-                        assert "..".equals(name);
-                        return false;
-                    }
-                    break;
-
-                case SEPARATOR_CHAR:
-                    assert name.startsWith("." + SEPARATOR);
-                    return false;
-
-                default:
-                    // Fall through.
-                }
-            } else {
-                assert ".".equals(name);
-                return false;
+            String name = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            try {
+                fsck.fix(new FileSystemEntryName(
+                        new URI(null, null, name, null, null),
+                        true).getPath());
+            } catch (URISyntaxException ignore) {
             }
-            break;
-
-        default:
-            // Fall through.
         }
-
-        return true;
     }
 
     /** Splits a path name into a parent path name and a base path. */
@@ -292,7 +228,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             // directory as its parameter, so we may NOT skip the following test.
             if (isRoot(path))
                 return; // never fix root or empty or absolute pathnames
-            assert isValidPath(path);
 
             split(path);
             final String parentPath = getParentPath();
@@ -422,6 +357,12 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return new ArchiveEntryIterator();
     }
 
+    @Nullable
+    public final ArchiveFileSystemEntry<E> getEntry(
+            @NonNull FileSystemEntryName name) {
+        return getEntry(name.getPath());
+    }
+
     @Override
     @Nullable
     public ArchiveFileSystemEntry<E> getEntry(@NonNull String path) {
@@ -444,7 +385,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             @NonNull final String path,
             @NonNull final Type type,
             @CheckForNull final Entry template) {
-        assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
         assert !(template instanceof ArchiveFileSystemEntry<?>);
@@ -463,9 +403,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * not yet linked into this (virtual) archive file system.
      *
      * @see    #mknod
-     * @param  path the non-{@code null} path name of the archive file system
-     *         entry.
-     *         This is always a {@link #isValidPath(String) valid path name}.
+     * @param  path the path name of the archive file system entry.
      */
     @NonNull
     private ArchiveFileSystemEntry<E> newEntryChecked(
@@ -473,7 +411,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             @NonNull final Type type,
             @CheckForNull final Entry template)
     throws ArchiveFileSystemException {
-        assert isValidPath(path);
         assert type != null;
         assert !isRoot(path) || type == DIRECTORY;
         assert !(template instanceof ArchiveFileSystemEntry<?>);
@@ -506,8 +443,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * system entries to the system's current time at the moment of the call
      * to this method.
      *
-     * @param  path a non-{@code null} relative path name.
-     * @param  type a non-{@code null} entry type.
+     * @param  name an entry name.
+     * @param  type an entry type.
      * @param  createParents if {@code true}, any missing parent directories
      *         will be created and linked into this archive file system with
      *         its last modification time set to the system's current time.
@@ -536,17 +473,15 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      */
     @NonNull
     public ArchiveFileSystemOperation<E> mknod(
-            @NonNull final String path,
+            @NonNull final FileSystemEntryName name,
             @NonNull final Type type,
             final boolean createParents,
             @CheckForNull Entry template)
     throws ArchiveFileSystemException {
+        final String path = name.getPath();
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
                     "cannot replace (virtual) root directory entry");
-        if (!isValidPath(path))
-            throw new ArchiveFileSystemException(path,
-                    "is not a valid path name");
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type)
@@ -691,7 +626,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
      * @throws ArchiveFileSystemException If the operation fails for some other
      *         reason.
      */
-    public void unlink(@NonNull final String path) throws ArchiveFileSystemException {
+    public void unlink(@NonNull final FileSystemEntryName name) throws ArchiveFileSystemException {
+        final String path = name.getPath();
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
                     "(virtual) root directory cannot get unlinked");
@@ -720,10 +656,11 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     public boolean setTime(
-            @NonNull final String path,
+            @NonNull final FileSystemEntryName name,
             @NonNull final BitField<Access> types,
             final long value)
     throws ArchiveFileSystemException {
+        final String path = name.getPath();
         if (0 > value)
             throw new IllegalArgumentException(path +
                     " (negative access time)");
@@ -739,19 +676,14 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return ok;
     }
 
-    private Type getType(@NonNull final String path) {
-        final ArchiveFileSystemEntry<E> entry = master.get(path);
-        return entry != null ? entry.getType() : null;
-    }
-
-    public boolean isWritable(@NonNull final String path) {
+    public boolean isWritable(@NonNull FileSystemEntryName name) {
         return !isReadOnly();
     }
 
-    public void setReadOnly(@NonNull final String path)
+    public void setReadOnly(@NonNull FileSystemEntryName name)
     throws ArchiveFileSystemException {
         if (!isReadOnly())
-            throw new ArchiveFileSystemException(path,
+            throw new ArchiveFileSystemException(name.getPath(),
                 "cannot set read-only state");
     }
 }

@@ -166,32 +166,31 @@ extends FileSystemController<ArchiveModel> {
     @Override
     public final FileSystemEntry getEntry(FileSystemEntryName name)
     throws IOException {
-        return autoMount().getEntry(name.getPath());
+        return autoMount().getEntry(name);
     }
 
     @Override
     public final boolean isReadable(FileSystemEntryName name) throws IOException {
-        return autoMount().getEntry(name.getPath()) != null;
+        return autoMount().getEntry(name) != null;
     }
 
     @Override
     public final boolean isWritable(FileSystemEntryName name) throws IOException {
-        return autoMount().isWritable(name.getPath());
+        return autoMount().isWritable(name);
     }
 
     @Override
     public final void setReadOnly(FileSystemEntryName name) throws IOException {
-        autoMount().setReadOnly(name.getPath());
+        autoMount().setReadOnly(name);
     }
 
     @Override
-    public final boolean setTime(
-            final FileSystemEntryName name,
-            final BitField<Access> types,
-            final long value)
+    public final boolean setTime(   FileSystemEntryName name,
+                                    BitField<Access> types,
+                                    long value)
     throws IOException {
         autoSync(name, null);
-        return autoMount().setTime(name.getPath(), types, value);
+        return autoMount().setTime(name, types, value);
     }
 
     @Override
@@ -199,7 +198,6 @@ extends FileSystemController<ArchiveModel> {
             final FileSystemEntryName name,
             final BitField<InputOption> options) {
         class Input extends InputSocket<E> {
-            final String path = name.getPath();
             boolean recursion;
 
             @Override
@@ -214,7 +212,7 @@ extends FileSystemController<ArchiveModel> {
                     }
                 }
                 final ArchiveFileSystemEntry<E> entry
-                        = autoMount().getEntry(path);
+                        = autoMount().getEntry(name);
                 if (null == entry)
                     throw new ArchiveEntryNotFoundException(getModel(),
                             name, "no such file or directory");
@@ -263,7 +261,7 @@ extends FileSystemController<ArchiveModel> {
                     // TODO: Use getPeerTarget() instead of template!
                     link = autoMount(   !isRoot(path)
                                         && options.get(CREATE_PARENTS), options)
-                            .mknod( path, FILE, options.get(CREATE_PARENTS),
+                            .mknod( name, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }
                 return link.getTarget().getArchiveEntry();
@@ -325,11 +323,10 @@ extends FileSystemController<ArchiveModel> {
             final BitField<OutputOption> options,
             final Entry template)
     throws IOException {
-        final String path = name.getPath();
         if (FILE != type && DIRECTORY != type)
             throw new ArchiveEntryNotFoundException(getModel(),
                     name, "not yet supported: mknod " + type);
-        if (isRoot(path)) {
+        if (isRoot(name.getPath())) {
             try {
                 autoMount(); // detect false positives!
             } catch (FalsePositiveException ex) {
@@ -343,9 +340,9 @@ extends FileSystemController<ArchiveModel> {
         } else { // !isRoot(entryName)
             final ArchiveFileSystem<E> fileSystem
                     = autoMount(options.get(CREATE_PARENTS), options);
-            final boolean created = null == fileSystem.getEntry(path);
+            final boolean created = null == fileSystem.getEntry(name);
             final ArchiveFileSystemOperation<E> link = fileSystem.mknod(
-                    path, type, options.get(CREATE_PARENTS), template);
+                    name, type, options.get(CREATE_PARENTS), template);
             assert DIRECTORY != type || created : "mknod() must not overwrite directory entries!";
             if (created)
                 link.run();
@@ -386,7 +383,7 @@ extends FileSystemController<ArchiveModel> {
                                         getModel().getMountPoint() });
             sync(   BitField.of(ABORT_CHANGES), new SyncExceptionBuilder());
         } else { // !isRoot(path)
-            autoMount().unlink(path);
+            autoMount().unlink(name);
         }
     }
 
