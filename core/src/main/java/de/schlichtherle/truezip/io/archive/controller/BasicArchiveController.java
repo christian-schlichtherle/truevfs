@@ -275,8 +275,8 @@ extends FileSystemController<ArchiveModel> {
             @Override
             public E getLocalTarget() throws IOException {
                 if (options.get(APPEND)) {
-                    assert false;
-                    return null; // FIXME: broken interface contract!
+                    throw new UnsupportedOperationException("This feature is not yet implemented!");
+                    // return null; // FIXME: broken interface contract!
                 }
                 return getEntry();
             }
