@@ -44,6 +44,7 @@ import java.io.InputStream;
 public abstract class InputSocket<LT extends Entry>
 extends IOSocket<LT, Entry> {
 
+    @CheckForNull
     private OutputSocket<?> peer;
 
     @Override
