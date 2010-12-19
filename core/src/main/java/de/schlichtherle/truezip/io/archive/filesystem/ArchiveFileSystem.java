@@ -164,7 +164,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         final Normalizer normalizer = new Normalizer();
         for (final E entry : container) {
             final String path = normalizer.normalize(entry.getName());
-            master.put(path, ArchiveFileSystemEntry.create(path, entry));
+            master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -450,7 +450,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
-            return ArchiveFileSystemEntry.create(path, factory.newEntry(path, type, template));
+            return ArchiveFileSystemEntry.create(
+                    path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new AssertionError(ex);
         }
@@ -478,7 +479,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
-            return ArchiveFileSystemEntry.create(path, factory.newEntry(path, type, template));
+            return ArchiveFileSystemEntry.create(
+                    path, type, factory.newEntry(path, type, template));
         } catch (CharConversionException ex) {
             throw new ArchiveFileSystemException(path, ex);
         }

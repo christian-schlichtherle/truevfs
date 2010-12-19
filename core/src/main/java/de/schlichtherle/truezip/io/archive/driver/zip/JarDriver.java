@@ -16,6 +16,10 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.entry.Entry.Type;
+import de.schlichtherle.truezip.io.entry.Entry;
+import java.io.CharConversionException;
+
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 /**
@@ -60,6 +64,12 @@ public class JarDriver extends ZipDriver {
     /** Constructs a new JAR driver. */
     public JarDriver(boolean preambled, boolean postambled, final int level) {
         super(JAR_CHARSET, preambled, postambled, level);
+    }
+
+    @Override
+    public JarEntry newEntry(String path, Type type, Entry template)
+    throws CharConversionException {
+        return (JarEntry) super.newEntry(path, type, template);
     }
 
     @Override
