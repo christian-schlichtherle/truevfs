@@ -38,14 +38,12 @@ import de.schlichtherle.truezip.io.archive.driver.zip.JarDriver;
 import de.schlichtherle.truezip.io.archive.driver.zip.JarEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipInputShop;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.archive.entry.ArchiveEntry.UNKNOWN;
-import static de.schlichtherle.truezip.io.zip.ZipEntry.DEFLATED;
+import static de.schlichtherle.truezip.io.zip.ZipEntry.*;
 
 /**
  * An abstract archive driver which builds RAES encrypted ZIP files
@@ -165,12 +163,12 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * This feature strengthens the security of the authentication process.
      */
     @Override
-    public ZipEntry newEntry(
+    public JarEntry newEntry(
             final String path,
             final Type type,
             final Entry template)
     throws CharConversionException {
-        final JarEntry entry = (JarEntry) super.newEntry(path, type, template);
+        final JarEntry entry = super.newEntry(path, type, template);
         if (entry.getMethod() != DEFLATED) {
             // Enforce deflation for enhanced authentication security.
             entry.setMethod(DEFLATED);

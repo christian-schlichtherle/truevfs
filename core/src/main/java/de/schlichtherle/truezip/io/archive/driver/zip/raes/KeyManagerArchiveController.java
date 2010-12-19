@@ -15,20 +15,16 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
+import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
-import java.io.CharConversionException;
-import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
-import java.util.Set;
-import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
-import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.CharConversionException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -49,7 +45,7 @@ extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
 
-    private final ArchiveDriver<ZipEntry> driver;
+    private final ArchiveDriver<?> driver;
 
     /**
      * Constructs a new key manager archive controller.
@@ -58,7 +54,7 @@ extends DecoratingFileSystemController<
      */
     KeyManagerArchiveController(
             final FileSystemController<? extends ArchiveModel> controller,
-            final ArchiveDriver<ZipEntry> driver) {
+            final ArchiveDriver<?> driver) {
         super(controller);
         this.driver = driver;
     }
@@ -81,7 +77,7 @@ extends DecoratingFileSystemController<
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
             try {
-                return ArchiveFileSystemEntry.create(ROOT,
+                return ArchiveFileSystemEntry.create(ROOT, SPECIAL,
                         driver.newEntry(ROOT, SPECIAL,
                             entry instanceof ArchiveFileSystemEntry<?>
                                 ? ((ArchiveFileSystemEntry<?>) entry).getArchiveEntry()

@@ -41,20 +41,23 @@ extends FileSystemEntry {
     @NonNull
     public static <E extends ArchiveEntry>
     ArchiveFileSystemEntry<E> create(   @NonNull final String path,
+                                        @NonNull final Type type,
                                         @NonNull final E entry) {
-        switch (entry.getType()) {
+        switch (type) {
             case FILE:
+                assert FILE == entry.getType();
                 return path.equals(entry.getName())
                         ? new      FileEntry<E>(      entry)
                         : new NamedFileEntry<E>(path, entry);
 
             case DIRECTORY:
+                assert DIRECTORY == entry.getType();
                 return path.equals(entry.getName())
                         ? new      DirectoryEntry<E>(      entry)
                         : new NamedDirectoryEntry<E>(path, entry);
 
             case SPECIAL:
-                return new SpecialFileEntry<E>(path, entry);
+                return new NamedSpecialFileEntry<E>(path, entry);
 
             default:
                 throw new UnsupportedOperationException(entry + " (type not supported)");
@@ -106,7 +109,7 @@ extends FileSystemEntry {
     }
 
     ArchiveFileSystemEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
-        return create(getName(), fileSystem.copy(entry));
+        return create(getName(), getType(), fileSystem.copy(entry));
     }
 
     /**
@@ -146,6 +149,11 @@ extends FileSystemEntry {
         FileEntry(final E entry) {
             super(entry);
             assert DIRECTORY != entry.getType();
+        }
+
+        @Override
+        public Type getType() {
+            return FILE;
         }
 
         @Override
@@ -192,6 +200,11 @@ extends FileSystemEntry {
         }
 
         @Override
+        public Type getType() {
+            return DIRECTORY;
+        }
+
+        @Override
         public Set<String> getMembers() {
             return members;
         }
@@ -226,13 +239,13 @@ extends FileSystemEntry {
         }
     } // class NamedDirectoryEntry
 
-    private static final class SpecialFileEntry<E extends ArchiveEntry>
+    private static final class NamedSpecialFileEntry<E extends ArchiveEntry>
     extends ArchiveFileSystemEntry<E> {
         final String path;
 
-        SpecialFileEntry(final String path, final E entry) {
+        NamedSpecialFileEntry(final String path, final E entry) {
             super(entry);
-            assert SPECIAL == entry.getType();
+            //assert SPECIAL == entry.getType(); // drivers could ignore this type, so we must ignore this!
             final String name = entry.getName();
             this.path = name.equals(path) ? name : path;
         }
@@ -244,7 +257,7 @@ extends FileSystemEntry {
 
         @Override
         public Type getType() {
-            return SPECIAL; // drivers could ignore this type, so we must ignore them!
+            return SPECIAL;
         }
 
         @Override
