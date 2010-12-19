@@ -38,12 +38,9 @@ extends InputSocket<LT> {
     }
 
     /**
-     * Binds the filtered socket to this socket and returns it.
-     * If you override this method, you must make sure to bind the returned
-     * socket to this socket!
+     * Binds the decorated socket to this socket and returns it.
      *
-     * @throws IOException at the discretion of an overriding method.
-     * @return The bound filtered socket.
+     * @return The bound decorated socket.
      */
     protected InputSocket<? extends LT> getBoundSocket() throws IOException {
         return delegate.bind(this);

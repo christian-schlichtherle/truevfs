@@ -32,12 +32,12 @@ import java.io.OutputStream;
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
- * @param   <RT> the type of the {@link #getPeerTarget() peer target}
+ * @param   <PT> the type of the {@link #getPeerTarget() peer target}
  *          for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class IOSocket<LT, RT> {
+public abstract class IOSocket<LT, PT> {
 
     /** You cannot instantiate this class outside its package. */
     IOSocket() {
@@ -72,7 +72,35 @@ public abstract class IOSocket<LT, RT> {
      * @return The nullable peer target for I/O operations.
      */
     @CheckForNull
-    public abstract RT getPeerTarget() throws IOException;
+    public abstract PT getPeerTarget() throws IOException;
+
+    /**
+     * This hook is called after a peering has been initiated, but before the
+     * peer socket has been changed.
+     * The implementation in this base class does nothing.
+     * A subclass implementation may throw an {@code IOException} to veto the
+     * peering, e.g. if the socket is not yet ready to do I/O.
+     *
+     * @see InputSocket#bind
+     * @see InputSocket#connect
+     * @see OutputSocket#bind
+     * @see OutputSocket#connect
+     */
+    protected void beforePeering() throws IOException {
+    }
+
+    /**
+     * This hook is called after a peering has been completed and the peer
+     * socket has been successfully changed.
+     * The implementation in this base class does nothing.
+     *
+     * @see InputSocket#bind
+     * @see InputSocket#connect
+     * @see OutputSocket#bind
+     * @see OutputSocket#connect
+     */
+    protected void afterPeering() {
+    }
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
@@ -126,7 +154,7 @@ public abstract class IOSocket<LT, RT> {
         }
         String rts;
         try {
-            final RT rt = getPeerTarget();
+            final PT rt = getPeerTarget();
             rts = null == rt ? "(null)" : rt.toString();
         } catch (IOException ex) {
             rts = "(?)";

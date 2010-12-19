@@ -51,19 +51,20 @@ extends IOSocket<LT, Entry> {
     }
 
     /**
-     * Makes the given output socket share its peer target with this output
+     * Binds the peer target of the given socket to this socket.
+     * Note that this method does <em>not</em> change the state of the
+     * given socket and does <em>not</em> connect this socket to the peer
+     * socket, i.e. it does not set this socket as the peer of of the given
      * socket.
-     * Note that this method does <em>not</em> change the peer output socket of
-     * the given output socket's peer input socket to this instance, i.e. this
-     * output socket is not connected to the peer input socket.
      *
-     * @param  to the output socket which has a remote target to share.
+     * @param  to the output socket which has a peer target to share.
      * @return {@code this}
      * @see    #beforePeering
      * @see    #afterPeering
      */
     @NonNull
-    public final OutputSocket<LT> bind(@CheckForNull final OutputSocket<?> to) {
+    public final OutputSocket<LT> bind(@CheckForNull final OutputSocket<?> to)
+    throws IOException {
         final InputSocket<?> newPeer = null == to ? null : to.peer;
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
@@ -90,7 +91,8 @@ extends IOSocket<LT, Entry> {
      * @see    #afterPeering
      */
     @NonNull
-    final OutputSocket<LT> connect(@CheckForNull final InputSocket<?> newPeer) {
+    final OutputSocket<LT> connect(@CheckForNull final InputSocket<?> newPeer)
+    throws IOException {
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {
             try {
@@ -102,6 +104,11 @@ extends IOSocket<LT, Entry> {
                 if (null != newPeer)
                     newPeer.connect(this);
                 afterPeering();
+            } catch (IOException ex) {
+                peer = oldPeer;
+                if (null != oldPeer)
+                    oldPeer.connect(this);
+                throw ex;
             } catch (RuntimeException ex) {
                 peer = oldPeer;
                 if (null != oldPeer)
@@ -113,26 +120,13 @@ extends IOSocket<LT, Entry> {
     }
 
     /**
-     * Called by {@link #bind} and {@link #connect} after a peering has been
-     * initiated, but before the peer input socket has been changed.
-     */
-    protected void beforePeering() {
-    }
-
-    /**
-     * Called by {@link #bind} and {@link #connect} after a peering has been
-     * completed and the peer input socket has been successfully changed.
-     */
-    protected void afterPeering() {
-    }
-
-    /**
      * Returns a new output stream for writing bytes to the
      * {@link #getLocalTarget() local target}.
      * <p>
      * Implementations must enable calling this method any number of times.
      * Furthermore, the returned output stream should <em>not</em> be buffered.
-     * Buffering should be addressed by client applications instead.
+     * Buffering should be addressed by the caller instead - see
+     * {@link IOSocket#copy}.
      *
      * @throws FileNotFoundException if the local target is not accessible
      *         for some reason.
