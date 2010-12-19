@@ -266,13 +266,13 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<? extends E> getInputSocket(final String name)
+    InputSocket<?> getInputSocket(final String name)
     throws IOException {
         return input.getInputSocket(name);
     }
 
     @Override
-    OutputSocket<? extends E> getOutputSocket(final E entry)
+    OutputSocket<?> getOutputSocket(final E entry)
     throws IOException {
         makeOutput(BitField.noneOf(OutputOption.class));
         return output.getOutputSocket(entry);

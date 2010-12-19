@@ -219,7 +219,7 @@ extends FileSystemController<ArchiveModel> {
                 return entry.getArchiveEntry();
             }
 
-            final InputSocket<? extends E> getBoundSocket() throws IOException {
+            final InputSocket<?> getBoundSocket() throws IOException {
                 final E entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(),
@@ -241,7 +241,7 @@ extends FileSystemController<ArchiveModel> {
         return new Input();
     }
 
-    abstract InputSocket<? extends E> getInputSocket(String name) throws IOException;
+    abstract InputSocket<?> getInputSocket(String name) throws IOException;
 
     @Override
     public final OutputSocket<?> getOutputSocket(
@@ -282,7 +282,7 @@ extends FileSystemController<ArchiveModel> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 final E entry = getEntry();
-                final OutputSocket<? extends E> output = getOutputSocket(entry);
+                final OutputSocket<?> output = getOutputSocket(entry);
                 final InputStream in = options.get(APPEND)
                         ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
                         : null;
@@ -314,7 +314,7 @@ extends FileSystemController<ArchiveModel> {
         return new Output();
     }
 
-    abstract OutputSocket<? extends E> getOutputSocket(E entry) throws IOException;
+    abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
 
     @Override
     public final boolean mknod(
