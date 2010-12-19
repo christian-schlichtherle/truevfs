@@ -16,17 +16,16 @@
 package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.entry.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.Path;
 import java.util.Collections;
 import java.io.File;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
-import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 
 /**
  * Adapts a {@link File} instance to a {@link FileSystemEntry}.
@@ -34,73 +33,19 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry implements FileSystemEntry {
+public class FileEntry extends FileSystemEntry {
 
-    /**
-     * Returns a file entry for the given parameter.
-     *
-     * @param path a non-{@code null} path name.
-     * @throws NullPointerException if {@code path} is {@code null}.
-     */
-    public static FileEntry get(String path) {
-        return new FileEntry(path);
-    }
-
-    /**
-     * Returns a file entry for the given parameter.
-     *
-     * @param uri a non-{@code null} {@code file:} URI
-     * @throws NullPointerException if {@code uri} is {@code null}.
-     */
-    public static FileEntry get(final URI uri) {
-        return new FileEntry(uri);
-    }
-
-    /**
-     * Returns a file entry for the given parameter(s).
-     *
-     * @param file a non-{@code null} file.
-     * @throws NullPointerException if {@code file} is {@code null}.
-     */
-    public static FileEntry get(File file) {
-        return new FileEntry(file);
-    }
-
-    /**
-     * Returns a file entry for the given parameter(s).
-     *
-     * @param file a non-{@code null} file.
-     * @throws NullPointerException if {@code file} is {@code null}.
-     */
-    public static FileEntry get(File file, String path) {
-        return new FileEntry(file, path);
-    }
-
-    private final File   file;
-    private final String name;
-
-    FileEntry(final String path) {
-        this.file = new File(path);
-        this.name = cutTrailingSeparators(
-                path.replace(File.separatorChar, SEPARATOR_CHAR),
-                SEPARATOR_CHAR);
-    }
-
-    FileEntry(final URI uri) {
-        this.file = new File(uri);
-        this.name = cutTrailingSeparators(uri.getPath(), SEPARATOR_CHAR);
-    }
+    private final File file;
+    private final EntryName name;
 
     FileEntry(final File file) {
         this.file = file;
-        this.name = file.getPath().replace(File.separatorChar, SEPARATOR_CHAR);
+        this.name = Path.create(file.toURI()).getEntryName();
     }
 
-    FileEntry(final File file, final String path) {
-        this.file = new File(file, path);
-        this.name = cutTrailingSeparators(
-                path.replace(File.separatorChar, SEPARATOR_CHAR),
-                SEPARATOR_CHAR);
+    FileEntry(final File file, final EntryName name) {
+        this.file = new File(file, name.getPath());
+        this.name = name;
     }
 
     /** Returns the decorated file. */
@@ -110,12 +55,7 @@ public class FileEntry implements FileSystemEntry {
 
     @Override
     public final String getName() {
-        return name;
-    }
-
-    @Override
-    public final String toString() {
-        return name;
+        return name.toString();
     }
 
     /** Returns the type of this file entry. */
@@ -124,7 +64,7 @@ public class FileEntry implements FileSystemEntry {
         return file.isDirectory() ? DIRECTORY
                 :   file.isFile() ? FILE
                 :   file.exists() ? SPECIAL
-                :                   null;
+                :                   Type.NULL;
     }
 
     @Override

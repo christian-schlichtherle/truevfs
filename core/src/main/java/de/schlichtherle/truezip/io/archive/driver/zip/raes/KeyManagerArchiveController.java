@@ -21,15 +21,14 @@ import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import java.io.CharConversionException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import java.util.Set;
-import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
-import de.schlichtherle.truezip.io.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -94,25 +93,21 @@ extends DecoratingFileSystemController<
     }
 
     private static final class SpecialFileEntry<E extends ArchiveEntry>
-    extends DecoratingEntry<E>
-    implements ArchiveFileSystemEntry<E> {
+    extends ArchiveFileSystemEntry<E> {
+
         SpecialFileEntry(E entry) {
             super(entry);
         }
 
         @Override
-        public Entry.Type getType() {
+        @NonNull
+        public Type getType() {
             return SPECIAL; // drivers could ignore this type, so we must ignore them!
         }
 
         @Override
         public Set<String> getMembers() {
             return null;
-        }
-
-        @Override
-        public E getArchiveEntry() {
-            return delegate;
         }
     }
 

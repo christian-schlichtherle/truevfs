@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.archive.entry;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Represents an entry in an archive file.
@@ -49,7 +50,7 @@ public interface ArchiveEntry extends Entry {
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      */
-    boolean setSize(Size type, long value);
+    boolean setSize(@NonNull Size type, long value);
 
     /**
      * Sets the last access time of this archive entry.
@@ -64,5 +65,5 @@ public interface ArchiveEntry extends Entry {
      * @throws IllegalArgumentException if {@code value} is negative and not
      *         {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}.
      */
-    boolean setTime(Access type, long value);
+    boolean setTime(@NonNull Access type, long value);
 }

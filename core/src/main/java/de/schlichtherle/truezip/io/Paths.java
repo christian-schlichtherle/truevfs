@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
@@ -228,10 +229,12 @@ public class Paths {
             return this;
         }
 
+        @CheckForNull
         public String getParentPath() {
             return parentPath;
         }
 
+        @NonNull
         public String getMemberName() {
             return memberName;
         }

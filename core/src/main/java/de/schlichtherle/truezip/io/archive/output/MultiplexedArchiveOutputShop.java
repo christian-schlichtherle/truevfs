@@ -34,8 +34,9 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.socket.FileInputSocket;
+import de.schlichtherle.truezip.io.socket.FileOutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
-import java.io.FileOutputStream;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -209,10 +210,10 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         private boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
-        TempEntryOutputStream(  final OutputSocket<? extends AE> output,
-                                final FileEntry temp)
+        TempEntryOutputStream(  @NonNull final OutputSocket<? extends AE> output,
+                                @NonNull final FileEntry temp)
         throws IOException {
-            super(new FileOutputStream(temp.getFile())); // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            super(FileOutputSocket.get(temp).newOutputStream());
             this.output = output;
             this.local = output.getLocalTarget();
             this.peer = output.getPeerTarget();
