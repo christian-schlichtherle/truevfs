@@ -28,6 +28,7 @@ import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.filesystem.file.FileCache;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.io.socket.IOCache;
 import de.schlichtherle.truezip.io.socket.OutputOption;
 import de.schlichtherle.truezip.io.socket.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -76,8 +77,8 @@ extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
 
-    private final Map<FileSystemEntryName, EntryCache> caches
-            = new HashMap<FileSystemEntryName, EntryCache>();
+    private final Map<FileSystemEntryName, IOCache<Entry>> caches
+            = new HashMap<FileSystemEntryName, IOCache<Entry>>();
 
     public CachingArchiveController(FileSystemController<? extends ArchiveModel> controller) {
         super(controller);
@@ -102,7 +103,7 @@ extends DecoratingFileSystemController<
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final FileCache<Entry> cache = caches.get(name);
+            final IOCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
             return (null != cache ? cache : new EntryCache(name,
@@ -138,7 +139,7 @@ extends DecoratingFileSystemController<
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final FileCache<Entry> cache = caches.get(name);
+            final IOCache<Entry> cache = caches.get(name);
             if (null == cache && !options.get(OutputOption.CACHE)
                     || options.get(OutputOption.APPEND)
                     || null != template) {
@@ -147,7 +148,7 @@ extends DecoratingFileSystemController<
                     try {
                         cache.flush();
                     } finally {
-                        final FileCache<Entry> cache2 = caches.remove(name);
+                        final IOCache<Entry> cache2 = caches.remove(name);
                         assert cache2 == cache;
                         cache.clear();
                     }
@@ -169,7 +170,7 @@ extends DecoratingFileSystemController<
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
-        final FileCache<Entry> cache = caches.remove(name);
+        final IOCache<Entry> cache = caches.remove(name);
         if (null != cache)
             cache.clear();
     }
@@ -183,7 +184,7 @@ extends DecoratingFileSystemController<
         if (0 < caches.size()) {
             final boolean flush = !options.get(ABORT_CHANGES);
             final boolean clear = !flush || options.get(CLEAR_CACHE);
-            for (final EntryCache cache : caches.values()) {
+            for (final IOCache<Entry> cache : caches.values()) {
                 try {
                     if (flush)
                         cache.flush();
@@ -204,7 +205,7 @@ extends DecoratingFileSystemController<
         delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
-    private final class EntryCache implements FileCache<Entry> {
+    private final class EntryCache implements IOCache<Entry> {
         final FileSystemEntryName name;
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
