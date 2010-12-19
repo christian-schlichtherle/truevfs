@@ -36,9 +36,9 @@ import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +52,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.*;
 import static de.schlichtherle.truezip.io.Paths.*;
-import static de.schlichtherle.truezip.io.socket.OutputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 
 /**
  * This is the base class for any archive controller, providing all the
@@ -223,12 +223,15 @@ extends FileSystemController<ArchiveModel> {
                 return entry.getArchiveEntry();
             }
 
-            final InputSocket<?> getBoundSocket() throws IOException {
+            InputSocket<?> getBoundSocket() throws IOException {
                 final E entry = getLocalTarget();
                 if (DIRECTORY == entry.getType())
                     throw new ArchiveEntryNotFoundException(getModel(),
                             name, "cannot read directories");
-                return BasicArchiveController.this.getInputSocket(entry.getName()).bind(this);
+                return BasicArchiveController
+                        .this
+                        .getInputSocket(entry.getName())
+                        .bind(this);
             }
 
             @Override
@@ -258,7 +261,9 @@ extends FileSystemController<ArchiveModel> {
             /*@Override
             protected void beforePeering() throws IOException {
                 if (!autoSync(name, WRITE))
-                    autoMount(); // detect false positives!
+                    autoMount( // detect false positives!
+                            !isRoot(name.getPath())
+                            && options.get(CREATE_PARENTS), options);
             }*/
 
             @Override
@@ -273,8 +278,9 @@ extends FileSystemController<ArchiveModel> {
                     // Start creating or overwriting the archive entry.
                     // This will fail if the entry already exists as a directory.
                     // TODO: Use getPeerTarget() instead of template!
-                    link = autoMount(   !isRoot(name.getPath())
-                                        && options.get(CREATE_PARENTS), options)
+                    link = autoMount(
+                                !isRoot(name.getPath())
+                                && options.get(CREATE_PARENTS), options)
                             .mknod( name, FILE, options.get(CREATE_PARENTS),
                                     template);
                 }

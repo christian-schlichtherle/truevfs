@@ -23,17 +23,17 @@ import de.schlichtherle.truezip.io.filesystem.file.FileDriver;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.InputBusyException;
 import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.Files.contains;
 
 /**

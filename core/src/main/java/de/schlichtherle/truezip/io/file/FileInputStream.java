@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.io.file;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.socket.InputOption;
+import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileDescriptor;

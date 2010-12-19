@@ -21,7 +21,7 @@ import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
@@ -30,9 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static de.schlichtherle.truezip.io.socket.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CACHE;
-import static de.schlichtherle.truezip.io.socket.OutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.APPEND;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.CACHE;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
 
