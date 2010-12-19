@@ -15,13 +15,23 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.io.socket.IOCache;
+import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.InputCache;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputCache;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Implements a caching strategy for input and output sockets.
@@ -44,11 +54,10 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileCache<LT extends Entry>
-extends InputCache<LT>, OutputCache<LT> {
+public final class FileCache<LT extends Entry> implements IOCache<LT> {
 
     /** Provides different cache strategies. */
-    enum Strategy {
+    public enum Strategy {
         /**
          * As the name implies, any attempt to create a new cache for output
          * will result in an {@link UnsupportedOperationException}.
@@ -62,15 +71,15 @@ extends InputCache<LT>, OutputCache<LT> {
 
             @Override
             public <LT extends Entry>
-            FileCache<LT> newCache(   InputSocket<? extends LT> input,
+            FileCache<LT> newCache( InputSocket<? extends LT> input,
                                     OutputSocket<? extends LT> output) {
                 throw new UnsupportedOperationException("read only cache!");
             }
 
             @Override
             <LT extends Entry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
-                    DefaultCache<LT> cache) {
+            Pool<FileCache<LT>.Buffer, IOException> newOutputStrategy(
+                    FileCache<LT> cache) {
                 throw new AssertionError();
             }
         },
@@ -82,8 +91,8 @@ extends InputCache<LT>, OutputCache<LT> {
         WRITE_THROUGH {
             @Override
             <LT extends Entry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
-                    DefaultCache<LT> cache) {
+            Pool<FileCache<LT>.Buffer, IOException> newOutputStrategy(
+                    FileCache<LT> cache) {
                 return cache.new WriteThroughOutputStrategy();
             }
         },
@@ -95,8 +104,8 @@ extends InputCache<LT>, OutputCache<LT> {
         WRITE_BACK {
             @Override
             <LT extends Entry>
-            Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
-                    DefaultCache<LT> cache) {
+            Pool<FileCache<LT>.Buffer, IOException> newOutputStrategy(
+                    FileCache<LT> cache) {
                 return cache.new WriteBackOutputStrategy();
             }
         };
@@ -106,7 +115,7 @@ extends InputCache<LT>, OutputCache<LT> {
         InputCache<LT> newCache(InputSocket <? extends LT> input) {
             if (null == input)
                 throw new NullPointerException();
-            return new DefaultCache<LT>(input, null, this);
+            return new FileCache<LT>(input, null, this);
         }
 
         /** Returns a new output cache. */
@@ -114,20 +123,327 @@ extends InputCache<LT>, OutputCache<LT> {
         OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
             if (null == output)
                 throw new NullPointerException();
-            return new DefaultCache<LT>(null, output, this);
+            return new FileCache<LT>(null, output, this);
         }
 
         /** Returns a new input / output cache. */
         public <LT extends Entry>
-        FileCache<LT> newCache(   InputSocket<? extends LT> input,
+        FileCache<LT> newCache( InputSocket<? extends LT> input,
                                 OutputSocket<? extends LT> output) {
             if (null == input || null == output)
                 throw new NullPointerException();
-            return new DefaultCache<LT>(input, output, this);
+            return new FileCache<LT>(input, output, this);
         }
 
         abstract <LT extends Entry>
-        Pool<DefaultCache<LT>.Buffer, IOException> newOutputStrategy(
-                DefaultCache<LT> cache);
+        Pool<FileCache<LT>.Buffer, IOException> newOutputStrategy(
+                FileCache<LT> cache);
     }
+    private final Pool<FileEntry, IOException> pool = TempFilePool.get();
+    private final InputSocketProxy inputProxy;
+    private final OutputSocketProxy outputProxy;
+    private final Strategy factory;
+    private Pool<Buffer, IOException> inputStrategy;
+    private Pool<Buffer, IOException> outputStrategy;
+    private volatile Buffer buffer;
+
+    FileCache(  final InputSocket <? extends LT> input,
+                final OutputSocket<? extends LT> output,
+                final Strategy factory) {
+        if (null == factory)
+            throw new NullPointerException();
+        this.inputProxy  = null == input  ? null : new InputSocketProxy (input );
+        this.outputProxy = null == output ? null : new OutputSocketProxy(output);
+        this.factory = factory;
+    }
+
+    private Pool<Buffer, IOException> getInputStrategy() {
+        return null != inputStrategy
+                ? inputStrategy
+                : (inputStrategy = new InputStrategy());
+    }
+
+    private Pool<Buffer, IOException> getOutputStrategy() {
+        return null != outputStrategy
+                ? outputStrategy
+                : (outputStrategy = factory.newOutputStrategy(this));
+    }
+
+    @Override
+    public InputSocket<LT> getInputSocket() {
+        return inputProxy;
+    }
+
+    @Override
+    public OutputSocket<LT> getOutputSocket() {
+        return outputProxy;
+    }
+
+    @Override
+    public void flush() throws IOException {
+        if (null != buffer) { // DCL is OK in this context!
+            synchronized (FileCache.this) {
+                final Buffer buffer = this.buffer;
+                if (null != buffer)
+                    getOutputStrategy().release(buffer);
+            }
+        }
+    }
+
+    @Override
+    public void clear() throws IOException {
+        if (null != buffer) { // DCL is OK in this context!
+            synchronized (FileCache.this) {
+                final Buffer buffer = this.buffer;
+                if (null != buffer) {
+                    // Order is important here!
+                    this.buffer = null;
+                    getInputStrategy().release(buffer);
+                }
+            }
+        }
+    }
+
+    final class InputStrategy implements Pool<Buffer, IOException> {
+        @Override
+        public Buffer allocate() throws IOException {
+            synchronized (FileCache.this) {
+                Buffer buffer = FileCache.this.buffer;
+                if (null == buffer) {
+                    final InputSocket<? extends LT> input
+                            = inputProxy.getBoundSocket();
+                    assert null == input.getPeerTarget();
+                    class ProxyOutput extends OutputSocket<Entry> {
+                        FileEntry temp;
+
+                        FileEntry getTemp() throws IOException {
+                            return null != temp ? temp : (temp = pool.allocate());
+                        }
+
+                        @Override
+                        public Entry getLocalTarget() throws IOException {
+                            return Entry.NULL;
+                        }
+
+                        @Override
+                        public OutputStream newOutputStream() throws IOException {
+                            return FileOutputSocket.get(getTemp()).newOutputStream();
+                        }
+                    }
+                    final ProxyOutput output = new ProxyOutput();
+                    IOSocket.copy(input, output);
+                    FileCache.this.buffer = buffer = new Buffer(output.getTemp());
+                }
+                buffer.used++;
+                return buffer;
+            }
+        }
+
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            synchronized (FileCache.this) {
+                buffer.used--;
+                if (buffer != FileCache.this.buffer && 0 == buffer.used)
+                    pool.release(buffer.file);
+            }
+        }
+    } // class InputStrategy
+
+    abstract class OutputStrategy implements Pool<Buffer, IOException> {
+        @Override
+        public Buffer allocate() throws IOException {
+            return new Buffer(pool.allocate());
+        }
+
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            try {
+                final OutputSocket<? extends LT> output
+                        = outputProxy.getBoundSocket();
+                assert null == output.getPeerTarget();
+                class ProxyInput extends DecoratingInputSocket<Entry> {
+                    ProxyInput() {
+                        super(FileInputSocket.get(buffer.file));
+                    }
+
+                    @Override
+                    public Entry getLocalTarget() throws IOException {
+                        return Entry.NULL;
+                    }
+                }
+                IOSocket.copy(new ProxyInput(), output);
+            } catch (IOException ex) {
+                pool.release(buffer.file);
+                throw ex;
+            }
+        }
+    } // class OutputStrategy
+
+    final class WriteBackOutputStrategy extends OutputStrategy {
+        @Override
+        public Buffer allocate() throws IOException {
+            synchronized (FileCache.this) {
+                final Buffer buffer = super.allocate();
+                buffer.dirty = true;
+                return buffer;
+            }
+        }
+
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            if (!buffer.dirty)
+                return;
+            synchronized (FileCache.this) {
+                if (buffer != FileCache.this.buffer) {
+                    FileCache.this.buffer = buffer;
+                } else {
+                    buffer.dirty = false;
+                    super.release(buffer);
+                }
+            }
+        }
+    } // class WriteBackOutputStrategy
+
+    final class WriteThroughOutputStrategy extends OutputStrategy {
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            if (buffer != FileCache.this.buffer) { // DCL is OK in this context!
+                synchronized (FileCache.this) {
+                    if (buffer != FileCache.this.buffer) {
+                        FileCache.this.buffer = buffer;
+                        super.release(buffer);
+                    }
+                }
+            }
+        }
+    } // class WriteThroughOutputStrategy
+
+    final class Buffer {
+        final FileEntry file;
+        int used;
+        volatile boolean dirty;
+
+        Buffer(final FileEntry file) {
+            this.file = file;
+        }
+
+        final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
+            boolean closed;
+
+            BufferReadOnlyFile() throws IOException {
+                super(FileInputSocket.get(file).newReadOnlyFile());
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    getInputStrategy().release(Buffer.this);
+                }
+            }
+        } // class BufferReadOnlyFile
+
+        final class BufferInputStream extends DecoratingInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            boolean closed;
+
+            BufferInputStream() throws IOException {
+                super(FileInputSocket.get(file).newInputStream());
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    getInputStrategy().release(Buffer.this);
+                }
+            }
+        } // class BufferInputStream
+
+        final class BufferOutputStream extends DecoratingOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+            boolean closed;
+
+            BufferOutputStream() throws IOException {
+                super(FileOutputSocket.get(file).newOutputStream());
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                closed = true;
+                try {
+                    delegate.close();
+                } finally {
+                    getOutputStrategy().release(Buffer.this);
+                }
+            }
+        } // class BufferOutputStream
+    } // class Buffer
+
+    private final class InputSocketProxy extends DecoratingInputSocket<LT> {
+        InputSocketProxy(final InputSocket <? extends LT> input) {
+            super(input);
+        }
+
+        @Override
+        protected InputSocket<? extends LT> getBoundSocket() throws IOException {
+            return super.getBoundSocket();
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            if (null != getPeerTarget()) {
+                // The data for connected sockets cannot not get cached because
+                // sockets may transfer different encoded data depending on
+                // the identity of their peer target!
+                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
+                // target, it transfers deflated data in order to omit
+                // redundant inflating of the data from the source archive file
+                // and deflating it again to the target archive file.
+                // So we must flush and bypass the cache.
+                flush();
+                return getBoundSocket().newReadOnlyFile();
+            }
+            return getInputStrategy().allocate().new BufferReadOnlyFile();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            if (null != getPeerTarget()) {
+                // Dito.
+                flush();
+                return getBoundSocket().newInputStream();
+            }
+            return getInputStrategy().allocate().new BufferInputStream();
+        }
+    } // class InputProxy
+
+    private final class OutputSocketProxy extends DecoratingOutputSocket<LT> {
+        OutputSocketProxy(final OutputSocket<? extends LT> output) {
+            super(output);
+        }
+
+        @Override
+        protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
+            return super.getBoundSocket();
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            if (null != getPeerTarget()) {
+                // Dito, but this time we must clear the cache.
+                clear();
+                return getBoundSocket().newOutputStream();
+            }
+            return getOutputStrategy().allocate().new BufferOutputStream();
+        }
+    } // class OutputProxy
 }
