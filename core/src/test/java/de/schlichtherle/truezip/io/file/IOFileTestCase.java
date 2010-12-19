@@ -1192,7 +1192,7 @@ public abstract class IOFileTestCase extends TestCase {
         assertFalse(dst.exists());
         if (!dst.isEntry())
             assertFalse(getPlainFile(dst).exists());
-        assertTrue(src.renameTo(dst)); // !strict
+        assertTrue(src.renameTo(dst)); // lenient!
         assertFalse(src.exists());
         if (!src.isEntry())
             assertFalse(getPlainFile(src).exists());

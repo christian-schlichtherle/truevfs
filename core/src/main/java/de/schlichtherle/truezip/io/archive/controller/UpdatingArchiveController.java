@@ -75,6 +75,15 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 public final class UpdatingArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 
+    private static final BitField<InputOption> MOUNT_INPUT_OPTIONS
+            = BitField.of(InputOption.CACHE);
+
+    private static final BitField<OutputOption> MAKE_OUTPUT_OPTIONS
+            = BitField.noneOf(OutputOption.class);
+
+    private static final BitField<SyncOption> SYNC_OPTIONS
+            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
+
     private static final class DummyInputService<E extends Entry>
     implements InputShop<E> {
 
@@ -148,7 +157,7 @@ extends FileSystemArchiveController<E> {
         public void beforeTouch(ArchiveFileSystemEvent<?> event)
         throws IOException {
             assert null == event || event.getSource() == getFileSystem();
-            makeOutput(BitField.noneOf(OutputOption.class));
+            makeOutput(MAKE_OUTPUT_OPTIONS);
         }
 
         @Override
@@ -219,7 +228,7 @@ extends FileSystemArchiveController<E> {
             // reading!
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = parent.getInputSocket(
-                    parentName, BitField.of(InputOption.CACHE));
+                    parentName, MOUNT_INPUT_OPTIONS);
             input = new Input(driver.newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(
                     input.getDriverProduct(), driver,
@@ -274,7 +283,7 @@ extends FileSystemArchiveController<E> {
     @Override
     OutputSocket<?> getOutputSocket(final E entry)
     throws IOException {
-        makeOutput(BitField.noneOf(OutputOption.class));
+        makeOutput(MAKE_OUTPUT_OPTIONS);
         return output.getOutputSocket(entry);
     }
 
@@ -300,20 +309,21 @@ extends FileSystemArchiveController<E> {
 
     private boolean sync() throws SyncException, FileSystemException {
         getModel().assertWriteLockedByCurrentThread();
-        sync(   BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT), new SyncExceptionBuilder());
+        sync(SYNC_OPTIONS, new SyncExceptionBuilder());
         return true;
     }
 
     @Override
 	public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(  final BitField<SyncOption> options,
+                final ExceptionBuilder<? super SyncException, X> builder)
     throws X {
         assert !isTouched() || null != output; // file system touched => output archive
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT))
             throw new IllegalArgumentException();
-        awaitSync(builder, options);
+        awaitSync(options, builder);
         commenceSync(builder);
         try {
             if (!options.get(ABORT_CHANGES) && isTouched())
@@ -332,9 +342,8 @@ extends FileSystemArchiveController<E> {
     }
 
     private <X extends IOException>
-    void awaitSync(
-            final ExceptionBuilder<? super SyncException, X> builder,
-            final BitField<SyncOption> options)
+    void awaitSync( final BitField<SyncOption> options,
+                    final ExceptionBuilder<? super SyncException, X> builder)
     throws X {
         // Check output streams first, because FORCE_CLOSE_INPUT may be
         // set and FORCE_CLOSE_OUTPUT may be unset in which case we
