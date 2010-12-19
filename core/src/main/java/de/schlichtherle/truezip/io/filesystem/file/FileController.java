@@ -98,34 +98,34 @@ final class FileController extends FileSystemController<FileSystemModel>  {
     }
 
     @Override
-    public FileEntry getEntry(FileSystemEntryName path) throws IOException {
-        final FileEntry entry = FileEntry.get(target, path.getPath());
+    public FileEntry getEntry(FileSystemEntryName name) throws IOException {
+        final FileEntry entry = new FileEntry(target, name);
         return entry.getFile().exists() ? entry : null;
     }
 
     @Override
-    public boolean isReadable(FileSystemEntryName path) throws IOException {
-        final File file = new File(target, path.getPath());
+    public boolean isReadable(FileSystemEntryName name) throws IOException {
+        final File file = new File(target, name.getPath());
         return file.canRead();
     }
 
     @Override
-    public boolean isWritable(FileSystemEntryName path) throws IOException {
-        final File file = new File(target, path.getPath());
+    public boolean isWritable(FileSystemEntryName name) throws IOException {
+        final File file = new File(target, name.getPath());
         return isCreatableOrWritable(file);
     }
 
     @Override
-    public void setReadOnly(FileSystemEntryName path) throws IOException {
-        final File file = new File(target, path.getPath());
+    public void setReadOnly(FileSystemEntryName name) throws IOException {
+        final File file = new File(target, name.getPath());
         if (!file.setReadOnly())
             throw new IOException();
     }
 
     @Override
-    public boolean setTime(FileSystemEntryName path, BitField<Access> types, long value)
+    public boolean setTime(FileSystemEntryName name, BitField<Access> types, long value)
     throws IOException {
-        final File file = new File(target, path.getPath());
+        final File file = new File(target, name.getPath());
         boolean ok = true;
         for (final Access type : types)
             ok &= WRITE == type ? file.setLastModified(value) : false;
@@ -134,27 +134,27 @@ final class FileController extends FileSystemController<FileSystemModel>  {
 
     @Override
     public InputSocket<?> getInputSocket(
-            FileSystemEntryName path,
+            FileSystemEntryName name,
             BitField<InputOption> options) {
-        return FileInputSocket.get( FileEntry.get(target, path.getPath()),
+        return FileInputSocket.get( new FileEntry(target, name),
                                     options.clear(InputOption.CACHE));
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FileSystemEntryName path,
+            FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return FileOutputSocket.get(FileEntry.get(target, path.getPath()), options, template);
+        return FileOutputSocket.get(new FileEntry(target, name), options, template);
     }
 
     @Override
-    public boolean mknod(   FileSystemEntryName path,
+    public boolean mknod(   FileSystemEntryName name,
                             Type type,
                             BitField<OutputOption> options,
                             Entry template)
     throws IOException {
-        final File file = new File(target, path.getPath());
+        final File file = new File(target, name.getPath());
         switch (type) {
             case FILE:
                 return file.createNewFile();
@@ -168,9 +168,9 @@ final class FileController extends FileSystemController<FileSystemModel>  {
     }
 
     @Override
-    public void unlink(FileSystemEntryName path)
+    public void unlink(FileSystemEntryName name)
     throws IOException {
-        final File file = new File(target, path.getPath());
+        final File file = new File(target, name.getPath());
         if (!file.delete())
             throw new IOException(file.getPath() + " (cannot delete)");
     }

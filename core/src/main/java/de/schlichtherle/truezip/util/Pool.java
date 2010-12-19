@@ -15,8 +15,10 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
- * A pooling strategy.
+ * An interface for pooling strategies.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -26,18 +28,19 @@ public interface Pool<R, E extends Exception> {
     /**
      * Allocates a resource from this pool.
      *
-     * @return A non-{@code null} resource.
+     * @return A resource.
      * @throws Exception if allocating the resource failed for any reason.
      */
+    @NonNull
     public R allocate() throws E;
 
     /**
      * Releases a previously allocated resource to this pool.
      *
-     * @param  resource a non-{@code null} resource.
-     * @throws IllegalArgumentException if the given resource is not allocated
-     *         by this pool.
+     * @param  resource a resource.
+     * @throws IllegalArgumentException if the given resource has not been
+     *         allocated by this pool.
      * @throws Exception if releasing the resource failed for any other reason.
      */
-    public void release(R resource) throws E;
+    public void release(@NonNull R resource) throws E;
 }

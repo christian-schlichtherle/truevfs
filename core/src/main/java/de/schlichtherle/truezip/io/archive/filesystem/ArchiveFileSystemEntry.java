@@ -15,31 +15,203 @@
  */
 package de.schlichtherle.truezip.io.archive.filesystem;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 /**
  * Adapts an {@link ArchiveEntry} to a {@link FileSystemEntry}.
- * With the help of this interface, an archive file system can ensure that
- * when a new archive entry is created, the {@code template} parameter is
- * <em>not</em> an instance of this interface, but possibly a product of the
- * archive entry factory in the archive driver.
- * This enables an archive driver to copy properties specific to its type of
- * archive entries, e.g. the compressed size of ZIP entries.
  * 
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface ArchiveFileSystemEntry<E extends ArchiveEntry>
+public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
 extends FileSystemEntry {
 
+    /** The decorated archive entry. */
+    @NonNull
+    protected final E entry;
+
+    /** Constructs a new instance of {@code Entry}. */
+    protected ArchiveFileSystemEntry(@NonNull final E entry) {
+        if (null == entry)
+            throw new NullPointerException();
+        this.entry = entry;
+    }
+
     /**
-     * Returns the non-{@code null} archive entry which is adapted by this
-     * archive file system entry.
+     * Returns the archive entry which is adapted by this archive file system
+     * entry.
      *
-     * @return The non-{@code null} archive entry which is adapted by this
-     *         archive file system entry.
+     * @return The archive entry which is adapted by this archive file system
+     *         entry.
      */
-    E getArchiveEntry();
+    public final E getArchiveEntry() {
+        return entry;
+    }
+
+    @Override
+    @NonNull
+    public String getName() {
+        return entry.getName();
+    }
+
+    @Override
+    @NonNull
+    public Type getType() {
+        return entry.getType();
+    }
+
+    @Override
+    public long getSize(Size type) {
+        return entry.getSize(type);
+    }
+
+    @Override
+    public long getTime(Access type) {
+        return entry.getTime(type);
+    }
+
+    ArchiveFileSystemEntry<E> clone(ArchiveFileSystem<E> fileSystem) {
+        return create(getName(), fileSystem.copy(entry));
+    }
+
+    /**
+     * Adds the given base path to the set of members of this directory
+     * if and only if this file system entry is a directory.
+     *
+     * @param  member The non-{@code null} base path of the member to add.
+     * @return Whether the member has been added or an equal member was
+     *         already present in the directory.
+     * @throws UnsupportedOperationException if this file system entry is
+     *         not a directory.
+     */
+    boolean add(@NonNull String member) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Removes the given base path from the set of members of this
+     * directory
+     * if and only if this file system entry is a directory.
+     *
+     * @param  member The non-{@code null} base path of the member to
+     *         remove.
+     * @return Whether the member has been removed or no equal member was
+     *         present in the directory.
+     * @throws UnsupportedOperationException if this file system entry is
+     *         not a directory.
+     */
+    boolean remove(@NonNull String member) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Constructs a new archive file system entry which decorates the given
+     * archive entry.
+     */
+    @NonNull
+    static <E extends ArchiveEntry>
+    ArchiveFileSystemEntry<E> create(@NonNull String path, @NonNull E entry) {
+        return DIRECTORY == entry.getType()
+                ? path.equals(entry.getName())
+                    ? new      DirectoryEntry<E>(      entry)
+                    : new NamedDirectoryEntry<E>(path, entry)
+                : path.equals(entry.getName())
+                    ? new           FileEntry<E>(      entry)
+                    : new      NamedFileEntry<E>(path, entry);
+    }
+
+    /** A file entry. */
+    private static class FileEntry<E extends ArchiveEntry>
+    extends ArchiveFileSystemEntry<E> {
+        /** Decorates the given archive entry. */
+        FileEntry(final E entry) {
+            super(entry);
+            assert DIRECTORY != entry.getType();
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return null;
+        }
+    } // class FileEntry
+
+    /** A named file entry. */
+    private static class NamedFileEntry<E extends ArchiveEntry>
+    extends FileEntry<E> {
+        final String path;
+
+        /** Decorates the given archive entry. */
+        NamedFileEntry(final String path, final E entry) {
+            super(entry);
+            assert !path.equals(entry.getName());
+            assert DIRECTORY != entry.getType();
+            this.path = path;
+        }
+
+        @Override
+        public String getName() {
+            return path;
+        }
+    } // class NamedFileEntry
+
+    /** A directory entry. */
+    private static class DirectoryEntry<E extends ArchiveEntry>
+    extends ArchiveFileSystemEntry<E> {
+        Set<String> members = new LinkedHashSet<String>();
+
+        /** Decorates the given archive entry. */
+        DirectoryEntry(final E entry) {
+            super(entry);
+            assert DIRECTORY == entry.getType();
+        }
+
+        @Override
+        ArchiveFileSystemEntry<E> clone(final ArchiveFileSystem<E> fileSystem) {
+            final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
+            clone.members = Collections.unmodifiableSet(members);
+            return clone;
+        }
+
+        @Override
+        public Set<String> getMembers() {
+            return members;
+        }
+
+        @Override
+        boolean add(String member) {
+            return members.add(member);
+        }
+
+        @Override
+        boolean remove(String member) {
+            return members.remove(member);
+        }
+    } // class DirectoryEntry
+
+    /** A named directory entry. */
+    private static class NamedDirectoryEntry<E extends ArchiveEntry>
+    extends DirectoryEntry<E> {
+        final String path;
+
+        /** Decorates the given archive entry. */
+        NamedDirectoryEntry(final String path, final E entry) {
+            super(entry);
+            assert !path.equals(entry.getName());
+            assert DIRECTORY == entry.getType();
+            this.path = path;
+        }
+
+        @Override
+        public String getName() {
+            return path;
+        }
+    } // class NamedDirectoryEntry
 }

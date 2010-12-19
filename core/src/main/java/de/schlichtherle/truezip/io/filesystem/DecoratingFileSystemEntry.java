@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.entry;
+package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A decorator for entries.
+ * A decorator for file system entries.
  *
  * @param <E> The type of the decorated entry.
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratingEntry<E extends Entry>
-implements Entry {
+public abstract class DecoratingFileSystemEntry<E extends FileSystemEntry>
+extends FileSystemEntry {
 
     /** The decorated entry. */
     @NonNull
     protected final E delegate;
 
-    protected DecoratingEntry(@NonNull final E entry) {
+    protected DecoratingFileSystemEntry(@NonNull final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;

@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.entry;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 /**
  * Represents an entry in an entry container, e.g. an archive file or a file
  * system etc.
@@ -36,7 +38,7 @@ public interface Entry {
      * available.
      * <p>
      * The {@code NULL} entry has {@code "/dev/random"} as its name,
-     * {@link Type#SPECIAL} as its type and {@link #UNKNOWN} for any other
+     * {@link Type#NULL} as its type and {@link #UNKNOWN} for any other
      * property.
      */
     Entry NULL = new Entry() {
@@ -47,7 +49,7 @@ public interface Entry {
 
         @Override
         public Type getType() {
-            return Type.SPECIAL;
+            return Type.NULL;
         }
 
         @Override
@@ -69,6 +71,13 @@ public interface Entry {
 
     /** Defines the type of archive entry. */
     enum Type {
+
+        /**
+         * Nonexistent entry.
+         * This entry does not exist in the file system.
+         */
+        NULL,
+
         /**
          * Regular file.
          * A file usually has some content associated to it which can be read
@@ -134,14 +143,15 @@ public interface Entry {
      * @return The non-{@code null} <i>entry name</i>.
      * @see    EntryName
      */
+    @NonNull
     String getName();
 
     /**
-     * Return the archive entry type.
+     * Returns the type of this entry.
      *
-     * @return A non-null reference.
-     * @see Type
+     * @return The type of this entry.
      */
+    @NonNull
     Type getType();
 
     /**
@@ -151,7 +161,7 @@ public interface Entry {
      * or {@link #UNKNOWN} if not specified or the type is unsupported.
      * This method is not meaningful for directory entries.
      */
-    long getSize(Size type);
+    long getSize(@NonNull Size type);
 
     /**
      * Returns the last access time of this entry.
@@ -160,5 +170,5 @@ public interface Entry {
      * milliseconds since the epoch or {@value #UNKNOWN} if not specified or
      * the type is unsupported.
      */
-    long getTime(Access type);
+    long getTime(@NonNull Access type);
 }

@@ -310,7 +310,7 @@ public final class Path implements Serializable, Comparable<Path> {
      *
      * @return The nullable mount point.
      */
-    @CheckForNull
+    @Nullable
     public MountPoint getMountPoint() {
         return mountPoint;
     }

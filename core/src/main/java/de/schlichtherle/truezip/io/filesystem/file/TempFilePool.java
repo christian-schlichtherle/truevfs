@@ -17,6 +17,8 @@ package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.Files;
 import de.schlichtherle.truezip.util.Pool;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 
@@ -37,9 +39,9 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     private static final TempFilePool INSTANCE
             = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, null);
 
-    private final String prefix;
-    private final String suffix;
-    private final File   dir;
+    @NonNull private final String prefix;
+    @Nullable private final String suffix;
+    @Nullable private final File   dir;
 
     /** Returns the default instance of this temp file pool. */
     public static TempFilePool get() {
@@ -47,9 +49,9 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     }
 
     /** Constructs a new temp file pool. */
-    public TempFilePool(final String prefix,
-                        final String suffix,
-                        final File   dir) {
+    public TempFilePool(@NonNull final String prefix,
+                        @Nullable final String suffix,
+                        @Nullable final File   dir) {
         if (null == prefix)
             throw new NullPointerException();
         this.prefix = prefix;
@@ -64,14 +66,14 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     }
 
     @Override
-    public void release(final FileEntry entry) throws IOException {
+    public void release(@NonNull final FileEntry entry) throws IOException {
         if (!(entry instanceof TempFileEntry) ||
                 this != ((TempFileEntry) entry).pool(null))
             throw new IllegalArgumentException(entry.getFile().getPath() + " (not allocated by this temporary file pool)");
     }
 
     private static final class TempFileEntry extends FileEntry {
-        TempFilePool pool;
+        TempFilePool pool; // TODO: Consider making this an inner class.
 
         TempFileEntry(TempFilePool pool, File file) {
             super(file);

@@ -20,6 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -78,7 +79,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     @NonNull
     private URI uri; // not final for serialization only!
 
-    @CheckForNull
+    @Nullable
     private transient Path path;
 
     private volatile transient Scheme scheme;
@@ -339,7 +340,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      *
      * @return The nullable path.
      */
-    @CheckForNull
+    @Nullable
     public Path getPath() {
         return path;
     }
@@ -351,7 +352,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      * 
      * @return The nullable parent mount point.
      */
-    @CheckForNull
+    @Nullable
     public MountPoint getParent() {
         return null == path ? null : path.getMountPoint();
     }

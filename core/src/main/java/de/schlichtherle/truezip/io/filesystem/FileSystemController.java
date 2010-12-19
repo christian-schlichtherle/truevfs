@@ -60,17 +60,21 @@ public abstract class FileSystemController<M extends FileSystemModel> {
 
     /**
      * Returns the controller for the parent file system or {@code null} if
-     * and only if this file system is not federated, i.e. a member of another
-     * file system.
+     * and only if this file system is not federated, i.e. not a member of
+     * another file system.
      */
+    @Nullable
     public abstract FileSystemController<?> getParent();
 
+    @Nullable
     public abstract Icon getOpenIcon() throws IOException;
 
+    @Nullable
     public abstract Icon getClosedIcon() throws IOException;
 
     public abstract boolean isReadOnly() throws IOException;
 
+    @Nullable
     public abstract FileSystemEntry getEntry(@NonNull FileSystemEntryName name)
     throws IOException;
 
@@ -152,8 +156,7 @@ public abstract class FileSystemController<M extends FileSystemModel> {
             @Nullable Entry template)
     throws IOException;
 
-    public abstract void unlink(
-            @NonNull FileSystemEntryName name)
+    public abstract void unlink(@NonNull FileSystemEntryName name)
     throws IOException;
 
     /**

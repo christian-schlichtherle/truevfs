@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface FileSystemEntry extends Entry {
+public abstract class FileSystemEntry implements Entry {
 
     /**
      * Returns the non-{@code null} <i>file system entry name</i>.
@@ -48,12 +50,46 @@ public interface FileSystemEntry extends Entry {
      * @see    FileSystemEntryName
      */
     @Override
-    String getName();
+    @NonNull
+    public abstract String getName();
 
     /**
      * If this is not a directory entry, {@code null} is returned.
      * Otherwise, an unmodifiable set of strings is returned which
      * represent the base names of the members of this directory entry.
      */
-    Set<String> getMembers();
+    @Nullable
+    public abstract Set<String> getMembers();
+
+    /**
+     * Two file system entries are considered equal if and only if they are
+     * identical.
+     * This can't get overriden.
+     */
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) {
+        return this == that;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * This can't get overriden.
+     */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(getClass().getName())
+                .append("[name=")
+                .append(getName())
+                .append(",members=")
+                .append(getMembers())
+                .append("]")
+                .toString();
+    }
 }

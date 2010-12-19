@@ -16,6 +16,8 @@
 package de.schlichtherle.truezip.io.entry;
 
 import de.schlichtherle.truezip.io.entry.Entry.Type;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 
 /**
@@ -51,6 +53,7 @@ public interface EntryFactory<E extends Entry> {
      * @throws NullPointerException if {@code name} or {@code type} are
      *         {@code null}.
      */
-    E newEntry(String name, Type type, Entry template)
+    @NonNull
+    E newEntry(@NonNull String name, @NonNull Type type, @CheckForNull Entry template)
     throws CharConversionException;
 }
