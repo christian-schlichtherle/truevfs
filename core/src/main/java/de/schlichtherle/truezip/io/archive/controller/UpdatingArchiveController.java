@@ -279,12 +279,12 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-	boolean autoSync(final FileSystemEntryName name, final Access intention)
+    boolean autoSync(final FileSystemEntryName name, final Access intention)
     throws SyncException, FileSystemException {
         final ArchiveFileSystem<E> fileSystem;
         final ArchiveFileSystemEntry<E> entry;
         if (null == (fileSystem = getFileSystem())
-                || null == (entry = fileSystem.getEntry(name.getPath())))
+                || null == (entry = fileSystem.getEntry(name)))
             return false;
         String n = null;
         if (null != output && null != output.getEntry(
@@ -413,8 +413,7 @@ extends FileSystemArchiveController<E> {
     void performSync(final ExceptionHandler<? super SyncException, X> handler)
     throws X {
         assert isTouched();
-        assert output != null;
-        assert checkNoDeletedEntriesWithNewData();
+        assert null != output;
 
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -443,30 +442,6 @@ extends FileSystemArchiveController<E> {
                     : input.getDriverProduct(),
                 output.getDriverProduct(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
-    }
-
-    private boolean checkNoDeletedEntriesWithNewData() {
-        assert isTouched();
-
-        // Check if we have written out any entries that have been
-        // deleted from the archive file system meanwhile and prepare
-        // to throw a warning exception.
-        final ArchiveFileSystem<E> fileSystem = getFileSystem();
-        for (final E entry : output) {
-            assert DIRECTORY != entry.getType();
-            // At this point in time we could have written only file archive
-            // entries with valid path names, so the following test should be
-            // enough:
-            String path = entry.getName();
-            //path = de.schlichtherle.truezip.io.Paths.normalize(path, Entry.SEPARATOR_CHAR);
-            if (null == fileSystem.getEntry(path)) {
-                // The entry has been written out already, but also
-                // has been deleted from the master directory meanwhile.
-                // Create a warn exception, but do not yet throw it.
-                throw new AssertionError(path + " (failed to remove archive entry)");
-            }
-        }
-        return true;
     }
 
     private static <E extends ArchiveEntry, X extends IOException>

@@ -23,6 +23,7 @@ import java.io.IOException;
 public class ArchiveFileSystemException extends IOException {
 
     private static final long serialVersionUID = 4652084652223428651L;
+
     /** The entry's path name. */
     private final String path;
 
