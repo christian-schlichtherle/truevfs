@@ -80,7 +80,7 @@ extends DecoratingFileSystemController<
                 return ArchiveFileSystemEntry.create(ROOT, SPECIAL,
                         driver.newEntry(ROOT, SPECIAL,
                             entry instanceof ArchiveFileSystemEntry<?>
-                                ? ((ArchiveFileSystemEntry<?>) entry).getArchiveEntry()
+                                ? ((ArchiveFileSystemEntry<?>) entry).getEntry()
                                 : entry));
             } catch (CharConversionException cannotHappen) {
                 throw new AssertionError(cannotHappen);

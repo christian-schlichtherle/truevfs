@@ -82,7 +82,7 @@ extends FileSystemEntry {
      * @return The archive entry which is adapted by this archive file system
      *         entry.
      */
-    public final E getArchiveEntry() {
+    public final E getEntry() {
         return entry;
     }
 

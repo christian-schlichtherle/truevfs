@@ -100,7 +100,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         // Setup root.
         root = newEntryUnchecked(ROOT, DIRECTORY, null);
         for (Access access : BitField.allOf(Access.class))
-            root.getArchiveEntry().setTime(access, System.currentTimeMillis());
+            root.getEntry().setTime(access, System.currentTimeMillis());
         master.put(ROOT, root);
         try {
             touch();
@@ -488,7 +488,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             throw new ArchiveFileSystemException(path,
                     "only FILE and DIRECTORY entries are currently supported");
         while (template instanceof ArchiveFileSystemEntry<?>)
-            template = ((ArchiveFileSystemEntry<?>) template).getArchiveEntry();
+            template = ((ArchiveFileSystemEntry<?>) template).getEntry();
         return new PathLink(path, type, createParents, template);
     }
 
@@ -568,10 +568,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 assert DIRECTORY == parent.getType();
                 master.put(entry.getName(), entry);
                 if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never beforeTouch ghosts!
-                    parent.getArchiveEntry().setTime(Access.WRITE, time);
+                    parent.getEntry().setTime(Access.WRITE, time);
                 parent = entry;
             }
-            final E entry = getTarget().getArchiveEntry();
+            final E entry = getTarget().getEntry();
             if (UNKNOWN == entry.getTime(WRITE))
                 entry.setTime(WRITE, time);
         }
@@ -652,7 +652,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                     + "\" does not contain this entry - archive file system is corrupted!";
         touch();
         if (parent.getTime(Access.WRITE) != UNKNOWN) // never beforeTouch ghosts!
-            parent.getArchiveEntry().setTime(Access.WRITE, System.currentTimeMillis());
+            parent.getEntry().setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     public boolean setTime(
@@ -672,7 +672,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         touch();
         boolean ok = true;
         for (Access type : types)
-            ok &= entry.getArchiveEntry().setTime(type, value);
+            ok &= entry.getEntry().setTime(type, value);
         return ok;
     }
 
