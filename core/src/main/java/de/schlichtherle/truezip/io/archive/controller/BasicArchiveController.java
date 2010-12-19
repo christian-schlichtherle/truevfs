@@ -274,8 +274,10 @@ extends FileSystemController<ArchiveModel> {
 
             @Override
             public E getLocalTarget() throws IOException {
-                if (options.get(APPEND))
+                if (options.get(APPEND)) {
+                    assert false;
                     return null; // FIXME: broken interface contract!
+                }
                 return getEntry();
             }
 

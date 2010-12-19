@@ -17,7 +17,9 @@ package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,6 +61,7 @@ public abstract class IOSocket<LT, RT> {
      *
      * @return The non-{@code null} local target for I/O operations.
      */
+    @NonNull
     public abstract LT getLocalTarget() throws IOException;
 
     /**
@@ -68,6 +71,7 @@ public abstract class IOSocket<LT, RT> {
      *
      * @return The nullable peer target for I/O operations.
      */
+    @CheckForNull
     public abstract RT getPeerTarget() throws IOException;
 
     /**
@@ -108,6 +112,7 @@ public abstract class IOSocket<LT, RT> {
      * targets.
      */
     @Override
+    @NonNull
     public final String toString() {
         // Note that the target actually must not be null, but this method
         // should work even if the interface contract is broken in order to
@@ -141,7 +146,7 @@ public abstract class IOSocket<LT, RT> {
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
+    public final boolean equals(@CheckForNull Object that) {
         return this == that;
     }
 
