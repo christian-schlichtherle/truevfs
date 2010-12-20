@@ -492,10 +492,20 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         return new PathLink(path, type, createParents, template);
     }
 
+    /**
+     * TODO: This implementation bears one problem: The state of the file
+     * system may be altered between the construction of an instance and the
+     * call to the {@link #run} method, which may render the operation illegal
+     * and corrupt the file system.
+     * As long as only the ArchiveControllers in the package
+     * de.schlichtherle.truezip.io.archive.controller are used, this should not
+     * happen, however.
+     */
     private final class PathLink implements ArchiveFileSystemOperation<E> {
         final Splitter splitter = new Splitter();
         final boolean createParents;
         final SegmentLink<E>[] links;
+        long time = -1;
 
         PathLink(   @NonNull final String entryPath,
                     @NonNull final Entry.Type entryType,
@@ -559,7 +569,6 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
             touch();
             final int l = links.length;
-            final long time = System.currentTimeMillis();
             ArchiveFileSystemEntry<E> parent = links[0].entry;
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
@@ -568,12 +577,16 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
                 assert DIRECTORY == parent.getType();
                 master.put(entry.getName(), entry);
                 if (parent.add(base) && UNKNOWN != parent.getTime(Access.WRITE)) // never beforeTouch ghosts!
-                    parent.getEntry().setTime(Access.WRITE, time);
+                    parent.getEntry().setTime(Access.WRITE, getCurrentTimeMillis());
                 parent = entry;
             }
             final E entry = getTarget().getEntry();
             if (UNKNOWN == entry.getTime(WRITE))
-                entry.setTime(WRITE, time);
+                entry.setTime(WRITE, getCurrentTimeMillis());
+        }
+
+        private long getCurrentTimeMillis() {
+            return 0 <= time ? time : (time = System.currentTimeMillis());
         }
 
         @Override

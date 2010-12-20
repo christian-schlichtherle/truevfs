@@ -56,7 +56,8 @@ extends DecoratingFileSystemController<
     private volatile ReentrantLock readLock;
     private volatile ReentrantLock writeLock;
 
-    public ConcurrentArchiveController(FileSystemController<? extends ArchiveModel> controller) {
+    public ConcurrentArchiveController(
+            FileSystemController<? extends ArchiveModel> controller) {
         super(controller);
     }
 

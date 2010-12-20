@@ -72,7 +72,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @version $Id$
  */
 @NotThreadSafe
-public final class CachingArchiveController
+public final class ContentCachingArchiveController
 extends DecoratingFileSystemController<
         ArchiveModel,
         FileSystemController<? extends ArchiveModel>> {
@@ -80,7 +80,8 @@ extends DecoratingFileSystemController<
     private final Map<FileSystemEntryName, IOCache<Entry>> caches
             = new HashMap<FileSystemEntryName, IOCache<Entry>>();
 
-    public CachingArchiveController(FileSystemController<? extends ArchiveModel> controller) {
+    public ContentCachingArchiveController(
+            FileSystemController<? extends ArchiveModel> controller) {
         super(controller);
     }
 
