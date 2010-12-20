@@ -15,16 +15,17 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A decorator for file system entries.
  *
- * @param <E> The type of the decorated entry.
- * @author Christian Schlichtherle
+ * @param   <E> The type of the decorated entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratingFileSystemEntry<E extends FileSystemEntry>
+public abstract class DecoratingFileSystemEntry<E extends Entry>
 extends FileSystemEntry {
 
     /** The decorated entry. */

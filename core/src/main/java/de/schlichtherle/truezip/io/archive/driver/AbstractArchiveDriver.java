@@ -15,9 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
+import de.schlichtherle.truezip.io.archive.controller.IOSocketCachingArchiveController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.archive.controller.CachingArchiveController;
+import de.schlichtherle.truezip.io.archive.controller.ContentCachingArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.ConcurrentArchiveController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
 import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
@@ -234,10 +235,11 @@ implements ArchiveDriver<E>, Serializable {
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent) {
         return new ConcurrentArchiveController(
-                    new CachingArchiveController(
-                        new UpdatingArchiveController<E>( // TODO: Support append strategy.
-                            new ArchiveModel(mountPoint, parent.getModel()),
-                            this, parent)));
+                    //new IOSocketCachingArchiveController(
+                        new ContentCachingArchiveController(
+                            new UpdatingArchiveController<E>( // TODO: Support append strategy.
+                                new ArchiveModel(mountPoint, parent.getModel()),
+                                this, parent)));
     }
 
     /**

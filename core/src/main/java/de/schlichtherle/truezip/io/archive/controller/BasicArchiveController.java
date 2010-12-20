@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
+import java.util.Map;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
@@ -44,6 +45,8 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
@@ -203,136 +206,131 @@ extends FileSystemController<ArchiveModel> {
 
     @Override
     public final InputSocket<?> getInputSocket(
-            final FileSystemEntryName name,
-            final BitField<InputOption> options) {
-        class Input extends InputSocket<E> {
-
-            /*@Override
-            protected void afterPeering() throws IOException {
-                getPeerTarget();
-            }*/
-
-            @Override
-            public E getLocalTarget() throws IOException {
-                if (!autoSync(name, READ)) {
-                    autoMount(); // detect false positives!
-                    // Force autoSync for peer target.
-                    // FIXME: This might cause recursive loops if the output
-                    // socket is also calling getPeerTarget(), e.g. in order
-                    // to copy some properties!
-                    getPeerTarget();
-                }
-                final ArchiveFileSystemEntry<E> entry
-                        = autoMount().getEntry(name);
-                if (null == entry)
-                    throw new ArchiveEntryNotFoundException(getModel(),
-                            name, "no such file or directory");
-                return entry.getEntry();
-            }
-
-            InputSocket<?> getBoundSocket() throws IOException {
-                final E entry = getLocalTarget();
-                if (DIRECTORY == entry.getType())
-                    throw new ArchiveEntryNotFoundException(getModel(),
-                            name, "cannot read directories");
-                return BasicArchiveController
-                        .this
-                        .getInputSocket(entry.getName())
-                        .bind(this);
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getBoundSocket().newReadOnlyFile();
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                return getBoundSocket().newInputStream();
-            }
-        } // class Input
-
-        return new Input();
+            FileSystemEntryName name,
+            BitField<InputOption> options) {
+        return new Input(name, options);
     }
+
+    private class Input extends InputSocket<E> {
+        final FileSystemEntryName name;
+        final BitField<InputOption> options;
+
+        Input(  final FileSystemEntryName name,
+                final BitField<InputOption> options) {
+            this.name = name;
+            this.options = options;
+        }
+
+        @Override
+        public E getLocalTarget() throws IOException {
+            if (!autoSync(name, READ)) {
+                autoMount();        // detect false positives
+                getPeerTarget();    // trigger autoSync() if in same file system
+            }
+            final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
+            if (null == entry)
+                throw new ArchiveEntryNotFoundException(getModel(),
+                        name, "no such file or directory");
+            return entry.getEntry();
+        }
+
+        InputSocket<?> getBoundSocket() throws IOException {
+            final E entry = getLocalTarget();
+            if (DIRECTORY == entry.getType())
+                throw new ArchiveEntryNotFoundException(getModel(),
+                        name, "cannot read directories");
+            return BasicArchiveController
+                    .this
+                    .getInputSocket(entry.getName())
+                    .bind(this);
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            return getBoundSocket().newReadOnlyFile();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return getBoundSocket().newInputStream();
+        }
+    } // class Input
 
     abstract InputSocket<?> getInputSocket(String name) throws IOException;
 
     @Override
     public final OutputSocket<?> getOutputSocket(
-            final FileSystemEntryName name,
-            final BitField<OutputOption> options,
-            final Entry template) {
-        class Output extends OutputSocket<E> {
-            ArchiveFileSystemOperation<E> link;
-
-            /*@Override
-            protected void beforePeering() throws IOException {
-            }*/
-
-            @Override
-            protected void afterPeering() throws IOException {
-                //getPeerTarget();
-                link = null;
-            }
-
-            E getEntry() throws IOException {
-                if (autoSync(name, WRITE))
-                    link = null;
-                if (null == link) {
-                    // Start creating or overwriting the archive entry.
-                    // This will fail if the entry already exists as a directory.
-                    // TODO: Use getPeerTarget() instead of template!
-                    link = autoMount(   !isRoot(name.getPath())
-                                        && options.get(CREATE_PARENTS), options)
-                            .mknod( name, FILE, options.get(CREATE_PARENTS),
-                                    template);
-                }
-                return link.getTarget().getEntry();
-            }
-
-            @Override
-            public E getLocalTarget() throws IOException {
-                if (options.get(APPEND)) {
-                    throw new UnsupportedOperationException("This feature is not yet implemented!");
-                    // return null; // FIXME: broken interface contract!
-                }
-                return getEntry();
-            }
-
-            @Override
-            public OutputStream newOutputStream() throws IOException {
-                final E entry = getEntry();
-                final OutputSocket<?> output = getOutputSocket(entry);
-                final InputStream in = options.get(APPEND)
-                        ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
-                        : null;
-                try {
-                    final OutputStream out = output
-                            .bind(null == in ? this : null)
-                            .newOutputStream();
-                    try {
-                        link.run();
-                        if (in != null)
-                            Streams.cat(in, out);
-                    } catch (IOException ex) {
-                        out.close(); // may throw another exception!
-                        throw ex;
-                    }
-                    return out;
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException ex) {
-                            throw new InputException(ex);
-                        }
-                    }
-                }
-            }
-        } // class Output
-
-        return new Output();
+            FileSystemEntryName name,
+            BitField<OutputOption> options,
+            Entry template) {
+        return new Output(name, options, template);
     }
+
+    private class Output extends OutputSocket<E> {
+        final FileSystemEntryName name;
+        final BitField<OutputOption> options;
+        final Entry template;
+
+        Output( final FileSystemEntryName name,
+                final BitField<OutputOption> options,
+                final Entry template) {
+            this.name = name;
+            this.options = options;
+            this.template = template;
+        }
+
+        ArchiveFileSystemOperation<E> getLink() throws IOException {
+            autoSync(name, WRITE);
+            // Start creating or overwriting the archive entry.
+            // This will fail if the entry already exists as a directory.
+            // TODO: Use getPeerTarget() instead of template!
+            return autoMount(   !isRoot(name.getPath())
+                                && options.get(CREATE_PARENTS), options)
+                    .mknod( name, FILE, options.get(CREATE_PARENTS),
+                            template);
+        }
+
+        @Override
+        public E getLocalTarget() throws IOException {
+            if (options.get(APPEND)) {
+                throw new UnsupportedOperationException("This feature is not yet implemented!");
+                // return null; // FIXME: broken interface contract!
+            }
+            return getLink().getTarget().getEntry();
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            final ArchiveFileSystemOperation<E> link = getLink();
+            final E entry = link.getTarget().getEntry();
+            final OutputSocket<?> output = getOutputSocket(entry);
+            final InputStream in = options.get(APPEND)
+                    ? getInputSocket(entry.getName()).newInputStream() // FIXME: Crashes on new entry!
+                    : null;
+            try {
+                final OutputStream out = output
+                        .bind(null == in ? this : null)
+                        .newOutputStream();
+                try {
+                    link.run();
+                    if (in != null)
+                        Streams.cat(in, out);
+                } catch (IOException ex) {
+                    out.close(); // may throw another exception!
+                    throw ex;
+                }
+                return out;
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        throw new InputException(ex);
+                    }
+                }
+            }
+        }
+    } // class Output
 
     abstract OutputSocket<?> getOutputSocket(E entry) throws IOException;
 
