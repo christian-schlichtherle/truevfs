@@ -72,7 +72,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
  * @version $Id$
  */
 @NotThreadSafe
-public final class UpdatingArchiveController<E extends ArchiveEntry>
+public final class DefaultArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 
     private static final BitField<InputOption> MOUNT_INPUT_OPTIONS
@@ -128,7 +128,7 @@ extends FileSystemArchiveController<E> {
         }
 
         /** Returns the product of the archive driver this input is wrapping. */
-        InputShop<E> getDriverProduct() {
+        InputShop<E> getDelegate() {
             return delegate;
         }
     }
@@ -146,7 +146,7 @@ extends FileSystemArchiveController<E> {
         }
 
         /** Returns the product of the archive driver this output is wrapping. */
-        OutputShop<E> getDriverProduct() {
+        OutputShop<E> getDelegate() {
             return delegate;
         }
     }
@@ -185,7 +185,7 @@ extends FileSystemArchiveController<E> {
     private final ArchiveFileSystemTouchListener<ArchiveEntry> touchListener
             = new TouchListener();
 
-    public UpdatingArchiveController(
+    public DefaultArchiveController(
             final ConcurrentFileSystemModel model,
             final ArchiveDriver<E> driver,
             final FileSystemController<?> parent) {
@@ -231,7 +231,7 @@ extends FileSystemArchiveController<E> {
                     parentName, MOUNT_INPUT_OPTIONS);
             input = new Input(driver.newInputShop(getModel(), socket));
             setFileSystem(newArchiveFileSystem(
-                    input.getDriverProduct(), driver,
+                    input.getDelegate(), driver,
                     socket.getLocalTarget(), readOnly));
         } catch (FileSystemException ex) {
             throw ex;
@@ -271,7 +271,7 @@ extends FileSystemArchiveController<E> {
         final OutputSocket<?> socket = parent.getOutputSocket(
                 parentName, options.set(OutputOption.CACHE), null);
         output = new Output(driver.newOutputShop(getModel(), socket,
-                    null == input ? null : input.getDriverProduct()));
+                    null == input ? null : input.getDelegate()));
     }
 
     @Override
@@ -448,8 +448,8 @@ extends FileSystemArchiveController<E> {
         copy(   getFileSystem(),
                 null == input
                     ? new DummyInputService<E>()
-                    : input.getDriverProduct(),
-                output.getDriverProduct(),
+                    : input.getDelegate(),
+                output.getDelegate(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
 

@@ -24,9 +24,6 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Defines the common properties of a file system.
- * <p>
- * This class is <em>not</em> thread-safe!
- * Multithreading needs to be addressed by client classes.
  *
  * @see     FileSystemController
  * @author  Christian Schlichtherle

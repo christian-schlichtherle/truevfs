@@ -306,7 +306,7 @@ public final class Path implements Serializable, Comparable<Path> {
 
     /**
      * Returns the mount point or {@code null} iff the {@link #getUri() URI}
-     * is hierarchical.
+     * is not absolute.
      *
      * @return The nullable mount point.
      */

@@ -138,7 +138,7 @@ public interface Entry {
      * when being parsed.
      *
      * @return The entry name.
-     * @see    EntryName
+     * @see    EntryName#create(java.lang.String, java.lang.String)
      */
     @NonNull
     String getName();

@@ -26,7 +26,8 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Supports multiple concurrent reader threads.
  *
- * @author Christian Schlichtherle
+ * @see     ConcurrentFileSystemController
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
