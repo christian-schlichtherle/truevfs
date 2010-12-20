@@ -235,11 +235,11 @@ implements ArchiveDriver<E>, Serializable {
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent) {
         return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                    new IOSocketCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                    //new IOSocketCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                         new ContentCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                             new UpdatingArchiveController<E>( // TODO: Support append strategy.
                                 new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
-                                this, parent))));
+                                this, parent)));
     }
 
     /**
