@@ -74,10 +74,10 @@ public final class FederatedFileSystemManager extends FileSystemManager {
 
     private final class Scheduler implements FileSystemTouchedListener {
 
-        final ManagedFileSystemController controller;
+        final FederatedFileSystemController controller;
 
         Scheduler(final FileSystemController<?> prospect) {
-            controller = new ManagedFileSystemController(prospect);
+            controller = new FederatedFileSystemController(prospect);
             controller.getModel().addFileSystemTouchedListener(this);
             touchedChanged(null); // setup schedule
         }
@@ -112,7 +112,7 @@ public final class FederatedFileSystemManager extends FileSystemManager {
                 = new TreeSet<FileSystemController<?>>(BOTTOM_UP_COMPARATOR);
         for (final Link<Scheduler> link : schedulers.values()) {
             final Scheduler scheduler = Links.getTarget(link);
-            final ManagedFileSystemController controller
+            final FederatedFileSystemController controller
                     = null == scheduler ? null : scheduler.controller;
             if (null != controller)
                 snapshot.add(controller);

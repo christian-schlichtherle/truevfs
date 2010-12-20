@@ -29,7 +29,6 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,8 +56,8 @@ import net.jcip.annotations.ThreadSafe;
  *     it can be serialized.
  * </ul>
  *
- * @param <E> The type of the archive entries.
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 // TODO: Consider making this an abstract class.
@@ -68,30 +67,12 @@ public interface ArchiveDriver<E extends ArchiveEntry>
 extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
 
     /**
-     * Creates a new file system controller for the given archive file's
-     * mount point and parent file system controller.
-     * <p>
-     * This method is primarily provided to serve two purposes:
-     * <ol>
-     * <li>An archive driver could decorate the default chain of archive
-     *     controllers in order to implement additional aspects such as
-     *     managing authentication keys for encrypted archive files or logging.
-     * <li>An archive driver could use the provided parent component file
-     *     system controller to request an entry for the archive model's mount
-     *     point and use its properties in order to resolve an appropriate
-     *     update strategy.
-     *     E.g. an archive driver for ZIP files could return an archive
-     *     controller which uses an append-strategy rather than the usual
-     *     full-update-strategy if the target archive file exceeds a
-     *     predefined size threshold such as 128 MB for example.
-     * </ol>
-     * Note that the returned archive controller must be thread-safe!
+     * {@inheritDoc}
      *
-     * @param  mountPoint the non-{@code null} mount point of the archive file
-     *         system.
-     * @param  parent the non-{@code null} parent file system controller.
-     * @return A new archive controller for the given archive model and
-     *         parent file system controller.
+     * @param  mountPoint the mount point of the archive file system.
+     * @param  parent the parent file system controller.
+     * @return A new archive file system controller for the given mount point
+     *         and parent file system controller.
      */
     @Override
     @NonNull

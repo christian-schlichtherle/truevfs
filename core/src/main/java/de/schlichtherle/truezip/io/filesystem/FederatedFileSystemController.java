@@ -34,22 +34,27 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Implements a chain of responsibility in order to resolve
  * {@link FalsePositiveException}s thrown by the prospective file system
- * provided to its {@link #ManagedFileSystemController constructor}.
+ * provided to its {@link #FederatedFileSystemController constructor}.
  * Whenever the controller for the prospective file system throws a
  * {@link FalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
  * operation.
- * As a desired side effect, it also adapts the controller for the prospective
- * file system to a controller for a component file system.
+ * <p>
+ * This class is thread-safe if and only if the decorated file system
+ * controller and its parent file system controller are thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
-final class ManagedFileSystemController
+final class FederatedFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 
-    ManagedFileSystemController(final FileSystemController<?> controller) {
+    /**
+     * Constructs a new federated file system controller.
+     *
+     * @param controller the decorated file system controller.
+     */
+    FederatedFileSystemController(final FileSystemController<?> controller) {
         super(controller);
         assert null != getParent();
     }

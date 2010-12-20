@@ -45,7 +45,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class IOSocketCachingArchiveController<
+public final class IOSocketCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
@@ -56,7 +56,12 @@ extends DecoratingFileSystemController<M, C> {
     private Map<FileSystemEntryName, Output> outputs
             = new WeakHashMap<FileSystemEntryName, Output>();
 
-    public IOSocketCachingArchiveController(C controller) {
+    /**
+     * Constructs a new I/O socket caching file system controller.
+     *
+     * @param controller the decorated file system controller.
+     */
+    public IOSocketCachingFileSystemController(@NonNull C controller) {
         super(controller);
     }
 

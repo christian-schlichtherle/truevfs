@@ -55,20 +55,16 @@ import static de.schlichtherle.truezip.io.Paths.*;
 public class ArchiveFileSystem<E extends ArchiveEntry>
 implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
-    /** The controller that this filesystem belongs to. */
     private final EntryFactory<E> factory;
 
     /**
-     * The map of archive entries in this file system.
-     * If this is a read-only file system, this is actually an unmodifiable
-     * map.
-     * This field should be considered final!
+     * The map of archive file system entries.
      * <p>
      * Note that the archive entries in this map are shared with the
      * {@link EntryContainer} object provided to the constructor of
      * this class.
      */
-    private Map<String, ArchiveFileSystemEntry<E>> master;
+    private final Map<String, ArchiveFileSystemEntry<E>> master;
 
     /** The file system entry for the (virtual) root of this file system. */
     private final ArchiveFileSystemEntry<E> root;
@@ -165,9 +161,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
 
         // Load entries from input archive.
         for (final E entry : container) {
-            String name = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
-            name = EntryName.create(name, null, true).getPath();
-            master.put(name, ArchiveFileSystemEntry.create(name, entry.getType(), entry));
+            String path = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            //path = EntryName.create(path, null, true).getPath();
+            path = new Normalizer(SEPARATOR_CHAR).normalize(path); // faster and more space efficient
+            master.put(path, ArchiveFileSystemEntry.create(path, entry.getType(), entry));
         }
 
         // Setup root file system entry, potentially replacing its previous
@@ -176,17 +173,17 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         master.put(ROOT, root);
 
         // Now perform a file system check to create missing parent directories
-        // and populate directories with their children - this needs to be done
+        // and populate directories with their members - this needs to be done
         // separately!
         // entries = Collections.enumeration(master.values()); // concurrent modification!
-        final Check fsck = new Check();
+        final Checker fsck = new Checker();
         for (final E entry : container) {
-            String name = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
+            String path = cutTrailingSeparators(entry.getName(), SEPARATOR_CHAR);
             try {
                 fsck.fix(new FileSystemEntryName(
-                        new URI(null, null, name, null, null),
+                        new URI(null, null, path, null, null),
                         true).getPath());
-            } catch (URISyntaxException ignore) {
+            } catch (URISyntaxException dontFix) {
             }
         }
     }
@@ -210,7 +207,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
     }
 
-    private class Check extends Splitter {
+    private class Checker extends Splitter {
 
         /**
          * Called from a constructor to fix the parent directories of the
@@ -303,12 +300,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     /**
      * Adds the given listener to the set of archive file system listeners.
      *
-     * @param  listener the non-{@code null} listener for archive file system
-     *         events.
-     * @throws NullPointerException if {@code listener} is {@code null}.
+     * @param  listener the listener for archive file system events.
      */
     public final void addArchiveFileSystemTouchListener(
-            @NonNull final ArchiveFileSystemTouchListener<? super E> listener) {
+            @NonNull ArchiveFileSystemTouchListener<? super E> listener) {
         if (null == listener)
             throw new NullPointerException();
         touchListeners.add(listener);
@@ -317,14 +312,10 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     /**
      * Removes the given listener from the set of archive file system listeners.
      *
-     * @param  listener the non-{@code null} listener for archive file system
-     *         events.
-     * @throws NullPointerException if {@code listener} is {@code null}.
+     * @param  listener the listener for archive file system events.
      */
     public final void removeArchiveFileSystemTouchListener(
-            @NonNull final ArchiveFileSystemTouchListener<? super E> listener) {
-        if (null == listener)
-            throw new NullPointerException();
+            @Nullable ArchiveFileSystemTouchListener<? super E> listener) {
         touchListeners.remove(listener);
     }
 
@@ -334,26 +325,26 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
     }
 
     @Override
-    @NonNull
     public Iterator<ArchiveFileSystemEntry<E>> iterator() {
         class ArchiveEntryIterator implements Iterator<ArchiveFileSystemEntry<E>> {
             final Iterator<ArchiveFileSystemEntry<E>> it = master.values().iterator();
 
             @Override
-			public boolean hasNext() {
+            public boolean hasNext() {
                 return it.hasNext();
             }
 
             @Override
-			public ArchiveFileSystemEntry<E> next() {
+            public ArchiveFileSystemEntry<E> next() {
                 return it.next();
             }
 
             @Override
-			public void remove() {
+            public void remove() {
                 throw new UnsupportedOperationException();
             }
-        }
+        } // class ArchiveEntryIterator
+
         return new ArchiveEntryIterator();
     }
 
@@ -385,8 +376,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             @NonNull final String path,
             @NonNull final Type type,
             @CheckForNull final Entry template) {
-        assert type != null;
-        assert !isRoot(path) || type == DIRECTORY;
+        assert null != type;
+        assert !isRoot(path) || DIRECTORY == type;
         assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
@@ -411,8 +402,8 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
             @NonNull final Type type,
             @CheckForNull final Entry template)
     throws ArchiveFileSystemException {
-        assert type != null;
-        assert !isRoot(path) || type == DIRECTORY;
+        assert null != type;
+        assert !isRoot(path) || DIRECTORY == type;
         assert !(template instanceof ArchiveFileSystemEntry<?>);
 
         try {
@@ -423,7 +414,7 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         }
     }
 
-    E copy(final E entry) {
+    final E copy(final E entry) {
         try {
             return factory.newEntry(entry.getName(), entry.getType(), entry);
         } catch (CharConversionException ex) {

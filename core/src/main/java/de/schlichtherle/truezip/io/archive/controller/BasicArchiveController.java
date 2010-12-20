@@ -130,8 +130,10 @@ extends FileSystemController<ConcurrentFileSystemModel> {
      * @param model the non-{@code null} archive model.
      */
     BasicArchiveController(final ConcurrentFileSystemModel model) {
-        assert null != model;
-        assert null != model.getParent();
+        if (null == model)
+            throw new NullPointerException();
+        if (null == model.getParent())
+            throw new IllegalArgumentException();
         this.model = model;
     }
 
@@ -394,7 +396,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
                 }
                 throw ex; // continue with unlinking our target archive file.
             }
-            if (!fileSystem.getEntry(ROOT).getMembers().isEmpty())
+            if (!fileSystem.getEntry(ROOT_ENTRY_NAME).getMembers().isEmpty())
                 throw new IOException("root directory not empty");
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.

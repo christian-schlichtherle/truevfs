@@ -16,6 +16,8 @@
 
 package de.schlichtherle.truezip.io.entry;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 
 /**
@@ -53,13 +55,13 @@ extends Iterable<E> {
     Iterator<E> iterator();
 
     /**
-     * Returns the entry for the given
-     * {@link Entry#getName() entry name} or {@code null} if no
-     * entry with this name exists in this container.
+     * Returns the entry for the given {@link Entry#getName() name} or
+     * {@code null} if no entry with this name exists in this container.
      *
-     * @param  name a non-{@code null} <i>entry name</i>.
-     * @return The entry for the given <i>entry name</i> or
-     *         {@code null} if no entry with this name exists in this container.
+     * @param  name an entry name.
+     * @return The entry for the given name or {@code null} if no entry with
+     *         this name exists in this container.
      */
-    E getEntry(String name);
+    @CheckForNull
+    E getEntry(@NonNull String name);
 }

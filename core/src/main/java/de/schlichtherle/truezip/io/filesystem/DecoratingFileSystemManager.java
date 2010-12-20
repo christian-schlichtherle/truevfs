@@ -29,6 +29,11 @@ extends FileSystemManager {
 
     protected final M delegate;
     
+    /**
+     * Constructs a new decorating file system manager.
+     *
+     * @param manager the decorated file system manager.
+     */
     protected DecoratingFileSystemManager(@NonNull final M manager) {
         if (null == manager)
             throw new NullPointerException();

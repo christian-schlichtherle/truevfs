@@ -117,8 +117,8 @@ public interface Entry {
     }
 
     /**
-     * Returns the non-{@code null} <i>entry name</i>.
-     * An entry name must conform to the following constraints:
+     * Returns the <i>entry name</i>.
+     * When parsed, an entry name is interpreted as follows:
      * <ol>
      * <li>An entry name is a sequence of <i>segments</i> which are
      *     separated by one or more <i>separator characters</i>
@@ -133,14 +133,11 @@ public interface Entry {
      * <li>An entry name may end with one or more separator
      *     characters (e.g. to identify a directory entry).
      * </ol>
-     * For example, {@code "foo/bar/"} and
-     * {@code "./abc/../foo/./def/./../bar/."} are both valid entry names which
-     * refer to the same entry.
-     * <p>
-     * Note that subinterfaces and implementations may impose additional
-     * constraints for an entry name to meet their particular requirements.
+     * For example, the entry names {@code "foo/bar/"} and
+     * {@code "./abc/../foo/./def/./../bar/."} both refer to the same entry
+     * when being parsed.
      *
-     * @return The non-{@code null} <i>entry name</i>.
+     * @return The entry name.
      * @see    EntryName
      */
     @NonNull

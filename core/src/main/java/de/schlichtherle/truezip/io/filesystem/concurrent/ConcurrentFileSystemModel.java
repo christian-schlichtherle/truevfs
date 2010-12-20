@@ -19,6 +19,8 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -32,12 +34,9 @@ public class ConcurrentFileSystemModel extends FileSystemModel {
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
 
-    public ConcurrentFileSystemModel(final MountPoint mountPoint,
-                        final FileSystemModel parent) {
+    public ConcurrentFileSystemModel(   @NonNull final MountPoint mountPoint,
+                                        @CheckForNull final FileSystemModel parent) {
         super(mountPoint, parent);
-        if (null == parent)
-            throw new NullPointerException();
-        assert parent == getParent();
         final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         readLock = lock.readLock();
         writeLock = lock.writeLock();

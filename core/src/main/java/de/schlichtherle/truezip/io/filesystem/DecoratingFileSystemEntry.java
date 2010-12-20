@@ -32,16 +32,15 @@ extends FileSystemEntry {
     @NonNull
     protected final E delegate;
 
+    /**
+     * Constructs a new decorating file system entry.
+     *
+     * @param entry the decorated entry.
+     */
     protected DecoratingFileSystemEntry(@NonNull final E entry) {
         if (null == entry)
             throw new NullPointerException();
         this.delegate = entry;
-    }
-
-    @Override
-    @NonNull
-    public String getName() {
-        return delegate.getName();
     }
 
     @Override
