@@ -266,7 +266,7 @@ extends FileSystemController<ConcurrentFileSystemModel> {
     private class Output extends OutputSocket<E> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
-        Entry template;
+        final Entry template;
 
         Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
@@ -276,11 +276,11 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             this.template = template;
         }
 
-        @Override
+        /*@Override
         protected void afterPeering() throws IOException {
             if (template != null)
                 template = getPeerTarget(); // update connection
-        }
+        }*/
 
         ArchiveFileSystemOperation<E> newLink() throws IOException {
             autoSync(name, WRITE);
