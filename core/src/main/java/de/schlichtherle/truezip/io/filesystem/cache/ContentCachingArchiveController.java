@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem.cache;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -72,16 +72,15 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @version $Id$
  */
 @NotThreadSafe
-public final class ContentCachingArchiveController
-extends DecoratingFileSystemController<
-        ArchiveModel,
-        FileSystemController<? extends ArchiveModel>> {
+public final class ContentCachingArchiveController<
+        M extends ConcurrentFileSystemModel,
+        C extends FileSystemController<? extends M>>
+extends DecoratingFileSystemController<M, C> {
 
     private final Map<FileSystemEntryName, IOCache<Entry>> caches
             = new HashMap<FileSystemEntryName, IOCache<Entry>>();
 
-    public ContentCachingArchiveController(
-            FileSystemController<? extends ArchiveModel> controller) {
+    public ContentCachingArchiveController(C controller) {
         super(controller);
     }
 

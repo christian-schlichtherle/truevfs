@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.socket.LazyOutputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -93,7 +93,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
 
     @Override
     @NonNull
-    public FileSystemController<? extends ArchiveModel> newController(
+    public FileSystemController<? extends ConcurrentFileSystemModel> newController(
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent) {
         return new KeyManagerArchiveController(
@@ -119,7 +119,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipInputShop newInputShop(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final InputSocket<?> target)
     throws IOException {
         class Input extends DecoratingInputSocket<Entry> {
@@ -185,7 +185,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final OutputSocket<?> target,
             final InputShop<ZipEntry> source)
     throws IOException {
@@ -229,7 +229,7 @@ public abstract class AbstractZipRaesDriver extends JarDriver {
      * @return The {@link RaesParameters} to use for accessing the
      *         prospective RAES encrypted ZIP file.
      */
-    protected RaesParameters getRaesParameters(ArchiveModel model) {
+    protected RaesParameters getRaesParameters(ConcurrentFileSystemModel model) {
         return new KeyManagerRaesParameters(model.getMountPoint().getUri());
     }
 }

@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class ReadOnlySfxDriver extends AbstractSfxDriver {
 
     @Override
     protected ZipOutputShop newZipOutputShop(
-            ArchiveModel model, OutputStream out, ZipInputShop source)
+            ConcurrentFileSystemModel model, OutputStream out, ZipInputShop source)
     throws IOException {
         throw new FileNotFoundException(
                 "driver class does not support creating or modifying SFX archives");

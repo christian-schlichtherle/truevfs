@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.filesystem.Path;
@@ -39,7 +39,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
     private final Path path;
 
     ArchiveEntryNotFoundException(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final FileSystemEntryName name,
             final String msg) {
         super(msg);
@@ -49,7 +49,7 @@ public final class ArchiveEntryNotFoundException extends FileNotFoundException {
     }
 
     ArchiveEntryNotFoundException(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final FileSystemEntryName name,
             final IOException cause) {
         super(cause == null ? null : cause.toString());

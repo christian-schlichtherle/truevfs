@@ -18,7 +18,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.annotations.ExtendOneOf;
 import de.schlichtherle.truezip.io.TabuFileException;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -65,7 +65,7 @@ import net.jcip.annotations.ThreadSafe;
 @ExtendOneOf(AbstractArchiveDriver.class)
 @ThreadSafe
 public interface ArchiveDriver<E extends ArchiveEntry>
-extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
+extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
 
     /**
      * Creates a new file system controller for the given archive file's
@@ -95,7 +95,7 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
      */
     @Override
     @NonNull
-    FileSystemController<? extends ArchiveModel> newController(
+    FileSystemController<? extends ConcurrentFileSystemModel> newController(
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent);
 
@@ -126,7 +126,7 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} input shop.
      */
-    InputShop<E> newInputShop(ArchiveModel model, InputSocket<?> input)
+    InputShop<E> newInputShop(ConcurrentFileSystemModel model, InputSocket<?> input)
     throws IOException;
 
     /**
@@ -164,7 +164,7 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
      *         synchronized with its parent file system.
      * @return A non-{@code null} output shop.
      */
-    OutputShop<E> newOutputShop(   ArchiveModel model,
+    OutputShop<E> newOutputShop(   ConcurrentFileSystemModel model,
                                     OutputSocket<?> output,
                                     InputShop<E> source)
     throws IOException;
@@ -179,7 +179,7 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getOpenIcon(ArchiveModel model);
+    Icon getOpenIcon(ConcurrentFileSystemModel model);
 
     /**
      * Returns the icon that
@@ -193,5 +193,5 @@ extends FileSystemDriver<ArchiveModel>, EntryFactory<E> {
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getClosedIcon(ArchiveModel model);
+    Icon getClosedIcon(ConcurrentFileSystemModel model);
 }

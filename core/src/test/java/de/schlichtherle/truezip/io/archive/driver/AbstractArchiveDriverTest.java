@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -177,7 +177,7 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public InputShop<ArchiveEntry> newInputShop(ArchiveModel archive, InputSocket<?> input)
+        public InputShop<ArchiveEntry> newInputShop(ConcurrentFileSystemModel archive, InputSocket<?> input)
         throws IOException {
             throw new UnsupportedOperationException();
         }
@@ -189,18 +189,18 @@ public class AbstractArchiveDriverTest extends TestCase {
         }
 
         @Override
-        public OutputShop<ArchiveEntry> newOutputShop(ArchiveModel archive, OutputSocket<?> output, InputShop<ArchiveEntry> source)
+        public OutputShop<ArchiveEntry> newOutputShop(ConcurrentFileSystemModel archive, OutputSocket<?> output, InputShop<ArchiveEntry> source)
         throws IOException {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Icon getOpenIcon(ArchiveModel archive) {
+        public Icon getOpenIcon(ConcurrentFileSystemModel archive) {
             return ICON;
         }
 
         @Override
-        public Icon getClosedIcon(ArchiveModel archive) {
+        public Icon getClosedIcon(ConcurrentFileSystemModel archive) {
             return ICON;
         }
     }

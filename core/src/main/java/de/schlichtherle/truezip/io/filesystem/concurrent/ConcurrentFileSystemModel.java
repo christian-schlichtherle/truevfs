@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.model;
+package de.schlichtherle.truezip.io.filesystem.concurrent;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantReadWriteLock;
-import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Defines the common properties of any archive file system.
+ * Supports multiple concurrent reader threads.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class ArchiveModel extends FileSystemModel {
+public class ConcurrentFileSystemModel extends FileSystemModel {
     private final ReentrantLock readLock;
     private final ReentrantLock writeLock;
 
-    public ArchiveModel(final MountPoint mountPoint,
+    public ConcurrentFileSystemModel(final MountPoint mountPoint,
                         final FileSystemModel parent) {
         super(mountPoint, parent);
         if (null == parent)

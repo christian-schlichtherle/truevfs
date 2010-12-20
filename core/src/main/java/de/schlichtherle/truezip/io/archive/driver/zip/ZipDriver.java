@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -199,7 +199,7 @@ implements ZipEntryFactory<ZipEntry> {
      * {@link #newZipInputShop}.
      */
     @Override
-    public ZipInputShop newInputShop(ArchiveModel model, InputSocket<?> input)
+    public ZipInputShop newInputShop(ConcurrentFileSystemModel model, InputSocket<?> input)
     throws IOException {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
@@ -210,7 +210,7 @@ implements ZipEntryFactory<ZipEntry> {
         }
     }
 
-    protected ZipInputShop newZipInputShop(ArchiveModel model, ReadOnlyFile rof)
+    protected ZipInputShop newZipInputShop(ConcurrentFileSystemModel model, ReadOnlyFile rof)
     throws IOException {
         return new ZipInputShop(
                 rof, getCharset(), getPreambled(), getPostambled(), this);
@@ -225,7 +225,7 @@ implements ZipEntryFactory<ZipEntry> {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            ArchiveModel model,
+            ConcurrentFileSystemModel model,
             OutputSocket<?> output,
             InputShop<ZipEntry> source)
     throws IOException {
@@ -240,7 +240,7 @@ implements ZipEntryFactory<ZipEntry> {
     }
 
     protected ZipOutputShop newZipOutputShop(
-            ArchiveModel model, OutputStream out, ZipInputShop source)
+            ConcurrentFileSystemModel model, OutputStream out, ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(out, getCharset(), level, source);
     }
