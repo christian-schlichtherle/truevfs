@@ -96,8 +96,8 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Returns an input socket for reading the given entry from the file
      * system.
      *
-     * @param  name a non-{@code null} relative path name.
-     * @return A non-{@code null} {@code InputSocket}.
+     * @param  name a file system entry name.
+     * @return An {@code InputSocket}.
      */
     @NonNull
     public abstract InputSocket<?> getInputSocket(
@@ -108,10 +108,9 @@ public abstract class FileSystemController<M extends FileSystemModel> {
      * Returns an output socket for writing the given entry to the file
      * system.
      *
-     * @param  name a non-{@code null} relative path name.
-     * @return A non-{@code null} {@code OutputSocket}.
+     * @param  name a file system entry name.
+     * @return An {@code OutputSocket}.
      */
-    // FIXME: Consider erasing template parameter and add OutputOption.PRESERVE?!
     @NonNull
     public abstract OutputSocket<?> getOutputSocket(
             @NonNull FileSystemEntryName name,
