@@ -15,13 +15,13 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.archive.controller.IOSocketCachingArchiveController;
+import de.schlichtherle.truezip.io.filesystem.cache.IOSocketCachingArchiveController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.archive.controller.ContentCachingArchiveController;
-import de.schlichtherle.truezip.io.archive.controller.ConcurrentArchiveController;
+import de.schlichtherle.truezip.io.filesystem.cache.ContentCachingArchiveController;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
@@ -231,15 +231,15 @@ implements ArchiveDriver<E>, Serializable {
     }
 
     @Override
-    public FileSystemController<? extends ArchiveModel> newController(
+    public FileSystemController<? extends ConcurrentFileSystemModel> newController(
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent) {
-        return new ConcurrentArchiveController(
-                    //new IOSocketCachingArchiveController(
-                        new ContentCachingArchiveController(
+        return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                    new IOSocketCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                        new ContentCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                             new UpdatingArchiveController<E>( // TODO: Support append strategy.
-                                new ArchiveModel(mountPoint, parent.getModel()),
-                                this, parent)));
+                                new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
+                                this, parent))));
     }
 
     /**
@@ -251,7 +251,7 @@ implements ArchiveDriver<E>, Serializable {
      * @param model ignored.
      */
     @Override
-    public Icon getOpenIcon(ArchiveModel model) {
+    public Icon getOpenIcon(ConcurrentFileSystemModel model) {
         return null;
     }
 
@@ -262,7 +262,7 @@ implements ArchiveDriver<E>, Serializable {
      * returns {@code null}.
      */
     @Override
-    public Icon getClosedIcon(ArchiveModel model) {
+    public Icon getClosedIcon(ConcurrentFileSystemModel model) {
         return null;
     }
 

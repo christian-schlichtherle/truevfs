@@ -32,7 +32,7 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.filesystem.FilterFileSystemManager;
 import de.schlichtherle.truezip.io.filesystem.SyncExceptionBuilder;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.socket.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileFilter;
@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -64,7 +65,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.Files.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Files.getRealFile;
 import static de.schlichtherle.truezip.io.Files.normalize;
-import static de.schlichtherle.truezip.io.socket.OutputOption.*;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
 
 /**
  * A drop-in replacement for its subclass which provides transparent
@@ -725,7 +726,7 @@ public class File extends java.io.File {
         assert invariants();
     }
 
-    private static final Scheme UNKNOWN = Scheme.create("unknown");
+    private static final Scheme UNKNOWN = Scheme.create("UNKNOWN");
 
     private void initController() {
         final java.io.File target = getRealFile(delegate);
@@ -2874,22 +2875,8 @@ public class File extends java.io.File {
      * @see <a href="package-summary.html#third_parties">Third Party
      *      Access using different Archive Detectors</a>
      */
-    public boolean renameTo(
-            final java.io.File dst,
-            final ArchiveDetector detector) {
-        // Nice trick, but wouldn't be thread safe!
-        /*if (enclArchive == null) {
-            if (!(dst instanceof File) || ((File) dst).enclArchive == null) {
-                try {
-                    sync(this);
-                    sync((File) dst);
-                } catch (ArchiveException ex) {
-                    return false;
-                }
-                return delegate.renameTo(dst);
-            }
-        }*/
-
+    public boolean renameTo(final java.io.File dst,
+                            final ArchiveDetector detector) {
         if (innerArchive == null)
             if (!(dst instanceof File) || ((File) dst).innerArchive == null)
                 return delegate.renameTo(dst);

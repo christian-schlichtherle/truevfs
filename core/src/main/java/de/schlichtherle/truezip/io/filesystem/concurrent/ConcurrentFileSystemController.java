@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem.concurrent;
 
-import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.entry.Entry;
@@ -44,20 +42,21 @@ import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * Supports multiple concurrent reader threads.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class ConcurrentArchiveController
-extends DecoratingFileSystemController<
-        ArchiveModel,
-        FileSystemController<? extends ArchiveModel>> {
+public final class ConcurrentFileSystemController<
+        M extends ConcurrentFileSystemModel,
+        C extends FileSystemController<? extends M>>
+extends DecoratingFileSystemController<M, C> {
 
     private volatile ReentrantLock readLock;
     private volatile ReentrantLock writeLock;
 
-    public ConcurrentArchiveController(
-            FileSystemController<? extends ArchiveModel> controller) {
+    public ConcurrentFileSystemController(C controller) {
         super(controller);
     }
 

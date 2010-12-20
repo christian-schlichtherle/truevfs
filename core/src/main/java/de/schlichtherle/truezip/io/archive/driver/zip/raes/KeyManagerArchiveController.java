@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -42,8 +42,8 @@ import static de.schlichtherle.truezip.io.Paths.*;
 @ThreadSafe
 final class KeyManagerArchiveController
 extends DecoratingFileSystemController<
-        ArchiveModel,
-        FileSystemController<? extends ArchiveModel>> {
+        ConcurrentFileSystemModel,
+        FileSystemController<? extends ConcurrentFileSystemModel>> {
 
     private final ArchiveDriver<?> driver;
 
@@ -53,7 +53,7 @@ extends DecoratingFileSystemController<
      * @param controller the non-{@code null} archive controller.
      */
     KeyManagerArchiveController(
-            final FileSystemController<? extends ArchiveModel> controller,
+            final FileSystemController<? extends ConcurrentFileSystemModel> controller,
             final ArchiveDriver<?> driver) {
         super(controller);
         this.driver = driver;

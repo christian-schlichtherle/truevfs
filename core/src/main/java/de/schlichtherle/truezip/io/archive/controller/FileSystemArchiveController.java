@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
@@ -46,7 +46,7 @@ extends BasicArchiveController<E> {
     /**
      * Creates a new instance of FileSystemArchiveController
      */
-    FileSystemArchiveController(ArchiveModel model) {
+    FileSystemArchiveController(ConcurrentFileSystemModel model) {
         super(model);
     }
 

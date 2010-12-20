@@ -27,7 +27,7 @@ import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEvent;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemTouchListener;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.FalsePositiveException;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
@@ -186,7 +186,7 @@ extends FileSystemArchiveController<E> {
             = new TouchListener();
 
     public UpdatingArchiveController(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final ArchiveDriver<E> driver,
             final FileSystemController<?> parent) {
         super(model);

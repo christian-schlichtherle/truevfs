@@ -15,17 +15,16 @@
  */
 package de.schlichtherle.truezip.io.archive.controller;
 
-import java.util.Map;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.io.archive.model.NotWriteLockedException;
+import de.schlichtherle.truezip.io.filesystem.concurrent.NotWriteLockedException;
 import de.schlichtherle.truezip.io.archive.driver.ArchiveDriver;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystem;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemEntry;
 import de.schlichtherle.truezip.io.archive.filesystem.ArchiveFileSystemOperation;
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
@@ -45,8 +44,6 @@ import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.NotThreadSafe;
@@ -111,7 +108,7 @@ import static de.schlichtherle.truezip.io.filesystem.OutputOption.*;
  */
 @NotThreadSafe
 abstract class BasicArchiveController<E extends ArchiveEntry>
-extends FileSystemController<ArchiveModel> {
+extends FileSystemController<ConcurrentFileSystemModel> {
 
     private static final String CLASS_NAME
             = BasicArchiveController.class.getName();
@@ -125,21 +122,21 @@ extends FileSystemController<ArchiveModel> {
     private static final BitField<SyncOption> UNLINK_SYNC_OPTIONS
             = BitField.of(ABORT_CHANGES);
 
-    private final ArchiveModel model;
+    private final ConcurrentFileSystemModel model;
 
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    BasicArchiveController(final ArchiveModel model) {
+    BasicArchiveController(final ConcurrentFileSystemModel model) {
         assert null != model;
         assert null != model.getParent();
         this.model = model;
     }
 
     @Override
-    public final ArchiveModel getModel() {
+    public final ConcurrentFileSystemModel getModel() {
         return model;
     }
 
@@ -225,7 +222,7 @@ extends FileSystemController<ArchiveModel> {
         public E getLocalTarget() throws IOException {
             if (!autoSync(name, READ)) {
                 autoMount();        // detect false positives
-                getPeerTarget();    // trigger autoSync() if in same file system
+                getPeerTarget();    // triggers autoSync() if in same file system
             }
             final ArchiveFileSystemEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
@@ -269,7 +266,7 @@ extends FileSystemController<ArchiveModel> {
     private class Output extends OutputSocket<E> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
-        final Entry template;
+        Entry template;
 
         Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
@@ -279,7 +276,13 @@ extends FileSystemController<ArchiveModel> {
             this.template = template;
         }
 
-        ArchiveFileSystemOperation<E> getLink() throws IOException {
+        @Override
+        protected void afterPeering() throws IOException {
+            if (template != null)
+                template = getPeerTarget(); // update connection
+        }
+
+        ArchiveFileSystemOperation<E> newLink() throws IOException {
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
@@ -296,12 +299,12 @@ extends FileSystemController<ArchiveModel> {
                 throw new UnsupportedOperationException("This feature is not yet implemented!");
                 // return null; // FIXME: broken interface contract!
             }
-            return getLink().getTarget().getEntry();
+            return newLink().getTarget().getEntry();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final ArchiveFileSystemOperation<E> link = getLink();
+            final ArchiveFileSystemOperation<E> link = newLink();
             final E entry = link.getTarget().getEntry();
             final OutputSocket<?> output = getOutputSocket(entry);
             final InputStream in = options.get(APPEND)

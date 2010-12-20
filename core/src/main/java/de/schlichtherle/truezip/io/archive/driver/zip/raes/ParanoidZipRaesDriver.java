@@ -16,7 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip.raes;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.archive.driver.zip.ZipEntry;
 import de.schlichtherle.truezip.io.socket.InputShop;
@@ -91,7 +91,7 @@ public class ParanoidZipRaesDriver extends AbstractZipRaesDriver {
      */
     @Override
     public OutputShop<ZipEntry> newOutputShop(
-            final ArchiveModel model,
+            final ConcurrentFileSystemModel model,
             final OutputSocket<?> output,
             final InputShop<ZipEntry> source)
     throws IOException {

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.controller;
+package de.schlichtherle.truezip.io.filesystem.cache;
 
-import de.schlichtherle.truezip.io.archive.model.ArchiveModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.FileSystemModel;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -44,10 +45,10 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class IOSocketCachingArchiveController
-extends DecoratingFileSystemController<
-        ArchiveModel,
-        FileSystemController<? extends ArchiveModel>> {
+public final class IOSocketCachingArchiveController<
+        M extends ConcurrentFileSystemModel,
+        C extends FileSystemController<? extends M>>
+extends DecoratingFileSystemController<M, C> {
 
     private Map<FileSystemEntryName, Input> inputs
             = new WeakHashMap<FileSystemEntryName, Input>();
@@ -55,13 +56,12 @@ extends DecoratingFileSystemController<
     private Map<FileSystemEntryName, Output> outputs
             = new WeakHashMap<FileSystemEntryName, Output>();
 
-    public IOSocketCachingArchiveController(
-            FileSystemController<? extends ArchiveModel> controller) {
+    public IOSocketCachingArchiveController(C controller) {
         super(controller);
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public synchronized InputSocket<?> getInputSocket(
             FileSystemEntryName name,
             BitField<InputOption> options) {
         Input input = inputs.get(name);
@@ -82,12 +82,14 @@ extends DecoratingFileSystemController<
     } // class Input
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public synchronized OutputSocket<?> getOutputSocket(
             FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
         Output output = outputs.get(name);
-        if (null == output || !output.options.equals(options))
+        if (null == output
+                || !output.options.equals(options)
+                || output.template != template)
             outputs.put(name, output = new Output(name, options, template));
         return output;
     }
@@ -95,6 +97,7 @@ extends DecoratingFileSystemController<
     private class Output extends DecoratingOutputSocket<Entry> {
         final FileSystemEntryName name;
         final BitField<OutputOption> options;
+        final Entry template;
 
         Output( final FileSystemEntryName name,
                 final BitField<OutputOption> options,
@@ -102,14 +105,26 @@ extends DecoratingFileSystemController<
             super(delegate.getOutputSocket(name, options, template));
             this.name = name;
             this.options = options;
+            this.template = template;
         }
     } // class Output
+
+    @Override
+    public void unlink(final FileSystemEntryName name) throws IOException {
+        assert getModel().writeLock().isHeldByCurrentThread();
+
+        delegate.unlink(name);
+        inputs.remove(name);
+        outputs.remove(name);
+    }
 
     @Override
     public <X extends IOException>
     void sync(  @NonNull BitField<SyncOption> options,
                 @NonNull ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
+        assert getModel().writeLock().isHeldByCurrentThread();
+
         try {
             delegate.sync(options, builder);
         } finally {

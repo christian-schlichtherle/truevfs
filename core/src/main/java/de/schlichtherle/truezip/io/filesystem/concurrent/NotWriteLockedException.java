@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.archive.model;
+package de.schlichtherle.truezip.io.filesystem.concurrent;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 
@@ -30,11 +30,11 @@ public final class NotWriteLockedException extends FileSystemException {
 
     private static final long serialVersionUID = 2345952581284762637L;
 
-    NotWriteLockedException(ArchiveModel model) {
+    NotWriteLockedException(ConcurrentFileSystemModel model) {
         super(model);
     }
 
-    NotWriteLockedException(ArchiveModel model, NotWriteLockedException ex) {
+    NotWriteLockedException(ConcurrentFileSystemModel model, NotWriteLockedException ex) {
         super(model, ex);
     }
 }
