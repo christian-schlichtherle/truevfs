@@ -39,6 +39,11 @@ public interface FileSystemDriver<M extends FileSystemModel> {
      * <p>
      * <strong>Important:</strong> The returned file system controller must be
      * thread-safe!
+     *
+     * @param  mountPoint the mount point of the file system.
+     * @param  parent the parent file system controller.
+     * @return A new file system controller for the given mount point and
+     *         parent file system controller.
      */
     @NonNull FileSystemController<? extends M> newController(
             @NonNull MountPoint mountPoint,

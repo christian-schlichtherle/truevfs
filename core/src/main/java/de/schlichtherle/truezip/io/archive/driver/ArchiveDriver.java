@@ -29,7 +29,9 @@ import de.schlichtherle.truezip.io.filesystem.FileSystemDriver;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -67,26 +69,13 @@ public interface ArchiveDriver<E extends ArchiveEntry>
 extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
 
     /**
-     * {@inheritDoc}
-     *
-     * @param  mountPoint the mount point of the archive file system.
-     * @param  parent the parent file system controller.
-     * @return A new archive file system controller for the given mount point
-     *         and parent file system controller.
-     */
-    @Override
-    @NonNull
-    FileSystemController<? extends ConcurrentFileSystemModel> newController(
-            @NonNull MountPoint mountPoint,
-            @NonNull FileSystemController<?> parent);
-
-    /**
      * Creates a new input shop for reading the archive entries of the the
      * described {@code archive} from the given {@code input} socket's target.
      * 
-     * @param  model the non-{@code null} archive model.
-     * @param  input the non-{@code null} input socket for reading
-     *         the contents of the described archive from its target.
+     * @param  model the concurrent file system model.
+     * @param  input the input socket for reading the contents of the archive
+     *         from its target.
+     * @return A new input shop.
      * @throws TabuFileException if the target archive file is temporarily not
      *         accessible, e.g. if a key for decryption is currently not
      *         available.
@@ -105,26 +94,28 @@ extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
-     * @return A non-{@code null} input shop.
      */
-    InputShop<E> newInputShop(ConcurrentFileSystemModel model, InputSocket<?> input)
+    @NonNull
+    InputShop<E> newInputShop(  @NonNull ConcurrentFileSystemModel model,
+                                @NonNull InputSocket<?> input)
     throws IOException;
 
     /**
      * Creates a new output shop for writing archive entries to the the
      * described {@code archive} to the given {@code output} socket's target.
      * 
-     * @param  model the non-{@code null} archive model.
-     * @param  output the non-{@code null} output socket for writing
-     *         the contents of the described archive to its target.
-     * @param  source the nullable {@link InputShop} if
-     *         {@code archive} is going to get updated.
+     * @param  model the concurrent file system model.
+     * @param  output the output socket for writing the contents of the
+     *         archive to its target.
+     * @param  source the {@link InputShop} if {@code archive} is going to get
+     *         updated.
      *         If not {@code null}, this is guaranteed to be a product
-     *         of this driver's {@link #newInputShop} factor method, which may
+     *         of this driver's {@link #newInputShop} factory method, which may
      *         be used to copy some meta data which is specific to the type of
      *         archive this driver supports.
      *         For example, this could be used to copy the comment of a ZIP
      *         file.
+     * @return A new output shop.
      * @throws TabuFileException if the target archive file is temporarily not
      *         accessible, e.g. if a key for decryption is currently not
      *         available.
@@ -143,11 +134,11 @@ extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
      *         The client application will recognize the target archive file
      *         as a <i>regular file</i> until the archive file system is
      *         synchronized with its parent file system.
-     * @return A non-{@code null} output shop.
      */
-    OutputShop<E> newOutputShop(   ConcurrentFileSystemModel model,
-                                    OutputSocket<?> output,
-                                    InputShop<E> source)
+    @NonNull
+    OutputShop<E> newOutputShop(@NonNull ConcurrentFileSystemModel model,
+                                @NonNull OutputSocket<?> output,
+                                @Nullable InputShop<E> source)
     throws IOException;
 
     /**
@@ -155,12 +146,13 @@ extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param  model the non-{@code null} archive model.
+     * @param  model the concurrent file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getOpenIcon(ConcurrentFileSystemModel model);
+    @CheckForNull
+    Icon getOpenIcon(@NonNull ConcurrentFileSystemModel model);
 
     /**
      * Returns the icon that
@@ -169,10 +161,11 @@ extends FileSystemDriver<ConcurrentFileSystemModel>, EntryFactory<E> {
      * {@link de.schlichtherle.truezip.io.swing.tree.FileTreeCellRenderer}
      * should display for the given archive file.
      *
-     * @param  model the non-{@code null} archive model.
+     * @param  model the concurrent file system model.
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
      */
-    Icon getClosedIcon(ConcurrentFileSystemModel model);
+    @CheckForNull
+    Icon getClosedIcon(@NonNull ConcurrentFileSystemModel model);
 }
