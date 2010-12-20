@@ -24,11 +24,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * client (i.e. archive controllers) to read and write archive entries from
  * and to archive files of their respective supported type.
  * <p>
- * In general, if a property has an unknown value, its getter method must
- * return the value
- * {@value de.schlichtherle.truezip.io.entry.Entry#UNKNOWN}
- * or {@code null} respectively.
- * <p>
  * Implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client applications.
  * 

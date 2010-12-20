@@ -29,12 +29,16 @@ public interface FileSystemDriver<M extends FileSystemModel> {
     /**
      * Constructs a new file system controller for the given mount point
      * and parent file system controller.
+     * <p>
      * When called, the following expression is a precondition:
      * {@code
             null == mountPoint.getParent()
                     ? null == parent
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint())
      * }
+     * <p>
+     * <strong>Important:</strong> The returned file system controller must be
+     * thread-safe!
      */
     @NonNull FileSystemController<? extends M> newController(
             @NonNull MountPoint mountPoint,

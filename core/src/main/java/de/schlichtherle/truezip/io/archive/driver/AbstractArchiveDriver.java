@@ -15,10 +15,10 @@
  */
 package de.schlichtherle.truezip.io.archive.driver;
 
-import de.schlichtherle.truezip.io.filesystem.cache.IOSocketCachingArchiveController;
+import de.schlichtherle.truezip.io.filesystem.cache.IOSocketCachingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.cache.ContentCachingArchiveController;
+import de.schlichtherle.truezip.io.filesystem.cache.ContentCachingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.UpdatingArchiveController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
@@ -235,8 +235,8 @@ implements ArchiveDriver<E>, Serializable {
             @NonNull MountPoint mountPoint,
             @NonNull FileSystemController<?> parent) {
         return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                    //new IOSocketCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                        new ContentCachingArchiveController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                    //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                        new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                             new UpdatingArchiveController<E>( // TODO: Support append strategy.
                                 new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
                                 this, parent)));

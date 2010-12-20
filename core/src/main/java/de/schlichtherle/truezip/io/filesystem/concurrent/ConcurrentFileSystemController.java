@@ -35,6 +35,7 @@ import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.concurrent.lock.ReentrantLock;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,7 +57,12 @@ extends DecoratingFileSystemController<M, C> {
     private volatile ReentrantLock readLock;
     private volatile ReentrantLock writeLock;
 
-    public ConcurrentFileSystemController(C controller) {
+    /**
+     * Constructs a new concurrent file system controller.
+     *
+     * @param controller the decorated file system controller.
+     */
+    public ConcurrentFileSystemController(@NonNull C controller) {
         super(controller);
     }
 

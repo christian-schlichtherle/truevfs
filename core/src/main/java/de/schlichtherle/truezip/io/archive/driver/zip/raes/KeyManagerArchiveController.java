@@ -77,7 +77,7 @@ extends DecoratingFileSystemController<
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
             try {
-                return ArchiveFileSystemEntry.create(ROOT, SPECIAL,
+                return ArchiveFileSystemEntry.create(ROOT_ENTRY_NAME, SPECIAL,
                         driver.newEntry(ROOT, SPECIAL,
                             entry instanceof ArchiveFileSystemEntry<?>
                                 ? ((ArchiveFileSystemEntry<?>) entry).getEntry()

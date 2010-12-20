@@ -21,16 +21,22 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * Decorates another file system controller.
+ * <p>
+ * This class is thread-safe if and only if the decorated file system
+ * controller and its parent file system controller are thread-safe.
+ *
+ * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 public abstract class DecoratingFileSystemController<
         M extends FileSystemModel,
         C extends FileSystemController<? extends M>>
@@ -41,7 +47,12 @@ extends FileSystemController<M> {
 
     private volatile M model;
 
-    protected DecoratingFileSystemController(final C controller) {
+    /**
+     * Constructs a new decorating file system controller.
+     *
+     * @param controller the decorated file system controller.
+     */
+    protected DecoratingFileSystemController(@NonNull final C controller) {
         if (null == controller)
             throw new NullPointerException();
         this.delegate = controller;

@@ -22,25 +22,37 @@ import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
+ * Implements statistics for its decorated file system controller.
+ * <p>
+ * This class is thread-safe if and only if the decorated file system
+ * controller is thread-safe.
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
 class StatisticsFileSystemController
 extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>> {
 
     private final StatisticsFileSystemManager manager;
 
+    /**
+     * Constructs a new statistics file system controller.
+     *
+     * @param controller the decorated file system controller.
+     * @param manager the statistics file system manager.
+     */
     StatisticsFileSystemController(
-            FileSystemController<?> controller,
-            StatisticsFileSystemManager manager) {
+            @NonNull FileSystemController<?> controller,
+            @NonNull StatisticsFileSystemManager manager) {
         super(controller);
+        assert null != manager;
         this.manager = manager;
     }
 

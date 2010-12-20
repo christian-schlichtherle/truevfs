@@ -135,15 +135,12 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * the given path and query elements and parsing the result.
      * This static factory method calls
      * {@link #EntryName(URI, boolean) new EntryName(new URI(null, null, path, query, null), normalize)}
-     * and wraps any thrown {@link URISyntaxException} in an
-     * {@link IllegalArgumentException}.
+     * and returns the result.
      *
      * @param  path the {@link #getPath() path}.
      * @param  query the {@link #getQuery() query}.
      * @param  normalize whether or not the URI shall get normalized before
      *         parsing it.
-     * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for entry names.
      * @return A new entry name.
      */
     @NonNull
@@ -151,7 +148,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
         try {
             return new EntryName(new URI(null, null, path, query, null), normalize);
         } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new AssertionError(ex);
         }
     }
 

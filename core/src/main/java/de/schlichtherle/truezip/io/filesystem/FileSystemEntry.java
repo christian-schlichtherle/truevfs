@@ -31,23 +31,11 @@ import java.util.Set;
 public abstract class FileSystemEntry implements Entry {
 
     /**
-     * Returns the non-{@code null} <i>file system entry name</i>.
-     * A file system entry name is an {@link Entry#getName() entry name}
-     * which must conform to the following additional constraints:
-     * <ol>
-     * <li>A file system entry name must be in normal form,
-     *     i.e. it must not contain redundant {@code "."} and {@code ".."}
-     *     segments.
-     * <li>A file system entry name must not equal {@code "."}.
-     * <li>A file system entry name must not equal {@code ".."}.
-     * <li>A file system entry name must not start with {@code "/"}.
-     * <li>A file system entry name must not start with {@code "./"}.
-     * <li>A file system entry name must not start with {@code "../"}.
-     * <li>A file system entry name must not end with {@code "/"}.
-     * </ol>
+     * Returns a string representation of the
+     * {@link FileSystemEntryName file system entry name}.
      *
-     * @return The non-{@code null} <i>file system entry name</i>.
-     * @see    FileSystemEntryName
+     * @return A string representation of the
+     *         {@link FileSystemEntryName file system entry name}.
      */
     @Override
     @NonNull

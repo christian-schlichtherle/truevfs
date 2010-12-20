@@ -35,8 +35,12 @@ extends DecoratingFileSystemManager<FileSystemManager> {
     private volatile FileSystemStatistics statistics
             = new FileSystemStatistics(this);
 
-    public StatisticsFileSystemManager(
-            @NonNull final FileSystemManager manager) {
+    /**
+     * Constructs a new statistics file system manager.
+     *
+     * @param manager the decorated file system manager.
+     */
+    public StatisticsFileSystemManager(@NonNull FileSystemManager manager) {
         super(manager);
     }
 
@@ -62,9 +66,8 @@ extends DecoratingFileSystemManager<FileSystemManager> {
     }
 
     /**
-     * Returns a non-{@code null} object which provides statistics about the
-     * set of federated file systems managed by the decorated file system
-     * manager.
+     * Returns statistics about the set of federated file systems managed by
+     * the decorated file system manager.
      * The statistics provided by the returned object get asynchronously
      * updated up to the next call to {@link #sync}.
      * <p>

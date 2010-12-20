@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
@@ -36,11 +37,19 @@ public abstract class ArchiveFileSystemEntry<E extends ArchiveEntry>
 extends DecoratingFileSystemEntry<E> {
 
     /**
-     * Constructs a new archive file system delegate which decorates the given
-     * archive delegate.
+     * Constructs a new archive file system entry which decorates the given
+     * archive entry.
      */
     @NonNull
     public static <E extends ArchiveEntry>
+    ArchiveFileSystemEntry<E> create(   @NonNull final FileSystemEntryName name,
+                                        @NonNull final Type type,
+                                        @NonNull final E entry) {
+        return create(name.getPath(), type, entry);
+    }
+
+    @NonNull
+    static <E extends ArchiveEntry>
     ArchiveFileSystemEntry<E> create(   @NonNull final String path,
                                         @NonNull final Type type,
                                         @NonNull final E entry) {
@@ -71,11 +80,11 @@ extends DecoratingFileSystemEntry<E> {
     }
 
     /**
-     * Returns the archive delegate which is adapted by this archive file system
-     * delegate.
+     * Returns the archive entry which is adapted by this archive file system
+     * entry.
      *
-     * @return The archive delegate which is adapted by this archive file system
-     *         delegate.
+     * @return The archive entry which is adapted by this archive file system
+     *         entry.
      */
     public final E getEntry() {
         return delegate;
@@ -87,12 +96,12 @@ extends DecoratingFileSystemEntry<E> {
 
     /**
      * Adds the given base path to the set of members of this directory
-     * if and only if this file system delegate is a directory.
+     * if and only if this file system entry is a directory.
      *
      * @param  member The non-{@code null} base path of the member to add.
      * @return Whether the member has been added or an equal member was
      *         already present in the directory.
-     * @throws UnsupportedOperationException if this file system delegate is
+     * @throws UnsupportedOperationException if this file system entry is
      *         not a directory.
      */
     boolean add(@NonNull String member) {
@@ -102,25 +111,31 @@ extends DecoratingFileSystemEntry<E> {
     /**
      * Removes the given base path from the set of members of this
      * directory
-     * if and only if this file system delegate is a directory.
+     * if and only if this file system entry is a directory.
      *
      * @param  member The non-{@code null} base path of the member to
      *         remove.
      * @return Whether the member has been removed or no equal member was
      *         present in the directory.
-     * @throws UnsupportedOperationException if this file system delegate is
+     * @throws UnsupportedOperationException if this file system entry is
      *         not a directory.
      */
     boolean remove(@NonNull String member) {
         throw new UnsupportedOperationException();
     }
 
-    /** A file delegate. */
+    /** A file entry. */
     private static class FileEntry<E extends ArchiveEntry>
     extends ArchiveFileSystemEntry<E> {
-        /** Decorates the given archive delegate. */
+        /** Decorates the given archive entry. */
         FileEntry(final E entry) {
             super(entry);
+        }
+
+        @Override
+        @NonNull
+        public String getName() {
+            return delegate.getName();
         }
 
         @Override
@@ -134,12 +149,12 @@ extends DecoratingFileSystemEntry<E> {
         }
     } // class FileEntry
 
-    /** A named file delegate. */
+    /** A named file entry. */
     private static class NamedFileEntry<E extends ArchiveEntry>
     extends FileEntry<E> {
         final String path;
 
-        /** Decorates the given archive delegate. */
+        /** Decorates the given archive entry. */
         NamedFileEntry(final String path, final E entry) {
             super(entry);
             assert !path.equals(entry.getName());
@@ -152,12 +167,12 @@ extends DecoratingFileSystemEntry<E> {
         }
     } // class NamedFileEntry
 
-    /** A directory delegate. */
+    /** A directory entry. */
     private static class DirectoryEntry<E extends ArchiveEntry>
     extends ArchiveFileSystemEntry<E> {
         Set<String> members = new LinkedHashSet<String>();
 
-        /** Decorates the given archive delegate. */
+        /** Decorates the given archive entry. */
         DirectoryEntry(final E entry) {
             super(entry);
         }
@@ -167,6 +182,12 @@ extends DecoratingFileSystemEntry<E> {
             final DirectoryEntry<E> clone = (DirectoryEntry<E>) super.clone(fileSystem);
             clone.members = Collections.unmodifiableSet(members);
             return clone;
+        }
+
+        @Override
+        @NonNull
+        public String getName() {
+            return delegate.getName();
         }
 
         @Override
@@ -190,12 +211,12 @@ extends DecoratingFileSystemEntry<E> {
         }
     } // class DirectoryEntry
 
-    /** A named directory delegate. */
+    /** A named directory entry. */
     private static class NamedDirectoryEntry<E extends ArchiveEntry>
     extends DirectoryEntry<E> {
         final String path;
 
-        /** Decorates the given archive delegate. */
+        /** Decorates the given archive entry. */
         NamedDirectoryEntry(final String path, final E entry) {
             super(entry);
             assert !path.equals(entry.getName());
@@ -208,14 +229,14 @@ extends DecoratingFileSystemEntry<E> {
         }
     } // class NamedDirectoryEntry
 
-    /** A named special file delegate. */
+    /** A named special file entry. */
     private static class NamedSpecialFileEntry<E extends ArchiveEntry>
     extends ArchiveFileSystemEntry<E> {
         final String path;
 
         NamedSpecialFileEntry(final String path, final E entry) {
             super(entry);
-            //assert SPECIAL == delegate.getType(); // drivers could ignore this type, so we must ignore this!
+            //assert SPECIAL == entry.getType(); // drivers could ignore this type, so we must ignore this!
             final String name = entry.getName();
             this.path = name.equals(path) ? name : path;
         }

@@ -35,6 +35,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,7 +73,7 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
  * @version $Id$
  */
 @NotThreadSafe
-public final class ContentCachingArchiveController<
+public final class ContentCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
@@ -80,7 +81,12 @@ extends DecoratingFileSystemController<M, C> {
     private final Map<FileSystemEntryName, IOCache<Entry>> caches
             = new HashMap<FileSystemEntryName, IOCache<Entry>>();
 
-    public ContentCachingArchiveController(C controller) {
+    /**
+     * Constructs a new content caching file system controller.
+     *
+     * @param controller the decorated file system controller.
+     */
+    public ContentCachingFileSystemController(@NonNull C controller) {
         super(controller);
     }
 

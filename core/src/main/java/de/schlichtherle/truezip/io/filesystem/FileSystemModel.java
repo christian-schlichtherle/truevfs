@@ -15,7 +15,9 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import net.jcip.annotations.ThreadSafe;
@@ -43,8 +45,8 @@ public class FileSystemModel {
         this(mountPoint, null);
     }
 
-    public FileSystemModel( final MountPoint mountPoint,
-                            final FileSystemModel parent) {
+    public FileSystemModel( @NonNull final MountPoint mountPoint,
+                            @CheckForNull final FileSystemModel parent) {
         if (!equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))
             throw new IllegalArgumentException("Parent/Member mismatch!");
@@ -57,14 +59,15 @@ public class FileSystemModel {
     }
 
     /**
-     * Returns the non-{@code null} mount point of this file system model.
+     * Returns the mount point of this file system model.
      * <p>
      * The mount point may be used to construct error messages or to locate
      * and access file system metadata which is stored outside the file system,
      * e.g. in-memory stored passwords for RAES encrypted ZIP files.
      *
-     * @return The non-{@code null} mount point of this file system model.
+     * @return The mount point of this file system model.
      */
+    @NonNull
     public final MountPoint getMountPoint() {
         return mountPoint;
     }
@@ -76,6 +79,7 @@ public class FileSystemModel {
      *
      * @return The nullable parent file system model.
      */
+    @Nullable
     public final FileSystemModel getParent() {
         return parent;
     }
@@ -84,16 +88,17 @@ public class FileSystemModel {
      * Resolves the given entry name against the entry name of the file system
      * in its parent file system.
      *
-     * @param  entryName a non-{@code null} entry name relative to the file
-     *         system's mount point.
+     * @param  entryName an entry name relative to the file system's mount
+     *         point.
      * @throws NullPointerException if {@code entryName} is {@code null} or if
      *         the file system is not federated, i.e. if it's not a member of
      *         a parent file system.
-     * @return a non-{@code null} entry name relative to the parent file
-     *         system's mount point.
+     * @return an entry name relative to the parent file system's mount point.
      * @see    #getParent
      */
-    public final FileSystemEntryName resolveParent(FileSystemEntryName entryName) {
+    @NonNull
+    public final FileSystemEntryName resolveParent(
+            @NonNull FileSystemEntryName entryName) {
         return mountPoint.resolveParent(entryName);
     }
 
@@ -138,6 +143,7 @@ public class FileSystemModel {
      * 
      * @return A clone of the set of file system listeners.
      */
+    @NonNull
     final synchronized Set<FileSystemTouchedListener> getFileSystemTouchedListeners() {
         return new LinkedHashSet<FileSystemTouchedListener>(touchedListeners);
     }
@@ -145,11 +151,10 @@ public class FileSystemModel {
     /**
      * Adds the given listener to the set of file system touched listeners.
      *
-     * @param  listener the non-{@code null} listener for file system events.
-     * @throws NullPointerException if {@code listener} is {@code null}.
+     * @param  listener the listener for file system events.
      */
     public final synchronized void addFileSystemTouchedListener(
-            final FileSystemTouchedListener listener) {
+            @NonNull FileSystemTouchedListener listener) {
         if (null == listener)
             throw new NullPointerException();
         touchedListeners.add(listener);
@@ -158,13 +163,10 @@ public class FileSystemModel {
     /**
      * Removes the given listener from the set of file system touched listeners.
      *
-     * @param  listener the non-{@code null} listener for file system events.
-     * @throws NullPointerException if {@code listener} is {@code null}.
+     * @param  listener the listener for file system events.
      */
     public final synchronized void removeFileSystemTouchedListener(
-            final FileSystemTouchedListener listener) {
-        if (null == listener)
-            throw new NullPointerException();
+            @Nullable FileSystemTouchedListener listener) {
         touchedListeners.remove(listener);
     }
 
@@ -174,7 +176,7 @@ public class FileSystemModel {
      * This can't get overriden.
      */
     @Override
-    public final boolean equals(Object that) {
+    public final boolean equals(@CheckForNull Object that) {
         return this == that
                 || that instanceof FileSystemModel
                     && this.mountPoint.equals(((FileSystemModel) that).mountPoint);
