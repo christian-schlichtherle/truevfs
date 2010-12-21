@@ -32,8 +32,11 @@ import java.io.InputStream;
 public final class FileInputSocket extends InputSocket<FileEntry> {
     private final FileEntry file;
 
+    private static final BitField<InputOption> NO_INPUT_OPTIONS
+            = BitField.noneOf(InputOption.class);
+
     public static InputSocket<FileEntry> get(FileEntry file) {
-        return get(file, BitField.noneOf(InputOption.class));
+        return get(file, NO_INPUT_OPTIONS);
     }
 
     public static InputSocket<FileEntry> get(   FileEntry file,

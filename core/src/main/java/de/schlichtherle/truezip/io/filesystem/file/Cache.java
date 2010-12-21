@@ -157,27 +157,18 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
 
     @Override
     public void flush() throws IOException {
-        if (null != buffer) { // DCL is OK in this context!
-            synchronized (Cache.this) {
-                final Buffer buffer = this.buffer;
-                if (null != buffer)
-                    getOutputBufferPool().release(buffer);
-            }
+        if (null == buffer) // DCL is OK in this context!
+            return;
+        synchronized (Cache.this) {
+            final Buffer buffer = this.buffer;
+            if (null != buffer)
+                getOutputBufferPool().release(buffer);
         }
     }
 
     @Override
     public void clear() throws IOException {
-        if (null != buffer) { // DCL is OK in this context!
-            synchronized (Cache.this) {
-                final Buffer buffer = this.buffer;
-                if (null != buffer) {
-                    // Order is important here!
-                    this.buffer = null;
-                    getInputBufferPool().release(buffer);
-                }
-            }
-        }
+        this.buffer = null;
     }
 
     private Pool<Buffer, IOException> getInputBufferPool() {
@@ -199,28 +190,24 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
                 Buffer buffer = Cache.this.buffer;
                 if (null == buffer) {
                     assert null == input.getPeerTarget();
-                    class ProxyOutput extends OutputSocket<Entry> {
+                    class ProxyOutput extends OutputSocket<TempFileEntry> {
                         TempFileEntry temp;
 
-                        TempFileEntry getTemp() throws IOException {
+                        @Override
+                        public TempFileEntry getLocalTarget() throws IOException {
                             return null != temp ? temp : (temp = TempFilePool.get().allocate());
                         }
 
                         @Override
-                        public Entry getLocalTarget() throws IOException {
-                            return Entry.NULL;
-                        }
-
-                        @Override
                         public OutputStream newOutputStream() throws IOException {
-                            return FileOutputSocket.get(getTemp()).newOutputStream();
+                            return FileOutputSocket.get(getLocalTarget()).newOutputStream();
                         }
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    Cache.this.buffer = buffer = new Buffer(output.getTemp());
+                    Cache.this.buffer = buffer = new Buffer(output.getLocalTarget());
                 }
-                buffer.used++;
+                buffer.reading++;
                 return buffer;
             }
         }
@@ -228,8 +215,7 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
         @Override
         public void release(final Buffer buffer) throws IOException {
             synchronized (Cache.this) {
-                buffer.used--;
-                if (buffer != Cache.this.buffer && 0 == buffer.used)
+                if (0 == --buffer.reading && buffer != Cache.this.buffer)
                     buffer.file.release();
             }
         }
@@ -238,21 +224,29 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
     abstract class OutputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            return new Buffer(TempFilePool.get().allocate());
+            final Buffer buffer = new Buffer(TempFilePool.get().allocate());
+            buffer.dirty = true;
+            return buffer;
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
             try {
                 assert null == output.getPeerTarget();
-                class ProxyInput extends DecoratingInputSocket<Entry> {
-                    ProxyInput() {
-                        super(FileInputSocket.get(buffer.file));
+                class ProxyInput extends InputSocket<TempFileEntry> {
+                    @Override
+                    public TempFileEntry getLocalTarget() throws IOException {
+                        return buffer.file;
                     }
 
                     @Override
-                    public Entry getLocalTarget() throws IOException {
-                        return Entry.NULL;
+                    public ReadOnlyFile newReadOnlyFile() throws IOException {
+                        return FileInputSocket.get(buffer.file).newReadOnlyFile();
+                    }
+
+                    @Override
+                    public InputStream newInputStream() throws IOException {
+                        return FileInputSocket.get(buffer.file).newInputStream();
                     }
                 }
                 IOSocket.copy(new ProxyInput(), output);
@@ -265,20 +259,11 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
 
     final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
-        public Buffer allocate() throws IOException {
-            //synchronized (Cache.this) {
-                final Buffer buffer = super.allocate();
-                buffer.dirty = true;
-                return buffer;
-            //}
-        }
-
-        @Override
         public void release(final Buffer buffer) throws IOException {
-            if (!buffer.dirty)
+            if (!buffer.dirty) // DCL is OK in this context!
                 return;
             synchronized (Cache.this) {
-                if (buffer != Cache.this.buffer) {
+                if (Cache.this.buffer != buffer) {
                     Cache.this.buffer = buffer;
                 } else {
                     buffer.dirty = false;
@@ -291,20 +276,20 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
     final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            if (buffer != Cache.this.buffer) { // DCL is OK in this context!
-                synchronized (Cache.this) {
-                    if (buffer != Cache.this.buffer) {
-                        Cache.this.buffer = buffer;
-                        super.release(buffer);
-                    }
-                }
+            if (Cache.this.buffer == buffer) // DCL is OK in this context!
+                return;
+            synchronized (Cache.this) {
+                if (Cache.this.buffer == buffer)
+                    return;
+                Cache.this.buffer = buffer;
+                super.release(buffer);
             }
         }
     } // class WriteThroughOutputBufferPool
 
     final class Buffer {
         final TempFileEntry file;
-        int used;
+        int reading;
         volatile boolean dirty;
 
         Buffer(final TempFileEntry file) {
