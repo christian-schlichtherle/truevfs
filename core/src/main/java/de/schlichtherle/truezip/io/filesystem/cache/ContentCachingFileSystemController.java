@@ -25,7 +25,7 @@ import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.filesystem.file.FileCache;
+import de.schlichtherle.truezip.io.filesystem.file.Cache;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.IOCache;
@@ -215,7 +215,7 @@ extends DecoratingFileSystemController<M, C> {
         final FileSystemEntryName name;
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
-        final FileCache<Entry> cache;
+        final Cache<Entry> cache;
         final InputSocket <Entry> input;
         final OutputSocket<Entry> output;
 
@@ -225,7 +225,7 @@ extends DecoratingFileSystemController<M, C> {
             this.name = name;
             this.inputOptions = inputOptions.clear(InputOption.CACHE);
             this.outputOptions = outputOptions.clear(OutputOption.CACHE);
-            this.cache = FileCache.Strategy.WRITE_BACK.newCache(Entry.class)
+            this.cache = Cache.Strategy.WRITE_BACK.create(Entry.class)
                     .configure(new RegisteringInputSocket(
                         delegate.getInputSocket(name, this.inputOptions)))
                     .configure(delegate.getOutputSocket(name, this.outputOptions, null));

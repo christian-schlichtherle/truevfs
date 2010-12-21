@@ -58,18 +58,18 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class FileCache<LT extends Entry> implements IOCache<LT> {
+public final class Cache<LT extends Entry> implements IOCache<LT> {
 
     /** Provides different cache strategies. */
-    public static enum Strategy {
+    public enum Strategy {
         /**
          * As the name implies, any attempt to create a new cache for output
          * will result in an {@link UnsupportedOperationException}.
          */
         READ_ONLY {
             @Override <LT extends Entry>
-            Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
-                    FileCache<LT> cache) {
+            Pool<Cache<LT>.Buffer, IOException> newOutputBufferPool(
+                    Cache<LT> cache) {
                 throw new AssertionError();
             }
         },
@@ -80,8 +80,8 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
          */
         WRITE_THROUGH {
             @Override <LT extends Entry>
-            Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
-                    FileCache<LT> cache) {
+            Pool<Cache<LT>.Buffer, IOException> newOutputBufferPool(
+                    Cache<LT> cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -92,27 +92,27 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
          */
         WRITE_BACK {
             @Override <LT extends Entry>
-            Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
-                    FileCache<LT> cache) {
+            Pool<Cache<LT>.Buffer, IOException> newOutputBufferPool(
+                    Cache<LT> cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
 
         /** Returns a new input / output cache. */
         @NonNull public <LT extends Entry>
-        FileCache<LT> newCache(Class<LT> clazz) {
-            return new FileCache<LT>(this);
+        Cache<LT> create(Class<LT> clazz) {
+            return new Cache<LT>(this);
         }
 
         @NonNull <LT extends Entry>
-        Pool<FileCache<LT>.Buffer, IOException> newInputBufferPool(
-                FileCache<LT> cache) {
+        Pool<Cache<LT>.Buffer, IOException> newInputBufferPool(
+                Cache<LT> cache) {
             return cache.new InputBufferPool();
         }
 
         @NonNull abstract <LT extends Entry>
-        Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
-                FileCache<LT> cache);
+        Pool<Cache<LT>.Buffer, IOException> newOutputBufferPool(
+                Cache<LT> cache);
     }
 
     private final Strategy strategy;
@@ -122,14 +122,14 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     private volatile Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
 
-    FileCache(final Strategy strategy) {
+    Cache(final Strategy strategy) {
         if (null == strategy)
             throw new NullPointerException();
         this.strategy = strategy;
     }
 
     @NonNull
-    public FileCache<LT> configure(@NonNull final InputSocket <? extends LT> input) {
+    public Cache<LT> configure(@NonNull final InputSocket <? extends LT> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -137,7 +137,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     }
 
     @NonNull
-    public FileCache<LT> configure(@NonNull final OutputSocket <? extends LT> output) {
+    public Cache<LT> configure(@NonNull final OutputSocket <? extends LT> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -157,7 +157,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     @Override
     public void flush() throws IOException {
         if (null != buffer) { // DCL is OK in this context!
-            synchronized (FileCache.this) {
+            synchronized (Cache.this) {
                 final Buffer buffer = this.buffer;
                 if (null != buffer)
                     getOutputBufferPool().release(buffer);
@@ -168,7 +168,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     @Override
     public void clear() throws IOException {
         if (null != buffer) { // DCL is OK in this context!
-            synchronized (FileCache.this) {
+            synchronized (Cache.this) {
                 final Buffer buffer = this.buffer;
                 if (null != buffer) {
                     // Order is important here!
@@ -194,8 +194,8 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (FileCache.this) {
-                Buffer buffer = FileCache.this.buffer;
+            synchronized (Cache.this) {
+                Buffer buffer = Cache.this.buffer;
                 if (null == buffer) {
                     assert null == input.getPeerTarget();
                     class ProxyOutput extends OutputSocket<Entry> {
@@ -217,7 +217,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    FileCache.this.buffer = buffer = new Buffer(output.getTemp());
+                    Cache.this.buffer = buffer = new Buffer(output.getTemp());
                 }
                 buffer.used++;
                 return buffer;
@@ -226,9 +226,9 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            synchronized (FileCache.this) {
+            synchronized (Cache.this) {
                 buffer.used--;
-                if (buffer != FileCache.this.buffer && 0 == buffer.used)
+                if (buffer != Cache.this.buffer && 0 == buffer.used)
                     buffer.file.release();
             }
         }
@@ -265,7 +265,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (FileCache.this) {
+            synchronized (Cache.this) {
                 final Buffer buffer = super.allocate();
                 buffer.dirty = true;
                 return buffer;
@@ -276,9 +276,9 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
         public void release(final Buffer buffer) throws IOException {
             if (!buffer.dirty)
                 return;
-            synchronized (FileCache.this) {
-                if (buffer != FileCache.this.buffer) {
-                    FileCache.this.buffer = buffer;
+            synchronized (Cache.this) {
+                if (buffer != Cache.this.buffer) {
+                    Cache.this.buffer = buffer;
                 } else {
                     buffer.dirty = false;
                     super.release(buffer);
@@ -290,10 +290,10 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            if (buffer != FileCache.this.buffer) { // DCL is OK in this context!
-                synchronized (FileCache.this) {
-                    if (buffer != FileCache.this.buffer) {
-                        FileCache.this.buffer = buffer;
+            if (buffer != Cache.this.buffer) { // DCL is OK in this context!
+                synchronized (Cache.this) {
+                    if (buffer != Cache.this.buffer) {
+                        Cache.this.buffer = buffer;
                         super.release(buffer);
                     }
                 }
