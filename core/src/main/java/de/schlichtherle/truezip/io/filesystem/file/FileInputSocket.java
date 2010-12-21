@@ -40,10 +40,8 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (options.get(InputOption.CACHE))
-            input = Cache
-                    .Strategy
-                    .READ_ONLY
-                    .create(FileEntry.class)
+            input = Cache.Strategy.READ_ONLY
+                    .newCache(FileEntry.class)
                     .configure(input)
                     .getInputSocket();
         return input;

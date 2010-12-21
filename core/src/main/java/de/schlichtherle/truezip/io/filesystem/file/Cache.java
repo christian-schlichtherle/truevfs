@@ -62,15 +62,16 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
 
     /** Provides different cache strategies. */
     public enum Strategy {
+
         /**
-         * As the name implies, any attempt to create a new cache for output
-         * will result in an {@link UnsupportedOperationException}.
+         * Any attempt to obtain an output socket will result in a
+         * {@link NullPointerException}.
          */
         READ_ONLY {
             @Override <LT extends Entry>
             Pool<Cache<LT>.Buffer, IOException> newOutputBufferPool(
                     Cache<LT> cache) {
-                throw new AssertionError();
+                throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
 
@@ -100,7 +101,7 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
 
         /** Returns a new input / output cache. */
         @NonNull public <LT extends Entry>
-        Cache<LT> create(Class<LT> clazz) {
+        Cache<LT> newCache(Class<LT> clazz) {
             return new Cache<LT>(this);
         }
 
@@ -116,8 +117,8 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
     }
 
     private final Strategy strategy;
-    private InputSocket<? extends LT> input;
-    private OutputSocket<? extends LT> output;
+    private volatile InputSocket<? extends LT> input;
+    private volatile OutputSocket<? extends LT> output;
     private volatile Pool<Buffer, IOException> inputBufferPool;
     private volatile Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
@@ -265,11 +266,11 @@ public final class Cache<LT extends Entry> implements IOCache<LT> {
     final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (Cache.this) {
+            //synchronized (Cache.this) {
                 final Buffer buffer = super.allocate();
                 buffer.dirty = true;
                 return buffer;
-            }
+            //}
         }
 
         @Override
