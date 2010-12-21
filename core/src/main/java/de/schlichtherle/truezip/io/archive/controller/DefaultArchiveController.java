@@ -66,7 +66,7 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 
 /**
  * This archive controller implements the mounting/unmounting strategy
- * by performing a full update of the container archive file.
+ * for the container archive file.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -170,6 +170,7 @@ extends FileSystemArchiveController<E> {
 
     private final ArchiveDriver<E> driver;
     private final FileSystemController<?> parent;
+    private final boolean useRootTemplate;
 
     /**
      * An {@link Input} object used to mount the (virtual) archive file system
@@ -189,7 +190,8 @@ extends FileSystemArchiveController<E> {
     public DefaultArchiveController(
             final ConcurrentFileSystemModel model,
             final ArchiveDriver<E> driver,
-            final FileSystemController<?> parent) {
+            final FileSystemController<?> parent,
+            final boolean useRootTemplate) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
@@ -197,6 +199,7 @@ extends FileSystemArchiveController<E> {
             throw new IllegalArgumentException("Parent/member mismatch!");
         this.driver = driver;
         this.parent = parent;
+        this.useRootTemplate = useRootTemplate;
     }
 
     @Override
@@ -266,15 +269,16 @@ extends FileSystemArchiveController<E> {
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
-    private void makeOutput(    @NonNull final BitField<OutputOption> options,
-                                ArchiveFileSystemEntry<E> root)
+    void makeOutput(  @NonNull final BitField<OutputOption> options,
+                            @NonNull final ArchiveFileSystemEntry<E> rootTemplate)
     throws IOException {
         if (null != output)
             return;
         final FileSystemEntryName parentName = getModel()
                 .resolveParent(ROOT_ENTRY_NAME);
         final OutputSocket<?> socket = getParent().getOutputSocket(
-                parentName, options.set(OutputOption.CACHE), /*root*/ null);
+                parentName, options.set(OutputOption.CACHE),
+                useRootTemplate ? rootTemplate : null);
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null == input ? null : input.getDelegate()));
     }
@@ -321,7 +325,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-	public <X extends IOException>
+    public <X extends IOException>
     void sync(  final BitField<SyncOption> options,
                 final ExceptionBuilder<? super SyncException, X> builder)
     throws X {

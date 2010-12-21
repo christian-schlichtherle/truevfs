@@ -238,7 +238,7 @@ implements ArchiveDriver<E>, Serializable {
                         new ContentCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                             new DefaultArchiveController<E>(
                                 new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
-                                this, parent)));
+                                this, parent, false)));
     }
 
     /**

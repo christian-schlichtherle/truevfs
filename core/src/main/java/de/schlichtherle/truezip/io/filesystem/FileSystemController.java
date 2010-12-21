@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
@@ -120,7 +121,7 @@ public abstract class FileSystemController<M extends FileSystemModel> {
     public abstract OutputSocket<?> getOutputSocket(
             @NonNull FileSystemEntryName name,
             @NonNull BitField<OutputOption> options,
-            @Nullable Entry template);
+            @CheckForNull Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries

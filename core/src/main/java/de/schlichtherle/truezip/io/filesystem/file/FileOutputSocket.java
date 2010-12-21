@@ -17,8 +17,9 @@ package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.socket.IOPool;
+import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
@@ -114,13 +115,13 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                             try {
                                 if (!tempTarget.renameTo(fileTarget)
                                         && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget)))
-                                    IOSocket.copy(  FileInputSocket.get(temp),
-                                                    FileOutputSocket.get(file));
+                                    IOSocket.copy(  temp.getInputSocket(),
+                                                    file.getOutputSocket());
                             } catch (IOException ex) {
                                 throw cause = ex;
                             } finally {
                                 try {
-                                    getTempFilePool().release(temp);
+                                    ((IOPool.Entry<FileEntry>) temp).release();
                                 } catch (IOException ex) {
                                     throw (IOException) ex.initCause(cause);
                                 }
@@ -140,13 +141,13 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
 
         try {
             if (temp != file && options.get(APPEND))
-                IOSocket.copy(  FileInputSocket.get(file),
-                                FileOutputSocket.get(temp));
+                IOSocket.copy(  file.getInputSocket(),
+                                temp.getOutputSocket());
             return new OutputStream();
         } catch (IOException cause) {
             if (temp != file) {
                 try {
-                    getTempFilePool().release(temp);
+                    ((IOPool.Entry<FileEntry>) temp).release();
                 } catch (IOException ex) {
                     throw (IOException) ex.initCause(cause);
                 }

@@ -69,15 +69,13 @@ public abstract class FileSystemEntry implements Entry {
         return super.hashCode();
     }
 
+    /**
+     * Returns {@link #getName()}.
+     * 
+     * @return {@link #getName()}.
+     */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[name=")
-                .append(getName())
-                .append(",members=")
-                .append(getMembers())
-                .append("]")
-                .toString();
+        return getName();
     }
 }
