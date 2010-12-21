@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.archive.driver.zip.ZipDriver;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +39,11 @@ public abstract class FileSystemManagerTestCase {
 
     @Before
     public void setUp() {
+    }
+
+    @After
+    public final void tearDown() {
+        manager = null;
     }
 
     @Test
