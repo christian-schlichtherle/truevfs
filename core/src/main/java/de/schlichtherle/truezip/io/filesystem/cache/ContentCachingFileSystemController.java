@@ -155,14 +155,14 @@ extends DecoratingFileSystemController<M, C> {
                         cache.flush();
                     } finally {
                         final IOCache<Entry> cache2 = caches.remove(name);
-                        assert cache2 == cache;
+                        assert cache == cache2;
                         cache.clear();
                     }
                 }
                 return super.getBoundSocket(); // bypass the cache
             }
             // Create marker entry and mind CREATE_PARENTS!
-            delegate.mknod(name, FILE, options, null);
+            delegate.mknod(name, FILE, options, template);
             getModel().setTouched(true);
             return (null != cache ? cache : new EntryCache(name,
                         BitField.noneOf(InputOption.class), options))

@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Implements a chain of responsibility in order to resolve

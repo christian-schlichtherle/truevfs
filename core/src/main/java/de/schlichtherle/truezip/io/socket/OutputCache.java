@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
@@ -36,7 +37,7 @@ import java.io.IOException;
 public interface OutputCache<LT extends Entry> {
 
     /** Returns an output socket for cached write operations. */
-    OutputSocket<LT> getOutputSocket();
+    @NonNull OutputSocket<LT> getOutputSocket();
 
     /**
      * Ensures that the last data written to this cache is written to the local

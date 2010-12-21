@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.entry.Entry;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
@@ -38,7 +39,7 @@ import java.io.IOException;
 public interface InputCache<LT extends Entry> {
 
     /** Returns an input socket for cached read operations. */
-    InputSocket<LT> getInputSocket();
+    @NonNull InputSocket<LT> getInputSocket();
 
     /**
      * Clears this cache and triggers re-reading the data from the local target

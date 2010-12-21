@@ -43,7 +43,6 @@ import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;

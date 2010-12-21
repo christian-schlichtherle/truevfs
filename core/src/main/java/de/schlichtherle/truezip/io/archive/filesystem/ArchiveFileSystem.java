@@ -635,16 +635,18 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         if (isRoot(path))
             throw new ArchiveFileSystemException(path,
                     "(virtual) root directory cannot get unlinked");
-        final ArchiveFileSystemEntry<E> entry = master.remove(path);
+        final ArchiveFileSystemEntry<E> entry = master.get(path);
         if (entry == null)
             throw new ArchiveFileSystemException(path,
                     "archive entry does not exist");
         assert entry != root;
-        if (entry.getType() == DIRECTORY && entry.getMembers().size() > 0) {
-            master.put(path, entry); // Restore file system
+        if (entry.getType() == DIRECTORY && 0 < entry.getMembers().size()) {
             throw new ArchiveFileSystemException(path,
                     "directory is not empty");
         }
+        touch();
+        final ArchiveFileSystemEntry<E> entry2 = master.remove(path);
+        assert entry == entry2;
         final Splitter splitter = new Splitter();
         splitter.split(path);
         final String parentPath = splitter.getParentPath();
@@ -654,9 +656,9 @@ implements EntryContainer<ArchiveFileSystemEntry<E>> {
         final boolean ok = parent.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + path
                     + "\" does not contain this entry - archive file system is corrupted!";
-        touch();
-        if (parent.getTime(Access.WRITE) != UNKNOWN) // never beforeTouch ghosts!
-            parent.getEntry().setTime(Access.WRITE, System.currentTimeMillis());
+        final E ae = parent.getEntry();
+        if (ae.getTime(Access.WRITE) != UNKNOWN) // never touch ghosts!
+            ae.setTime(Access.WRITE, System.currentTimeMillis());
     }
 
     public boolean setTime(
