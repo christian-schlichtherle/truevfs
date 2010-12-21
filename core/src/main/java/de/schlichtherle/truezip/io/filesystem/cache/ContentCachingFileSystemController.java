@@ -113,10 +113,8 @@ extends DecoratingFileSystemController<M, C> {
             final EntryCache cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
-            return (null != cache ? cache : new EntryCache(name)
-                    .configure(options))
-                    .getInputSocket()
-                    .bind(this);
+            return (null != cache ? cache : new EntryCache(name))
+                    .configure(options).getInputSocket().bind(this);
         }
     } // class Input
 
@@ -165,10 +163,8 @@ extends DecoratingFileSystemController<M, C> {
             // Create marker entry and mind CREATE_PARENTS!
             delegate.mknod(name, FILE, options, template);
             getModel().setTouched(true);
-            return (null != cache ? cache : new EntryCache(name)
-                    .configure(options, template))
-                    .getOutputSocket()
-                    .bind(this);
+            return (null != cache ? cache : new EntryCache(name))
+                    .configure(options, template).getOutputSocket().bind(this);
         }
     } // class Output
 
