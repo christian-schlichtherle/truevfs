@@ -36,6 +36,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -78,8 +79,8 @@ public final class ContentCachingFileSystemController<
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
 
-    private final Map<FileSystemEntryName, IOCache<Entry>> caches
-            = new HashMap<FileSystemEntryName, IOCache<Entry>>();
+    private final Map<FileSystemEntryName, EntryCache> caches
+            = new HashMap<FileSystemEntryName, EntryCache>();
 
     /**
      * Constructs a new content caching file system controller.
@@ -109,11 +110,11 @@ extends DecoratingFileSystemController<M, C> {
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final IOCache<Entry> cache = caches.get(name);
+            final EntryCache cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
                 return super.getBoundSocket(); // bypass the cache
-            return (null != cache ? cache : new EntryCache(name,
-                        options, BitField.noneOf(OutputOption.class)))
+            return (null != cache ? cache : new EntryCache(name)
+                    .configure(options))
                     .getInputSocket()
                     .bind(this);
         }
@@ -145,7 +146,7 @@ extends DecoratingFileSystemController<M, C> {
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final IOCache<Entry> cache = caches.get(name);
+            final EntryCache cache = caches.get(name);
             if (null == cache && !options.get(OutputOption.CACHE)
                     || options.get(OutputOption.APPEND)
                     || null != template) {
@@ -154,7 +155,7 @@ extends DecoratingFileSystemController<M, C> {
                     try {
                         cache.flush();
                     } finally {
-                        final IOCache<Entry> cache2 = caches.remove(name);
+                        final EntryCache cache2 = caches.remove(name);
                         assert cache == cache2;
                         cache.clear();
                     }
@@ -164,8 +165,8 @@ extends DecoratingFileSystemController<M, C> {
             // Create marker entry and mind CREATE_PARENTS!
             delegate.mknod(name, FILE, options, template);
             getModel().setTouched(true);
-            return (null != cache ? cache : new EntryCache(name,
-                        BitField.noneOf(InputOption.class), options))
+            return (null != cache ? cache : new EntryCache(name)
+                    .configure(options, template))
                     .getOutputSocket()
                     .bind(this);
         }
@@ -176,21 +177,22 @@ extends DecoratingFileSystemController<M, C> {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
-        final IOCache<Entry> cache = caches.remove(name);
+        final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.clear();
     }
 
     @Override
     public <X extends IOException>
-    void sync(  final BitField<SyncOption> options, final ExceptionBuilder<? super SyncException, X> builder)
+    void sync(  @NonNull final BitField<SyncOption> options,
+                @NonNull final ExceptionBuilder<? super SyncException, X> builder)
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         if (0 < caches.size()) {
             final boolean flush = !options.get(ABORT_CHANGES);
             final boolean clear = !flush || options.get(CLEAR_CACHE);
-            for (final IOCache<Entry> cache : caches.values()) {
+            for (final EntryCache cache : caches.values()) {
                 try {
                     if (flush)
                         cache.flush();
@@ -211,32 +213,54 @@ extends DecoratingFileSystemController<M, C> {
         delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
+    private static final BitField<InputOption> NO_INPUT_OPTIONS
+            = BitField.noneOf(InputOption.class);
+
+    private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
+            = BitField.noneOf(OutputOption.class);
+
     private final class EntryCache implements IOCache<Entry> {
         final FileSystemEntryName name;
-        final BitField<InputOption> inputOptions;
-        final BitField<OutputOption> outputOptions;
         final Cache<Entry> cache;
+        volatile InputSocket<Entry> input;
+        volatile OutputSocket<Entry> output;
 
-        EntryCache( final FileSystemEntryName name,
-                    final BitField<InputOption > inputOptions,
-                    final BitField<OutputOption> outputOptions) {
+        EntryCache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.inputOptions = inputOptions.clear(InputOption.CACHE);
-            this.outputOptions = outputOptions.clear(OutputOption.CACHE);
-            this.cache = Cache.Strategy.WRITE_BACK.create(Entry.class)
-                    .configure(new RegisteringInputSocket(
-                        delegate.getInputSocket(name, this.inputOptions)))
-                    .configure(delegate.getOutputSocket(name, this.outputOptions, null));
+            this.cache = Cache.Strategy.WRITE_BACK.create(Entry.class);
+            configure(NO_INPUT_OPTIONS);
+            configure(NO_OUTPUT_OPTIONS, null);
+        }
+
+        @NonNull
+        public EntryCache configure(@NonNull BitField<InputOption> options) {
+            cache.configure(new RegisteringInputSocket(delegate.getInputSocket(
+                    name, options.clear(InputOption.CACHE))));
+            input = null;
+            return this;
+        }
+
+        @NonNull
+        public EntryCache configure(@NonNull BitField<OutputOption> options,
+                                    @Nullable Entry template) {
+            cache.configure(delegate.getOutputSocket(
+                    name, options.clear(OutputOption.CACHE), template));
+            output = null;
+            return this;
         }
 
         @Override
         public InputSocket<Entry> getInputSocket() {
-            return cache.getInputSocket();
+            return null != input
+                    ? input
+                    : (input = cache.getInputSocket());
         }
 
         @Override
         public OutputSocket<Entry> getOutputSocket() {
-            return new RegisteringOutputSocket(cache.getOutputSocket());
+            return null != output
+                    ? output
+                    : (output = new RegisteringOutputSocket(cache.getOutputSocket()));
         }
 
         @Override
@@ -249,7 +273,7 @@ extends DecoratingFileSystemController<M, C> {
             cache.clear();
         }
 
-        class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
+        final class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
             RegisteringInputSocket(final InputSocket <?> input) {
                 super(input);
             }
@@ -271,7 +295,7 @@ extends DecoratingFileSystemController<M, C> {
             }
         } // class RegisteringInputSocket
 
-        class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
+        final class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
             RegisteringOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
