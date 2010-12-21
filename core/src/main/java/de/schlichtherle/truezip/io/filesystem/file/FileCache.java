@@ -141,9 +141,9 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                 FileCache<LT> cache);
     }
 
-    private final InputSocketProxy inputProxy;
-    private final OutputSocketProxy outputProxy;
     private final Strategy strategy;
+    private InputSocket<? extends LT> input;
+    private OutputSocket<? extends LT> output;
     private Pool<Buffer, IOException> inputBufferPool;
     private Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
@@ -153,9 +153,9 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                 final Strategy strategy) {
         if (null == strategy)
             throw new NullPointerException();
-        this.inputProxy  = null == input  ? null : new InputSocketProxy (input );
-        this.outputProxy = null == output ? null : new OutputSocketProxy(output);
         this.strategy = strategy;
+        this.input = input;
+        this.output = output;
     }
 
     private Pool<Buffer, IOException> getInputBufferPool() {
@@ -172,12 +172,12 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
 
     @Override
     public InputSocket<LT> getInputSocket() {
-        return inputProxy;
+        return new InputSocketProxy(input);
     }
 
     @Override
     public OutputSocket<LT> getOutputSocket() {
-        return outputProxy;
+        return new OutputSocketProxy(output);
     }
 
     @Override
@@ -211,8 +211,6 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
             synchronized (FileCache.this) {
                 Buffer buffer = FileCache.this.buffer;
                 if (null == buffer) {
-                    final InputSocket<? extends LT> input
-                            = inputProxy.getBoundSocket();
                     assert null == input.getPeerTarget();
                     class ProxyOutput extends OutputSocket<Entry> {
                         TempFileEntry temp;
@@ -259,8 +257,6 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
         @Override
         public void release(final Buffer buffer) throws IOException {
             try {
-                final OutputSocket<? extends LT> output
-                        = outputProxy.getBoundSocket();
                 assert null == output.getPeerTarget();
                 class ProxyInput extends DecoratingInputSocket<Entry> {
                     ProxyInput() {
