@@ -30,9 +30,11 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputCache;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Pool;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Implements a caching strategy for input and output sockets.
@@ -55,30 +57,17 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class FileCache<LT extends Entry> implements IOCache<LT> {
 
     /** Provides different cache strategies. */
-    public enum Strategy {
+    public static enum Strategy {
         /**
          * As the name implies, any attempt to create a new cache for output
          * will result in an {@link UnsupportedOperationException}.
          */
         READ_ONLY {
-            @Override
-            public <LT extends Entry>
-            OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
-                throw new UnsupportedOperationException("read only cache!");
-            }
-
-            @Override
-            public <LT extends Entry>
-            FileCache<LT> newCache( InputSocket<? extends LT> input,
-                                    OutputSocket<? extends LT> output) {
-                throw new UnsupportedOperationException("read only cache!");
-            }
-
-            @Override
-            <LT extends Entry>
+            @Override <LT extends Entry>
             Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
                     FileCache<LT> cache) {
                 throw new AssertionError();
@@ -90,8 +79,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override
-            <LT extends Entry>
+            @Override <LT extends Entry>
             Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
                     FileCache<LT> cache) {
                 return cache.new WriteThroughOutputBufferPool();
@@ -103,40 +91,26 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override
-            <LT extends Entry>
+            @Override <LT extends Entry>
             Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
                     FileCache<LT> cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
 
-        /** Returns a new input cache. */
-        public <LT extends Entry>
-        InputCache<LT> newCache(InputSocket <? extends LT> input) {
-            if (null == input)
-                throw new NullPointerException();
-            return new FileCache<LT>(input, null, this);
-        }
-
-        /** Returns a new output cache. */
-        public <LT extends Entry>
-        OutputCache<LT> newCache(OutputSocket <? extends LT> output) {
-            if (null == output)
-                throw new NullPointerException();
-            return new FileCache<LT>(null, output, this);
-        }
-
         /** Returns a new input / output cache. */
-        public <LT extends Entry>
-        FileCache<LT> newCache( InputSocket<? extends LT> input,
-                                OutputSocket<? extends LT> output) {
-            if (null == input || null == output)
-                throw new NullPointerException();
-            return new FileCache<LT>(input, output, this);
+        @NonNull public <LT extends Entry>
+        FileCache<LT> newCache(Class<LT> clazz) {
+            return new FileCache<LT>(this);
         }
 
-        abstract <LT extends Entry>
+        @NonNull <LT extends Entry>
+        Pool<FileCache<LT>.Buffer, IOException> newInputBufferPool(
+                FileCache<LT> cache) {
+            return cache.new InputBufferPool();
+        }
+
+        @NonNull abstract <LT extends Entry>
         Pool<FileCache<LT>.Buffer, IOException> newOutputBufferPool(
                 FileCache<LT> cache);
     }
@@ -144,30 +118,30 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     private final Strategy strategy;
     private InputSocket<? extends LT> input;
     private OutputSocket<? extends LT> output;
-    private Pool<Buffer, IOException> inputBufferPool;
-    private Pool<Buffer, IOException> outputBufferPool;
+    private volatile Pool<Buffer, IOException> inputBufferPool;
+    private volatile Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
 
-    FileCache(  final InputSocket <? extends LT> input,
-                final OutputSocket<? extends LT> output,
-                final Strategy strategy) {
+    FileCache(final Strategy strategy) {
         if (null == strategy)
             throw new NullPointerException();
         this.strategy = strategy;
+    }
+
+    @NonNull
+    public FileCache<LT> configure(@NonNull final InputSocket <? extends LT> input) {
+        if (null == input)
+            throw new NullPointerException();
         this.input = input;
+        return this;
+    }
+
+    @NonNull
+    public FileCache<LT> configure(@NonNull final OutputSocket <? extends LT> output) {
+        if (null == output)
+            throw new NullPointerException();
         this.output = output;
-    }
-
-    private Pool<Buffer, IOException> getInputBufferPool() {
-        return null != inputBufferPool
-                ? inputBufferPool
-                : (inputBufferPool = new InputBufferPool());
-    }
-
-    private Pool<Buffer, IOException> getOutputBufferPool() {
-        return null != outputBufferPool
-                ? outputBufferPool
-                : (outputBufferPool = strategy.newOutputBufferPool(this));
+        return this;
     }
 
     @Override
@@ -203,6 +177,18 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                 }
             }
         }
+    }
+
+    private Pool<Buffer, IOException> getInputBufferPool() {
+        return null != inputBufferPool
+                ? inputBufferPool
+                : (inputBufferPool = strategy.newInputBufferPool(this));
+    }
+
+    private Pool<Buffer, IOException> getOutputBufferPool() {
+        return null != outputBufferPool
+                ? outputBufferPool
+                : (outputBufferPool = strategy.newOutputBufferPool(this));
     }
 
     final class InputBufferPool implements Pool<Buffer, IOException> {
@@ -391,11 +377,6 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
         }
 
         @Override
-        protected InputSocket<? extends LT> getBoundSocket() throws IOException {
-            return super.getBoundSocket();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             if (null != getPeerTarget()) {
                 // The data for connected sockets cannot not get cached because
@@ -421,16 +402,11 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
             }
             return getInputBufferPool().allocate().new BufferInputStream();
         }
-    } // class InputProxy
+    } // class InputSocketProxy
 
     private final class OutputSocketProxy extends DecoratingOutputSocket<LT> {
         OutputSocketProxy(final OutputSocket<? extends LT> output) {
             super(output);
-        }
-
-        @Override
-        protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
-            return super.getBoundSocket();
         }
 
         @Override
@@ -442,5 +418,5 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
             }
             return getOutputBufferPool().allocate().new BufferOutputStream();
         }
-    } // class OutputProxy
+    } // class OutputSocketProxy
 }

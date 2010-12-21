@@ -225,10 +225,10 @@ extends DecoratingFileSystemController<M, C> {
             this.name = name;
             this.inputOptions = inputOptions.clear(InputOption.CACHE);
             this.outputOptions = outputOptions.clear(OutputOption.CACHE);
-            this.cache = FileCache.Strategy.WRITE_BACK.newCache(
-                    new RegisteringInputSocket(
-                        delegate.getInputSocket(name, this.inputOptions)),
-                    delegate.getOutputSocket(name, this.outputOptions, null));
+            this.cache = FileCache.Strategy.WRITE_BACK.newCache(Entry.class)
+                    .configure(new RegisteringInputSocket(
+                        delegate.getInputSocket(name, this.inputOptions)))
+                    .configure(delegate.getOutputSocket(name, this.outputOptions, null));
             this.input = cache.getInputSocket();
             this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }
