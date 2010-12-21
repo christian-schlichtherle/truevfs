@@ -45,6 +45,7 @@ import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.io.filesystem.file.Cache.Strategy.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
@@ -112,7 +113,7 @@ extends DecoratingFileSystemController<M, C> {
         public InputSocket<?> getBoundSocket() throws IOException {
             final EntryCache cache = caches.get(name);
             if (null == cache && !options.get(InputOption.CACHE))
-                return super.getBoundSocket(); // bypass the cache
+                return super.getBoundSocket(); // dont cache
             return (null != cache ? cache : new EntryCache(name))
                     .configure(options).getInputSocket().bind(this);
         }
@@ -145,20 +146,22 @@ extends DecoratingFileSystemController<M, C> {
             assert getModel().writeLock().isHeldByCurrentThread();
 
             final EntryCache cache = caches.get(name);
-            if (null == cache && !options.get(OutputOption.CACHE)
-                    || options.get(OutputOption.APPEND)
-                    || null != template) {
-                if (null != cache) {
-                    getModel().assertWriteLockedByCurrentThread();
-                    try {
-                        cache.flush();
-                    } finally {
-                        final EntryCache cache2 = caches.remove(name);
-                        assert cache == cache2;
-                        cache.clear();
-                    }
+            if (null == cache) {
+                if (!options.get(OutputOption.CACHE))
+                    return super.getBoundSocket(); // dont cache
+            } else {
+                if (options.get(OutputOption.APPEND)) {
+                    // This combination of features would be expected to work
+                    // with a WRITE_THROUGH cache strategy.
+                    // However, we are using WRITE_BACK for performance reasons
+                    // and we can't change the strategy because the cache might
+                    // be busy on input!
+                    // So if this is really required, change the caching
+                    // strategy to WRITE_THROUGH and bear the performance
+                    // impact.
+                    assert false; // FIXME: Check and fix this!
+                    cache.flush();
                 }
-                return super.getBoundSocket(); // bypass the cache
             }
             // Create marker entry and mind CREATE_PARENTS!
             delegate.mknod(name, FILE, options, template);
@@ -223,7 +226,7 @@ extends DecoratingFileSystemController<M, C> {
 
         EntryCache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = Cache.Strategy.WRITE_BACK.create(Entry.class);
+            this.cache = WRITE_BACK.newCache(Entry.class);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
