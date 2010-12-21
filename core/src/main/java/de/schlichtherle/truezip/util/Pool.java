@@ -31,8 +31,7 @@ public interface Pool<R, E extends Exception> {
      * @return A resource.
      * @throws Exception if allocating the resource failed for any reason.
      */
-    @NonNull
-    public R allocate() throws E;
+    @NonNull R allocate() throws E;
 
     /**
      * Releases a previously allocated resource to this pool.
@@ -40,7 +39,21 @@ public interface Pool<R, E extends Exception> {
      * @param  resource a resource.
      * @throws IllegalArgumentException if the given resource has not been
      *         allocated by this pool.
+     * @throws IllegalStateException if the given resource has already been
+     *         released to this pool.
      * @throws Exception if releasing the resource failed for any other reason.
      */
-    public void release(@NonNull R resource) throws E;
+    void release(@NonNull R resource) throws E;
+
+    /** For use with Pools. */
+    interface Resource<E extends Exception> {
+
+        /**
+         * Releases this resource to its pool.
+         *
+         * @throws IllegalStateException if this resource has already been
+         *         released to its pool.
+         */
+        void release() throws E;
+    }
 }

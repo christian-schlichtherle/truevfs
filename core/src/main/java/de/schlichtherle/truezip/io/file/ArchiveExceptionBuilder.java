@@ -35,9 +35,9 @@ extends AbstractExceptionBuilder<IOException, ArchiveException> {
         if (cause instanceof ArchiveException)
             next = (ArchiveException) cause;
         else if (cause instanceof SyncWarningException)
-            next = new ArchiveWarningException(cause.getMessage(), cause.getCause()); // erase SyncWarningException
+            next = new ArchiveWarningException(cause.getMessage(), cause.getCause()); // remove SyncWarningException - it's not thrown yet so it has no stack trace anyway!
         else if (cause instanceof SyncException)
-            next = new ArchiveException(cause.getMessage(), cause.getCause()); // erase SyncException
+            next = new ArchiveException(cause.getMessage(), cause.getCause()); // remove SyncWarningException - it's not thrown yet so it has no stack trace anyway!
         else
             next = new ArchiveException(cause.getMessage(), cause);
         try {

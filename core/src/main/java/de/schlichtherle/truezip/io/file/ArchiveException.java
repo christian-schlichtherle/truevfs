@@ -54,7 +54,7 @@ public class ArchiveException extends ChainableIOException {
     private static final long serialVersionUID = 6846372003204673485L;
 
     ArchiveException(String message, Throwable cause) {
-        super(message);
+        super(message, cause);
     }
 
     ArchiveException(String message, Throwable cause, int priority) {

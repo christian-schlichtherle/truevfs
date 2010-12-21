@@ -242,6 +242,6 @@ implements ZipEntryFactory<ZipEntry> {
     protected ZipOutputShop newZipOutputShop(
             ConcurrentFileSystemModel model, OutputStream out, ZipInputShop source)
     throws IOException {
-        return new ZipOutputShop(out, getCharset(), level, source);
+        return new ZipOutputShop(out, getCharset(), level, source); // TODO: Support append strategy!
     }
 }

@@ -332,9 +332,9 @@ public class ChainableIOException extends IOException implements Cloneable {
         if (null != predecessor) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("followed, but not caused by:");
+                s.println("\nFollowed, but not caused by:");
             } else {
-                s.println("(omitting " + predecessor.getNumExceptions() + " exception(s) at the start of this list)");
+                s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
         }
         super.printStackTrace(s);
@@ -385,9 +385,9 @@ public class ChainableIOException extends IOException implements Cloneable {
         if (predecessor != null) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("followed, but not caused by:");
+                s.println("\nFollowed, but not caused by:");
             } else {
-                s.println("(omitting " + predecessor.getNumExceptions() + " exception(s) at the start of this list)");
+                s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
         }
 

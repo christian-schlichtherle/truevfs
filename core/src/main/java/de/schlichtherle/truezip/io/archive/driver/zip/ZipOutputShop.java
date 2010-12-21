@@ -22,10 +22,13 @@ import de.schlichtherle.truezip.io.archive.output.MultiplexedArchiveOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,7 +61,7 @@ public class ZipOutputShop
 extends RawZipOutputStream<ZipEntry>
 implements OutputShop<ZipEntry> {
 
-    private final ZipInputShop source;
+    private TempFileEntry postamble;
     private ZipEntry tempEntry;
 
     /**
@@ -78,33 +81,41 @@ implements OutputShop<ZipEntry> {
     throws  NullPointerException,
             UnsupportedEncodingException,
             IOException {
+        // super(out, source); // TODO: Support append strategy!
         super(out, charset);
         super.setLevel(level);
 
-        this.source = source;
-        if (source != null) {
+        if (null != source) {
             // Retain comment and preamble of input ZIP archive.
             super.setComment(source.getComment());
-            if (source.getPreambleLength() > 0) {
+            if (0 < source.getPreambleLength()) {
                 final InputStream in = source.getPreambleInputStream();
                 try {
-                    de.schlichtherle.truezip.io.file.File.cat(
-                            in, source.offsetsConsiderPreamble() ? this : out);
+                    Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
                 } finally {
                     in.close();
                 }
             }
+            if (0 < source.getPostambleLength()) {
+                postamble = TempFilePool.get().allocate();
+                Streams.copy(   source.getPostambleInputStream(),
+                                new FileOutputStream(postamble.getFile()));
+            } else {
+                postamble = null;
+            }
+        } else {
+            postamble = null;
         }
     }
 
     @Override
     public int getSize() {
-        return super.size() + (tempEntry != null ? 1 : 0);
+        return super.size() + (null != tempEntry ? 1 : 0);
     }
 
     @Override
     public Iterator<ZipEntry> iterator() {
-        if (tempEntry == null)
+        if (null == tempEntry)
             return super.iterator();
         return new JointIterator<ZipEntry>(
                 super.iterator(),
@@ -114,7 +125,7 @@ implements OutputShop<ZipEntry> {
     @Override
     public ZipEntry getEntry(final String name) {
         ZipEntry entry = super.getEntry(name);
-        if (entry != null)
+        if (null != entry)
             return entry;
         entry = tempEntry;
         return entry != null && name.equals(entry.getName()) ? entry : null;
@@ -194,7 +205,7 @@ implements OutputShop<ZipEntry> {
      */
     @Override
     public final boolean isBusy() {
-        return super.isBusy() || tempEntry != null;
+        return super.isBusy() || null != tempEntry;
     }
 
     /**
@@ -296,36 +307,37 @@ implements OutputShop<ZipEntry> {
     } // class TempEntryOutputStream
 
     /**
-     * Retain the postamble of the source ZIP archive, if any.
+     * Retains the postamble of the source source ZIP file, if any.
      */
     @Override
-    public void finish() throws IOException {
-        super.finish();
-
-        if (source == null)
-            return;
-
-        final long ipl = source.getPostambleLength();
-        if (ipl <= 0)
-            return;
-
-        final long il = source.length();
-        final long ol = length();
-
-        final InputStream in = source.getPostambleInputStream();
+    public void close() throws IOException {
         try {
-            // Second, if the output ZIP compatible file differs in length from
-            // the input ZIP compatible file pad the output to the next four byte
-            // boundary before appending the postamble.
-            // This might be required for self extracting files on some platforms
-            // (e.g. Wintel).
-            if (ol + ipl != il)
-                write(new byte[(int) (ol % 4)]);
+            final TempFileEntry postamble = this.postamble;
+            if (null != postamble) {
+                this.postamble = null;
+                try {
+                    final InputStream in = new FileInputStream(postamble.getFile());
+                    try {
+                    // Second, if the output ZIP compatible file differs in length from
+                    // the input ZIP compatible file pad the output to the next four byte
+                    // boundary before appending the postamble.
+                    // This might be required for self extracting files on some platforms
+                    // (e.g. Wintel).
+                    final long ol = length();
+                    final long ipl = postamble.getFile().length();
+                    if ((ol + ipl) % 4 != 0)
+                        write(new byte[4 - (int) (ol % 4)]);
 
-            // Finally, write the postamble.
-            Streams.cat(in, this);
+                        Streams.cat(in, this);
+                    } finally {
+                        in.close();
+                    }
+                } finally {
+                    postamble.release();
+                }
+            }
         } finally {
-            in.close();
+            super.close();
         }
     }
 }
