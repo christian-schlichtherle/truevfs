@@ -35,9 +35,10 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     // Declared package private for unit testing purposes.
     static final String DEFAULT_PREFIX = "tzp-pool";
     static final String DEFAULT_SUFFIX = null;
+    static final File   DEFAULT_DIR    = null;
 
     private static final TempFilePool INSTANCE
-            = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, null);
+            = new TempFilePool(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIR);
 
     @NonNull private final String prefix;
     @Nullable private final String suffix;
@@ -51,7 +52,7 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     /** Constructs a new temp file pool. */
     public TempFilePool(@NonNull final String prefix,
                         @Nullable final String suffix,
-                        @Nullable final File   dir) {
+                        @Nullable final File dir) {
         if (null == prefix)
             throw new NullPointerException();
         this.prefix = prefix;
@@ -60,20 +61,23 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     }
 
     @Override
-    public FileEntry allocate() throws IOException {
+    public TempFileEntry allocate() throws IOException {
         return new TempFileEntry(this,
                 Files.createTempFile(prefix, suffix, dir));
     }
 
     @Override
     public void release(@NonNull final FileEntry entry) throws IOException {
-        if (!(entry instanceof TempFileEntry) ||
-                this != ((TempFileEntry) entry).pool(null))
-            throw new IllegalArgumentException(entry.getFile().getPath() + " (not allocated by this temporary file pool)");
+        if (!(entry instanceof TempFileEntry))
+            throw new IllegalArgumentException(entry.getFile() + " (not allocated by this temporary file pool)");
+        ((TempFileEntry) entry).release();
     }
 
-    private static final class TempFileEntry extends FileEntry {
-        TempFilePool pool; // TODO: Consider making this an inner class.
+    public static final class TempFileEntry
+    extends FileEntry
+    implements Resource<IOException> {
+
+        TempFilePool pool;
 
         TempFileEntry(TempFilePool pool, File file) {
             super(file);
@@ -81,12 +85,21 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
             this.pool = pool;
         }
 
+        @Override
+        public void release() throws IOException {
+            if (null == pool)
+                throw new IllegalStateException(getFile() + " (already released)");
+            pool(null);
+        }
+
         TempFilePool pool(final TempFilePool newPool) throws IOException {
             final TempFilePool oldPool = pool;
             this.pool = newPool;
-            if (oldPool != newPool)
-                if (!getFile().delete())
-                    throw new IOException(getFile().getPath() + " (cannot delete temporary file)");
+            if (oldPool != newPool) {
+                final File file = getFile();
+                if (!file.delete() && file.exists())
+                    throw new IOException(file + " (cannot delete temporary file)");
+            }
             return oldPool;
         }
 

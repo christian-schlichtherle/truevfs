@@ -15,10 +15,8 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.util.Pool;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
-import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
@@ -42,13 +40,18 @@ import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
  * @version $Id$
  */
 public final class FileOutputSocket extends OutputSocket<FileEntry> {
+
+    private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
+            = BitField.noneOf(OutputOption.class);
+    private static final String TEMP_FILE_POOL_PREFIX = ".tzp";
+
     private final FileEntry file;
     private final Entry template;
     private final BitField<OutputOption> options;
-    private final Pool<FileEntry, IOException> pool;
+    private volatile TempFilePool pool;
 
     public static OutputSocket<FileEntry> get(FileEntry file) {
-        return new FileOutputSocket(file, BitField.noneOf(OutputOption.class), null);
+        return new FileOutputSocket(file, NO_OUTPUT_OPTIONS, null);
     }
 
     public static OutputSocket<FileEntry> get(
@@ -66,10 +69,13 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
         this.file = file;
         this.template = template;
         this.options = options;
-        final File fileTarget = file.getFile();
-        this.pool = new TempFilePool(   fileTarget.getName(),
-                                        null,
-                                        fileTarget.getParentFile());
+    }
+
+    private TempFilePool getTempFilePool() {
+        if (null == pool)
+            pool = new TempFilePool(    TEMP_FILE_POOL_PREFIX, null,
+                                        file.getFile().getParentFile());
+        return pool;
     }
 
     @Override
@@ -84,7 +90,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(CREATE_PARENTS))
             fileTarget.getParentFile().mkdirs();
         final FileEntry temp = options.get(CACHE) && !fileTarget.createNewFile()
-                ? pool.allocate()
+                ? getTempFilePool().allocate()
                 : file;
         final File tempTarget = temp.getFile();
 
@@ -103,33 +109,35 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     super.close();
                 } finally {
-                    if (temp != file
-                    && !tempTarget.renameTo(fileTarget)
-                    && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget))) {
-                        IOException cause = null;
-                        try {
-                            IOSocket.copy(  FileInputSocket.get(temp),
-                                            FileOutputSocket.get(file));
-                        } catch (IOException ex) {
-                            throw cause = ex;
-                        } finally {
+                    try {
+                        if (temp != file) {
+                            IOException cause = null;
                             try {
-                                pool.release(temp);
+                                if (!tempTarget.renameTo(fileTarget)
+                                        && (!fileTarget.delete() || !tempTarget.renameTo(fileTarget)))
+                                    IOSocket.copy(  FileInputSocket.get(temp),
+                                                    FileOutputSocket.get(file));
                             } catch (IOException ex) {
-                                throw (IOException) ex.initCause(cause);
+                                throw cause = ex;
+                            } finally {
+                                try {
+                                    getTempFilePool().release(temp);
+                                } catch (IOException ex) {
+                                    throw (IOException) ex.initCause(cause);
+                                }
                             }
                         }
-                    }
-                    if (null != template) {
-                        // TODO: Use getPeerTarget() instead of template!
-                        final long time = template.getTime(WRITE);
-                        if (UNKNOWN != time)
-                            if (!fileTarget.setLastModified(time))
+                    } finally {
+                        if (null != template) {
+                            final long time = template.getTime(WRITE);
+                            if (UNKNOWN != time
+                                    && !fileTarget.setLastModified(time))
                                 throw new IOException(fileTarget.getPath() + " (cannot preserve last modification time)");
+                        }
                     }
                 }
             }
-        }
+        } // class OutputStream
 
         try {
             if (temp != file && options.get(APPEND))
@@ -139,7 +147,7 @@ public final class FileOutputSocket extends OutputSocket<FileEntry> {
         } catch (IOException cause) {
             if (temp != file) {
                 try {
-                    pool.release(temp);
+                    getTempFilePool().release(temp);
                 } catch (IOException ex) {
                     throw (IOException) ex.initCause(cause);
                 }

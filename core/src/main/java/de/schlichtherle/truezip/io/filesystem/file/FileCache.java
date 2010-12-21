@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.filesystem.file;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
@@ -139,7 +140,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
         Pool<FileCache<LT>.Buffer, IOException> newOutputStrategy(
                 FileCache<LT> cache);
     }
-    private final Pool<FileEntry, IOException> pool = TempFilePool.get();
+
     private final InputSocketProxy inputProxy;
     private final OutputSocketProxy outputProxy;
     private final Strategy factory;
@@ -214,10 +215,10 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                             = inputProxy.getBoundSocket();
                     assert null == input.getPeerTarget();
                     class ProxyOutput extends OutputSocket<Entry> {
-                        FileEntry temp;
+                        TempFileEntry temp;
 
-                        FileEntry getTemp() throws IOException {
-                            return null != temp ? temp : (temp = pool.allocate());
+                        TempFileEntry getTemp() throws IOException {
+                            return null != temp ? temp : (temp = TempFilePool.get().allocate());
                         }
 
                         @Override
@@ -244,7 +245,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
             synchronized (FileCache.this) {
                 buffer.used--;
                 if (buffer != FileCache.this.buffer && 0 == buffer.used)
-                    pool.release(buffer.file);
+                    buffer.file.release();
             }
         }
     } // class InputStrategy
@@ -252,7 +253,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     abstract class OutputStrategy implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            return new Buffer(pool.allocate());
+            return new Buffer(TempFilePool.get().allocate());
         }
 
         @Override
@@ -273,7 +274,7 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
                 }
                 IOSocket.copy(new ProxyInput(), output);
             } catch (IOException ex) {
-                pool.release(buffer.file);
+                buffer.file.release();
                 throw ex;
             }
         }
@@ -319,11 +320,11 @@ public final class FileCache<LT extends Entry> implements IOCache<LT> {
     } // class WriteThroughOutputStrategy
 
     final class Buffer {
-        final FileEntry file;
+        final TempFileEntry file;
         int used;
         volatile boolean dirty;
 
-        Buffer(final FileEntry file) {
+        Buffer(final TempFileEntry file) {
             this.file = file;
         }
 

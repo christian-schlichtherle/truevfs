@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
@@ -26,7 +27,6 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputShop;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.file.FileEntry;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.ChainableIOException;
 import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
@@ -139,7 +139,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final FileEntry temp = TempFilePool.get().allocate();
+                    final TempFileEntry temp = TempFilePool.get().allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);
@@ -148,7 +148,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                     } finally {
                         if (null != cause) {
                             try {
-                                TempFilePool.get().release(temp);
+                                temp.release();
                             } catch (IOException ex) {
                                 throw (IOException) ex.initCause(cause);
                             }
@@ -202,7 +202,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      */
     private class TempEntryOutputStream
     extends DecoratingOutputStream {
-        private final FileEntry temp;
+        private final TempFileEntry temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
         private final Entry peer;
@@ -211,7 +211,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(  @NonNull final OutputSocket<? extends AE> output,
-                                @NonNull final FileEntry temp)
+                                @NonNull final TempFileEntry temp)
         throws IOException {
             super(FileOutputSocket.get(temp).newOutputStream());
             this.output = output;
@@ -274,7 +274,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                     IOSocket.copy(input, output);
             } finally {
                 try {
-                    TempFilePool.get().release(temp);
+                    temp.release();
                 } catch (IOException ex) {
                     throw (IOException) ex.initCause(cause);
                 }

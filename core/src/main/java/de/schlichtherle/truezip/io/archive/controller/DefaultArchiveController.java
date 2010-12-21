@@ -49,6 +49,7 @@ import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -156,13 +157,13 @@ extends FileSystemArchiveController<E> {
         @Override
         public void beforeTouch(ArchiveFileSystemEvent<?> event)
         throws IOException {
-            assert null == event || event.getSource() == getFileSystem();
-            makeOutput(MAKE_OUTPUT_OPTIONS);
+            assert event.getSource() == getFileSystem();
+            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
         }
 
         @Override
         public void afterTouch(ArchiveFileSystemEvent<?> event) {
-            assert null == event || event.getSource() == getFileSystem();
+            assert event.getSource() == getFileSystem();
             getModel().setTouched(true);
         }
     }
@@ -242,11 +243,13 @@ extends FileSystemArchiveController<E> {
                 throw new FalsePositiveException(getModel(), ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
+            final ArchiveFileSystem<E> fileSystem = newArchiveFileSystem(driver);
+            final ArchiveFileSystemEntry<E> root = fileSystem.getEntry(ROOT_ENTRY_NAME);
             // This may fail if e.g. the container file is an RAES
             // encrypted ZIP file and the user cancels password
             // prompting.
             try {
-                makeOutput(options);
+                makeOutput(options, root);
             } catch (FileSystemException ex2) {
                 throw ex2;
             } catch (TabuFileException ex2) {
@@ -254,22 +257,24 @@ extends FileSystemArchiveController<E> {
             } catch (IOException ex2) {
                 throw new FalsePositiveException(getModel(), ex2);
             }
-            touchListener.beforeTouch(null);
-            setFileSystem(newArchiveFileSystem(driver));
-            touchListener.afterTouch(null);
+            setFileSystem(fileSystem);
+            final ArchiveFileSystemEvent<E> event
+                    = new ArchiveFileSystemEvent<E>(getFileSystem());
+            touchListener.beforeTouch(event);
+            touchListener.afterTouch(event);
         }
         getFileSystem().addArchiveFileSystemTouchListener(touchListener);
     }
 
-    private void makeOutput(final BitField<OutputOption> options)
+    private void makeOutput(    @NonNull final BitField<OutputOption> options,
+                                ArchiveFileSystemEntry<E> root)
     throws IOException {
         if (null != output)
             return;
-        final FileSystemController<?> parent = getParent();
         final FileSystemEntryName parentName = getModel()
                 .resolveParent(ROOT_ENTRY_NAME);
-        final OutputSocket<?> socket = parent.getOutputSocket(
-                parentName, options.set(OutputOption.CACHE), null);
+        final OutputSocket<?> socket = getParent().getOutputSocket(
+                parentName, options.set(OutputOption.CACHE), /*root*/ null);
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null == input ? null : input.getDelegate()));
     }
@@ -283,7 +288,8 @@ extends FileSystemArchiveController<E> {
     @Override
     OutputSocket<?> getOutputSocket(final E entry)
     throws IOException {
-        makeOutput(MAKE_OUTPUT_OPTIONS);
+        if (null == output)
+            makeOutput(MAKE_OUTPUT_OPTIONS, getFileSystem().getEntry(ROOT));
         return output.getOutputSocket(entry);
     }
 
@@ -296,11 +302,12 @@ extends FileSystemArchiveController<E> {
                 || null == (entry = fileSystem.getEntry(name)))
             return false;
         String n = null;
-        if (null != output && null != output.getEntry(
-                n = entry.getEntry().getName()))
-            return sync();
-        if (null != input && null != input.getEntry(
-                null != n ? n : (n = entry.getEntry().getName())))
+        if (null != output
+                && null != output.getEntry(n = entry.getEntry().getName()))
+            //if (READ == intention || !output.canAppend(entry.getEntry()))
+                return sync();
+        if (null != input
+                && null != input.getEntry(null != n ? n : (n = entry.getEntry().getName())))
             return false;
         if (READ == intention)
             return sync();
@@ -429,13 +436,13 @@ extends FileSystemArchiveController<E> {
             IOException last;
 
             @Override
-			public X fail(final IOException cause) {
+            public X fail(final IOException cause) {
                 last = cause;
                 return handler.fail(new SyncException(getModel(), cause));
             }
 
             @Override
-			public void warn(final IOException cause) throws X {
+            public void warn(final IOException cause) throws X {
                 assert null != cause;
                 final IOException old = last;
                 last = cause;
@@ -446,9 +453,7 @@ extends FileSystemArchiveController<E> {
         } // class FilterExceptionHandler
 
         copy(   getFileSystem(),
-                null == input
-                    ? new DummyInputService<E>()
-                    : input.getDelegate(),
+                null != input ? input.getDelegate() : new DummyInputService<E>(),
                 output.getDelegate(),
                 (ExceptionHandler<IOException, X>) new FilterExceptionHandler());
     }
@@ -460,27 +465,27 @@ extends FileSystemArchiveController<E> {
                 final ExceptionHandler<IOException, X> handler)
     throws X {
         for (final ArchiveFileSystemEntry<E> fse : fileSystem) {
-            final E ae = fse.getEntry();
-            final String n = ae.getName();
+            final E e = fse.getEntry();
+            final String n = e.getName();
             if (null != output.getEntry(n))
                 continue; // we have already written this entry
             try {
                 if (DIRECTORY == fse.getType()) {
                     if (isRoot(fse.getName()))
-                        continue; // never write the (virtual) root directory
+                        continue; // never write the root directory
                     if (UNKNOWN == fse.getTime(Access.WRITE))
                         continue; // never write ghost directories
-                    output.getOutputSocket(ae).newOutputStream().close();
+                    output.getOutputSocket(e).newOutputStream().close();
                 } else if (null != input.getEntry(n)) {
                     IOSocket.copy(  input.getInputSocket(n),
-                                    output.getOutputSocket(ae));
+                                    output.getOutputSocket(e));
                 } else {
                     // The file system entry is a newly created non-directory
                     // entry which hasn't received any content yet.
                     // Write an empty file system entry now as a marker in
                     // order to recreate the file system entry when the file
                     // system gets remounted from the container archive file.
-                    output.getOutputSocket(ae).newOutputStream().close();
+                    output.getOutputSocket(e).newOutputStream().close();
                 }
             } catch (IOException ex) {
                 handler.warn(ex);
@@ -500,31 +505,24 @@ extends FileSystemArchiveController<E> {
     throws X {
         setFileSystem(null);
 
-        // The output archive must be closed BEFORE the input archive is
-        // closed. This is because the input archive has been presented to the
-        // output archive as the "source" when it was created and may be using
-        // the input archive when its closing to retrieve some meta data
-        // information.
-        // E.g. for ZIP archive files, the OutputShop copies the postamble
-        // from the InputShop when it closes.
         try {
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException ex) {
-                    throw handler.fail(new SyncException(getModel(), ex));
-                } finally {
-                    output = null;
-                }
-            }
-        } finally {
+            final Input input = this.input;
+            this.input = null;
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException ex) {
                     handler.warn(new SyncWarningException(getModel(), ex));
-                } finally {
-                    input = null;
+                }
+            }
+        } finally {
+            final Output output = this.output;
+            this.output = null;
+            if (output != null) {
+                try {
+                    output.close();
+                } catch (IOException ex) {
+                    throw handler.fail(new SyncException(getModel(), ex));
                 }
             }
         }
