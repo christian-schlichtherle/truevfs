@@ -216,8 +216,6 @@ extends DecoratingFileSystemController<M, C> {
         final BitField<InputOption> inputOptions;
         final BitField<OutputOption> outputOptions;
         final Cache<Entry> cache;
-        final InputSocket <Entry> input;
-        final OutputSocket<Entry> output;
 
         EntryCache( final FileSystemEntryName name,
                     final BitField<InputOption > inputOptions,
@@ -229,18 +227,16 @@ extends DecoratingFileSystemController<M, C> {
                     .configure(new RegisteringInputSocket(
                         delegate.getInputSocket(name, this.inputOptions)))
                     .configure(delegate.getOutputSocket(name, this.outputOptions, null));
-            this.input = cache.getInputSocket();
-            this.output = new RegisteringOutputSocket(cache.getOutputSocket());
         }
 
         @Override
         public InputSocket<Entry> getInputSocket() {
-            return input;
+            return cache.getInputSocket();
         }
 
         @Override
         public OutputSocket<Entry> getOutputSocket() {
-            return output;
+            return new RegisteringOutputSocket(cache.getOutputSocket());
         }
 
         @Override
