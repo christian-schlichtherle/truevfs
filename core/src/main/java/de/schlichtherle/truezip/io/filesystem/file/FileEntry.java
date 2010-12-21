@@ -15,6 +15,15 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.socket.IOEntry;
+import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.socket.InputSocket;
+import de.schlichtherle.truezip.io.socket.OutputSocket;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
@@ -33,7 +42,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class FileEntry extends FileSystemEntry {
+public class FileEntry extends FileSystemEntry implements IOEntry<FileEntry> {
 
     private final File file;
     private final EntryName name;
@@ -96,4 +105,59 @@ public class FileEntry extends FileSystemEntry {
             set.add(member);
         return Collections.unmodifiableSet(set);
     }
+
+    @Override
+    public InputSocket<FileEntry> getInputSocket() {
+        return new Input();
+    }
+
+    private class Input extends InputSocket<FileEntry> {
+        @Override
+        public FileEntry getLocalTarget() {
+            return FileEntry.this;
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            return FileInputSocket.get(FileEntry.this).newReadOnlyFile();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return FileInputSocket.get(FileEntry.this).newInputStream();
+        }
+    } // class Input
+
+    @Override
+    public OutputSocket<FileEntry> getOutputSocket() {
+        return new Output(BitField.noneOf(OutputOption.class), null);
+    }
+
+    public OutputSocket<FileEntry> getOutputSocket(
+            BitField<OutputOption> options,
+            Entry template) {
+        return new Output(options, template);
+    }
+
+    private class Output extends OutputSocket<FileEntry> {
+        final BitField<OutputOption> options;
+        final Entry template;
+
+        Output( final BitField<OutputOption> options,
+                final Entry template) {
+            this.options = options;
+            this.template = template;
+        }
+
+        @Override
+        public FileEntry getLocalTarget() {
+            return FileEntry.this;
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            return FileOutputSocket.get(FileEntry.this, options, template)
+                    .newOutputStream();
+        }
+    } // class Output
 }

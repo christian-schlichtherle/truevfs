@@ -15,7 +15,7 @@
  */
 package de.schlichtherle.truezip.io.archive.output;
 
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
+import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
@@ -33,8 +33,6 @@ import de.schlichtherle.truezip.io.ChainableIOExceptionBuilder;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
-import de.schlichtherle.truezip.io.filesystem.file.FileInputSocket;
-import de.schlichtherle.truezip.io.filesystem.file.FileOutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -139,7 +137,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy()) {
-                    final TempFileEntry temp = TempFilePool.get().allocate();
+                    final IOPool.Entry<?> temp = TempFilePool.get().allocate();
                     IOException cause = null;
                     try {
                         return new TempEntryOutputStream(getBoundSocket(), temp);
@@ -202,7 +200,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      */
     private class TempEntryOutputStream
     extends DecoratingOutputStream {
-        private final TempFileEntry temp;
+        private final IOPool.Entry<?> temp;
         private final OutputSocket<? extends AE> output;
         private final AE local;
         private final Entry peer;
@@ -211,9 +209,9 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
         @SuppressWarnings("LeakingThisInConstructor")
         TempEntryOutputStream(  @NonNull final OutputSocket<? extends AE> output,
-                                @NonNull final TempFileEntry temp)
+                                @NonNull final IOPool.Entry<?> temp)
         throws IOException {
-            super(FileOutputSocket.get(temp).newOutputStream());
+            super(temp.getOutputSocket().newOutputStream());
             this.output = output;
             this.local = output.getLocalTarget();
             this.peer = output.getPeerTarget();
@@ -221,7 +219,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 private final Entry target = null != peer ? peer : temp;
 
                 ProxyInput() {
-                    super(FileInputSocket.get(temp));
+                    super(temp.getInputSocket());
                 }
 
                 @Override

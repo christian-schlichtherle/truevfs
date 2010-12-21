@@ -15,6 +15,8 @@
  */
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.socket.IOPool;
+import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
@@ -23,12 +25,10 @@ import de.schlichtherle.truezip.io.socket.OutputShop;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool.TempFileEntry;
 import de.schlichtherle.truezip.io.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.util.JointIterator;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,7 +61,7 @@ public class ZipOutputShop
 extends RawZipOutputStream<ZipEntry>
 implements OutputShop<ZipEntry> {
 
-    private TempFileEntry postamble;
+    private IOPool.Entry<?> postamble;
     private ZipEntry tempEntry;
 
     /**
@@ -99,7 +99,7 @@ implements OutputShop<ZipEntry> {
             if (0 < source.getPostambleLength()) {
                 postamble = TempFilePool.get().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
-                                new FileOutputStream(postamble.getFile()));
+                                postamble.getOutputSocket().newOutputStream());
             } else {
                 postamble = null;
             }
@@ -312,11 +312,12 @@ implements OutputShop<ZipEntry> {
     @Override
     public void close() throws IOException {
         try {
-            final TempFileEntry postamble = this.postamble;
+            final IOPool.Entry<?> postamble = this.postamble;
             if (null != postamble) {
                 this.postamble = null;
                 try {
-                    final InputStream in = new FileInputStream(postamble.getFile());
+                    final InputSocket<?> input = postamble.getInputSocket();
+                    final InputStream in = input.newInputStream();
                     try {
                     // Second, if the output ZIP compatible file differs in length from
                     // the input ZIP compatible file pad the output to the next four byte
@@ -324,7 +325,7 @@ implements OutputShop<ZipEntry> {
                     // This might be required for self extracting files on some platforms
                     // (e.g. Wintel).
                     final long ol = length();
-                    final long ipl = postamble.getFile().length();
+                    final long ipl = input.getLocalTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
 

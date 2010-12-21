@@ -16,21 +16,23 @@
 package de.schlichtherle.truezip.io.filesystem.file;
 
 import de.schlichtherle.truezip.io.Files;
-import de.schlichtherle.truezip.util.Pool;
+import de.schlichtherle.truezip.io.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 
 /**
- * This pool creates a temporary file on {@link #allocate()} and deletes it
- * on {@link #release(FileEntry)} or when the returned file entry gets
- * {@link Object#finalize()}d.
- * 
+ * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
+ * Besides a call to {@link #release}, the {@link Object#finalize()} method of
+ * a created {@link FileEntry} will delete the temporary file, too.
+ * However, for best performance you should not rely on this.
+ *
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class TempFilePool implements Pool<FileEntry, IOException> {
+public final class TempFilePool
+implements IOPool<FileEntry> {
 
     // Declared package private for unit testing purposes.
     static final String DEFAULT_PREFIX = "tzp-pool";
@@ -61,25 +63,22 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
     }
 
     @Override
-    public TempFileEntry allocate() throws IOException {
-        return new TempFileEntry(this,
-                Files.createTempFile(prefix, suffix, dir));
+    public Entry allocate() throws IOException {
+        return new Entry(this, Files.createTempFile(prefix, suffix, dir));
     }
 
     @Override
-    public void release(@NonNull final FileEntry entry) throws IOException {
-        if (!(entry instanceof TempFileEntry))
-            throw new IllegalArgumentException(entry.getFile() + " (not allocated by this temporary file pool)");
-        ((TempFileEntry) entry).release();
+    public void release(IOPool.Entry<FileEntry> resource) throws IOException {
+        resource.release();
     }
 
-    public static final class TempFileEntry
+    public static final class Entry
     extends FileEntry
-    implements Resource<IOException> {
+    implements IOPool.Entry<FileEntry> {
 
         TempFilePool pool;
 
-        TempFileEntry(TempFilePool pool, File file) {
+        Entry(TempFilePool pool, File file) {
             super(file);
             assert null != pool;
             this.pool = pool;
@@ -112,5 +111,5 @@ public final class TempFilePool implements Pool<FileEntry, IOException> {
                 super.finalize();
             }
         }
-    }
+    } // class Entry
 }
