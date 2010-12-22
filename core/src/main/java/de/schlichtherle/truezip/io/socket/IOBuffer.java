@@ -35,13 +35,13 @@ import net.jcip.annotations.ThreadSafe;
  *     underlying input socket and temporarily stored in the buffer.
  *     Subsequent or concurrent read operations will be served from the buffer
  *     without re-reading the contents from the underlying input socket again
- *     until the buffer gets {@link InputCache#clear cleared}.
+ *     until the buffer gets {@link #clear cleared}.
  * <li>At the discretion of the {@link Strategy}, contents written to the
  *     buffer may not be written to the underlying output socket until the
- *     buffer gets {@link OutputCache#flush flushed}.
+ *     buffer gets {@link #flush flushed}.
  * <li>After a write operation, the contents will be temporarily stored in the
  *     buffer for subsequent read operations until the buffer gets
- *     {@link OutputCache#clear cleared}.
+ *     {@link #clear cleared}.
  * <li>As a side effect, buffering decouples the underlying storage from its
  *     clients, allowing it to create, read, update or delete its contents
  *     while some clients are still busy on reading or writing the buffered
@@ -53,7 +53,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class IOBuffer<E extends Entry> implements IOCache<E> {
+public final class IOBuffer<E extends Entry> {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -137,17 +137,14 @@ public final class IOBuffer<E extends Entry> implements IOCache<E> {
         return this;
     }
 
-    @Override
     public InputSocket<E> getInputSocket() {
         return new InputSocketProxy(input);
     }
 
-    @Override
     public OutputSocket<E> getOutputSocket() {
         return new OutputSocketProxy(output);
     }
 
-    @Override
     public void flush() throws IOException {
         if (null == contents) // DCL is OK in this context!
             return;
@@ -158,7 +155,6 @@ public final class IOBuffer<E extends Entry> implements IOCache<E> {
         }
     }
 
-    @Override
     public void clear() throws IOException {
         synchronized (IOBuffer.this) {
             final Contents contents = this.contents;
