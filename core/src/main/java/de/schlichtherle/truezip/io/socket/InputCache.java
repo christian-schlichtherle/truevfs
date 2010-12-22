@@ -32,14 +32,14 @@ import java.io.IOException;
  *
  * @see     OutputCache
  * @see     IOCache
- * @param   <LT> The type of the <i>local target</i> for I/O operations.
+ * @param   <E> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface InputCache<LT extends Entry> {
+public interface InputCache<E extends Entry> {
 
     /** Returns an input socket for cached read operations. */
-    @NonNull InputSocket<LT> getInputSocket();
+    @NonNull InputSocket<E> getInputSocket();
 
     /**
      * Clears this cache and triggers re-reading the data from the local target

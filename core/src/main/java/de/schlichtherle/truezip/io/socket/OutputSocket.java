@@ -18,6 +18,7 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,20 +33,26 @@ import java.io.OutputStream;
  * In general, implementations do <em>not</em> need to be thread-safe:
  * Multithreading needs to be addressed by client classes.
  *
- * @param   <LT> the type of the {@link #getLocalTarget() local target}
+ * @param   <E> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
  * @see     InputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OutputSocket<LT extends Entry>
-extends IOSocket<LT, Entry> {
+public abstract class OutputSocket<E extends Entry>
+extends IOSocket<E, Entry> {
 
     @CheckForNull
     private InputSocket<?> peer;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The peer target is {@code null} if and only if this socket is not
+     * {@link #connect}ed to another socket.
+     */
     @Override
-    @CheckForNull
+    @Nullable
     public Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
@@ -63,7 +70,7 @@ extends IOSocket<LT, Entry> {
      * @see    #afterPeering
      */
     @NonNull
-    public final OutputSocket<LT> bind(@CheckForNull final OutputSocket<?> to)
+    public final OutputSocket<E> bind(@CheckForNull final OutputSocket<?> to)
     throws IOException {
         final InputSocket<?> newPeer = null == to ? null : to.peer;
         final InputSocket<?> oldPeer = peer;
@@ -86,7 +93,7 @@ extends IOSocket<LT, Entry> {
      * @see    #afterPeering
      */
     @NonNull
-    final OutputSocket<LT> connect(@CheckForNull final InputSocket<?> newPeer)
+    final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newPeer)
     throws IOException {
         final InputSocket<?> oldPeer = peer;
         if (!equal(oldPeer, newPeer)) {

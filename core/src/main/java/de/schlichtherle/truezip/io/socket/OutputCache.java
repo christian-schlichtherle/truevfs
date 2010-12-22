@@ -30,14 +30,14 @@ import java.io.IOException;
  *
  * @see     InputCache
  * @see     IOCache
- * @param   <LT> The type of the <i>local target</i> for I/O operations.
+ * @param   <E> The type of the <i>local target</i> for I/O operations.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public interface OutputCache<LT extends Entry> {
+public interface OutputCache<E extends Entry> {
 
     /** Returns an output socket for cached write operations. */
-    @NonNull OutputSocket<LT> getOutputSocket();
+    @NonNull OutputSocket<E> getOutputSocket();
 
     /**
      * Ensures that the last data written to this cache is written to the local

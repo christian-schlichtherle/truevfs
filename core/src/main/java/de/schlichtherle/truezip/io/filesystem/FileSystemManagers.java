@@ -78,7 +78,11 @@ public class FileSystemManagers {
                 manager = instance;
                 if (null == manager) {
                     // TODO: Check compatibility with OSGi.
-                    manager = ServiceLoader.load(FileSystemManager.class).iterator().next();
+                    manager = ServiceLoader
+                            .load(  FileSystemManager.class,
+                                    FileSystemManagers.class.getClassLoader())
+                            .iterator()
+                            .next();
                     setInstance(manager);
                 }
             }

@@ -44,7 +44,7 @@ public abstract class IOSocket<LT, PT> {
     }
 
     /**
-     * Returns the non-{@code null} <i>local target</i> for I/O operations.
+     * Returns the <i>local target</i> for I/O operations.
      * <p>
      * Note that this interface contract does <em>not</em> state any other
      * terms or conditions for the returned object.
@@ -59,17 +59,17 @@ public abstract class IOSocket<LT, PT> {
      * Sub-interfaces or implementations may add additional terms and
      * conditions in order to resolve these potential issues.
      *
-     * @return The non-{@code null} local target for I/O operations.
+     * @return The local target for I/O operations.
      */
     @NonNull
     public abstract LT getLocalTarget() throws IOException;
 
     /**
-     * Returns the nullable <i>peer target</i> for I/O operations.
+     * Returns the <i>peer target</i> for I/O operations.
      * <p>
      * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
-     * @return The nullable peer target for I/O operations.
+     * @return The peer target for I/O operations.
      */
     @CheckForNull
     public abstract PT getPeerTarget() throws IOException;
