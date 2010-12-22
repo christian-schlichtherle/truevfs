@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -80,27 +82,41 @@ public class IOBufferTest {
             front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
             IOSocket.copy(front.getInputSocket(), output);
             buffer.flush();
-            //buffer.clear();
+            buffer.clear();
             assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+
+            //assertThat(pool.entries.size(), is(0));
         }
     }
 
     private static final class MockIOPool implements IOPool<MockIOEntry> {
-        MockIOEntry entry;
+        final Set<IOPool.Entry<MockIOEntry>> entries
+                = new HashSet<IOPool.Entry<MockIOEntry>>();
 
         @Override
         public IOPool.Entry<MockIOEntry> allocate() throws IOException {
-            return entry = new MockIOEntry("");
+            final IOPool.Entry<MockIOEntry> entry = new MockIOEntry("") {
+                @Override
+                public void release() {
+                    super.release();
+                    if (!entries.remove(this))
+                        throw new IllegalArgumentException();
+                }
+            };
+            entries.add(entry);
+            return entry;
         }
 
         @Override
-        public void release(IOPool.Entry<MockIOEntry> resource) throws IOException {
-            resource.release();
+        public void release(IOPool.Entry<MockIOEntry> entry) throws IOException {
+            if (!entries.remove(entry))
+                throw new IllegalArgumentException();
+            entry.release();
         }
 
     } // class MockIOPool
 
-    private static final class MockIOEntry implements IOPool.Entry<MockIOEntry> {
+    private static class MockIOEntry implements IOPool.Entry<MockIOEntry> {
         byte[] data;
         int reads, writes;
 
@@ -163,11 +179,13 @@ public class IOBufferTest {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
                 throw new UnsupportedOperationException();
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
                 reads++;
                 return new ByteArrayInputStream(data);
             }
@@ -181,6 +199,7 @@ public class IOBufferTest {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
                 writes++;
                 return new MockOutputStream();
             }
