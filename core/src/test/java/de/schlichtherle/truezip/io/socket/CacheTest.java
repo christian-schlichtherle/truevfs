@@ -1,14 +1,9 @@
-package de.schlichtherle.truezip.io.filesystem.file;
+package de.schlichtherle.truezip.io.socket;
 
-import de.schlichtherle.truezip.io.socket.IOEntry;
-import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
 public class CacheTest {
@@ -24,23 +20,27 @@ public class CacheTest {
     private static final String MOCK_ENTRY_DATA = "Hello World!";
 
     private MockIOPool pool = new MockIOPool();
-    private Cache<?> cache;
+    private DefaultCache<?> cache;
 
     @Before
     public final void setUp() throws IOException {
         MockIOEntry entry = new MockIOEntry();
-        cache = newCache(pool)
+        cache = newCache(MockIOEntry.class, pool)
                 .configure(entry.getInputSocket())
                 .configure(entry.getOutputSocket());
     }
 
-    protected <E extends IOEntry<E>> Cache<E> newCache(IOPool<E> pool) {
-        return Cache.Strategy.WRITE_THROUGH.newCache(pool);
+    protected <E extends IOEntry<E>> DefaultCache<E> newCache(Class<E> clazz, IOPool<?> pool) {
+        return DefaultCache.Strategy.WRITE_THROUGH.newCache(clazz, pool);
     }
 
     @After
     public final void tearDown() {
         cache = null;
+    }
+
+    @Test
+    public void test() {
     }
 
     static final class MockIOPool implements IOPool<MockIOEntry> {
