@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,7 +65,7 @@ public final class IOBuffer<E extends Entry> {
          */
         READ_ONLY {
             @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
-            newOutputContentsPool(IOBuffer<E> cache) {
+            newOutputContentsPool(IOBuffer<E> buffer) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -75,8 +76,8 @@ public final class IOBuffer<E extends Entry> {
          */
         WRITE_THROUGH {
             @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
-            newOutputContentsPool(IOBuffer<E> cache) {
-                return cache.new WriteThroughOutputContentsPool();
+            newOutputContentsPool(IOBuffer<E> buffer) {
+                return buffer.new WriteThroughOutputContentsPool();
             }
         },
 
@@ -86,24 +87,34 @@ public final class IOBuffer<E extends Entry> {
          */
         WRITE_BACK {
             @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
-            newOutputContentsPool(IOBuffer<E> cache) {
-                return cache.new WriteBackOutputContentsPool();
+            newOutputContentsPool(IOBuffer<E> buffer) {
+                return buffer.new WriteBackOutputContentsPool();
             }
         };
 
-        /** Returns a new input / output cache. */
+        /**
+         * Returns a new I/O buffer.
+         *
+         * @param  clazz the class indicating the type of entries for which this
+         *         I/O buffer is going to be used.
+         *         This is only required to infer the type parameter of the
+         *         returned object.
+         * @param  pool the pool of temporary entries to buffer the entry
+         *         contents.
+         * @return A new I/O buffer.
+         */
         @NonNull public <E extends Entry> IOBuffer<E>
-        newIOBuffer(Class<E> clazz, IOPool<?> pool) {
+        newIOBuffer(@Nullable Class<E> clazz, @NonNull IOPool<?> pool) {
             return new IOBuffer<E>(this, pool);
         }
 
         @NonNull <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
-        newInputContentsPool(IOBuffer<E> cache) {
-            return cache.new InputContentsPool();
+        newInputContentsPool(IOBuffer<E> buffer) {
+            return buffer.new InputContentsPool();
         }
 
         @NonNull abstract <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
-        newOutputContentsPool(IOBuffer<E> cache);
+        newOutputContentsPool(IOBuffer<E> buffer);
     }
 
     private final Strategy strategy;
@@ -114,13 +125,15 @@ public final class IOBuffer<E extends Entry> {
     private volatile Pool<Contents, IOException> outputContentsPool;
     private volatile Contents contents;
 
-    private IOBuffer(@NonNull final Strategy strategy, @NonNull final IOPool<?> pool) {
+    private IOBuffer(   @NonNull final Strategy strategy,
+                        @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
         this.pool = pool;
     }
 
+    // FIXME: Consider calling clear()!
     @NonNull
     public IOBuffer<E> configure(@NonNull final InputSocket <? extends E> input) {
         if (null == input)
@@ -129,6 +142,7 @@ public final class IOBuffer<E extends Entry> {
         return this;
     }
 
+    // FIXME: Consider calling flush()!
     @NonNull
     public IOBuffer<E> configure(@NonNull final OutputSocket <? extends E> output) {
         if (null == output)
