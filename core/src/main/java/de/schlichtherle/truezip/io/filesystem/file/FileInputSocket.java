@@ -15,12 +15,10 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
-import de.schlichtherle.truezip.io.socket.IOBuffer;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
-import de.schlichtherle.truezip.io.filesystem.InputOption;
 import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,28 +28,11 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileInputSocket extends InputSocket<FileEntry> {
+final class FileInputSocket extends InputSocket<FileEntry> {
+
     private final FileEntry file;
 
-    private static final BitField<InputOption> NO_INPUT_OPTIONS
-            = BitField.noneOf(InputOption.class);
-
-    public static InputSocket<FileEntry> get(FileEntry file) {
-        return get(file, NO_INPUT_OPTIONS);
-    }
-
-    public static InputSocket<FileEntry> get(   FileEntry file,
-                                                BitField<InputOption> options) {
-        InputSocket<FileEntry> input = new FileInputSocket(file);
-        if (options.get(InputOption.BUFFER))
-            input = IOBuffer.Strategy.READ_ONLY
-                    .newIOBuffer(FileEntry.class, TempFilePool.get())
-                    .configure(input)
-                    .getInputSocket();
-        return input;
-    }
-
-    private FileInputSocket(final FileEntry file) {
+    FileInputSocket(@NonNull final FileEntry file) {
         if (null == file)
             throw new NullPointerException();
         this.file = file;

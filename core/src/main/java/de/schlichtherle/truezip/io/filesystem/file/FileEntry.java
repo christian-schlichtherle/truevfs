@@ -18,16 +18,15 @@ package de.schlichtherle.truezip.io.filesystem.file;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.socket.IOEntry;
-import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.entry.EntryName;
 import de.schlichtherle.truezip.io.filesystem.FileSystemEntry;
-import de.schlichtherle.truezip.io.filesystem.Path;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
 import java.io.File;
 import java.util.HashSet;
@@ -44,12 +43,15 @@ import static de.schlichtherle.truezip.io.entry.Entry.Access.*;
  */
 public class FileEntry extends FileSystemEntry implements IOEntry<FileEntry> {
 
+    private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
+            = BitField.noneOf(OutputOption.class);
+
     private final File file;
     private final EntryName name;
 
     FileEntry(final File file) {
         this.file = file;
-        this.name = Path.create(file.toURI()).getEntryName();
+        this.name = EntryName.create(file.getName()); // Path.create(file.toURI()).getEntryName();
     }
 
     FileEntry(final File file, final EntryName name) {
@@ -107,36 +109,19 @@ public class FileEntry extends FileSystemEntry implements IOEntry<FileEntry> {
     }
 
     @Override
-    public InputSocket<FileEntry> getInputSocket() {
-        return new Input();
+    public final InputSocket<FileEntry> getInputSocket() {
+        return new FileInputSocket(this);
     }
-
-    private class Input extends InputSocket<FileEntry> {
-        @Override
-        public FileEntry getLocalTarget() {
-            return FileEntry.this;
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return FileInputSocket.get(FileEntry.this).newReadOnlyFile();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            return FileInputSocket.get(FileEntry.this).newInputStream();
-        }
-    } // class Input
 
     @Override
-    public OutputSocket<FileEntry> getOutputSocket() {
-        return new Output(BitField.noneOf(OutputOption.class), null);
+    public final OutputSocket<FileEntry> getOutputSocket() {
+        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
     }
 
-    public OutputSocket<FileEntry> getOutputSocket(
-            BitField<OutputOption> options,
-            Entry template) {
-        return new Output(options, template);
+    public final OutputSocket<FileEntry> getOutputSocket(
+            @NonNull BitField<OutputOption> options,
+            @Nullable Entry template) {
+        return new FileOutputSocket(this, options, template);
     }
 
     private class Output extends OutputSocket<FileEntry> {
@@ -156,7 +141,7 @@ public class FileEntry extends FileSystemEntry implements IOEntry<FileEntry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            return FileOutputSocket.get(FileEntry.this, options, template)
+            return new FileOutputSocket(FileEntry.this, options, template)
                     .newOutputStream();
         }
     } // class Output
