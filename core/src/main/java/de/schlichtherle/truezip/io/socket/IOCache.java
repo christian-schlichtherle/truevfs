@@ -18,6 +18,22 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.entry.Entry;
 
 /**
+ * Implements a caching strategy for input and output sockets.
+ * Using this interface has the following effects:
+ * <ul>
+ * <li>Upon the first read operation, the data will be read from the local
+ *     target and temporarily stored in this cache.
+ *     Subsequent or concurrent read operations will be served from this cache
+ *     without re-reading the data from the local target again until the cache
+ *     gets {@link InputCache#clear cleared}.</li>
+ * <li>At the discretion of the implementation, data written to the cache may
+ *     not be written to the local target until the cache gets
+ *     {@link OutputCache#flush flushed}.</li>
+ * <li>After a write operation, the data will be temporarily stored in the
+ *     cache for subsequent read operations until this cache gets
+ *     {@link OutputCache#clear cleared}.
+ * </ul>
+ *
  * @author  Christian Schlichtherle
  * @version $Id$
  */

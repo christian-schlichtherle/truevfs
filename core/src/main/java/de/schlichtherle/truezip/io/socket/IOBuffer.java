@@ -28,28 +28,32 @@ import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Implements a caching strategy for input and output sockets.
+ * Implements a buffering strategy for input and output sockets.
  * Using this interface has the following effects:
  * <ul>
- * <li>Upon the first read operation, the data will be read from the local
- *     target and temporarily stored in this cache.
- *     Subsequent or concurrent read operations will be served from this cache
- *     without re-reading the data from the local target again until the cache
- *     gets {@link InputCache#clear cleared}.</li>
- * <li>At the discretion of the implementation, data written to the cache may
- *     not be written to the local target until the cache gets
- *     {@link OutputCache#flush flushed}.</li>
- * <li>After a write operation, the data will be temporarily stored in the
- *     cache for subsequent read operations until this cache gets
+ * <li>Upon the first read operation, the contents will be read from the
+ *     underlying input socket and temporarily stored in the buffer.
+ *     Subsequent or concurrent read operations will be served from the buffer
+ *     without re-reading the contents from the underlying input socket again
+ *     until the buffer gets {@link InputCache#clear cleared}.
+ * <li>At the discretion of the {@link Strategy}, contents written to the
+ *     buffer may not be written to the underlying output socket until the
+ *     buffer gets {@link OutputCache#flush flushed}.
+ * <li>After a write operation, the contents will be temporarily stored in the
+ *     buffer for subsequent read operations until the buffer gets
  *     {@link OutputCache#clear cleared}.
+ * <li>As a side effect, buffering decouples the underlying storage from its
+ *     clients, allowing it to create, read, update or delete its contents
+ *     while some clients are still busy on reading or writing the buffered
+ *     contents.
  * </ul>
  *
- * @param   <E> The type of the cached entries.
+ * @param   <E> The type of the buffered entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class DefaultCache<E extends Entry> implements IOCache<E> {
+public final class IOBuffer<E extends Entry> implements IOCache<E> {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -59,8 +63,8 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
-            newOutputBufferPool(DefaultCache<E> cache) {
+            @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
+            newOutputContentsPool(IOBuffer<E> cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -70,9 +74,9 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
-            newOutputBufferPool(DefaultCache<E> cache) {
-                return cache.new WriteThroughOutputBufferPool();
+            @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
+            newOutputContentsPool(IOBuffer<E> cache) {
+                return cache.new WriteThroughOutputContentsPool();
             }
         },
 
@@ -81,36 +85,36 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
-            newOutputBufferPool(DefaultCache<E> cache) {
-                return cache.new WriteBackOutputBufferPool();
+            @Override <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
+            newOutputContentsPool(IOBuffer<E> cache) {
+                return cache.new WriteBackOutputContentsPool();
             }
         };
 
         /** Returns a new input / output cache. */
-        @NonNull public <E extends Entry> DefaultCache<E>
-        newCache(Class<E> clazz, IOPool<?> pool) {
-            return new DefaultCache<E>(this, pool);
+        @NonNull public <E extends Entry> IOBuffer<E>
+        newIOBuffer(Class<E> clazz, IOPool<?> pool) {
+            return new IOBuffer<E>(this, pool);
         }
 
-        @NonNull <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
-        newInputBufferPool(DefaultCache<E> cache) {
-            return cache.new InputBufferPool();
+        @NonNull <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
+        newInputContentsPool(IOBuffer<E> cache) {
+            return cache.new InputContentsPool();
         }
 
-        @NonNull abstract <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
-        newOutputBufferPool(DefaultCache<E> cache);
+        @NonNull abstract <E extends Entry> Pool<IOBuffer<E>.Contents, IOException>
+        newOutputContentsPool(IOBuffer<E> cache);
     }
 
     private final Strategy strategy;
     private final IOPool<?> pool;
     private volatile InputSocket<? extends E> input;
     private volatile OutputSocket<? extends E> output;
-    private volatile Pool<Buffer, IOException> inputBufferPool;
-    private volatile Pool<Buffer, IOException> outputBufferPool;
-    private volatile Buffer buffer;
+    private volatile Pool<Contents, IOException> inputContentsPool;
+    private volatile Pool<Contents, IOException> outputContentsPool;
+    private volatile Contents contents;
 
-    private DefaultCache(@NonNull final Strategy strategy, @NonNull final IOPool<?> pool) {
+    private IOBuffer(@NonNull final Strategy strategy, @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
@@ -118,7 +122,7 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
     }
 
     @NonNull
-    public DefaultCache<E> configure(@NonNull final InputSocket <? extends E> input) {
+    public IOBuffer<E> configure(@NonNull final InputSocket <? extends E> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -126,7 +130,7 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
     }
 
     @NonNull
-    public DefaultCache<E> configure(@NonNull final OutputSocket <? extends E> output) {
+    public IOBuffer<E> configure(@NonNull final OutputSocket <? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -145,37 +149,37 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
 
     @Override
     public void flush() throws IOException {
-        if (null == buffer) // DCL is OK in this context!
+        if (null == contents) // DCL is OK in this context!
             return;
-        synchronized (DefaultCache.this) {
-            final Buffer buffer = this.buffer;
-            if (null != buffer)
-                getOutputBufferPool().release(buffer);
+        synchronized (IOBuffer.this) {
+            final Contents contents = this.contents;
+            if (null != contents)
+                getOutputContentsPool().release(contents);
         }
     }
 
     @Override
     public void clear() throws IOException {
-        synchronized (DefaultCache.this) {
-            final Buffer buffer = this.buffer;
-            this.buffer = null;
-            if (null != buffer && 0 == buffer.reading && !buffer.dirty)
-                buffer.release();
+        synchronized (IOBuffer.this) {
+            final Contents contents = this.contents;
+            this.contents = null;
+            if (null != contents && 0 == contents.reading && !contents.dirty)
+                contents.release();
         }
     }
 
-    private Pool<Buffer, IOException> getInputBufferPool() {
-        return null != inputBufferPool
-                ? inputBufferPool
-                : (inputBufferPool = strategy.newInputBufferPool(this));
+    private Pool<Contents, IOException> getInputContentsPool() {
+        return null != inputContentsPool
+                ? inputContentsPool
+                : (inputContentsPool = strategy.newInputContentsPool(this));
     }
 
-    private final class InputBufferPool implements Pool<Buffer, IOException> {
+    private final class InputContentsPool implements Pool<Contents, IOException> {
         @Override
-        public Buffer allocate() throws IOException {
-            synchronized (DefaultCache.this) {
-                Buffer buffer = DefaultCache.this.buffer;
-                if (null == buffer) {
+        public Contents allocate() throws IOException {
+            synchronized (IOBuffer.this) {
+                Contents contents = IOBuffer.this.contents;
+                if (null == contents) {
                     assert null == input.getPeerTarget();
                     class ProxyOutput extends OutputSocket<IOPool.Entry<?>> {
                         IOPool.Entry<?> temp;
@@ -192,105 +196,105 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    DefaultCache.this.buffer = buffer = new Buffer(output.getLocalTarget());
+                    IOBuffer.this.contents = contents = new Contents(output.getLocalTarget());
                 }
-                buffer.reading++;
-                return buffer;
+                contents.reading++;
+                return contents;
             }
         }
 
         @Override
-        public void release(final Buffer buffer) throws IOException {
-            synchronized (DefaultCache.this) {
-                if (0 == --buffer.reading && buffer != DefaultCache.this.buffer && !buffer.dirty)
-                    buffer.release();
+        public void release(final Contents contents) throws IOException {
+            synchronized (IOBuffer.this) {
+                if (0 == --contents.reading && contents != IOBuffer.this.contents && !contents.dirty)
+                    contents.release();
             }
         }
-    } // class InputBufferPool
+    } // class InputContentsPool
 
-    private Pool<Buffer, IOException> getOutputBufferPool() {
-        return null != outputBufferPool
-                ? outputBufferPool
-                : (outputBufferPool = strategy.newOutputBufferPool(this));
+    private Pool<Contents, IOException> getOutputContentsPool() {
+        return null != outputContentsPool
+                ? outputContentsPool
+                : (outputContentsPool = strategy.newOutputContentsPool(this));
     }
 
-    private abstract class OutputBufferPool implements Pool<Buffer, IOException> {
+    private abstract class OutputContentsPool implements Pool<Contents, IOException> {
         @Override
-        public Buffer allocate() throws IOException {
-            final Buffer buffer = new Buffer(pool.allocate());
-            buffer.dirty = true;
-            return buffer;
+        public Contents allocate() throws IOException {
+            final Contents contents = new Contents(pool.allocate());
+            contents.dirty = true;
+            return contents;
         }
 
         @Override
-        public void release(final Buffer buffer) throws IOException {
+        public void release(final Contents contents) throws IOException {
             try {
                 assert null == output.getPeerTarget();
                 class ProxyInput extends InputSocket<IOPool.Entry<?>> {
                     @Override
                     public IOPool.Entry<?> getLocalTarget() throws IOException {
-                        return buffer.file;
+                        return contents.file;
                     }
 
                     @Override
                     public ReadOnlyFile newReadOnlyFile() throws IOException {
-                        return buffer.file.getInputSocket().newReadOnlyFile();
+                        return contents.file.getInputSocket().newReadOnlyFile();
                     }
 
                     @Override
                     public InputStream newInputStream() throws IOException {
-                        return buffer.file.getInputSocket().newInputStream();
+                        return contents.file.getInputSocket().newInputStream();
                     }
                 }
                 IOSocket.copy(new ProxyInput(), output);
             } catch (IOException ex) {
-                buffer.file.release();
+                contents.file.release();
                 throw ex;
             }
         }
-    } // class OutputBufferPool
+    } // class OutputContentsPool
 
-    private final class WriteBackOutputBufferPool extends OutputBufferPool {
+    private final class WriteBackOutputContentsPool extends OutputContentsPool {
         @Override
-        public void release(final Buffer buffer) throws IOException {
-            if (!buffer.dirty) // DCL is OK in this context!
+        public void release(final Contents contents) throws IOException {
+            if (!contents.dirty) // DCL is OK in this context!
                 return;
-            synchronized (DefaultCache.this) {
-                if (!buffer.dirty)
+            synchronized (IOBuffer.this) {
+                if (!contents.dirty)
                     return;
-                if (DefaultCache.this.buffer != buffer) {
-                    DefaultCache.this.buffer = buffer;
+                if (IOBuffer.this.contents != contents) {
+                    IOBuffer.this.contents = contents;
                 } else {
-                    buffer.dirty = false;
-                    super.release(buffer);
+                    contents.dirty = false;
+                    super.release(contents);
                 }
             }
         }
-    } // class WriteBackOutputBufferPool
+    } // class WriteBackOutputContentsPool
 
-    private final class WriteThroughOutputBufferPool extends OutputBufferPool {
+    private final class WriteThroughOutputContentsPool extends OutputContentsPool {
         @Override
-        public void release(final Buffer buffer) throws IOException {
-            if (!buffer.dirty) // DCL is OK in this context!
+        public void release(final Contents contents) throws IOException {
+            if (!contents.dirty) // DCL is OK in this context!
                 return;
-            synchronized (DefaultCache.this) {
-                if (!buffer.dirty)
+            synchronized (IOBuffer.this) {
+                if (!contents.dirty)
                     return;
-                if (DefaultCache.this.buffer != buffer && null != DefaultCache.this.buffer && !DefaultCache.this.buffer.dirty && 0 == DefaultCache.this.buffer.reading)
-                    DefaultCache.this.buffer.release();
-                DefaultCache.this.buffer = buffer;
-                buffer.dirty = false;
-                super.release(buffer);
+                if (IOBuffer.this.contents != contents && null != IOBuffer.this.contents && !IOBuffer.this.contents.dirty && 0 == IOBuffer.this.contents.reading)
+                    IOBuffer.this.contents.release();
+                IOBuffer.this.contents = contents;
+                contents.dirty = false;
+                super.release(contents);
             }
         }
-    } // class WriteThroughOutputBufferPool
+    } // class WriteThroughOutputContentsPool
 
-    private final class Buffer {
+    private final class Contents {
         final IOPool.Entry<?> file;
         volatile boolean dirty;
         int reading;
 
-        Buffer(final IOPool.Entry<?> file) {
+        Contents(final IOPool.Entry<?> file) {
             this.file = file;
         }
 
@@ -298,10 +302,10 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
             file.release();
         }
 
-        final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
+        final class ContentsReadOnlyFile extends DecoratingReadOnlyFile {
             boolean closed;
 
-            BufferReadOnlyFile() throws IOException {
+            ContentsReadOnlyFile() throws IOException {
                 super(file.getInputSocket().newReadOnlyFile());
             }
 
@@ -313,15 +317,15 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 try {
                     delegate.close();
                 } finally {
-                    getInputBufferPool().release(Buffer.this);
+                    getInputContentsPool().release(Contents.this);
                 }
             }
-        } // class BufferReadOnlyFile
+        } // class ContentsReadOnlyFile
 
-        final class BufferInputStream extends DecoratingInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class ContentsInputStream extends DecoratingInputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
-            BufferInputStream() throws IOException {
+            ContentsInputStream() throws IOException {
                 super(file.getInputSocket().newInputStream());
             }
 
@@ -333,15 +337,15 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 try {
                     delegate.close();
                 } finally {
-                    getInputBufferPool().release(Buffer.this);
+                    getInputContentsPool().release(Contents.this);
                 }
             }
-        } // class BufferInputStream
+        } // class ContentsInputStream
 
-        final class BufferOutputStream extends DecoratingOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
+        final class ContentsOutputStream extends DecoratingOutputStream { // Do NOT extend FileIn|OutputStream: They implement finalize(), which may cause deadlocks!
             boolean closed;
 
-            BufferOutputStream() throws IOException {
+            ContentsOutputStream() throws IOException {
                 super(file.getOutputSocket().newOutputStream());
             }
 
@@ -353,11 +357,11 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 try {
                     delegate.close();
                 } finally {
-                    getOutputBufferPool().release(Buffer.this);
+                    getOutputContentsPool().release(Contents.this);
                 }
             }
-        } // class BufferOutputStream
-    } // class Buffer
+        } // class ContentsOutputStream
+    } // class Contents
 
     private final class InputSocketProxy extends DecoratingInputSocket<E> {
         InputSocketProxy(final InputSocket <? extends E> input) {
@@ -378,7 +382,7 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 flush();
                 return getBoundSocket().newReadOnlyFile();
             }
-            return getInputBufferPool().allocate().new BufferReadOnlyFile();
+            return getInputContentsPool().allocate().new ContentsReadOnlyFile();
         }
 
         @Override
@@ -388,7 +392,7 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 flush();
                 return getBoundSocket().newInputStream();
             }
-            return getInputBufferPool().allocate().new BufferInputStream();
+            return getInputContentsPool().allocate().new ContentsInputStream();
         }
     } // class InputSocketProxy
 
@@ -404,7 +408,7 @@ public final class DefaultCache<E extends Entry> implements IOCache<E> {
                 clear();
                 return getBoundSocket().newOutputStream();
             }
-            return getOutputBufferPool().allocate().new BufferOutputStream();
+            return getOutputContentsPool().allocate().new ContentsOutputStream();
         }
     } // class OutputSocketProxy
 }

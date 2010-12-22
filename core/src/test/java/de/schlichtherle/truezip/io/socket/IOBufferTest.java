@@ -14,13 +14,13 @@ import org.junit.Before;
 import org.junit.Test;
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 
-public class CacheTest {
+public class IOBufferTest {
 
     private static final String MOCK_ENTRY_NAME = "mock";
     private static final String MOCK_ENTRY_DATA = "Hello World!";
 
     private MockIOPool pool = new MockIOPool();
-    private DefaultCache<?> cache;
+    private IOBuffer<?> cache;
 
     @Before
     public final void setUp() throws IOException {
@@ -30,8 +30,8 @@ public class CacheTest {
                 .configure(entry.getOutputSocket());
     }
 
-    protected <E extends IOEntry<E>> DefaultCache<E> newCache(Class<E> clazz, IOPool<?> pool) {
-        return DefaultCache.Strategy.WRITE_THROUGH.newCache(clazz, pool);
+    protected <E extends IOEntry<E>> IOBuffer<E> newCache(Class<E> clazz, IOPool<?> pool) {
+        return IOBuffer.Strategy.WRITE_THROUGH.newIOBuffer(clazz, pool);
     }
 
     @After
