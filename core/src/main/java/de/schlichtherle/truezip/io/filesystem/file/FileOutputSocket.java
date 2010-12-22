@@ -22,6 +22,8 @@ import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.IOSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,33 +41,20 @@ import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileOutputSocket extends OutputSocket<FileEntry> {
+final class FileOutputSocket extends OutputSocket<FileEntry> {
 
-    private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
-            = BitField.noneOf(OutputOption.class);
     private static final String TEMP_FILE_POOL_PREFIX = ".tzp";
 
     private final FileEntry file;
-    private final Entry template;
     private final BitField<OutputOption> options;
+    private final Entry template;
     private volatile TempFilePool pool;
 
-    public static OutputSocket<FileEntry> get(FileEntry file) {
-        return new FileOutputSocket(file, NO_OUTPUT_OPTIONS, null);
-    }
-
-    public static OutputSocket<FileEntry> get(
-            FileEntry file,
-            BitField<OutputOption> options,
-            Entry template) {
-        return new FileOutputSocket(file, options, template);
-    }
-
-    private FileOutputSocket(   final FileEntry file,
-                                final BitField<OutputOption> options,
-                                final Entry template) {
-        if (null == file || null == options)
-            throw new NullPointerException();
+    FileOutputSocket(   @NonNull final FileEntry file,
+                        @NonNull final BitField<OutputOption> options,
+                        @Nullable final Entry template) {
+        assert null != file;
+        assert null != options;
         this.file = file;
         this.template = template;
         this.options = options;

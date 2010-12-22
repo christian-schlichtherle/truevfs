@@ -134,8 +134,7 @@ final class FileController extends FileSystemController<FileSystemModel>  {
     public InputSocket<?> getInputSocket(
             FileSystemEntryName name,
             BitField<InputOption> options) {
-        return FileInputSocket.get( new FileEntry(target, name),
-                                    options.clear(InputOption.BUFFER));
+        return new FileEntry(target, name).getInputSocket();
     }
 
     @Override
@@ -143,7 +142,7 @@ final class FileController extends FileSystemController<FileSystemModel>  {
             FileSystemEntryName name,
             BitField<OutputOption> options,
             Entry template) {
-        return FileOutputSocket.get(new FileEntry(target, name), options, template);
+        return new FileEntry(target, name).getOutputSocket(options, template);
     }
 
     @Override
