@@ -33,16 +33,19 @@ import java.io.IOException;
 public enum OutputOption {
 
     /**
+     * Whether or not the output socket contents shall get buffered in a
+     * temporary file for subsequent access.
+     * As a desired side effect, buffering allows a file system controller to
+     * {@link FileSystemController#sync} its contents to its underlying storage
+     * while some client is still busy on reading or writing the buffer.
+     */
+    BUFFER,
+
+    /**
      * Whether or not any missing parent directory entries shall get created
      * automatically.
      */
     CREATE_PARENTS,
-
-    /**
-     * Whether or not the output socket data shall get cached in a temporary
-     * file for future use.
-     */
-    CACHE,
 
     /**
      * Whether or not the new data shall get appended to the existing data

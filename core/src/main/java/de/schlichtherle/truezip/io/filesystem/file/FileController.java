@@ -135,7 +135,7 @@ final class FileController extends FileSystemController<FileSystemModel>  {
             FileSystemEntryName name,
             BitField<InputOption> options) {
         return FileInputSocket.get( new FileEntry(target, name),
-                                    options.clear(InputOption.CACHE));
+                                    options.clear(InputOption.BUFFER));
     }
 
     @Override
