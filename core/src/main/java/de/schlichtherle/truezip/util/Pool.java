@@ -53,7 +53,7 @@ public interface Pool<R, E extends Exception> {
      * This interface is designed to be used with Pools which enable their
      * resources to release itself.
      */
-    interface Resource<E extends Exception> {
+    interface Releasable<E extends Exception> {
 
         /**
          * Releases this resource to its pool.

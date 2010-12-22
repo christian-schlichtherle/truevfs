@@ -45,7 +45,7 @@ public class IOBufferTest {
         // FIXME: Add the test code!
     }
 
-    static final class MockIOPool implements IOPool<MockIOEntry> {
+    private static final class MockIOPool implements IOPool<MockIOEntry> {
         MockIOEntry entry;
 
         @Override
@@ -111,7 +111,7 @@ public class IOBufferTest {
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException();
             }
 
             @Override
