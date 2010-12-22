@@ -17,7 +17,7 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.BufferingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.concurrent.BufferingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;

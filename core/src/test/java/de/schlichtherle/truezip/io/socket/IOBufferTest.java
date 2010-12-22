@@ -20,12 +20,13 @@ public class IOBufferTest {
     private static final String MOCK_ENTRY_DATA = "Hello World!";
 
     private MockIOPool pool = new MockIOPool();
-    private IOBuffer<?> cache;
+    private MockIOEntry entry;
+    private IOBuffer<?> buffer;
 
     @Before
     public final void setUp() throws IOException {
-        MockIOEntry entry = new MockIOEntry();
-        cache = newCache(MockIOEntry.class, pool)
+        entry = new MockIOEntry();
+        buffer = newCache(MockIOEntry.class, pool)
                 .configure(entry.getInputSocket())
                 .configure(entry.getOutputSocket());
     }
@@ -36,11 +37,12 @@ public class IOBufferTest {
 
     @After
     public final void tearDown() {
-        cache = null;
+        buffer = null;
     }
 
     @Test
     public void test() {
+        // FIXME: Add the test code!
     }
 
     static final class MockIOPool implements IOPool<MockIOEntry> {

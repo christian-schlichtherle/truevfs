@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem;
+package de.schlichtherle.truezip.io.filesystem.concurrent;
 
-import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.entry.Entry;
+import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemController;
+import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
+import de.schlichtherle.truezip.io.filesystem.FileSystemException;
+import de.schlichtherle.truezip.io.filesystem.InputOption;
+import de.schlichtherle.truezip.io.filesystem.OutputOption;
+import de.schlichtherle.truezip.io.filesystem.SyncException;
+import de.schlichtherle.truezip.io.filesystem.SyncOption;
+import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
@@ -72,13 +80,14 @@ public final class BufferingFileSystemController<
 extends DecoratingFileSystemController<M, C> {
 
     private final IOPool<?> pool;
-    private final Map<FileSystemEntryName, EntryBuffer> buffers
-            = new HashMap<FileSystemEntryName, EntryBuffer>();
+    private final Map<FileSystemEntryName, Buffer> buffers
+            = new HashMap<FileSystemEntryName, Buffer>();
 
     /**
      * Constructs a new content caching file system controller.
      *
      * @param controller the decorated file system controller.
+     * @param pool the pool of temporary entries to buffer the contents.
      */
     public BufferingFileSystemController(   @NonNull final C controller,
                                             @NonNull final IOPool<?> pool) {
@@ -107,10 +116,10 @@ extends DecoratingFileSystemController<M, C> {
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final EntryBuffer buffer = buffers.get(name);
+            final Buffer buffer = buffers.get(name);
             if (null == buffer && !options.get(InputOption.BUFFER))
                 return super.getBoundSocket(); // dont buffer
-            return (null != buffer ? buffer : new EntryBuffer(name))
+            return (null != buffer ? buffer : new Buffer(name))
                     .configure(options).getInputSocket().bind(this);
         }
     } // class Input
@@ -141,7 +150,7 @@ extends DecoratingFileSystemController<M, C> {
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final EntryBuffer buffer = buffers.get(name);
+            final Buffer buffer = buffers.get(name);
             if (null == buffer) {
                 if (!options.get(OutputOption.BUFFER))
                     return super.getBoundSocket(); // dont buffer
@@ -162,7 +171,7 @@ extends DecoratingFileSystemController<M, C> {
             // Create marker entry and mind CREATE_PARENTS!
             delegate.mknod(name, FILE, options, template);
             getModel().setTouched(true);
-            return (null != buffer ? buffer : new EntryBuffer(name))
+            return (null != buffer ? buffer : new Buffer(name))
                     .configure(options, template).getOutputSocket().bind(this);
         }
     } // class Output
@@ -172,7 +181,7 @@ extends DecoratingFileSystemController<M, C> {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
-        final EntryBuffer buffer = buffers.remove(name);
+        final Buffer buffer = buffers.remove(name);
         if (null != buffer)
             buffer.clear();
     }
@@ -187,7 +196,7 @@ extends DecoratingFileSystemController<M, C> {
         if (0 < buffers.size()) {
             final boolean flush = !options.get(ABORT_CHANGES);
             final boolean clear = !flush || options.get(CLEAR_BUFFERS);
-            for (final EntryBuffer buffer : buffers.values()) {
+            for (final Buffer buffer : buffers.values()) {
                 try {
                     if (flush)
                         buffer.flush();
@@ -214,13 +223,13 @@ extends DecoratingFileSystemController<M, C> {
     private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(OutputOption.class);
 
-    private final class EntryBuffer {
+    private final class Buffer {
         final FileSystemEntryName name;
         final IOBuffer<Entry> buffer;
         volatile InputSocket<Entry> input;
         volatile OutputSocket<Entry> output;
 
-        EntryBuffer(@NonNull final FileSystemEntryName name) {
+        Buffer(@NonNull final FileSystemEntryName name) {
             this.name = name;
             this.buffer = WRITE_BACK.newIOBuffer(Entry.class, pool);
             configure(NO_INPUT_OPTIONS);
@@ -228,7 +237,7 @@ extends DecoratingFileSystemController<M, C> {
         }
 
         @NonNull
-        public EntryBuffer configure(@NonNull BitField<InputOption> options) {
+        public Buffer configure(@NonNull BitField<InputOption> options) {
             buffer.configure(new RegisteringInputSocket(delegate.getInputSocket(
                     name, options.clear(InputOption.BUFFER))));
             input = null;
@@ -236,8 +245,8 @@ extends DecoratingFileSystemController<M, C> {
         }
 
         @NonNull
-        public EntryBuffer configure(@NonNull BitField<OutputOption> options,
-                                    @Nullable Entry template) {
+        public Buffer configure(@NonNull BitField<OutputOption> options,
+                                @Nullable Entry template) {
             buffer.configure(delegate.getOutputSocket(
                     name, options.clear(OutputOption.BUFFER), template));
             output = null;
@@ -273,7 +282,7 @@ extends DecoratingFileSystemController<M, C> {
             public InputStream newInputStream() throws IOException {
                 getModel().assertWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
-                buffers.put(name, EntryBuffer.this);
+                buffers.put(name, Buffer.this);
                 return in;
             }
 
@@ -281,7 +290,7 @@ extends DecoratingFileSystemController<M, C> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 getModel().assertWriteLockedByCurrentThread();
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                buffers.put(name, EntryBuffer.this);
+                buffers.put(name, Buffer.this);
                 return rof;
             }
         } // class RegisteringInputSocket
@@ -299,7 +308,7 @@ extends DecoratingFileSystemController<M, C> {
                 // Create marker entry and mind CREATE_PARENTS!
                 //controller.mknod(name, FILE, outputOptions, null);
                 //getModel().setTouched(true);
-                buffers.put(name, EntryBuffer.this);
+                buffers.put(name, Buffer.this);
                 return out;
             }
         } // class RegisteringOutputSocket
