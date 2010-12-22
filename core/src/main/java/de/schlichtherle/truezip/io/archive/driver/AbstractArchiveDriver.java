@@ -17,13 +17,14 @@ package de.schlichtherle.truezip.io.archive.driver;
 
 import de.schlichtherle.truezip.io.filesystem.FileSystemController;
 import de.schlichtherle.truezip.io.filesystem.MountPoint;
-import de.schlichtherle.truezip.io.filesystem.cache.ContentBufferingFileSystemController;
+import de.schlichtherle.truezip.io.filesystem.BufferingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemController;
 import de.schlichtherle.truezip.io.archive.controller.DefaultArchiveController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.archive.entry.ArchiveEntry;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
 import de.schlichtherle.truezip.io.entry.EntryFactory;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -235,10 +236,11 @@ implements ArchiveDriver<E>, Serializable {
             @NonNull FileSystemController<?> parent) {
         return  new ConcurrentFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                     //new IOSocketCachingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
-                        new ContentBufferingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
+                        new BufferingFileSystemController<ConcurrentFileSystemModel, FileSystemController<? extends ConcurrentFileSystemModel>>(
                             new DefaultArchiveController<E>(
                                 new ConcurrentFileSystemModel(mountPoint, parent.getModel()),
-                                this, parent, false)));
+                                this, parent, false),
+                            TempFilePool.get()));
     }
 
     /**
