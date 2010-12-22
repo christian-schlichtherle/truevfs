@@ -89,7 +89,11 @@ public abstract class KeyManager {
                 manager = instance;
                 if (null == manager) {
                     // TODO: Check compatibility with OSGi.
-                    instance = manager = ServiceLoader.load(KeyManager.class).iterator().next();
+                    instance = manager = ServiceLoader
+                            .load(  KeyManager.class,
+                                    KeyManager.class.getClassLoader())
+                            .iterator()
+                            .next();
                 }
             }
         }

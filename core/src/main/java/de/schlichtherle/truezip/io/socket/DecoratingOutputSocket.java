@@ -21,16 +21,16 @@ import java.io.OutputStream;
 
 /**
  * @see     DecoratingInputSocket
- * @param   <LT> The type of the {@link #getLocalTarget() local target}.
+ * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DecoratingOutputSocket<LT extends Entry>
-extends OutputSocket<LT> {
+public abstract class DecoratingOutputSocket<E extends Entry>
+extends OutputSocket<E> {
 
-    private final OutputSocket<? extends LT> delegate;
+    private final OutputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends LT> output) {
+    protected DecoratingOutputSocket(final OutputSocket<? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.delegate = output;
@@ -41,12 +41,12 @@ extends OutputSocket<LT> {
      *
      * @return The bound decorated socket.
      */
-    protected OutputSocket<? extends LT> getBoundSocket() throws IOException {
+    protected OutputSocket<? extends E> getBoundSocket() throws IOException {
         return delegate.bind(this);
     }
 
     @Override
-    public LT getLocalTarget() throws IOException {
+    public E getLocalTarget() throws IOException {
         return getBoundSocket().getLocalTarget();
     }
 

@@ -23,15 +23,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @param   <LT> The type of the {@link #getLocalTarget() local target}.
+ * @param   <E> The type of the {@link #getLocalTarget() local target}.
  * @see     LazyOutputSocket
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class LazyInputSocket<LT extends Entry>
-extends DecoratingInputSocket<LT> {
+public final class LazyInputSocket<E extends Entry>
+extends DecoratingInputSocket<E> {
 
-    public LazyInputSocket(final InputSocket<? extends LT> input) {
+    public LazyInputSocket(final InputSocket<? extends E> input) {
         super(input);
     }
 
