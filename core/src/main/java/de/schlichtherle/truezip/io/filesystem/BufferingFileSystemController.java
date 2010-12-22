@@ -13,25 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem.cache;
+package de.schlichtherle.truezip.io.filesystem;
 
-import de.schlichtherle.truezip.io.filesystem.FileSystemController;
-import de.schlichtherle.truezip.io.filesystem.DecoratingFileSystemController;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
-import de.schlichtherle.truezip.io.filesystem.FileSystemEntryName;
-import de.schlichtherle.truezip.io.filesystem.FileSystemException;
 import de.schlichtherle.truezip.io.entry.Entry;
-import de.schlichtherle.truezip.io.filesystem.SyncOption;
-import de.schlichtherle.truezip.io.filesystem.SyncException;
-import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.IOBuffer;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.IOCache;
-import de.schlichtherle.truezip.io.filesystem.OutputOption;
-import de.schlichtherle.truezip.io.filesystem.InputOption;
-import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
+import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -76,11 +67,12 @@ import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_BUFFERS;
  * @version $Id$
  */
 @NotThreadSafe
-public final class ContentBufferingFileSystemController<
+public final class BufferingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
 
+    private final IOPool<?> pool;
     private final Map<FileSystemEntryName, EntryBuffer> buffers
             = new HashMap<FileSystemEntryName, EntryBuffer>();
 
@@ -89,8 +81,12 @@ extends DecoratingFileSystemController<M, C> {
      *
      * @param controller the decorated file system controller.
      */
-    public ContentBufferingFileSystemController(@NonNull C controller) {
+    public BufferingFileSystemController(   @NonNull final C controller,
+                                            @NonNull final IOPool<?> pool) {
         super(controller);
+        if (null == pool)
+            throw new NullPointerException();
+        this.pool = pool;
     }
 
     @Override
@@ -227,7 +223,7 @@ extends DecoratingFileSystemController<M, C> {
 
         EntryBuffer(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.buffer = WRITE_BACK.newIOBuffer(Entry.class, TempFilePool.get());
+            this.buffer = WRITE_BACK.newIOBuffer(Entry.class, pool);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
