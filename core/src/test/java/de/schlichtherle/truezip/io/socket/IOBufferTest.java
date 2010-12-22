@@ -1,5 +1,6 @@
 package de.schlichtherle.truezip.io.socket;
 
+import de.schlichtherle.truezip.io.socket.IOBuffer.Strategy;
 import de.schlichtherle.truezip.io.entry.Entry.Access;
 import de.schlichtherle.truezip.io.entry.Entry.Size;
 import de.schlichtherle.truezip.io.entry.Entry.Type;
@@ -9,40 +10,79 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.io.socket.IOBuffer.Strategy.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 public class IOBufferTest {
 
     private static final String MOCK_ENTRY_NAME = "mock";
-    private static final String MOCK_ENTRY_DATA = "Hello World!";
+    private static final String MOCK_ENTRY_DATA_READ = "read";
+    private static final String MOCK_ENTRY_DATA_WRITE = "write";
 
-    private MockIOPool pool = new MockIOPool();
-    private MockIOEntry entry;
-    private IOBuffer<?> buffer;
+    private MockIOPool pool;
 
     @Before
     public final void setUp() throws IOException {
-        entry = new MockIOEntry();
-        buffer = newCache(MockIOEntry.class, pool)
-                .configure(entry.getInputSocket())
-                .configure(entry.getOutputSocket());
-    }
-
-    protected <E extends IOEntry<E>> IOBuffer<E> newCache(Class<E> clazz, IOPool<?> pool) {
-        return IOBuffer.Strategy.WRITE_THROUGH.newIOBuffer(clazz, pool);
-    }
-
-    @After
-    public final void tearDown() {
-        buffer = null;
+        pool = new MockIOPool();
     }
 
     @Test
-    public void test() {
-        // FIXME: Add the test code!
+    public void testInvariants() throws IOException {
+        for (final Strategy strategy : new Strategy[] {
+            WRITE_THROUGH,
+            WRITE_BACK,
+        }) {
+            final IOBuffer<MockIOEntry> buffer = strategy
+                    .newIOBuffer(MockIOEntry.class, pool);
+            MockIOEntry front, back;
+            InputSocket<MockIOEntry> input;
+            OutputSocket<MockIOEntry> output;
+
+            back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
+            buffer  .configure(back.getInputSocket())
+                    .configure(back.getOutputSocket());
+            input = buffer.getInputSocket();
+            output = buffer.getOutputSocket();
+            assertThat(input.getLocalTarget(), sameInstance(back));
+            assertThat(output.getLocalTarget(), sameInstance(back));
+
+            front = new MockIOEntry();
+            IOSocket.copy(input, front.getOutputSocket());
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+
+            front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
+            IOSocket.copy(front.getInputSocket(), output);
+            buffer.flush();
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+
+            back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
+            buffer  .configure(back.getInputSocket())
+                    .configure(back.getOutputSocket());
+            input = buffer.getInputSocket();
+            output = buffer.getOutputSocket();
+            assertThat(input.getLocalTarget(), sameInstance(back));
+            assertThat(output.getLocalTarget(), sameInstance(back));
+
+            front = new MockIOEntry();
+            IOSocket.copy(input, front.getOutputSocket());
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+
+            buffer.clear();
+            front = new MockIOEntry();
+            IOSocket.copy(input, front.getOutputSocket());
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+
+            front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
+            IOSocket.copy(front.getInputSocket(), output);
+            buffer.flush();
+            //buffer.clear();
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+        }
     }
 
     private static final class MockIOPool implements IOPool<MockIOEntry> {
@@ -50,7 +90,7 @@ public class IOBufferTest {
 
         @Override
         public IOPool.Entry<MockIOEntry> allocate() throws IOException {
-            return entry = new MockIOEntry();
+            return entry = new MockIOEntry("");
         }
 
         @Override
@@ -61,8 +101,17 @@ public class IOBufferTest {
     } // class MockIOPool
 
     private static final class MockIOEntry implements IOPool.Entry<MockIOEntry> {
-        byte[] data = MOCK_ENTRY_DATA.getBytes();
+        byte[] data;
         int reads, writes;
+
+        MockIOEntry() {
+            this(null);
+        }
+
+        MockIOEntry(final String data) {
+            if (null != data)
+                this.data = data.getBytes();
+        }
 
         @Override
         public String getName() {
@@ -93,9 +142,12 @@ public class IOBufferTest {
 
         @Override
         public OutputSocket<MockIOEntry> getOutputSocket() {
-            if (null == data)
-                throw new IllegalStateException();
             return new MockOutputSocket();
+        }
+
+        @Override
+        public String toString() {
+            return null == data ? null : new String(data);
         }
 
         @Override
