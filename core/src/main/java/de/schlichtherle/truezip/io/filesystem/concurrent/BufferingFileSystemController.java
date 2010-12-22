@@ -254,15 +254,12 @@ extends DecoratingFileSystemController<M, C> {
         }
 
         public InputSocket<Entry> getInputSocket() {
-            return null != input
-                    ? input
-                    : (input = buffer.getInputSocket());
+            return null != input ? input : (input = buffer.getInputSocket());
         }
 
         public OutputSocket<Entry> getOutputSocket() {
-            return null != output
-                    ? output
-                    : (output = new RegisteringOutputSocket(buffer.getOutputSocket()));
+            return null != output ? output : (output
+                    = new RegisteringOutputSocket(buffer.getOutputSocket()));
         }
 
         public void flush() throws IOException {
@@ -273,36 +270,77 @@ extends DecoratingFileSystemController<M, C> {
             buffer.clear();
         }
 
-        final class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
+        private final class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
+            //private volatile Entry entry;
+
             RegisteringInputSocket(final InputSocket <?> input) {
                 super(input);
+            }
+
+            /*@Override
+            public Entry getLocalTarget() throws IOException {
+                return null != entry ? entry : (entry = new ProxyEntry(super.getLocalTarget()));
+            }*/
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                getModel().assertWriteLockedByCurrentThread();
+
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // The data for connected sockets cannot not get cached because
+                    // sockets may transfer different encoded data depending on
+                    // the identity of their peer target!
+                    // E.g. if the ZipDriver recognizes a ZipEntry as its peer
+                    // target, it transfers deflated data in order to omit
+                    // redundant inflating of the data from the source archive file
+                    // and deflating it again to the target archive file.
+                    // So we must flush and bypass the cache.
+                    flush();
+                    return getBoundSocket().newReadOnlyFile();
+                }
+
+                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
+                buffers.put(name, Buffer.this);
+                return rof;
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
                 getModel().assertWriteLockedByCurrentThread();
+
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // Dito.
+                    flush();
+                    return getBoundSocket().newInputStream();
+                }
+
                 final InputStream in = getBoundSocket().newInputStream();
                 buffers.put(name, Buffer.this);
                 return in;
             }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                getModel().assertWriteLockedByCurrentThread();
-                final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                buffers.put(name, Buffer.this);
-                return rof;
-            }
         } // class RegisteringInputSocket
 
-        final class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
+        private final class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
+            //private volatile Entry entry;
+
             RegisteringOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 
+            /*@Override
+            public Entry getLocalTarget() throws IOException {
+                return null != entry ? entry : (entry = new ProxyEntry(super.getLocalTarget()));
+            }*/
+
             @Override
             public OutputStream newOutputStream() throws IOException {
                 assert getModel().writeLock().isHeldByCurrentThread();
+
+                if (null != getBoundSocket().getPeerTarget()) {
+                    // Dito, but this time we must clear the cache.
+                    clear();
+                    return getBoundSocket().newOutputStream();
+                }
 
                 final OutputStream out = getBoundSocket().newOutputStream();
                 // Create marker entry and mind CREATE_PARENTS!
@@ -313,4 +351,10 @@ extends DecoratingFileSystemController<M, C> {
             }
         } // class RegisteringOutputSocket
     } // class EntryCache
+
+    /*private static final class ProxyEntry extends DecoratingEntry<Entry> {
+        ProxyEntry(@NonNull Entry entry) {
+            super(entry);
+        }
+    }*/
 }
