@@ -18,10 +18,9 @@ package de.schlichtherle.truezip.io.filesystem;
 import de.schlichtherle.truezip.io.filesystem.concurrent.ConcurrentFileSystemModel;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.IOBuffer;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.IOCache;
+import de.schlichtherle.truezip.io.socket.IOBuffer;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -215,7 +214,7 @@ extends DecoratingFileSystemController<M, C> {
     private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(OutputOption.class);
 
-    private final class EntryBuffer implements IOCache<Entry> {
+    private final class EntryBuffer {
         final FileSystemEntryName name;
         final IOBuffer<Entry> buffer;
         volatile InputSocket<Entry> input;
@@ -245,26 +244,22 @@ extends DecoratingFileSystemController<M, C> {
             return this;
         }
 
-        @Override
         public InputSocket<Entry> getInputSocket() {
             return null != input
                     ? input
                     : (input = buffer.getInputSocket());
         }
 
-        @Override
         public OutputSocket<Entry> getOutputSocket() {
             return null != output
                     ? output
                     : (output = new RegisteringOutputSocket(buffer.getOutputSocket()));
         }
 
-        @Override
         public void flush() throws IOException {
             buffer.flush();
         }
 
-        @Override
         public void clear() throws IOException {
             buffer.clear();
         }
