@@ -32,6 +32,6 @@ public interface IOPool<E extends IOEntry<E>>
 extends Pool<Entry<E>, IOException> {
 
     interface Entry<E extends IOEntry<E>>
-    extends IOEntry<E>, Pool.Resource<IOException> {
+    extends IOEntry<E>, Pool.Releasable<IOException> {
     }
 }

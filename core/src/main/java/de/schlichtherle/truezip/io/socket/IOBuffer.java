@@ -374,7 +374,7 @@ public final class IOBuffer<E extends Entry> {
     } // class Contents
 
     private final class InputSocketProxy extends DecoratingInputSocket<E> {
-        InputSocketProxy(final InputSocket <? extends E> input) {
+        InputSocketProxy(InputSocket <? extends E> input) {
             super(input);
         }
 
@@ -407,7 +407,7 @@ public final class IOBuffer<E extends Entry> {
     } // class InputSocketProxy
 
     private final class OutputSocketProxy extends DecoratingOutputSocket<E> {
-        OutputSocketProxy(final OutputSocket<? extends E> output) {
+        OutputSocketProxy(OutputSocket<? extends E> output) {
             super(output);
         }
 
