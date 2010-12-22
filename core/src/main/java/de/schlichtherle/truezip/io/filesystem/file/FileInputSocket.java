@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem.file;
 
+import de.schlichtherle.truezip.io.socket.DefaultCache;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.SimpleReadOnlyFile;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
@@ -43,8 +44,8 @@ public final class FileInputSocket extends InputSocket<FileEntry> {
                                                 BitField<InputOption> options) {
         InputSocket<FileEntry> input = new FileInputSocket(file);
         if (options.get(InputOption.CACHE))
-            input = Cache.Strategy.READ_ONLY
-                    .newCache(FileEntry.class)
+            input = DefaultCache.Strategy.READ_ONLY
+                    .newCache(FileEntry.class, TempFilePool.get())
                     .configure(input)
                     .getInputSocket();
         return input;

@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.schlichtherle.truezip.io.filesystem.file;
+package de.schlichtherle.truezip.io.socket;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.IOCache;
-import de.schlichtherle.truezip.io.socket.IOEntry;
-import de.schlichtherle.truezip.io.socket.IOPool;
-import de.schlichtherle.truezip.io.socket.IOSocket;
-import de.schlichtherle.truezip.io.socket.InputCache;
-import de.schlichtherle.truezip.io.socket.InputSocket;
-import de.schlichtherle.truezip.io.socket.OutputCache;
-import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -44,12 +34,12 @@ import net.jcip.annotations.ThreadSafe;
  * <li>Upon the first read operation, the data will be read from the local
  *     target and temporarily stored in this cache.
  *     Subsequent or concurrent read operations will be served from this cache
- *     without re-reading the data from the local target again until this cache
+ *     without re-reading the data from the local target again until the cache
  *     gets {@link InputCache#clear cleared}.</li>
- * <li>At the discretion of the implementation, data written to this cache may
- *     not be written to the local target until this cache gets
+ * <li>At the discretion of the implementation, data written to the cache may
+ *     not be written to the local target until the cache gets
  *     {@link OutputCache#flush flushed}.</li>
- * <li>After a write operation, the data will be temporarily stored in this
+ * <li>After a write operation, the data will be temporarily stored in the
  *     cache for subsequent read operations until this cache gets
  *     {@link OutputCache#clear cleared}.
  * </ul>
@@ -59,7 +49,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class Cache<E extends Entry> implements IOCache<E> {
+public final class DefaultCache<E extends Entry> implements IOCache<E> {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -69,8 +59,8 @@ public final class Cache<E extends Entry> implements IOCache<E> {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override <E extends Entry> Pool<Cache<E>.Buffer, IOException>
-            newOutputBufferPool(Cache<E> cache) {
+            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
+            newOutputBufferPool(DefaultCache<E> cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -80,8 +70,8 @@ public final class Cache<E extends Entry> implements IOCache<E> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override <E extends Entry> Pool<Cache<E>.Buffer, IOException>
-            newOutputBufferPool(Cache<E> cache) {
+            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
+            newOutputBufferPool(DefaultCache<E> cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -91,31 +81,25 @@ public final class Cache<E extends Entry> implements IOCache<E> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override <E extends Entry> Pool<Cache<E>.Buffer, IOException>
-            newOutputBufferPool(Cache<E> cache) {
+            @Override <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
+            newOutputBufferPool(DefaultCache<E> cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
 
         /** Returns a new input / output cache. */
-        @NonNull public <E extends Entry> Cache<E>
-        newCache(Class<E> clazz) {
-            return new Cache<E>(this, TempFilePool.get());
+        @NonNull public <E extends Entry> DefaultCache<E>
+        newCache(Class<E> clazz, IOPool<?> pool) {
+            return new DefaultCache<E>(this, pool);
         }
 
-        /** Returns a new input / output cache. */
-        @NonNull public <E extends IOEntry<E>> Cache<E>
-        newCache(IOPool<E> pool) {
-            return new Cache<E>(this, pool);
-        }
-
-        @NonNull <E extends Entry> Pool<Cache<E>.Buffer, IOException>
-        newInputBufferPool(Cache<E> cache) {
+        @NonNull <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
+        newInputBufferPool(DefaultCache<E> cache) {
             return cache.new InputBufferPool();
         }
 
-        @NonNull abstract <E extends Entry> Pool<Cache<E>.Buffer, IOException>
-        newOutputBufferPool(Cache<E> cache);
+        @NonNull abstract <E extends Entry> Pool<DefaultCache<E>.Buffer, IOException>
+        newOutputBufferPool(DefaultCache<E> cache);
     }
 
     private final Strategy strategy;
@@ -126,7 +110,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
     private volatile Pool<Buffer, IOException> outputBufferPool;
     private volatile Buffer buffer;
 
-    private Cache(@NonNull final Strategy strategy, @NonNull final IOPool<?> pool) {
+    private DefaultCache(@NonNull final Strategy strategy, @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
@@ -134,7 +118,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
     }
 
     @NonNull
-    public Cache<E> configure(@NonNull final InputSocket <? extends E> input) {
+    public DefaultCache<E> configure(@NonNull final InputSocket <? extends E> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -142,7 +126,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
     }
 
     @NonNull
-    public Cache<E> configure(@NonNull final OutputSocket <? extends E> output) {
+    public DefaultCache<E> configure(@NonNull final OutputSocket <? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -163,7 +147,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
     public void flush() throws IOException {
         if (null == buffer) // DCL is OK in this context!
             return;
-        synchronized (Cache.this) {
+        synchronized (DefaultCache.this) {
             final Buffer buffer = this.buffer;
             if (null != buffer)
                 getOutputBufferPool().release(buffer);
@@ -172,7 +156,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
 
     @Override
     public void clear() throws IOException {
-        synchronized (Cache.this) {
+        synchronized (DefaultCache.this) {
             final Buffer buffer = this.buffer;
             this.buffer = null;
             if (null != buffer && 0 == buffer.reading && !buffer.dirty)
@@ -189,8 +173,8 @@ public final class Cache<E extends Entry> implements IOCache<E> {
     private final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (Cache.this) {
-                Buffer buffer = Cache.this.buffer;
+            synchronized (DefaultCache.this) {
+                Buffer buffer = DefaultCache.this.buffer;
                 if (null == buffer) {
                     assert null == input.getPeerTarget();
                     class ProxyOutput extends OutputSocket<IOPool.Entry<?>> {
@@ -208,7 +192,7 @@ public final class Cache<E extends Entry> implements IOCache<E> {
                     }
                     final ProxyOutput output = new ProxyOutput();
                     IOSocket.copy(input, output);
-                    Cache.this.buffer = buffer = new Buffer(output.getLocalTarget());
+                    DefaultCache.this.buffer = buffer = new Buffer(output.getLocalTarget());
                 }
                 buffer.reading++;
                 return buffer;
@@ -217,8 +201,8 @@ public final class Cache<E extends Entry> implements IOCache<E> {
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            synchronized (Cache.this) {
-                if (0 == --buffer.reading && buffer != Cache.this.buffer && !buffer.dirty)
+            synchronized (DefaultCache.this) {
+                if (0 == --buffer.reading && buffer != DefaultCache.this.buffer && !buffer.dirty)
                     buffer.release();
             }
         }
@@ -271,11 +255,11 @@ public final class Cache<E extends Entry> implements IOCache<E> {
         public void release(final Buffer buffer) throws IOException {
             if (!buffer.dirty) // DCL is OK in this context!
                 return;
-            synchronized (Cache.this) {
+            synchronized (DefaultCache.this) {
                 if (!buffer.dirty)
                     return;
-                if (Cache.this.buffer != buffer) {
-                    Cache.this.buffer = buffer;
+                if (DefaultCache.this.buffer != buffer) {
+                    DefaultCache.this.buffer = buffer;
                 } else {
                     buffer.dirty = false;
                     super.release(buffer);
@@ -289,12 +273,12 @@ public final class Cache<E extends Entry> implements IOCache<E> {
         public void release(final Buffer buffer) throws IOException {
             if (!buffer.dirty) // DCL is OK in this context!
                 return;
-            synchronized (Cache.this) {
+            synchronized (DefaultCache.this) {
                 if (!buffer.dirty)
                     return;
-                if (Cache.this.buffer != buffer && null != Cache.this.buffer && !Cache.this.buffer.dirty && 0 == Cache.this.buffer.reading)
-                    Cache.this.buffer.release();
-                Cache.this.buffer = buffer;
+                if (DefaultCache.this.buffer != buffer && null != DefaultCache.this.buffer && !DefaultCache.this.buffer.dirty && 0 == DefaultCache.this.buffer.reading)
+                    DefaultCache.this.buffer.release();
+                DefaultCache.this.buffer = buffer;
                 buffer.dirty = false;
                 super.release(buffer);
             }

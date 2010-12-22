@@ -25,12 +25,13 @@ import de.schlichtherle.truezip.io.filesystem.SyncOption;
 import de.schlichtherle.truezip.io.filesystem.SyncException;
 import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.io.filesystem.file.Cache;
+import de.schlichtherle.truezip.io.socket.DefaultCache;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.io.socket.IOCache;
 import de.schlichtherle.truezip.io.filesystem.OutputOption;
 import de.schlichtherle.truezip.io.filesystem.InputOption;
+import de.schlichtherle.truezip.io.filesystem.file.TempFilePool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -45,7 +46,7 @@ import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.io.filesystem.file.Cache.Strategy.*;
+import static de.schlichtherle.truezip.io.socket.DefaultCache.Strategy.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
@@ -220,13 +221,13 @@ extends DecoratingFileSystemController<M, C> {
 
     private final class EntryCache implements IOCache<Entry> {
         final FileSystemEntryName name;
-        final Cache<Entry> cache;
+        final DefaultCache<Entry> cache;
         volatile InputSocket<Entry> input;
         volatile OutputSocket<Entry> output;
 
         EntryCache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(Entry.class);
+            this.cache = WRITE_BACK.newCache(Entry.class, TempFilePool.get());
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
