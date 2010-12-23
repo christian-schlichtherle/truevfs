@@ -21,6 +21,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
@@ -31,6 +33,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class TempFilePool
 implements IOPool<FileEntry> {
 
@@ -72,13 +75,14 @@ implements IOPool<FileEntry> {
         resource.release();
     }
 
+    @NotThreadSafe
     public static final class Entry
     extends FileEntry
     implements IOPool.Entry<FileEntry> {
 
-        TempFilePool pool;
+        private TempFilePool pool;
 
-        Entry(TempFilePool pool, File file) {
+        private Entry(TempFilePool pool, File file) {
             super(file);
             assert null != pool;
             this.pool = pool;
@@ -91,7 +95,7 @@ implements IOPool<FileEntry> {
             pool(null);
         }
 
-        TempFilePool pool(final TempFilePool newPool) throws IOException {
+        private TempFilePool pool(final TempFilePool newPool) throws IOException {
             final TempFilePool oldPool = pool;
             this.pool = newPool;
             if (oldPool != newPool) {

@@ -125,6 +125,18 @@ public final class IOBuffer<E extends Entry> {
     private volatile OutputPool outputPool;
     private volatile Buffer buffer;
 
+    /**
+     * Constructs a new I/O buffer which applies the given buffering strategy
+     * and uses the given pool to allocate and release temporary I/O entries.
+     * <p>
+     * Note that you need to call {@link #configure(InputSocket)} before
+     * you can do any input.
+     * Likewise, you need to call {@link #configure(OutputSocket)} before
+     * you can do any output.
+     *
+     * @param strategy the buffering strategy.
+     * @param pool the pool for allocating and releasing temporary I/O entries.
+     */
     private IOBuffer(   @NonNull final Strategy strategy,
                         @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
@@ -133,7 +145,19 @@ public final class IOBuffer<E extends Entry> {
         this.pool = pool;
     }
 
-    // FIXME: Consider calling clear()!
+    /**
+     * Configures the input socket for reading the entry data from the
+     * backing store.
+     * This method needs to be called before any input can be done -
+     * otherwise a {@link NullPointerException} will be thrown on the first
+     * read attempt.
+     * Note that calling this method does <em>not</em> {@link #clear() clear}
+     * this buffer.
+     *
+     * @param input an input socket for reading the entry data from the
+     *        backing store.
+     * @return this
+     */
     @NonNull
     public IOBuffer<E> configure(@NonNull final InputSocket <? extends E> input) {
         if (null == input)
@@ -142,7 +166,19 @@ public final class IOBuffer<E extends Entry> {
         return this;
     }
 
-    // FIXME: Consider calling flush()!
+    /**
+     * Configures the output socket for writing the entry data to the
+     * backing store.
+     * This method needs to be called before any output can be done -
+     * otherwise a {@link NullPointerException} will be thrown on the first
+     * write attempt.
+     * Note that calling this method does <em>not</em> {@link #flush() flush}
+     * this buffer.
+     *
+     * @param output an output socket for writing the entry data to the
+     *        backing store.
+     * @return this
+     */
     @NonNull
     public IOBuffer<E> configure(@NonNull final OutputSocket <? extends E> output) {
         if (null == output)
@@ -151,28 +187,56 @@ public final class IOBuffer<E extends Entry> {
         return this;
     }
 
-    public InputSocket<E> getInputSocket() {
-        return new ProxyInputSocket(input);
-    }
-
-    public OutputSocket<E> getOutputSocket() {
-        return new ProxyOutputSocket(output);
-    }
-
-    public void flush() throws IOException {
+    /**
+     * Writes the buffered entry data to the backing store unless already done.
+     * Whether or not this method needs to be called depends on the buffering
+     * strategy.
+     * E.g. the buffering strategy {@link Strategy#WRITE_THROUGH} writes any
+     * changed entry data immediately, so calling this method has no effect.
+     *
+     * @return this
+     */
+    public IOBuffer<E> flush() throws IOException {
         if (null == getBuffer()) // DCL is OK in this context!
-            return;
+            return this;
         synchronized (IOBuffer.this) {
             final Buffer buffer = getBuffer();
             if (null != buffer)
                 getOutputPool().release(buffer);
         }
+        return this;
     }
 
-    public void clear() throws IOException {
+    /**
+     * Discards the entry data in this buffer.
+     *
+     * @return this
+     */
+    public IOBuffer<E> clear() throws IOException {
         synchronized (IOBuffer.this) {
             setBuffer(null);
         }
+        return this;
+    }
+
+    /**
+     * Returns an input socket for reading the buffered entry data.
+     *
+     * @return An input socket for reading the buffered entry data.
+     */
+    @NonNull
+    public InputSocket<E> getInputSocket() {
+        return new BufferInputSocket(input);
+    }
+
+    /**
+     * Returns an output socket for writing the buffered entry data.
+     *
+     * @return An output socket for writing the buffered entry data.
+     */
+    @NonNull
+    public OutputSocket<E> getOutputSocket() {
+        return new BufferOutputSocket(output);
     }
 
     private Buffer getBuffer() {
@@ -187,6 +251,16 @@ public final class IOBuffer<E extends Entry> {
                     && oldBuffer.writers == 0
                     && oldBuffer.readers == 0)
                 oldBuffer.release();
+        }
+    }
+
+    @Override
+    @SuppressWarnings("FinalizeDeclaration")
+    protected void finalize() throws Throwable {
+        try {
+            setBuffer(null);
+        } finally {
+            super.finalize();
         }
     }
 
@@ -253,9 +327,9 @@ public final class IOBuffer<E extends Entry> {
         public void release(final Buffer buffer) throws IOException {
             buffer.writers = 0;
             try {
-                setBuffer(buffer);
-            } finally {
                 IOSocket.copy(buffer.getInputSocket(), output);
+            } finally {
+                setBuffer(buffer);
             }
         }
     } // class OutputPool
@@ -385,8 +459,8 @@ public final class IOBuffer<E extends Entry> {
         } // class BufferOutputStream
     } // class Buffer
 
-    private final class ProxyInputSocket extends DecoratingInputSocket<E> {
-        ProxyInputSocket(InputSocket <? extends E> input) {
+    private final class BufferInputSocket extends DecoratingInputSocket<E> {
+        BufferInputSocket(InputSocket <? extends E> input) {
             super(input);
         }
 
@@ -399,10 +473,10 @@ public final class IOBuffer<E extends Entry> {
         public InputStream newInputStream() throws IOException {
             return getInputPool().newInputStream(this);
         }
-    } // class InputSocketProxy
+    } // class BufferInputSocket
 
-    private final class ProxyOutputSocket extends DecoratingOutputSocket<E> {
-        ProxyOutputSocket(OutputSocket<? extends E> output) {
+    private final class BufferOutputSocket extends DecoratingOutputSocket<E> {
+        BufferOutputSocket(OutputSocket<? extends E> output) {
             super(output);
         }
 
@@ -410,5 +484,5 @@ public final class IOBuffer<E extends Entry> {
         public OutputStream newOutputStream() throws IOException {
             return getOutputPool().newOutputStream(this);
         }
-    } // class OutputSocketProxy
+    } // class BufferOutputSocket
 }

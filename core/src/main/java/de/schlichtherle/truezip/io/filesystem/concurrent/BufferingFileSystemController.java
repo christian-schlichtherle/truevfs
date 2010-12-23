@@ -231,6 +231,8 @@ extends DecoratingFileSystemController<M, C> {
 
         Buffer(@NonNull final FileSystemEntryName name) {
             this.name = name;
+            // TODO: Using WRITE_THROUGH leaves temporary files with some unit
+            // tests - why?
             this.buffer = WRITE_BACK.newIOBuffer(Entry.class, pool);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
