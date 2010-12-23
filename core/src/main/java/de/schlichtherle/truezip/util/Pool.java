@@ -16,13 +16,20 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * An interface for pooling strategies.
+ * <p>
+ * Note that any pool implementation is expected to be thread-safe!
+ * However, this does not necessarily apply to the implementation of its
+ * managed resources.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public interface Pool<R, E extends Exception> {
 
     /**
@@ -53,6 +60,7 @@ public interface Pool<R, E extends Exception> {
      * This interface is designed to be used with Pools which enable their
      * resources to release itself.
      */
+    @NotThreadSafe
     interface Releasable<E extends Exception> {
 
         /**

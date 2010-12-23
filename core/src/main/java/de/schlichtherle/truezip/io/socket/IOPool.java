@@ -18,19 +18,24 @@ package de.schlichtherle.truezip.io.socket;
 import de.schlichtherle.truezip.io.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A pool for I/O entries.
  * <p>
- * Implementations do <em>not</em> need to be thread-safe:
- * Multithreading needs to be addressed by client applications.
+ * Note that any pool implementation is expected to be thread-safe!
+ * However, this does not necessarily apply to the implementation of its
+ * managed resources.
  *
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public interface IOPool<E extends IOEntry<E>>
 extends Pool<Entry<E>, IOException> {
 
+    @NotThreadSafe
     interface Entry<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {
     }
