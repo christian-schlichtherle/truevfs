@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +54,7 @@ extends DecoratingFileSystemController<FileSystemModel, FileSystemController<?>>
      *
      * @param controller the decorated file system controller.
      */
-    FederatedFileSystemController(final FileSystemController<?> controller) {
+    FederatedFileSystemController(@NonNull final FileSystemController<?> controller) {
         super(controller);
         assert null != getParent();
     }

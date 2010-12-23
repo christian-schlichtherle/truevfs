@@ -394,6 +394,8 @@ public class PathTest {
         }) {
             final Path path = Path.create(params[0]);
             assertThat(path.hierarchicalize(), equalTo(URI.create(params[1])));
+            assertThat(Path.create(path.hierarchicalize()).getUri(), equalTo(path.hierarchicalize()));
+            assertThat(Path.create(path.hierarchicalize()).hierarchicalize(), equalTo(path.hierarchicalize()));
         }
     }
 }

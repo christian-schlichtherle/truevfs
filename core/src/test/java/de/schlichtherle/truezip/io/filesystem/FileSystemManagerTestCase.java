@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public abstract class FileSystemManagerTestCase {
 
     protected FileSystemManager manager;
-    private final FileSystemDriver<?> driver = new Driver();
+    final FileSystemDriver<?> driver = new Driver();
 
     @Before
     public void setUp() {
@@ -141,7 +141,7 @@ public abstract class FileSystemManagerTestCase {
         }
     }
 
-    private static class Driver implements FileSystemDriver<FileSystemModel> {
+    static class Driver implements FileSystemDriver<FileSystemModel> {
         @Override
         public FileSystemController<?> newController(
                 final MountPoint mountPoint,

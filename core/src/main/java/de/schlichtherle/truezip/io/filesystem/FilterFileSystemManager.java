@@ -16,6 +16,7 @@
 package de.schlichtherle.truezip.io.filesystem;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class FilterFileSystemManager
 extends DecoratingFileSystemManager<FileSystemManager> {
 
-    private final String prefix;
+    private final URI prefix;
 
     /**
      * Constructs a new prefix filter file system manager from the given file
@@ -48,7 +49,7 @@ extends DecoratingFileSystemManager<FileSystemManager> {
             @NonNull final FileSystemManager manager,
             @NonNull final MountPoint prefix) {
         super(manager);
-        this.prefix = prefix.hierarchicalize().toString();
+        this.prefix = prefix.hierarchicalize();
     }
 
     @Override
@@ -65,14 +66,12 @@ extends DecoratingFileSystemManager<FileSystemManager> {
         final List<FileSystemController<?>> snapshot
                 = new ArrayList<FileSystemController<?>>(
                     (int) (delegate.getSize() / .75f) + 1);
-        for (FileSystemController<?> controller : delegate)
-            if (controller
-                    .getModel()
-                    .getMountPoint()
-                    .hierarchicalize()
-                    .toString()
-                    .startsWith(prefix))
+        for (FileSystemController<?> controller : delegate) {
+            final URI uri = controller.getModel().getMountPoint().hierarchicalize();
+            if (uri.getScheme().equals(prefix.getScheme())
+                    && uri.getPath().startsWith(prefix.getPath()))
                 snapshot.add(controller);
+        }
         return snapshot;
     }
 }
