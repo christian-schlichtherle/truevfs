@@ -64,7 +64,7 @@ public final class IOBuffer<E extends Entry> {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override <E extends Entry> Pool<IOBuffer<E>.Buffer, IOException>
+            @Override <E extends Entry> IOBuffer<E>.OutputPool
             newOutputPool(IOBuffer<E> buffer) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
@@ -75,7 +75,7 @@ public final class IOBuffer<E extends Entry> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override <E extends Entry> Pool<IOBuffer<E>.Buffer, IOException>
+            @Override <E extends Entry> IOBuffer<E>.OutputPool
             newOutputPool(IOBuffer<E> buffer) {
                 return buffer.new WriteThroughOutputPool();
             }
@@ -86,7 +86,7 @@ public final class IOBuffer<E extends Entry> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override <E extends Entry> Pool<IOBuffer<E>.Buffer, IOException>
+            @Override <E extends Entry> IOBuffer<E>.OutputPool
             newOutputPool(IOBuffer<E> buffer) {
                 return buffer.new WriteBackOutputPool();
             }
@@ -108,12 +108,12 @@ public final class IOBuffer<E extends Entry> {
             return new IOBuffer<E>(this, pool);
         }
 
-        @NonNull <E extends Entry> Pool<IOBuffer<E>.Buffer, IOException>
+        @NonNull <E extends Entry> IOBuffer<E>.InputPool
         newInputPool(IOBuffer<E> buffer) {
             return buffer.new InputPool();
         }
 
-        @NonNull abstract <E extends Entry> Pool<IOBuffer<E>.Buffer, IOException>
+        @NonNull abstract <E extends Entry> IOBuffer<E>.OutputPool
         newOutputPool(IOBuffer<E> buffer);
     }
 
@@ -121,8 +121,8 @@ public final class IOBuffer<E extends Entry> {
     private final IOPool<?> pool;
     private volatile InputSocket<? extends E> input;
     private volatile OutputSocket<? extends E> output;
-    private volatile Pool<Buffer, IOException> inputPool;
-    private volatile Pool<Buffer, IOException> outputPool;
+    private volatile InputPool inputPool;
+    private volatile OutputPool outputPool;
     private volatile Buffer buffer;
 
     private IOBuffer(   @NonNull final Strategy strategy,
@@ -178,7 +178,7 @@ public final class IOBuffer<E extends Entry> {
         }
     }
 
-    private Pool<Buffer, IOException> getInputPool() {
+    private InputPool getInputPool() {
         return null != inputPool
                 ? inputPool
                 : (inputPool = strategy.newInputPool(this));
@@ -206,9 +206,17 @@ public final class IOBuffer<E extends Entry> {
                     buffer.release();
             }
         }
+
+        ReadOnlyFile newReadOnlyFile(InputSocket<?> input) throws IOException {
+            return allocate().newReadOnlyFile(input);
+        }
+
+        InputStream newInputStream(InputSocket<?> input) throws IOException {
+            return allocate().newInputStream(input);
+        }
     } // class InputPool
 
-    private Pool<Buffer, IOException> getOutputPool() {
+    private OutputPool getOutputPool() {
         return null != outputPool
                 ? outputPool
                 : (outputPool = strategy.newOutputPool(this));
@@ -230,6 +238,10 @@ public final class IOBuffer<E extends Entry> {
                 buffer.release();
                 throw ex;
             }
+        }
+
+        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
+            return allocate().newOutputStream(output);
         }
     } // class OutputPool
 
@@ -290,6 +302,10 @@ public final class IOBuffer<E extends Entry> {
             data.release();
         }
 
+        ReadOnlyFile newReadOnlyFile(InputSocket<?> input) throws IOException {
+            return new BufferReadOnlyFile(input);
+        }
+
         private final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
             private boolean closed;
 
@@ -310,6 +326,10 @@ public final class IOBuffer<E extends Entry> {
             }
         } // class BufferReadOnlyFile
 
+        InputStream newInputStream(InputSocket<?> input) throws IOException {
+            return new BufferInputStream(input);
+        }
+
         private final class BufferInputStream extends DecoratingInputStream {
             private boolean closed;
 
@@ -329,6 +349,10 @@ public final class IOBuffer<E extends Entry> {
                 }
             }
         } // class BufferInputStream
+
+        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
+            return new BufferOutputStream(output);
+        }
 
         private final class BufferOutputStream extends DecoratingOutputStream {
             private boolean closed;
@@ -358,12 +382,12 @@ public final class IOBuffer<E extends Entry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return getInputPool().allocate().new BufferReadOnlyFile(this);
+            return getInputPool().newReadOnlyFile(this);
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            return getInputPool().allocate().new BufferInputStream(this);
+            return getInputPool().newInputStream(this);
         }
     } // class InputSocketProxy
 
@@ -374,7 +398,7 @@ public final class IOBuffer<E extends Entry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            return getOutputPool().allocate().new BufferOutputStream(this);
+            return getOutputPool().newOutputStream(this);
         }
     } // class OutputSocketProxy
 }
