@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
 
-import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.io.filesystem.FileSystemEntryName.*;
 
 /**
  * Addresses an entry in a file system.
@@ -95,6 +95,8 @@ public final class Path implements Serializable, Comparable<Path> {
 
     @NonNull
     private transient FileSystemEntryName entryName;
+
+    private volatile transient URI hierarchical;
 
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
@@ -324,6 +326,34 @@ public final class Path implements Serializable, Comparable<Path> {
     @NonNull
     public FileSystemEntryName getEntryName() {
         return entryName;
+    }
+
+    /**
+     * Returns a hierarchical URI for this path.
+     * If the path names a {@link #getMountPoint() mount point}, its
+     * {@link MountPoint#hierarchicalize() hierarchical URI} with the
+     * {@link #getEntryName() entry name} resolved against it is returned.
+     * Otherwise, the {@link #getUri() URI} of this mount point is returned.
+     * <p>
+     * Note that the URI returned by this method is not unique anymore.
+     * For example, the mount point URIs {@code zip:file:/archive!/} and
+     * {@code tar:file:/archive!/} have both the same hierarchical URI
+     * {@code file:/archive/}.
+     *
+     * @return A hierarchical URI for this path.
+     */
+    @NonNull
+    public URI hierarchicalize() {
+        if (null != hierarchical)
+            return hierarchical;
+        if (uri.isOpaque()) {
+            final URI mountPointUri = mountPoint.hierarchicalize();
+            final URI entryNameUri = entryName.getUri();
+            return hierarchical = 0 >= entryNameUri.getRawPath().length()
+                    ? mountPointUri : mountPointUri.resolve(entryNameUri);
+        } else {
+            return hierarchical = uri;
+        }
     }
 
     /**
