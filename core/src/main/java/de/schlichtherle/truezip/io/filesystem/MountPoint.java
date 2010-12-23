@@ -84,6 +84,8 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private volatile transient Scheme scheme;
 
+    private volatile transient MountPoint hierarchical;
+
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
@@ -397,10 +399,12 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
      */
     @NonNull
     public MountPoint hierarchicalize() {
+        if (null != hierarchical)
+            return hierarchical;
         if (uri.isOpaque()) {
             final URI uri = path.hierarchicalize().getUri();
             try {
-                return new MountPoint(new URI(
+                return hierarchical = new MountPoint(new URI(
                         uri.getScheme(), uri.getAuthority(),
                         uri.getPath() + SEPARATOR_CHAR,
                         uri.getQuery(), null));
@@ -408,7 +412,7 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
                 throw new AssertionError(ex);
             }
         } else {
-            return this;
+            return hierarchical = this;
         }
     }
 
