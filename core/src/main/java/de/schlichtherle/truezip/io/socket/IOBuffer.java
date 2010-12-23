@@ -233,6 +233,7 @@ public final class IOBuffer<E extends Entry> {
         @Override
         public void release(final Buffer buffer) throws IOException {
             try {
+                buffer.dirty = false;
                 IOSocket.copy(buffer.getInputSocket(), output);
             } catch (IOException ex) {
                 buffer.release();
@@ -256,7 +257,6 @@ public final class IOBuffer<E extends Entry> {
                 if (IOBuffer.this.buffer != buffer) {
                     IOBuffer.this.buffer = buffer;
                 } else {
-                    buffer.dirty = false;
                     super.release(buffer);
                 }
             }
@@ -299,6 +299,8 @@ public final class IOBuffer<E extends Entry> {
         }
 
         void release() throws IOException {
+            assert !dirty;
+            assert 0 == reading;
             data.release();
         }
 
