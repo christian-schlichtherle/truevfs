@@ -65,7 +65,7 @@ public final class IOBuffer<E extends Entry> {
          */
         READ_ONLY {
             @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> buffer) {
+            newOutputPool(IOBuffer<E> ioBuffer) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -76,8 +76,8 @@ public final class IOBuffer<E extends Entry> {
          */
         WRITE_THROUGH {
             @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> buffer) {
-                return buffer.new WriteThroughOutputPool();
+            newOutputPool(IOBuffer<E> ioBuffer) {
+                return ioBuffer.new WriteThroughOutputPool();
             }
         },
 
@@ -87,8 +87,8 @@ public final class IOBuffer<E extends Entry> {
          */
         WRITE_BACK {
             @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> buffer) {
-                return buffer.new WriteBackOutputPool();
+            newOutputPool(IOBuffer<E> ioBuffer) {
+                return ioBuffer.new WriteBackOutputPool();
             }
         };
 
@@ -109,12 +109,12 @@ public final class IOBuffer<E extends Entry> {
         }
 
         @NonNull <E extends Entry> IOBuffer<E>.InputPool
-        newInputPool(IOBuffer<E> buffer) {
-            return buffer.new InputPool();
+        newInputPool(IOBuffer<E> ioBuffer) {
+            return ioBuffer.new InputPool();
         }
 
         @NonNull abstract <E extends Entry> IOBuffer<E>.OutputPool
-        newOutputPool(IOBuffer<E> buffer);
+        newOutputPool(IOBuffer<E> ioBuffer);
     }
 
     private final Strategy strategy;
@@ -160,10 +160,10 @@ public final class IOBuffer<E extends Entry> {
     }
 
     public void flush() throws IOException {
-        if (null == buffer) // DCL is OK in this context!
+        if (null == getBuffer()) // DCL is OK in this context!
             return;
         synchronized (IOBuffer.this) {
-            final Buffer buffer = this.buffer;
+            final Buffer buffer = getBuffer();
             if (null != buffer)
                 getOutputPool().release(buffer);
         }
@@ -171,42 +171,31 @@ public final class IOBuffer<E extends Entry> {
 
     public void clear() throws IOException {
         synchronized (IOBuffer.this) {
-            final Buffer buffer = this.buffer;
-            this.buffer = null;
-            if (null != buffer && 0 == buffer.reading && !buffer.dirty)
-                buffer.release();
+            setBuffer(null);
+        }
+    }
+
+    private Buffer getBuffer() {
+        return buffer;
+    }
+
+    private void setBuffer(final Buffer newBuffer) throws IOException {
+        final Buffer oldBuffer = this.buffer;
+        if (oldBuffer != newBuffer) {
+            this.buffer = newBuffer;
+            if (oldBuffer != null
+                    && oldBuffer.writers == 0
+                    && oldBuffer.readers == 0)
+                oldBuffer.release();
         }
     }
 
     private InputPool getInputPool() {
         return null != inputPool
-                ? inputPool
-                : (inputPool = strategy.newInputPool(this));
+                ? inputPool : (inputPool = strategy.newInputPool(this));
     }
 
     private final class InputPool implements Pool<Buffer, IOException> {
-        @Override
-        public Buffer allocate() throws IOException {
-            synchronized (IOBuffer.this) {
-                Buffer buffer = IOBuffer.this.buffer;
-                if (null == buffer) {
-                    buffer = new Buffer();
-                    IOSocket.copy(input, buffer.getOutputSocket());
-                    IOBuffer.this.buffer = buffer;
-                }
-                buffer.reading++;
-                return buffer;
-            }
-        }
-
-        @Override
-        public void release(final Buffer buffer) throws IOException {
-            synchronized (IOBuffer.this) {
-                if (0 == --buffer.reading && buffer != IOBuffer.this.buffer && !buffer.dirty)
-                    buffer.release();
-            }
-        }
-
         ReadOnlyFile newReadOnlyFile(InputSocket<?> input) throws IOException {
             return allocate().newReadOnlyFile(input);
         }
@@ -214,48 +203,86 @@ public final class IOBuffer<E extends Entry> {
         InputStream newInputStream(InputSocket<?> input) throws IOException {
             return allocate().newInputStream(input);
         }
+
+        @Override
+        public Buffer allocate() throws IOException {
+            synchronized (IOBuffer.this) {
+                Buffer buffer = getBuffer();
+                if (null == buffer) {
+                    buffer = new Buffer();
+                    try {
+                        IOSocket.copy(input, buffer.getOutputSocket());
+                    } catch (IOException ex) {
+                        buffer.release();
+                        throw ex;
+                    }
+                    setBuffer(buffer);
+                }
+                buffer.readers++;
+                return buffer;
+            }
+        }
+
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            synchronized (IOBuffer.this) {
+                if (--buffer.readers == 0 && buffer.writers == 0 && buffer != getBuffer())
+                    buffer.release();
+            }
+        }
     } // class InputPool
 
     private OutputPool getOutputPool() {
         return null != outputPool
-                ? outputPool
-                : (outputPool = strategy.newOutputPool(this));
+                ? outputPool : (outputPool = strategy.newOutputPool(this));
     }
 
     private abstract class OutputPool implements Pool<Buffer, IOException> {
+        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
+            return allocate().newOutputStream(output);
+        }
+
         @Override
         public Buffer allocate() throws IOException {
             final Buffer buffer = new Buffer();
-            buffer.dirty = true;
+            buffer.writers = 1;
             return buffer;
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
+            buffer.writers = 0;
             try {
-                buffer.dirty = false;
+                setBuffer(buffer);
+            } finally {
                 IOSocket.copy(buffer.getInputSocket(), output);
-            } catch (IOException ex) {
-                buffer.release();
-                throw ex;
             }
         }
-
-        OutputStream newOutputStream(OutputSocket<?> output) throws IOException {
-            return allocate().newOutputStream(output);
-        }
     } // class OutputPool
+
+    private class WriteThroughOutputPool extends OutputPool {
+        @Override
+        public void release(Buffer buffer) throws IOException {
+            if (buffer.writers == 0) // DCL is OK in this context!
+                return;
+            synchronized (IOBuffer.this) {
+                if (buffer.writers == 0)
+                    return;
+                super.release(buffer);
+            }
+        }
+    } // class WriteThroughOutputPool
 
     private final class WriteBackOutputPool extends OutputPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            if (!buffer.dirty) // DCL is OK in this context!
+            if (buffer.writers == 0) // DCL is OK in this context!
                 return;
             synchronized (IOBuffer.this) {
-                if (!buffer.dirty)
+                if (buffer.writers == 0)
                     return;
-                if (IOBuffer.this.buffer != buffer) {
-                    IOBuffer.this.buffer = buffer;
+                if (getBuffer() != buffer) {
+                    setBuffer(buffer);
                 } else {
                     super.release(buffer);
                 }
@@ -263,28 +290,9 @@ public final class IOBuffer<E extends Entry> {
         }
     } // class WriteBackOutputPool
 
-    private final class WriteThroughOutputPool extends OutputPool {
-        @Override
-        public void release(final Buffer buffer) throws IOException {
-            if (!buffer.dirty) // DCL is OK in this context!
-                return;
-            synchronized (IOBuffer.this) {
-                if (!buffer.dirty)
-                    return;
-                /*if (IOBuffer.this.buffer != buffer && IOBuffer.this.buffer != null
-                        && !IOBuffer.this.buffer.dirty && 0 == IOBuffer.this.buffer.reading)
-                    IOBuffer.this.buffer.release();*/
-                IOBuffer.this.buffer = buffer;
-                buffer.dirty = false;
-                super.release(buffer);
-            }
-        }
-    } // class WriteThroughOutputPool
-
     private final class Buffer {
         private final IOPool.Entry<?> data;
-        volatile boolean dirty;
-        int reading;
+        volatile int readers, writers; // max one writer!
 
         Buffer() throws IOException {
             data = pool.allocate();
@@ -299,8 +307,8 @@ public final class IOBuffer<E extends Entry> {
         }
 
         void release() throws IOException {
-            assert !dirty;
-            assert 0 == reading;
+            assert 0 == writers;
+            assert 0 == readers;
             data.release();
         }
 
@@ -312,7 +320,7 @@ public final class IOBuffer<E extends Entry> {
             private boolean closed;
 
             BufferReadOnlyFile(InputSocket<?> input) throws IOException {
-                super(data.getInputSocket().bind(input).newReadOnlyFile());
+                super(getInputSocket().bind(input).newReadOnlyFile());
             }
 
             @Override
@@ -336,7 +344,7 @@ public final class IOBuffer<E extends Entry> {
             private boolean closed;
 
             BufferInputStream(InputSocket<?> input) throws IOException {
-                super(data.getInputSocket().bind(input).newInputStream());
+                super(getInputSocket().bind(input).newInputStream());
             }
 
             @Override
@@ -360,7 +368,7 @@ public final class IOBuffer<E extends Entry> {
             private boolean closed;
 
             BufferOutputStream(OutputSocket<?> output) throws IOException {
-                super(data.getOutputSocket().bind(output).newOutputStream());
+                super(getOutputSocket().bind(output).newOutputStream());
             }
 
             @Override
