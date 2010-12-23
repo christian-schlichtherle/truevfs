@@ -84,8 +84,6 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
 
     private volatile transient Scheme scheme;
 
-    private volatile transient URI hierarchical;
-
     /**
      * Equivalent to {@link #create(URI, boolean) create(uri, false)}.
      */
@@ -386,36 +384,31 @@ public final class MountPoint implements Serializable, Comparable<MountPoint> {
     }
 
     /**
-     * Returns an absolute, hierarchical URI for this mount point.
-     * If the mount point names a parent mount point, the
-     * {@link Path#hierarchicalize() hierarchical URI} for its
-     * {@link #getPath() path} with an appended {@code "/"} separator is
-     * returned.
-     * Otherwise, the {@link #getUri() URI} of this mount point is returned.
+     * Returns a mount point which has its URI converted from the URI of
+     * this mount point so that it's absolute and hierarchical.
+     * If this mount point is already in hierarchical form, it's returned.
      * <p>
-     * Note that the URI returned by this method is not unique anymore.
      * For example, the mount point URIs {@code zip:file:/archive!/} and
-     * {@code tar:file:/archive!/} have both the same hierarchical URI
-     * {@code file:/archive/}.
+     * {@code tar:file:/archive!/} will both produce an equal mount point
+     * with the absolute, hierarchical URI {@code file:/archive/}.
      *
-     * @return An absolute, hierarchical URI for this mount point.
+     * @return A mount point which has its URI converted from the URI of
+     *         this mount point so that it's absolute and hierarchical.
      */
     @NonNull
-    public URI hierarchicalize() {
-        if (null != hierarchical)
-            return hierarchical;
+    public MountPoint hierarchicalize() {
         if (uri.isOpaque()) {
-            final URI uri = path.hierarchicalize();
+            final URI uri = path.hierarchicalize().getUri();
             try {
-                return hierarchical
-                        = new URI(  uri.getScheme(), uri.getAuthority(),
-                                    uri.getPath() + SEPARATOR_CHAR,
-                                    uri.getQuery(), null);
+                return new MountPoint(new URI(
+                        uri.getScheme(), uri.getAuthority(),
+                        uri.getPath() + SEPARATOR_CHAR,
+                        uri.getQuery(), null));
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
         } else {
-            return hierarchical = uri;
+            return this;
         }
     }
 

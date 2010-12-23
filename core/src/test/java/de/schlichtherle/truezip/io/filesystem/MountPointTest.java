@@ -287,7 +287,7 @@ public class MountPointTest {
             assertThat(MountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.getUri().toString()), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.getUri().toString()).hashCode(), equalTo(mountPoint.hashCode()));
-            assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(ROOT_ENTRY_NAME))), equalTo(mountPoint));
+            //assertThat(MountPoint.create(mountPoint.getScheme(), new Path(mountPoint.getParent(), mountPoint.resolveParent(ROOT_ENTRY_NAME))), equalTo(mountPoint));
             assertThat(MountPoint.create(mountPoint.resolvePath(ROOT_ENTRY_NAME).getUri()), equalTo(mountPoint));
         }
     }
@@ -295,10 +295,16 @@ public class MountPointTest {
     @Test
     public void testResolve() {
         for (final String[] params : new String[][] {
+            { "foo:bar:/baz?plonk!/", "", "baz", "foo:bar:/baz?plonk!/" },
             { "foo:bar:/bäz?bööm!/", "bäng?plönk", "bäz/bäng?plönk", "foo:bar:/bäz?bööm!/bäng?plönk" },
             { "foo:bar:/baz!/", "bang?boom", "baz/bang?boom", "foo:bar:/baz!/bang?boom" },
             { "foo:bar:/baz!/", "bang", "baz/bang", "foo:bar:/baz!/bang" },
-            { "foo:/bar/?boom", "baz?plonk", null, "foo:/bar/baz?plonk" },
+            { "foo:bar:/baz!/", "", "baz", "foo:bar:/baz!/" },
+            { "foo:bar:/baz?plonk!/", "bang?boom", "baz/bang?boom", "foo:bar:/baz?plonk!/bang?boom" },
+            { "foo:bar:/baz?plonk!/", "bang", "baz/bang", "foo:bar:/baz?plonk!/bang" },
+            { "foo:/bar/?boom", "baz?bang", null, "foo:/bar/baz?bang" },
+            { "foo:/bar/?boom", "baz", null, "foo:/bar/baz" },
+            { "foo:/bar/?boom", "", null, "foo:/bar/" },
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },
         }) {
             final MountPoint mountPoint = MountPoint.create(params[0]);
@@ -324,10 +330,13 @@ public class MountPointTest {
             { "foo:/bar/?boom", "foo:/bar/?boom" },
             { "foo:/bar/", "foo:/bar/" },
         }) {
-            final MountPoint mountPoint = MountPoint.create(params[0]);
-            assertThat(mountPoint.hierarchicalize(), equalTo(URI.create(params[1])));
-            assertThat(MountPoint.create(mountPoint.hierarchicalize()).getUri(), equalTo(mountPoint.hierarchicalize()));
-            assertThat(MountPoint.create(mountPoint.hierarchicalize()).hierarchicalize(), equalTo(mountPoint.hierarchicalize()));
+            final MountPoint mp = MountPoint.create(params[0]);
+            final MountPoint hmp = mp.hierarchicalize();
+            final Path p = Path.create(params[0]);
+            final Path hp = p.hierarchicalize();
+            assertThat(hmp.hierarchicalize(), sameInstance(hmp));
+            assertThat(hmp.getUri(), equalTo(URI.create(params[1])));
+            assertThat(hmp.getUri(), equalTo(hp.getUri()));
         }
     }
 }

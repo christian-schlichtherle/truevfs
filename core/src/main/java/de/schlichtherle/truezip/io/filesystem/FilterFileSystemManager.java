@@ -35,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class FilterFileSystemManager
 extends DecoratingFileSystemManager<FileSystemManager> {
 
-    private final URI prefix;
+    private final MountPoint prefix;
 
     /**
      * Constructs a new prefix filter file system manager from the given file
@@ -67,9 +67,11 @@ extends DecoratingFileSystemManager<FileSystemManager> {
                 = new ArrayList<FileSystemController<?>>(
                     (int) (delegate.getSize() / .75f) + 1);
         for (FileSystemController<?> controller : delegate) {
-            final URI uri = controller.getModel().getMountPoint().hierarchicalize();
-            if (uri.getScheme().equals(prefix.getScheme())
-                    && uri.getPath().startsWith(prefix.getPath()))
+            final MountPoint mountPoint
+                    = controller.getModel().getMountPoint().hierarchicalize();
+            if (mountPoint.getScheme().equals(prefix.getScheme())
+                    && mountPoint.getUri().getPath().startsWith(
+                        prefix.getUri().getPath()))
                 snapshot.add(controller);
         }
         return snapshot;
