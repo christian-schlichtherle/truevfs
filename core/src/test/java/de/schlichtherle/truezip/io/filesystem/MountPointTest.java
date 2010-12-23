@@ -315,6 +315,7 @@ public class MountPointTest {
     @Test
     public void testHierarchicalize() {
         for (final String[] params : new String[][] {
+            { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g/?zö%20k" },
             { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng/?zönk" },
             { "foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang/?zonk" },
             { "foo:bar:baz:/boom!/bang!/", "baz:/boom/bang/" },
