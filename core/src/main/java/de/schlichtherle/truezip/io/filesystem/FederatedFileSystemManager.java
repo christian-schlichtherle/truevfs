@@ -15,6 +15,7 @@
  */
 package de.schlichtherle.truezip.io.filesystem;
 
+import de.schlichtherle.truezip.util.Link.Type;
 import java.util.Iterator;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Links;
@@ -45,6 +46,17 @@ public final class FederatedFileSystemManager extends FileSystemManager {
      */
     private final Map<MountPoint, Link<Scheduler>> schedulers
             = new WeakHashMap<MountPoint, Link<Scheduler>>();
+
+    private final Type optionalScheduleType;
+
+    public FederatedFileSystemManager() {
+        this(WEAK);
+    }
+
+    FederatedFileSystemManager(final Type optionalScheduleType) {
+        assert null != optionalScheduleType;
+        this.optionalScheduleType = optionalScheduleType;
+    }
 
     @Override
     @NonNull
@@ -92,7 +104,8 @@ public final class FederatedFileSystemManager extends FileSystemManager {
             assert null == event || event.getSource() == model;
             synchronized (FederatedFileSystemManager.this) {
                 schedulers.put(model.getMountPoint(),
-                        (model.isTouched() ? STRONG : WEAK).newLink(this));
+                        (model.isTouched() ? STRONG : optionalScheduleType)
+                            .newLink(this));
             }
         }
     } // class Scheduler

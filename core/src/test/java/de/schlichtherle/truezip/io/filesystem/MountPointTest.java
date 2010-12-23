@@ -326,6 +326,8 @@ public class MountPointTest {
         }) {
             final MountPoint mountPoint = MountPoint.create(params[0]);
             assertThat(mountPoint.hierarchicalize(), equalTo(URI.create(params[1])));
+            assertThat(MountPoint.create(mountPoint.hierarchicalize()).getUri(), equalTo(mountPoint.hierarchicalize()));
+            assertThat(MountPoint.create(mountPoint.hierarchicalize()).hierarchicalize(), equalTo(mountPoint.hierarchicalize()));
         }
     }
 }
