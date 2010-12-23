@@ -236,7 +236,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * entry name against the given parent entry name.
      * Note that the URI of the parent entry name is considered to
      * name a directory even if it's not ending with a
-     * {@link #SEPARATOR}, so calling this constructor with
+     * {@link #SEPARATOR_CHAR}, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
      * entry names respectively will result in the URI
      * {@code "foo/bar"} for the resulting entry name.
@@ -247,14 +247,22 @@ public class EntryName implements Serializable, Comparable<EntryName> {
     public EntryName(   @NonNull final EntryName parent,
                         @NonNull final EntryName member) {
         final URI parentUri = parent.uri;
+        final String parentUriPath = parentUri.getPath();
         final URI memberUri = member.uri;
         try {
-            uri = 0 == parentUri.getPath().length()
+            uri = 0 == parentUriPath.length()
                     ? memberUri
-                    : 0 == memberUri.getPath().length()
-                        ? parentUri
-                        : new URI(null, null, parentUri.getPath() + SEPARATOR, parentUri.getQuery(), null)
-                            .resolve(memberUri);
+                    : parentUriPath.endsWith(SEPARATOR)
+                        ? parentUri.resolve(memberUri)
+                        : 0 == memberUri.getPath().length()
+                            ? new URI(  null, null,
+                                        parentUriPath,
+                                        memberUri.getQuery(),
+                                        null)
+                            : new URI(  null, null,
+                                        parentUriPath + SEPARATOR_CHAR,
+                                        null, // query is irrelevant!
+                                        null).resolve(memberUri);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }

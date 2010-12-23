@@ -199,6 +199,9 @@ public class FileSystemEntryNameTest {
     @Test
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
+            { "föö", "?bär", "föö?bär" },
+            { "föö?bär", "", "föö" },
+            { "föö?bär", "?tüü", "föö?tüü" },
             { "föö", "", "föö" },
             { "", "föö", "föö" },
             { "föö", "bär", "föö/bär" },

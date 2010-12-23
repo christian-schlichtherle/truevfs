@@ -96,8 +96,6 @@ public final class Path implements Serializable, Comparable<Path> {
     @NonNull
     private transient FileSystemEntryName entryName;
 
-    private volatile transient URI hierarchical;
-
     /**
      * Equivalent to {@link #create(String, boolean) create(uri, false)}.
      */
@@ -343,17 +341,12 @@ public final class Path implements Serializable, Comparable<Path> {
      * @return A hierarchical URI for this path.
      */
     @NonNull
-    public URI hierarchicalize() {
-        if (null != hierarchical)
-            return hierarchical;
-        if (uri.isOpaque()) {
-            final URI mountPointUri = mountPoint.hierarchicalize();
-            final URI entryNameUri = entryName.getUri();
-            return hierarchical = 0 >= entryNameUri.getRawPath().length()
-                    ? mountPointUri : mountPointUri.resolve(entryNameUri);
-        } else {
-            return hierarchical = uri;
-        }
+    public Path hierarchicalize() {
+        return !uri.isOpaque()
+                ? this
+                : 0 >= entryName.toString().length()
+                    ? Path.create(mountPoint.hierarchicalize().getUri())
+                    : mountPoint.hierarchicalize().resolvePath(entryName);
     }
 
     /**
