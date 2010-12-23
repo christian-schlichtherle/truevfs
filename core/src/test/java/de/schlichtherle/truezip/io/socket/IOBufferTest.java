@@ -34,7 +34,7 @@ public class IOBufferTest {
     }
 
     @Test
-    public void testInvariants() throws IOException {
+    public void testBuffering() throws IOException {
         for (final Strategy strategy : new Strategy[] {
             WRITE_THROUGH,
             WRITE_BACK,
@@ -42,50 +42,149 @@ public class IOBufferTest {
             final IOBuffer<MockIOEntry> buffer = strategy
                     .newIOBuffer(MockIOEntry.class, pool);
             MockIOEntry front, back;
-            InputSocket<MockIOEntry> input;
-            OutputSocket<MockIOEntry> output;
 
             back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
-            buffer  .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
-            input = buffer.getInputSocket();
-            output = buffer.getOutputSocket();
-            assertThat(input.getLocalTarget(), sameInstance(back));
-            assertThat(output.getLocalTarget(), sameInstance(back));
+            buffer  .configure(back.getBrokenInputSocket())
+                    .configure(back.getBrokenOutputSocket());
+            assertThat(buffer.getInputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(buffer.getOutputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(pool.entries.size(), is(0));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
 
             front = new MockIOEntry();
-            IOSocket.copy(input, front.getOutputSocket());
+            assertThat(front.toString(), nullValue());
+            try {
+                IOSocket.copy(buffer.getInputSocket(), front.getOutputSocket());
+                fail();
+            } catch (IOException expected) {
+            }
+            assertThat(pool.entries.size(), is(0));
+            assertThat(front.toString(), nullValue());
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
+
+            buffer  .configure(back.getInputSocket())
+                    .configure(back.getOutputSocket());
+            assertThat(buffer.getInputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(buffer.getOutputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(pool.entries.size(), is(0));
+            assertThat(front.toString(), nullValue());
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
+
+            front = new MockIOEntry();
+            assertThat(pool.entries.size(), is(0));
+            assertThat(front.toString(), nullValue());
+            IOSocket.copy(buffer.getInputSocket(), front.getOutputSocket());
+            assertThat(pool.entries.size(), is(1));
             assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(0));
 
             front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
-            IOSocket.copy(front.getInputSocket(), output);
-            buffer.flush();
-            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
-
-            back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
-            buffer  .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
-            input = buffer.getInputSocket();
-            output = buffer.getOutputSocket();
-            assertThat(input.getLocalTarget(), sameInstance(back));
-            assertThat(output.getLocalTarget(), sameInstance(back));
-
-            front = new MockIOEntry();
-            IOSocket.copy(input, front.getOutputSocket());
+            buffer  .configure(back.getBrokenInputSocket())
+                    .configure(back.getBrokenOutputSocket());
+            assertThat(buffer.getInputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(buffer.getOutputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(pool.entries.size(), is(1));
             assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(0));
+
+            try {
+                IOSocket.copy(front.getInputSocket(), buffer.getOutputSocket());
+                if (WRITE_THROUGH != strategy) {
+                    assertThat(back.writes, is(0));
+                    buffer.flush();
+                }
+                fail();
+            } catch (IOException expected) {
+            }
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(0));
+
+            buffer  .configure(back.getInputSocket())
+                    .configure(back.getOutputSocket());
+            assertThat(buffer.getInputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(buffer.getOutputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(0));
+
+            IOSocket.copy(front.getInputSocket(), buffer.getOutputSocket());
+            if (WRITE_THROUGH != strategy) {
+                assertThat(back.writes, is(0));
+                buffer.flush();
+            }
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(1));
+
+            back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
+            buffer  .configure(back.getInputSocket())
+                    .configure(back.getOutputSocket());
+            assertThat(buffer.getInputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(buffer.getOutputSocket().getLocalTarget(), sameInstance(back));
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
+
+            front = new MockIOEntry();
+            IOSocket.copy(buffer.getInputSocket(), front.getOutputSocket());
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
 
             buffer.clear();
+            assertThat(pool.entries.size(), is(0));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(0));
+            assertThat(back.writes, is(0));
+
             front = new MockIOEntry();
-            IOSocket.copy(input, front.getOutputSocket());
+            IOSocket.copy(buffer.getInputSocket(), front.getOutputSocket());
+            assertThat(pool.entries.size(), is(1));
             assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_READ));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(0));
 
             front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
-            IOSocket.copy(front.getInputSocket(), output);
-            buffer.flush();
-            buffer.clear();
+            IOSocket.copy(front.getInputSocket(), buffer.getOutputSocket());
+            if (WRITE_THROUGH != strategy) {
+                assertThat(back.writes, is(0));
+                buffer.flush();
+            }
+            assertThat(pool.entries.size(), is(1));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(1));
 
-            //assertThat(pool.entries.size(), is(0));
+            buffer.clear();
+            assertThat(pool.entries.size(), is(0));
+            assertThat(front.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.toString(), equalTo(MOCK_ENTRY_DATA_WRITE));
+            assertThat(back.reads, is(1));
+            assertThat(back.writes, is(1));
         }
     }
 
@@ -98,9 +197,9 @@ public class IOBufferTest {
             final IOPool.Entry<MockIOEntry> entry = new MockIOEntry("") {
                 @Override
                 public void release() {
-                    super.release();
                     if (!entries.remove(this))
                         throw new IllegalArgumentException();
+                    super.release();
                 }
             };
             entries.add(entry);
@@ -109,8 +208,7 @@ public class IOBufferTest {
 
         @Override
         public void release(IOPool.Entry<MockIOEntry> entry) throws IOException {
-            if (!entries.remove(entry))
-                throw new IllegalArgumentException();
+            assert false;
             entry.release();
         }
 
@@ -156,9 +254,17 @@ public class IOBufferTest {
             return new MockInputSocket();
         }
 
+        public InputSocket<MockIOEntry> getBrokenInputSocket() {
+            return new BrokenInputSocket();
+        }
+
         @Override
         public OutputSocket<MockIOEntry> getOutputSocket() {
             return new MockOutputSocket();
+        }
+
+        public OutputSocket<MockIOEntry> getBrokenOutputSocket() {
+            return new BrokenOutputSocket();
         }
 
         @Override
@@ -191,6 +297,25 @@ public class IOBufferTest {
             }
         } // class MockInputSocket
 
+        private final class BrokenInputSocket extends InputSocket<MockIOEntry> {
+            @Override
+            public MockIOEntry getLocalTarget() throws IOException {
+                return MockIOEntry.this;
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
+                return new BrokenInputStream();
+            }
+        } // class MockInputSocket
+
         private final class MockOutputSocket extends OutputSocket<MockIOEntry> {
             @Override
             public MockIOEntry getLocalTarget() throws IOException {
@@ -205,6 +330,19 @@ public class IOBufferTest {
             }
         } // class MockOutputSocket
 
+        private final class BrokenOutputSocket extends OutputSocket<MockIOEntry> {
+            @Override
+            public MockIOEntry getLocalTarget() throws IOException {
+                return MockIOEntry.this;
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                assertThat(getPeerTarget(), notNullValue());
+                return new BrokenOutputStream();
+            }
+        } // class MockOutputSocket
+
         private final class MockOutputStream extends ByteArrayOutputStream {
             @Override
             public void close() throws IOException {
@@ -213,4 +351,18 @@ public class IOBufferTest {
             }
         } // class MockOutputStream
     } // class MockIOEntry
+
+    private static final class BrokenInputStream extends InputStream {
+        @Override
+        public int read() throws IOException {
+            throw new IOException();
+        }
+    } // class BrokenInputStream
+
+    private static final class BrokenOutputStream extends OutputStream {
+        @Override
+        public void write(int b) throws IOException {
+            throw new IOException();
+        }
+    } // class BrokenOutputStream
 }
