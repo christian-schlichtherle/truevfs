@@ -278,12 +278,6 @@ extends FileSystemController<ConcurrentFileSystemModel> {
             this.template = template;
         }
 
-        /*@Override
-        protected void afterPeering() throws IOException {
-            if (template != null)
-                template = getPeerTarget(); // update connection
-        }*/
-
         ArchiveFileSystemOperation<E> newLink() throws IOException {
             autoSync(name, WRITE);
             // Start creating or overwriting the archive entry.
