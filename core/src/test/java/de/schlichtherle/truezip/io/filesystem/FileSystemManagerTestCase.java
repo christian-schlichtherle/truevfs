@@ -151,7 +151,6 @@ public abstract class FileSystemManagerTestCase {
                     : mountPoint.getParent().equals(parent.getModel().getMountPoint());
             final Scheme scheme = mountPoint.getScheme();
             if (Scheme.FILE.equals(scheme)) {
-                // FIXME: Replace FileDriver.INSTANCE with a service locator!
                 return new FileDriver().newController(mountPoint);
             } else if (Scheme.create("zip").equals(scheme)) {
                 return new ZipDriver().newController(mountPoint, parent);

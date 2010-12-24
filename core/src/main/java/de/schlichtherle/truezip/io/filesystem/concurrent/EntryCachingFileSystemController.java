@@ -28,7 +28,6 @@ import de.schlichtherle.truezip.io.filesystem.SyncWarningException;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.io.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.io.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.io.socket.IOBuffer;
 import de.schlichtherle.truezip.io.socket.IOPool;
 import de.schlichtherle.truezip.io.socket.OutputSocket;
 import de.schlichtherle.truezip.io.socket.InputSocket;
@@ -44,52 +43,59 @@ import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
 import static de.schlichtherle.truezip.io.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.io.socket.IOBuffer.Strategy.*;
+import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
 import static de.schlichtherle.truezip.io.filesystem.SyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_BUFFERS;
+import static de.schlichtherle.truezip.io.filesystem.SyncOption.CLEAR_CACHE;
 
 /**
  * A caching archive controller implements a caching strategy for entries
  * within its target archive file.
  * Decorating an archive controller with this class has the following effects:
  * <ul>
- * <li>Upon the first read operation, the data will be read from the archive
- *     entry and stored in the buffer.
- *     Subsequent or concurrent read operations will be served from the buffer
- *     without re-reading the data from the archive entry again until the
- *     target archive file gets {@link #sync synced}.
- * <li>Any data written to the buffer will get written to the target archive
- *     file if and only if the target archive file gets {@link #sync synced}.
- * <li>After a write operation, the data will be stored in the buffer for
- *     subsequent read operations until the target archive file gets
+ * <li>Upon the first read operation, the entry data will be read from the
+ *     backing store and temporarily stored in the cache.
+ *     Subsequent or concurrent read operations will be served from the cache
+ *     without re-reading the entry data from the backing store again until
+ *     the file system gets {@link #sync synced}.
+ * <li>At the discretion of the internal caching strategy, entry data written
+ *     to the cache may not be written to the backing store until the file
+ *     system gets {@link #sync synced}.
+ * <li>After a write operation, the entry data will be stored in the cache
+ *     for subsequent read operations until the file system gets
  *     {@link #sync synced}.
+ * <li>As a side effect, caching decouples the underlying storage from its
+ *     clients, allowing it to create, read, update or delete the entry data
+ *     while some clients are still busy on reading or writing the cached
+ *     entry data.
  * </ul>
- * <p>
- * Caching an archive entry is automatically used for an
+ * Note that caching file system entry data is performed only if an
  * {@link #getInputSocket input socket} with the input option
- * {@link InputOption#BUFFER} set or an {@link #getOutputSocket output socket}
- * with the output option {@link OutputOption#BUFFER} set.
+ * {@link InputOption#CACHE} is used or an
+ * {@link #getOutputSocket output socket} with the output option
+ * {@link OutputOption#CACHE} is used.
  *
+ * @param   <M> The type of the file system model.
+ * @param   <C> The type of the decorated file system controller.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-public final class BufferingFileSystemController<
+public final class EntryCachingFileSystemController<
         M extends ConcurrentFileSystemModel,
         C extends FileSystemController<? extends M>>
 extends DecoratingFileSystemController<M, C> {
 
     private final IOPool<?> pool;
-    private final Map<FileSystemEntryName, Buffer> buffers
-            = new HashMap<FileSystemEntryName, Buffer>();
+    private final Map<FileSystemEntryName, Cache> caches
+            = new HashMap<FileSystemEntryName, Cache>();
 
     /**
      * Constructs a new content caching file system controller.
      *
      * @param controller the decorated file system controller.
-     * @param pool the pool of temporary entries to buffer the contents.
+     * @param pool the pool of temporary entries to cache the contents.
      */
-    public BufferingFileSystemController(   @NonNull final C controller,
+    public EntryCachingFileSystemController(   @NonNull final C controller,
                                             @NonNull final IOPool<?> pool) {
         super(controller);
         if (null == pool)
@@ -116,10 +122,10 @@ extends DecoratingFileSystemController<M, C> {
 
         @Override
         public InputSocket<?> getBoundSocket() throws IOException {
-            final Buffer buffer = buffers.get(name);
-            if (null == buffer && !options.get(InputOption.BUFFER))
-                return super.getBoundSocket(); // dont buffer
-            return (null != buffer ? buffer : new Buffer(name))
+            final Cache cache = caches.get(name);
+            if (null == cache && !options.get(InputOption.CACHE))
+                return super.getBoundSocket(); // dont cache
+            return (null != cache ? cache : new Cache(name))
                     .configure(options).getInputSocket().bind(this);
         }
     } // class Input
@@ -150,28 +156,28 @@ extends DecoratingFileSystemController<M, C> {
         public OutputSocket<?> getBoundSocket() throws IOException {
             assert getModel().writeLock().isHeldByCurrentThread();
 
-            final Buffer buffer = buffers.get(name);
-            if (null == buffer) {
-                if (!options.get(OutputOption.BUFFER))
-                    return super.getBoundSocket(); // dont buffer
+            final Cache cache = caches.get(name);
+            if (null == cache) {
+                if (!options.get(OutputOption.CACHE))
+                    return super.getBoundSocket(); // dont cache
             } else {
                 if (options.get(OutputOption.APPEND)) {
                     // This combination of features would be expected to work
-                    // with a WRITE_THROUGH buffer strategy.
+                    // with a WRITE_THROUGH cache strategy.
                     // However, we are using WRITE_BACK for performance reasons
-                    // and we can't change the strategy because the buffer might
+                    // and we can't change the strategy because the cache might
                     // be busy on input!
                     // So if this is really required, change the caching
                     // strategy to WRITE_THROUGH and bear the performance
                     // impact.
                     assert false; // FIXME: Check and fix this!
-                    buffer.flush();
+                    cache.flush();
                 }
             }
             // Create marker entry and mind CREATE_PARENTS!
             delegate.mknod(name, FILE, options, template);
             getModel().setTouched(true);
-            return (null != buffer ? buffer : new Buffer(name))
+            return (null != cache ? cache : new Cache(name))
                     .configure(options, template).getOutputSocket().bind(this);
         }
     } // class Output
@@ -181,9 +187,9 @@ extends DecoratingFileSystemController<M, C> {
         assert getModel().writeLock().isHeldByCurrentThread();
 
         delegate.unlink(name);
-        final Buffer buffer = buffers.remove(name);
-        if (null != buffer)
-            buffer.clear();
+        final Cache cache = caches.remove(name);
+        if (null != cache)
+            cache.clear();
     }
 
     @Override
@@ -193,28 +199,28 @@ extends DecoratingFileSystemController<M, C> {
     throws X, FileSystemException {
         assert getModel().writeLock().isHeldByCurrentThread();
 
-        if (0 < buffers.size()) {
+        if (0 < caches.size()) {
             final boolean flush = !options.get(ABORT_CHANGES);
-            final boolean clear = !flush || options.get(CLEAR_BUFFERS);
-            for (final Buffer buffer : buffers.values()) {
+            final boolean clear = !flush || options.get(CLEAR_CACHE);
+            for (final Cache cache : caches.values()) {
                 try {
                     if (flush)
-                        buffer.flush();
+                        cache.flush();
                 } catch (IOException ex) {
                     throw builder.fail(new SyncException(getModel(), ex));
                 } finally  {
                     try {
                         if (clear)
-                            buffer.clear();
+                            cache.clear();
                     } catch (IOException ex) {
                         builder.warn(new SyncWarningException(getModel(), ex));
                     }
                 }
             }
             if (clear)
-                buffers.clear();
+                caches.clear();
         }
-        delegate.sync(options.clear(CLEAR_BUFFERS), builder);
+        delegate.sync(options.clear(CLEAR_CACHE), builder);
     }
 
     private static final BitField<InputOption> NO_INPUT_OPTIONS
@@ -223,53 +229,53 @@ extends DecoratingFileSystemController<M, C> {
     private static final BitField<OutputOption> NO_OUTPUT_OPTIONS
             = BitField.noneOf(OutputOption.class);
 
-    private final class Buffer {
+    private final class Cache {
         final FileSystemEntryName name;
-        final IOBuffer<Entry> buffer;
+        final de.schlichtherle.truezip.io.socket.Cache<Entry> cache;
         volatile InputSocket<Entry> input;
         volatile OutputSocket<Entry> output;
 
-        Buffer(@NonNull final FileSystemEntryName name) {
+        Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
             // TODO: Using WRITE_THROUGH leaves temporary files with some unit
             // tests - why?
-            this.buffer = WRITE_BACK.newIOBuffer(Entry.class, pool);
+            this.cache = WRITE_BACK.newCache(Entry.class, pool);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
         }
 
         @NonNull
-        public Buffer configure(@NonNull BitField<InputOption> options) {
-            buffer.configure(new RegisteringInputSocket(delegate.getInputSocket(
-                    name, options.clear(InputOption.BUFFER))));
+        public Cache configure(@NonNull BitField<InputOption> options) {
+            cache.configure(new RegisteringInputSocket(delegate.getInputSocket(
+                    name, options.clear(InputOption.CACHE))));
             input = null;
             return this;
         }
 
         @NonNull
-        public Buffer configure(@NonNull BitField<OutputOption> options,
+        public Cache configure(@NonNull BitField<OutputOption> options,
                                 @Nullable Entry template) {
-            buffer.configure(delegate.getOutputSocket(
-                    name, options.clear(OutputOption.BUFFER), template));
+            cache.configure(delegate.getOutputSocket(
+                    name, options.clear(OutputOption.CACHE), template));
             output = null;
             return this;
         }
 
         public InputSocket<Entry> getInputSocket() {
-            return null != input ? input : (input = buffer.getInputSocket());
+            return null != input ? input : (input = cache.getInputSocket());
         }
 
         public OutputSocket<Entry> getOutputSocket() {
             return null != output ? output : (output
-                    = new RegisteringOutputSocket(buffer.getOutputSocket()));
+                    = new RegisteringOutputSocket(cache.getOutputSocket()));
         }
 
         public void flush() throws IOException {
-            buffer.flush();
+            cache.flush();
         }
 
         public void clear() throws IOException {
-            buffer.clear();
+            cache.clear();
         }
 
         private final class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
@@ -302,7 +308,7 @@ extends DecoratingFileSystemController<M, C> {
                 }
 
                 final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-                buffers.put(name, Buffer.this);
+                caches.put(name, Cache.this);
                 return rof;
             }
 
@@ -317,7 +323,7 @@ extends DecoratingFileSystemController<M, C> {
                 }
 
                 final InputStream in = getBoundSocket().newInputStream();
-                buffers.put(name, Buffer.this);
+                caches.put(name, Cache.this);
                 return in;
             }
         } // class RegisteringInputSocket
@@ -348,11 +354,11 @@ extends DecoratingFileSystemController<M, C> {
                 // Create marker entry and mind CREATE_PARENTS!
                 //controller.mknod(name, FILE, outputOptions, null);
                 //getModel().setTouched(true);
-                buffers.put(name, Buffer.this);
+                caches.put(name, Cache.this);
                 return out;
             }
         } // class RegisteringOutputSocket
-    } // class EntryCache
+    } // class Cache
 
     /*private static final class ProxyEntry extends DecoratingEntry<Entry> {
         ProxyEntry(@NonNull Entry entry) {

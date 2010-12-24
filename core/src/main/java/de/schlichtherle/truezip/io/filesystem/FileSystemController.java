@@ -191,9 +191,9 @@ public abstract class FileSystemController<M extends FileSystemModel> {
             = BitField.of(FORCE_CLOSE_INPUT, FORCE_CLOSE_OUTPUT);
 
     /**
-     * Equivalent to {@code UPDATE.set(SyncOption.CLEAR_BUFFERS)}.
+     * Equivalent to {@code UPDATE.set(SyncOption.CLEAR_CACHE)}.
      */
-    public static final BitField<SyncOption> UMOUNT = UPDATE.set(CLEAR_BUFFERS);
+    public static final BitField<SyncOption> UMOUNT = UPDATE.set(CLEAR_CACHE);
 
     /**
      * Two file system controllers are considered equal if and only if they

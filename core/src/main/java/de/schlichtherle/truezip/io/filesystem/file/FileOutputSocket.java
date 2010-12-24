@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import static de.schlichtherle.truezip.io.filesystem.OutputOption.APPEND;
-import static de.schlichtherle.truezip.io.filesystem.OutputOption.BUFFER;
+import static de.schlichtherle.truezip.io.filesystem.OutputOption.CACHE;
 import static de.schlichtherle.truezip.io.filesystem.OutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.io.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.io.entry.Entry.UNKNOWN;
@@ -78,7 +78,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final File fileTarget = file.getFile();
         if (options.get(CREATE_PARENTS))
             fileTarget.getParentFile().mkdirs();
-        final FileEntry temp = options.get(BUFFER) && !fileTarget.createNewFile()
+        final FileEntry temp = options.get(CACHE) && !fileTarget.createNewFile()
                 ? getTempFilePool().allocate()
                 : file;
         final File tempTarget = temp.getFile();
