@@ -276,10 +276,11 @@ extends DecoratingFileSystemController<M, C> {
             cache.clear();
         }
 
-        private final class RegisteringInputSocket extends DecoratingInputSocket<Entry> {
+        private final class RegisteringInputSocket
+        extends DecoratingInputSocket<Entry> {
             //private volatile Entry entry;
 
-            RegisteringInputSocket(final InputSocket <?> input) {
+            private RegisteringInputSocket(final InputSocket <?> input) {
                 super(input);
             }
 
@@ -326,10 +327,11 @@ extends DecoratingFileSystemController<M, C> {
             }
         } // class RegisteringInputSocket
 
-        private final class RegisteringOutputSocket extends DecoratingOutputSocket<Entry> {
+        private final class RegisteringOutputSocket
+        extends DecoratingOutputSocket<Entry> {
             //private volatile Entry entry;
 
-            RegisteringOutputSocket(OutputSocket <?> output) {
+            private RegisteringOutputSocket(OutputSocket <?> output) {
                 super(output);
             }
 
