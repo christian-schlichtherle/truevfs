@@ -19,6 +19,7 @@ import static de.schlichtherle.truezip.io.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.io.socket.Cache.Strategy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static de.schlichtherle.truezip.io.socket.Cache.Scope.*;
 
 public class CacheTest {
 
@@ -40,11 +41,11 @@ public class CacheTest {
             WRITE_BACK,
         }) {
             final Cache<MockIOEntry> cache = strategy
-                    .newCache(MockIOEntry.class, pool);
+                    .newCache(MockIOEntry.class, ANY, pool);
             MockIOEntry front, back;
 
             back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
-            cache  .configure(back.getBrokenInputSocket())
+            cache   .configure(back.getBrokenInputSocket())
                     .configure(back.getBrokenOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -66,7 +67,7 @@ public class CacheTest {
             assertThat(back.reads, is(0));
             assertThat(back.writes, is(0));
 
-            cache  .configure(back.getInputSocket())
+            cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -87,7 +88,7 @@ public class CacheTest {
             assertThat(back.writes, is(0));
 
             front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
-            cache  .configure(back.getBrokenInputSocket())
+            cache   .configure(back.getBrokenInputSocket())
                     .configure(back.getBrokenOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -112,7 +113,7 @@ public class CacheTest {
             assertThat(back.reads, is(1));
             assertThat(back.writes, is(0));
 
-            cache  .configure(back.getInputSocket())
+            cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -134,7 +135,7 @@ public class CacheTest {
             assertThat(back.writes, is(1));
 
             back = new MockIOEntry(MOCK_ENTRY_DATA_READ);
-            cache  .configure(back.getBrokenInputSocket())
+            cache   .configure(back.getBrokenInputSocket())
                     .configure(back.getBrokenOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -171,7 +172,7 @@ public class CacheTest {
             assertThat(back.reads, is(0));
             assertThat(back.writes, is(0));
 
-            cache  .configure(back.getInputSocket())
+            cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -189,7 +190,7 @@ public class CacheTest {
             assertThat(back.writes, is(0));
 
             front = new MockIOEntry(MOCK_ENTRY_DATA_WRITE);
-            cache  .configure(back.getBrokenInputSocket())
+            cache   .configure(back.getBrokenInputSocket())
                     .configure(back.getBrokenOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -214,7 +215,7 @@ public class CacheTest {
             assertThat(back.reads, is(1));
             assertThat(back.writes, is(0));
 
-            cache  .configure(back.getInputSocket())
+            cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
             assertThat(cache.getOutputSocket().getLocalTarget(), sameInstance(back));
@@ -235,7 +236,7 @@ public class CacheTest {
             assertThat(back.reads, is(1));
             assertThat(back.writes, is(1));
 
-            cache  .configure(back.getBrokenInputSocket())
+            cache   .configure(back.getBrokenInputSocket())
                     .configure(back.getBrokenOutputSocket())
                     .clear();
             assertThat(cache.getInputSocket().getLocalTarget(), sameInstance(back));
