@@ -26,6 +26,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -106,8 +108,8 @@ public final class Cache<E extends Entry> {
          * @return A new cache.
          */
         @NonNull public <E extends Entry> Cache<E>
-        newCache(@Nullable Class<E> clazz, @NonNull IOPool<?> pool) {
-            return new Cache<E>(this, pool);
+        newCache(@Nullable Class<E> clazz, @NonNull Scope mode, @NonNull IOPool<?> pool) {
+            return new Cache<E>(this, mode, pool);
         }
 
         @NonNull <E extends Entry> Cache<E>.InputPool
@@ -119,10 +121,52 @@ public final class Cache<E extends Entry> {
         newOutputPool(Cache<E> cache);
     } // enum Strategy
 
+    public enum Scope {
+        DISCONNECTED {
+            @Override <E extends Entry> boolean
+            cache(InputSocket<E> input) throws IOException {
+                // The data for connected sockets cannot not get cached because
+                // sockets may transfer different encoded data depending on
+                // the identity of their peer target!
+                // E.g. if the ZipDriver recognizes a ZipEntry as its peer
+                // target, it transfers deflated data in order to omit
+                // redundant inflating of the data from the source archive file
+                // and deflating it again to the target archive file.
+                // So we must flush and bypass the cache.
+                return null == input.getPeerTarget();
+            }
+
+            @Override <E extends Entry> boolean
+            cache(OutputSocket<E> output) throws IOException {
+                // dito
+                return null == output.getPeerTarget();
+            }
+        },
+
+        ANY {
+            @Override <E extends Entry> boolean
+            cache(InputSocket<E> input) throws IOException {
+                return true;
+            }
+
+            @Override <E extends Entry> boolean
+            cache(OutputSocket<E> output) throws IOException {
+                return true;
+            }
+        };
+
+        @NonNull abstract <E extends Entry> boolean
+        cache(InputSocket<E> input) throws IOException;
+
+        @NonNull abstract <E extends Entry> boolean
+        cache(OutputSocket<E> input) throws IOException;
+    }
+
     private static class Lock { }
 
     private final Lock lock = new Lock();
     private final Strategy strategy;
+    private final Scope mode;
     private final IOPool<?> pool;
     private volatile InputSocket<? extends E> input;
     private volatile OutputSocket<? extends E> output;
@@ -142,11 +186,13 @@ public final class Cache<E extends Entry> {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private Cache(   @NonNull final Strategy strategy,
-                        @NonNull final IOPool<?> pool) {
-        if (null == strategy || null == pool)
+    private Cache(  @NonNull final Strategy strategy,
+                    @NonNull final Scope mode,
+                    @NonNull final IOPool<?> pool) {
+        if (null == strategy || null == mode || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
+        this.mode = mode;
         this.pool = pool;
     }
 
@@ -471,14 +517,22 @@ public final class Cache<E extends Entry> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
+            if (!mode.cache(getBoundSocket())) {
+                flush();
+                return getBoundSocket().newReadOnlyFile();
+            }
             return getInputPool().newReadOnlyFile(this);
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
+            if (!mode.cache(getBoundSocket())) {
+                flush();
+                return getBoundSocket().newInputStream();
+            }
             return getInputPool().newInputStream(this);
         }
-    } // class BufferInputSocket
+    } // class SafeBufferInputSocket
 
     private final class BufferOutputSocket extends DecoratingOutputSocket<E> {
         BufferOutputSocket(OutputSocket<? extends E> output) {
@@ -487,7 +541,11 @@ public final class Cache<E extends Entry> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            if (!mode.cache(getBoundSocket())) {
+                clear();
+                return getBoundSocket().newOutputStream();
+            }
             return getOutputPool().newOutputStream(this);
         }
-    } // class BufferOutputSocket
+    } // class SafeBufferOutputSocket
 }

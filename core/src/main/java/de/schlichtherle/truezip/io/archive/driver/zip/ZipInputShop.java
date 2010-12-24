@@ -16,6 +16,7 @@
 
 package de.schlichtherle.truezip.io.archive.driver.zip;
 
+import de.schlichtherle.truezip.io.entry.Entry;
 import de.schlichtherle.truezip.io.socket.InputSocket;
 import de.schlichtherle.truezip.io.socket.InputShop;
 import de.schlichtherle.truezip.io.rof.ReadOnlyFile;
@@ -24,6 +25,8 @@ import de.schlichtherle.truezip.io.zip.ZipEntryFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static de.schlichtherle.truezip.io.zip.ZipEntry.*;
 
 /**
  * An implementation of {@link InputShop} to read ZIP archives.
@@ -67,10 +70,12 @@ implements InputShop<ZipEntry> {
 
             @Override
             public InputStream newInputStream() throws IOException {
+                final Entry entry = getPeerTarget();
                 return ZipInputShop.this.getInputStream(
                         getLocalTarget().getName(),
                         false,
-                        !(getPeerTarget() instanceof ZipEntry));
+                        !(entry instanceof ZipEntry)
+                            || ((ZipEntry) entry).getMethod() != DEFLATED);
             }
 
             @Override
