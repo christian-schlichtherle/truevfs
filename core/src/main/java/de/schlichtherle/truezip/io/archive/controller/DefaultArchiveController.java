@@ -77,7 +77,7 @@ public final class DefaultArchiveController<E extends ArchiveEntry>
 extends FileSystemArchiveController<E> {
 
     private static final BitField<InputOption> MOUNT_INPUT_OPTIONS
-            = BitField.of(InputOption.BUFFER);
+            = BitField.of(InputOption.CACHE);
 
     private static final BitField<OutputOption> MAKE_OUTPUT_OPTIONS
             = BitField.noneOf(OutputOption.class);
@@ -277,7 +277,7 @@ extends FileSystemArchiveController<E> {
         final FileSystemEntryName parentName = getModel()
                 .resolveParent(ROOT_ENTRY_NAME);
         final OutputSocket<?> socket = getParent().getOutputSocket(
-                parentName, options.set(OutputOption.BUFFER),
+                parentName, options.set(OutputOption.CACHE),
                 useRootTemplate ? rootTemplate : null);
         output = new Output(driver.newOutputShop(getModel(), socket,
                     null == input ? null : input.getDelegate()));

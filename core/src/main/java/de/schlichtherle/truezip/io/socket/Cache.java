@@ -29,32 +29,34 @@ import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Implements a buffering strategy for input and output sockets.
- * Using this interface has the following effects:
+ * Provides temporary caching services for input and output sockets with the
+ * following features:
  * <ul>
- * <li>Upon the first read operation, the data will be read from the
- *     underlying input socket and temporarily stored in the buffer.
- *     Subsequent or concurrent read operations will be served from the buffer
- *     without re-reading the data from the underlying input socket again
- *     until the buffer gets {@link #clear cleared}.
- * <li>At the discretion of the {@link Strategy}, data written to the
- *     buffer may not be written to the underlying output socket until the
- *     buffer gets {@link #flush flushed}.
- * <li>After a write operation, the data will be temporarily stored in the
- *     buffer for subsequent read operations until the buffer gets
+ * <li>Upon the first read operation, the entry data will be read from the
+ *     backing store and temporarily stored in the cache.
+ *     Subsequent or concurrent read operations will be served from the cache
+ *     without re-reading the entry data from the backing store again until
+ *     the cache gets {@link #clear cleared}.
+ * <li>At the discretion of the {@link Strategy}, entry data written to the
+ *     cache may not be written to the backing store until the cache gets
+ *     {@link #flush flushed}.
+ * <li>After a write operation, the entry data will be stored in the cache
+ *     for subsequent read operations until the cache gets
  *     {@link #clear cleared}.
- * <li>As a side effect, buffering decouples the underlying storage from its
- *     clients, allowing it to create, read, update or delete its data
- *     while some clients are still busy on reading or writing the buffered
- *     data.
+ * <li>As a side effect, caching decouples the underlying storage from its
+ *     clients, allowing it to create, read, update or delete the entry data
+ *     while some clients are still busy on reading or writing the cached
+ *     entry data.
+ * <li>When a cache gets picked up by the finalizer thread of the JVM, it gets
+ *     cleared (this class is not a persistence service).
  * </ul>
  *
- * @param   <E> The type of the buffered entries.
+ * @param   <E> The type of the cached entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public final class IOBuffer<E extends Entry> {
+public final class Cache<E extends Entry> {
 
     /** Provides different cache strategies. */
     public enum Strategy {
@@ -64,8 +66,8 @@ public final class IOBuffer<E extends Entry> {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> ioBuffer) {
+            @Override <E extends Entry> Cache<E>.OutputPool
+            newOutputPool(Cache<E> cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -75,9 +77,9 @@ public final class IOBuffer<E extends Entry> {
          * output stream created by the provided output socket gets closed.
          */
         WRITE_THROUGH {
-            @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> ioBuffer) {
-                return ioBuffer.new WriteThroughOutputPool();
+            @Override <E extends Entry> Cache<E>.OutputPool
+            newOutputPool(Cache<E> cache) {
+                return cache.new WriteThroughOutputPool();
             }
         },
 
@@ -86,37 +88,40 @@ public final class IOBuffer<E extends Entry> {
          * explicitly flushed.
          */
         WRITE_BACK {
-            @Override <E extends Entry> IOBuffer<E>.OutputPool
-            newOutputPool(IOBuffer<E> ioBuffer) {
-                return ioBuffer.new WriteBackOutputPool();
+            @Override <E extends Entry> Cache<E>.OutputPool
+            newOutputPool(Cache<E> cache) {
+                return cache.new WriteBackOutputPool();
             }
         };
 
         /**
-         * Returns a new I/O buffer.
+         * Returns a new cache.
          *
          * @param  clazz the class indicating the type of entries for which this
-         *         I/O buffer is going to be used.
+         *         cache is going to be used.
          *         This is only required to infer the type parameter of the
          *         returned object.
-         * @param  pool the pool of temporary entries to buffer the entry
+         * @param  pool the pool of temporary entries to cache the entry
          *         data.
-         * @return A new I/O buffer.
+         * @return A new cache.
          */
-        @NonNull public <E extends Entry> IOBuffer<E>
-        newIOBuffer(@Nullable Class<E> clazz, @NonNull IOPool<?> pool) {
-            return new IOBuffer<E>(this, pool);
+        @NonNull public <E extends Entry> Cache<E>
+        newCache(@Nullable Class<E> clazz, @NonNull IOPool<?> pool) {
+            return new Cache<E>(this, pool);
         }
 
-        @NonNull <E extends Entry> IOBuffer<E>.InputPool
-        newInputPool(IOBuffer<E> ioBuffer) {
-            return ioBuffer.new InputPool();
+        @NonNull <E extends Entry> Cache<E>.InputPool
+        newInputPool(Cache<E> cache) {
+            return cache.new InputPool();
         }
 
-        @NonNull abstract <E extends Entry> IOBuffer<E>.OutputPool
-        newOutputPool(IOBuffer<E> ioBuffer);
-    }
+        @NonNull abstract <E extends Entry> Cache<E>.OutputPool
+        newOutputPool(Cache<E> cache);
+    } // enum Strategy
 
+    private static class Lock { }
+
+    private final Lock lock = new Lock();
     private final Strategy strategy;
     private final IOPool<?> pool;
     private volatile InputSocket<? extends E> input;
@@ -126,7 +131,7 @@ public final class IOBuffer<E extends Entry> {
     private volatile Buffer buffer;
 
     /**
-     * Constructs a new I/O buffer which applies the given buffering strategy
+     * Constructs a new cache which applies the given caching strategy
      * and uses the given pool to allocate and release temporary I/O entries.
      * <p>
      * Note that you need to call {@link #configure(InputSocket)} before
@@ -134,10 +139,10 @@ public final class IOBuffer<E extends Entry> {
      * Likewise, you need to call {@link #configure(OutputSocket)} before
      * you can do any output.
      *
-     * @param strategy the buffering strategy.
+     * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private IOBuffer(   @NonNull final Strategy strategy,
+    private Cache(   @NonNull final Strategy strategy,
                         @NonNull final IOPool<?> pool) {
         if (null == strategy || null == pool)
             throw new NullPointerException();
@@ -152,14 +157,14 @@ public final class IOBuffer<E extends Entry> {
      * otherwise a {@link NullPointerException} will be thrown on the first
      * read attempt.
      * Note that calling this method does <em>not</em> {@link #clear() clear}
-     * this buffer.
+     * this cache.
      *
      * @param input an input socket for reading the entry data from the
      *        backing store.
      * @return this
      */
     @NonNull
-    public IOBuffer<E> configure(@NonNull final InputSocket <? extends E> input) {
+    public Cache<E> configure(@NonNull final InputSocket <? extends E> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -173,14 +178,14 @@ public final class IOBuffer<E extends Entry> {
      * otherwise a {@link NullPointerException} will be thrown on the first
      * write attempt.
      * Note that calling this method does <em>not</em> {@link #flush() flush}
-     * this buffer.
+     * this cache.
      *
      * @param output an output socket for writing the entry data to the
      *        backing store.
      * @return this
      */
     @NonNull
-    public IOBuffer<E> configure(@NonNull final OutputSocket <? extends E> output) {
+    public Cache<E> configure(@NonNull final OutputSocket <? extends E> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -188,18 +193,18 @@ public final class IOBuffer<E extends Entry> {
     }
 
     /**
-     * Writes the buffered entry data to the backing store unless already done.
-     * Whether or not this method needs to be called depends on the buffering
+     * Writes the cached entry data to the backing store unless already done.
+     * Whether or not this method needs to be called depends on the caching
      * strategy.
-     * E.g. the buffering strategy {@link Strategy#WRITE_THROUGH} writes any
+     * E.g. the caching strategy {@link Strategy#WRITE_THROUGH} writes any
      * changed entry data immediately, so calling this method has no effect.
      *
      * @return this
      */
-    public IOBuffer<E> flush() throws IOException {
+    public Cache<E> flush() throws IOException {
         if (null == getBuffer()) // DCL is OK in this context!
             return this;
-        synchronized (IOBuffer.this) {
+        synchronized (lock) {
             final Buffer buffer = getBuffer();
             if (null != buffer)
                 getOutputPool().release(buffer);
@@ -212,17 +217,17 @@ public final class IOBuffer<E extends Entry> {
      *
      * @return this
      */
-    public IOBuffer<E> clear() throws IOException {
-        synchronized (IOBuffer.this) {
+    public Cache<E> clear() throws IOException {
+        synchronized (lock) {
             setBuffer(null);
         }
         return this;
     }
 
     /**
-     * Returns an input socket for reading the buffered entry data.
+     * Returns an input socket for reading the cached entry data.
      *
-     * @return An input socket for reading the buffered entry data.
+     * @return An input socket for reading the cached entry data.
      */
     @NonNull
     public InputSocket<E> getInputSocket() {
@@ -230,9 +235,9 @@ public final class IOBuffer<E extends Entry> {
     }
 
     /**
-     * Returns an output socket for writing the buffered entry data.
+     * Returns an output socket for writing the cached entry data.
      *
-     * @return An output socket for writing the buffered entry data.
+     * @return An output socket for writing the cached entry data.
      */
     @NonNull
     public OutputSocket<E> getOutputSocket() {
@@ -280,7 +285,7 @@ public final class IOBuffer<E extends Entry> {
 
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (IOBuffer.this) {
+            synchronized (lock) {
                 Buffer buffer = getBuffer();
                 if (null == buffer) {
                     buffer = new Buffer();
@@ -299,7 +304,7 @@ public final class IOBuffer<E extends Entry> {
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            synchronized (IOBuffer.this) {
+            synchronized (lock) {
                 if (--buffer.readers == 0 && buffer.writers == 0 && buffer != getBuffer())
                     buffer.release();
             }
@@ -339,7 +344,7 @@ public final class IOBuffer<E extends Entry> {
         public void release(Buffer buffer) throws IOException {
             if (buffer.writers == 0) // DCL is OK in this context!
                 return;
-            synchronized (IOBuffer.this) {
+            synchronized (lock) {
                 if (buffer.writers == 0)
                     return;
                 super.release(buffer);
@@ -352,7 +357,7 @@ public final class IOBuffer<E extends Entry> {
         public void release(final Buffer buffer) throws IOException {
             if (buffer.writers == 0) // DCL is OK in this context!
                 return;
-            synchronized (IOBuffer.this) {
+            synchronized (lock) {
                 if (buffer.writers == 0)
                     return;
                 if (getBuffer() != buffer) {

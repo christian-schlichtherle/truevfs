@@ -33,11 +33,12 @@ import java.io.IOException;
 public enum InputOption {
 
     /**
-     * Whether or not the input socket contents shall get buffered in a
-     * temporary file for subsequent access.
-     * As a desired side effect, buffering allows a file system controller to
-     * {@link FileSystemController#sync} its contents to its underlying storage
-     * while some client is still busy on reading or writing the buffer.
+     * Whether or not the entry data written by an output socket shall get
+     * temporarily cached for subsequent access.
+     * As a desired side effect, caching allows a file system controller to
+     * {@link FileSystemController#sync} the entry data to the backing storage
+     * (e.g. a parent file system) while some client is still busy on reading
+     * or writing the cached entry data.
      */
-    BUFFER
+    CACHE
 }
