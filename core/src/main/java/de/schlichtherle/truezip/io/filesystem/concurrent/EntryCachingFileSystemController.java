@@ -237,8 +237,6 @@ extends DecoratingFileSystemController<M, C> {
 
         Cache(@NonNull final FileSystemEntryName name) {
             this.name = name;
-            // TODO: Using WRITE_THROUGH leaves temporary files with some unit
-            // tests - why?
             this.cache = WRITE_BACK.newCache(Entry.class, pool);
             configure(NO_INPUT_OPTIONS);
             configure(NO_OUTPUT_OPTIONS, null);
@@ -253,7 +251,7 @@ extends DecoratingFileSystemController<M, C> {
         }
 
         @NonNull
-        public Cache configure(@NonNull BitField<OutputOption> options,
+        public Cache configure( @NonNull BitField<OutputOption> options,
                                 @Nullable Entry template) {
             cache.configure(delegate.getOutputSocket(
                     name, options.clear(OutputOption.CACHE), template));
